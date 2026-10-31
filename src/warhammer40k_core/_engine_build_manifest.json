@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9305c4ac4f1bf6a56785538635007afa3ef54c6e294e215bf9f6a2fc4905bcdd",
-  "fingerprint": "9305c4ac4f1bf6a56785538635007afa3ef54c6e294e215bf9f6a2fc4905bcdd",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0cafa6aa78d589fc98ad9b1c1f0f2aa3ceb3bf0a11102819c6d0b12605ca6981",
+  "fingerprint": "0cafa6aa78d589fc98ad9b1c1f0f2aa3ceb3bf0a11102819c6d0b12605ca6981",
   "resource_count": 3167,
   "resources": [
     {
@@ -14935,9 +14935,9 @@
       "sha256": "3ae3e51f2d4ebe20d55677fc03b83707657081081ae863d60fb894eecfdc3310"
     },
     {
-      "byte_length": 60645,
+      "byte_length": 60637,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_coverage_2026_27.py",
-      "sha256": "ec8e780f90b675827a9df390133d9f1567e4af4695959facb4072a9a2b8fd430"
+      "sha256": "d42cdd750bbca5485e87251d44be4ee77e8138d15d8fd1cae468264dd269974e"
     },
     {
       "byte_length": 35136,

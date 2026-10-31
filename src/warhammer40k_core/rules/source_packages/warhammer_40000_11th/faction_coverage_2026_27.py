@@ -98,7 +98,7 @@ AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind",
 )
 ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMER_IDS = (
-    "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start",
+    "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:turn-start",
     "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed",
     "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:relics_of_the_matriarchs:battle-round-start",
     "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:relics_of_the_matriarchs:bloody-rose:weapon-profile",

@@ -30793,7 +30793,9 @@
       ],
       "owners": [
         "test_acts_additions_preserve_every_original_assertion",
-        "test_acts_comparison_registration_preserves_exact_historical_helper"
+        "test_acts_comparison_registration_preserves_exact_historical_helper",
+        "test_acts_inactive_api_maintenance_preserves_original_evidence",
+        "test_acts_live_consumer_rename_preserves_exact_original_bytes"
       ],
       "families": [],
       "sensitive": false,
@@ -30847,6 +30849,8 @@
       ],
       "owners": [
         "@module",
+        "acts_consumer_predecessor",
+        "acts_inactive_predecessor",
         "acts_predecessor",
         "acts_provenance_predecessor"
       ],
@@ -30860,6 +30864,33 @@
       ],
       "owners": [
         "_adepta_sororitas_runtime_consumer_ids"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-exact-inactive-api-admission": {
+      "paths": [
+        "scripts/build_test_shards.py"
+      ],
+      "owners": [
+        "validate_acts_inactive_source"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-quarantined-api-maintenance": {
+      "paths": [
+        "tests/unit/test_phase17g_adepta_sororitas_army_rule.py"
+      ],
+      "owners": [
+        "@module",
+        "test_acts_of_faith_handlers_fail_fast_on_malformed_inputs",
+        "test_acts_of_faith_runtime_contribution_exposes_hooks",
+        "test_battle_round_start_gains_miracle_die_once_for_adepta_army",
+        "test_miracle_die_pool_spend_and_game_state_payload_round_trip",
+        "test_triumph_relics_ebon_chalice_raises_acts_limit_and_icon_syncs_fnp"
       ],
       "families": [],
       "sensitive": false,

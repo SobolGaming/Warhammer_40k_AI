@@ -53,3 +53,13 @@ docs/performance/policy-v3/ec-provenance-20261031/phase14a-predecessor.py.txt te
 
 # Preserve the exact historical runtime-hook test byte archive.
 docs/performance/policy-v3/acts-provenance-20261031/runtime-hook-predecessor.py.txt -text whitespace=cr-at-eol
+
+# Preserve the exact one-token runtime-consumer successor proof.
+tests/shared/category_migration/reporting__test_runtime_consumer_evidence.py -text whitespace=cr-at-eol
+docs/performance/policy-v3/acts-provenance-20261031/runtime-consumer-predecessor.py.txt -text whitespace=cr-at-eol
+
+# Exact inactive API maintenance and retained proof bytes.
+tests/unit/test_phase17g_adepta_sororitas_army_rule.py text eol=lf
+docs/performance/policy-v3/acts-provenance-20261031/inactive-acts-predecessor.py.txt -text
+docs/performance/policy-v3/acts-provenance-20261031/inactive-acts-api-recipe.json text eol=lf
+docs/performance/policy-v3/acts-provenance-20261031/source-scope-predecessor.py.txt -text

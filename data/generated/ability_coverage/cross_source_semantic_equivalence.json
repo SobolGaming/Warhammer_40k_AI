@@ -64491,7 +64491,7 @@
       "rule_name": "Acts of Faith",
       "rules_surface": "faction_rule",
       "runtime_consumer_ids": [
-        "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start",
+        "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:turn-start",
         "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed",
         "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:relics_of_the_matriarchs:battle-round-start",
         "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:relics_of_the_matriarchs:bloody-rose:weapon-profile",
@@ -121990,8 +121990,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "5b979838f3c74b1bd364bc08f0214c29a0a234cfa0f4a3740abc7ebbca722057",
+  "source_payload_checksum_sha256": "d5d8fdfea234cb99d00bbd1a25d156c5cfef269dde859161078d88bd5bae2263",
   "source_text_unavailable_member_count": 111,
   "structured_member_count": 807,
-  "upstream_execution_checksum_sha256": "91d65afd0aa5502132997df65fad3e501cd3284d984d8557cc735cd6330958de"
+  "upstream_execution_checksum_sha256": "6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c"
 }

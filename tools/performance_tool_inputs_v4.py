@@ -175,8 +175,8 @@ _SCOPES = (
     ReviewedScope(
         ACTS_BASE,
         ACTS_SPEC_PATH,
-        "5cc010849ae3bbe74bb11554f72d368fb9e90e1412daf6d07ddf302f8280f3ae",
-        "70d0006277d8fa33d1cdc51758956333226a7c5b7fd415b62b4c7b66b5acbc50",
+        "2959505fa176f0f3832e984f57a95bba960e35830b74d20427751f4e8c60dd92",
+        "4f859235e0cd0162d164b24b38835c32db885ce875d1b38f92c6b966ce8192e6",
         ACTS_REPORT_PATH,
         frozenset(
             [
@@ -189,6 +189,7 @@ _SCOPES = (
                 "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/destruction_sequencing.py",
                 "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/round_sequencing.py",
                 "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/turn_sequencing.py",
+                "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_coverage_2026_27.py",
                 "tools/generate_ability_support_matrix.py",
             ]
         ),
@@ -202,6 +203,7 @@ _SCOPES = (
                 "contracts/examples/support-profile-player-b-redacted.json",
                 "contracts/examples/support-profile.json",
                 "contracts/manifest.json",
+                "data/generated/ability_coverage/cross_source_semantic_equivalence.json",
                 "data/generated/ability_coverage/ability_coverage_rows.json",
                 "data/generated/ability_coverage/ability_support_category_rows.json",
                 "src/warhammer40k_core/_engine_build_manifest.json",
@@ -223,6 +225,12 @@ _SCOPES = (
                 "tests/code_quality/test_category_migration_preservation.py",
                 "tests/code_quality/test_registered_source_scopes.py",
                 "tests/infrastructure/runtime_hooks/unit/test_runtime_hook_bindings.py",
+                "docs/performance/policy-v3/acts-provenance-20261031/runtime-consumer-predecessor.py.txt",
+                "tests/shared/category_migration/reporting__test_runtime_consumer_evidence.py",
+                "docs/performance/policy-v3/acts-provenance-20261031/inactive-acts-api-recipe.json",
+                "docs/performance/policy-v3/acts-provenance-20261031/inactive-acts-predecessor.py.txt",
+                "scripts/build_test_shards.py",
+                "tests/unit/test_phase17g_adepta_sororitas_army_rule.py",
                 "tests/support/acts_of_faith.py",
                 "tests/support/acts_preservation.py",
                 "tools/performance_tool_inputs_v4.py",

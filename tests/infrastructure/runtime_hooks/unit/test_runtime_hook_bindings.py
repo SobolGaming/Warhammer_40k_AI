@@ -179,6 +179,31 @@ def test_acts_of_faith_uses_turn_start_and_preserves_triumph_round_hook() -> Non
     ]
     assert len(contribution.unit_destroyed_hook_bindings) == 1
 
+    from tests.support.acts_of_faith import session as acts_session
+    from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle
+    from warhammer40k_core.engine.faction_content.runtime_evidence import (
+        RuntimeEvidenceProvider,
+        active_runtime_evidence_inventory,
+    )
+
+    bundle = build_runtime_content_bundle(acts_session().lifecycle.config)
+    records = tuple(
+        row
+        for row in bundle.faction_rule_execution_registry.all_records()
+        if row.rule_name == "Acts of Faith"
+    )
+    assert len(records) == 1
+    assert records[0].handler_id == army_rule.TURN_START_HOOK_ID
+    inventory = active_runtime_evidence_inventory(bundle)
+    assert any(
+        row.provider is RuntimeEvidenceProvider.EVENT_HANDLER
+        for row in inventory.records_for_evidence_id(army_rule.TURN_START_HOOK_ID)
+    )
+    assert any(
+        row.provider is RuntimeEvidenceProvider.FACTION_EXECUTION_RECORD
+        for row in inventory.records_for_evidence_id(records[0].execution_id)
+    )
+
 
 @pytest.mark.parametrize("both_armies", [False, True])
 def test_acts_of_faith_turn_transition_duplicate_restore_and_replay(both_armies: bool) -> None:

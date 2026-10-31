@@ -46,8 +46,10 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
+from warhammer40k_core.engine.faction_content.events import RuntimeContentEventContext
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
     army_rule,
+    turn_sequencing,
 )
 from warhammer40k_core.engine.game_state import GameState, GameStatePayload
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
@@ -91,7 +93,7 @@ def test_battle_round_start_gains_miracle_die_once_for_adepta_army() -> None:
     )
     payload = _last_event_payload(decisions, army_rule.MIRACLE_DIE_GAINED_EVENT)
     assert payload["player_id"] == "player-a"
-    assert payload["trigger"] == army_rule.BATTLE_ROUND_START_TRIGGER
+    assert payload["trigger"] == army_rule.TURN_START_TRIGGER
     assert _dice_roll_count(decisions) == 1
 
     second_request = registry.next_request_for(
@@ -250,7 +252,7 @@ def test_miracle_die_pool_spend_and_game_state_payload_round_trip() -> None:
         state,
         decisions,
         player_id="player-a",
-        trigger=army_rule.BATTLE_ROUND_START_TRIGGER,
+        trigger=army_rule.TURN_START_TRIGGER,
         source_id="phase17g-adepta-test:manual-gain",
         source_context={"test": "manual"},
     )
@@ -430,7 +432,7 @@ def test_triumph_relics_ebon_chalice_raises_acts_limit_and_icon_syncs_fnp() -> N
             state,
             decisions,
             player_id="player-a",
-            trigger=army_rule.BATTLE_ROUND_START_TRIGGER,
+            trigger=army_rule.TURN_START_TRIGGER,
             source_id=f"phase17g-adepta-test:triumph-extra-gain-{index}",
             source_context={"test": "triumph"},
         )
@@ -1081,8 +1083,10 @@ def test_acts_of_faith_runtime_contribution_exposes_hooks() -> None:
     )
     assert contribution.contribution_id == army_rule.CONTRIBUTION_ID
     assert not contribution.contribution_id.endswith(":scaffold")
+    assert tuple(binding.handler_id for binding in contribution.event_handler_bindings) == (
+        army_rule.TURN_START_HOOK_ID,
+    )
     assert tuple(binding.hook_id for binding in contribution.battle_round_start_hook_bindings) == (
-        army_rule.BATTLE_ROUND_START_HOOK_ID,
         army_rule.TRIUMPH_RELICS_BATTLE_ROUND_START_HOOK_ID,
     )
     assert tuple(binding.hook_id for binding in contribution.unit_destroyed_hook_bindings) == (
@@ -1108,9 +1112,7 @@ def test_acts_of_faith_handlers_fail_fast_on_malformed_inputs() -> None:
     decisions = DecisionController()
 
     invalid_cases: tuple[Callable[[], object], ...] = (
-        lambda: army_rule.resolve_battle_round_start(
-            cast(BattleRoundStartRequestContext, object())
-        ),
+        lambda: turn_sequencing.resolve_turn_start(cast(RuntimeContentEventContext, object())),
         lambda: army_rule.resolve_adepta_sororitas_unit_destroyed(
             cast(UnitDestroyedContext, object())
         ),
@@ -1118,7 +1120,7 @@ def test_acts_of_faith_handlers_fail_fast_on_malformed_inputs() -> None:
             cast(GameState, object()),
             decisions,
             player_id="player-a",
-            trigger=army_rule.BATTLE_ROUND_START_TRIGGER,
+            trigger=army_rule.TURN_START_TRIGGER,
             source_id="phase17g-adepta-test:invalid-state",
             source_context={},
         ),

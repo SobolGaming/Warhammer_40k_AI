@@ -1,36 +1,36 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "2490faab2c41915c54eb26aed04902165fbfc042",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9305c4ac4f1bf6a56785538635007afa3ef54c6e294e215bf9f6a2fc4905bcdd",
-  "operation_map_sha256": "d8e3981fe4f346671ff11550c41d308f288659e89e8dd5a30c3d423a6739ba34",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0cafa6aa78d589fc98ad9b1c1f0f2aa3ceb3bf0a11102819c6d0b12605ca6981",
+  "operation_map_sha256": "ca64bab1e3bc3815d68131023e258c7683c7f6bef550927d1b1c12220fc48378",
   "changes": {
     ".gitattributes": {
       "before_sha256": "d9f1240cb76e40f2058bb73dce4b792ae901de3aab6ea7e7e5f7c387a86d8232",
-      "after_sha256": "b8ea1e564301eaa3c1dfa4b359306e36a4a15554ae4e090766a3c75c497f5ae6",
+      "after_sha256": "f57f8e08e66f9080d1ad3f560cd1d5dfef6d43a44ef221a0ad81898149ca1394",
       "owners": {
         "@document": {
           "before": "d9f1240cb76e40f2058bb73dce4b792ae901de3aab6ea7e7e5f7c387a86d8232",
-          "after": "b8ea1e564301eaa3c1dfa4b359306e36a4a15554ae4e090766a3c75c497f5ae6"
+          "after": "f57f8e08e66f9080d1ad3f560cd1d5dfef6d43a44ef221a0ad81898149ca1394"
         }
       }
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": "851082d9a54e822bb9d7c3c16898a74ab24a418dc4f3fd09d8ff7261e4571da5",
-      "after_sha256": "e93f67c8dde61e93ef64cf4a7ff0169ac0187d5b57976180fba0a072b0f57251",
+      "after_sha256": "860aa5e3a0caaf35d6b589ad2c8d84c4f4c894a0b0189bb79d16259c34c53f36",
       "owners": {
         "@document": {
           "before": "851082d9a54e822bb9d7c3c16898a74ab24a418dc4f3fd09d8ff7261e4571da5",
-          "after": "e93f67c8dde61e93ef64cf4a7ff0169ac0187d5b57976180fba0a072b0f57251"
+          "after": "860aa5e3a0caaf35d6b589ad2c8d84c4f4c894a0b0189bb79d16259c34c53f36"
         }
       }
     },
     "ci/quality_shards/shard-1.txt": {
       "before_sha256": "851a6de8b36eb5083c6a1c4f9de6e675a4455345fa9eea08efe7f48c22c4c986",
-      "after_sha256": "668a517a46543d865a75228f7b1e2a8f98770f972df4b6933a3d41387c8e1aaa",
+      "after_sha256": "3ac301fdbcc5d8fe238c0e8dd6ec6b4b0df6cda00ac9fcdc4cbf1107694944bb",
       "owners": {
         "@document": {
           "before": "851a6de8b36eb5083c6a1c4f9de6e675a4455345fa9eea08efe7f48c22c4c986",
-          "after": "668a517a46543d865a75228f7b1e2a8f98770f972df4b6933a3d41387c8e1aaa"
+          "after": "3ac301fdbcc5d8fe238c0e8dd6ec6b4b0df6cda00ac9fcdc4cbf1107694944bb"
         }
       }
     },
@@ -46,81 +46,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "032393a06c1c06bec3dfa5d78e38eb629d09e57c0f7ae4cec2a509608d2e9c20",
-      "after_sha256": "5197d2519a2f705faeb7abacbc12a627745ee9228873674a62fb54456cbe2eed",
+      "after_sha256": "6d1bb57575304bfa3aea611a929211fadeeb1e15bb06d98e275d704fdf65cbb9",
       "owners": {
         "@document": {
           "before": "032393a06c1c06bec3dfa5d78e38eb629d09e57c0f7ae4cec2a509608d2e9c20",
-          "after": "5197d2519a2f705faeb7abacbc12a627745ee9228873674a62fb54456cbe2eed"
+          "after": "6d1bb57575304bfa3aea611a929211fadeeb1e15bb06d98e275d704fdf65cbb9"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "1193baac51251751f309ffa54b2e9956d07bad9606e39bae595cef6fa7227305",
-      "after_sha256": "16daf78dbf0c0aaa4ddebd4887be62fbc2cad467e1cb3c916a57285c38d7eac8",
+      "after_sha256": "c9ea5adc49ab3ba36eb31c5a390ca193c26990aac5a1e6d80ab308d232bb95d1",
       "owners": {
         "@document": {
           "before": "1193baac51251751f309ffa54b2e9956d07bad9606e39bae595cef6fa7227305",
-          "after": "16daf78dbf0c0aaa4ddebd4887be62fbc2cad467e1cb3c916a57285c38d7eac8"
+          "after": "c9ea5adc49ab3ba36eb31c5a390ca193c26990aac5a1e6d80ab308d232bb95d1"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "cb282c6e667f826e17cacdc33c217b33e75ce2834236f3acc52114ccdefd21ad",
-      "after_sha256": "03a13cf534d81ed626700e54160ff2e4018276c91a63e011b5b5956e50074762",
+      "after_sha256": "39f09d494a76a12dd4d0d3694192ef504ac3036abcff5328f15b93f6a46cbac2",
       "owners": {
         "@document": {
           "before": "cb282c6e667f826e17cacdc33c217b33e75ce2834236f3acc52114ccdefd21ad",
-          "after": "03a13cf534d81ed626700e54160ff2e4018276c91a63e011b5b5956e50074762"
+          "after": "39f09d494a76a12dd4d0d3694192ef504ac3036abcff5328f15b93f6a46cbac2"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "a25687e175c6a64f634332d948d0a27a67854c7a25564cf891fb899babdb503d",
-      "after_sha256": "d386534d02245b46a9054036cd69462003f8cc5ef8aa87c6275c041aa9e282ff",
+      "after_sha256": "73b478878561de60795877fad50321cdaee84405cc7f1cbd037e7ee72222c3d7",
       "owners": {
         "@document": {
           "before": "a25687e175c6a64f634332d948d0a27a67854c7a25564cf891fb899babdb503d",
-          "after": "d386534d02245b46a9054036cd69462003f8cc5ef8aa87c6275c041aa9e282ff"
+          "after": "73b478878561de60795877fad50321cdaee84405cc7f1cbd037e7ee72222c3d7"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "74f90c130c3825b4895e9868e984c0929c8db511e9c9169f91e7f31c97edd226",
-      "after_sha256": "f1aec3f813a884c494dba1c2a46ffcd17d5d0e1ed98ed6141771d259925f8619",
+      "after_sha256": "3db4893a370c7bdcd1a6df6ffe987ddbc506b72767e83f58bbd2d68ef583ae1d",
       "owners": {
         "@document": {
           "before": "74f90c130c3825b4895e9868e984c0929c8db511e9c9169f91e7f31c97edd226",
-          "after": "f1aec3f813a884c494dba1c2a46ffcd17d5d0e1ed98ed6141771d259925f8619"
+          "after": "3db4893a370c7bdcd1a6df6ffe987ddbc506b72767e83f58bbd2d68ef583ae1d"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "f30771cbd096a99f5d2d2dc3cc08b80bf38a57413d9abcf0b7ceaccfc22fec49",
-      "after_sha256": "2d0650b0dbc1a17d2de040e19325f48248b103264eac49c574aa619586273fb4",
+      "after_sha256": "e130c301456657b4b7a8e9149b26b13c83751369d22d85f3aa44c0c01eebadd7",
       "owners": {
         "@document": {
           "before": "f30771cbd096a99f5d2d2dc3cc08b80bf38a57413d9abcf0b7ceaccfc22fec49",
-          "after": "2d0650b0dbc1a17d2de040e19325f48248b103264eac49c574aa619586273fb4"
+          "after": "e130c301456657b4b7a8e9149b26b13c83751369d22d85f3aa44c0c01eebadd7"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "9ee3fef9822fcb6b1012c561afe2872ad84afc59d9aa544660d5cf565e658f0f",
-      "after_sha256": "a27a13d74ad21f31f85cc70f628a0e0780bf54dad23651f3274ef5ff5d277c87",
+      "after_sha256": "10a722027532bb55e95623ba74ee09b6457f1b61e31f9d0bdd611af72459acf5",
       "owners": {
         "@document": {
           "before": "9ee3fef9822fcb6b1012c561afe2872ad84afc59d9aa544660d5cf565e658f0f",
-          "after": "a27a13d74ad21f31f85cc70f628a0e0780bf54dad23651f3274ef5ff5d277c87"
+          "after": "10a722027532bb55e95623ba74ee09b6457f1b61e31f9d0bdd611af72459acf5"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "2a4ac293800ce7c54bcc124a4d10e58563bc957a863a49e51929eb854d79cc28",
-      "after_sha256": "1b22baeeaf40709b04f3ebca7f8d7751e52b0b8e7177a20422bf9aba247d50da",
+      "after_sha256": "f2680e3095311a2abbb9ed2432dde76d909d1c285273c500f8a71d444d1b78e7",
       "owners": {
         "@document": {
           "before": "2a4ac293800ce7c54bcc124a4d10e58563bc957a863a49e51929eb854d79cc28",
-          "after": "1b22baeeaf40709b04f3ebca7f8d7751e52b0b8e7177a20422bf9aba247d50da"
+          "after": "f2680e3095311a2abbb9ed2432dde76d909d1c285273c500f8a71d444d1b78e7"
         }
       }
     },
@@ -144,13 +144,23 @@
         }
       }
     },
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
+      "before_sha256": "eb1ebc9bc640daba94c0d813ec799c599259306430400604ac6fd6d0fcacc8fd",
+      "after_sha256": "a7d73c5abe3ca6175ede448f5351cdad40df260ce43f984f6f18ae5aee324a0d",
+      "owners": {
+        "@document": {
+          "before": "eb1ebc9bc640daba94c0d813ec799c599259306430400604ac6fd6d0fcacc8fd",
+          "after": "a7d73c5abe3ca6175ede448f5351cdad40df260ce43f984f6f18ae5aee324a0d"
+        }
+      }
+    },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "ea395b3caca761eb588ce2b2034eebfbec6f1708a7ea5e84fe7a219539c5878a",
-      "after_sha256": "5fd2961d3ae65465ff0164677233b2113523ba1861bfcd1566af4c94bf7b11f3",
+      "after_sha256": "947e1b2b80ca2a0c9b6d520768308e60795b3cfa05d9fe178ed6974b78958045",
       "owners": {
         "@document": {
           "before": "ea395b3caca761eb588ce2b2034eebfbec6f1708a7ea5e84fe7a219539c5878a",
-          "after": "5fd2961d3ae65465ff0164677233b2113523ba1861bfcd1566af4c94bf7b11f3"
+          "after": "947e1b2b80ca2a0c9b6d520768308e60795b3cfa05d9fe178ed6974b78958045"
         }
       }
     },
@@ -206,11 +216,41 @@
     },
     "docs/performance/policy-v3/acts-of-faith-input-roles-v4.json": {
       "before_sha256": null,
-      "after_sha256": "5cc010849ae3bbe74bb11554f72d368fb9e90e1412daf6d07ddf302f8280f3ae",
+      "after_sha256": "2959505fa176f0f3832e984f57a95bba960e35830b74d20427751f4e8c60dd92",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5cc010849ae3bbe74bb11554f72d368fb9e90e1412daf6d07ddf302f8280f3ae"
+          "after": "2959505fa176f0f3832e984f57a95bba960e35830b74d20427751f4e8c60dd92"
+        }
+      }
+    },
+    "docs/performance/policy-v3/acts-provenance-20261031/inactive-acts-api-recipe.json": {
+      "before_sha256": null,
+      "after_sha256": "7206bee260fe831e3c9626042dd4e7954dea5e074590a32f9cb40cd6161e82fa",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "7206bee260fe831e3c9626042dd4e7954dea5e074590a32f9cb40cd6161e82fa"
+        }
+      }
+    },
+    "docs/performance/policy-v3/acts-provenance-20261031/inactive-acts-predecessor.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "c4fe28349415081f36acaf612cd6715d8a383c6892e70830ad1bcc1d6a4e968e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c4fe28349415081f36acaf612cd6715d8a383c6892e70830ad1bcc1d6a4e968e"
+        }
+      }
+    },
+    "docs/performance/policy-v3/acts-provenance-20261031/runtime-consumer-predecessor.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "2606d89d43fffdecffafbb301fe19e561119a57629dbd29d2d7a8ba2bef261c9",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2606d89d43fffdecffafbb301fe19e561119a57629dbd29d2d7a8ba2bef261c9"
         }
       }
     },
@@ -236,21 +276,35 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "8b9655d28aae72ddab38f4ab9952de54c7127065ac6505edb361fd238beae8a9",
-      "after_sha256": "60400882b3051bbf6498ab96be0b21fee0a422dbe1ffb3f735eb0d03784d0e8c",
+      "after_sha256": "7f3ff298e31aaf13e8d94d34ff0d4f2bf0598a3999853163728ba50a8b50c363",
       "owners": {
         "@document": {
           "before": "8b9655d28aae72ddab38f4ab9952de54c7127065ac6505edb361fd238beae8a9",
-          "after": "60400882b3051bbf6498ab96be0b21fee0a422dbe1ffb3f735eb0d03784d0e8c"
+          "after": "7f3ff298e31aaf13e8d94d34ff0d4f2bf0598a3999853163728ba50a8b50c363"
+        }
+      }
+    },
+    "scripts/build_test_shards.py": {
+      "before_sha256": "a3afcf4ffef5effec1aae8c66e2cb1d5340bb0d0376b8b5eecc5c38aea347a06",
+      "after_sha256": "effaa8fd483abe474b99cda888819aeccc714ddbdcf0fb28e4496347dcc48498",
+      "owners": {
+        "behavioral_selection": {
+          "before": "7b413d71fbe13d6f35f4f540ebf307f966dbb7ce52c46466d48d43d8067454cf",
+          "after": "1527eba616a8bc8dc68cac7e408dcdaf027d1760b6275fe5969fa2034d78977b"
+        },
+        "validate_acts_inactive_source": {
+          "before": null,
+          "after": "9d85d0eb2e6445f1235f8d0cd5b71abfa47058b4f2914acaa5c603c902d15690"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "976ab9950dd0b07ba99f837bf9d56b0aa7dea862351f4217d03f2b7e50b5ed6e",
-      "after_sha256": "df3d40b940775f3cb8410e316c81a959dba3c46620ad6900946bba53ca18c14f",
+      "after_sha256": "84802f2714b63b34c0bc3676385a5f2e2dba60433fb01478482318dd936cb59e",
       "owners": {
         "@document": {
           "before": "976ab9950dd0b07ba99f837bf9d56b0aa7dea862351f4217d03f2b7e50b5ed6e",
-          "after": "df3d40b940775f3cb8410e316c81a959dba3c46620ad6900946bba53ca18c14f"
+          "after": "84802f2714b63b34c0bc3676385a5f2e2dba60433fb01478482318dd936cb59e"
         }
       }
     },
@@ -350,6 +404,16 @@
         }
       }
     },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_coverage_2026_27.py": {
+      "before_sha256": "ec8e780f90b675827a9df390133d9f1567e4af4695959facb4072a9a2b8fd430",
+      "after_sha256": "d42cdd750bbca5485e87251d44be4ee77e8138d15d8fd1cae468264dd269974e",
+      "owners": {
+        "@module": {
+          "before": "1399be0bba808568783dd92c9c911b7b61189188e140d9f42d34b2ce324377e2",
+          "after": "17345084d7bc3c8ed49abf26699b1715018be1d6a2bb85e54f8e20d802c48b9e"
+        }
+      }
+    },
     "tests/category_migration_preservation.py": {
       "before_sha256": "84a0e3f55b5d300d0a7ff6b1a90bc47b6b4d4e48e30bf399605852494cc70291",
       "after_sha256": "8c4754b916b030076052106253c48237c34f5cda4ef3a3974fcc201357a4a36c",
@@ -370,7 +434,7 @@
     },
     "tests/code_quality/test_category_migration_preservation.py": {
       "before_sha256": "1881570577f2200d1083dd57d77b47cba4b9ea7038b38e3e9548f5f370107524",
-      "after_sha256": "f989a9afbec6c0477887c8a96638af30990295fcfa7120ed3d10e28596940deb",
+      "after_sha256": "e81f17e87fb9a6788780b0a060e3f91b161b2a410d1a6b90e73f906b3c9550ff",
       "owners": {
         "edition_root": {
           "before": "2ffb1acc3395c87568d6e16da29d601adf438269042fe600aebac6336dec0cd9",
@@ -383,6 +447,14 @@
         "test_acts_comparison_registration_preserves_exact_historical_helper": {
           "before": null,
           "after": "5bc5d2751f0161ffdb4811b87367a809cb9c27a04948b2e56f10de06c4fe43a2"
+        },
+        "test_acts_inactive_api_maintenance_preserves_original_evidence": {
+          "before": null,
+          "after": "320e8fa297e092a83c5731816f3182248da50f25e80327f73c411c03f58feb8e"
+        },
+        "test_acts_live_consumer_rename_preserves_exact_original_bytes": {
+          "before": null,
+          "after": "394defe8832b9ee1bc01a9d70eae38d76b4e68b4a81592b09a839d52b4ccdc7b"
         }
       }
     },
@@ -418,7 +490,7 @@
     },
     "tests/infrastructure/runtime_hooks/unit/test_runtime_hook_bindings.py": {
       "before_sha256": "2097b78ccf59d264f9dfdba560697c84984afa0b7ad61c4ae18d208f1435a0a2",
-      "after_sha256": "96da72ee50675dcdff8141246700d8eb330643949f63555aae1a3ecad081a34f",
+      "after_sha256": "af25df72195dd40dd85bbc16b71e01b23d9cda34df2f34528756ad91099f685c",
       "owners": {
         "test_acts_actual_casualty_and_native_combat_replay": {
           "before": null,
@@ -430,7 +502,7 @@
         },
         "test_acts_of_faith_uses_turn_start_and_preserves_triumph_round_hook": {
           "before": null,
-          "after": "b28524bd68b3fd2555e50c7d38e463ff1d442c6f59231012e47d77d3cb805bf8"
+          "after": "544ab81bdefc8c7ab950885cef33d51ccfa6db512146532c2f58af0e4582949e"
         },
         "test_acts_turn_candidates_preserve_spend_destruction_and_source_deduplication": {
           "before": null,
@@ -439,6 +511,16 @@
         "test_destruction_keyword_predicate_uses_canonical_retained_physical_models": {
           "before": null,
           "after": "634d3c6aa10b6c2e6056c7aea78260fde958240ba76155fd1a892014f8c94116"
+        }
+      }
+    },
+    "tests/shared/category_migration/reporting__test_runtime_consumer_evidence.py": {
+      "before_sha256": "2606d89d43fffdecffafbb301fe19e561119a57629dbd29d2d7a8ba2bef261c9",
+      "after_sha256": "b26f3439b84848d0d9a00aa03f37bd416a8f941d0c0ff3768afc52bca9c47484",
+      "owners": {
+        "@module": {
+          "before": "ebd1895594837cb91c03a8082838a4e38c41ecb71c06974564af27b231561e0f",
+          "after": "a35732b4984af8d6805db355164e9393df2063edb3e42d244b75ffb33b8dc8bb"
         }
       }
     },
@@ -458,19 +540,57 @@
     },
     "tests/support/acts_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "16d1e812f5e76961fad5f0fba4dca99423a35488459484461c8f2c2cf896a74a",
+      "after_sha256": "bb8e0f47febc5c8892425f453497a829e64d2c99e775ff3f974936bac816d2a6",
       "owners": {
         "@module": {
           "before": null,
-          "after": "ee48c0046437cada360873690a900f7479e030b55a36764458103d577564731c"
+          "after": "399a10d9db3e4a8cd6ea0e071d47e6cfd5041352496c770e7d308d533307a45f"
+        },
+        "acts_consumer_predecessor": {
+          "before": null,
+          "after": "ffc7c2e82cc5100125765e491eb635e678d4ee1c4b9149815b090e3ab2b3789b"
+        },
+        "acts_inactive_predecessor": {
+          "before": null,
+          "after": "cbc7c86d3b0188f5bef63a0a6cb90522518566bf88103dc11c9c056a80d2c683"
         },
         "acts_predecessor": {
           "before": null,
-          "after": "35e993bf58a9cbd508179aff5066856abd627ca7ac8e598c570d145d5e9ffba1"
+          "after": "ee89ebc36d2f1e2b87127856ecadf6b92e0375c07846b904b54b6c094fcf56f6"
         },
         "acts_provenance_predecessor": {
           "before": null,
           "after": "67dfe41fc822574e4f5afd87c83faf35f5767d21e077ac915a93ce127a3707b0"
+        }
+      }
+    },
+    "tests/unit/test_phase17g_adepta_sororitas_army_rule.py": {
+      "before_sha256": "c4fe28349415081f36acaf612cd6715d8a383c6892e70830ad1bcc1d6a4e968e",
+      "after_sha256": "cb7c48432f4c26fc42af074122e3cf2a377f9892aa9bb8eac9a2188ffd985362",
+      "owners": {
+        "@module": {
+          "before": "18353469203023849859dd489cfbf20a8c077ece64ad8a767fa615905c3aab70",
+          "after": "98a95986f28eb35873fa2d47a5290f59fe3101378e46a9b36be6e9d8d9684a2a"
+        },
+        "test_acts_of_faith_handlers_fail_fast_on_malformed_inputs": {
+          "before": "82b374ce3a6e3c553a1e7c52033a866917d998814850e9f70478fe373bbabd29",
+          "after": "9f1174ccd6490141835ef07351014081c39b4f293c145400288369c01c0b965d"
+        },
+        "test_acts_of_faith_runtime_contribution_exposes_hooks": {
+          "before": "dd76b048b6861c489e5bf9c6b29526611cd267f62e6355f0bad28fc7cfd41a74",
+          "after": "928adfd81b5f65a130a8efb0679294ceeacd0113f6257b4e7354c4463feac400"
+        },
+        "test_battle_round_start_gains_miracle_die_once_for_adepta_army": {
+          "before": "30784a2ba1d814775ea1fee398a03b9bce7c54da61597fe6a8dc14e542402d4b",
+          "after": "9bcc9947e93ce0a2c58087853e23031a5bd7a4d6f8c592a6556ab1c34c55c1db"
+        },
+        "test_miracle_die_pool_spend_and_game_state_payload_round_trip": {
+          "before": "987f883f9b3d2643e244dca0ae887142fc58d2f4a985926ca63ae55e3448187e",
+          "after": "89c65cf38baffd1df584d9be7ed03ad2e4acfa540dfd87f2acec9c45dbfd7ad2"
+        },
+        "test_triumph_relics_ebon_chalice_raises_acts_limit_and_icon_syncs_fnp": {
+          "before": "5cb272ff4fd5db4b0a7b7202177d7b032d0e5a5340d5be76d08fa94662acb7dd",
+          "after": "c16521fe8aa25b6af8ded9434a963ffeeb3c7983fd96351bc870adda1ccbd5d1"
         }
       }
     },
@@ -490,11 +610,11 @@
     },
     "tools/performance_tool_inputs_v4.py": {
       "before_sha256": "8c532e4327b7e25bfb6979f5d320e92ccfb5c43037ce3db54f8982c72f1729ab",
-      "after_sha256": "8270c1bfc9585a8a97655f23130f21ea56869373b96782aec9fe2966e6125764",
+      "after_sha256": "134cbd9e0f33f1a5db0893546350ba17b83cb231b119cb74d87bd586384de215",
       "owners": {
         "@module": {
           "before": "79880141e3b0d8f5ba67b8162ac3d67556b79ad3af8c17da4e541dc852d72593",
-          "after": "47a99948c579b0b7289ae3f42e68c1d09bf2a540d3bea35516a041867d407d6f"
+          "after": "0564c71d63ca2f5eb37e2b52952e08ac6d64bcb2089be7b5d801df1c587ae919"
         }
       }
     },
@@ -648,6 +768,16 @@
       "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
       "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order121-generated-semantic-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
       "operations": [
@@ -708,6 +838,30 @@
       "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
       "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
+    "docs/performance/policy-v3/acts-provenance-20261031/inactive-acts-api-recipe.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
+    "docs/performance/policy-v3/acts-provenance-20261031/inactive-acts-predecessor.py.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
+    "docs/performance/policy-v3/acts-provenance-20261031/runtime-consumer-predecessor.py.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
     "docs/performance/policy-v3/acts-provenance-20261031/runtime-hook-predecessor.py.txt": {
       "category": "governance",
       "operations": [],
@@ -727,6 +881,17 @@
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
+    "scripts/build_test_shards.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f",
+        "supported-acts-exact-inactive-api-admission"
+      ],
       "selected_families": [],
       "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
       "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
@@ -776,6 +941,16 @@
       "category": "rule_semantics",
       "operations": [
         "supported-acts-timing-turn-sequencing"
+      ],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_coverage_2026_27.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
       ],
       "selected_families": [],
       "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
@@ -833,6 +1008,16 @@
       "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
       "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
+    "tests/shared/category_migration/reporting__test_runtime_consumer_evidence.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci-restructure-tests-shared-category_migration-reporting__test_runtime_consumer_evidence.py"
+      ],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
     "tests/support/acts_of_faith.py": {
       "category": "rule_semantics",
       "operations": [
@@ -847,6 +1032,16 @@
       "category": "rule_semantics",
       "operations": [
         "supported-acts-original-test-preservation"
+      ],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
+    "tests/unit/test_phase17g_adepta_sororitas_army_rule.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-acts-quarantined-api-maintenance"
       ],
       "selected_families": [],
       "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
