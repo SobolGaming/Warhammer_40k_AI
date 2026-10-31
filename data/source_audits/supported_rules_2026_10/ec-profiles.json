@@ -1,0 +1,232 @@
+{
+  "schema": "supported-ec-numeric-profile-reconciliation-v1",
+  "base": "105b467b1140e6d9ff6710a74ed839ad225d17ec",
+  "observed_date": "2026-10-31",
+  "source_version": "981",
+  "source_version_release_date": "2026-10-14",
+  "updates_index": "https://www.40k.app/factions/updates",
+  "source_precedence": "User-directed preferred App mirror over conflicting PDFs; mirror is not an official GW site.",
+  "latest_qualification": "Latest EC snapshot inferred from inspected updates index; global latest listed995/2026-10-16. No official API attestation.",
+  "source_access": "Ordinary browser; research retrieval403. No raw mirror response hash available or claimed.",
+  "scope": "20 numeric fields on15 source rows for6 existing supported component datasheets; no faction, unit, detachment, geometry, ability, keyword, or runtime semantic expansion.",
+  "version_caution": "Only Lord Exultant Toughness4-to5 is explicitly corroborated by itsv981 update history in this slice. Other values are observed in thev981 snapshot, not asserted to have changed on that date.",
+  "changes": [
+    {
+      "table": "Datasheets_models",
+      "row": "000004078:1",
+      "sheet": "000004078",
+      "slug": "lord-exultant",
+      "preimage": "642c4d142f1b541fee4cb7fa145d9daaa7189e7faef6e1e26671e264a6a6d5a0",
+      "before": {
+        "T": "4"
+      },
+      "after": {
+        "T": "5"
+      }
+    },
+    {
+      "table": "Datasheets_models",
+      "row": "000004079:1",
+      "sheet": "000004079",
+      "slug": "tormentors",
+      "preimage": "38a849e709e2521096ed8197dc4d57fbda4423e73076aa3acbd840efc6c94695",
+      "before": {
+        "T": "4"
+      },
+      "after": {
+        "T": "5"
+      }
+    },
+    {
+      "table": "Datasheets_models",
+      "row": "000004080:1",
+      "sheet": "000004080",
+      "slug": "infractors",
+      "preimage": "29df31e0a1efb5994893dca44010ce23676740251aad10ddaad50560b9bdd815",
+      "before": {
+        "T": "4"
+      },
+      "after": {
+        "T": "5"
+      }
+    },
+    {
+      "table": "Datasheets_models",
+      "row": "000004084:1",
+      "sheet": "000004084",
+      "slug": "lord-kakophonist",
+      "preimage": "cd53f6ff4f8934aac1786368a228c59a5677151086d43cdc06cbbbca13e111fe",
+      "before": {
+        "T": "5"
+      },
+      "after": {
+        "T": "6"
+      }
+    },
+    {
+      "table": "Datasheets_models",
+      "row": "000004088:1",
+      "sheet": "000004088",
+      "slug": "noise-marines",
+      "preimage": "7f0f65eb66cf2c9984add6c30d76a3e1185d7b6689aa15e5809de93aa2e86285",
+      "before": {
+        "W": "2"
+      },
+      "after": {
+        "W": "3"
+      }
+    },
+    {
+      "table": "Datasheets_wargear",
+      "row": "000004078:1:1:8633",
+      "sheet": "000004078",
+      "slug": "lord-exultant",
+      "preimage": "eb398373ff17f00e40d390ce3d70c11ae554801fcb04a8243f9f28cce6f70cf5",
+      "before": {
+        "S": "4",
+        "AP": "0"
+      },
+      "after": {
+        "S": "5",
+        "AP": "-1"
+      }
+    },
+    {
+      "table": "Datasheets_wargear",
+      "row": "000004078:5:1:8637",
+      "sheet": "000004078",
+      "slug": "lord-exultant",
+      "preimage": "492e310cb7175de22b348d4644b83f0214d07b9eac688d0c2b288e05d0192743",
+      "before": {
+        "S": "4"
+      },
+      "after": {
+        "S": "5"
+      }
+    },
+    {
+      "table": "Datasheets_wargear",
+      "row": "000004079:1:1:8642",
+      "sheet": "000004079",
+      "slug": "tormentors",
+      "preimage": "7e3b25e34da8a22c9aa195262a9261e4bf041e1f700ae1bafa719e620db41666",
+      "before": {
+        "S": "4",
+        "AP": "0"
+      },
+      "after": {
+        "S": "5",
+        "AP": "-1"
+      }
+    },
+    {
+      "table": "Datasheets_wargear",
+      "row": "000004079:2:1:8643",
+      "sheet": "000004079",
+      "slug": "tormentors",
+      "preimage": "2dbbc8e2a2549a3e9d010e1cdcf41d92033ef41af5414dbf01a012e4fe1e2847",
+      "before": {
+        "S": "4",
+        "AP": "0"
+      },
+      "after": {
+        "S": "5",
+        "AP": "-1"
+      }
+    },
+    {
+      "table": "Datasheets_wargear",
+      "row": "000004079:8:1:8649",
+      "sheet": "000004079",
+      "slug": "tormentors",
+      "preimage": "fa32af2bc616db391abd34c1fe016deca850fdb7da0c257fb171f9bbf93faa7b",
+      "before": {
+        "S": "4"
+      },
+      "after": {
+        "S": "5"
+      }
+    },
+    {
+      "table": "Datasheets_wargear",
+      "row": "000004080:1:1:8652",
+      "sheet": "000004080",
+      "slug": "infractors",
+      "preimage": "3ccdac16bfd94f9046b1307ac3f553680c08a0f0df0296b3b4e089a7d791b0d8",
+      "before": {
+        "S": "4",
+        "AP": "0"
+      },
+      "after": {
+        "S": "5",
+        "AP": "-1"
+      }
+    },
+    {
+      "table": "Datasheets_wargear",
+      "row": "000004080:4:1:8655",
+      "sheet": "000004080",
+      "slug": "infractors",
+      "preimage": "54b13e94a47ece270f797facd8f003e6665bbf9aff3caf8cb7b79ad0c8d9fa1f",
+      "before": {
+        "S": "4"
+      },
+      "after": {
+        "S": "5"
+      }
+    },
+    {
+      "table": "Datasheets_wargear",
+      "row": "000004084:2:1:8675",
+      "sheet": "000004084",
+      "slug": "lord-kakophonist",
+      "preimage": "f32bf5af489d974dc93e7c82254e9855b1f640c3fb68c71b3415740a5e4ce14a",
+      "before": {
+        "S": "4"
+      },
+      "after": {
+        "S": "5"
+      }
+    },
+    {
+      "table": "Datasheets_wargear",
+      "row": "000004088:5:1:8691",
+      "sheet": "000004088",
+      "slug": "noise-marines",
+      "preimage": "539dde0dcb7b5e8832e1269085de074dff0a30c564a7bbcdd4d3437232ed7112",
+      "before": {
+        "S": "4"
+      },
+      "after": {
+        "S": "5"
+      }
+    },
+    {
+      "table": "Datasheets_wargear",
+      "row": "000004089:1:1:8693",
+      "sheet": "000004089",
+      "slug": "flawless-blades",
+      "preimage": "96d930ee17e7c91d26b76f835a7585dbac3417d5f061ec6537c0b92f434cb24d",
+      "before": {
+        "S": "4",
+        "AP": "0"
+      },
+      "after": {
+        "S": "5",
+        "AP": "-1"
+      }
+    }
+  ],
+  "preservation": "Stable IDs, composition, attachment targets, weapon keywords, abilities and earlier source artifacts remain. Existing overlay processing can rebuild touched-row HTML metadata;20 refers to semantic runtime fields, not a claim that all serialization metadata is byte-identical.",
+  "residual_inventory": [
+    "Murdermind SUPPORT eligibility/execution remains blocked; current plain rule text does not establish required attachment boundary.",
+    "Butcher Lord LEADER metadata remains blocked.",
+    "Grimnar's Mark lacks exact leader/execution match.",
+    "EC Sorcerer000004085 is present in raw source but absent from the59-sheet supported component catalog; observedT5 and weapon values are inventory only, with no support promotion.",
+    "Other faction books, datasheets, weapons, characteristics and nonexecuting World Eaters detachments remain unaudited or inaccessible."
+  ],
+  "performance_admission": "Pending scoped decision. Existing mandatory source-loader operation selects external_contract_source_reuse; historicalv4 accepts exactbc9 only and rejects currentbase105b. No checker, role spec, map or historical measurements changed here.",
+  "validation_status": "Focused validation recorded separately. Full coverage, four strict quality lanes, serial smoke, types/contracts/package, independent exact-head reviews and hosted CI remain required before delivery.",
+  "provenance_admission": "Unchanged active-edition guard reproduced one failure: the new overlay artifact contains its truthful historical base package version. A finite hash-authenticated artifact/spec/report provenance registry and preserved predecessor proof are proposed, not implemented.",
+  "rng_fixture_observation": "Current weapon descriptors change native decision/event payloads included in deterministic RNG history. Two retained seeded Icon outcomes change; explicit uncapped success/failure and capped-success cases are preserved, with added original-RNG/total/threshold assertions. No RNG or CP rule code changed."
+}

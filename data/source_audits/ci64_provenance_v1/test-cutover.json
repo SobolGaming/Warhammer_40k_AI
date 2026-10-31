@@ -103,10 +103,10 @@
       "sha256": "0edf3bc19424cf7882c9a24db3e877fd353696a3ed6718fb0d0ab4e9454ecc44"
     },
     "tests/factions/emperors_children/test_selected_consumers.py": {
-      "blob_sha1": "a6dec68c29e2eae88f64339cfe9e0409c22f7372",
-      "bytes": 20867,
+      "blob_sha1": "3f8dc143a555c90db1d2982fcabac588edce3c33",
+      "bytes": 28751,
       "mode": "100644",
-      "sha256": "86bcec11b69cb959306a99d2d0aa052b9bd90860f04e7ddb2d9c1292744c3cb4"
+      "sha256": "095d35261a80fe87d53b9a011b0a9646ddf73c69e11d701df3cc44f2a3811a2c"
     },
     "tests/factions/emperors_children/test_shared_attack_consumers.py": {
       "blob_sha1": "4ecaee88b7d221b9569f3c37d2d41ccc4972cdaf",
