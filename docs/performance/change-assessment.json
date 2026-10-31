@@ -156,28 +156,33 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "49822f821e0707d345c46c53cf0c1ba86a1ed4d6232c4c6b653e230f3ca80b76",
-      "after_sha256": "ef7ff67984e7e442570e74da5ad77fa990fc00898f466aaeeaef0cd80aa6894c",
+      "after_sha256": "3a6c811ec6e6fc994133526a3ad22d7d6dc047df14155e1c42e8b5112b885a9e",
       "owners": {
         "@document": {
           "before": "49822f821e0707d345c46c53cf0c1ba86a1ed4d6232c4c6b653e230f3ca80b76",
-          "after": "ef7ff67984e7e442570e74da5ad77fa990fc00898f466aaeeaef0cd80aa6894c"
+          "after": "3a6c811ec6e6fc994133526a3ad22d7d6dc047df14155e1c42e8b5112b885a9e"
         }
       }
     },
     "docs/SUPPORTED_EC_PROFILE_RECONCILIATION_2026_10.md": {
       "before_sha256": null,
-      "after_sha256": "67e19fcb09380348112f0fb4a69a577230bf2d2dd3707e0bbae08d182662e0e0",
+      "after_sha256": "38253c9183f118637a2106b358d60f5950801c31cbd664b93e73488e67eb4e8c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "67e19fcb09380348112f0fb4a69a577230bf2d2dd3707e0bbae08d182662e0e0"
+          "after": "38253c9183f118637a2106b358d60f5950801c31cbd664b93e73488e67eb4e8c"
         }
       }
     },
     "docs/performance/current/ec-profile-105b-v4.json": {
       "before_sha256": null,
-      "after_sha256": null,
-      "owners": {}
+      "after_sha256": "35535c0ad14233d00e570d4208d79d90c464d8793cdeae5ed086e9c8ecec5be2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "35535c0ad14233d00e570d4208d79d90c464d8793cdeae5ed086e9c8ecec5be2"
+        }
+      }
     },
     "docs/performance/policy-v3/ec-profile-input-roles-v4.json": {
       "before_sha256": null,
