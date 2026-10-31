@@ -334,6 +334,26 @@ def deferred_comparison_cases(value: object) -> tuple[str, ...]:
     return tuple(nodes)
 
 
+def validate_acts_inactive_source(root: Path) -> None:
+    """Authenticate the single reviewed inactive API successor independently of its ledger."""
+    exact = {
+        "tests/unit/test_phase17g_adepta_sororitas_army_rule.py": (
+            "cb7c48432f4c26fc42af074122e3cf2a377f9892aa9bb8eac9a2188ffd985362"
+        ),
+        "docs/performance/policy-v3/acts-provenance-20261031/inactive-acts-predecessor.py.txt": (
+            "c4fe28349415081f36acaf612cd6715d8a383c6892e70830ad1bcc1d6a4e968e"
+        ),
+        "docs/performance/policy-v3/acts-provenance-20261031/inactive-acts-api-recipe.json": (
+            "7206bee260fe831e3c9626042dd4e7954dea5e074590a32f9cb40cd6161e82fa"
+        ),
+    }
+    for relative, expected in exact.items():
+        target = root / relative
+        _selection_no_links(root, target)
+        if not target.is_file() or hashlib.sha256(target.read_bytes()).hexdigest() != expected:
+            raise SystemExit("Acts inactive API successor/preimage changed.")
+
+
 def behavioral_selection(root: Path) -> BehavioralSelection:
     """Fresh finite cutover admission shared by pytest and shard discovery."""
     root = root.resolve(strict=True)
@@ -406,6 +426,7 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     retained = _selection_members(value["retained_active_files"], root)
     updates = value["inactive_updates"]
     allowed_updates = {
+        "tests/unit/test_phase17g_adepta_sororitas_army_rule.py": "acts-turn-api-maintenance-v1",
         "tests/unit/test_phase15c_fight_order.py": "add-pending-decision-requests-v1",
         "tests/unit/test_phase13b_shooting_declarations.py": "add-pending-decision-requests-v1",
         "tests/integration/test_embarked_ability_authority.py": "type-only-battle-phase-cast-v1",
@@ -424,6 +445,8 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
         ):
             raise SystemExit("Inactive update native preimage/recipe changed.")
         current.update(_selection_members({name: update["after"]}, root))
+    if "tests/unit/test_phase17g_adepta_sororitas_army_rule.py" in current:
+        validate_acts_inactive_source(root)
     retired = _selection_retirements(root, value["retirements"], value["inactive_legacy_files"])
     if current.keys() & retired:
         raise SystemExit("A retired test cannot also carry a live inactive update.")

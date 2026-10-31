@@ -439,10 +439,10 @@
       "sha256": "03783dd671bcaf766a7e9a8e995bc62e2d148e91d8d551d10d7b903d88613940"
     },
     "tests/infrastructure/runtime_hooks/unit/test_runtime_hook_bindings.py": {
-      "blob_sha1": "0a6ce8a7191459d0d4dd2170b30d92103bf313d1",
-      "bytes": 6539,
       "mode": "100644",
-      "sha256": "2097b78ccf59d264f9dfdba560697c84984afa0b7ad61c4ae18d208f1435a0a2"
+      "blob_sha1": "9e6764f8f8cf91e5dc917d1cad5bba67d51cb1b7",
+      "sha256": "af25df72195dd40dd85bbc16b71e01b23d9cda34df2f34528756ad91099f685c",
+      "bytes": 23083
     },
     "tests/infrastructure/setup/unit/test_deployment.py": {
       "blob_sha1": "d535945205de067cbdb44701b70ff4866a333059",
@@ -4741,6 +4741,21 @@
         "sha256": "334ce50fbb541155d2b40f51e8ede1276870065e55365b497d1a5a2990c1f766"
       },
       "recipe": "type-only-server-session-test-access-v1"
+    },
+    "tests/unit/test_phase17g_adepta_sororitas_army_rule.py": {
+      "before": {
+        "blob_sha1": "f652f7f0e4334254c19102dd2c3b59a925dc06de",
+        "bytes": 56072,
+        "mode": "100644",
+        "sha256": "c4fe28349415081f36acaf612cd6715d8a383c6892e70830ad1bcc1d6a4e968e"
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "ea6e8979cd3380bc76cb7148a8f863c827651158",
+        "sha256": "cb7c48432f4c26fc42af074122e3cf2a377f9892aa9bb8eac9a2188ffd985362",
+        "bytes": 56211
+      },
+      "recipe": "acts-turn-api-maintenance-v1"
     }
   },
   "native_active_files": {

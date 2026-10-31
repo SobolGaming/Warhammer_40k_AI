@@ -152,7 +152,7 @@ _ARMY_RULE_EVIDENCE = (
         datasheet_name="Adepta Sororitas",
         runtime_consumer_ids=frozenset(
             {
-                adepta_sororitas_army_rule.BATTLE_ROUND_START_HOOK_ID,
+                adepta_sororitas_army_rule.TURN_START_HOOK_ID,
                 adepta_sororitas_army_rule.UNIT_DESTROYED_HOOK_ID,
                 adepta_sororitas_army_rule.TRIUMPH_RELICS_BATTLE_ROUND_START_HOOK_ID,
             }

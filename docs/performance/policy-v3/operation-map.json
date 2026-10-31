@@ -198,7 +198,7 @@
       "workload_id": "external-contract-orphan-write-independent-check-v1",
       "input_binding": {
         "schema": "tool-input-roles-v4",
-        "role_specification": "docs/performance/policy-v3/ec-profile-input-roles-v4.json"
+        "role_specification": "docs/performance/policy-v3/acts-of-faith-input-roles-v4.json"
       }
     },
     "session_command_fork": {
@@ -30727,6 +30727,195 @@
         "external_contract_source_reuse"
       ],
       "sensitive": true,
+      "mandatory": true
+    },
+    "supported-acts-timing-army-rule": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/army_rule.py"
+      ],
+      "owners": [
+        "@module",
+        "_active_player_id",
+        "battle_round_start_source_id",
+        "miracle_sequencing_candidates",
+        "resolve_battle_round_start",
+        "runtime_contribution",
+        "turn_start_source_id"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-timing-destruction-sequencing": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/destruction_sequencing.py"
+      ],
+      "owners": [
+        "@module",
+        "_has_retained_sororitas_keyword",
+        "candidates",
+        "resolve_adepta_sororitas_unit_destroyed"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-timing-round-sequencing": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/round_sequencing.py"
+      ],
+      "owners": [
+        "@module",
+        "_gain_miracle_die",
+        "miracle_candidates"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-timing-turn-sequencing": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/turn_sequencing.py"
+      ],
+      "owners": [
+        "@module",
+        "_source_id",
+        "candidates",
+        "resolve_turn_start"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-migration-quality-controls": {
+      "paths": [
+        "tests/code_quality/test_category_migration_preservation.py"
+      ],
+      "owners": [
+        "test_acts_additions_preserve_every_original_assertion",
+        "test_acts_comparison_registration_preserves_exact_historical_helper",
+        "test_acts_inactive_api_maintenance_preserves_original_evidence",
+        "test_acts_live_consumer_rename_preserves_exact_original_bytes"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-registered-scope-controls": {
+      "paths": [
+        "tests/code_quality/test_registered_source_scopes.py"
+      ],
+      "owners": [
+        "_acts_scope",
+        "test_acts_comparison_only_provenance_is_exact_and_closed",
+        "test_acts_registered_scope_preserves_real_six_sample_contract",
+        "test_acts_scope_rejects_input_and_role_drift",
+        "test_acts_scope_requires_all_six_samples_and_output_trees"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-native-regression-controls": {
+      "paths": [
+        "tests/infrastructure/runtime_hooks/unit/test_runtime_hook_bindings.py"
+      ],
+      "owners": [
+        "test_acts_actual_casualty_and_native_combat_replay",
+        "test_acts_of_faith_turn_transition_duplicate_restore_and_replay",
+        "test_acts_of_faith_uses_turn_start_and_preserves_triumph_round_hook",
+        "test_acts_turn_candidates_preserve_spend_destruction_and_source_deduplication",
+        "test_destruction_keyword_predicate_uses_canonical_retained_physical_models"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-canonical-fixture": {
+      "paths": [
+        "tests/support/acts_of_faith.py"
+      ],
+      "owners": [
+        "@module",
+        "session"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-original-test-preservation": {
+      "paths": [
+        "tests/support/acts_preservation.py"
+      ],
+      "owners": [
+        "@module",
+        "acts_consumer_predecessor",
+        "acts_inactive_predecessor",
+        "acts_predecessor",
+        "acts_provenance_predecessor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-support-consumer-inventory": {
+      "paths": [
+        "tools/generate_ability_support_matrix.py"
+      ],
+      "owners": [
+        "_adepta_sororitas_runtime_consumer_ids"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-exact-inactive-api-admission": {
+      "paths": [
+        "scripts/build_test_shards.py"
+      ],
+      "owners": [
+        "validate_acts_inactive_source"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-quarantined-api-maintenance": {
+      "paths": [
+        "tests/unit/test_phase17g_adepta_sororitas_army_rule.py"
+      ],
+      "owners": [
+        "@module",
+        "test_acts_of_faith_handlers_fail_fast_on_malformed_inputs",
+        "test_acts_of_faith_runtime_contribution_exposes_hooks",
+        "test_battle_round_start_gains_miracle_die_once_for_adepta_army",
+        "test_miracle_die_pool_spend_and_game_state_payload_round_trip",
+        "test_triumph_relics_ebon_chalice_raises_acts_limit_and_icon_syncs_fnp"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-current-source-documentation": {
+      "paths": [
+        "FACTION_INTEGRATION.md"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-acts-current-semantic-artifact": {
+      "paths": [
+        "data/generated/ability_coverage/runtime_content_semantic_coverage.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
       "mandatory": true
     }
   },

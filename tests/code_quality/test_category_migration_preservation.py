@@ -306,6 +306,7 @@ def edition_root(tmp_path: Path) -> Path:
         migration.EDITION_PREDECESSOR_ARCHIVE,
         migration.EDITION_REGISTERED_PREDECESSOR_ARCHIVE,
         migration.EDITION_REGISTERED_HELPER,
+        "docs/performance/policy-v3/acts-provenance-20261031/source-scope-predecessor.py.txt",
     ):
         target = tmp_path / name
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -569,3 +570,188 @@ def test_registered_projection_rejects_repin_of_changed_successor(
     monkeypatch.setattr(migration, "EDITION_AFTER_SHA256", hashlib.sha256(changed).hexdigest())
     with pytest.raises(ValueError, match=r"edition provenance|Original edition"):
         migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
+
+
+@pytest.mark.parametrize(
+    "drift", [None, "archive", "original", "addition", "omission", "duplicate"]
+)
+def test_acts_additions_preserve_every_original_assertion(
+    tmp_path: Path, drift: str | None
+) -> None:
+    from tests.support.acts_preservation import ARCHIVE, TEST_PATH, acts_predecessor
+
+    archive = tmp_path / ARCHIVE
+    archive.parent.mkdir(parents=True)
+    archive.write_bytes((ROOT / ARCHIVE).read_bytes())
+    raw = (ROOT / TEST_PATH).read_bytes()
+    if drift is None:
+        assert acts_predecessor(tmp_path, TEST_PATH, raw) == archive.read_bytes()
+        assert acts_predecessor(tmp_path, "tests/unrelated.py", raw) == raw
+        return
+    if drift == "archive":
+        archive.write_bytes(archive.read_bytes() + b"\n")
+    else:
+        tree = ast.parse(raw)
+        original = next(node for node in tree.body if isinstance(node, ast.FunctionDef))
+        addition = next(
+            node
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name.startswith("test_acts_")
+        )
+        if drift in {"original", "addition"}:
+            (original if drift == "original" else addition).body = [ast.Pass()]
+        elif drift == "omission":
+            tree.body.remove(addition)
+        else:
+            tree.body.append(addition)
+        raw = ast.unparse(tree).encode()
+    with pytest.raises(ValueError, match="Acts"):
+        acts_predecessor(tmp_path, TEST_PATH, raw)
+
+
+@pytest.mark.parametrize(
+    "mutation", [None, "archive", "original", "addition", "omission", "duplicate"]
+)
+def test_acts_comparison_registration_preserves_exact_historical_helper(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str | None
+) -> None:
+    from tests.support import acts_preservation as acts
+
+    target = tmp_path / acts.PROVENANCE_ARCHIVE
+    target.parent.mkdir(parents=True)
+    target.write_bytes((ROOT / acts.PROVENANCE_ARCHIVE).read_bytes())
+    current = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    if mutation is None:
+        assert acts.acts_provenance_predecessor(tmp_path, current) == target.read_bytes()
+        return
+    if mutation == "archive":
+        target.write_bytes(target.read_bytes() + b"\n")
+    elif mutation == "original":
+        current = current.replace(b"return contexts.get(relative)", b"return None")
+    elif mutation == "addition":
+        current = current.replace(b"(scopes.ACTS_BASE,)", b"(scopes.EC_BASE,)")
+    elif mutation == "omission":
+        current = current.replace(acts.PROVENANCE_ADDITIONS[0], b"")
+    else:
+        current += acts.PROVENANCE_ADDITIONS[0]
+    # Re-pinning current bytes cannot hide a changed old predicate or broadened addition.
+    monkeypatch.setattr(acts, "PROVENANCE_AFTER_SHA256", hashlib.sha256(current).hexdigest())
+    with pytest.raises(ValueError, match="registered edition provenance inputs changed"):
+        acts.acts_provenance_predecessor(tmp_path, current)
+
+
+@pytest.mark.parametrize(
+    "mutation", [None, "archive", "unrelated", "omission", "duplicate", "adjacent"]
+)
+def test_acts_live_consumer_rename_preserves_exact_original_bytes(
+    tmp_path: Path, mutation: str | None
+) -> None:
+    from tests.support import acts_preservation as acts
+
+    target = tmp_path / acts.CONSUMER_ARCHIVE
+    target.parent.mkdir(parents=True)
+    target.write_bytes((ROOT / acts.CONSUMER_ARCHIVE).read_bytes())
+    current = (ROOT / acts.CONSUMER_PATH).read_bytes()
+    if mutation is None:
+        assert acts.acts_predecessor(tmp_path, acts.CONSUMER_PATH, current) == target.read_bytes()
+        # Exercise the actual immutable migration consumer, not only the projection helper.
+        original, record = migration.verify_migrated_test(
+            ROOT, "tests/unit/reporting/test_runtime_consumer_evidence.py"
+        )
+        assert hashlib.sha256(original).hexdigest() == record["original_sha256"]
+        return
+    if mutation == "archive":
+        target.write_bytes(target.read_bytes() + b"\n")
+    elif mutation == "unrelated":
+        current += b"\nUNRELATED_INITIALIZER = True\n"
+    elif mutation == "omission":
+        current = current.replace(acts.CONSUMER_NEW_TOKEN, acts.CONSUMER_OLD_TOKEN)
+    elif mutation == "duplicate":
+        current += b"\n" + acts.CONSUMER_NEW_TOKEN
+    else:
+        current = current.replace(
+            acts.CONSUMER_NEW_TOKEN, b"adepta_sororitas_army_rule.UNIT_DESTROYED_HOOK_ID"
+        )
+    with pytest.raises(ValueError, match="Acts runtime-consumer"):
+        acts.acts_predecessor(tmp_path, acts.CONSUMER_PATH, current)
+
+
+@pytest.mark.parametrize(
+    "mutation", [None, "archive", "recipe", "assertion", "initializer", "omission"]
+)
+def test_acts_inactive_api_maintenance_preserves_original_evidence(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str | None
+) -> None:
+    from scripts.build_test_shards import behavioral_selection, validate_acts_inactive_source
+
+    from tests.support import acts_preservation as acts
+
+    for path in (acts.INACTIVE_ARCHIVE, acts.INACTIVE_RECIPE):
+        target = tmp_path / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((ROOT / path).read_bytes())
+    current = (ROOT / acts.INACTIVE_PATH).read_bytes()
+    live = tmp_path / acts.INACTIVE_PATH
+    live.parent.mkdir(parents=True, exist_ok=True)
+    live.write_bytes(current)
+    if mutation is None:
+        validate_acts_inactive_source(tmp_path)
+        behavioral_selection(ROOT)
+        original = acts.acts_inactive_predecessor(tmp_path, current)
+        ledger = json.loads(
+            (ROOT / "data/source_audits/ci64_provenance_v1/test-cutover.json").read_bytes()
+        )
+        assert (
+            hashlib.sha256(original).hexdigest()
+            == ledger["inactive_legacy_files"][acts.INACTIVE_PATH]["sha256"]
+        )
+        assert acts.INACTIVE_PATH not in ledger["active_files"]
+        assert (
+            ledger["inactive_updates"][acts.INACTIVE_PATH]["recipe"]
+            == "acts-turn-api-maintenance-v1"
+        )
+        return
+    if mutation in {"archive", "recipe"}:
+        target = tmp_path / (
+            acts.INACTIVE_ARCHIVE if mutation == "archive" else acts.INACTIVE_RECIPE
+        )
+        target.write_bytes(target.read_bytes() + b"\n")
+    elif mutation == "assertion":
+        current = current.replace(b"assert len(pool) == 1", b"assert True", 1)
+    elif mutation == "initializer":
+        current += b"\nUNRELATED_INITIALIZER = True\n"
+    else:
+        current = current.replace(
+            b"army_rule.TURN_START_TRIGGER", b"army_rule.BATTLE_ROUND_START_TRIGGER", 1
+        )
+    live.write_bytes(current)
+    with pytest.raises(SystemExit, match="Acts inactive"):
+        validate_acts_inactive_source(tmp_path)
+    with pytest.raises(ValueError, match="Acts inactive"):
+        acts.acts_inactive_predecessor(tmp_path, current)
+
+    if mutation == "initializer":
+        ledger_path = ROOT / "data/source_audits/ci64_provenance_v1/test-cutover.json"
+        ledger = json.loads(ledger_path.read_bytes())
+        ledger["inactive_updates"][acts.INACTIVE_PATH]["after"] = {
+            "mode": "100644",
+            "bytes": len(current),
+            "sha256": hashlib.sha256(current).hexdigest(),
+            "blob_sha1": hashlib.sha1(
+                b"blob " + str(len(current)).encode() + b"\0" + current
+            ).hexdigest(),
+        }
+        original_read_bytes = Path.read_bytes
+
+        def repinned_bytes(target: Path) -> bytes:
+            if target == ROOT / acts.INACTIVE_PATH:
+                return current
+            if target == ledger_path:
+                return json.dumps(ledger).encode()
+            return original_read_bytes(target)
+
+        # Even a coordinated current-file and metadata re-pin cannot widen admission.
+        with monkeypatch.context() as patch:
+            patch.setattr(Path, "read_bytes", repinned_bytes)
+            with pytest.raises(SystemExit, match="Acts inactive"):
+                behavioral_selection(ROOT)
