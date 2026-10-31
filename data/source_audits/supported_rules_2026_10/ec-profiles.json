@@ -225,8 +225,8 @@
     "EC Sorcerer000004085 is present in raw source but absent from the59-sheet supported component catalog; observedT5 and weapon values are inventory only, with no support promotion.",
     "Other faction books, datasheets, weapons, characteristics and nonexecuting World Eaters detachments remain unaudited or inaccessible."
   ],
-  "performance_admission": "Pending scoped decision. Existing mandatory source-loader operation selects external_contract_source_reuse; historicalv4 accepts exactbc9 only and rejects currentbase105b. No checker, role spec, map or historical measurements changed here.",
+  "performance_admission": "Owner-approved finite reviewed scopes implemented in existing v4; EC actual base105b and exact spec raw/canonical hashes, closed roles and unchanged six fresh original-workload samples required. Original Vyper scope/spec/report bytes retained. Full qualification pending.",
   "validation_status": "Focused validation recorded separately. Full coverage, four strict quality lanes, serial smoke, types/contracts/package, independent exact-head reviews and hosted CI remain required before delivery.",
-  "provenance_admission": "Unchanged active-edition guard reproduced one failure: the new overlay artifact contains its truthful historical base package version. A finite hash-authenticated artifact/spec/report provenance registry and preserved predecessor proof are proposed, not implemented.",
+  "provenance_admission": "Exact registered overlay/spec and authenticated report historical inventory projection implemented. Successor route/helper/predecessor authenticated before unchanged original verifier chain; other fields remain actively scanned.",
   "rng_fixture_observation": "Current weapon descriptors change native decision/event payloads included in deterministic RNG history. Two retained seeded Icon outcomes change; explicit uncapped success/failure and capped-success cases are preserved, with added original-RNG/total/threshold assertions. No RNG or CP rule code changed."
 }

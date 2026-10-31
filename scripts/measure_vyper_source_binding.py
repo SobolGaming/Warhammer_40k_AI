@@ -94,7 +94,8 @@ def invoke_owned(
     return directory
 
 
-def run(base: Path, head: Path, output: Path) -> None:
+def run(base: Path, head: Path, output: Path, *, scope_base: str = exact.BASE) -> None:
+    scope = exact.registered_scope(scope_base)
     started = time.monotonic()
     remaining_job = (
         3600 - (time.time() - float(os.environ["REUSE_JOB_START"])) - 120
@@ -121,18 +122,18 @@ def run(base: Path, head: Path, output: Path) -> None:
             raise ValueError("Measurements require clean committed source checkouts.")
     if (
         subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=base).decode().strip()
-        != exact.BASE
+        != scope.base
     ):
-        raise ValueError("Measurement baseline must be exact PR600 main.")
+        raise ValueError("Measurement baseline must equal the registered reviewed base.")
     head_revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=head).decode().strip()
     input_digest = canonical_digest(runtime_inputs(head))
     binding = exact.comparison_inputs(
-        head, base=exact.BASE, head_input_digest=input_digest, measured_head=head_revision
+        head, base=scope.base, head_input_digest=input_digest, measured_head=head_revision
     )
     sides = original.input_object(binding["sides"])
     for side, root in roots.items():
         expected = original.input_object(original.input_object(sides[side])["inventory"])
-        observed, _ = exact.current_inventory(root)
+        observed, _ = exact.current_inventory(root, scope_base=scope.base)
         if observed != expected:
             raise ValueError(
                 "Physical checkout differs from independently bound " + side + " Git bytes."
@@ -141,12 +142,12 @@ def run(base: Path, head: Path, output: Path) -> None:
     write(output / "input-binding-before.json", binding)
     dependencies = dependency_identity()
     write(output / "dependencies-before.json", dependencies)
-    harness = {p: hashlib.sha256((head / p).read_bytes()).hexdigest() for p in exact.HARNESS}
+    harness = {p: hashlib.sha256((head / p).read_bytes()).hexdigest() for p in scope.harness}
     if original.input_object(binding["harness"])["head"] != harness:
         raise ValueError("Executing harness differs from the admitted candidate.")
     external_harness = output / "harness"
     external_harness.mkdir()
-    for relative in exact.HARNESS:
+    for relative in scope.harness:
         target = external_harness / Path(relative).name
         if target.exists():
             raise ValueError("Ambiguous copied harness basename.")
@@ -175,7 +176,7 @@ def run(base: Path, head: Path, output: Path) -> None:
 
     def check_arms() -> None:
         for arm_side, arm in roots.items():
-            actual, _ = exact.current_inventory(arm)
+            actual, _ = exact.current_inventory(arm, scope_base=scope.base)
             expected = original.input_object(original.input_object(sides[arm_side])["inventory"])
             if actual != expected or subprocess.check_output(
                 ["git", "status", "--porcelain", "--untracked-files=normal"], cwd=arm
@@ -328,7 +329,7 @@ def run(base: Path, head: Path, output: Path) -> None:
         raise TimeoutError("Original controller deadline exceeded before completion.")
     after = exact.comparison_inputs(
         head,
-        base=exact.BASE,
+        base=scope.base,
         head_input_digest=canonical_digest(runtime_inputs(head)),
         measured_head=head_revision,
     )
@@ -338,7 +339,7 @@ def run(base: Path, head: Path, output: Path) -> None:
     if after != binding or after_dependencies != dependencies:
         raise ValueError("Source, harness or installed dependencies changed during measurements.")
     for side, root in roots.items():
-        current, _ = exact.current_inventory(root)
+        current, _ = exact.current_inventory(root, scope_base=scope.base)
         if current != original.input_object(original.input_object(sides[side])["inventory"]):
             raise ValueError("Measured checkout changed during samples: " + side)
     host = {
@@ -359,7 +360,7 @@ def run(base: Path, head: Path, output: Path) -> None:
         "policy": POLICY,
         "family": original.FAMILY,
         "workload_id": original.WORKLOAD_ID,
-        "base_revision": exact.BASE,
+        "base_revision": scope.base,
         "head_runtime_build_id": runtime_id(head),
         "head_input_digest": input_digest,
         "budget_profile": "current-change-relative-v1",
@@ -382,7 +383,7 @@ def run(base: Path, head: Path, output: Path) -> None:
     )[original.FAMILY]
     validate_comparison(
         report,
-        base=exact.BASE,
+        base=scope.base,
         runtime_id=runtime_id(head),
         input_digest=input_digest,
         family=original.FAMILY,
@@ -421,8 +422,9 @@ def main() -> None:
     parser.add_argument("--base-root", type=Path, required=True)
     parser.add_argument("--head-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--scope-base", default=exact.BASE)
     args = parser.parse_args()
-    run(args.base_root, args.head_root, args.output)
+    run(args.base_root, args.head_root, args.output, scope_base=args.scope_base)
 
 
 if __name__ == "__main__":

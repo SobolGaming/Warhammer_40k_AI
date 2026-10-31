@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from tools.source_scope_provenance import registered_provenance_text
 
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     datasheets as chaos_daemons_datasheets,
@@ -595,6 +596,9 @@ def _vyper_provenance_text(path: Path, raw: bytes) -> str:
 def _active_identity_text(path: Path) -> str:
     """Keep exact historical hash-map keys distinct from active edition identities."""
     raw = path.read_bytes()
+    registered = registered_provenance_text(ROOT, path, raw, _historical_snapshot_inputs)
+    if registered is not None:
+        return registered
     if path in {
         ROOT / VYPER_CURRENT_COMPARISON,
         *(ROOT / relative for relative in VYPER_PROVENANCE_DOCUMENT_SHA256),

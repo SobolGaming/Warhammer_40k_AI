@@ -155,7 +155,7 @@ def binding_enabled(family: str, specification: dict[str, object]) -> bool:
         {"schema": SCHEMA, "role_specification": SPEC_PATH},
         {"schema": fresh.SCHEMA, "role_specification": fresh.SPEC_PATH},
         {"schema": current.SCHEMA, "role_specification": current.SPEC_PATH},
-        {"schema": exact.SCHEMA, "role_specification": exact.SPEC_PATH},
+        *exact.registered_declarations(),
     )
     if family == FAMILY:
         if (

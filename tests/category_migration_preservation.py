@@ -31,7 +31,7 @@ UTF8_AFTER_SHA256 = "7b4ce6c6d14243afe9f08fedf616e867f9555a5101e98de45bad130f66f
 EDITION_TEST = "tests/code_quality/test_phase14a_source_identity.py"
 EDITION_ARCHIVE = "docs/performance/policy-v3/ci-compatibility-20261015/phase14a-original.py.txt"
 EDITION_BEFORE_SHA256 = "22146cd184b4267c71b482cba021cd31387c8df1bd4a0d27f1157647cbc93e8b"
-EDITION_AFTER_SHA256 = "4d4edccdda4369e6e0aeafb41d0f13ed4dcad0696ccefaa86149cb8de1516302"
+EDITION_AFTER_SHA256 = "4f6077374fffba2c61f6897787bc21d055fa9f8fb66ce23f4fd66746919580c3"
 
 EDITION_PREDECESSOR_ARCHIVE = (
     "docs/performance/policy-v3/vyper-provenance-20261030/phase14a-predecessor.py.txt"
@@ -545,6 +545,65 @@ def verify_migrated_test(root: Path, relative: str) -> tuple[bytes, MigrationRec
     return original, record
 
 
+EDITION_REGISTERED_PREDECESSOR_ARCHIVE = (
+    "docs/performance/policy-v3/ec-provenance-20261031/phase14a-predecessor.py.txt"
+)
+EDITION_REGISTERED_PREDECESSOR_SHA256 = (
+    "4d4edccdda4369e6e0aeafb41d0f13ed4dcad0696ccefaa86149cb8de1516302"
+)
+EDITION_REGISTERED_IMPORT_SHA256 = (
+    "f67ec0a0ffcb37b984562549e1d3e4cb84211849e215160d29655045e7bfc1df"
+)
+EDITION_REGISTERED_ROUTE_SHA256 = "1402402bbc5c2fed88a1d8bd9fbce244757ce18d582a5eb26631bb4ef8ea987b"
+EDITION_REGISTERED_HELPER = "tools/source_scope_provenance.py"
+EDITION_REGISTERED_HELPER_SHA256 = (
+    "ae08dd5bb7277eb4cf86bae7ecb881cb15a16917ba05fac7a14c74d07376ba04"
+)
+
+
+def edition_registered_predecessor(root: Path, current: bytes) -> bytes:
+    """Authenticate the registered projection, then retain the original proof chain."""
+    predecessor = _read(root, EDITION_REGISTERED_PREDECESSOR_ARCHIVE)
+    if (
+        hashlib.sha256(predecessor).hexdigest() != EDITION_REGISTERED_PREDECESSOR_SHA256
+        or hashlib.sha256(_read(root, EDITION_REGISTERED_HELPER)).hexdigest()
+        != EDITION_REGISTERED_HELPER_SHA256
+    ):
+        raise ValueError("Exact registered edition provenance inputs changed.")
+    tree = ast.parse(current)
+    imports = [
+        node
+        for node in tree.body
+        if isinstance(node, ast.ImportFrom) and node.module == "tools.source_scope_provenance"
+    ]
+    if len(imports) != 1 or (
+        hashlib.sha256(ast.dump(imports[0]).encode()).hexdigest()
+        != EDITION_REGISTERED_IMPORT_SHA256
+    ):
+        raise ValueError("Exact registered edition provenance import changed.")
+    tree.body.remove(imports[0])
+    routes = [
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "_active_identity_text"
+    ]
+    if (
+        len(routes) != 1
+        or len(routes[0].body) < 4
+        or (
+            hashlib.sha256(
+                ast.dump(ast.Module(body=routes[0].body[2:4], type_ignores=[])).encode()
+            ).hexdigest()
+            != EDITION_REGISTERED_ROUTE_SHA256
+        )
+    ):
+        raise ValueError("Exact registered edition provenance route changed.")
+    del routes[0].body[2:4]
+    if ast.dump(tree) != ast.dump(ast.parse(predecessor)):
+        raise ValueError("Original edition assertions or unrelated semantics changed.")
+    return predecessor
+
+
 def edition_provenance_predecessor(root: Path, current: bytes) -> bytes:
     """Authenticate only the reviewed additive guard extension before its old proof."""
     predecessor = _read(root, EDITION_PREDECESSOR_ARCHIVE)
@@ -603,6 +662,7 @@ def read_historical_test_bytes(root: Path, relative: str) -> bytes:
             or hashlib.sha256(original).hexdigest() != EDITION_BEFORE_SHA256
         ):
             raise ValueError("Exact edition-scanner maintenance bytes changed.")
+        current = edition_registered_predecessor(root, current)
         current = edition_provenance_predecessor(root, current)
         before = b'_without_non_edition_references(path.read_text(encoding="utf-8"))'
         after = b"_without_non_edition_references(_active_identity_text(path))"

@@ -1,4 +1,4 @@
-"""Fresh source-overlay comparison bound to the exact PR600 base.
+"""Fresh source-overlay comparisons bound to finite reviewed exact-base scopes.
 
 Historical v1/v2/v3 specifications and receipts remain separate. The role lists
 are closed: every other selected byte must be identical between the two arms.
@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+from dataclasses import dataclass
 from pathlib import Path
 
 from tools import performance_tool_inputs as original
@@ -68,19 +69,141 @@ HARNESS = frozenset(
 REQUIRED = original.REQUIRED | (HARNESS - {DRIVER})
 
 
-def selected(path: str) -> bool:
+@dataclass(frozen=True, slots=True)
+class ReviewedScope:
+    base: str
+    spec_path: str
+    spec_raw_sha256: str
+    spec_canonical_sha256: str
+    report_path: str
+    new_treatment: frozenset[str]
+    treatment: frozenset[str]
+    derived: frozenset[str]
+    control: frozenset[str]
+    required: frozenset[str]
+    harness: frozenset[str]
+
+
+EC_BASE = "105b467b1140e6d9ff6710a74ed839ad225d17ec"
+EC_SPEC_PATH = "docs/performance/policy-v3/ec-profile-input-roles-v4.json"
+EC_REPORT_PATH = "docs/performance/current/ec-profile-105b-v4.json"
+_SCOPES = (
+    ReviewedScope(
+        BASE,
+        SPEC_PATH,
+        "76d0e3bc6cd71c5205cabf30c990f16bf190632953d5fec2978ac660abb7c37f",
+        "0df4b51388949aa86d8fd0cc4f0952e49341d80a6bd1c57754971209576fd258",
+        "docs/performance/current/vyper-source-bc9-v4.json",
+        NEW_TREATMENT,
+        TREATMENT,
+        DERIVED,
+        CONTROL,
+        REQUIRED,
+        HARNESS,
+    ),
+    ReviewedScope(
+        EC_BASE,
+        EC_SPEC_PATH,
+        "46cc5ec90ac5ac8f4caebdd750abcd1a22d93079a1d57fd7537bb661a7cfff6d",
+        "bb1e1ffb9595bd19f58c98622ea1bd03937f9e93825b6f9f33569c7bb1cfc705",
+        EC_REPORT_PATH,
+        frozenset(
+            [
+                "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_profiles_2026_10.overlay-pack.json",
+                "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_profiles_2026_10.py",
+                "tools/generate_emperors_children_current_profiles.py",
+            ]
+        ),
+        frozenset(
+            [
+                "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_profiles_2026_10.overlay-pack.json",
+                "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_profiles_2026_10.py",
+                "tools/ability_support_sources.py",
+                "tools/generate_emperors_children_current_profiles.py",
+            ]
+        ),
+        frozenset(
+            [
+                "contracts/examples/persistence/session-persistence.json",
+                "contracts/examples/sessions/session-command-outcome.json",
+                "contracts/examples/sessions/session-command-started.json",
+                "contracts/examples/sessions/session-metadata-created.json",
+                "contracts/examples/support-profile-player-a-redacted.json",
+                "contracts/examples/support-profile-player-b-redacted.json",
+                "contracts/examples/support-profile.json",
+                "contracts/manifest.json",
+                "src/warhammer40k_core/_engine_build_manifest.json",
+            ]
+        ),
+        frozenset(
+            [
+                "data/source_audits/ci64_provenance_v1/test-cutover.json",
+                "data/source_audits/supported_rules_2026_10/ec-profiles.json",
+                "docs/performance/policy-v3/ec-profile-input-roles-v4.json",
+                "docs/performance/policy-v3/ec-provenance-20261031/phase14a-predecessor.py.txt",
+                "docs/performance/policy-v3/operation-map.json",
+                "scripts/check_performance_policy.py",
+                "scripts/measure_vyper_source_binding.py",
+                "tests/category_migration_preservation.py",
+                "tests/code_quality/test_category_migration_preservation.py",
+                "tests/code_quality/test_current_comparison_routing.py",
+                "tests/code_quality/test_phase14a_source_identity.py",
+                "tests/code_quality/test_registered_source_scopes.py",
+                "tests/factions/emperors_children/test_selected_consumers.py",
+                "tools/performance_tool_inputs.py",
+                "tools/performance_tool_inputs_v4.py",
+                "tools/source_scope_provenance.py",
+            ]
+        ),
+        REQUIRED,
+        HARNESS,
+    ),
+)
+
+
+def registered_scope(base: str = BASE) -> ReviewedScope:
+    matches = [scope for scope in _SCOPES if scope.base == base]
+    if len(matches) != 1:
+        raise ValueError("V4 requires an exact PR600 or registered reviewed base.")
+    return matches[0]
+
+
+def scope_for_specification(path: str) -> ReviewedScope:
+    matches = [scope for scope in _SCOPES if scope.spec_path == path]
+    if len(matches) != 1:
+        raise ValueError("Unknown v4 reviewed role specification.")
+    return matches[0]
+
+
+def registered_declarations() -> tuple[dict[str, str], ...]:
+    return tuple({"schema": SCHEMA, "role_specification": scope.spec_path} for scope in _SCOPES)
+
+
+def validate_scope_binding(base: str, binding: dict[str, object]) -> ReviewedScope:
+    scope = registered_scope(base)
+    if (
+        binding.get("schema") != SCHEMA
+        or binding.get("role_spec_sha256") != scope.spec_canonical_sha256
+    ):
+        raise ValueError("V4 report does not bind the exact registered scope.")
+    return scope
+
+
+def selected(path: str, *, scope_base: str = BASE) -> bool:
     """Complete code, source-data, schema and copied-output input boundaries.
 
     Current reports live only under docs/performance/current; neither reports nor
     the assessment recursively hash themselves. The fixed role spec is included.
     """
+    scope = registered_scope(scope_base)
     return (
         path.startswith(("src/", "tests/", "scripts/", "tools/", "contracts/", "schemas/", "data/"))
-        or path in REQUIRED | CONTROL
+        or path in scope.required | scope.control
     )
 
 
-def validate_spec(spec: dict[str, object]) -> None:
+def validate_spec(spec: dict[str, object], *, scope_base: str = BASE) -> None:
+    scope = registered_scope(scope_base)
     if spec.keys() != {
         "schema",
         "family",
@@ -95,33 +218,38 @@ def validate_spec(spec: dict[str, object]) -> None:
         SCHEMA,
         original.FAMILY,
         original.WORKLOAD,
-        BASE,
+        scope.base,
     ):
         raise ValueError("Unsupported v4 exact-base role specification.")
     control = original.input_object(spec["control_plane"])
     original.input_paths(list(control))
     if (
-        frozenset(original.input_paths(spec["treatment"])) != TREATMENT
-        or frozenset(original.input_paths(spec["derived_outputs"])) != DERIVED
-        or control.keys() != CONTROL
-        or frozenset(original.input_paths(spec["required_dependencies"])) != REQUIRED
-        or frozenset(original.input_paths(spec["harness"])) != HARNESS
+        frozenset(original.input_paths(spec["treatment"])) != scope.treatment
+        or frozenset(original.input_paths(spec["derived_outputs"])) != scope.derived
+        or control.keys() != scope.control
+        or frozenset(original.input_paths(spec["required_dependencies"])) != scope.required
+        or frozenset(original.input_paths(spec["harness"])) != scope.harness
     ):
         raise ValueError("V4 roles differ from the exact reviewed workload scope.")
-    if TREATMENT & (DERIVED | CONTROL) or DERIVED & CONTROL:
+    if scope.treatment & (scope.derived | scope.control) or scope.derived & scope.control:
         raise ValueError("Overlapping v4 roles.")
     if any(not isinstance(reason, str) or len(reason.strip()) < 20 for reason in control.values()):
         raise ValueError("Every v4 control requires an explicit workload-role reason.")
 
+    if original.digest(spec) != scope.spec_canonical_sha256:
+        raise ValueError("V4 specification differs from its registered canonical digest.")
 
-def read_role_spec(root: Path) -> dict[str, object]:
-    path = root / SPEC_PATH
+
+def read_role_spec(root: Path, *, scope_base: str = BASE) -> dict[str, object]:
+    scope = registered_scope(scope_base)
+    path = root / scope.spec_path
     if path.is_symlink() or not path.is_file():
         raise ValueError("V4 specification must be a regular reviewed file.")
-    spec = original.input_object(
-        json.loads(path.read_bytes(), object_pairs_hook=original.unique_input_object)
-    )
-    validate_spec(spec)
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != scope.spec_raw_sha256:
+        raise ValueError("V4 specification raw bytes differ from its reviewed registration.")
+    spec = original.input_object(json.loads(raw, object_pairs_hook=original.unique_input_object))
+    validate_spec(spec, scope_base=scope.base)
     return spec
 
 
@@ -136,11 +264,12 @@ def classify_inputs(
     harness_base: dict[str, str],
     harness_head: dict[str, str],
 ) -> dict[str, object]:
-    validate_spec(spec)
+    scope = registered_scope(base_revision)
+    validate_spec(spec, scope_base=scope.base)
     for identity, length in ((base_revision, 40), (head_revision, 40), (head_input_digest, 64)):
         if len(identity) != length or any(c not in "0123456789abcdef" for c in identity):
             raise ValueError("Missing actual v4 revision/input digest.")
-    if base_revision != BASE or head_revision == BASE:
+    if base_revision != scope.base or head_revision == scope.base:
         raise ValueError("V4 requires the exact PR600 base and a fresh head.")
     for inventory in (base, head, harness_base, harness_head):
         original.input_paths(list(inventory))
@@ -150,20 +279,24 @@ def classify_inputs(
         ):
             raise ValueError("V4 inputs require complete raw-byte SHA256 identities.")
     if (
-        not base.keys() >= REQUIRED | DERIVED | (TREATMENT - NEW_TREATMENT)
-        or base.keys() & NEW_TREATMENT
+        not base.keys() >= scope.required | scope.derived | (scope.treatment - scope.new_treatment)
+        or base.keys() & scope.new_treatment
     ):
         raise ValueError("V4 base source/dependency presence differs from the reviewed base.")
-    if not head.keys() >= REQUIRED | TREATMENT | DERIVED | CONTROL:
+    if not head.keys() >= scope.required | scope.treatment | scope.derived | scope.control:
         raise ValueError("V4 head lacks required source/dependency inputs.")
-    common_base = {p: v for p, v in base.items() if p not in TREATMENT | DERIVED | CONTROL}
-    common_head = {p: v for p, v in head.items() if p not in TREATMENT | DERIVED | CONTROL}
+    common_base = {
+        p: v for p, v in base.items() if p not in scope.treatment | scope.derived | scope.control
+    }
+    common_head = {
+        p: v for p, v in head.items() if p not in scope.treatment | scope.derived | scope.control
+    }
     if common_base != common_head:
         raise ValueError("True common source/fixture/workload/dependency inputs changed.")
     if (
-        harness_base.keys() != HARNESS
+        harness_base.keys() != scope.harness
         or harness_base != harness_head
-        or harness_head != {p: head[p] for p in HARNESS}
+        or harness_head != {p: head[p] for p in scope.harness}
     ):
         raise ValueError("V4 requires the same independently bound harness on both arms.")
     sides: dict[str, object] = {}
@@ -172,9 +305,9 @@ def classify_inputs(
             "revision": revision,
             "inventory": inventory,
             "inventory_sha256": original.digest(inventory),
-            "implementation": {p: inventory.get(p) for p in sorted(TREATMENT)},
-            "derived_outputs": {p: inventory[p] for p in sorted(DERIVED)},
-            "control_plane": {p: inventory.get(p) for p in sorted(CONTROL)},
+            "implementation": {p: inventory.get(p) for p in sorted(scope.treatment)},
+            "derived_outputs": {p: inventory[p] for p in sorted(scope.derived)},
+            "control_plane": {p: inventory.get(p) for p in sorted(scope.control)},
         }
     return {
         "schema": SCHEMA,
@@ -192,7 +325,9 @@ def classify_inputs(
     }
 
 
-def git_inventory(root: Path, revision: str) -> tuple[dict[str, str], dict[str, str]]:
+def git_inventory(
+    root: Path, revision: str, *, scope_base: str = BASE
+) -> tuple[dict[str, str], dict[str, str]]:
     """Hash independently fetched Git blobs in bounded batches, without checkout."""
     git = ["git", "-c", f"safe.directory={root.as_posix()}"]
     entries = subprocess.check_output([*git, "ls-tree", "-r", "-z", revision], cwd=root)
@@ -201,7 +336,7 @@ def git_inventory(root: Path, revision: str) -> tuple[dict[str, str], dict[str, 
         if row:
             metadata, path = row.split("\t", 1)
             mode, kind, oid = metadata.split()
-            if selected(path):
+            if selected(path, scope_base=scope_base):
                 if kind != "blob" or mode not in {"100644", "100755"}:
                     raise ValueError("V4 inputs must be regular Git blobs.")
                 objects[path] = oid
@@ -228,7 +363,9 @@ def git_inventory(root: Path, revision: str) -> tuple[dict[str, str], dict[str, 
     return inventory, objects
 
 
-def current_inventory(root: Path) -> tuple[dict[str, str], dict[str, str]]:
+def current_inventory(
+    root: Path, *, scope_base: str = BASE
+) -> tuple[dict[str, str], dict[str, str]]:
     names = set(
         subprocess.check_output(
             ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=root
@@ -253,7 +390,7 @@ def current_inventory(root: Path) -> tuple[dict[str, str], dict[str, str]]:
     inventory: dict[str, str] = {}
     blobs: dict[str, str] = {}
     for name in sorted(names):
-        if selected(name):
+        if selected(name, scope_base=scope_base):
             path = root / name
             if path.is_symlink():
                 raise ValueError("V4 current inputs must be regular files.")
@@ -269,22 +406,23 @@ def current_inventory(root: Path) -> tuple[dict[str, str], dict[str, str]]:
 def comparison_inputs(
     root: Path, *, base: str, head_input_digest: str, measured_head: str | None
 ) -> dict[str, object]:
-    if base != BASE:
-        raise ValueError("V4 requires the exact PR600 base.")
-    spec = read_role_spec(root)
-    before, _ = git_inventory(root, base)
-    after, blobs = current_inventory(root)
+    scope = registered_scope(base)
+    # Preserve original entry signatures for the historical scope and its controls.
+    options = {} if base == BASE else {"scope_base": base}
+    spec = read_role_spec(root, **options)
+    before, _ = git_inventory(root, base, **options)
+    after, blobs = current_inventory(root, **options)
     revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root).decode().strip()
     if measured_head is not None:
         if len(measured_head) != 40 or any(c not in "0123456789abcdef" for c in measured_head):
             raise ValueError("Invalid v4 measured revision selector.")
         # Squash-merged main may not descend from the measured branch commit.
         # The retained Git object is a locator; independently equal bytes admit it.
-        _, measured_blobs = git_inventory(root, measured_head)
+        _, measured_blobs = git_inventory(root, measured_head, **options)
         if measured_blobs != blobs:
             raise ValueError("V4 measured head bytes differ from the current source inventory.")
         revision = measured_head
-    harness = {p: after[p] for p in HARNESS}
+    harness = {p: after[p] for p in scope.harness}
     return classify_inputs(
         spec=spec,
         base=before,

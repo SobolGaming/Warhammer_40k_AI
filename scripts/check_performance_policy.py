@@ -75,8 +75,8 @@ def _fresh_comparison_metadata(
             and isinstance(binding, dict)
             and binding.get("schema") == exact.SCHEMA
         )
-        if exact_binding and base != exact.BASE:
-            raise ValueError("V4 current admission requires the exact PR600 base.")
+        if exact_binding:
+            exact.validate_scope_binding(base, object_value(binding))
         if not exact_binding and (
             family in input_bound_families
             or {"owner_exception", "input_binding", "ordered_pairs"} & report.keys()
@@ -407,6 +407,16 @@ def _validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict
     input_digest = canonical_digest(inputs)
     comparisons = object_value(assessment["comparisons"])
     families = object_value(operation_map["families"])
+    from tools import performance_tool_inputs_v4 as registered_scopes
+
+    for family in selected:
+        declaration = object_value(object_value(families[family]).get("input_binding", {}))
+        if (
+            declaration.get("schema") == registered_scopes.SCHEMA
+            and declaration.get("role_specification")
+            != registered_scopes.registered_scope(base).spec_path
+        ):
+            raise ValueError("Current family capability does not match the registered base scope.")
     base_identity = object_value(json.loads(_base_manifest(root, base)))["build_id"]
     if not isinstance(base_identity, str):
         raise TypeError("Base runtime identity missing.")

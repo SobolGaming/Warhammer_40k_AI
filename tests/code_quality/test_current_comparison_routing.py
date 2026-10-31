@@ -370,7 +370,10 @@ def test_exact_v4_uses_current_transaction_without_reclassifying_history(
     assessment["comparisons"] = {original.FAMILY: REPORT}
     report["base_revision"] = exact.BASE
     report["family"] = original.FAMILY
-    report["input_binding"] = {"schema": exact.SCHEMA}
+    report["input_binding"] = {
+        "schema": exact.SCHEMA,
+        "role_spec_sha256": exact.registered_scope().spec_canonical_sha256,
+    }
     report["generated_output_binding"] = {"base": [], "head": []}
     base = exact.BASE
     base_paths: set[str] = set()
