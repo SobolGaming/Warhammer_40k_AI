@@ -198,7 +198,7 @@
       "workload_id": "external-contract-orphan-write-independent-check-v1",
       "input_binding": {
         "schema": "tool-input-roles-v4",
-        "role_specification": "docs/performance/policy-v3/ec-profile-input-roles-v4.json"
+        "role_specification": "docs/performance/policy-v3/acts-of-faith-input-roles-v4.json"
       }
     },
     "session_command_fork": {
