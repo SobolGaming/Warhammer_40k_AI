@@ -104,8 +104,8 @@ _SCOPES = (
     ReviewedScope(
         EC_BASE,
         EC_SPEC_PATH,
-        "fb4d0c667a84c944fca4dadf717701d9d608d7c7f58fc4fdc3dd2a433dddc4b9",
-        "2f3b24254f1fdde4ff337b27a7a8e6b53b17ba91b02dc4223c98e0618cb8bc33",
+        "16397e5ffb71cac67ceb6fc5a1754e3f271a0a16b3864292d7bbc8e9d0ef3e7d",
+        "32d32f5822835a19bab1f92804198d076a3ad2c35ea2e2638934027e7d9f9310",
         EC_REPORT_PATH,
         frozenset(
             [
@@ -157,6 +157,7 @@ _SCOPES = (
                 "tests/rules/section05/coverage.json",
                 "tests/rules/section05/test_rolls.py",
                 "tests/rules/section05/test_toughness.py",
+                "tests/rules/section18/coverage.json",
                 "tests/rules/section18/test_emergency_status.py",
                 "tests/support/section05_fixtures.py",
                 "tools/performance_tool_inputs.py",

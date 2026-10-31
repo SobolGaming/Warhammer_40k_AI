@@ -30689,6 +30689,7 @@
     "supported-ec-source-fixture-controls": {
       "paths": [
         "tests/rules/section05/coverage.json",
+        "tests/rules/section18/coverage.json",
         "tests/rules/section02/test_02_04_01_constructed_contract.py",
         "tests/rules/section02/test_02_04_weapons.py",
         "tests/rules/section05/test_rolls.py",
