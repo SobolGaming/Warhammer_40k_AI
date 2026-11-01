@@ -209,7 +209,10 @@ _DATASHEET_REVIEW_ROWS = (
             "height estimate relayed from another AI and accepted by the owner, with a 40 mm "
             "base. This is not a verified assembled measurement. Its typed required geometry "
             "record preserves provenance and rejects omission; selected-game detachment "
-            "capabilities remain separate. See data/source_audits/sorcerer_2026_11/review.json."
+            "capabilities remain separate. A legal lone-target shooting scene still has an "
+            "unresolved exact visibility computation; complete-support and ready/merge claims "
+            "remain blocked pending a scoped correction or owner disposition. See "
+            "data/source_audits/sorcerer_2026_11/review.json and visibility-diagnostic.json."
         ),
     ),
     EmperorsChildrenDatasheetReviewRow(

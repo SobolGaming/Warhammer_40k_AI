@@ -1,0 +1,78 @@
+{
+  "schema": "sorcerer-native-visibility-diagnostic-v1",
+  "status": "unresolved; completion and ready/merge require a scoped correction or explicit owner disposition",
+  "base": "7827235d328bf5b82201c8fece29dab7356ba3e3",
+  "diagnostic_head": "3c175b7ec51b2ad377e6515693109c6e673b6304",
+  "original_tree": "00535df1851a3d7f128fbdc19696825628b555c3",
+  "entry_path": "Strict public native session, official purge-vs-purge-layout3, accepted deployment and 7-inch owner movement, shooting-declaration target enumeration -> _best_line_of_sight_range_evidence -> continuous visibility -> visibility_algebra.decide -> quantified solver.check.",
+  "scene": {
+    "owner": "Attached Tormentors and Sorcerer; Tormentor grid x=3.5,5,6.5 and y=1.4+1.5*(index//3); Sorcerer (6.5,2.9); normal 7-inch positive-x move.",
+    "enemy": "Never-attached Sorcerer (31,4.5); separate Tormentors at x=31,32.5,34 and y=1.4+1.5*(index//3).",
+    "geometry": "Explicit provisional Sorcerer overall height 65/25.4 inches and circular 40 mm base; no fallback or scene modification in diagnosis."
+  },
+  "original_attempt": {
+    "elapsed_seconds": 494.54,
+    "termination": "Agent keyboard interrupt; VisibilityComputationError interrupted from keyboard. No visibility result.",
+    "evidence": "Private task-5/native-controls-1.log and native-controls-1.junit.xml; original pre-guard complete source archive and patch retained."
+  },
+  "formula": {
+    "query": 214,
+    "characters": 6242379,
+    "sha256": "8ab3672f48b939980bbca8c86b2ea9dcb0fbd944422dca51b21bab552a117cbc",
+    "input": "Complete exact formula retained in private task-5/visibility-diagnostic/query-214.json. Guarded diagnostic head reproduced the identical formula from the original accepted native scene."
+  },
+  "environment": {
+    "python": "3.14.5",
+    "z3": "4.15.4.0"
+  },
+  "bounded_solver_replays": {
+    "base-query": {
+      "started_utc": "2026-11-01T21:26:46.905577+00:00",
+      "deadline_seconds": 45.0,
+      "interrupted": true,
+      "killed": false,
+      "interrupt": "agent-enforced diagnostic deadline; not a visibility result",
+      "exit_code": 1,
+      "elapsed_seconds": 45.116830316999994,
+      "completed_utc": "2026-11-01T21:27:32.022407+00:00"
+    },
+    "head-query": {
+      "started_utc": "2026-11-01T21:29:33.062211+00:00",
+      "deadline_seconds": 45.0,
+      "interrupted": true,
+      "killed": false,
+      "interrupt": "agent-enforced diagnostic deadline; not a visibility result",
+      "exit_code": 1,
+      "elapsed_seconds": 45.06654565499997,
+      "completed_utc": "2026-11-01T21:30:18.128761+00:00"
+    }
+  },
+  "capture_times_not_solver_timings": {
+    "capture2": {
+      "deadline_seconds": 70.0,
+      "interrupted": true,
+      "exit_code": 1,
+      "elapsed_seconds": 70.818796867
+    },
+    "current-native-input": {
+      "deadline_seconds": 70.0,
+      "interrupted": false,
+      "exit_code": 0,
+      "elapsed_seconds": 30.892278938000004
+    }
+  },
+  "query_owner_comparison": {
+    "changed_files": [],
+    "file_count": 59,
+    "full_private_diagnostic_sha256": "78225ba979ad4a20e22d7bf0378e75a0e04c9195aff60da78e45c5072814a33d"
+  },
+  "findings": [
+    "Original and current strict native accepted deployment/movement reach the identical quantified full-visibility formula during normal shooting-declaration target enumeration.",
+    "Both exact-base and head generic solvers were evaluated on the identical complete mathematical input, same Python3.14.5/Z3 4.15.4.0 environment and equal45-second external diagnostic deadline.",
+    "Interrupted/unresolved queries return no visibility answer. Deadlines are diagnostic controls, not new engine budgets or passing performance measurements.",
+    "The relevant geometry/query implementation bytes are compared explicitly. This establishes pre-existing solver behavior on this input, not prior native Sorcerer support on base (Sorcerer was unsupported there).",
+    "Admission makes the workload reachable through supported native play. The original494.54-second legal scene remains a material unresolved limit; alternate legal placement is separate evidence.",
+    "A separately scoped solver correction or explicit owner scope decision is needed before an unqualified complete-support claim. No solver repair or budget weakening was implemented."
+  ],
+  "qualification_limit": "Diagnostic deadlines are not new runtime budgets or passing performance results. The alternate front-lane native control remains separate evidence and does not resolve this legal scene. No solver implementation or performance-budget changes are included."
+}

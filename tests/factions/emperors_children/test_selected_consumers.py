@@ -1109,7 +1109,12 @@ def test_sorcerer_native_shooting_cover_wracking_and_exact_replay(
     ignore: bool,
     target_number: int,
 ) -> None:
-    from tests.support.sorcerer_native import native_choice, native_fire, translate_native
+    from tests.support.sorcerer_native import (
+        assert_native_movement_budget,
+        native_choice,
+        native_fire,
+        translate_native,
+    )
     from warhammer40k_core.engine.replay import ReplayRunStatus
 
     session = LocalGameSession.from_persistence_payload(sorcerer_native_shooting_checkpoint)
@@ -1143,6 +1148,7 @@ def test_sorcerer_native_shooting_cover_wracking_and_exact_replay(
         assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
     if profile == "witchfire":
         translate_native(session, "attached-unit:opponent:bodyguard", -5.0)
+        assert_native_movement_budget(session, "attached-unit:opponent:bodyguard", 5.0)
         for _ in range(50):
             current = session.lifecycle.state
             assert current is not None
@@ -1304,6 +1310,7 @@ def test_sorcerer_native_cover_is_conditional_and_respects_ignores_cover(case: s
 
 def test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement() -> None:
     from tests.support.sorcerer_native import (
+        assert_native_movement_budget,
         deploy_native,
         native_declaration,
         native_fire,
@@ -1337,6 +1344,7 @@ def test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement() 
     # Two distinct real receipts retain their durations; the generic source slot
     # applies the named condition once. A cumulative -4 would reject this move.
     translate_native(session, "attached-unit:opponent:bodyguard", -5.0)
+    assert_native_movement_budget(session, "attached-unit:opponent:bodyguard", 5.0)
 
 
 @pytest.mark.parametrize("omit_all", [True, False])

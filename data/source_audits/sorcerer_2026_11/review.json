@@ -42,5 +42,10 @@
     "geometry": "Explicit provisional_estimate/user_supplied_estimate evidence. Overall 65 mm from bottom of base to staff tip is an OTHER-AI photo estimate relayed and authorized by the owner, not a verified physical measurement. Source origin already includes base; no guessed offset."
   },
   "schema": "sorcerer-native-admission-source-review-v1",
-  "scope": "Admit only Emperor's Children Sorcerer 000004085 to the existing native catalog; correct dormant T4 to T5 and bolt pistol S4/AP0 to S5/AP-1; retain MFM 55 points."
+  "scope": "Admit only Emperor's Children Sorcerer 000004085 to the existing native catalog; correct dormant T4 to T5 and bolt pistol S4/AP0 to S5/AP-1; retain MFM 55 points.",
+  "visibility_limit": {
+    "completion": "No unqualified support-complete or ready/merge claim until a scoped solver correction or explicit owner disposition. The unchanged base and admission-head algorithms both exceed the equal diagnostic deadline on the same mathematical input; this does not remove the native-play limitation.",
+    "record": "visibility-diagnostic.json",
+    "status": "material unresolved normal-play visibility computation"
+  }
 }

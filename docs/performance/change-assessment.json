@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "7827235d328bf5b82201c8fece29dab7356ba3e3",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:224105d665af38f9116c259c6f3daf18a1f827e66956f8c490162471085bbb0c",
-  "operation_map_sha256": "cc82ba8c52641e97ddf9874fca06132631a22ef9c5e4cb33a19d6abca3a2be96",
+  "operation_map_sha256": "79a6e2a1626c1739452a272d1cee453d63c7be81a8ec641df1099d57934f8e6e",
   "changes": {
     "README.md": {
       "before_sha256": "aaacce152217fc7072d8b90db4b105d39e6ec9b1c65b51bfaaa5b0cd9872cb2a",
@@ -156,11 +156,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "d3a4a23838a977e0c1a5d93b99739e2d149e9c491fcfdf30b30b96027b98ecf5",
-      "after_sha256": "163b799ab73cc4d119feca11f95511f1ccb1feb74090ee2bbf8adcdf35882d58",
+      "after_sha256": "1a245a6218320bb63f72d9b9f383c58a7397ad6ff312f44da0936888edcdd220",
       "owners": {
         "@document": {
           "before": "d3a4a23838a977e0c1a5d93b99739e2d149e9c491fcfdf30b30b96027b98ecf5",
-          "after": "163b799ab73cc4d119feca11f95511f1ccb1feb74090ee2bbf8adcdf35882d58"
+          "after": "1a245a6218320bb63f72d9b9f383c58a7397ad6ff312f44da0936888edcdd220"
         }
       }
     },
@@ -186,11 +186,11 @@
     },
     "data/source_audits/sorcerer_2026_11/review.json": {
       "before_sha256": null,
-      "after_sha256": "26e6b88f46c9cd5a85b85f5814a35160867d2237c0b89f548373387340190fe8",
+      "after_sha256": "0226509050ea210660850bb87aefdb2e186279bda7a6503f3a2eb8a9f99c0c81",
       "owners": {
         "@document": {
           "before": null,
-          "after": "26e6b88f46c9cd5a85b85f5814a35160867d2237c0b89f548373387340190fe8"
+          "after": "0226509050ea210660850bb87aefdb2e186279bda7a6503f3a2eb8a9f99c0c81"
         }
       }
     },
@@ -201,6 +201,16 @@
         "@document": {
           "before": null,
           "after": "7045ea750defe53c819b69828490a9fa644ed8520c335a49fd574c6986e61a8b"
+        }
+      }
+    },
+    "data/source_audits/sorcerer_2026_11/visibility-diagnostic.json": {
+      "before_sha256": null,
+      "after_sha256": "f77da91c445d4b7eaeb2a1976f2424635294811c21b3cc5ff54fd24e7ea74326",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f77da91c445d4b7eaeb2a1976f2424635294811c21b3cc5ff54fd24e7ea74326"
         }
       }
     },
@@ -216,11 +226,11 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "29e9d56461752527f4b8961ef54ed573bb5626b094fd37a8ad12e88d65a1b618",
-      "after_sha256": "afe027dd2ebe74ff351f61d7b272a71a92cc83178b0ba8e0dfeb4f232a9858b1",
+      "after_sha256": "93a05353ef1f018632a4a3bb61092fce0355a92e0e2ff3c6d42aee4d2f33aebd",
       "owners": {
         "@document": {
           "before": "29e9d56461752527f4b8961ef54ed573bb5626b094fd37a8ad12e88d65a1b618",
-          "after": "afe027dd2ebe74ff351f61d7b272a71a92cc83178b0ba8e0dfeb4f232a9858b1"
+          "after": "93a05353ef1f018632a4a3bb61092fce0355a92e0e2ff3c6d42aee4d2f33aebd"
         }
       }
     },
@@ -246,21 +256,21 @@
     },
     "docs/factions/emperors-children.md": {
       "before_sha256": "33c711c393179dfc16405c1d3135e78a50fb26a536a917e78879f3ff8de7bec4",
-      "after_sha256": "6b1d0c931e076b0c80193d557adda04690d72f6045a489b82c5f2a3ce51f12a3",
+      "after_sha256": "a494865e7e9e87b72ce684fae445e407c6aa0d80a68d41857a1d4ea2d24abb23",
       "owners": {
         "@document": {
           "before": "33c711c393179dfc16405c1d3135e78a50fb26a536a917e78879f3ff8de7bec4",
-          "after": "6b1d0c931e076b0c80193d557adda04690d72f6045a489b82c5f2a3ce51f12a3"
+          "after": "a494865e7e9e87b72ce684fae445e407c6aa0d80a68d41857a1d4ea2d24abb23"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "215c6b071b95ec666f21f66e4ca00de24f65ecda8471cf9a8cb5d1f60fb7fd17",
-      "after_sha256": "ba707552ee3b7cf1e0fdd222cbff1ea64c50f12623616993b582d6e9bbdad154",
+      "after_sha256": "045167d798b47ba166446d5816f50499c6b736ddb47a5a8a2d26456d958f626c",
       "owners": {
         "@document": {
           "before": "215c6b071b95ec666f21f66e4ca00de24f65ecda8471cf9a8cb5d1f60fb7fd17",
-          "after": "ba707552ee3b7cf1e0fdd222cbff1ea64c50f12623616993b582d6e9bbdad154"
+          "after": "045167d798b47ba166446d5816f50499c6b736ddb47a5a8a2d26456d958f626c"
         }
       }
     },
@@ -690,7 +700,7 @@
     },
     "tests/factions/emperors_children/test_selected_consumers.py": {
       "before_sha256": "ec5a51f2118a2038a598c6a2ac149e2b4b72dce06460ac743408cea1e39032c5",
-      "after_sha256": "93b04b6f10556d747d9e85394603b26ccaaa385352917c61d7dee0ca0e277636",
+      "after_sha256": "860e6d33db742f55db32f90844a9624864f89517b35c89b434c77876b178e73f",
       "owners": {
         "sorcerer_native_shooting_checkpoint": {
           "before": null,
@@ -738,7 +748,7 @@
         },
         "test_sorcerer_native_shooting_cover_wracking_and_exact_replay": {
           "before": null,
-          "after": "b61c3c7e81a422f15554df27679a48eb47172646c20f6659d3d5fe082fcf37cb"
+          "after": "2f116dea7326811bf4d6593d80db9a9961f3a47c42b477efcbcf45c8a155d2cd"
         },
         "test_sorcerer_strict_public_setup_requires_provisional_geometry": {
           "before": null,
@@ -746,17 +756,31 @@
         },
         "test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement": {
           "before": null,
-          "after": "b01c1dc0b0c1c40680204af2ccb98fcf73c21f8c585f587d6402e1904c730985"
+          "after": "b77c853ebf7748e902d5fe4031e3b9f4364824798779e51740c734d317ea3812"
+        }
+      }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "a60344c5b940809207b25d7add3f30734faff2cbd8296511437b958a134eb899",
+      "after_sha256": "e1a115d6a2f207f6aedd375345e117ed2af7d153ffb3dd1d41aebfda80444bff",
+      "owners": {
+        "@document": {
+          "before": "a60344c5b940809207b25d7add3f30734faff2cbd8296511437b958a134eb899",
+          "after": "e1a115d6a2f207f6aedd375345e117ed2af7d153ffb3dd1d41aebfda80444bff"
         }
       }
     },
     "tests/support/sorcerer_native.py": {
       "before_sha256": null,
-      "after_sha256": "1c47728a91fe839f1dbc0094386b84180235d020626512c789c7b21660f40a7c",
+      "after_sha256": "12d8e695c17bcb2bf45042727551643c09ae9c7d165cc06505c0fd092b29ff05",
       "owners": {
         "@module": {
           "before": null,
           "after": "980ab6996d8d328796599fd62d1d3aa6c664739378ad199ecb14dec28862a938"
+        },
+        "assert_native_movement_budget": {
+          "before": null,
+          "after": "a1c856af91c57e9ccaed7674ec6d2248accd502bfe6abe662706f9e6d18c4e7d"
         },
         "deploy_native": {
           "before": null,
@@ -816,11 +840,11 @@
     },
     "tools/emperors_children_support_report.py": {
       "before_sha256": "da4affe91b538e6bef0dab236414f678ade5d6ae8496d69494b8c55d5208b840",
-      "after_sha256": "c614b4e3ca243976c83a5decd0b67e2b9aa80587171b0573320be9ae9c69f29f",
+      "after_sha256": "45edc59489e5b753edd786ccef815fa5dc9db097c8846b189020bba9d089c060",
       "owners": {
         "@module": {
           "before": "0d2c6d3bfdc4f79903c7869175a25962b27eff3132bcd225edb57f1b904c673a",
-          "after": "cd195084586f902fd167b932478942326dde58139834ecee20ff93326b53fd66"
+          "after": "15c0bc4fc7abbe88ddb06c8c2c6584fe1e115a30bafd228fb2ce544c6733f26d"
         },
         "emperors_children_datasheet_support_markdown": {
           "before": "c565a67ca141f5bd25d9912cb71db29310a07f0723577e7f5a58de2706ecc31d",
@@ -1108,6 +1132,16 @@
       "category": "rule_semantics",
       "operations": [
         "sorcerer-admission-exact-04"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "data/source_audits/sorcerer_2026_11/visibility-diagnostic.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-29"
       ],
       "selected_families": [],
       "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
@@ -1453,10 +1487,21 @@
       "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
       "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
     "tests/support/sorcerer_native.py": {
       "category": "rule_semantics",
       "operations": [
-        "sorcerer-admission-exact-23"
+        "sorcerer-admission-exact-23",
+        "sorcerer-admission-exact-30"
       ],
       "selected_families": [],
       "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",

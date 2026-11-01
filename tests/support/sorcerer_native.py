@@ -435,3 +435,29 @@ def native_sorcerer_overwatch(session: LocalGameSession) -> tuple[str, ...]:
         result_id="native:reactive",
         snap=True,
     )
+
+
+def assert_native_movement_budget(
+    session: LocalGameSession, unit_id: str, expected_inches: float
+) -> None:
+    from tests.support.faction_batch01 import events
+
+    completed = [
+        event
+        for event in events(session, "movement_activation_completed")
+        if event["unit_instance_id"] == unit_id
+    ]
+    assert completed
+    models = completed[-1]["model_movements"]
+    assert isinstance(models, list)
+    assert models
+    for model in models:
+        assert isinstance(model, dict)
+        result = model["path_validation_result"]
+        assert isinstance(result, dict)
+        assert result["is_valid"] is True
+        witness = result["movement_distance_witness"]
+        assert isinstance(witness, dict)
+        budget = witness["budget"]
+        assert isinstance(budget, dict)
+        assert budget["max_distance_inches"] == expected_inches
