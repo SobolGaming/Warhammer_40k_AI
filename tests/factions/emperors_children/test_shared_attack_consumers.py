@@ -29,6 +29,7 @@ from tests.support.terrain_batch03 import (
     FULGRIM,
     MAULERFIEND,
     SINUOUS,
+    barrier,
     breach_options,
     breach_request,
     movement_request,
@@ -393,34 +394,54 @@ def test_native_court_close_quarters_owns_ranged_distance_and_physical_profile(
 
 
 @pytest.mark.parametrize(
-    ("sheet", "height", "breach", "end_x", "action", "via_z", "accepted"),
+    ("sheet", "height", "breach", "end_x", "action", "via_z", "accepted", "terrain"),
     [
-        (FULGRIM, 4.0, None, 18.0, "normal_move", 0.0, True),
-        (FULGRIM, 4.001, None, 18.0, "normal_move", 0.0, False),
-        (DEFILER, 8.0, None, 18.0, "normal_move", 0.0, True),
-        (MAULERFIEND, 4.0, None, 18.0, "normal_move", 0.0, False),
-        (MAULERFIEND, 8.0, True, 18.0, "normal_move", 0.0, True),
-        (MAULERFIEND, 8.0, False, 18.0, "normal_move", 0.0, False),
-        (FULGRIM, 4.0, None, 14.0, "normal_move", 0.0, False),
-        (DEFILER, 8.0, None, 14.0, "normal_move", 0.0, False),
-        (MAULERFIEND, 8.0, True, 14.0, "normal_move", 0.0, False),
-        (FULGRIM, 4.0, None, 18.0, "advance", 0.0, True),
-        (MAULERFIEND, 8.0, True, 18.0, "advance", 0.0, True),
-        (MAULERFIEND, 8.0, True, 18.0, "normal_move", 1.0, False),
+        (FULGRIM, 4.0, None, 18.0, "normal_move", 0.0, True, "debris"),
+        (FULGRIM, 4.001, None, 18.0, "normal_move", 0.0, True, "debris"),
+        (DEFILER, 8.0, None, 18.0, "normal_move", 0.0, True, "debris"),
+        (MAULERFIEND, 4.0, None, 18.0, "normal_move", 0.0, False, "debris"),
+        (MAULERFIEND, 8.0, True, 18.0, "normal_move", 0.0, True, "debris"),
+        (MAULERFIEND, 8.0, False, 18.0, "normal_move", 0.0, False, "debris"),
+        (FULGRIM, 4.0, None, 14.0, "normal_move", 0.0, False, "debris"),
+        (DEFILER, 8.0, None, 14.0, "normal_move", 0.0, False, "debris"),
+        (MAULERFIEND, 8.0, True, 14.0, "normal_move", 0.0, False, "debris"),
+        (FULGRIM, 4.0, None, 18.0, "advance", 0.0, True, "debris"),
+        (MAULERFIEND, 8.0, True, 18.0, "advance", 0.0, True, "debris"),
+        (MAULERFIEND, 8.0, True, 18.0, "normal_move", 1.0, False, "debris"),
+        (FULGRIM, 4.0, None, 18.0, "normal_move", 0.0, True, "ruins"),
+        (FULGRIM, 4.001, None, 18.0, "normal_move", 0.0, True, "ruins"),
+        (FULGRIM, 8.0, None, 18.0, "normal_move", 0.0, True, "ruins"),
+        (FULGRIM, 8.0, None, 18.0, "advance", 0.0, True, "ruins"),
+        (FULGRIM, 8.0, None, 18.0, "fall_back", 0.0, True, "ruins"),
+        (FULGRIM, 8.0, None, 14.0, "normal_move", 0.0, False, "ruins"),
+        (FULGRIM, 8.0, None, 18.0, "normal_move", 1.0, False, "ruins"),
+        (FULGRIM, 4.0, None, 18.0, "normal_move", 1.0, False, "ruins"),
+        (FULGRIM, 8.0, None, 18.0, "normal_move", 0.0, True, "light_ruins"),
+        (FULGRIM, 2.0, None, 18.0, "normal_move", 0.0, True, "debris"),
     ],
     ids=[
-        "serpentine-inclusive-four",
-        "serpentine-above-four",
+        "mobile-dense-debris-four",
+        "mobile-dense-debris-above-four",
         "scuttling-tall-wall",
         "mauler-no-permission",
         "sinuous-granted",
         "sinuous-declined",
-        "serpentine-endpoint-blocked",
+        "mobile-debris-endpoint-blocked",
         "scuttling-endpoint-blocked",
         "sinuous-endpoint-blocked",
-        "serpentine-native-advance",
+        "mobile-dense-debris-advance",
         "sinuous-native-advance",
         "sinuous-vertical-transit-blocked",
+        "mobile-dense-ruins-four",
+        "mobile-dense-ruins-above-four",
+        "mobile-dense-ruins-tall",
+        "mobile-dense-ruins-advance",
+        "mobile-dense-ruins-fall-back",
+        "mobile-dense-ruins-blocked-endpoint",
+        "mobile-dense-ruins-vertical-blocked",
+        "mobile-dense-ruins-four-vertical-blocked",
+        "mobile-light-ruins-transit",
+        "mobile-ordinary-two-inch-control",
     ],
 )
 def test_native_terrain_transit_witness_and_committed_consequences(
@@ -432,9 +453,48 @@ def test_native_terrain_transit_witness_and_committed_consequences(
     action: str,
     via_z: float,
     accepted: bool,
+    terrain: str,
     record_property: Callable[[str, str], None],
 ) -> None:
-    s = terrain_scene(terrain_definitions, sheet, height)
+    from warhammer40k_core.geometry.terrain import TerrainFeatureKind, TerrainFloorDefinition
+    from warhammer40k_core.geometry.terrain_classification import TerrainAreaClassification
+
+    d = terrain_definitions
+    if terrain == "debris":
+        s = terrain_scene(d, sheet, height)
+    else:
+        feature = replace(
+            barrier(height),
+            feature_kind=TerrainFeatureKind.RUINS,
+            classification=(
+                TerrainAreaClassification.DENSE
+                if terrain == "ruins"
+                else TerrainAreaClassification.LIGHT
+            ),
+            floors=(
+                TerrainFloorDefinition(
+                    floor_id="current-ec:ground",
+                    center_x_inches=14,
+                    center_y_inches=10,
+                    bottom_z_inches=0,
+                    width_inches=0.25,
+                    depth_inches=12,
+                    thickness_inches=0.1,
+                ),
+            ),
+        )
+        s = scene(
+            d,
+            (selection(d, sheet, "mover"), selection(d, INFRACTORS, "observer")),
+            (selection(d, RANGERS, "target"),),
+            seed="batch03-terrain",
+            terrain_features=(feature,),
+        )
+        locate(s, "own:mover", (Pose.at(10, 10),))
+        if action == "fall_back":
+            # A real enemy behind the mover makes Fall Back legal without crossing its models.
+            locate(s, "foe:target", tuple(Pose.at(6.8, 10 + i * 1.3) for i in range(5)))
+        anchor(s)
     if breach is not None:
         r = breach_request(s)
         options = breach_options(r)
@@ -453,12 +513,18 @@ def test_native_terrain_transit_witness_and_committed_consequences(
             use = s.state.stratagem_use_records[0]
             assert use.stratagem_id == SINUOUS
             assert use.targeted_unit_instance_ids == ("own:mover",)
-    r = movement_request(s, action)
-    capability = terrain_capability(s, "advance" if action == "advance" else "normal")
+    r = movement_request(s, "fall_back:ordered_retreat" if action == "fall_back" else action)
+    capability = terrain_capability(s, "normal" if action == "normal_move" else action)
     assert capability.horizontal_terrain_feature_transit is (sheet == DEFILER or breach is True)
-    assert capability.terrain_as_if_absent_height_inches == (4.0 if sheet == FULGRIM else None)
+    assert capability.terrain_as_if_absent_height_inches is None
+    if sheet == FULGRIM:
+        assert "MOBILE" in s.units["own:mover"].own_models[0].keywords
+        assert capability.can_traverse_ruins_walls
+        assert not any(
+            a.name == "Serpentine" for a in d.package.army_catalog.datasheet_by_id(sheet).abilities
+        )
     checkpoint = (
-        action == "normal_move"
+        action in {"normal_move", "advance", "fall_back"}
         and end_x == 18
         and not via_z
         and (sheet in {FULGRIM, DEFILER} or breach is True)
@@ -514,7 +580,12 @@ def test_native_terrain_transit_witness_and_committed_consequences(
             assert len(completions) == 1
             assert completions[0]["request_id"] == proposal.source_decision_request_id
             assert completions[0]["result_id"] == proposal.source_decision_result_id
-            assert completions[0]["proposal_request_id"] == r.request_id
+            if action == "fall_back":
+                # Fall Back completion carries the selected action IDs above;
+                # its submitted proposal is authenticated by committed[0] and witness below.
+                assert completions[0]["fall_back_mode"] == "ordered_retreat"
+            else:
+                assert completions[0]["proposal_request_id"] == r.request_id
             assert completions[0]["movement_phase_action"] == action
             assert completions[0]["witness"] == cast(dict[str, Any], expected_payload)["witness"]
             assert state.battlefield_state.unit_placement_by_id("own:mover").model_placements[
@@ -522,6 +593,15 @@ def test_native_terrain_transit_witness_and_committed_consequences(
             ].pose == Pose.at(end_x, 10)
             assert state.movement_phase_state is not None
             assert "own:mover" in state.movement_phase_state.moved_unit_ids
+            if action == "fall_back":
+                # The real Ranger opponent receives its native Opportunity Seized window.
+                triggered = request(status, "select_triggered_movement")
+                assert triggered.actor_id == "opponent"
+                status = session.submit_option(
+                    request_id=triggered.request_id,
+                    option_id="decline_triggered_movement",
+                    result_id=f"{triggered.request_id}:current-ec-decline",
+                )
             pending = request(status, "select_movement_unit")
             assert "own:mover" not in {o.option_id for o in pending.options}
         else:
@@ -573,6 +653,7 @@ def test_native_terrain_transit_witness_and_committed_consequences(
             {
                 "datasheet_id": sheet,
                 "height": height,
+                "terrain": terrain,
                 "breach": breach,
                 "action": action,
                 "via_z": via_z,

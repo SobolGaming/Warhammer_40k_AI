@@ -1,0 +1,191 @@
+{
+  "old_hash": "07bd5c3e530853c383403e4d2d47c2e4fa2e2d7b50dcecfcd25987083bde6b7c",
+  "base_generated_hash": "e62073073f85b10cffafa580b083a7b89b04250e3c1ae2d43d22593eaca8356d",
+  "head_generated_hash": "6e7a763c002b4194024321c024e22fdd05eab5a2ec9065b6194bb13e5c853347",
+  "prior_approved_PR602_propagation": {
+    "model:000004078:lord-exultant:toughness": {
+      "before": 4,
+      "after": 5
+    },
+    "model:000004079:obsessionist:toughness": {
+      "before": 4,
+      "after": 5
+    },
+    "model:000004079:tormentors:toughness": {
+      "before": 4,
+      "after": 5
+    },
+    "model:000004080:infractors:toughness": {
+      "before": 4,
+      "after": 5
+    },
+    "model:000004080:obsessionist:toughness": {
+      "before": 4,
+      "after": 5
+    },
+    "model:000004084:lord-kakophonist:toughness": {
+      "before": 5,
+      "after": 6
+    },
+    "model:000004088:disharmonist:wounds": {
+      "before": 2,
+      "after": 3
+    },
+    "model:000004088:noise-marines:wounds": {
+      "before": 2,
+      "after": 3
+    },
+    "weapon:000004078:bolt-pistol:000004078:bolt-pistol:standard:armor_penetration": {
+      "before": 0,
+      "after": -1
+    },
+    "weapon:000004078:bolt-pistol:000004078:bolt-pistol:standard:strength": {
+      "before": 4,
+      "after": 5
+    },
+    "weapon:000004078:close-combat-weapon:000004078:close-combat-weapon:standard:strength": {
+      "before": 4,
+      "after": 5
+    },
+    "weapon:000004079:bolt-pistol:000004079:bolt-pistol:standard:armor_penetration": {
+      "before": 0,
+      "after": -1
+    },
+    "weapon:000004079:bolt-pistol:000004079:bolt-pistol:standard:strength": {
+      "before": 4,
+      "after": 5
+    },
+    "weapon:000004079:boltgun:000004079:boltgun:standard:armor_penetration": {
+      "before": 0,
+      "after": -1
+    },
+    "weapon:000004079:boltgun:000004079:boltgun:standard:strength": {
+      "before": 4,
+      "after": 5
+    },
+    "weapon:000004079:close-combat-weapon:000004079:close-combat-weapon:standard:strength": {
+      "before": 4,
+      "after": 5
+    },
+    "weapon:000004080:bolt-pistol:000004080:bolt-pistol:standard:armor_penetration": {
+      "before": 0,
+      "after": -1
+    },
+    "weapon:000004080:bolt-pistol:000004080:bolt-pistol:standard:strength": {
+      "before": 4,
+      "after": 5
+    },
+    "weapon:000004080:duelling-sabre:000004080:duelling-sabre:standard:strength": {
+      "before": 4,
+      "after": 5
+    },
+    "weapon:000004084:close-combat-weapon:000004084:close-combat-weapon:standard:strength": {
+      "before": 4,
+      "after": 5
+    },
+    "weapon:000004088:close-combat-weapon:000004088:close-combat-weapon:standard:strength": {
+      "before": 4,
+      "after": 5
+    },
+    "weapon:000004089:bolt-pistol:000004089:bolt-pistol:standard:armor_penetration": {
+      "before": 0,
+      "after": -1
+    },
+    "weapon:000004089:bolt-pistol:000004089:bolt-pistol:standard:strength": {
+      "before": 4,
+      "after": 5
+    }
+  },
+  "this_PR": {
+    "model:000004081:chaos-terminators:toughness": {
+      "before": 5,
+      "after": 6
+    },
+    "model:000004081:terminator-champion:toughness": {
+      "before": 5,
+      "after": 6
+    },
+    "model:000004083:lucius-the-eternal-epic-hero:toughness": {
+      "before": 5,
+      "after": 6
+    },
+    "sheet:000004077:abilities": {
+      "before": [
+        "000004077:beguiling-form",
+        "000004077:daemon-primarch-of-slaanesh",
+        "000004077:daemonic-poisons",
+        "000004077:daemonic-speed",
+        "000004077:enthralling-hypnosis-aura",
+        "000004077:serpentine",
+        "000004077:supreme-commander",
+        "000008339",
+        "000008343",
+        "000009994"
+      ],
+      "after": [
+        "000004077:beguiling-form",
+        "000004077:daemon-primarch-of-slaanesh",
+        "000004077:daemonic-poisons",
+        "000004077:daemonic-speed",
+        "000004077:enthralling-hypnosis-aura",
+        "000004077:supreme-commander",
+        "000008339",
+        "000008343",
+        "000009994"
+      ]
+    },
+    "sheet:000004077:keywords": {
+      "before": {
+        "faction_keywords": [
+          "EMPEROR'S CHILDREN"
+        ],
+        "keywords": [
+          "CHAOS",
+          "CHARACTER",
+          "DAEMON",
+          "EPIC HERO",
+          "FLY",
+          "FULGRIM",
+          "MONSTER",
+          "PRIMARCH",
+          "SLAANESH"
+        ]
+      },
+      "after": {
+        "faction_keywords": [
+          "EMPEROR'S CHILDREN"
+        ],
+        "keywords": [
+          "CHAOS",
+          "CHARACTER",
+          "DAEMON",
+          "EPIC HERO",
+          "FLY",
+          "FULGRIM",
+          "MOBILE",
+          "MONSTER",
+          "PRIMARCH",
+          "SLAANESH"
+        ]
+      }
+    },
+    "weapon:000004081:combi-bolter:000004081:combi-bolter:standard:armor_penetration": {
+      "before": 0,
+      "after": -1
+    },
+    "weapon:000004081:combi-bolter:000004081:combi-bolter:standard:strength": {
+      "before": 4,
+      "after": 5
+    },
+    "weapon:000004081:combi-weapon:000004081:combi-weapon:standard:armor_penetration": {
+      "before": 0,
+      "after": -1
+    },
+    "weapon:000004081:combi-weapon:000004081:combi-weapon:standard:strength": {
+      "before": 4,
+      "after": 5
+    }
+  },
+  "checks": "All prices, options, composition, model geometry, identities, faction/detachment/enhancement/stratagem/army rules unchanged.",
+  "full_structure_check": "Exact whole-payload reconstruction passes: only the enumerated numeric characteristic values (raw/base/final), Fulgrim MOBILE and removed Serpentine/source IDs, and derived package/source hashes differ. Every remaining byte-independent JSON value, including every weapon property, price, option, composition, identifier and geometry, is unchanged."
+}

@@ -28,6 +28,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_space_marines_defiler_datasheet_overlay_2026_07 as csm_defiler_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    emperors_children_current_2026_11 as ec_current,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     emperors_children_datasheet_overlay_2026_06 as emperors_children_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -94,8 +97,13 @@ def load_ability_support_sources(source_json_dir: Path) -> tuple[BridgeSourceArt
         release_manifest=emperors_children_profiles.source_release_manifest(),
         overlay_packs=(emperors_children_profiles.overlay_pack(),),
     )
-    maulerfiend_overlaid_artifacts = apply_source_release_overlays(
+    latest_ec_artifacts = apply_source_release_overlays(
         source_artifacts=current_ec_artifacts,
+        release_manifest=ec_current.source_release_manifest(),
+        overlay_packs=(ec_current.overlay_pack(),),
+    )
+    maulerfiend_overlaid_artifacts = apply_source_release_overlays(
+        source_artifacts=latest_ec_artifacts,
         release_manifest=maulerfiend_overlay.source_release_manifest(),
         overlay_packs=(maulerfiend_overlay.overlay_pack(),),
     )
@@ -180,6 +188,7 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
                 coverage.JULY_OVERLAY_PACK_PATH,
                 coverage.RELEASE_MANIFEST_PATH,
                 Path(vyper_title_overlay.__file__).with_name(vyper_title_overlay.ARTIFACT_NAME),
+                Path(ec_current.__file__).with_name(ec_current.ARTIFACT_NAME),
                 Path(emperors_children_profiles.__file__).with_name(
                     emperors_children_profiles.ARTIFACT_NAME
                 ),

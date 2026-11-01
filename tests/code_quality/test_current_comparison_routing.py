@@ -406,3 +406,39 @@ def test_exact_v4_uses_current_transaction_without_reclassifying_history(
     else:
         with pytest.raises(ValueError, match=r"exact PR600|stale|newly added|closed generic"):
             classify()
+
+
+def test_current_ec_source_smoke_scope_requires_exact_base_bytes_owners_and_category() -> None:
+    import copy
+
+    from tools.performance_policy import (
+        ec_current_rule_semantics_smoke_operations,
+        object_value,
+        read_object,
+    )
+
+    scope = read_object(ROOT / "docs/performance/policy-v3/ec-current-source-smoke-scope.json")
+    for path, operation in {
+        "tools/ability_support_sources.py": "qualification40-exact-b0712fa66a9cc38e",
+        "tools/source_scope_provenance.py": "registered-source-provenance-projection",
+    }.items():
+        base = "1e2a8cdee1964bccd638c34e2ccb72ea5ead01ac"
+        change = object_value(object_value(scope["changes"])[path])
+        assert ec_current_rule_semantics_smoke_operations(
+            base=base, path=path, category="rule_semantics", change=change
+        ) == frozenset({operation})
+        for candidate_base, candidate_path, category in (
+            ("0" * 40, path, "rule_semantics"),
+            (base, path + ".extra", "rule_semantics"),
+            (base, path, "algorithm_or_search"),
+            (base, path, "cache_policy"),
+        ):
+            assert not ec_current_rule_semantics_smoke_operations(
+                base=candidate_base, path=candidate_path, category=category, change=change
+            )
+        for key in ("before_sha256", "after_sha256", "owners"):
+            drifted = copy.deepcopy(change)
+            drifted[key] = {} if key == "owners" else "0" * 64
+            assert not ec_current_rule_semantics_smoke_operations(
+                base=base, path=path, category="rule_semantics", change=drifted
+            )

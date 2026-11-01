@@ -343,7 +343,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:movement-end-reactive-normal-move` | Path of the Outcast<br>Scuttling Horrors |
 | `catalog-ir:movement-end-selected-target-effect` | Doom (Psychic) |
 | `catalog-ir:movement-friendly-enemy-target-pair` | Spirit Mark (Psychic) |
-| `catalog-ir:movement-transit-permission` | Extreme Mobility<br>Flip Belt<br>Scuttling Walker<br>Serpentine |
+| `catalog-ir:movement-transit-permission` | Extreme Mobility<br>Flip Belt<br>Scuttling Walker |
 | `catalog-ir:named-weapon-ability-choice` | Master of Magicks (Psychic) |
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |

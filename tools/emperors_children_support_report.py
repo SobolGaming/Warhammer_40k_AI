@@ -61,8 +61,9 @@ _DATASHEET_REVIEW_ROWS = (
             "Deadly Demise D6, Daemonic Poisons post-Shooting and post-Fight selection plus "
             "persistent Command-phase mortal wounds, Daemon Primarch of Slaanesh mode "
             "selection, Beguiling Form hit modifier, Daemonic Speed Fights First, Deep Strike, "
-            "Enthralling Hypnosis (Aura) Fall Back Leadership denial, Serpentine terrain "
-            "transit, Supreme Commander mustering, and the Thrill Seekers army-rule handler "
+            "Enthralling Hypnosis (Aura) Fall Back Leadership denial, current MOBILE terrain "
+            "transit (retired Serpentine superseded), Supreme Commander mustering, and the "
+            "Thrill Seekers army-rule handler "
             "are implemented source-backed generic or faction paths."
         ),
         semantics_needed="None in the exact source ability rows.",
@@ -519,10 +520,10 @@ def emperors_children_secondary_reference_audit_markdown(
             (
                 (
                     f"**{_markdown_text(discrepancy.source_assignment_name)}:** "
-                    f"{_markdown_text(discrepancy.discrepancy_reason)} The official source "
-                    "assignment remains authoritative, so this report retains the rule and "
-                    "records its source-backed runtime semantics as consumed where reported "
-                    "in the datasheet support table below."
+                    f"{_markdown_text(discrepancy.discrepancy_reason)} This is a historical "
+                    "provider comparison. The current preferred App capture supersedes "
+                    "Fulgrim Serpentine with MOBILE; the current catalog does not grant "
+                    "the retired rule."
                 ),
                 "",
             )
@@ -680,8 +681,9 @@ _RULES_UPDATE_ROWS = (
     ),
     (
         "Datasheet",
-        "Fulgrim - Serpentine",
-        "Normal, Advance, and Fall Back moves can cross terrain sections up to 4 inches high.",
+        "Fulgrim - MOBILE",
+        "Current source grants MOBILE through the generic classified-terrain authority; "
+        "Serpentine is retired.",
     ),
     (
         "Datasheet",

@@ -31048,6 +31048,159 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "ec-current-source-exact-01": {
+      "paths": [
+        "data/source_audits/ec_current_2026_11/browser-captures.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "ec-current-source-exact-02": {
+      "paths": [
+        "data/source_audits/ec_current_2026_11/historical-court-catalog.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "ec-current-source-exact-03": {
+      "paths": [
+        "data/source_audits/ec_current_2026_11/historical-fulgrim-rule-ir.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "ec-current-source-exact-04": {
+      "paths": [
+        "data/source_audits/ec_current_2026_11/packaged-catalog-partition.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "ec-current-source-exact-05": {
+      "paths": [
+        "data/source_audits/ec_current_2026_11/review.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "ec-current-source-exact-06": {
+      "paths": [
+        "tests/factions/emperors_children/test_selected_consumers.py"
+      ],
+      "owners": [
+        "current_ec_definitions",
+        "test_current_ec_source_overlay_is_closed_and_preimage_bound",
+        "test_current_native_toughness_changes_real_wound_resolution",
+        "test_current_packaged_court_native_profiles_mobile_and_roundtrip",
+        "test_current_terminator_native_weapons_change_wound_and_armour_save"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "ec-current-source-exact-07": {
+      "paths": [
+        "tools/emperors_children_support_report.py"
+      ],
+      "owners": [
+        "@module",
+        "emperors_children_secondary_reference_audit_markdown"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "ec-current-source-exact-08": {
+      "paths": [
+        "tools/generate_emperors_children_current_source.py"
+      ],
+      "owners": [
+        "@module",
+        "generated_overlay_pack",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "ec-current-source-exact-09": {
+      "paths": [
+        "tools/generate_emperors_children_fulgrim_rule_ir.py"
+      ],
+      "owners": [
+        "@module",
+        "_serpentine_rule_ir",
+        "_validated_source_rows",
+        "generated_artifact_payload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "ec-current-source-exact-10": {
+      "paths": [
+        "tools/source_scope_provenance.py"
+      ],
+      "owners": [
+        "current_ec_overlay_provenance"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "ec-current-source-exact-11": {
+      "paths": [
+        "tests/code_quality/test_current_comparison_routing.py"
+      ],
+      "owners": [
+        "test_current_ec_source_smoke_scope_requires_exact_base_bytes_owners_and_category"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "ec-current-source-exact-12": {
+      "paths": [
+        "tests/code_quality/test_registered_source_scopes.py"
+      ],
+      "owners": [
+        "test_current_ec_overlay_projects_only_exact_historical_base"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "ec-current-source-exact-13": {
+      "paths": [
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "ec_current_rule_semantics_smoke_operations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

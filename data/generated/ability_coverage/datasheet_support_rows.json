@@ -1912,7 +1912,6 @@
       "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemonic-poisons/none",
       "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemonic-speed/none",
       "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:enthralling-hypnosis-aura/none",
-      "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:serpentine/none",
       "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:supreme-commander/none",
       "chaos-daemons-bridge-catalog/000004077/faction/000009994/none"
     ],
@@ -1941,7 +1940,7 @@
       "court-of-the-phoenician",
       "spectacle-of-slaughter"
     ],
-    "tests_evidence": "Runtime consumers: `army-mustering:supreme-commander`, `catalog-ir:command-phase-ability-mode`, `catalog-ir:movement-transit-permission`, `catalog-ir:poisoned-command-mortal-wounds`, `catalog-ir:post-fight-hit-target-effect`, `catalog-ir:post-shoot-hit-target-effect`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `army-mustering:supreme-commander`, `catalog-ir:command-phase-ability-mode`, `catalog-ir:poisoned-command-mortal-wounds`, `catalog-ir:post-fight-hit-target-effect`, `catalog-ir:post-shoot-hit-target-effect`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },

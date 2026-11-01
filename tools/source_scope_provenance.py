@@ -51,6 +51,34 @@ PROVENANCE_RECORDS = (
 # documents contain the independently authenticated historical input paths.
 COMPARISON_ONLY_SCOPE_BASES = (scopes.ACTS_BASE, scopes.DEFILER_BASE)
 
+# Current source-only admission: historical base metadata remains exact and immutable.
+CURRENT_EC_OVERLAY = (
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+    "emperors_children_current_2026_11.overlay-pack.json"
+)
+CURRENT_EC_OVERLAY_SHA256 = "eb081b3b482fb52d8ebdca367937675134199359f799607aeb98d93984b80d59"
+
+
+def current_ec_overlay_provenance(root: Path, path: Path, raw: bytes) -> str | None:
+    if path != root / CURRENT_EC_OVERLAY:
+        return None
+    if path.is_symlink() or hashlib.sha256(raw).hexdigest() != CURRENT_EC_OVERLAY_SHA256:
+        raise ValueError("Current EC overlay requires its exact reviewed bytes.")
+    value = inputs.input_object(json.loads(raw, object_pairs_hook=inputs.unique_input_object))
+    historical = {
+        "namespace": "wahapedia",
+        "package_name": "source-mirror",
+        "version": "10th-edition-2026-06-14",
+    }
+    if (
+        value["schema_version"] != "phase17-source-overlay-v1"
+        or value["target_edition"] != "warhammer-40000-11th"
+        or value["base_source_package_id"] != historical
+    ):
+        raise ValueError("Current EC overlay historical base identity changed.")
+    del value["base_source_package_id"]["version"]
+    return json.dumps(value)
+
 
 def registered_provenance_context(
     relative: str,
@@ -83,6 +111,9 @@ def registered_provenance_text(
     if not path.is_relative_to(root):
         return None
     relative = path.relative_to(root).as_posix()
+    current = current_ec_overlay_provenance(root, path, raw)
+    if current is not None:
+        return current
     context = registered_provenance_context(relative)
     if context is None:
         return None

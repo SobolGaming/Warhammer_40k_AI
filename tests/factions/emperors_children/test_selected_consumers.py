@@ -669,3 +669,298 @@ def test_current_ec_overlay_has_exact_numeric_boundary_and_stale_preimage_reject
         )
     with pytest.raises(SourceOverlayError, match="invalid"):
         current.overlay_pack_from_json_bytes(b"not JSON")
+
+
+@pytest.fixture(scope="module")
+def current_ec_definitions(selected_army_source_index: Path | None) -> Section02Definitions:
+    from tools.generate_ability_support_matrix import (
+        _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
+    )
+
+    return Section02Definitions(
+        _ability_support_catalog_package(
+            datasheet_ids=("000004081", "000004083", "000000611", "000004080", "000004078"),
+            source_index_dir=selected_army_source_index,
+        ),
+        0.0,
+    )
+
+
+@pytest.mark.parametrize("role", ["chaos-terminators", "terminator-champion"])
+@pytest.mark.parametrize("weapon_name", ["combi-bolter", "combi-weapon"])
+def test_current_terminator_native_weapons_change_wound_and_armour_save(
+    current_ec_definitions: Section02Definitions,
+    role: str,
+    weapon_name: str,
+) -> None:
+    from tests.support.section02_consumers import attack_pool
+    from tests.support.section04_fixtures import combat_state
+    from tests.support.section05_sequence import fixed_sequence_dice, payloads, resolve
+    from warhammer40k_core.engine.attack_sequence import AttackSequence
+    from warhammer40k_core.engine.damage_allocation import model_by_id
+    from warhammer40k_core.engine.unit_factory import UnitInstance
+    from warhammer40k_core.engine.wargear_selections import WargearSelection
+    from warhammer40k_core.engine.weapon_instances import (
+        equipped_weapon_profile_instances_for_model,
+    )
+
+    d = current_ec_definitions
+    sheet = d.package.army_catalog.datasheet_by_id("000004081")
+    wargear_id = f"000004081:{weapon_name}"
+    choices: tuple[WargearSelection, ...] = ()
+    if weapon_name == "combi-weapon":
+        option = next(
+            o
+            for o in sheet.wargear_options
+            if wargear_id in o.allowed_wargear_ids and o.model_profile_id == f"000004081:{role}"
+        )
+        choices = (WargearSelection(option.option_id, f"000004081:{role}", (wargear_id,)),)
+    unit = d.unit("000004081", wargear=choices)
+    assert UnitInstance.from_payload(unit.to_payload()).to_payload() == unit.to_payload()
+    model = next(
+        m
+        for m in unit.own_models
+        if m.model_profile_id == f"000004081:{role}"
+        and any(
+            w.wargear_id == wargear_id
+            for w in equipped_weapon_profile_instances_for_model(
+                model=m, army_catalog=d.package.army_catalog
+            )
+        )
+    )
+    physical = next(
+        w
+        for w in equipped_weapon_profile_instances_for_model(
+            model=model, army_catalog=d.package.army_catalog
+        )
+        if w.wargear_id == wargear_id
+    )
+    weapon = physical.weapon_profile
+    assert weapon.strength_for_interaction() == 5
+    assert weapon.armor_penetration.final == -1
+    target = d.unit("000000611", army_id="enemy", identity="target")
+    from warhammer40k_core.core.attributes import Characteristic
+
+    assert len(target.own_models) == 1
+    assert {
+        v.characteristic: v.final
+        for v in target.own_models[0].characteristics
+        if v.characteristic in (Characteristic.TOUGHNESS, Characteristic.SAVE)
+    } == {Characteristic.TOUGHNESS: 9, Characteristic.SAVE: 3}
+    assert "VEHICLE" in target.own_models[0].keywords
+    assert "INFANTRY" not in target.own_models[0].keywords
+    # Native single-model T9, Sv3+ VEHICLE: S5 wounds on5 and AP-1 makes save3 fail.
+    # Anti-Infantry cannot replace this S/T check; the target has no invulnerable save.
+    pool = replace(
+        attack_pool(unit, target, weapon, wargear_id),
+        attacker_model_instance_id=model.model_instance_id,
+        weapon_instance_id=physical.weapon_instance_id,
+    )
+    sequence = AttackSequence(
+        "s05", "owner", unit.unit_instance_id, (pool,), source_phase=BattlePhase.SHOOTING
+    )
+    state = combat_state(d, unit, target=target, distance=18)
+    n = pool.attacks
+    decisions, remaining, status = resolve(
+        state, sequence, fixed_sequence_dice(sequence, target, (5,) * n, (5,) * n, (3,) * n)
+    )
+    assert remaining is None, status
+    assert status is None
+    steps = payloads(decisions, "attack_sequence_step")
+    assert len([p for p in steps if p["step"] == "wound"]) == n
+    assert len([p for p in steps if p["step"] == "save"]) == n
+    assert model_by_id(state=state, model_instance_id=target.own_model_ids()[0]).current_wounds == (
+        target.own_models[0].current_wounds - n
+    )
+
+
+@pytest.mark.parametrize("sheet", ["000004081", "000004083"])
+@pytest.mark.parametrize("face", [4, 5])
+def test_current_native_toughness_changes_real_wound_resolution(
+    current_ec_definitions: Section02Definitions,
+    sheet: str,
+    face: int,
+) -> None:
+    from tests.support.section05_sequence import (
+        fixed_sequence_dice,
+        native_sequence,
+        payloads,
+        resolve,
+    )
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.engine.damage_allocation import model_by_id
+    from warhammer40k_core.engine.unit_factory import UnitInstance
+
+    d = current_ec_definitions
+    target = d.unit(sheet, army_id="enemy", identity="target")
+    assert UnitInstance.from_payload(target.to_payload()).to_payload() == target.to_payload()
+    assert {
+        v.final
+        for m in target.own_models
+        for v in m.characteristics
+        if v.characteristic is Characteristic.TOUGHNESS
+    } == {6}
+    if sheet == "000004081":
+        assert {m.model_profile_id for m in target.own_models} == {
+            "000004081:chaos-terminators",
+            "000004081:terminator-champion",
+        }
+    state, target, sequence = native_sequence(d, target=target)
+    assert sequence.attack_pools[0].weapon_profile.strength_for_interaction() == 5
+    # S5 wounds native T6 on5; the former T5 profile incorrectly accepted4.
+    dice = fixed_sequence_dice(sequence, target, (3,), (face,), (1,))
+    if face == 4:
+        dice = dice[:-1]
+    decisions, remaining, status = resolve(state, sequence, dice)
+    if sheet == "000004081" and face == 5:
+        from warhammer40k_core.engine.attack_sequence import resolve_attack_sequence_until_blocked
+        from warhammer40k_core.engine.attack_sequence_group_selection import (
+            apply_damage_allocation_model_decision,
+        )
+
+        assert remaining is not None
+        assert status is not None
+        assert status.decision_request is not None
+        request = status.decision_request
+        assert request.decision_type == "select_damage_allocation_model"
+        assert request.actor_id == "opponent"
+        assert len(request.options) == len(target.own_models)
+        chosen = DecisionResult.for_request(
+            result_id="current-toughness-allocation",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+        decisions.submit_result(chosen)
+        remaining, allocated, status = apply_damage_allocation_model_decision(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            attack_sequence=remaining,
+            result=chosen,
+            already_allocated_model_ids=(),
+        )
+        if remaining is not None and status is None:
+            remaining, _, status = resolve_attack_sequence_until_blocked(
+                state=state,
+                decisions=decisions,
+                ruleset_descriptor=state.runtime_ruleset_descriptor(),
+                attack_sequence=remaining,
+                already_allocated_model_ids=allocated,
+            )
+    assert remaining is None, status
+    assert status is None
+    steps = payloads(decisions, "attack_sequence_step")
+    assert len([p for p in steps if p["step"] == "save"]) == int(face == 5)
+    assert model_by_id(state=state, model_instance_id=target.own_model_ids()[0]).current_wounds == (
+        target.own_models[0].current_wounds - int(face == 5)
+    )
+
+
+def test_current_ec_source_overlay_is_closed_and_preimage_bound() -> None:
+    from tools.ability_support_sources import load_source_artifacts
+    from tools.generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR
+    from tools.generate_emperors_children_current_source import generated_overlay_pack
+
+    from warhammer40k_core.rules.source_overlay import (
+        SourceOverlayError,
+        apply_source_release_overlays,
+    )
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        emperors_children_current_2026_11 as current,
+    )
+
+    pack = current.overlay_pack()
+    assert pack == generated_overlay_pack()
+    numeric = pack.operations[:4]
+    assert len(pack.operations) == 6
+    assert sum(len(o.fields) for o in numeric) == 6
+    assert {o.source_row_id for o in numeric} == {
+        "000004081:1",
+        "000004081:1:1:8658",
+        "000004081:2:1:8659",
+        "000004083:1",
+    }
+    assert pack.operations[4].source_row_id == "000004077:6"
+    assert pack.operations[4].operation_kind.value == "supersede_row"
+    assert dict(pack.operations[5].fields)["keyword"] == "Mobile"
+    sources = load_source_artifacts(DEFAULT_SOURCE_JSON_DIR)
+    updated = apply_source_release_overlays(
+        source_artifacts=sources,
+        release_manifest=current.source_release_manifest(),
+        overlay_packs=(pack,),
+    )
+    originals = {(a.source_table, r.source_row_id): r for a in sources for r in a.rows}
+    after = {(a.source_table, r.source_row_id): r for a in updated for r in a.rows}
+    touched = {(o.source_table, o.source_row_id) for o in pack.operations}
+    assert set(after) - set(originals) == {
+        ("Datasheets_keywords", pack.operations[5].source_row_id)
+    }
+    for identity, row in originals.items():
+        if identity not in touched:
+            assert row.to_payload() == after[identity].to_payload()
+    for index in range(5):
+        stale = replace(pack.operations[index], expected_preimage_hash="0" * 64)
+        with pytest.raises(SourceOverlayError, match="target_drift"):
+            apply_source_release_overlays(
+                source_artifacts=sources,
+                release_manifest=current.source_release_manifest(),
+                overlay_packs=(
+                    replace(
+                        pack,
+                        operations=(*pack.operations[:index], stale, *pack.operations[index + 1 :]),
+                    ),
+                ),
+            )
+    with pytest.raises(SourceOverlayError, match="invalid"):
+        current.overlay_pack_from_json_bytes(b"not JSON")
+
+
+def test_current_packaged_court_native_profiles_mobile_and_roundtrip() -> None:
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+    from warhammer40k_core.engine.movement_legality import MovementCapabilitySet
+    from warhammer40k_core.engine.unit_factory import UnitInstance
+    from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        court_of_slaughter_anvanth_2026_08 as packaged,
+    )
+
+    package = packaged.catalog_package()
+    assert (
+        CanonicalCatalogPackage.from_payload(package.to_payload()).to_payload()
+        == package.to_payload()
+    )
+    d = Section02Definitions(package, 0.0)
+    for sheet in ("000004081", "000004083"):
+        unit = d.unit(sheet)
+        assert UnitInstance.from_payload(unit.to_payload()).to_payload() == unit.to_payload()
+        assert {
+            v.final
+            for m in unit.own_models
+            for v in m.characteristics
+            if v.characteristic is Characteristic.TOUGHNESS
+        } == {6}
+    for name in ("combi-bolter", "combi-weapon"):
+        weapon = d.weapon(f"000004081:{name}")
+        assert (weapon.strength_for_interaction(), weapon.armor_penetration.final) == (5, -1)
+    fulgrim = d.unit("000004077")
+    assert "MOBILE" in fulgrim.own_models[0].keywords
+    assert not any(
+        a.ability_id == "000004077:serpentine"
+        for a in package.army_catalog.datasheet_by_id("000004077").abilities
+    )
+    capability = MovementCapabilitySet.from_keywords(
+        fulgrim.own_models[0].keywords,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        movement_mode="normal",
+    )
+    assert capability.can_traverse_ruins_walls
+    assert capability.terrain_as_if_absent_height_inches is None
+    assert MovementCapabilitySet.from_payload(capability.to_payload()) == capability
+    # The packaged consumer now receives the already-merged October corrections too.
+    lord = d.unit("000004078")
+    assert {
+        v.final
+        for v in lord.own_models[0].characteristics
+        if v.characteristic is Characteristic.TOUGHNESS
+    } == {5}

@@ -16,7 +16,7 @@
     "source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32"
   },
   "edition": 11,
-  "package_hash": "bb067e9171cbe530cab9d6fef25d88c0bf32d4befde295a0b251e64b83ad4cd4",
+  "package_hash": "9be3564104f1f0379c1c7a10d110cdeaacd72bee22dc4817838128cda5cc6224",
   "shard_id": "emperors-children",
   "source_packages": {
     "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08": {
@@ -421,8 +421,8 @@
         9
       ],
       "official_document_sha256": "1808fabb911f7a3e917ae5f2f12a6a7436ed97e1e5382238566dfd5e4540aa3c",
-      "overlay_package_hash": "c8a36f8301ace9121e92418f48d47818c8bc9b64ede895a0b84556bfba5824bb",
-      "package_hash": "90b27e3a76f6a2c5b0b5cd3ad678ea284f202ac8f072ef35126d0762792a6d09",
+      "overlay_package_hash": "a3e6c594de500f7d51efbcd1eb0f4d757a414c062119845a559f0595d3231f1c",
+      "package_hash": "cd24d2816621c9418ebdc91c9d4d159eaf350b035d27b150d7d9cc60c64bbfbc",
       "records": {
         "000004077:4": {
           "ability_name": "Daemonic Poisons",
@@ -826,109 +826,6 @@
             "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:5"
           }
         },
-        "000004077:6": {
-          "ability_name": "Serpentine",
-          "normalized_text_sha256": "f0d95df44df5a9eda03d2ca38ef8292a6c85d7d748846c0c4a993139cd34410a",
-          "rule_ir": {
-            "clauses": [
-              {
-                "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:6:clause:001",
-                "conditions": [],
-                "diagnostics": [],
-                "duration": null,
-                "effects": [
-                  {
-                    "kind": "movement_transit_permission",
-                    "parameters": [
-                      {
-                        "key": "movement_modes",
-                        "value": [
-                          "normal",
-                          "advance",
-                          "fall_back"
-                        ]
-                      },
-                      {
-                        "key": "permission",
-                        "value": "move_over_as_if_not_there"
-                      },
-                      {
-                        "key": "terrain_height_max_inches",
-                        "value": 4.0
-                      },
-                      {
-                        "key": "terrain_scope",
-                        "value": "terrain_features"
-                      }
-                    ],
-                    "source_span": {
-                      "end": 139,
-                      "start": 71,
-                      "text": "move over sections of terrain features that are 4\" or less in height"
-                    }
-                  }
-                ],
-                "source_span": {
-                  "end": 140,
-                  "start": 0,
-                  "text": "Each time this model makes a Normal, Advance or Fall Back move, it can move over sections of terrain features that are 4\" or less in height."
-                },
-                "target": {
-                  "kind": "this_model",
-                  "parameters": [],
-                  "source_span": {
-                    "end": 20,
-                    "start": 10,
-                    "text": "this model"
-                  }
-                },
-                "template_id": "phase17k:model-terrain-height-transit",
-                "trigger": {
-                  "kind": "timing_window",
-                  "parameters": [
-                    {
-                      "key": "edge",
-                      "value": "during"
-                    },
-                    {
-                      "key": "movement_modes",
-                      "value": [
-                        "normal",
-                        "advance",
-                        "fall_back"
-                      ]
-                    },
-                    {
-                      "key": "phase",
-                      "value": "movement"
-                    },
-                    {
-                      "key": "subject",
-                      "value": "this_model"
-                    },
-                    {
-                      "key": "timing_window",
-                      "value": "model_makes_move"
-                    }
-                  ],
-                  "source_span": {
-                    "end": 62,
-                    "start": 0,
-                    "text": "Each time this model makes a Normal, Advance or Fall Back move"
-                  }
-                },
-                "unsupported_reason": null
-              }
-            ],
-            "diagnostics": [],
-            "ir_hash": "a2b9852dabed5009928bd7e7123b5b558ec309604d7f52808ae35809b20b11d3",
-            "normalized_text": "Each time this model makes a Normal, Advance or Fall Back move, it can move over sections of terrain features that are 4\" or less in height.",
-            "parser_version": "manual-source-backed-rule-ir:v1",
-            "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:6",
-            "schema_version": "phase17c-rule-ir-v1",
-            "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:6"
-          }
-        },
         "000004077:7": {
           "ability_name": "Beguiling Form",
           "normalized_text_sha256": "b1d72de189090371262e4a02612769a0dd06ae044981c6baf2f883812d0c6739",
@@ -1112,6 +1009,10 @@
           }
         }
       },
+      "review_manifest_filename": "review.json",
+      "review_manifest_sha256": "0acd88e7752b73df36ceaf4aa7fe8c23984e8026b869ce28d7158b3df31242a5",
+      "review_row_id": "000004077:retire-serpentine",
+      "review_treatment": "Preferred current App mirror supersedes retired Serpentine; other clauses retain their historical source.",
       "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
       "source_package_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07",
       "source_snapshot_filename": "Datasheets_abilities.json",

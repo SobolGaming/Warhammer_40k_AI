@@ -1,0 +1,71 @@
+{
+  "authority": "User-preferred 40k.app mirror; not an official GW API or raw HTTP attestation.",
+  "base": "1e2a8cdee1964bccd638c34e2ccb72ea5ead01ac",
+  "capture_file": "browser-captures.json",
+  "capture_sha256": "a7ad87299193bc05dce2ed65e12e015d3669d876e8dc10840ff2d19d4aff172e",
+  "changes": [
+    {
+      "after": {
+        "T": "6"
+      },
+      "before": {
+        "T": "5"
+      },
+      "preimage": "5ca5308819c871754d987f791a4f7f4f219f469c8afb3b3513542be2bea9db43",
+      "row": "000004081:1",
+      "table": "Datasheets_models",
+      "url": "https://www.40k.app/factions/emperors-children/units/chaos-terminators"
+    },
+    {
+      "after": {
+        "AP": "-1",
+        "S": "5"
+      },
+      "before": {
+        "AP": "0",
+        "S": "4"
+      },
+      "preimage": "4fd17f955a5795dc1019893fd16ee8a12ee3333f06a49b9305e9467de277d078",
+      "row": "000004081:1:1:8658",
+      "table": "Datasheets_wargear",
+      "url": "https://www.40k.app/factions/emperors-children/units/chaos-terminators"
+    },
+    {
+      "after": {
+        "AP": "-1",
+        "S": "5"
+      },
+      "before": {
+        "AP": "0",
+        "S": "4"
+      },
+      "preimage": "f9906d6e879246111d122bebef4bd2a1d7a0b70e59a21da9d6fdb4f701d3f033",
+      "row": "000004081:2:1:8659",
+      "table": "Datasheets_wargear",
+      "url": "https://www.40k.app/factions/emperors-children/units/chaos-terminators"
+    },
+    {
+      "after": {
+        "T": "6"
+      },
+      "before": {
+        "T": "5"
+      },
+      "preimage": "8804ac361ef81533fbc9d138b311b5dc821617df894acfb7f4a8966ffbb7c94b",
+      "row": "000004083:1",
+      "table": "Datasheets_models",
+      "url": "https://www.40k.app/factions/emperors-children/units/lucius-the-eternal"
+    }
+  ],
+  "history": "Full browser text matches the earlier 1 November captures. Own-unit history dates both T5-to6 changes to v963/30 September and Serpentine removal to v909/22 July. No date is asserted for MOBILE or combi changes.",
+  "observed_date": "2026-11-01",
+  "retired_row": {
+    "historical_ir": "historical-fulgrim-rule-ir.json",
+    "preimage": "d8ea1ab6f6cb8dee2cf190bbab5878dd8c0d9b2a111b7e224eac1c87d10351bf",
+    "row": "000004077:6",
+    "table": "Datasheets_abilities"
+  },
+  "schema": "ec-current-source-reconciliation-v1",
+  "scope": "Six numeric fields on four rows; Fulgrim MOBILE keyword and retirement of Serpentine. Existing native units only; no Sorcerer admission or pricing changes.",
+  "unchanged": "Raw snapshot, June/October overlays, identities, geometry, options, costs and adjacent profiles remain historical or unchanged. Current source/IR/catalog are regenerated; no new generic movement semantics."
+}

@@ -1,0 +1,51 @@
+{
+  "base": "1e2a8cdee1964bccd638c34e2ccb72ea5ead01ac",
+  "changes": {
+    "tools/ability_support_sources.py": {
+      "before_sha256": "de7f781cbd8d1a8016a64bcee58feb24722876c258192cdf96bebe0a939d4873",
+      "after_sha256": "dd89b8d7453ac23d7ea3ede565be979c8abdc1c631460e228e265e398fba4692",
+      "owners": {
+        "@module": {
+          "before": "0cf32e1b562df58010654b2f9447a5a83966ca3b8dac07c5ec4f1f8e1d2f5af6",
+          "after": "fa53eb355f191b18ea0a1dc7e9968350f8491f0f1a21547264504623c9860681"
+        },
+        "ability_support_index_inputs": {
+          "before": "c4c927908a0d934709737aadd9297c2431503f2078ec5b0e667742191e5c8d75",
+          "after": "d5db6e92d55d148f7316c354a8be7f69b0a129ed5d617828653bee7d5c5297d4"
+        },
+        "load_ability_support_sources": {
+          "before": "2355ed0e2433ae4e256a5840b749b89644120bce89c053cbe8ff0131b5a3c494",
+          "after": "2802a7285098899f07d0a47ac6393f65b709a5a3d8eab4b3f54c5f6842256c10"
+        }
+      }
+    },
+    "tools/source_scope_provenance.py": {
+      "before_sha256": "26b77718d94a586afebf33f90d1ca1eb0c7df17a5e922f054b28d5901abe938b",
+      "after_sha256": "7d5dbcca852a9ae237fe79b8d518e8b1a08f776a8af448ee19439746735ad732",
+      "owners": {
+        "@module": {
+          "before": "1532245b40263f4bf785016ece32c06d045f59aba03971ce235438ae6d783ccd",
+          "after": "c7986d732f5f19ac7a15368424ced5a5191a14689f265d777004e4d84b5ee635"
+        },
+        "current_ec_overlay_provenance": {
+          "before": null,
+          "after": "f793516e2369317415c064a243d26f700fd4754bc13bdb9b6c1d3e92047a1fb3"
+        },
+        "registered_provenance_text": {
+          "before": "2f456bf69529efece50711b54eea4467b1d70e0f15242ae442d377450510e9f9",
+          "after": "566d10a21e15afcbca5d708bba0f76a284757f8038f00ae5c6408241913e15ac"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tools/ability_support_sources.py": [
+      "qualification40-exact-b0712fa66a9cc38e"
+    ],
+    "tools/source_scope_provenance.py": [
+      "registered-source-provenance-projection"
+    ]
+  },
+  "source_obligation": "Apply the observed six-field Emperor's Children correction and current Fulgrim MOBILE/superseded Serpentine through the existing source-overlay pipeline. The new overlay retains its exact historical base metadata, requiring exact-byte source-scanner admission.",
+  "unchanged_work": "The same immutable overlay validation, preimage hashing, source indexing and catalog generation algorithms execute. One finite overlay and its exact input bytes are added; no search, caching, concurrency, parser or optimization change. Standing bounded-remediation policy requires current serial smoke and live integrity checks; no performance gain is claimed. The additional source-provenance row only authenticates and projects this finite overlay metadata; no general source exemption, cache, search, serialization algorithm or optimization changes. Both original mandatory sensitive operation mappings and detailed families remain intact; every other path, operation, category, base or owner-byte change restores the original requirements."
+}
