@@ -30917,6 +30917,102 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "supported-defiler-generated-owner-locator": {
+      "paths": [
+        "data/generated/ability_coverage/maulerfiend_cross_faction_support.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-defiler-source-dispatch-extraction": {
+      "paths": [
+        "src/warhammer40k_core/rules/wahapedia_bridge.py"
+      ],
+      "owners": [
+        "_bridge_options",
+        "_bridge_single_replacement_option"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-defiler-source-plural-replacement": {
+      "paths": [
+        "src/warhammer40k_core/rules/wahapedia_replacement_option_bridge.py"
+      ],
+      "owners": [
+        "@module",
+        "append_single_replacement_rows"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-defiler-exact-predecessor-controls": {
+      "paths": [
+        "tests/code_quality/test_category_migration_preservation.py"
+      ],
+      "owners": [
+        "test_defiler_registration_retains_exact_acts_predecessor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-defiler-exact-scope-controls": {
+      "paths": [
+        "tests/code_quality/test_registered_source_scopes.py"
+      ],
+      "owners": [
+        "test_defiler_scope_preserves_closed_inputs_provenance_and_six_real_samples"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-defiler-native-and-source-controls": {
+      "paths": [
+        "tests/rules/section22/test_wargear.py"
+      ],
+      "owners": [
+        "_selected_unit",
+        "replacement_package",
+        "test_native_defiler_default_and_independent_slot_controls",
+        "test_native_plural_replacement_removes_all_named_source_copies",
+        "test_native_single_copy_option_preserves_other_default_copy",
+        "test_native_singular_item_replaced_with_two_copies",
+        "test_plural_source_boundary_requires_and_preserves_explicit_removal_count"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-defiler-exact-predecessor-projection": {
+      "paths": [
+        "tests/support/acts_preservation.py"
+      ],
+      "owners": [
+        "defiler_provenance_predecessor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-defiler-generated-evidence-owner": {
+      "paths": [
+        "tools/maulerfiend_cross_faction_support.py"
+      ],
+      "owners": [
+        "@module"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

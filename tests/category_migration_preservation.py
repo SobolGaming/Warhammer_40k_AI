@@ -13,7 +13,11 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import TypedDict, cast
 
-from tests.support.acts_preservation import acts_predecessor, acts_provenance_predecessor
+from tests.support.acts_preservation import (
+    acts_predecessor,
+    acts_provenance_predecessor,
+    defiler_provenance_predecessor,
+)
 from tests.support.faction_layout_preservation import (
     ORIGINALS as FACTION_LAYOUT_ORIGINALS,
 )
@@ -569,7 +573,9 @@ def edition_registered_predecessor(root: Path, current: bytes) -> bytes:
     if (
         hashlib.sha256(predecessor).hexdigest() != EDITION_REGISTERED_PREDECESSOR_SHA256
         or hashlib.sha256(
-            acts_provenance_predecessor(root, _read(root, EDITION_REGISTERED_HELPER))
+            acts_provenance_predecessor(
+                root, defiler_provenance_predecessor(_read(root, EDITION_REGISTERED_HELPER))
+            )
         ).hexdigest()
         != EDITION_REGISTERED_HELPER_SHA256
     ):

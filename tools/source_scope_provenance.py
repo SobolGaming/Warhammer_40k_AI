@@ -49,7 +49,7 @@ PROVENANCE_RECORDS = (
 
 # No overlay is added by the Acts timing repair. Only its exact comparison
 # documents contain the independently authenticated historical input paths.
-COMPARISON_ONLY_SCOPE_BASES = (scopes.ACTS_BASE,)
+COMPARISON_ONLY_SCOPE_BASES = (scopes.ACTS_BASE, scopes.DEFILER_BASE)
 
 
 def registered_provenance_context(

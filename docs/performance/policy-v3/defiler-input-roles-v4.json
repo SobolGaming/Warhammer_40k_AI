@@ -1,0 +1,65 @@
+{
+  "schema": "tool-input-roles-v4",
+  "family": "external_contract_source_reuse",
+  "workload": "tests/code_quality/test_phase18m_conformance_boundary.py",
+  "base": "c15bd1564bd62a7c1ba9069a5ee6bbc7a6b94ce8",
+  "treatment": [
+    "src/warhammer40k_core/rules/wahapedia_bridge.py",
+    "src/warhammer40k_core/rules/wahapedia_replacement_option_bridge.py",
+    "tools/maulerfiend_cross_faction_support.py"
+  ],
+  "derived_outputs": [
+    "contracts/examples/persistence/session-persistence.json",
+    "contracts/examples/sessions/session-command-outcome.json",
+    "contracts/examples/sessions/session-command-started.json",
+    "contracts/examples/sessions/session-metadata-created.json",
+    "contracts/examples/support-profile-player-a-redacted.json",
+    "contracts/examples/support-profile-player-b-redacted.json",
+    "contracts/examples/support-profile.json",
+    "contracts/manifest.json",
+    "data/generated/ability_coverage/maulerfiend_cross_faction_support.json",
+    "src/warhammer40k_core/_engine_build_manifest.json"
+  ],
+  "control_plane": {
+    "ci/quality_shards/all.txt": "Actual quality collection inventory; old relative order and finite deferrals retained.",
+    "ci/quality_shards/shard-1.txt": "Actual quality collection lane for additive controls, unchanged module assignment.",
+    "ci/quality_shards/shard-4.txt": "Actual quality collection lane for additive controls, unchanged module assignment.",
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": "Current native wargear test hash only; original native ledger and all 260 deferrals retained.",
+    "data/source_audits/supported_rules_2026_10/defiler-replacement.json": "Bounded retained source evidence and same-class search; not loaded by timed testcase.",
+    "docs/performance/policy-v3/defiler-input-roles-v4.json": "Exact c15 role specification, checked outside the unchanged timed contract workload.",
+    "docs/performance/policy-v3/operation-map.json": "Closed actual-owner classification and required comparison selection; no timed workload behavior.",
+    "tests/category_migration_preservation.py": "Authenticate exact one-token successor before unchanged original Acts historical projection.",
+    "tests/code_quality/test_category_migration_preservation.py": "Untimed exact predecessor preservation and rejection controls; original Acts checks receive authenticated preceding bytes.",
+    "tests/code_quality/test_registered_source_scopes.py": "Untimed exact registration, true common inputs and real six-sample contract controls.",
+    "tests/rules/section22/test_wargear.py": "Native fresh-source Defiler, singular and multiple-copy controls outside measured contract testcase.",
+    "tests/support/acts_preservation.py": "Reverse only the exact new registration token and authenticate every prior byte before historical checks.",
+    "tools/performance_tool_inputs_v4.py": "Closed c15 registration; existing reviewed scopes and comparison validators unchanged.",
+    "tools/source_scope_provenance.py": "One exact comparison-only spec/report registration; no source overlay or broad provenance exemption."
+  },
+  "required_dependencies": [
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Abilities.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_abilities.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_keywords.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_leader.json",
+    "docs/source_rules/faq-warhammer-open-tacoma-2026-dtb3ingprd-cvcl2agtfd.pdf",
+    "docs/source_rules/tacoma-open-2026-source-package.json",
+    "pyproject.toml",
+    "scripts/check_ci_attribution_supervisor.py",
+    "scripts/ci_attribution_supervisor.py",
+    "scripts/source_reuse_experiment.py",
+    "tests/code_quality/test_phase18m_conformance_boundary.py",
+    "tests/conftest.py",
+    "tests/timing_plugin.py",
+    "uv.lock"
+  ],
+  "harness": [
+    "scripts/check_ci_attribution_supervisor.py",
+    "scripts/ci_attribution_supervisor.py",
+    "scripts/measure_vyper_source_binding.py",
+    "scripts/source_reuse_experiment.py",
+    "tests/code_quality/test_phase18m_conformance_boundary.py",
+    "tests/conftest.py",
+    "tests/timing_plugin.py"
+  ]
+}

@@ -503,3 +503,42 @@ def test_acts_comparison_only_provenance_is_exact_and_closed(
             provenance.registered_provenance_text(
                 ROOT, ROOT / scope.report_path, raw, historical_snapshot_inputs
             )
+
+
+def test_defiler_scope_preserves_closed_inputs_provenance_and_six_real_samples(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import sys
+
+    scope = scopes.registered_scope(scopes.DEFILER_BASE)
+    monkeypatch.setattr(sys.modules[__name__], "SCOPE", scope)
+    assert scope.base == "c15bd1564bd62a7c1ba9069a5ee6bbc7a6b94ce8"
+    assert scope.new_treatment == frozenset()
+    assert scope.harness == scopes.registered_scope(scopes.ACTS_BASE).harness
+    assert scope.required == scopes.registered_scope(scopes.ACTS_BASE).required
+    assert scopes.scope_for_specification(scope.spec_path) == scope
+    assert (
+        inputs.digest(scopes.read_role_spec(ROOT, scope_base=scope.base))
+        == scope.spec_canonical_sha256
+    )
+    _validate(*_report())
+    for side in ("base", "head"):
+        for index in range(3):
+            report, specification, binding = _report()
+            report[side]["samples"]["orphan-write-independent-check"].pop(index)
+            with pytest.raises(ValueError, match="samples missing"):
+                _validate(report, specification, binding)
+    before, after = _inventories()
+    after["src/real.py"] = "f" * 64
+    with pytest.raises(ValueError, match=r"True common|V4"):
+        _binding(before, after)
+    for kind in ("spec", "report"):
+        path = ROOT / (scope.spec_path if kind == "spec" else scope.report_path)
+        raw = path.read_bytes() if kind == "spec" else json.dumps(_provenance_report()).encode()
+        text = provenance.registered_provenance_text(ROOT, path, raw, historical_snapshot_inputs)
+        assert text is not None
+        assert not any(token in text for token in retired_identity_tokens())
+    context = provenance.registered_provenance_context(scope.spec_path)
+    assert context is not None
+    assert context[0].overlay_path == ""
+    assert context[1] == scope

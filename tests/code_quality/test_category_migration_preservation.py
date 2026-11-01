@@ -620,7 +620,9 @@ def test_acts_comparison_registration_preserves_exact_historical_helper(
     target = tmp_path / acts.PROVENANCE_ARCHIVE
     target.parent.mkdir(parents=True)
     target.write_bytes((ROOT / acts.PROVENANCE_ARCHIVE).read_bytes())
-    current = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    current = acts.defiler_provenance_predecessor(
+        (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    )
     if mutation is None:
         assert acts.acts_provenance_predecessor(tmp_path, current) == target.read_bytes()
         return
@@ -755,3 +757,26 @@ def test_acts_inactive_api_maintenance_preserves_original_evidence(
             patch.setattr(Path, "read_bytes", repinned_bytes)
             with pytest.raises(SystemExit, match="Acts inactive"):
                 behavioral_selection(ROOT)
+
+
+@pytest.mark.parametrize("mutation", [None, "original", "scope", "omission", "duplicate"])
+def test_defiler_registration_retains_exact_acts_predecessor(mutation: str | None) -> None:
+    from tests.support import acts_preservation as acts
+
+    raw = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    addition = b"COMPARISON_ONLY_SCOPE_BASES = (scopes.ACTS_BASE, scopes.DEFILER_BASE)"
+    if mutation is None:
+        assert hashlib.sha256(acts.defiler_provenance_predecessor(raw)).hexdigest() == (
+            "40ef539dc75aa669df54a099d7788b74ca68453c7ae18a1e009194c48a42f64a"
+        )
+        return
+    if mutation == "original":
+        raw = raw.replace(b"return contexts.get(relative)", b"return None")
+    elif mutation == "scope":
+        raw = raw.replace(b"scopes.DEFILER_BASE", b"scopes.EC_BASE")
+    elif mutation == "omission":
+        raw = raw.replace(addition, b"")
+    else:
+        raw += addition
+    with pytest.raises(ValueError, match="registered edition provenance inputs changed"):
+        acts.defiler_provenance_predecessor(raw)

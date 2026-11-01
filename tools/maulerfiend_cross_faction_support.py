@@ -54,7 +54,8 @@ _GENERIC_MECHANICS = (
         mechanic_id="counted-wargear-replacement",
         scope="content_neutral_engine_mechanic",
         evidence=(
-            "src/warhammer40k_core/rules/wahapedia_bridge.py:_bridge_single_replacement_option",
+            "src/warhammer40k_core/rules/wahapedia_replacement_option_bridge.py:"
+            "append_single_replacement_rows",
             "src/warhammer40k_core/engine/unit_factory.py:_apply_replace_wargear_effect_to_models",
             "tests/unit/test_phase17a_wahapedia_source_mirror.py:"
             "test_phase17a_maulerfiend_counted_replacement_is_generic_across_source_variants",
