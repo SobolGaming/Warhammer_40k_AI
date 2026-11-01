@@ -457,6 +457,7 @@ def test_sorcerer_source_smoke_scope_requires_exact_base_bytes_owners_and_catego
     for path, operation in {
         "tools/ability_support_sources.py": "qualification40-exact-b0712fa66a9cc38e",
         "tools/generate_ability_support_matrix.py": "qualification40-exact-ded6452f144f095b",
+        "tools/source_scope_provenance.py": "registered-source-provenance-projection",
     }.items():
         base = "7827235d328bf5b82201c8fece29dab7356ba3e3"
         change = object_value(object_value(scope["changes"])[path])

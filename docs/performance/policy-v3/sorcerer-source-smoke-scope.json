@@ -32,6 +32,20 @@
           "after": "f23859c4b6aa641a420700d63c2304a1b2f3f72a75dbd9e21ed414bcda5a0f2f"
         }
       }
+    },
+    "tools/source_scope_provenance.py": {
+      "before_sha256": "7d5dbcca852a9ae237fe79b8d518e8b1a08f776a8af448ee19439746735ad732",
+      "after_sha256": "e755f0325fd4b8d2877f6389962177483d0731a97d880929b8541da9d1da71be",
+      "owners": {
+        "@module": {
+          "before": "c7986d732f5f19ac7a15368424ced5a5191a14689f265d777004e4d84b5ee635",
+          "after": "aa0ff51d4fc2e1eaaf466bac56b8d2f76064ff475ad664c5467e536cceca7ad6"
+        },
+        "current_ec_overlay_provenance": {
+          "before": "f793516e2369317415c064a243d26f700fd4754bc13bdb9b6c1d3e92047a1fb3",
+          "after": "8d922d719988ff53b5da6ad73a14260c004bbad65f2f02792a1048f2a822b0c6"
+        }
+      }
     }
   },
   "smoke_operations": {
@@ -40,8 +54,11 @@
     ],
     "tools/generate_ability_support_matrix.py": [
       "qualification40-exact-ded6452f144f095b"
+    ],
+    "tools/source_scope_provenance.py": [
+      "registered-source-provenance-projection"
     ]
   },
   "source_obligation": "Admit Sorcerer 000004085 with its complete observed current rules, exact profile corrections and explicit provisional physical configuration through existing source indexing and native catalog generation.",
-  "unchanged_work": "Only the finite overlay/source-index inventory and Sorcerer model height/catalog membership inputs are added to these two owners. Source indexing, immutable overlay preimage checks and catalog algorithms are unchanged. All existing sensitive mappings, detailed families, serial smoke budgets and live integrity obligations remain in force; no throughput improvement is asserted."
+  "unchanged_work": "The finite overlay/source-index inventory, Sorcerer model height/catalog membership inputs and one exact historical-overlay provenance registration are added to these three owners. Source indexing, immutable overlay preimage checks and catalog algorithms are unchanged. The provenance path authenticates exact bytes and projects only historical base-version metadata; operative retired-edition text remains scanned. All existing sensitive mappings, detailed families, serial smoke budgets and live integrity obligations remain in force; no throughput improvement is asserted."
 }

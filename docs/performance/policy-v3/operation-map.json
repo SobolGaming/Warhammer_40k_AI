@@ -31586,6 +31586,28 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "sorcerer-admission-exact-31": {
+      "paths": [
+        "data/source_audits/sorcerer_2026_11/provenance-successor.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-32": {
+      "paths": [
+        "tests/code_quality/test_registered_source_scopes.py"
+      ],
+      "owners": [
+        "test_sorcerer_overlay_projects_only_exact_historical_base"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

@@ -1,0 +1,22 @@
+{
+  "schema": "sorcerer-exact-provenance-successor-v1",
+  "base": "7827235d328bf5b82201c8fece29dab7356ba3e3",
+  "path": "tools/source_scope_provenance.py",
+  "before_sha256": "7d5dbcca852a9ae237fe79b8d518e8b1a08f776a8af448ee19439746735ad732",
+  "after_sha256": "e755f0325fd4b8d2877f6389962177483d0731a97d880929b8541da9d1da71be",
+  "overlay_path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_sorcerer_2026_11.overlay-pack.json",
+  "overlay_sha256": "735e021d0df16ee20f54f742a562152bed109c77ea600e35c90420abc8c7ab7a",
+  "reverse_edits": [
+    {
+      "before": "\nSORCERER_OVERLAY = (\n    \"src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/\"\n    \"emperors_children_sorcerer_2026_11.overlay-pack.json\"\n)\nSORCERER_OVERLAY_SHA256 = \"735e021d0df16ee20f54f742a562152bed109c77ea600e35c90420abc8c7ab7a\"\n",
+      "after": "",
+      "count": 1
+    },
+    {
+      "before": "    reviewed_hash = {\n        root / CURRENT_EC_OVERLAY: CURRENT_EC_OVERLAY_SHA256,\n        root / SORCERER_OVERLAY: SORCERER_OVERLAY_SHA256,\n    }.get(path)\n    if reviewed_hash is None:\n        return None\n    if path.is_symlink() or hashlib.sha256(raw).hexdigest() != reviewed_hash:\n",
+      "after": "    if path != root / CURRENT_EC_OVERLAY:\n        return None\n    if path.is_symlink() or hashlib.sha256(raw).hexdigest() != CURRENT_EC_OVERLAY_SHA256:\n",
+      "count": 1
+    }
+  ],
+  "scope": "One exact artifact is added to the existing path/hash/11th-target/historical-origin table. Only the historical base version field is projected; operative text remains scanned. Exact reversal preserves the prior EC, Defiler and Acts byte proof chain."
+}
