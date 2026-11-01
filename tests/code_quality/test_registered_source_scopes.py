@@ -542,3 +542,32 @@ def test_defiler_scope_preserves_closed_inputs_provenance_and_six_real_samples(
     assert context is not None
     assert context[0].overlay_path == ""
     assert context[1] == scope
+
+
+def test_current_ec_overlay_projects_only_exact_historical_base(tmp_path: Path) -> None:
+    path = ROOT / provenance.CURRENT_EC_OVERLAY
+    raw = path.read_bytes()
+    projected = provenance.registered_provenance_text(ROOT, path, raw, historical_snapshot_inputs)
+    assert projected is not None
+    payload = json.loads(projected)
+    assert "version" not in payload["base_source_package_id"]
+    assert payload["target_edition"] == "warhammer-40000-11th"
+    assert path.read_bytes() == raw
+    assert (
+        provenance.registered_provenance_text(
+            ROOT, ROOT / "other-overlay.json", raw, historical_snapshot_inputs
+        )
+        is None
+    )
+    for mutation in ("base_source_package_id", "target_edition", "adjacent_identity"):
+        changed = json.loads(raw)
+        changed[mutation] = retired_identity_tokens()[0]
+        with pytest.raises(ValueError, match="exact reviewed bytes"):
+            provenance.registered_provenance_text(
+                ROOT, path, json.dumps(changed).encode(), historical_snapshot_inputs
+            )
+    linked = tmp_path / provenance.CURRENT_EC_OVERLAY
+    linked.parent.mkdir(parents=True)
+    linked.symlink_to(path)
+    with pytest.raises(ValueError, match="exact reviewed bytes"):
+        provenance.registered_provenance_text(tmp_path, linked, raw, historical_snapshot_inputs)

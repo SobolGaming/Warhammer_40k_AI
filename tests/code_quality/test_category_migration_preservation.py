@@ -759,7 +759,19 @@ def test_acts_inactive_api_maintenance_preserves_original_evidence(
                 behavioral_selection(ROOT)
 
 
-@pytest.mark.parametrize("mutation", [None, "original", "scope", "omission", "duplicate"])
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        None,
+        "original",
+        "scope",
+        "omission",
+        "duplicate",
+        "ec_addition",
+        "ec_omission",
+        "ec_duplicate",
+    ],
+)
 def test_defiler_registration_retains_exact_acts_predecessor(mutation: str | None) -> None:
     from tests.support import acts_preservation as acts
 
@@ -776,6 +788,16 @@ def test_defiler_registration_retains_exact_acts_predecessor(mutation: str | Non
         raw = raw.replace(b"scopes.DEFILER_BASE", b"scopes.EC_BASE")
     elif mutation == "omission":
         raw = raw.replace(addition, b"")
+    elif mutation == "ec_addition":
+        raw = raw.replace(b"CURRENT_EC_OVERLAY_SHA256", b"ALTERED_EC_OVERLAY_SHA256")
+    elif mutation == "ec_omission":
+        raw = raw.replace(b"    current = current_ec_overlay_provenance(root, path, raw)\n", b"")
+    elif mutation == "ec_duplicate":
+        raw += raw[
+            raw.index(b"# Current source-only admission:") : raw.index(
+                b"\ndef registered_provenance_context("
+            )
+        ]
     else:
         raw += addition
     with pytest.raises(ValueError, match="registered edition provenance inputs changed"):

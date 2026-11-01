@@ -26,7 +26,7 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTriggerKind,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    emperors_children_datasheet_overlay_2026_06 as source_overlay,
+    emperors_children_current_2026_11 as source_overlay,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -66,12 +66,12 @@ SHARD_ID = "emperors-children"
 PARSER_VERSION = "manual-source-backed-rule-ir:v1"
 DATASHEET_ID = "000004077"
 DATASHEET_NAME = "Fulgrim"
-SUPPORTED_SOURCE_ROW_IDS = tuple(f"{DATASHEET_ID}:{line}" for line in range(4, 10))
+REVIEW_PATH = REPO_ROOT / "data/source_audits/ec_current_2026_11/review.json"
+SUPPORTED_SOURCE_ROW_IDS = tuple(f"{DATASHEET_ID}:{line}" for line in (4, 5, 7, 8, 9))
 
 ABILITY_NAMES = {
     f"{DATASHEET_ID}:4": "Daemonic Poisons",
     f"{DATASHEET_ID}:5": "Daemon Primarch of Slaanesh",
-    f"{DATASHEET_ID}:6": "Serpentine",
     f"{DATASHEET_ID}:7": "Beguiling Form",
     f"{DATASHEET_ID}:8": "Daemonic Speed",
     f"{DATASHEET_ID}:9": "Enthralling Hypnosis (Aura)",
@@ -88,7 +88,6 @@ def generated_artifact_payload() -> dict[str, object]:
     rule_irs = {
         f"{DATASHEET_ID}:4": _daemonic_poisons_rule_ir(source_rows[f"{DATASHEET_ID}:4"]),
         f"{DATASHEET_ID}:5": _daemon_primarch_rule_ir(source_rows[f"{DATASHEET_ID}:5"]),
-        f"{DATASHEET_ID}:6": _serpentine_rule_ir(source_rows[f"{DATASHEET_ID}:6"]),
         f"{DATASHEET_ID}:7": _beguiling_form_rule_ir(source_rows[f"{DATASHEET_ID}:7"]),
         f"{DATASHEET_ID}:8": _daemonic_speed_rule_ir(source_rows[f"{DATASHEET_ID}:8"]),
         f"{DATASHEET_ID}:9": _enthralling_hypnosis_rule_ir(source_rows[f"{DATASHEET_ID}:9"]),
@@ -103,6 +102,13 @@ def generated_artifact_payload() -> dict[str, object]:
         "official_document_sha256": hashlib.sha256(OFFICIAL_PDF_PATH.read_bytes()).hexdigest(),
         "official_document_pages": [8, 9],
         "overlay_package_hash": source_overlay.overlay_pack().package_hash(),
+        "review_manifest_filename": "review.json",
+        "review_manifest_sha256": hashlib.sha256(REVIEW_PATH.read_bytes()).hexdigest(),
+        "review_row_id": "000004077:retire-serpentine",
+        "review_treatment": (
+            "Preferred current App mirror supersedes retired Serpentine; "
+            "other clauses retain their historical source."
+        ),
         "datasheet_id": DATASHEET_ID,
         "datasheet_name": DATASHEET_NAME,
         "records": {
@@ -142,8 +148,6 @@ def _validated_source_rows(source_payload: object) -> dict[str, str]:
         source_rows[source_row_id] = description
     if set(source_rows) != set(SUPPORTED_SOURCE_ROW_IDS):
         raise ValueError("Fulgrim source-row inventory drifted.")
-    if source_rows[f"{DATASHEET_ID}:6"] != source_overlay.SERPENTINE_DESCRIPTION:
-        raise ValueError("Fulgrim Serpentine overlay text drifted.")
     return source_rows
 
 
@@ -330,55 +334,6 @@ def _daemon_primarch_rule_ir(text: str) -> RuleIR:
                         ("endpoint", "phase"),
                         ("owner", "opponent"),
                         ("phase", "command"),
-                    ),
-                ),
-            ),
-        ),
-    )
-
-
-def _serpentine_rule_ir(text: str) -> RuleIR:
-    source_row_id = f"{DATASHEET_ID}:6"
-    movement_modes = ("normal", "advance", "fall_back")
-    return _rule_ir(
-        source_row_id,
-        text,
-        (
-            RuleClause(
-                clause_id=_clause_id(source_row_id, 1),
-                template_id="phase17k:model-terrain-height-transit",
-                source_span=_span(text, text),
-                trigger=RuleTrigger(
-                    kind=RuleTriggerKind.TIMING_WINDOW,
-                    source_span=_span(
-                        text,
-                        "Each time this model makes a Normal, Advance or Fall Back move",
-                    ),
-                    parameters=_parameters(
-                        ("edge", "during"),
-                        ("movement_modes", movement_modes),
-                        ("phase", "movement"),
-                        ("subject", "this_model"),
-                        ("timing_window", "model_makes_move"),
-                    ),
-                ),
-                target=RuleTargetSpec(
-                    kind=RuleTargetKind.THIS_MODEL,
-                    source_span=_span(text, "this model"),
-                ),
-                effects=(
-                    RuleEffectSpec(
-                        kind=RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION,
-                        source_span=_span(
-                            text,
-                            'move over sections of terrain features that are 4" or less in height',
-                        ),
-                        parameters=_parameters(
-                            ("movement_modes", movement_modes),
-                            ("permission", "move_over_as_if_not_there"),
-                            ("terrain_height_max_inches", 4.0),
-                            ("terrain_scope", "terrain_features"),
-                        ),
                     ),
                 ),
             ),

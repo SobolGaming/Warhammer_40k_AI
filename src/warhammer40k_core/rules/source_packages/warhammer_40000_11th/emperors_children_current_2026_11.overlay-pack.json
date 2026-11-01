@@ -1,0 +1,115 @@
+{
+  "base_source_package_id": {
+    "namespace": "wahapedia",
+    "package_name": "source-mirror",
+    "version": "10th-edition-2026-06-14"
+  },
+  "catalog_version": {
+    "source_date": "2026-11-01",
+    "version_id": "warhammer-40000-11th-emperors-children-current-2026-11"
+  },
+  "effective_date": "2026-11-01",
+  "operations": [
+    {
+      "effective_date": "2026-11-01",
+      "expected_preimage_hash": "5ca5308819c871754d987f791a4f7f4f219f469c8afb3b3513542be2bea9db43",
+      "fields": {
+        "T": "6"
+      },
+      "op_id": "ec-current-profile-1",
+      "operation_kind": "update_row",
+      "order_index": 1,
+      "reason": "Apply the observed current profile; preserve all other fields and raw history.",
+      "source_reference": "https://www.40k.app/factions/emperors-children/units/chaos-terminators",
+      "source_row_id": "000004081:1",
+      "source_table": "Datasheets_models",
+      "target_edition": "warhammer-40000-11th"
+    },
+    {
+      "effective_date": "2026-11-01",
+      "expected_preimage_hash": "4fd17f955a5795dc1019893fd16ee8a12ee3333f06a49b9305e9467de277d078",
+      "fields": {
+        "AP": "-1",
+        "S": "5"
+      },
+      "op_id": "ec-current-profile-2",
+      "operation_kind": "update_row",
+      "order_index": 2,
+      "reason": "Apply the observed current profile; preserve all other fields and raw history.",
+      "source_reference": "https://www.40k.app/factions/emperors-children/units/chaos-terminators",
+      "source_row_id": "000004081:1:1:8658",
+      "source_table": "Datasheets_wargear",
+      "target_edition": "warhammer-40000-11th"
+    },
+    {
+      "effective_date": "2026-11-01",
+      "expected_preimage_hash": "f9906d6e879246111d122bebef4bd2a1d7a0b70e59a21da9d6fdb4f701d3f033",
+      "fields": {
+        "AP": "-1",
+        "S": "5"
+      },
+      "op_id": "ec-current-profile-3",
+      "operation_kind": "update_row",
+      "order_index": 3,
+      "reason": "Apply the observed current profile; preserve all other fields and raw history.",
+      "source_reference": "https://www.40k.app/factions/emperors-children/units/chaos-terminators",
+      "source_row_id": "000004081:2:1:8659",
+      "source_table": "Datasheets_wargear",
+      "target_edition": "warhammer-40000-11th"
+    },
+    {
+      "effective_date": "2026-11-01",
+      "expected_preimage_hash": "8804ac361ef81533fbc9d138b311b5dc821617df894acfb7f4a8966ffbb7c94b",
+      "fields": {
+        "T": "6"
+      },
+      "op_id": "ec-current-profile-4",
+      "operation_kind": "update_row",
+      "order_index": 4,
+      "reason": "Apply the observed current profile; preserve all other fields and raw history.",
+      "source_reference": "https://www.40k.app/factions/emperors-children/units/lucius-the-eternal",
+      "source_row_id": "000004083:1",
+      "source_table": "Datasheets_models",
+      "target_edition": "warhammer-40000-11th"
+    },
+    {
+      "effective_date": "2026-11-01",
+      "expected_preimage_hash": "d8ea1ab6f6cb8dee2cf190bbab5878dd8c0d9b2a111b7e224eac1c87d10351bf",
+      "fields": {},
+      "op_id": "ec-fulgrim-retire-serpentine",
+      "operation_kind": "supersede_row",
+      "order_index": 5,
+      "reason": "Current Fulgrim has no Serpentine; own-unit history records removal at v909.",
+      "source_reference": "https://www.40k.app/factions/emperors-children/units/fulgrim",
+      "source_row_id": "000004077:6",
+      "source_table": "Datasheets_abilities",
+      "target_edition": "warhammer-40000-11th"
+    },
+    {
+      "effective_date": "2026-11-01",
+      "expected_preimage_hash": null,
+      "fields": {
+        "datasheet_id": "000004077",
+        "is_faction_keyword": "false",
+        "keyword": "Mobile",
+        "model": ""
+      },
+      "op_id": "ec-fulgrim-mobile",
+      "operation_kind": "add_row",
+      "order_index": 6,
+      "reason": "Current Fulgrim carries MOBILE; consume the existing generic keyword authority.",
+      "source_reference": "https://www.40k.app/factions/emperors-children/units/fulgrim",
+      "source_row_id": "000004077:Mobile:global:false:8",
+      "source_table": "Datasheets_keywords",
+      "target_edition": "warhammer-40000-11th"
+    }
+  ],
+  "package_hash": "a3e6c594de500f7d51efbcd1eb0f4d757a414c062119845a559f0595d3231f1c",
+  "package_id": {
+    "namespace": "40k-app",
+    "package_name": "emperors-children-current",
+    "version": "reviewed-2026-11-01"
+  },
+  "schema_version": "phase17-source-overlay-v1",
+  "target_edition": "warhammer-40000-11th"
+}

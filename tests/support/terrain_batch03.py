@@ -237,6 +237,8 @@ def path_payload(s: Scene, r: DecisionRequest, end_x: float, *, via_z: float = 0
     assert context.context is not None
     mode = context.context.get("movement_mode")
     assert mode is None or isinstance(mode, str)
+    fall_back = context.context.get("fall_back_mode")
+    assert fall_back is None or isinstance(fall_back, str)
     poses: tuple[Pose, ...] = (model.pose, Pose.at(end_x, 10))
     if via_z:
         poses = (model.pose, Pose.at(14, 10, via_z), Pose.at(end_x, 10))
@@ -248,6 +250,7 @@ def path_payload(s: Scene, r: DecisionRequest, end_x: float, *, via_z: float = 0
         context.movement_phase_action,
         witness,
         movement_mode=mode,
+        fall_back_mode=fall_back,
     )
     return validate_json_value(payload.to_payload())
 

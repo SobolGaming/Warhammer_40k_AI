@@ -148,26 +148,6 @@ class _PdfMultiDatasheetSourcePackageWire(
     package_hash: str
 
 
-class _OfficialSnapshotSingleDatasheetSourcePackageWire(
-    msgspec.Struct,
-    frozen=True,
-    forbid_unknown_fields=True,
-):
-    artifact_schema: str
-    source_package_id: str
-    source_snapshot_filename: str
-    source_snapshot_sha256: str
-    source_artifact_hash: str
-    official_document_filename: str
-    official_document_sha256: str
-    official_document_pages: list[int]
-    overlay_package_hash: str
-    datasheet_id: str
-    datasheet_name: str
-    records: dict[str, dict[str, object]]
-    package_hash: str
-
-
 class _OfficialSnapshotMultiDatasheetSourcePackageWire(
     msgspec.Struct,
     frozen=True,
@@ -387,8 +367,8 @@ _SOURCE_PACKAGE_DESCRIPTOR_BY_ID: Final = MappingProxyType(
         ),
         "gw-11e-emperors-children-fulgrim-datasheet-2026-07": _SourcePackageDescriptor(
             artifact_schema="core-v2-emperors-children-fulgrim-rule-ir-v1",
-            package_hash="90b27e3a76f6a2c5b0b5cd3ad678ea284f202ac8f072ef35126d0762792a6d09",
-            wire_type=_OfficialSnapshotSingleDatasheetSourcePackageWire,
+            package_hash="cd24d2816621c9418ebdc91c9d4d159eaf350b035d27b150d7d9cc60c64bbfbc",
+            wire_type=_ReviewedOfficialSnapshotSingleDatasheetSourcePackageWire,
         ),
         "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08": (
             _SourcePackageDescriptor(

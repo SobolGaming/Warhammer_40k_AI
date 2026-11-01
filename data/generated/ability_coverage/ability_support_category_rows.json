@@ -3105,14 +3105,6 @@
   {
     "ability_datasheet_pairs": [
       {
-        "ability_id": "000004077:serpentine",
-        "ability_name": "Serpentine",
-        "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:serpentine/none",
-        "datasheet_id": "000004077",
-        "datasheet_name": "Fulgrim",
-        "source_kind": "datasheet"
-      },
-      {
         "ability_id": "000001151:scuttling-walker",
         "ability_name": "Scuttling Walker",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001151/datasheet/000001151:scuttling-walker/none",
@@ -3122,25 +3114,22 @@
       }
     ],
     "ability_names": [
-      "Scuttling Walker",
-      "Serpentine"
+      "Scuttling Walker"
     ],
     "category_id": "datasheet.rule_ir.movement_transit_permission.this_model",
     "category_name": "Datasheet Rule Ir Movement Transit Permission This Model",
-    "coverage_row_count": 2,
+    "coverage_row_count": 1,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:serpentine/none",
       "chaos-daemons-bridge-catalog/000001151/datasheet/000001151:scuttling-walker/none"
     ],
     "datasheet_names": [
-      "Fulgrim",
       "Soul Grinder"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:movement-transit-permission"
     ],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 1
     },
     "support_stages": [
       "engine_consumed"

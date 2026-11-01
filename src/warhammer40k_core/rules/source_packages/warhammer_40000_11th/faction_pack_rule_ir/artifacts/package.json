@@ -1,7 +1,7 @@
 {
   "artifact_schema": "core-v2-faction-pack-rule-ir-package-v1",
   "edition": 11,
-  "package_hash": "4d0b9b983dc94cb6c4495c19256195591d5cbbd403cf3ec89121a8f62db7a8d6",
+  "package_hash": "f04dce532b32c70416b954a5c957996a0f3bf35b996705916c24b647aa637fbc",
   "registry_id": "warhammer-40000-11th-faction-pack-rule-ir",
   "shard_artifacts": {
     "aeldari": {
@@ -166,7 +166,7 @@
         "000004091"
       ],
       "path": "shards/emperors-children.json",
-      "sha256": "a81563c0f584b1768ebb5961eff0b4c47ab66dded74986928d89ebb134da01b7",
+      "sha256": "f0cfd493378ed0ff88e47935b13d6fced2c78de2b58f02f2099b5d8a495ee111",
       "source_package_ids": [
         "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08",
         "gw-11e-emperors-children-fulgrim-datasheet-2026-07",
@@ -177,7 +177,6 @@
       "source_row_ids": [
         "000004077:4",
         "000004077:5",
-        "000004077:6",
         "000004077:7",
         "000004077:8",
         "000004077:9",

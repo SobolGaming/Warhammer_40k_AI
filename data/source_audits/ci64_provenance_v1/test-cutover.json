@@ -103,16 +103,16 @@
       "sha256": "0edf3bc19424cf7882c9a24db3e877fd353696a3ed6718fb0d0ab4e9454ecc44"
     },
     "tests/factions/emperors_children/test_selected_consumers.py": {
-      "blob_sha1": "3f8dc143a555c90db1d2982fcabac588edce3c33",
-      "bytes": 28751,
+      "blob_sha1": "5002dd60dd550d54a68e1925d26422412c7646e9",
+      "bytes": 41534,
       "mode": "100644",
-      "sha256": "095d35261a80fe87d53b9a011b0a9646ddf73c69e11d701df3cc44f2a3811a2c"
+      "sha256": "ec5a51f2118a2038a598c6a2ac149e2b4b72dce06460ac743408cea1e39032c5"
     },
     "tests/factions/emperors_children/test_shared_attack_consumers.py": {
-      "blob_sha1": "f93626a86f09fb86c7b351d43905f01befec9101",
-      "bytes": 29065,
+      "blob_sha1": "4d6141e4a647edbcf7aaa841f7349262e66c08a9",
+      "bytes": 33022,
       "mode": "100644",
-      "sha256": "86d2e97316b3eae92ae9097e0e9c0198f74ba3257b7dfbcf0030c0a134a94fb2"
+      "sha256": "bb7b42cc78b53acdaa324ea19a93747ad1b53d69fe73eae37f4481f356d6ce23"
     },
     "tests/factions/emperors_children/unit/test_generic_rule_ability_registry.py": {
       "blob_sha1": "ea30f12ebf9dfaa6e1d9fbfd8d4e93c8a2763aee",

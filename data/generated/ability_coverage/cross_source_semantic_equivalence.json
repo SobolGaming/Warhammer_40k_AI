@@ -7011,7 +7011,7 @@
     }
   ],
   "equivalent_group_count": 322,
-  "exact_text_only_member_count": 3176,
+  "exact_text_only_member_count": 3177,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -56819,10 +56819,12 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [],
-      "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "35730ad5de56978d09e0e27925440dfb4912d316985caee393d219ace2d114b6",
-      "execution_status": "engine_consumed",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "equivalence_basis": "exact_normalized_text",
+      "equivalence_hash": "e259bceb1f121bf243524ca0dd47783509152f616438ddb1e2a847be81a34724",
+      "execution_status": "blocked_structured_semantics",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004077:6",
@@ -56832,18 +56834,16 @@
       "rule_id": "000004077:6",
       "rule_name": "Serpentine",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [
-        "catalog-ir:movement-transit-permission"
-      ],
+      "runtime_consumer_ids": [],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": "39f3ebab44dda2a80c2e2bd7cf7a7a05e7dbb725b2fa6a0fcdae6a3f613a5b7e",
+      "semantic_hash": null,
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004077:6"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004077:6:description"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -121990,8 +121990,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "d5d8fdfea234cb99d00bbd1a25d156c5cfef269dde859161078d88bd5bae2263",
+  "source_payload_checksum_sha256": "b6eff6e3c68748a4554ed202336efa2890bf4714a367e1e850de7a50a3994dc9",
   "source_text_unavailable_member_count": 111,
-  "structured_member_count": 807,
+  "structured_member_count": 806,
   "upstream_execution_checksum_sha256": "6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c"
 }
