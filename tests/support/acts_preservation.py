@@ -163,7 +163,31 @@ def acts_inactive_predecessor(root: Path, current: bytes) -> bytes:
 
 
 def defiler_provenance_predecessor(current: bytes) -> bytes:
-    """Reverse the one exact comparison-scope addition before the Acts proof."""
+    """Reverse exact current admissions, then retain the original Defiler/Acts proof."""
+    if hashlib.sha256(current).hexdigest() == (
+        "7d5dbcca852a9ae237fe79b8d518e8b1a08f776a8af448ee19439746735ad732"
+    ):
+        # Authenticate the complete EC successor before removing its two finite additions.
+        begin = (
+            b"# Current source-only admission: historical base metadata "
+            b"remains exact and immutable.\n"
+        )
+        end = b"\ndef registered_provenance_context("
+        route = (
+            b"    current = current_ec_overlay_provenance(root, path, raw)\n"
+            b"    if current is not None:\n"
+            b"        return current\n"
+        )
+        if current.count(begin) != 1 or current.count(end) != 1 or current.count(route) != 1:
+            raise ValueError("Exact registered edition provenance inputs changed.")
+        start = current.index(begin)
+        predecessor = current[:start] + current[current.index(end, start) :]
+        predecessor = predecessor.replace(route, b"", 1)
+        if hashlib.sha256(predecessor).hexdigest() != (
+            "26b77718d94a586afebf33f90d1ca1eb0c7df17a5e922f054b28d5901abe938b"
+        ):
+            raise ValueError("Exact registered edition provenance inputs changed.")
+        current = predecessor
     old = b"COMPARISON_ONLY_SCOPE_BASES = (scopes.ACTS_BASE,)"
     new = b"COMPARISON_ONLY_SCOPE_BASES = (scopes.ACTS_BASE, scopes.DEFILER_BASE)"
     if current.count(new) != 1:

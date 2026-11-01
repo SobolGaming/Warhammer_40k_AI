@@ -148,26 +148,6 @@ class _PdfMultiDatasheetSourcePackageWire(
     package_hash: str
 
 
-class _OfficialSnapshotSingleDatasheetSourcePackageWire(
-    msgspec.Struct,
-    frozen=True,
-    forbid_unknown_fields=True,
-):
-    artifact_schema: str
-    source_package_id: str
-    source_snapshot_filename: str
-    source_snapshot_sha256: str
-    source_artifact_hash: str
-    official_document_filename: str
-    official_document_sha256: str
-    official_document_pages: list[int]
-    overlay_package_hash: str
-    datasheet_id: str
-    datasheet_name: str
-    records: dict[str, dict[str, object]]
-    package_hash: str
-
-
 class _OfficialSnapshotMultiDatasheetSourcePackageWire(
     msgspec.Struct,
     frozen=True,

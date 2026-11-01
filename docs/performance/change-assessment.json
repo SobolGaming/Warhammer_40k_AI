@@ -1,26 +1,26 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "1e2a8cdee1964bccd638c34e2ccb72ea5ead01ac",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f6cf23b7255676f526abafe68efccf88f99748e561b94d9c3aec7de1cafe535d",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:42a3c9eaab5fd7e0b8771d0cf2bfcfc46f647b5c909bd650bea6789198b1f749",
   "operation_map_sha256": "5fdbe8554fe0cb22e6e4dc923ab59055c1f9e885f73fd04de396265aa43d43f3",
   "changes": {
     "ci/quality_shards/all.txt": {
       "before_sha256": "bbbded4504168f2b34df6f133ba457d7b5d0b57f9eab64772dcb4491bec56bfa",
-      "after_sha256": "2ace4a0b8c6a7758751df0a83e921a3a6fe58b7d1a253e074998b4bd16f8eee3",
+      "after_sha256": "0e38975956d7ac10bf1effbef705e6b3c17ab0f9da5610e911a7383e81dda39b",
       "owners": {
         "@document": {
           "before": "bbbded4504168f2b34df6f133ba457d7b5d0b57f9eab64772dcb4491bec56bfa",
-          "after": "2ace4a0b8c6a7758751df0a83e921a3a6fe58b7d1a253e074998b4bd16f8eee3"
+          "after": "0e38975956d7ac10bf1effbef705e6b3c17ab0f9da5610e911a7383e81dda39b"
         }
       }
     },
     "ci/quality_shards/shard-1.txt": {
       "before_sha256": "c0b335c8af253f7f4b39508293d48266ba99e4d93692b2da8047086e9ea0bd30",
-      "after_sha256": "bb1f2a8a6ceca36c8b5b685104ef9028a0e4266385520d490bab140f4b6bec1d",
+      "after_sha256": "b46e9a6422ff1a49d56b48fa3960c1684443b6f99167cbecc269b1466013c89e",
       "owners": {
         "@document": {
           "before": "c0b335c8af253f7f4b39508293d48266ba99e4d93692b2da8047086e9ea0bd30",
-          "after": "bb1f2a8a6ceca36c8b5b685104ef9028a0e4266385520d490bab140f4b6bec1d"
+          "after": "b46e9a6422ff1a49d56b48fa3960c1684443b6f99167cbecc269b1466013c89e"
         }
       }
     },
@@ -36,81 +36,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "7025bc6c20c413ae2926670e93ba775186c046dd80602a89f2157fd4a50d7109",
-      "after_sha256": "3c8d2c81f42f4d20430efeb9e6c0cbe6ca8bf595ce5bb7581294e326a4135084",
+      "after_sha256": "c3f2031d306ae4341431eeb5d5b0baedf7405bf1b9a5469eedfebb14c1562c64",
       "owners": {
         "@document": {
           "before": "7025bc6c20c413ae2926670e93ba775186c046dd80602a89f2157fd4a50d7109",
-          "after": "3c8d2c81f42f4d20430efeb9e6c0cbe6ca8bf595ce5bb7581294e326a4135084"
+          "after": "c3f2031d306ae4341431eeb5d5b0baedf7405bf1b9a5469eedfebb14c1562c64"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "957bf42f9da97aba2cdb7792afdb787ccfd7c3a62415cbdbe07de601453e1e13",
-      "after_sha256": "cc27a6f6ac3495388e489162bbb9542bf6bb48ad83e098c2ec479688a194fa23",
+      "after_sha256": "08cae7e69daa2e17981ba9f08eba3d7eb8768586a3758a78a19395f68e99c817",
       "owners": {
         "@document": {
           "before": "957bf42f9da97aba2cdb7792afdb787ccfd7c3a62415cbdbe07de601453e1e13",
-          "after": "cc27a6f6ac3495388e489162bbb9542bf6bb48ad83e098c2ec479688a194fa23"
+          "after": "08cae7e69daa2e17981ba9f08eba3d7eb8768586a3758a78a19395f68e99c817"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "385147a9d0c2f4071654d08aea33c8a7cc9bc8e843081f8b02d1b483a7be9bec",
-      "after_sha256": "30b43022da8801d1b6a55f5e84f5450b5d2550bacec947828fcfd7c5a1fe4c40",
+      "after_sha256": "7cf0cfdffe3aab7a616f08e8efe03f6cc253ad5b908728257f72a8c1a1d3c167",
       "owners": {
         "@document": {
           "before": "385147a9d0c2f4071654d08aea33c8a7cc9bc8e843081f8b02d1b483a7be9bec",
-          "after": "30b43022da8801d1b6a55f5e84f5450b5d2550bacec947828fcfd7c5a1fe4c40"
+          "after": "7cf0cfdffe3aab7a616f08e8efe03f6cc253ad5b908728257f72a8c1a1d3c167"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "131bf2c711c5d95daddb039c0cfa72ed017c437f1a875241dcb68a6a7c8cfdf3",
-      "after_sha256": "8d9d49cd9f4067018e86ca522e734a678d111fa2f4d9a9825d9dc53c52099f95",
+      "after_sha256": "430b3949e222e98c95665d6d0a701fc807ee107aa11deaf96eddc59ec4945438",
       "owners": {
         "@document": {
           "before": "131bf2c711c5d95daddb039c0cfa72ed017c437f1a875241dcb68a6a7c8cfdf3",
-          "after": "8d9d49cd9f4067018e86ca522e734a678d111fa2f4d9a9825d9dc53c52099f95"
+          "after": "430b3949e222e98c95665d6d0a701fc807ee107aa11deaf96eddc59ec4945438"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "d6e872f73875842d54fdb4d3e84645b96255b4046265cab053c90b14289a1c48",
-      "after_sha256": "31ace64ae9e8e9211dc2eee166971085cfa266c08e941aa27d3a9c09c50927f7",
+      "after_sha256": "a8170837b925c857743435491a767629799eb23024577c764becc40f018bac3f",
       "owners": {
         "@document": {
           "before": "d6e872f73875842d54fdb4d3e84645b96255b4046265cab053c90b14289a1c48",
-          "after": "31ace64ae9e8e9211dc2eee166971085cfa266c08e941aa27d3a9c09c50927f7"
+          "after": "a8170837b925c857743435491a767629799eb23024577c764becc40f018bac3f"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "0cefe8d1a7de5123cf43e5d3094b3a5676a291208950d6a0619ef3ca1888fdbe",
-      "after_sha256": "f1bbe8eadf175aaf12ac5d1e56178bc2b67d91c2e34502da3edf954e9bce838c",
+      "after_sha256": "2372a32c8fb0d9f87367e4ffc5aec3e870cc1328c21e4ff79a19f9811f6483ce",
       "owners": {
         "@document": {
           "before": "0cefe8d1a7de5123cf43e5d3094b3a5676a291208950d6a0619ef3ca1888fdbe",
-          "after": "f1bbe8eadf175aaf12ac5d1e56178bc2b67d91c2e34502da3edf954e9bce838c"
+          "after": "2372a32c8fb0d9f87367e4ffc5aec3e870cc1328c21e4ff79a19f9811f6483ce"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "b596fe8867c9a366cba90c14fb2648040e41a959c02c3ce4d43783909a36c1e5",
-      "after_sha256": "38e553dccc416c3c5a0b3cb0f3c1e8fe1fdab7e1d63705f480f3379a58122310",
+      "after_sha256": "fadefb954e70860ed4b9cb1c48dfd7c196be3d7f98d8084b074ab95b18a30985",
       "owners": {
         "@document": {
           "before": "b596fe8867c9a366cba90c14fb2648040e41a959c02c3ce4d43783909a36c1e5",
-          "after": "38e553dccc416c3c5a0b3cb0f3c1e8fe1fdab7e1d63705f480f3379a58122310"
+          "after": "fadefb954e70860ed4b9cb1c48dfd7c196be3d7f98d8084b074ab95b18a30985"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "b4a144e2d967e7db00a190eebb99436617142b53f56791352aabfe10b43f5560",
-      "after_sha256": "ebd2462ff7be77141049ab1a1b9d7a029f4652965e99ad6cdb459a728b7b6a30",
+      "after_sha256": "d1d0af1d558cb78904e5352b2f510beaa304c40ea875ae7b8637fe027b6042fd",
       "owners": {
         "@document": {
           "before": "b4a144e2d967e7db00a190eebb99436617142b53f56791352aabfe10b43f5560",
-          "after": "ebd2462ff7be77141049ab1a1b9d7a029f4652965e99ad6cdb459a728b7b6a30"
+          "after": "d1d0af1d558cb78904e5352b2f510beaa304c40ea875ae7b8637fe027b6042fd"
         }
       }
     },
@@ -276,11 +276,11 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "5ae5d8bdf28233329969dde232ec832c5aa7fc13fe41e6e3d84ec0b80935f4e2",
-      "after_sha256": "97d081368c3a0e6c3ce97e1a4a4fd6f58a8458da9fcc4f54e925e5ccc71b196d",
+      "after_sha256": "9afd17fbd95bda3638c7e9524f79a00cb9fab8658d2830786ba11d9a9c096686",
       "owners": {
         "@document": {
           "before": "5ae5d8bdf28233329969dde232ec832c5aa7fc13fe41e6e3d84ec0b80935f4e2",
-          "after": "97d081368c3a0e6c3ce97e1a4a4fd6f58a8458da9fcc4f54e925e5ccc71b196d"
+          "after": "9afd17fbd95bda3638c7e9524f79a00cb9fab8658d2830786ba11d9a9c096686"
         }
       }
     },
@@ -348,11 +348,15 @@
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/_artifacts.py": {
       "before_sha256": "62d520932a0080585101a3e9a933d9035ed1ccbb541bdaafa270a8c5c6160a00",
-      "after_sha256": "ef8fa768d6147ebc7c45c67adb0b69ceb737dde290d3c22fe32c13db66621b44",
+      "after_sha256": "e435496ba1b2278e99f3fcf412db7633d0a4936c4514a816d47c9eee379fe19f",
       "owners": {
         "@module": {
           "before": "259d189d3cfab9b108377ed9482f7fd9e16d5357e07d6769d5f60e16396a943c",
           "after": "4ec73379190900daf5ea535d335d7da679e7f5dac069d3858a30b6c78ad54e86"
+        },
+        "_OfficialSnapshotSingleDatasheetSourcePackageWire": {
+          "before": "0a452ca50754ed3d1a5703d95a41ce07fe96c585bdf6d2c45667bf0b2c09b800",
+          "after": null
         }
       }
     },
@@ -373,6 +377,16 @@
         "@document": {
           "before": "a81563c0f584b1768ebb5961eff0b4c47ab66dded74986928d89ebb134da01b7",
           "after": "f0cfd493378ed0ff88e47935b13d6fced2c78de2b58f02f2099b5d8a495ee111"
+        }
+      }
+    },
+    "tests/code_quality/test_category_migration_preservation.py": {
+      "before_sha256": "cc5bde48d53cff504ad25831491955066401602a9095f26b5ac3c10e9a907c99",
+      "after_sha256": "e0547fef5fdb3c5c8e0517ce9febf84e28b4d8cb6c6bc7bac9bee6aaae08c773",
+      "owners": {
+        "test_defiler_registration_retains_exact_acts_predecessor": {
+          "before": "fa9cddcda7979741f7565f43975e3cc8c52a1ce80bd3b7b0aa610ad15bf6de05",
+          "after": "cf6ee95f1277d55ad9f87d40bdedfc55978597344c2d7d4f13d521ebe87dde7b"
         }
       }
     },
@@ -433,6 +447,16 @@
         "test_native_terrain_transit_witness_and_committed_consequences": {
           "before": "8909fdf944d59848f12d8df7a7117d1aec3ef226f87f9f619dece89ae52b5949",
           "after": "9286b1a9e102d5ac91dcd128a1e898022bec66fc3dd8551287f62df67fc4d8d3"
+        }
+      }
+    },
+    "tests/support/acts_preservation.py": {
+      "before_sha256": "1efa8cfb9a482e851645c5e4ffd9bbb5221ed08b952230f2a6250ad98360de73",
+      "after_sha256": "7651c1d5d29ea8043059a672e56bdd4a024c134a0d667d25bfb56a0e94a77b0c",
+      "owners": {
+        "defiler_provenance_predecessor": {
+          "before": "c45995e27697a870c516bc8889157b5f564fb2a8db3fc5fec17f9b8abdaf8678",
+          "after": "90c3d5136cd71b09797fefcca246f10a93a16866d0d135436399e2891e46c46a"
         }
       }
     },
@@ -894,6 +918,16 @@
       "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
       "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
     },
+    "tests/code_quality/test_category_migration_preservation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-defiler-exact-predecessor-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
+      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
+      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+    },
     "tests/code_quality/test_current_comparison_routing.py": {
       "category": "governance",
       "operations": [],
@@ -925,6 +959,16 @@
       "operations": [
         "qualification40-exact-b7575b3e0b8cba2c",
         "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
+      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
+      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+    },
+    "tests/support/acts_preservation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-defiler-exact-predecessor-projection"
       ],
       "selected_families": [],
       "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
