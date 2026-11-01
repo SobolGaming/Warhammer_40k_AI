@@ -154,6 +154,16 @@
         }
       }
     },
+    "docs/performance/current/defiler-c15-v4.json": {
+      "before_sha256": null,
+      "after_sha256": "31569136f5f652f61d17156adab9e8037ea30c6e8db45b68af2d15dea99ee170",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "31569136f5f652f61d17156adab9e8037ea30c6e8db45b68af2d15dea99ee170"
+        }
+      }
+    },
     "docs/performance/policy-v3/defiler-input-roles-v4.json": {
       "before_sha256": null,
       "after_sha256": "e8ffff573fad9ae0e065061bf2de00cd1999fd1a77a3d80419709920cc596553",
@@ -469,6 +479,14 @@
       "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
+      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
+      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
+    },
+    "docs/performance/current/defiler-c15-v4.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
