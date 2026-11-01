@@ -556,6 +556,7 @@ def _benefit_of_cover_ballistic_skill_penalty(
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> int:
     from warhammer40k_core.core.weapon_profiles import RangeProfileKind
+    from warhammer40k_core.engine.catalog_cover_grants import catalog_cover_inventory
     from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
 
     if pool.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE:
@@ -567,6 +568,12 @@ def _benefit_of_cover_ballistic_skill_penalty(
         target_unit_instance_id=pool.target_unit_instance_id,
     ):
         return 0
+    if catalog_cover_inventory(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+        runtime_modifier_registry=runtime_modifier_registry,
+    ):
+        return 1
     if (
         rules_unit_stealth_sources(
             state=state,

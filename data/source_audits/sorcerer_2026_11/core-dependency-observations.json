@@ -1,0 +1,81 @@
+{
+  "schema": "sorcerer-linked-core-observations-v1",
+  "observation_date": "2026-11-01",
+  "observed_window_utc": "Core13/24 selected sections observed after20:13:18Z; Close-Quarters supplemental observation later in same task",
+  "provider": "40k.app; project-authoritative unofficial mirror",
+  "qualification": "dependency comparison evidence; no new independent Core authority admission; source typography preserved including coveragainst displayed join",
+  "sections": [
+    {
+      "section": "24.07",
+      "url": "https://www.40k.app/rules/24-core-abilities",
+      "scope": "complete selected section including displayed examples/notes; not a full-page capture",
+      "capture_method": "ordinary browser read-only DOM parent section innerText",
+      "captured_text": "24.07\n[CLOSE-QUARTERS]\n\nUnits containing one or more models with a [CLOSE\u2011QUARTERS] weapon can shoot using close\u2011quarters shooting (10.06).\n\nWhen using another shooting type, for each model in that unit (excluding MONSTER/VEHICLE models), you can only select one of the following to make attacks with:\n\nOne or more of its [CLOSE\u2011QUARTERS] weapons.\nOne or more of its other ranged weapons.",
+      "sha256_utf8": "2e92abe0274c57232ce292ec9e094b49f6f606b6bfb60775602f3878c39daa85"
+    },
+    {
+      "section": "24.22",
+      "url": "https://www.40k.app/rules/24-core-abilities",
+      "scope": "complete selected section including displayed examples/notes; not a full-page capture",
+      "capture_method": "ordinary browser read-only DOM parent section innerText",
+      "captured_text": "24.22\nLEADER\n\nBefore the battle, in the Muster Armies step, for each leader and support unit in your army, you can select one friendly bodyguard unit that unit can lead. That unit will then lead that bodyguard unit for the battle and form an attached unit with it.\n\nUnless otherwise stated, each bodyguard unit can only have one leader unit and one support unit attached to it.\n\nSee Attached Units (19)",
+      "sha256_utf8": "4a950d6098970350304bc2c3dd8aae4e8dc8eb0e4662f78dbcbaeaf0db7f41f9"
+    },
+    {
+      "section": "24.18",
+      "url": "https://www.40k.app/rules/24-core-abilities",
+      "scope": "complete selected section including displayed examples/notes; not a full-page capture",
+      "capture_method": "ordinary browser read-only DOM parent section innerText",
+      "captured_text": "24.18\n[IGNORES COVER]\n\nEach time an attack is made with an [IGNORES COVER] weapon, the target cannot have the benefit of cover against that attack (13.08), including from rules that give a model or unit the benefit of cover (e.g. Stealth).",
+      "sha256_utf8": "5c62983b09f40a9f7a2e9f82b6775d9811e2c7f1c205e6c1bca25346f3249f6a"
+    },
+    {
+      "section": "24.33",
+      "url": "https://www.40k.app/rules/24-core-abilities",
+      "scope": "complete selected section including displayed examples/notes; not a full-page capture",
+      "capture_method": "ordinary browser read-only DOM parent section innerText",
+      "captured_text": "24.33\nSTEALTH\n\nIf every model in a unit has this ability, each time a ranged attack targets that unit, that unit has the benefit of cover against that attack (13.08).",
+      "sha256_utf8": "a2994b1378b39786f5ee3aaf2580c9b1137d293d2fcea84a772c0f51e33ccb23"
+    },
+    {
+      "section": "24.29",
+      "url": "https://www.40k.app/rules/24-core-abilities",
+      "scope": "complete selected section including displayed examples/notes; not a full-page capture",
+      "capture_method": "ordinary browser read-only DOM parent section innerText",
+      "captured_text": "24.29\n[PSYCHIC]\n\nEach time an attack is made with a [PSYCHIC] weapon, you can ignore any or all modifiers to that attack\u2019s BS or WS characteristic and any or all modifiers to the hit roll. Attacks made with [PSYCHIC] weapons are known as psychic attacks (this can be important for the triggering of other rules).",
+      "sha256_utf8": "c041f6dbe64222d39d050ef7116cd95e3f06b77ff46a392f6b980f8fea46a762"
+    },
+    {
+      "section": "24.15",
+      "url": "https://www.40k.app/rules/24-core-abilities",
+      "scope": "complete selected section including displayed examples/notes; not a full-page capture",
+      "capture_method": "ordinary browser read-only DOM parent section innerText",
+      "captured_text": "24.15\n[HAZARDOUS]\n\nEach time a unit is selected to shoot or selected to fight, after that unit has resolved all of its attacks, make a number of hazard rolls (06.03) for that unit equal to the number of [HAZARDOUS] weapons you selected in the Select Weapons step.",
+      "sha256_utf8": "cb4939c51b4a8fd7b85384e48fec82b5cca856c8d69ef5fe6c9c367f865dd6c4"
+    },
+    {
+      "section": "24.27",
+      "url": "https://www.40k.app/rules/24-core-abilities",
+      "scope": "complete selected section including displayed examples/notes; not a full-page capture",
+      "capture_method": "ordinary browser read-only DOM parent section innerText",
+      "captured_text": "24.27\n[PISTOL]\n\n[PISTOL] and [CLOSE\u2011QUARTERS] are identical for all rules purposes. See [CLOSE\u2011QUARTERS].\n\nDesigner\u2019s Note: [PISTOL] is a pre-existing ability that will be superseded by [CLOSE-QUARTERS] as this edition of Warhammer 40,000 progresses. Both are functionally the same, but the latter is a more suitable term for weapons that function in this way.",
+      "sha256_utf8": "c3e69c7464982dfb596a5287277fd04e26971509060b7b7dde8e5a551d3f411b"
+    },
+    {
+      "section": "24.10",
+      "url": "https://www.40k.app/rules/24-core-abilities",
+      "scope": "complete selected section including displayed examples/notes; not a full-page capture",
+      "capture_method": "ordinary browser read-only DOM parent section innerText",
+      "captured_text": "24.10\n[DEVASTATING WOUNDS]\n\nEach time an attack made with a [DEVASTATING WOUNDS] weapon results in a critical wound, the attack sequence for that attack ends and the target unit suffers a number of mortal wounds equal to the D characteristic of that weapon. These are inflicted after resolving any normal damage inflicted by those attacks.\n\nMortal wounds inflicted by [DEVASTATING WOUNDS] weapons can damage a maximum of one model for each critical wound; any remaining mortal wounds inflicted by that attack are lost.\n\nExample: An attack made with a [DEVASTATING WOUNDS] weapon with a D characteristic of 3 results in a critical wound against an Intercessor Squad, so inflicts 3 mortal wounds. The first 2 mortal wounds are sufficient to destroy 1 Intercessor model, so the remaining mortal wound is lost.",
+      "sha256_utf8": "9b161fcdb07332dbe060d62a93cdf95b2191621280a79150e526fa461c92c79b"
+    },
+    {
+      "section": "13.08",
+      "url": "https://www.40k.app/rules/13-terrain",
+      "scope": "complete selected section including displayed examples/notes; not a full-page capture",
+      "capture_method": "ordinary browser read-only DOM parent section innerText",
+      "captured_text": "13.08\nBENEFIT OF COVER\n\nEach time a ranged attack targets a unit, if every model in that unit meets one or more of the following conditions, that unit has the benefit of cover against that attack:\n\nThat model has the INFANTRY/BEASTS/SWARM keyword and is within a terrain area.\nThat model is not fully visible to the attacking model due to one or more intervening terrain features and/or one or more intervening obscuring terrain areas (13.10).\n\nEach time a ranged attack targets a unit that has the benefit of coveragainst it, worsen the BS characteristic of that attack by 1.\n\nBENEFIT OF COVER\n\nWhen Unit E makes ranged attacks:\n\nUnit A is fully visible to every model in Unit E, so does not have the benefit of cover.\n\nNot all of the models in unit B are within a terrain area, so unit B does not have the benefit of cover.\n\nAll of the models in unit C are within a terrain area, so unit C has the benefit of cover (-1 BS).\n\nUnit D is not fully visible to unit E due to an intervening obscuring terrain area, so unit D has the benefit of cover (-1 BS).",
+      "sha256_utf8": "2f2be2db5d6308291b162d1c44e674e3b46a5fc3e06076331196369272bbcbb3"
+    }
+  ]
+}

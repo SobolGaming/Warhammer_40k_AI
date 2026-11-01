@@ -1,0 +1,53 @@
+{
+  "base_source_package_id": {
+    "namespace": "wahapedia",
+    "package_name": "source-mirror",
+    "version": "10th-edition-2026-06-14"
+  },
+  "catalog_version": {
+    "source_date": "2026-11-01",
+    "version_id": "warhammer-40000-11th-sorcerer-2026-11"
+  },
+  "effective_date": "2026-11-01",
+  "operations": [
+    {
+      "effective_date": "2026-11-01",
+      "expected_preimage_hash": "014a630ddab29885d725691996376e7558cc1ce7bab2264e6e67c12b1497710f",
+      "fields": {
+        "T": "5"
+      },
+      "op_id": "sorcerer-current-profile-1",
+      "operation_kind": "update_row",
+      "order_index": 1,
+      "reason": "Apply the complete current observed Sorcerer profile; observation date is not a per-field release date.",
+      "source_reference": "https://www.40k.app/factions/emperors-children/units/sorcerer",
+      "source_row_id": "000004085:1",
+      "source_table": "Datasheets_models",
+      "target_edition": "warhammer-40000-11th"
+    },
+    {
+      "effective_date": "2026-11-01",
+      "expected_preimage_hash": "3a8c706522829d972fc649963dfe5e1a5dc5988728c110d06ab0c952276124c8",
+      "fields": {
+        "AP": "-1",
+        "S": "5"
+      },
+      "op_id": "sorcerer-current-profile-2",
+      "operation_kind": "update_row",
+      "order_index": 2,
+      "reason": "Apply the complete current observed Sorcerer profile; observation date is not a per-field release date.",
+      "source_reference": "https://www.40k.app/factions/emperors-children/units/sorcerer",
+      "source_row_id": "000004085:3:1:8679",
+      "source_table": "Datasheets_wargear",
+      "target_edition": "warhammer-40000-11th"
+    }
+  ],
+  "package_hash": "3a7b9a66243fb39c527ca14ddbbde5ea5a7a3477a36bf0bf0f0f47d65926a193",
+  "package_id": {
+    "namespace": "40k-app",
+    "package_name": "emperors-children-sorcerer",
+    "version": "reviewed-2026-11-01"
+  },
+  "schema_version": "phase17-source-overlay-v1",
+  "target_edition": "warhammer-40000-11th"
+}

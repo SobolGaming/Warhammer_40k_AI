@@ -1,7 +1,7 @@
 {
   "artifact_schema": "core-v2-faction-pack-rule-ir-package-v1",
   "edition": 11,
-  "package_hash": "f04dce532b32c70416b954a5c957996a0f3bf35b996705916c24b647aa637fbc",
+  "package_hash": "f1dbc5894a26f2b6f5561910ea99d8ea66c79b67b054228cbe601ad2623e4ba8",
   "registry_id": "warhammer-40000-11th-faction-pack-rule-ir",
   "shard_artifacts": {
     "aeldari": {
@@ -161,13 +161,15 @@
         "000004079",
         "000004080",
         "000004083",
+        "000004085",
         "000004086",
         "000004090",
         "000004091"
       ],
       "path": "shards/emperors-children.json",
-      "sha256": "f0cfd493378ed0ff88e47935b13d6fced2c78de2b58f02f2099b5d8a495ee111",
+      "sha256": "920fffd77f9209aad4b9c7024321d694ee1b1a15987a18f9e970b4a064d88e89",
       "source_package_ids": [
+        "40k-app-11e-emperors-children-sorcerer-2026-11-01",
         "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08",
         "gw-11e-emperors-children-fulgrim-datasheet-2026-07",
         "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08",
@@ -188,6 +190,8 @@
         "000004080:4",
         "000004083:5",
         "000004083:6",
+        "000004085:3",
+        "000004085:4",
         "000004086:3",
         "000004086:4",
         "000004086:5",

@@ -732,6 +732,19 @@ EMPERORS_CHILDREN_DEFILER_PDF_CORRECTION = PdfDatasheetCorrection(
     datasheet_id="000004208",
     source_id="pdf:emperors-children-faction-pack:2026-06-10:p7-p8",
 )
+EMPERORS_CHILDREN_SORCERER_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000004085",
+        model_name="Sorcerer",
+        height=65.0,
+        height_units=GeometrySourceUnits.MILLIMETERS,
+        height_source_id="provisional-geometry:2026-11-01:sorcerer-plastic-foot:overall-height",
+        height_document_reference="data/source_audits/sorcerer_2026_11/geometry.json",
+        reviewer_status=GeometryReviewStatus.PROVISIONAL_ESTIMATE,
+        evidence_kind=GeometryEvidenceKind.USER_SUPPLIED_ESTIMATE,
+    ),
+)
+
 EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000004077",
@@ -1068,6 +1081,7 @@ DEFAULT_HEIGHT_OVERRIDES = (
     *MAULERFIEND_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES,
+    *EMPERORS_CHILDREN_SORCERER_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_DAEMON_PRINCE_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_LORD_EXULTANT_HEIGHT_OVERRIDES,

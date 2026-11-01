@@ -964,3 +964,525 @@ def test_current_packaged_court_native_profiles_mobile_and_roundtrip() -> None:
         for v in lord.own_models[0].characteristics
         if v.characteristic is Characteristic.TOUGHNESS
     } == {5}
+
+
+@pytest.mark.parametrize("kind", ["user_supplied_estimate", "crowd_sourced_measurement"])
+def test_explicit_provisional_geometry_preserves_uncertainty_and_rejects_unknowns(
+    kind: str,
+) -> None:
+    from warhammer40k_core.core.model_geometry_catalog import (
+        GeometryEvidenceKind,
+        GeometryMeasurementKind,
+        GeometryReviewStatus,
+        GeometrySourceUnits,
+        ModelGeometrySourceEvidence,
+        ModelHeightDefinition,
+    )
+
+    evidence = ModelGeometrySourceEvidence.from_source_dimensions(
+        evidence_id="sorcerer:provisional-height",
+        evidence_kind=GeometryEvidenceKind(kind),
+        measurement_kind=GeometryMeasurementKind.HEIGHT,
+        source_id="user-relayed-estimate:2026-11-01:sorcerer-foot-plastic",
+        source_units=GeometrySourceUnits.MILLIMETERS,
+        source_dimensions=(("height", 65.0),),
+        document_reference="data/source_audits/sorcerer_2026_11/geometry.json",
+        reviewer_status=GeometryReviewStatus.PROVISIONAL_ESTIMATE,
+    )
+    height = ModelHeightDefinition.from_evidence(evidence)
+    assert height.height_inches == 65 / 25.4
+    payload = evidence.to_payload()
+    assert payload["reviewer_status"] == "provisional_estimate"
+    assert payload["evidence_kind"] == kind
+    assert ModelGeometrySourceEvidence.from_payload(payload) == evidence
+    assert ModelHeightDefinition.from_payload(height.to_payload()) == height
+    with pytest.raises(ValueError, match="not accepted"):
+        ModelHeightDefinition.from_evidence(
+            replace(evidence, reviewer_status=GeometryReviewStatus.NEEDS_REVIEW)
+        )
+    with pytest.raises(ValueError, match="GeometryReviewStatus"):
+        ModelGeometrySourceEvidence.from_payload({**payload, "reviewer_status": "unknown"})
+    with pytest.raises(ValueError, match="greater than 0"):
+        ModelGeometrySourceEvidence.from_payload({**payload, "source_dimensions": {"height": 0.0}})
+    if kind == "user_supplied_estimate":
+        with pytest.raises(ValueError, match="estimate"):
+            replace(evidence, reviewer_status=GeometryReviewStatus.ACCEPTED)
+    with pytest.raises(ValueError, match="official"):
+        replace(evidence, evidence_kind=GeometryEvidenceKind.OFFICIAL_MODEL_PROFILE)
+
+
+@pytest.mark.parametrize("bodyguard", ["000004079", "000004080", "000004088"])
+def test_sorcerer_current_native_muster_geometry_equipment_and_leader_targets(
+    bodyguard: str,
+) -> None:
+    from tests.support.sorcerer_native import SORCERER, native_request
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.core.datasheet import ModelProfileDefinitionPayload
+    from warhammer40k_core.core.model_geometry_catalog import GeometryReviewStatus
+    from warhammer40k_core.engine.army_mustering import ArmyDefinition, muster_army
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        court_of_slaughter_anvanth_2026_08 as source,
+    )
+
+    package = source.catalog_package()
+    selected = native_request(player="owner", bodyguard=bodyguard)
+    army = muster_army(
+        catalog=package.army_catalog, request=selected, model_geometries=package.model_geometries
+    )
+    assert army.roster_legality_report.is_legal
+    profile = package.army_catalog.datasheet_by_id(SORCERER).model_profiles[0]
+    assert profile.requires_geometry_record
+    assert type(profile).from_payload(profile.to_payload()) == profile
+    with pytest.raises(ValueError, match="must be bool"):
+        type(profile).from_payload(
+            cast(
+                ModelProfileDefinitionPayload,
+                {
+                    **profile.to_payload(),
+                    "requires_geometry_record": "yes",
+                },
+            )
+        )
+    legacy_profile = package.army_catalog.datasheet_by_id(bodyguard).model_profiles[0]
+    assert not legacy_profile.requires_geometry_record
+    assert "requires_geometry_record" not in legacy_profile.to_payload()
+    assert next(p.points for p in selected.unit_points if p.unit_selection_id == "sorcerer") == 55
+    unit = next(u for u in army.units if u.datasheet_id == SORCERER)
+    assert len(unit.own_models) == 1
+    model = unit.own_models[0]
+    assert (
+        next(c.final for c in model.characteristics if c.characteristic is Characteristic.TOUGHNESS)
+        == 5
+    )
+    assert set(model.wargear_ids) == {
+        f"{SORCERER}:agonising-energies",
+        f"{SORCERER}:bolt-pistol",
+        f"{SORCERER}:force-weapon",
+    }
+    pistol = next(
+        w for w in package.army_catalog.wargear if w.wargear_id == f"{SORCERER}:bolt-pistol"
+    ).weapon_profiles[0]
+    assert pistol.strength.final == 5
+    assert pistol.armor_penetration.final == -1
+    geometry = next(
+        g for g in package.model_geometries if g.model_profile_id == model.model_profile_id
+    )
+    assert geometry.height.height_inches == 65 / 25.4
+    assert (
+        next(
+            e for e in geometry.evidence if e.evidence_id == geometry.height.evidence_id
+        ).reviewer_status
+        is GeometryReviewStatus.PROVISIONAL_ESTIMATE
+    )
+    assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()
+
+
+@pytest.fixture(scope="module")
+def sorcerer_native_shooting_checkpoint() -> Any:
+    from tests.support.sorcerer_native import (
+        deploy_native,
+        native_declaration,
+        native_session,
+        translate_native,
+    )
+
+    session = native_session()
+    deploy_native(session)
+    translate_native(session, "attached-unit:owner:bodyguard", 7.0)
+    native_declaration(session, "attached-unit:owner:bodyguard")
+    state = session.lifecycle.state
+    assert state is not None
+    assert all(a.roster_legality_report.is_legal for a in state.army_definitions)
+    return session.to_persistence_payload()
+
+
+@pytest.mark.parametrize(
+    ("profile", "ignore", "target_number"),
+    [
+        ("witchfire", False, 4),
+        ("focused-witchfire", True, 3),
+    ],
+)
+def test_sorcerer_native_shooting_cover_wracking_and_exact_replay(
+    sorcerer_native_shooting_checkpoint: Any,
+    profile: str,
+    ignore: bool,
+    target_number: int,
+) -> None:
+    from tests.support.sorcerer_native import native_choice, native_fire, translate_native
+    from warhammer40k_core.engine.replay import ReplayRunStatus
+
+    session = LocalGameSession.from_persistence_payload(sorcerer_native_shooting_checkpoint)
+    seen = native_fire(
+        session, profile_id=f"000004085:agonising-energies:{profile}", ignore_psychic=ignore
+    )
+    assert "select_psychic_attack_modifier_ignores" in seen
+    assert "select_catalog_post_shoot_hit_target_effect" in seen
+    state = session.lifecycle.state
+    assert state is not None
+    hits = [p["payload"] for p in events(session, "attack_sequence_step") if p["step"] == "hit"]
+    assert hits
+    assert all(isinstance(hit, dict) and hit["target_number"] == target_number for hit in hits)
+    assert any(isinstance(hit, dict) and hit["successful"] is True for hit in hits)
+    effects = [
+        e
+        for e in state.persisting_effects
+        if isinstance(e.effect_payload, dict)
+        and e.effect_payload.get("rule_id") == "sorcerer:datasheet:000004085:4"
+    ]
+    assert len(effects) == 2
+    assert all(e.target_unit_instance_ids == ("attached-unit:opponent:bodyguard",) for e in effects)
+    assert all(
+        e.expiration.battle_round == 2 and e.expiration.player_id == "owner" for e in effects
+    )
+    assert state.active_player_id == "opponent"
+    persisted = json.loads(json.dumps(session.to_persistence_payload()))
+    restored = LocalGameSession.from_persistence_payload(persisted)
+    assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
+    for viewer in ("owner", "opponent"):
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+    if profile == "witchfire":
+        translate_native(session, "attached-unit:opponent:bodyguard", -5.0)
+        for _ in range(50):
+            current = session.lifecycle.state
+            assert current is not None
+            if current.battle_round == 2 and current.active_player_id == "owner":
+                break
+            pending = session.lifecycle.pending_decision_request()
+            assert pending is not None
+            native_choice(
+                session,
+                option_id="attached-unit:opponent:bodyguard"
+                if pending.decision_type == "select_charging_unit"
+                else None,
+            )
+        else:
+            raise AssertionError("Native next owner turn did not start")
+        assert not any(
+            isinstance(e.effect_payload, dict)
+            and e.effect_payload.get("rule_id") == "sorcerer:datasheet:000004085:4"
+            for e in state.persisting_effects
+        )
+        charge = events(session, "charge_roll_resolved")[-1]
+        modifiers = charge["charge_roll_modifiers"]
+        assert isinstance(modifiers, list)
+        assert len(modifiers) == 1
+        assert isinstance(modifiers[0], dict)
+        assert modifiers[0]["operand"] == -2
+    result = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id=f"sorcerer-native:{profile}")
+    ).run()
+    assert result.status is ReplayRunStatus.REPRODUCED
+
+
+def test_sorcerer_bodyguard_hits_do_not_activate_its_wracking_agony(
+    sorcerer_native_shooting_checkpoint: Any,
+) -> None:
+    from tests.support.sorcerer_native import native_fire
+
+    session = LocalGameSession.from_persistence_payload(sorcerer_native_shooting_checkpoint)
+    seen = native_fire(session, profile_id="000004079:boltgun:standard")
+    assert "select_catalog_post_shoot_hit_target_effect" not in seen
+    state = session.lifecycle.state
+    assert state is not None
+    assert not any(
+        isinstance(e.effect_payload, dict)
+        and e.effect_payload.get("rule_id") == "sorcerer:datasheet:000004085:4"
+        for e in state.persisting_effects
+    )
+    assert any(
+        isinstance(p["payload"], dict) and p["payload"].get("successful") is True
+        for p in events(session, "attack_sequence_step")
+        if p["step"] == "hit"
+    )
+
+
+def test_sorcerer_native_misses_do_not_offer_wracking(
+    sorcerer_native_shooting_checkpoint: Any,
+) -> None:
+    from tests.support.sorcerer_native import native_fire
+
+    session = LocalGameSession.from_persistence_payload(sorcerer_native_shooting_checkpoint)
+    seen = native_fire(
+        session,
+        profile_id="000004085:agonising-energies:witchfire",
+        result_id="decision-request-000019:native-fire",
+    )
+    assert "select_catalog_post_shoot_hit_target_effect" not in seen
+    hits = [p["payload"] for p in events(session, "attack_sequence_step") if p["step"] == "hit"]
+    assert hits
+    assert all(isinstance(hit, dict) and hit["successful"] is False for hit in hits)
+
+
+def test_sorcerer_muster_rejects_illegal_bodyguard_counts_equipment_and_missing_geometry() -> None:
+    from tests.support.sorcerer_native import native_request
+    from warhammer40k_core.engine.army_mustering import ArmyMusteringError, muster_army
+    from warhammer40k_core.engine.wargear_selections import ModelProfileSelection, WargearSelection
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        court_of_slaughter_anvanth_2026_08 as source,
+    )
+
+    package = source.catalog_package()
+    selected = native_request(player="owner")
+    illegal = native_request(player="owner", bodyguard="000004089")
+    leader = selected.unit_selections[0]
+    bad_count = replace(
+        leader,
+        model_profile_selections=(
+            ModelProfileSelection(leader.model_profile_selections[0].model_profile_id, 2),
+        ),
+    )
+    bad_weapon = replace(
+        leader,
+        wargear_selections=(
+            WargearSelection(
+                "unadvertised",
+                leader.model_profile_selections[0].model_profile_id,
+                ("unadvertised",),
+            ),
+        ),
+    )
+    for invalid_request in (
+        illegal,
+        replace(selected, unit_selections=(bad_count, *selected.unit_selections[1:])),
+        replace(selected, unit_selections=(bad_weapon, *selected.unit_selections[1:])),
+    ):
+        with pytest.raises(ArmyMusteringError):
+            muster_army(
+                catalog=package.army_catalog,
+                request=invalid_request,
+                model_geometries=package.model_geometries,
+            )
+    with pytest.raises(ArmyMusteringError):
+        muster_army(
+            catalog=package.army_catalog,
+            request=selected,
+            model_geometries=tuple(
+                g
+                for g in package.model_geometries
+                if g.model_profile_id != leader.model_profile_selections[0].model_profile_id
+            ),
+        )
+
+
+@pytest.mark.parametrize("case", ["never-attached", "ignores-cover"])
+def test_sorcerer_native_cover_is_conditional_and_respects_ignores_cover(case: str) -> None:
+    from tests.support.sorcerer_native import (
+        deploy_native,
+        native_declaration,
+        native_fire,
+        native_session,
+        translate_native,
+    )
+
+    session = native_session(
+        enemy_attached=case != "never-attached",
+        own_bodyguard="000004088" if case == "ignores-cover" else "000004079",
+    )
+    deploy_native(session)
+    translate_native(
+        session, "attached-unit:owner:bodyguard", 6.0 if case == "ignores-cover" else 7.0
+    )
+    native_declaration(session, "attached-unit:owner:bodyguard")
+    native_fire(
+        session,
+        profile_id="000004088:sonic-blaster:standard"
+        if case == "ignores-cover"
+        else "000004085:agonising-energies:witchfire",
+        target_id="attached-unit:opponent:bodyguard"
+        if case == "ignores-cover"
+        else "opponent:sorcerer",
+        model_id="owner:bodyguard:000004088:noise-marines:005" if case == "ignores-cover" else None,
+    )
+    hits = [p["payload"] for p in events(session, "attack_sequence_step") if p["step"] == "hit"]
+    assert hits
+    assert all(isinstance(hit, dict) and hit["target_number"] == 3 for hit in hits)
+    assert all(
+        isinstance(hit, dict) and hit.get("psychic_modifier_selection") is None for hit in hits
+    )
+
+
+def test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement() -> None:
+    from tests.support.sorcerer_native import (
+        deploy_native,
+        native_declaration,
+        native_fire,
+        native_session,
+        translate_native,
+    )
+
+    session = native_session(second_sorcerer=True)
+    deploy_native(session)
+    translate_native(session, "attached-unit:owner:bodyguard", 7.0)
+    translate_native(session, "owner:second-sorcerer", 6.2)
+    for identity, result in (
+        ("attached-unit:owner:bodyguard", "native:energies"),
+        ("owner:second-sorcerer", "native:energies-2"),
+    ):
+        native_declaration(session, identity)
+        seen = native_fire(
+            session, profile_id="000004085:agonising-energies:witchfire", result_id=result
+        )
+        assert "select_catalog_post_shoot_hit_target_effect" in seen
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.active_player_id == "opponent"
+    effects = [
+        e
+        for e in state.persisting_effects
+        if isinstance(e.effect_payload, dict)
+        and e.effect_payload.get("rule_id") == "sorcerer:datasheet:000004085:4"
+    ]
+    assert len(effects) == 4
+    # Two distinct real receipts retain their durations; the generic source slot
+    # applies the named condition once. A cumulative -4 would reject this move.
+    translate_native(session, "attached-unit:opponent:bodyguard", -5.0)
+
+
+@pytest.mark.parametrize("omit_all", [True, False])
+def test_sorcerer_strict_public_setup_requires_provisional_geometry(omit_all: bool) -> None:
+    from tests.support.sorcerer_native import native_session
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    original = native_session()
+    config = original.lifecycle.config
+    assert config is not None
+    assert config.model_geometries is not None
+    geometry = (
+        None
+        if omit_all
+        else tuple(
+            record
+            for record in config.model_geometries
+            if record.model_profile_id != "000004085:sorcerer"
+        )
+    )
+    altered = replace(config, model_geometries=geometry)
+    assert not altered.allow_legacy_non_strict_rosters
+    session = LocalGameSession()
+    session.start(altered)
+    with pytest.raises(GameLifecycleError, match="MUSTER_ARMIES failed"):
+        session.advance_until_decision_or_terminal()
+    assert session.lifecycle.state is not None
+    assert not session.lifecycle.state.army_definitions
+
+
+def test_sorcerer_native_agonising_hits_on_non_infantry_do_not_offer_wracking() -> None:
+    from tests.support.sorcerer_native import (
+        deploy_native,
+        native_declaration,
+        native_fire,
+        native_session,
+        translate_native,
+    )
+
+    session = native_session(enemy_character_only=True)
+    deploy_native(session)
+    translate_native(session, "attached-unit:owner:bodyguard", 7.0)
+    native_declaration(session, "attached-unit:owner:bodyguard")
+    seen = native_fire(
+        session,
+        profile_id="000004085:agonising-energies:witchfire",
+        target_id="opponent:sorcerer",
+    )
+    assert "select_catalog_post_shoot_hit_target_effect" not in seen
+    hits = [p["payload"] for p in events(session, "attack_sequence_step") if p["step"] == "hit"]
+    assert any(isinstance(hit, dict) and hit["successful"] is True for hit in hits)
+
+
+def test_sorcerer_native_bolt_pistol_hits_do_not_offer_wracking(
+    sorcerer_native_shooting_checkpoint: Any,
+) -> None:
+    from tests.support.sorcerer_native import (
+        native_choice,
+        native_declaration,
+        native_fire,
+        translate_native,
+    )
+
+    session = LocalGameSession.from_persistence_payload(sorcerer_native_shooting_checkpoint)
+    native_fire(session, profile_id="000004079:boltgun:standard")
+    translate_native(session, "attached-unit:opponent:bodyguard", -7.0)
+    for _ in range(50):
+        current = session.lifecycle.state
+        assert current is not None
+        if current.battle_round == 2 and current.active_player_id == "owner":
+            break
+        native_choice(session)
+    else:
+        raise AssertionError("Native second owner turn not reached")
+    native_declaration(session, "attached-unit:owner:bodyguard")
+    before = len(events(session, "attack_sequence_step"))
+    seen = native_fire(
+        session, profile_id="000004085:bolt-pistol:standard", result_id="native:pistol"
+    )
+    assert "select_catalog_post_shoot_hit_target_effect" not in seen
+    attacks = events(session, "attack_sequence_step")[before:]
+    assert any(
+        p["step"] == "hit" and isinstance(p["payload"], dict) and p["payload"]["successful"] is True
+        for p in attacks
+    )
+
+
+@pytest.mark.parametrize("drift", ["unknown-role", "melee", "extra-condition"])
+def test_leading_cover_rejects_unrecognized_source_descriptor_scope(drift: str) -> None:
+    from warhammer40k_core.engine.catalog_cover_support import clause_is_leading_cover
+    from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload, RuleParameter
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        court_of_slaughter_anvanth_2026_08 as source,
+    )
+
+    sheet = source.catalog_package().army_catalog.datasheet_by_id("000004085")
+    ability = next(a for a in sheet.abilities if a.name.startswith("Warped Interference"))
+    assert ability.rule_ir_payload is not None
+    rule = RuleIR.from_payload(cast(RuleIRPayload, ability.rule_ir_payload))
+    clause = rule.clauses[0]
+    assert clause_is_leading_cover(clause)
+    if drift == "unknown-role":
+        condition = replace(
+            clause.conditions[0], parameters=(RuleParameter("relationship", "unknown_role"),)
+        )
+        invalid = replace(clause, conditions=(condition,))
+    elif drift == "melee":
+        effect = replace(
+            clause.effects[0],
+            parameters=tuple(
+                RuleParameter(p.key, "melee") if p.key == "attack_kind" else p
+                for p in clause.effects[0].parameters
+            ),
+        )
+        invalid = replace(clause, effects=(effect,))
+    else:
+        invalid = replace(clause, conditions=(*clause.conditions, clause.conditions[0]))
+    assert not clause_is_leading_cover(invalid)
+
+
+def test_sorcerer_native_overwatch_hits_cannot_trigger_own_shooting_wracking(
+    sorcerer_native_shooting_checkpoint: Any,
+) -> None:
+    from tests.support.sorcerer_native import (
+        native_fire,
+        native_sorcerer_overwatch,
+        translate_native,
+    )
+
+    session = LocalGameSession.from_persistence_payload(sorcerer_native_shooting_checkpoint)
+    native_fire(session, profile_id="000004079:boltgun:standard")
+    translate_native(session, "attached-unit:opponent:bodyguard", -7.0)
+    before = len(events(session, "attack_sequence_step"))
+    seen = native_sorcerer_overwatch(session)
+    assert "select_catalog_post_shoot_hit_target_effect" not in seen
+    steps = events(session, "attack_sequence_step")[before:]
+    assert any(
+        p["step"] == "hit" and isinstance(p["payload"], dict) and p["payload"]["successful"] is True
+        for p in steps
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.active_player_id == "opponent"
+    assert state.out_of_phase_shooting_state is None
+    assert not any(
+        isinstance(effect.effect_payload, dict)
+        and effect.effect_payload.get("rule_id") == "sorcerer:datasheet:000004085:4"
+        for effect in state.persisting_effects
+    )

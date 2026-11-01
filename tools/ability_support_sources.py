@@ -37,6 +37,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     emperors_children_profiles_2026_10 as emperors_children_profiles,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    emperors_children_sorcerer_2026_11 as sorcerer_current,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     thousand_sons_defiler_datasheet_overlay_2026_07 as chaos_defiler_overlay,
 )
 from warhammer40k_core.rules.wahapedia_bridge_rows import BridgeSourceArtifact
@@ -102,8 +105,13 @@ def load_ability_support_sources(source_json_dir: Path) -> tuple[BridgeSourceArt
         release_manifest=ec_current.source_release_manifest(),
         overlay_packs=(ec_current.overlay_pack(),),
     )
-    maulerfiend_overlaid_artifacts = apply_source_release_overlays(
+    sorcerer_artifacts = apply_source_release_overlays(
         source_artifacts=latest_ec_artifacts,
+        release_manifest=sorcerer_current.source_release_manifest(),
+        overlay_packs=(sorcerer_current.overlay_pack(),),
+    )
+    maulerfiend_overlaid_artifacts = apply_source_release_overlays(
+        source_artifacts=sorcerer_artifacts,
         release_manifest=maulerfiend_overlay.source_release_manifest(),
         overlay_packs=(maulerfiend_overlay.overlay_pack(),),
     )
@@ -189,6 +197,7 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
                 coverage.RELEASE_MANIFEST_PATH,
                 Path(vyper_title_overlay.__file__).with_name(vyper_title_overlay.ARTIFACT_NAME),
                 Path(ec_current.__file__).with_name(ec_current.ARTIFACT_NAME),
+                Path(sorcerer_current.__file__).with_name(sorcerer_current.ARTIFACT_NAME),
                 Path(emperors_children_profiles.__file__).with_name(
                     emperors_children_profiles.ARTIFACT_NAME
                 ),

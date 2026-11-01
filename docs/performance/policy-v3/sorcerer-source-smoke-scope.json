@@ -1,0 +1,47 @@
+{
+  "base": "7827235d328bf5b82201c8fece29dab7356ba3e3",
+  "changes": {
+    "tools/ability_support_sources.py": {
+      "before_sha256": "dd89b8d7453ac23d7ea3ede565be979c8abdc1c631460e228e265e398fba4692",
+      "after_sha256": "179fb1af416e0385271d7383f92c48b1005bede7900e95adf7654ba0e50f97ed",
+      "owners": {
+        "@module": {
+          "before": "fa53eb355f191b18ea0a1dc7e9968350f8491f0f1a21547264504623c9860681",
+          "after": "80603ee67290b56e096fdbd68278889c9ad7ace4ef6b8624f3851430fd5be333"
+        },
+        "ability_support_index_inputs": {
+          "before": "d5db6e92d55d148f7316c354a8be7f69b0a129ed5d617828653bee7d5c5297d4",
+          "after": "fa3e5a33381e4304a9dff50575346c6bfcf633d557689994d250331fac1fc16a"
+        },
+        "load_ability_support_sources": {
+          "before": "2802a7285098899f07d0a47ac6393f65b709a5a3d8eab4b3f54c5f6842256c10",
+          "after": "d93bb882b2d4ed690e7d698be2b76bfdbbd006f750f8c8e5553e6e021d47d0bc"
+        }
+      }
+    },
+    "tools/generate_ability_support_matrix.py": {
+      "before_sha256": "1c30c7d8813aff9e9eeccb9d2305c6823c084ba955f6ae2ae83b517076f14760",
+      "after_sha256": "637133b98493843facac8dea1a0887905e6443c3a0b355af1a1670b08288d4b8",
+      "owners": {
+        "@module": {
+          "before": "09dd7e273d5024f31d2ab3eaa5afaa63dfdc684fcd9085d671ee4f503caa285b",
+          "after": "6643a9b33a30d026df6925f9fdafd868953e3ffb22478cdfb9fd91c350b4cd73"
+        },
+        "_ability_support_catalog_package": {
+          "before": "17abfed629bcd9fa3290e442589c82b6d587fd62b363518d9d189c726e01abf0",
+          "after": "f23859c4b6aa641a420700d63c2304a1b2f3f72a75dbd9e21ed414bcda5a0f2f"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tools/ability_support_sources.py": [
+      "qualification40-exact-b0712fa66a9cc38e"
+    ],
+    "tools/generate_ability_support_matrix.py": [
+      "qualification40-exact-ded6452f144f095b"
+    ]
+  },
+  "source_obligation": "Admit Sorcerer 000004085 with its complete observed current rules, exact profile corrections and explicit provisional physical configuration through existing source indexing and native catalog generation.",
+  "unchanged_work": "Only the finite overlay/source-index inventory and Sorcerer model height/catalog membership inputs are added to these two owners. Source indexing, immutable overlay preimage checks and catalog algorithms are unchanged. All existing sensitive mappings, detailed families, serial smoke budgets and live integrity obligations remain in force; no throughput improvement is asserted."
+}

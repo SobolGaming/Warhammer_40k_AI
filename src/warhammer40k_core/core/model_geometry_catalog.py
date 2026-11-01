@@ -35,6 +35,7 @@ class GeometryEvidenceKind(StrEnum):
     OFFICIAL_MODEL_PROFILE = "official_model_profile"
     MANUAL_MEASUREMENT = "manual_measurement"
     CROWD_SOURCED_MEASUREMENT = "crowd_sourced_measurement"
+    USER_SUPPLIED_ESTIMATE = "user_supplied_estimate"
 
 
 class GeometryMeasurementKind(StrEnum):
@@ -47,6 +48,7 @@ class GeometryMeasurementKind(StrEnum):
 class GeometryReviewStatus(StrEnum):
     ACCEPTED = "accepted"
     NEEDS_REVIEW = "needs_review"
+    PROVISIONAL_ESTIMATE = "provisional_estimate"
 
 
 class GeometryRulesFootprintPolicy(StrEnum):
@@ -250,6 +252,21 @@ class ModelGeometrySourceEvidence:
             "reviewer_status",
             geometry_review_status_from_token(self.reviewer_status),
         )
+        if (
+            self.evidence_kind is GeometryEvidenceKind.USER_SUPPLIED_ESTIMATE
+            and self.reviewer_status is GeometryReviewStatus.ACCEPTED
+        ):
+            raise ModelGeometryCatalogError("A user-supplied estimate cannot be verified evidence.")
+        if self.reviewer_status is GeometryReviewStatus.PROVISIONAL_ESTIMATE and (
+            self.evidence_kind
+            in {
+                GeometryEvidenceKind.OFFICIAL_BASE_SIZE,
+                GeometryEvidenceKind.OFFICIAL_MODEL_PROFILE,
+            }
+        ):
+            raise ModelGeometryCatalogError(
+                "A provisional estimate cannot claim official evidence."
+            )
 
     @classmethod
     def from_source_dimensions(
@@ -300,9 +317,12 @@ class ModelGeometrySourceEvidence:
                 return value
         raise ModelGeometryCatalogError("ModelGeometrySourceEvidence dimension was not found.")
 
-    def require_accepted(self) -> None:
-        if self.reviewer_status is not GeometryReviewStatus.ACCEPTED:
-            raise ModelGeometryCatalogError("ModelGeometrySourceEvidence is not accepted.")
+    def require_admissible(self) -> None:
+        if self.reviewer_status not in {
+            GeometryReviewStatus.ACCEPTED,
+            GeometryReviewStatus.PROVISIONAL_ESTIMATE,
+        }:
+            raise ModelGeometryCatalogError("ModelGeometrySourceEvidence is not accepted for use.")
 
     def to_payload(self) -> ModelGeometrySourceEvidencePayload:
         return {
@@ -438,7 +458,7 @@ class ModelFootprintPartDefinition:
             raise ModelGeometryCatalogError(
                 "ModelFootprintPartDefinition evidence must be footprint or support-base."
             )
-        evidence.require_accepted()
+        evidence.require_admissible()
         footprint = model_footprint_kind_from_token(footprint_kind)
         radius_x_inches, radius_y_inches = _footprint_radii_from_evidence(
             footprint_kind=footprint,
@@ -627,7 +647,7 @@ class ModelHeightDefinition:
             raise ModelGeometryCatalogError("ModelHeightDefinition evidence is invalid.")
         if evidence.measurement_kind is not GeometryMeasurementKind.HEIGHT:
             raise ModelGeometryCatalogError("ModelHeightDefinition evidence must be height.")
-        evidence.require_accepted()
+        evidence.require_admissible()
         return cls(
             height_inches=evidence.dimension_inches("height"),
             source_units=evidence.source_units,
@@ -705,7 +725,7 @@ class ModelZOffsetDefinition:
             raise ModelGeometryCatalogError("ModelZOffsetDefinition evidence is invalid.")
         if evidence.measurement_kind is not GeometryMeasurementKind.Z_OFFSET:
             raise ModelGeometryCatalogError("ModelZOffsetDefinition evidence must be z-offset.")
-        evidence.require_accepted()
+        evidence.require_admissible()
         return cls(
             z_offset_inches=evidence.dimension_inches("z_offset"),
             source_units=evidence.source_units,
@@ -1135,7 +1155,7 @@ def _validate_linked_evidence(
         raise ModelGeometryCatalogError(
             "ModelGeometryCatalogRecord references geometry evidence with wrong measurement kind."
         )
-    linked_evidence.require_accepted()
+    linked_evidence.require_admissible()
 
 
 def _validate_evidence_tuple(

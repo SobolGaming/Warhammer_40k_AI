@@ -48,6 +48,9 @@ from warhammer40k_core.engine.model_keyword_grants import (
     grant_unit_keywords,
     replace_unit_faction_keywords,
 )
+from warhammer40k_core.engine.roster_catalog_identity import (
+    validate_request_matches_catalog as _validate_request_matches_catalog,
+)
 from warhammer40k_core.engine.roster_points import (
     RosterEnhancementPointValue,
     RosterEnhancementPointValuePayload,
@@ -1166,7 +1169,9 @@ def muster_army(
     )
     from warhammer40k_core.engine.roster_bearer_validation import apply_warlord_keyword_if_selected
 
-    roster_legality_report = validate_roster_legality(catalog=catalog, request=request)
+    roster_legality_report = validate_roster_legality(
+        catalog=catalog, request=request, model_geometries=model_geometries
+    )
     assert_construction_legal(roster_legality_report)
     if request.roster_legality_required:
         roster_legality_report.assert_legal()
@@ -1210,6 +1215,7 @@ def validate_roster_legality(
     *,
     catalog: ArmyCatalog,
     request: ArmyMusterRequest,
+    model_geometries: tuple[ModelGeometryCatalogRecord, ...] | None = None,
 ) -> RosterLegalityReport:
     if type(catalog) is not ArmyCatalog:
         raise ArmyMusteringError("catalog must be an ArmyCatalog.")
@@ -1318,7 +1324,9 @@ def validate_roster_legality(
         append_construction_violations,
     )
 
-    model_resolver = RosterModelResolver(catalog=catalog, request=request)
+    model_resolver = RosterModelResolver(
+        catalog=catalog, request=request, model_geometries=model_geometries or ()
+    )
     append_construction_violations(
         request=request,
         detachments=detachments,
@@ -2725,19 +2733,6 @@ def _roster_violation_sort_key(
         "" if violation.source_id is None else violation.source_id,
         violation.message,
     )
-
-
-def _validate_request_matches_catalog(
-    *,
-    catalog: ArmyCatalog,
-    request: ArmyMusterRequest,
-) -> None:
-    if request.catalog_id != catalog.catalog_id:
-        raise ArmyMusteringError("ArmyMusterRequest catalog_id does not match catalog.")
-    if request.source_package_id != catalog.source_package_id:
-        raise ArmyMusteringError("ArmyMusterRequest source_package_id does not match catalog.")
-    if request.ruleset_id != catalog.ruleset_id:
-        raise ArmyMusteringError("ArmyMusterRequest ruleset_id does not match catalog.")
 
 
 def _ruleset_id_from_payload(payload: RulesetIdPayload) -> RulesetId:

@@ -42,6 +42,7 @@ if TYPE_CHECKING or __package__:
         generate_emperors_children_infractors_tormentors_rule_ir as emperors_children_battleline,
     )
     from tools import generate_emperors_children_lucius_rule_ir as emperors_children_lucius
+    from tools import generate_emperors_children_sorcerer_rule_ir as emperors_children_sorcerer
     from tools.faction_rule_ir_bundle import (
         build_rule_ir_shard_artifact,
         canonical_package_hash,
@@ -73,6 +74,7 @@ else:
     import generate_emperors_children_fulgrim_rule_ir as emperors_children_fulgrim
     import generate_emperors_children_infractors_tormentors_rule_ir as emperors_children_battleline
     import generate_emperors_children_lucius_rule_ir as emperors_children_lucius
+    import generate_emperors_children_sorcerer_rule_ir as emperors_children_sorcerer
     from faction_rule_ir_bundle import (
         build_rule_ir_shard_artifact,
         canonical_package_hash,
@@ -138,6 +140,7 @@ EMPERORS_CHILDREN_SOURCE_PACKAGE_FACTORIES: tuple[PayloadFactory, ...] = (
     generate_emperors_children_lord_spawn,
     emperors_children_lucius.generated_artifact_payload,
     emperors_children_daemon_prince.generated_artifact_payload,
+    emperors_children_sorcerer.generated_artifact_payload,
 )
 CHAOS_DAEMONS_SOURCE_PACKAGE_FACTORIES: tuple[PayloadFactory, ...] = (
     chaos_daemons.generated_artifact_payload,

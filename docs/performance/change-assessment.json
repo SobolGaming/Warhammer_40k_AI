@@ -1,326 +1,618 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "1e2a8cdee1964bccd638c34e2ccb72ea5ead01ac",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:42a3c9eaab5fd7e0b8771d0cf2bfcfc46f647b5c909bd650bea6789198b1f749",
-  "operation_map_sha256": "5fdbe8554fe0cb22e6e4dc923ab59055c1f9e885f73fd04de396265aa43d43f3",
+  "base": "7827235d328bf5b82201c8fece29dab7356ba3e3",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dd31e281b7dd700883ebbd2cd6e95bd0b2cb3ab85eacdf03a8e2c14b8147e31b",
+  "operation_map_sha256": "cc82ba8c52641e97ddf9874fca06132631a22ef9c5e4cb33a19d6abca3a2be96",
   "changes": {
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "bbbded4504168f2b34df6f133ba457d7b5d0b57f9eab64772dcb4491bec56bfa",
-      "after_sha256": "0e38975956d7ac10bf1effbef705e6b3c17ab0f9da5610e911a7383e81dda39b",
+    "README.md": {
+      "before_sha256": "aaacce152217fc7072d8b90db4b105d39e6ec9b1c65b51bfaaa5b0cd9872cb2a",
+      "after_sha256": "d0950aff1592421b310fe06d4ff455900374fadad7021e0bba06e3db5860ff96",
       "owners": {
         "@document": {
-          "before": "bbbded4504168f2b34df6f133ba457d7b5d0b57f9eab64772dcb4491bec56bfa",
-          "after": "0e38975956d7ac10bf1effbef705e6b3c17ab0f9da5610e911a7383e81dda39b"
+          "before": "aaacce152217fc7072d8b90db4b105d39e6ec9b1c65b51bfaaa5b0cd9872cb2a",
+          "after": "d0950aff1592421b310fe06d4ff455900374fadad7021e0bba06e3db5860ff96"
+        }
+      }
+    },
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "0e38975956d7ac10bf1effbef705e6b3c17ab0f9da5610e911a7383e81dda39b",
+      "after_sha256": "f8f6ae44a5a225bbc5a994c657a18c657bc82f0652a609de2385b422251eb8bf",
+      "owners": {
+        "@document": {
+          "before": "0e38975956d7ac10bf1effbef705e6b3c17ab0f9da5610e911a7383e81dda39b",
+          "after": "f8f6ae44a5a225bbc5a994c657a18c657bc82f0652a609de2385b422251eb8bf"
         }
       }
     },
     "ci/quality_shards/shard-1.txt": {
-      "before_sha256": "c0b335c8af253f7f4b39508293d48266ba99e4d93692b2da8047086e9ea0bd30",
-      "after_sha256": "b46e9a6422ff1a49d56b48fa3960c1684443b6f99167cbecc269b1466013c89e",
+      "before_sha256": "b46e9a6422ff1a49d56b48fa3960c1684443b6f99167cbecc269b1466013c89e",
+      "after_sha256": "496e4821550578a345c8cf72765366046c866271276108289c9c6e08fe541193",
       "owners": {
         "@document": {
-          "before": "c0b335c8af253f7f4b39508293d48266ba99e4d93692b2da8047086e9ea0bd30",
-          "after": "b46e9a6422ff1a49d56b48fa3960c1684443b6f99167cbecc269b1466013c89e"
-        }
-      }
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "bf6a9f542b8fec903e3e3839053c1cb822e0b7e9321967fd30a2d69d586e5dbd",
-      "after_sha256": "3994bf9d59cf9d496f64e9261557c994251220425906337e52303830b5e40265",
-      "owners": {
-        "@document": {
-          "before": "bf6a9f542b8fec903e3e3839053c1cb822e0b7e9321967fd30a2d69d586e5dbd",
-          "after": "3994bf9d59cf9d496f64e9261557c994251220425906337e52303830b5e40265"
+          "before": "b46e9a6422ff1a49d56b48fa3960c1684443b6f99167cbecc269b1466013c89e",
+          "after": "496e4821550578a345c8cf72765366046c866271276108289c9c6e08fe541193"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "7025bc6c20c413ae2926670e93ba775186c046dd80602a89f2157fd4a50d7109",
-      "after_sha256": "c3f2031d306ae4341431eeb5d5b0baedf7405bf1b9a5469eedfebb14c1562c64",
+      "before_sha256": "c3f2031d306ae4341431eeb5d5b0baedf7405bf1b9a5469eedfebb14c1562c64",
+      "after_sha256": "51c7dc556a01f7b7dc4d6e44ec4b7c46cf4b67a210f62f9f303ba4ac5ac4e906",
       "owners": {
         "@document": {
-          "before": "7025bc6c20c413ae2926670e93ba775186c046dd80602a89f2157fd4a50d7109",
-          "after": "c3f2031d306ae4341431eeb5d5b0baedf7405bf1b9a5469eedfebb14c1562c64"
+          "before": "c3f2031d306ae4341431eeb5d5b0baedf7405bf1b9a5469eedfebb14c1562c64",
+          "after": "51c7dc556a01f7b7dc4d6e44ec4b7c46cf4b67a210f62f9f303ba4ac5ac4e906"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "957bf42f9da97aba2cdb7792afdb787ccfd7c3a62415cbdbe07de601453e1e13",
-      "after_sha256": "08cae7e69daa2e17981ba9f08eba3d7eb8768586a3758a78a19395f68e99c817",
+      "before_sha256": "08cae7e69daa2e17981ba9f08eba3d7eb8768586a3758a78a19395f68e99c817",
+      "after_sha256": "5b71a99182ad9dc2c6012f5065c780fb8ef6fc1393d50f36cc6a8c697065b262",
       "owners": {
         "@document": {
-          "before": "957bf42f9da97aba2cdb7792afdb787ccfd7c3a62415cbdbe07de601453e1e13",
-          "after": "08cae7e69daa2e17981ba9f08eba3d7eb8768586a3758a78a19395f68e99c817"
+          "before": "08cae7e69daa2e17981ba9f08eba3d7eb8768586a3758a78a19395f68e99c817",
+          "after": "5b71a99182ad9dc2c6012f5065c780fb8ef6fc1393d50f36cc6a8c697065b262"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "385147a9d0c2f4071654d08aea33c8a7cc9bc8e843081f8b02d1b483a7be9bec",
-      "after_sha256": "7cf0cfdffe3aab7a616f08e8efe03f6cc253ad5b908728257f72a8c1a1d3c167",
+      "before_sha256": "7cf0cfdffe3aab7a616f08e8efe03f6cc253ad5b908728257f72a8c1a1d3c167",
+      "after_sha256": "a892d68973382ef81f74ff7f6eab5cddd5c225fd0855099aeb74f546ae7d8cf5",
       "owners": {
         "@document": {
-          "before": "385147a9d0c2f4071654d08aea33c8a7cc9bc8e843081f8b02d1b483a7be9bec",
-          "after": "7cf0cfdffe3aab7a616f08e8efe03f6cc253ad5b908728257f72a8c1a1d3c167"
+          "before": "7cf0cfdffe3aab7a616f08e8efe03f6cc253ad5b908728257f72a8c1a1d3c167",
+          "after": "a892d68973382ef81f74ff7f6eab5cddd5c225fd0855099aeb74f546ae7d8cf5"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "131bf2c711c5d95daddb039c0cfa72ed017c437f1a875241dcb68a6a7c8cfdf3",
-      "after_sha256": "430b3949e222e98c95665d6d0a701fc807ee107aa11deaf96eddc59ec4945438",
+      "before_sha256": "430b3949e222e98c95665d6d0a701fc807ee107aa11deaf96eddc59ec4945438",
+      "after_sha256": "7285af967f5a6c4e4a283ba8cb627f1a865f72182dd7ed02a848848cd9342c7a",
       "owners": {
         "@document": {
-          "before": "131bf2c711c5d95daddb039c0cfa72ed017c437f1a875241dcb68a6a7c8cfdf3",
-          "after": "430b3949e222e98c95665d6d0a701fc807ee107aa11deaf96eddc59ec4945438"
+          "before": "430b3949e222e98c95665d6d0a701fc807ee107aa11deaf96eddc59ec4945438",
+          "after": "7285af967f5a6c4e4a283ba8cb627f1a865f72182dd7ed02a848848cd9342c7a"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "d6e872f73875842d54fdb4d3e84645b96255b4046265cab053c90b14289a1c48",
-      "after_sha256": "a8170837b925c857743435491a767629799eb23024577c764becc40f018bac3f",
+      "before_sha256": "a8170837b925c857743435491a767629799eb23024577c764becc40f018bac3f",
+      "after_sha256": "cd295db12d3f7498a5a114dc2f3c684699b6706f041f73c6b01f3b18a94404c7",
       "owners": {
         "@document": {
-          "before": "d6e872f73875842d54fdb4d3e84645b96255b4046265cab053c90b14289a1c48",
-          "after": "a8170837b925c857743435491a767629799eb23024577c764becc40f018bac3f"
+          "before": "a8170837b925c857743435491a767629799eb23024577c764becc40f018bac3f",
+          "after": "cd295db12d3f7498a5a114dc2f3c684699b6706f041f73c6b01f3b18a94404c7"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "0cefe8d1a7de5123cf43e5d3094b3a5676a291208950d6a0619ef3ca1888fdbe",
-      "after_sha256": "2372a32c8fb0d9f87367e4ffc5aec3e870cc1328c21e4ff79a19f9811f6483ce",
+      "before_sha256": "2372a32c8fb0d9f87367e4ffc5aec3e870cc1328c21e4ff79a19f9811f6483ce",
+      "after_sha256": "8566ab655ffd34d948988df37acf71d98cd1916fff1acc9babbf54a66125edc6",
       "owners": {
         "@document": {
-          "before": "0cefe8d1a7de5123cf43e5d3094b3a5676a291208950d6a0619ef3ca1888fdbe",
-          "after": "2372a32c8fb0d9f87367e4ffc5aec3e870cc1328c21e4ff79a19f9811f6483ce"
+          "before": "2372a32c8fb0d9f87367e4ffc5aec3e870cc1328c21e4ff79a19f9811f6483ce",
+          "after": "8566ab655ffd34d948988df37acf71d98cd1916fff1acc9babbf54a66125edc6"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "b596fe8867c9a366cba90c14fb2648040e41a959c02c3ce4d43783909a36c1e5",
-      "after_sha256": "fadefb954e70860ed4b9cb1c48dfd7c196be3d7f98d8084b074ab95b18a30985",
+      "before_sha256": "fadefb954e70860ed4b9cb1c48dfd7c196be3d7f98d8084b074ab95b18a30985",
+      "after_sha256": "9fa72837040cf42f589aa3c0bba1900e83dff1dda0773a01f217097c8e83b946",
       "owners": {
         "@document": {
-          "before": "b596fe8867c9a366cba90c14fb2648040e41a959c02c3ce4d43783909a36c1e5",
-          "after": "fadefb954e70860ed4b9cb1c48dfd7c196be3d7f98d8084b074ab95b18a30985"
+          "before": "fadefb954e70860ed4b9cb1c48dfd7c196be3d7f98d8084b074ab95b18a30985",
+          "after": "9fa72837040cf42f589aa3c0bba1900e83dff1dda0773a01f217097c8e83b946"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "b4a144e2d967e7db00a190eebb99436617142b53f56791352aabfe10b43f5560",
-      "after_sha256": "d1d0af1d558cb78904e5352b2f510beaa304c40ea875ae7b8637fe027b6042fd",
+      "before_sha256": "d1d0af1d558cb78904e5352b2f510beaa304c40ea875ae7b8637fe027b6042fd",
+      "after_sha256": "7bfa2f12cd661476d62f7ab35049cc5c1936d4dd6db46da938b5bd578de1978f",
       "owners": {
         "@document": {
-          "before": "b4a144e2d967e7db00a190eebb99436617142b53f56791352aabfe10b43f5560",
-          "after": "d1d0af1d558cb78904e5352b2f510beaa304c40ea875ae7b8637fe027b6042fd"
+          "before": "d1d0af1d558cb78904e5352b2f510beaa304c40ea875ae7b8637fe027b6042fd",
+          "after": "7bfa2f12cd661476d62f7ab35049cc5c1936d4dd6db46da938b5bd578de1978f"
         }
       }
     },
     "data/generated/ability_coverage/ability_coverage_rows.json": {
-      "before_sha256": "e7c3ff93fc5637be86353756ce37d46f5bbd088148d97530872231d4b9c4693e",
-      "after_sha256": "dfad39accf4fa6becc034f2b85e39e92a0a23e9f0ccf289665e8941eca83bb2c",
+      "before_sha256": "dfad39accf4fa6becc034f2b85e39e92a0a23e9f0ccf289665e8941eca83bb2c",
+      "after_sha256": "87caaffa640988a5e8427e56d8a9a62515a88f4e92e3ef3116382421c4205952",
       "owners": {
         "@document": {
-          "before": "e7c3ff93fc5637be86353756ce37d46f5bbd088148d97530872231d4b9c4693e",
-          "after": "dfad39accf4fa6becc034f2b85e39e92a0a23e9f0ccf289665e8941eca83bb2c"
+          "before": "dfad39accf4fa6becc034f2b85e39e92a0a23e9f0ccf289665e8941eca83bb2c",
+          "after": "87caaffa640988a5e8427e56d8a9a62515a88f4e92e3ef3116382421c4205952"
         }
       }
     },
     "data/generated/ability_coverage/ability_support_category_rows.json": {
-      "before_sha256": "5d099aaebbb8a098c95dd59fd56c889771af07b425899d4d35235dc8540a60a3",
-      "after_sha256": "531bce5ff0bdc74c9c7ab45126ec76d15f0aede43dc11caf68064e240885479e",
+      "before_sha256": "531bce5ff0bdc74c9c7ab45126ec76d15f0aede43dc11caf68064e240885479e",
+      "after_sha256": "ff751c17e28dcb3982c56c01f184e72e4ffcb57173105a7a2506450935072149",
       "owners": {
         "@document": {
-          "before": "5d099aaebbb8a098c95dd59fd56c889771af07b425899d4d35235dc8540a60a3",
-          "after": "531bce5ff0bdc74c9c7ab45126ec76d15f0aede43dc11caf68064e240885479e"
+          "before": "531bce5ff0bdc74c9c7ab45126ec76d15f0aede43dc11caf68064e240885479e",
+          "after": "ff751c17e28dcb3982c56c01f184e72e4ffcb57173105a7a2506450935072149"
         }
       }
     },
     "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
-      "before_sha256": "a7d73c5abe3ca6175ede448f5351cdad40df260ce43f984f6f18ae5aee324a0d",
-      "after_sha256": "6c7bc9c2b34aad9cd115b478c34759f0574bf28166e372acd7a7bd6e8a1b7036",
+      "before_sha256": "6c7bc9c2b34aad9cd115b478c34759f0574bf28166e372acd7a7bd6e8a1b7036",
+      "after_sha256": "c550d5fdb4b7ee9934a60cd4ef197e1e0918ca8224d55d3913c237503c85359f",
       "owners": {
         "@document": {
-          "before": "a7d73c5abe3ca6175ede448f5351cdad40df260ce43f984f6f18ae5aee324a0d",
-          "after": "6c7bc9c2b34aad9cd115b478c34759f0574bf28166e372acd7a7bd6e8a1b7036"
+          "before": "6c7bc9c2b34aad9cd115b478c34759f0574bf28166e372acd7a7bd6e8a1b7036",
+          "after": "c550d5fdb4b7ee9934a60cd4ef197e1e0918ca8224d55d3913c237503c85359f"
         }
       }
     },
     "data/generated/ability_coverage/datasheet_support_rows.json": {
-      "before_sha256": "88063548c2535777339cb19ddfe5b6816c172dd2974e44c93e1451333202f418",
-      "after_sha256": "2e8be9bd80b1d925b2f8c9064416d1230ca079ea9e97a73bbea47e9a2fa6ccb3",
+      "before_sha256": "2e8be9bd80b1d925b2f8c9064416d1230ca079ea9e97a73bbea47e9a2fa6ccb3",
+      "after_sha256": "b0a4e879ed07798a0abb4bd9e1ee25f22130419b8505b37e97706f9692d639eb",
       "owners": {
         "@document": {
-          "before": "88063548c2535777339cb19ddfe5b6816c172dd2974e44c93e1451333202f418",
-          "after": "2e8be9bd80b1d925b2f8c9064416d1230ca079ea9e97a73bbea47e9a2fa6ccb3"
+          "before": "2e8be9bd80b1d925b2f8c9064416d1230ca079ea9e97a73bbea47e9a2fa6ccb3",
+          "after": "b0a4e879ed07798a0abb4bd9e1ee25f22130419b8505b37e97706f9692d639eb"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "ef66340351dc99c0e45b810a7d677fdeb86dcf075fdaa17d7e3c96774dad9cf9",
-      "after_sha256": "d3a4a23838a977e0c1a5d93b99739e2d149e9c491fcfdf30b30b96027b98ecf5",
+      "before_sha256": "d3a4a23838a977e0c1a5d93b99739e2d149e9c491fcfdf30b30b96027b98ecf5",
+      "after_sha256": "163b799ab73cc4d119feca11f95511f1ccb1feb74090ee2bbf8adcdf35882d58",
       "owners": {
         "@document": {
-          "before": "ef66340351dc99c0e45b810a7d677fdeb86dcf075fdaa17d7e3c96774dad9cf9",
-          "after": "d3a4a23838a977e0c1a5d93b99739e2d149e9c491fcfdf30b30b96027b98ecf5"
+          "before": "d3a4a23838a977e0c1a5d93b99739e2d149e9c491fcfdf30b30b96027b98ecf5",
+          "after": "163b799ab73cc4d119feca11f95511f1ccb1feb74090ee2bbf8adcdf35882d58"
         }
       }
     },
-    "data/source_audits/ec_current_2026_11/browser-captures.json": {
+    "data/source_audits/sorcerer_2026_11/core-dependency-observations.json": {
       "before_sha256": null,
-      "after_sha256": "a7ad87299193bc05dce2ed65e12e015d3669d876e8dc10840ff2d19d4aff172e",
+      "after_sha256": "7e2aa187bee183be8b23f830f98deb6b3de096cda851f9bb9338c39caa21cd26",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a7ad87299193bc05dce2ed65e12e015d3669d876e8dc10840ff2d19d4aff172e"
+          "after": "7e2aa187bee183be8b23f830f98deb6b3de096cda851f9bb9338c39caa21cd26"
         }
       }
     },
-    "data/source_audits/ec_current_2026_11/historical-court-catalog.json": {
+    "data/source_audits/sorcerer_2026_11/geometry.json": {
       "before_sha256": null,
-      "after_sha256": "c349f5fe2614f43ae78c150c98e571aa9f892db7f91722468a23204e666a2e1d",
+      "after_sha256": "e816092e57ac7aea294a2628781605bc21baf3f34f1d1cec8d6b0536ec81182c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c349f5fe2614f43ae78c150c98e571aa9f892db7f91722468a23204e666a2e1d"
+          "after": "e816092e57ac7aea294a2628781605bc21baf3f34f1d1cec8d6b0536ec81182c"
         }
       }
     },
-    "data/source_audits/ec_current_2026_11/historical-fulgrim-rule-ir.json": {
+    "data/source_audits/sorcerer_2026_11/review.json": {
       "before_sha256": null,
-      "after_sha256": "f24453e6ecb68dc541591dce0a931a1af7862b24fdade8813bf5ffdac4a2ec26",
+      "after_sha256": "26e6b88f46c9cd5a85b85f5814a35160867d2237c0b89f548373387340190fe8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f24453e6ecb68dc541591dce0a931a1af7862b24fdade8813bf5ffdac4a2ec26"
+          "after": "26e6b88f46c9cd5a85b85f5814a35160867d2237c0b89f548373387340190fe8"
         }
       }
     },
-    "data/source_audits/ec_current_2026_11/packaged-catalog-partition.json": {
+    "data/source_audits/sorcerer_2026_11/source-observation-current.json": {
       "before_sha256": null,
-      "after_sha256": "4f0a4349cd83323e4057f7fdf4fbac7864a0741e22219739ed17374522da3123",
+      "after_sha256": "7045ea750defe53c819b69828490a9fa644ed8520c335a49fd574c6986e61a8b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4f0a4349cd83323e4057f7fdf4fbac7864a0741e22219739ed17374522da3123"
-        }
-      }
-    },
-    "data/source_audits/ec_current_2026_11/review.json": {
-      "before_sha256": null,
-      "after_sha256": "0acd88e7752b73df36ceaf4aa7fe8c23984e8026b869ce28d7158b3df31242a5",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "0acd88e7752b73df36ceaf4aa7fe8c23984e8026b869ce28d7158b3df31242a5"
+          "after": "7045ea750defe53c819b69828490a9fa644ed8520c335a49fd574c6986e61a8b"
         }
       }
     },
     "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
-      "before_sha256": "aada9285ccb21694bd1c31b377f367ab9a7b07bf88a9028e9c510c5974a38c7d",
-      "after_sha256": "f6166cedcc9be4f8e868fd7a29bc945a1a6f01204c8b85a03a1346f842a9a6a8",
+      "before_sha256": "f6166cedcc9be4f8e868fd7a29bc945a1a6f01204c8b85a03a1346f842a9a6a8",
+      "after_sha256": "8a7b16b5b936da2a2320f208a80b57fcf630cf1c101ccb8c7e3cee839e94a159",
       "owners": {
         "@document": {
-          "before": "aada9285ccb21694bd1c31b377f367ab9a7b07bf88a9028e9c510c5974a38c7d",
-          "after": "f6166cedcc9be4f8e868fd7a29bc945a1a6f01204c8b85a03a1346f842a9a6a8"
+          "before": "f6166cedcc9be4f8e868fd7a29bc945a1a6f01204c8b85a03a1346f842a9a6a8",
+          "after": "8a7b16b5b936da2a2320f208a80b57fcf630cf1c101ccb8c7e3cee839e94a159"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "c617e1b01e56027ac7563eef82165470e28a4148eb400250d6185f14f667cc7f",
-      "after_sha256": "29e9d56461752527f4b8961ef54ed573bb5626b094fd37a8ad12e88d65a1b618",
+      "before_sha256": "29e9d56461752527f4b8961ef54ed573bb5626b094fd37a8ad12e88d65a1b618",
+      "after_sha256": "afe027dd2ebe74ff351f61d7b272a71a92cc83178b0ba8e0dfeb4f232a9858b1",
       "owners": {
         "@document": {
-          "before": "c617e1b01e56027ac7563eef82165470e28a4148eb400250d6185f14f667cc7f",
-          "after": "29e9d56461752527f4b8961ef54ed573bb5626b094fd37a8ad12e88d65a1b618"
+          "before": "29e9d56461752527f4b8961ef54ed573bb5626b094fd37a8ad12e88d65a1b618",
+          "after": "afe027dd2ebe74ff351f61d7b272a71a92cc83178b0ba8e0dfeb4f232a9858b1"
         }
       }
     },
     "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
-      "before_sha256": "1f620c116e2631d22503ec2f73e6864b8b84adb4e36bd3fca4dd5431b66fdd0d",
-      "after_sha256": "a714e3fe5a7076ba73dfc9dff8eb8820eccbd30ebcd211ea1aadf80a487d110e",
+      "before_sha256": "a714e3fe5a7076ba73dfc9dff8eb8820eccbd30ebcd211ea1aadf80a487d110e",
+      "after_sha256": "2849acfa4b2fe8c15ea9240ff384d0dd69c22b1c7af0d7a24bbec40b4a08df92",
       "owners": {
         "@document": {
-          "before": "1f620c116e2631d22503ec2f73e6864b8b84adb4e36bd3fca4dd5431b66fdd0d",
-          "after": "a714e3fe5a7076ba73dfc9dff8eb8820eccbd30ebcd211ea1aadf80a487d110e"
+          "before": "a714e3fe5a7076ba73dfc9dff8eb8820eccbd30ebcd211ea1aadf80a487d110e",
+          "after": "2849acfa4b2fe8c15ea9240ff384d0dd69c22b1c7af0d7a24bbec40b4a08df92"
+        }
+      }
+    },
+    "docs/FACTION_RULES_SOURCE_POLICY.md": {
+      "before_sha256": "d8c0f775238177d6b5c248c60a8aee5d81af79d415ca853c6ead36a52a2022e5",
+      "after_sha256": "e0d13ac8fb511e9b0ba6343a2552540b1b7c58a756894b9f9bb95f268efabdfd",
+      "owners": {
+        "@document": {
+          "before": "d8c0f775238177d6b5c248c60a8aee5d81af79d415ca853c6ead36a52a2022e5",
+          "after": "e0d13ac8fb511e9b0ba6343a2552540b1b7c58a756894b9f9bb95f268efabdfd"
         }
       }
     },
     "docs/factions/emperors-children.md": {
-      "before_sha256": "145a3d29b6ec55912fe08bd508edfe3493f53a4f652e80498cbbcda6247627ec",
-      "after_sha256": "33c711c393179dfc16405c1d3135e78a50fb26a536a917e78879f3ff8de7bec4",
+      "before_sha256": "33c711c393179dfc16405c1d3135e78a50fb26a536a917e78879f3ff8de7bec4",
+      "after_sha256": "6b1d0c931e076b0c80193d557adda04690d72f6045a489b82c5f2a3ce51f12a3",
       "owners": {
         "@document": {
-          "before": "145a3d29b6ec55912fe08bd508edfe3493f53a4f652e80498cbbcda6247627ec",
-          "after": "33c711c393179dfc16405c1d3135e78a50fb26a536a917e78879f3ff8de7bec4"
-        }
-      }
-    },
-    "docs/performance/policy-v3/ec-current-source-smoke-scope.json": {
-      "before_sha256": null,
-      "after_sha256": "15c726f329b9b81c2e3e4d674e3701b42a44bd5f3fb368904fd9069d7dfc5fb7",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "15c726f329b9b81c2e3e4d674e3701b42a44bd5f3fb368904fd9069d7dfc5fb7"
+          "before": "33c711c393179dfc16405c1d3135e78a50fb26a536a917e78879f3ff8de7bec4",
+          "after": "6b1d0c931e076b0c80193d557adda04690d72f6045a489b82c5f2a3ce51f12a3"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "47d89c89ab2f547ee9ba079a3137d7c77382f3f64241ce4aaf4e164bb4bfdbd0",
-      "after_sha256": "215c6b071b95ec666f21f66e4ca00de24f65ecda8471cf9a8cb5d1f60fb7fd17",
+      "before_sha256": "215c6b071b95ec666f21f66e4ca00de24f65ecda8471cf9a8cb5d1f60fb7fd17",
+      "after_sha256": "ba707552ee3b7cf1e0fdd222cbff1ea64c50f12623616993b582d6e9bbdad154",
       "owners": {
         "@document": {
-          "before": "47d89c89ab2f547ee9ba079a3137d7c77382f3f64241ce4aaf4e164bb4bfdbd0",
-          "after": "215c6b071b95ec666f21f66e4ca00de24f65ecda8471cf9a8cb5d1f60fb7fd17"
+          "before": "215c6b071b95ec666f21f66e4ca00de24f65ecda8471cf9a8cb5d1f60fb7fd17",
+          "after": "ba707552ee3b7cf1e0fdd222cbff1ea64c50f12623616993b582d6e9bbdad154"
+        }
+      }
+    },
+    "docs/performance/policy-v3/sorcerer-source-smoke-scope.json": {
+      "before_sha256": null,
+      "after_sha256": "09dfc3b7d5388074b0047258b26746f9fd5b2e420b806883df1c435d9b0cb463",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "09dfc3b7d5388074b0047258b26746f9fd5b2e420b806883df1c435d9b0cb463"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "5ae5d8bdf28233329969dde232ec832c5aa7fc13fe41e6e3d84ec0b80935f4e2",
-      "after_sha256": "9afd17fbd95bda3638c7e9524f79a00cb9fab8658d2830786ba11d9a9c096686",
+      "before_sha256": "9afd17fbd95bda3638c7e9524f79a00cb9fab8658d2830786ba11d9a9c096686",
+      "after_sha256": "50f37b2e088538f55f1faab9f45c00465f4e8249b67f43f4e366a998d16f0b21",
       "owners": {
         "@document": {
-          "before": "5ae5d8bdf28233329969dde232ec832c5aa7fc13fe41e6e3d84ec0b80935f4e2",
-          "after": "9afd17fbd95bda3638c7e9524f79a00cb9fab8658d2830786ba11d9a9c096686"
+          "before": "9afd17fbd95bda3638c7e9524f79a00cb9fab8658d2830786ba11d9a9c096686",
+          "after": "50f37b2e088538f55f1faab9f45c00465f4e8249b67f43f4e366a998d16f0b21"
+        }
+      }
+    },
+    "src/warhammer40k_core/core/datasheet.py": {
+      "before_sha256": "749906592d0d3a7468afc7e3e4ce85ba5406ee633ef608eb8835b2e8017f9d42",
+      "after_sha256": "c1a9303efc080c67b396578d4ed827ea2e38350e103e9854aa34c176ea72804d",
+      "owners": {
+        "@module": {
+          "before": "e4d87e6add0ff4735324e2514eaeab7d93ca0b026405d8b3037b57b14c946f5d",
+          "after": "2ff5ffc0cb797d2a154e5445d0e303bc6ca33d2295518eed9e31833f4eea95bd"
+        },
+        "ModelProfileDefinition": {
+          "before": "8b488baa7e3e5d4203c20cdc60fbf7c64d8063b8d13fe968578369b1cba06d09",
+          "after": "414585fbaecb73c9f0d886243306fdc3a25cb53c1c2c164f324b964e40a97c28"
+        },
+        "ModelProfileDefinition.__post_init__": {
+          "before": "7298a41298c875b9b5068cbdb2651b6b4214c75c154d883593a2d67f08ccf4bb",
+          "after": "804b27c5fdb05a85fe687e413c1355d5d4e6c1b5b8451fd37c92a039c1f8d3c9"
+        },
+        "ModelProfileDefinition.from_payload": {
+          "before": "312f7c4e42bc537a7420d8668962a63504660e77b4583126ad025d0151ed077a",
+          "after": "a60c48fbdea46d81cd5b690e795ae4ac0ea577be75fda0a008e6f179ffa44ab1"
+        },
+        "ModelProfileDefinition.to_payload": {
+          "before": "9a5798b3e920e64032e4530ee0ddda46d8f196a573d045280792fd01e565c888",
+          "after": "f2f2e25ce4b9a6bedbf1b7fb452bf5564574b7d8e1e14ebd7f3c3f0c30af7b0e"
+        },
+        "ModelProfileDefinitionPayload": {
+          "before": "a6a209249571f794c2e1ae60d876bff51fbc646b47db56c9b78e42d6b6062fef",
+          "after": "bd7e9f3793a7f830df6cc1dd8a7b619e114d32edc654b2dd6df37f39859f8999"
+        },
+        "_validate_model_profile_tuple": {
+          "before": "ca82e69fc3aa9e346273aa1dd958e7c3d63041524a16a5c7ad33411616d1e048",
+          "after": null
+        }
+      }
+    },
+    "src/warhammer40k_core/core/datasheet_model_validation.py": {
+      "before_sha256": null,
+      "after_sha256": "8470f400b2ef6b6d1c134233472518acbf308b783e1d533a08b14716ac6926dd",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "2847fef4e1d14a40effe6f2c54fa497e1864bd3e0dece0543622fd327a6d5bda"
+        },
+        "validate_model_profile_tuple": {
+          "before": null,
+          "after": "1e7ffd32034e09f93e2df339155447363ff9e29c600650212e1ca31e7f72cef4"
+        }
+      }
+    },
+    "src/warhammer40k_core/core/model_geometry_catalog.py": {
+      "before_sha256": "2775585df458da022599168403592c7ad2de40ab86ed7387efb307d5fc5da309",
+      "after_sha256": "1579960d284f646952b263fef997e1e52b779980e83252d5b7d3f6f5d9802746",
+      "owners": {
+        "GeometryEvidenceKind": {
+          "before": "dfcbe092fa8449bda18f78606650f1d0e150497846a2bc237f67f278dabfa2db",
+          "after": "69a3d67dd13c5fa38fb66a680566b251f7dacff98e8a4c807b506298fd761bfd"
+        },
+        "GeometryReviewStatus": {
+          "before": "1f93727f10fd2ea68a99cc9e87145d20522dda2800dc87b488f2beb2c33f4919",
+          "after": "27a3b44387ac7476b28be23b671aa84465f50bc9ccc3bdcb72953e4592f3cacb"
+        },
+        "ModelFootprintPartDefinition.from_evidence": {
+          "before": "03a3c1763ef4dd2b6f1d7188d22ddb435f951dfb4ade8449176d2460b072fe15",
+          "after": "ae719467d5514c28377dcce8d31c43c57a3ac451cbf5cf1cde5cbd5515096922"
+        },
+        "ModelGeometrySourceEvidence.__post_init__": {
+          "before": "e8da359e5bbafe696f1bf279dab6b12e80c688bd37688619b02c976d8f8d6bd5",
+          "after": "67e83b1de8bf95c6d1f317eaafb8fc857088c51391edeae27fb72206902919a3"
+        },
+        "ModelGeometrySourceEvidence.require_accepted": {
+          "before": "cbf7caf4c79dbe17db031897c131c4a02f0f1b62e4646dce1aae97b553808aa4",
+          "after": null
+        },
+        "ModelGeometrySourceEvidence.require_admissible": {
+          "before": null,
+          "after": "6c19f6687666e7234228fe894b59914ad928d6e0720cdeae2bd103719657b758"
+        },
+        "ModelHeightDefinition.from_evidence": {
+          "before": "c413e255799fb164c8ac6b069576e98bd9c805dc698220871f03637686b87558",
+          "after": "f1d1c92d21907073dd680a25cdadb682d9b468c6a2a564df31fba032051c35b5"
+        },
+        "ModelZOffsetDefinition.from_evidence": {
+          "before": "0f30b31f9cbd7e2cb3ad9e2eec3d491a6ac86d78fe74030a2ada345a6e529dec",
+          "after": "42311cedc2ee3b3838ddcdd03257e862603182fdc07cd58fdcc21ce8dc119d35"
+        },
+        "_validate_linked_evidence": {
+          "before": "a5caaab6607fa1a44a22610aa5eb196cb54ff700c96b5238fc2f0f512311691c",
+          "after": "72ffcdf5278943153f0ec2d04ed425e02a12477193ace399eb5177cb84e9c0ca"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/army_mustering.py": {
+      "before_sha256": "4ca230cace66cd337c225dd8fca53d283740918e247a9f28f28bdc810a49dc18",
+      "after_sha256": "4d7a22f5b9f2518a15e12c96a87eaaf4b16cceef4d50daf6c1777c2a9c8a6327",
+      "owners": {
+        "@module": {
+          "before": "b5ebb31893d600d05f28ad372561399f77f0156ba7b7cff12cdc1378ed66c538",
+          "after": "5e0de25aeac9e74d2f4d64a92aca1cddc07edbbdbf18661334293bfd9bfed85b"
+        },
+        "_validate_request_matches_catalog": {
+          "before": "ed8f926e2bbcaf569b4fa10016cf1ed970d73acebb86e02a80283ae6b087b1c0",
+          "after": null
+        },
+        "muster_army": {
+          "before": "adec0613d3df4c685ad38f52570af20bb04c6d33745b3f9122e4c604bc36e789",
+          "after": "f486d12ddab1d7267c3e59d4569a0b6c4097827c463f12cafa85fe1f752e336a"
+        },
+        "validate_roster_legality": {
+          "before": "8a5920988cb32b1c34f0f617b671215794a2b3cbeffde76afbdb840a1977bd11",
+          "after": "9e92c41b370967213684d176c52414ef76c415c3bb80556d41ca1a88b1362543"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_modifier_snapshots.py": {
+      "before_sha256": "b4b93457f58ce8b5f2acf0f72cb513c3a6b689bb777a50def938f890291a8c65",
+      "after_sha256": "baa4aa7e63014cf75b675fed541b90e301b37c07133981a86a5a4417784e9192",
+      "owners": {
+        "@module": {
+          "before": "c41219f485565717fa4cd9270b06fc56323b416662c8ff2ae2a09848e0ed8f5c",
+          "after": "7148e709bfa9a2e9c2dbfb9b99ed5395f343e234d840dcb877f44bd8a97696c7"
+        },
+        "attack_modifier_snapshots": {
+          "before": "98e365205ae618bd3d39771082a464ac90b6a7ade769d2adf3c72cd957d436f9",
+          "after": "8d62c0541fea160a8a78e541e6fa6347f755d1001b487566d7a42ed5254c04db"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py": {
+      "before_sha256": "0319a909765e527d035ceac7db83aa7a06d68682e0e1667172176b7f6324b198",
+      "after_sha256": "50652106cf04e19420c96a1711fbfcedb47c96972293360ed87ffb99a1240115",
+      "owners": {
+        "_benefit_of_cover_ballistic_skill_penalty": {
+          "before": "a2558a77c9b79dc36df34214159babf415c49a88f361ed89ad65138f190f61b3",
+          "after": "06dafcb60057fbfc355cf909c1094c70c95bfa2517eafc3f031d09ec907e99e1"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_attack_context_rule_runtime.py": {
+      "before_sha256": "a920a36eb083279fdee81ee52a037e75cb8570ee0f08a068ab1c265bc72083d1",
+      "after_sha256": "40aa72ae6e7fa552935ed2d9aa4f601f50b8ca85aec6c44fe256077a0d702dd5",
+      "owners": {
+        "source_currently_leading_rules_unit": {
+          "before": null,
+          "after": "ec89c91223ec338716d3a76212ed4fd65cc35b02c23ad4fe051f7bbfe2317cd5"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_cover_grants.py": {
+      "before_sha256": null,
+      "after_sha256": "7e49348b78f7cef8ae2a02dff8bc0bc1a6524ec233bdc6dedb5702a5524e7d23",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "db421e63605a05c78a040106c25ab8cf21dfbb6772f59608dfda7b88f7e8821e"
+        },
+        "_grant_handler": {
+          "before": null,
+          "after": "9b3961303504a6d32b3d728e6a3a9556907bbfb1387b83609a361b3de5abb8a6"
+        },
+        "catalog_cover_grant_binding": {
+          "before": null,
+          "after": "1066e7ba3a6b09c371d5060b464e3c00fd68873019a64396155e4b839be8dfc4"
+        },
+        "catalog_cover_inventory": {
+          "before": null,
+          "after": "efc6968a47d5d6bb8c5f1554f87468efa6ae0ac2aea34f860356289bddd88f61"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_cover_support.py": {
+      "before_sha256": null,
+      "after_sha256": "231b031ee277f087268691d3e47b64ed0bfc2b3a6ae4dc2ee68facd8e5d81f3c",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "f2095188d74bb21ccf475928f9a0bbd934347decfc5017619927da86bd00661e"
+        },
+        "clause_is_leading_cover": {
+          "before": null,
+          "after": "b94713f04a09bad8542bcdb6f754a31ba7d3d839a67b8efe91d09e3e586cd3da"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_datasheet_rule_runtime.py": {
+      "before_sha256": "bc7b7420dad140b189c3b31f6b671d8d99954c6478a16feb28be0a5d31fab0cf",
+      "after_sha256": "7cee9b9ccdd685bb09de21ec854777baa2910e80c81c6d213606e6ef1ddd1592",
+      "owners": {
+        "@module": {
+          "before": "4a45e610be0809b47200359e1c8bf58a14894ff95cb647f2ab9b75d8889bcb13",
+          "after": "81f37f965a44c5efe6cb9cb0c511d389c49eafef2ededcf034ba8324a63950b8"
+        },
+        "CatalogDatasheetRuleRuntime.model_ability_grant_bindings": {
+          "before": "67c0de38541e223c8d47bcbd7753f497e6d6cd322bd6a2e70b9d1fb0319f6359",
+          "after": "faad31b7d55a6402642b17dff01ed1c081b2307a41393ce0fd176cf7686cfefc"
+        },
+        "_source_currently_leading_rules_unit": {
+          "before": "681f07816ed28cc65e39956e32269260f3d44d0d666e016c30715a7f3db28ba1",
+          "after": null
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_datasheet_rule_support.py": {
+      "before_sha256": "e7414b0610b41d55d5496f144793f102741a1fe25ddb6be33bf7570569973da5",
+      "after_sha256": "de63eb937fc7d9eca433ad4e0408ab2ca597f34e1d5ae1397dfa6912558be4c4",
+      "owners": {
+        "@module": {
+          "before": "1138de050a1f073120a38dd6728c1fd894eb7f98ce6ec81f1a681507cf97557c",
+          "after": "d54ab1909ea1ce93395f434f799644146932dc86d96c694df5363be016827131"
+        },
+        "clause_has_invalid_exact_datasheet_runtime_shape": {
+          "before": "e1545ad2af22baa408aef78d432186b775a20add31d6dc69fddadebc0b6fb79d",
+          "after": "5aaa7a4868e2c7af7891875b7d4fd7b2eedbe228ead52ccd8890b8d5c1a61ff3"
+        },
+        "consumer_ids_for_clause": {
+          "before": "963c7c19448cedf115299d28b6f6335985c8f32864d04bd6a55b3da0f8ad7d7b",
+          "after": "64012b2711bb0e219e9da013c50ce9c5dcbf74b8ab344806a11022aaa88ffbb9"
+        },
+        "registered_consumer_ids": {
+          "before": "51422e0c05e425333347508600af096c60cad46ccae6d7870f21c5a2cc1d1238",
+          "after": "293948707f45843c95232015b24fd83d2be8369a2691cdba0b63069058541bbd"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/native_gathering_cover_rules.py": {
+      "before_sha256": "319b8e220ea7d02caabfac61afc3a41554893a0a6ee8588c809833ab616c52ab",
+      "after_sha256": "66a976554ff0398ba2f1dbbf88d329d31eec4713e9716582ae8db20d3546e1bc",
+      "owners": {
+        "@module": {
+          "before": "1925d5ac29343ed0f83753f8bf54f74ddbb41f6e3be319098789d471db106888",
+          "after": "25cdf49267bbea20b07311e375511ce38e583e50ba31382a2edc812bf4e9a193"
+        },
+        "cover_gathering_inventories": {
+          "before": "8d32f17c49f1be6bf50c93b4ca11569e66ab72a818970e7417773f37793ef34d",
+          "after": "877bcc7777db95edc0345ca4f9c8c6929ed4c6ec24263b057acbe9042eff3be7"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/roster_bearer_validation.py": {
+      "before_sha256": "12899e9972591bce9ce5fc14cc4381651a9ab22b54f900c8172ccc15b7c7272d",
+      "after_sha256": "d1d7c2a327a589999fddcb38cf2e332ab2049fd24643fa29ac9ce780ade55147",
+      "owners": {
+        "@module": {
+          "before": "fa21d4460f1900814f7486f10929a84916fffc259e1857e4c024a561f4c4f8bb",
+          "after": "60eff6ea95d858a89795cb09dc929cebad5df17187b4c22ec88226aec1d78f71"
+        },
+        "RosterModelResolver": {
+          "before": "6f5732f9d9be90f689c5e8e472a3869523ea9673e8acec1873ddc04f47cc80bb",
+          "after": "706ba43917a0e6f6940b59140de5b872407bf985d77bfb25f64594b494a5ecd1"
+        },
+        "RosterModelResolver.unit": {
+          "before": "8e37779949efa09bb0e368fcfd189213be2fd84af607c23b001c257dd5de3596",
+          "after": "48e683b56037c74e054df7c540468bf5b1e845bf976697e7a71eedf659331a1c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/roster_catalog_identity.py": {
+      "before_sha256": null,
+      "after_sha256": "ca20f3ea4f4c473886a31cd4446fa8ecd69b764c770ea5da19f0fc6026486a78",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "7171c00fc7c575bfdc812137643f58e5c4842a9f6aea3e44278cbad8c9307b36"
+        },
+        "validate_request_matches_catalog": {
+          "before": null,
+          "after": "6e0456debe92b4bbacef5de24205354c7268588e71d143cfcb450fe5fc4d3719"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/unit_factory.py": {
+      "before_sha256": "9f79236e4ee94c3daa9f62a8c5bb032a721d5a1676ed1a17d50a21c422853c82",
+      "after_sha256": "08b37fc7b5f218bd1fad749a2d8bf0cdda3a64cfccc305291349ecc893782568",
+      "owners": {
+        "_model_geometry_for_profile": {
+          "before": "0ec21cc58cd87c16125aa908267e1f401c520ab4e76bb4525847717a4b65cc6b",
+          "after": "08a7e0a0941d9fde83c07f190a9fd5bee476ae11e19c3cff87da0d1b53419330"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/catalog_generation.py": {
+      "before_sha256": "84c9cab1ecf33d9b4d8a029225c1e22efe22f4325c5ab7fc9bf6528c60e9cf74",
+      "after_sha256": "c4b48d34e29a21e3beb2ce0738f4cdea7ef0c33d2b39916a9248eb6242d5e24b",
+      "owners": {
+        "_geometry_record_from_model_row": {
+          "before": "bc4e00dad60557e0e8901a905be104c777102892498e515f75785199f662371b",
+          "after": "292ff604f598c60e24565f3754fea12d40904a096b855a30dfea1359fd10b661"
+        },
+        "_model_profile_from_row": {
+          "before": "a7f39cd63b551ca0e4032d94b611daccb1eecda8d75b1d987df034567f49e2d4",
+          "after": "5f9544cc73c0b61241c972a3f880fc23eda884ff89a3f38d5dd94e39e8a91c71"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/__init__.py": {
-      "before_sha256": "3ac4e7f5a2675a3b0c153986432a0fdad098a1e3f58878986cc725ca9cdeb264",
-      "after_sha256": "d964dfda6be13d6562368deae73afe764a4ddace7363a5d4ba12c06d058fe0a1",
+      "before_sha256": "d964dfda6be13d6562368deae73afe764a4ddace7363a5d4ba12c06d058fe0a1",
+      "after_sha256": "2d1e64e71e56a481099ae8bc4df71cd6d2e371ea38e43eba5e6b58389c374fd2",
       "owners": {
         "@module": {
-          "before": "b6959cac22e8aedb8edbf0ce0640fefc542e0b80c11b9ede446c083803304e3e",
-          "after": "30050c9cc70eb30712e307426e86566feb006335862d8d601d09d87ca8114079"
+          "before": "30050c9cc70eb30712e307426e86566feb006335862d8d601d09d87ca8114079",
+          "after": "002e54bce7cd082ff0606e5d29f0b54c98c5fb9d4a9c8d4949c75d0917a5be51"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/artifacts/catalog.json": {
-      "before_sha256": "c349f5fe2614f43ae78c150c98e571aa9f892db7f91722468a23204e666a2e1d",
-      "after_sha256": "900c0f80e297e57ff160c85e49089935395204be47670a6e081908844ec81744",
+      "before_sha256": "900c0f80e297e57ff160c85e49089935395204be47670a6e081908844ec81744",
+      "after_sha256": "a044fb36d809c88c7337dff40dddefb2c38a870645bd3a3cc88c8c3bbd3f5469",
       "owners": {
         "@document": {
-          "before": "c349f5fe2614f43ae78c150c98e571aa9f892db7f91722468a23204e666a2e1d",
-          "after": "900c0f80e297e57ff160c85e49089935395204be47670a6e081908844ec81744"
+          "before": "900c0f80e297e57ff160c85e49089935395204be47670a6e081908844ec81744",
+          "after": "a044fb36d809c88c7337dff40dddefb2c38a870645bd3a3cc88c8c3bbd3f5469"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_current_2026_11.overlay-pack.json": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_sorcerer_2026_11.overlay-pack.json": {
       "before_sha256": null,
-      "after_sha256": "eb081b3b482fb52d8ebdca367937675134199359f799607aeb98d93984b80d59",
+      "after_sha256": "735e021d0df16ee20f54f742a562152bed109c77ea600e35c90420abc8c7ab7a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "eb081b3b482fb52d8ebdca367937675134199359f799607aeb98d93984b80d59"
+          "after": "735e021d0df16ee20f54f742a562152bed109c77ea600e35c90420abc8c7ab7a"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_current_2026_11.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_sorcerer_2026_11.py": {
       "before_sha256": null,
-      "after_sha256": "c85c62fe137aa93139e75f431ca22d61bfea6f262b103c94e46d19b80ff11dce",
+      "after_sha256": "5582567775ffa248c99b71232a757e004f96206fe7ae0c4464d438228937eb50",
       "owners": {
         "@module": {
           "before": null,
-          "after": "d12af6cbec620498af19a0947406f055cedc32dbdb466a49c0932457c6db0e1c"
+          "after": "a50f9c866a6f42926a6cbd7bb5af80c158cc8ec04273e32d04f92b98ebc21dbc"
         },
         "overlay_pack": {
           "before": null,
@@ -328,191 +620,273 @@
         },
         "overlay_pack_from_json_bytes": {
           "before": null,
-          "after": "68ec911c628b173cdca1c7f6f65e29cff14fcf709e6f8485f5c48fe34e0cb635"
+          "after": "d76fd368051481025ee73c2e9cad034005ff0c4023826e3eeee7cb4ae95d888a"
         },
         "source_release_manifest": {
           "before": null,
-          "after": "d4e468a5499ec038c1ce57a77ba776792124225388c4b68cf70b77f7590a5e97"
+          "after": "50e6b6ee70bd67f62cd144fab883a11bb4b6ff9065ff8da6f8dda6ee6b225872"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/__init__.py": {
-      "before_sha256": "d7e19b1419273ecb7c5f6c7114d534582185bc6e0ff4a18b167a39414097eff5",
-      "after_sha256": "f8d515e40cb1947fca53021a85ee7b2179cf8277df4c9b2393c9c912bd04dfc4",
+      "before_sha256": "f8d515e40cb1947fca53021a85ee7b2179cf8277df4c9b2393c9c912bd04dfc4",
+      "after_sha256": "41a559aa7081407f6752a9c2cc1afa372eb5e66e6c684702427e346a941e050e",
       "owners": {
         "@module": {
-          "before": "6d04071cc8dd1cc0d5dacc731f045e81ff6626763e209a35f40333ffc00ae001",
-          "after": "71a6ee0b812bb650a24ca5c53e5c6e6d459bf3cd00823421b3a52c34468574dc"
+          "before": "71a6ee0b812bb650a24ca5c53e5c6e6d459bf3cd00823421b3a52c34468574dc",
+          "after": "14b3585969050ee642ca01e32ecb7f51698590ec288216d1b494f899a0057e95"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/_artifacts.py": {
-      "before_sha256": "62d520932a0080585101a3e9a933d9035ed1ccbb541bdaafa270a8c5c6160a00",
-      "after_sha256": "e435496ba1b2278e99f3fcf412db7633d0a4936c4514a816d47c9eee379fe19f",
+      "before_sha256": "e435496ba1b2278e99f3fcf412db7633d0a4936c4514a816d47c9eee379fe19f",
+      "after_sha256": "2533d6497fef6cef30fe6e601ad694656efb86dba17d44ced01febbb9cc3b34a",
       "owners": {
         "@module": {
-          "before": "259d189d3cfab9b108377ed9482f7fd9e16d5357e07d6769d5f60e16396a943c",
-          "after": "4ec73379190900daf5ea535d335d7da679e7f5dac069d3858a30b6c78ad54e86"
-        },
-        "_OfficialSnapshotSingleDatasheetSourcePackageWire": {
-          "before": "0a452ca50754ed3d1a5703d95a41ce07fe96c585bdf6d2c45667bf0b2c09b800",
-          "after": null
+          "before": "4ec73379190900daf5ea535d335d7da679e7f5dac069d3858a30b6c78ad54e86",
+          "after": "7feccd27106f14cd4c7fab2c5a72e2b5abb0c77294f2eaf39259607fa267b9ff"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/package.json": {
-      "before_sha256": "60afad5af52c1c36468239d46f977d9b9f5148a52477094b53ebda62b391e9f0",
-      "after_sha256": "603ba44077a8c97cc21b19530148b5d1394475fd48df0235bb7a6ae4f76a3a96",
+      "before_sha256": "603ba44077a8c97cc21b19530148b5d1394475fd48df0235bb7a6ae4f76a3a96",
+      "after_sha256": "40c54893dc57657104c74237f4cf877080b57ca367d9e08709d747362eabc0d9",
       "owners": {
         "@document": {
-          "before": "60afad5af52c1c36468239d46f977d9b9f5148a52477094b53ebda62b391e9f0",
-          "after": "603ba44077a8c97cc21b19530148b5d1394475fd48df0235bb7a6ae4f76a3a96"
+          "before": "603ba44077a8c97cc21b19530148b5d1394475fd48df0235bb7a6ae4f76a3a96",
+          "after": "40c54893dc57657104c74237f4cf877080b57ca367d9e08709d747362eabc0d9"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/emperors-children.json": {
-      "before_sha256": "a81563c0f584b1768ebb5961eff0b4c47ab66dded74986928d89ebb134da01b7",
-      "after_sha256": "f0cfd493378ed0ff88e47935b13d6fced2c78de2b58f02f2099b5d8a495ee111",
+      "before_sha256": "f0cfd493378ed0ff88e47935b13d6fced2c78de2b58f02f2099b5d8a495ee111",
+      "after_sha256": "920fffd77f9209aad4b9c7024321d694ee1b1a15987a18f9e970b4a064d88e89",
       "owners": {
         "@document": {
-          "before": "a81563c0f584b1768ebb5961eff0b4c47ab66dded74986928d89ebb134da01b7",
-          "after": "f0cfd493378ed0ff88e47935b13d6fced2c78de2b58f02f2099b5d8a495ee111"
+          "before": "f0cfd493378ed0ff88e47935b13d6fced2c78de2b58f02f2099b5d8a495ee111",
+          "after": "920fffd77f9209aad4b9c7024321d694ee1b1a15987a18f9e970b4a064d88e89"
         }
       }
     },
-    "tests/code_quality/test_category_migration_preservation.py": {
-      "before_sha256": "cc5bde48d53cff504ad25831491955066401602a9095f26b5ac3c10e9a907c99",
-      "after_sha256": "e0547fef5fdb3c5c8e0517ce9febf84e28b4d8cb6c6bc7bac9bee6aaae08c773",
+    "src/warhammer40k_core/rules/wahapedia_bridge_defaults.py": {
+      "before_sha256": "9b8843d9ea2c45d2231bf7621b5f10be058971d6cfab058ee96fd28a416530af",
+      "after_sha256": "4a62b9c447771b218ab6c285cba87718708a9d746761e9d0604889c3f5207401",
       "owners": {
-        "test_defiler_registration_retains_exact_acts_predecessor": {
-          "before": "fa9cddcda7979741f7565f43975e3cc8c52a1ce80bd3b7b0aa610ad15bf6de05",
-          "after": "cf6ee95f1277d55ad9f87d40bdedfc55978597344c2d7d4f13d521ebe87dde7b"
+        "@module": {
+          "before": "79306aadd7887b268ec33fd8248ad30722a0c3120c8a827d1ad18d3949fbed31",
+          "after": "1578d62954da09b6403c99f981891afad8ba88233a244af069389dac0577bb18"
         }
       }
     },
     "tests/code_quality/test_current_comparison_routing.py": {
-      "before_sha256": "d26cfb7bc7ee1225cc805d26b8007be5fd64f6d019ff2bf1d686eaa3523b56e2",
-      "after_sha256": "6b63f3f4d8ce44cb40376dc793741e72fa75ba128d995f390f8bc1d07df9ee0f",
+      "before_sha256": "6b63f3f4d8ce44cb40376dc793741e72fa75ba128d995f390f8bc1d07df9ee0f",
+      "after_sha256": "84102ad88a6cb0f1c189b8e45244a56c6db096656b640893bd681753e8870903",
       "owners": {
-        "test_current_ec_source_smoke_scope_requires_exact_base_bytes_owners_and_category": {
+        "test_sorcerer_source_smoke_scope_requires_exact_base_bytes_owners_and_category": {
           "before": null,
-          "after": "8930e82131121c9a4fb891b6b3145e695358ef76b3dca239f2339967a16f710f"
-        }
-      }
-    },
-    "tests/code_quality/test_registered_source_scopes.py": {
-      "before_sha256": "f6b8f381b48aa92d15ec271f3e46789a8d36a7c72a402c63dd1e652c91bb4e85",
-      "after_sha256": "ebfdf03a69eb8bb715ca1b187ab8892e30e9cf1637fd02db23fb3f056e6fd924",
-      "owners": {
-        "test_current_ec_overlay_projects_only_exact_historical_base": {
-          "before": null,
-          "after": "9999e87670466c8927225cd179725b5d88935612afeadce5798d2a55021374a6"
+          "after": "37ed5b1244681c9cf49e995407e3041f226f605766eba53e1aa24f303f6662a9"
         }
       }
     },
     "tests/factions/emperors_children/test_selected_consumers.py": {
-      "before_sha256": "095d35261a80fe87d53b9a011b0a9646ddf73c69e11d701df3cc44f2a3811a2c",
-      "after_sha256": "ec5a51f2118a2038a598c6a2ac149e2b4b72dce06460ac743408cea1e39032c5",
+      "before_sha256": "ec5a51f2118a2038a598c6a2ac149e2b4b72dce06460ac743408cea1e39032c5",
+      "after_sha256": "93b04b6f10556d747d9e85394603b26ccaaa385352917c61d7dee0ca0e277636",
       "owners": {
-        "current_ec_definitions": {
+        "sorcerer_native_shooting_checkpoint": {
           "before": null,
-          "after": "a1afbe25e3ef308239aae5f9c85ede07386609cb8b4267107fbea1b118823456"
+          "after": "3078dd554f1caedae3ec9052b4f84636fb1b282b9fa8789c5356378db2bcea94"
         },
-        "test_current_ec_source_overlay_is_closed_and_preimage_bound": {
+        "test_explicit_provisional_geometry_preserves_uncertainty_and_rejects_unknowns": {
           "before": null,
-          "after": "59fba9f9efdc24cfe409eaae786ab8e5bc48754cc3d0f4a20831974c32718d8c"
+          "after": "6bb705a2e394daa4bb1ad26487c6e759c08a2b3746366bad34e0859319aa972e"
         },
-        "test_current_native_toughness_changes_real_wound_resolution": {
+        "test_leading_cover_rejects_unrecognized_source_descriptor_scope": {
           "before": null,
-          "after": "a96527835be004683844945b83a5d26eec4f38e48edf139d92adbf26a7581c7d"
+          "after": "a8377ca78e37d0535da5a00d59a996bd7e7deebee5f8365271ee712c1aecd440"
         },
-        "test_current_packaged_court_native_profiles_mobile_and_roundtrip": {
+        "test_sorcerer_bodyguard_hits_do_not_activate_its_wracking_agony": {
           "before": null,
-          "after": "98218dfff7cf6ca93d8d56f286a19915427bc885d22bd1f6810557fbf0419c7d"
+          "after": "7f1791b00d086483a829afb6f6e244c609b7c78aeb90a74ec312b0bd461e5dcb"
         },
-        "test_current_terminator_native_weapons_change_wound_and_armour_save": {
+        "test_sorcerer_current_native_muster_geometry_equipment_and_leader_targets": {
           "before": null,
-          "after": "d13c0284d533c3ea7e1e8db33b290f06570db903a61325dbf1ece7eb7d92038f"
+          "after": "b854453c09b1ad851df7cd8ea7bc92a730ce6a66bae86b13054e7af9423df945"
+        },
+        "test_sorcerer_muster_rejects_illegal_bodyguard_counts_equipment_and_missing_geometry": {
+          "before": null,
+          "after": "5a1c2e18f1d21b2cc5f7932169e7baa028e79fc1b3348d2db2a46c397032a9df"
+        },
+        "test_sorcerer_native_agonising_hits_on_non_infantry_do_not_offer_wracking": {
+          "before": null,
+          "after": "f5e019b281b3b97ff748a87c4119050c7c216d52402dcc75c34d0158fe204327"
+        },
+        "test_sorcerer_native_bolt_pistol_hits_do_not_offer_wracking": {
+          "before": null,
+          "after": "1930da0712d374fd86d79d7014ebb54d5662c43a84806abb6f44fc39b9eb65f7"
+        },
+        "test_sorcerer_native_cover_is_conditional_and_respects_ignores_cover": {
+          "before": null,
+          "after": "aabee67ed8b82257e257c932536404d293f5070feea880f4e7e6840a2b9830c4"
+        },
+        "test_sorcerer_native_misses_do_not_offer_wracking": {
+          "before": null,
+          "after": "561f274ca7e191be3926b2f99278135a411469c9e435f8c24cfcdb1ff044176f"
+        },
+        "test_sorcerer_native_overwatch_hits_cannot_trigger_own_shooting_wracking": {
+          "before": null,
+          "after": "39adf3895f6d956d106827dac52f9fd5ee515e8e244f81dc738f66baad8119cd"
+        },
+        "test_sorcerer_native_shooting_cover_wracking_and_exact_replay": {
+          "before": null,
+          "after": "b61c3c7e81a422f15554df27679a48eb47172646c20f6659d3d5fe082fcf37cb"
+        },
+        "test_sorcerer_strict_public_setup_requires_provisional_geometry": {
+          "before": null,
+          "after": "3ea652ab1fd2fea164c47e61280a95c6376bd3a6a1820b2c006506deee6762eb"
+        },
+        "test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement": {
+          "before": null,
+          "after": "b01c1dc0b0c1c40680204af2ccb98fcf73c21f8c585f587d6402e1904c730985"
         }
       }
     },
-    "tests/factions/emperors_children/test_shared_attack_consumers.py": {
-      "before_sha256": "86d2e97316b3eae92ae9097e0e9c0198f74ba3257b7dfbcf0030c0a134a94fb2",
-      "after_sha256": "bb7b42cc78b53acdaa324ea19a93747ad1b53d69fe73eae37f4481f356d6ce23",
+    "tests/support/sorcerer_native.py": {
+      "before_sha256": null,
+      "after_sha256": "1c47728a91fe839f1dbc0094386b84180235d020626512c789c7b21660f40a7c",
       "owners": {
         "@module": {
-          "before": "39391e5ac6770ee7d44f26a0c71dbeba18c980af4f57053526db10a235e74a85",
-          "after": "fa2ebbfc7788e453b1397c8fa2dfcc30b2ac10ebc72b4f82dc2a49b77b206f11"
+          "before": null,
+          "after": "980ab6996d8d328796599fd62d1d3aa6c664739378ad199ecb14dec28862a938"
         },
-        "test_native_terrain_transit_witness_and_committed_consequences": {
-          "before": "8909fdf944d59848f12d8df7a7117d1aec3ef226f87f9f619dece89ae52b5949",
-          "after": "9286b1a9e102d5ac91dcd128a1e898022bec66fc3dd8551287f62df67fc4d8d3"
-        }
-      }
-    },
-    "tests/support/acts_preservation.py": {
-      "before_sha256": "1efa8cfb9a482e851645c5e4ffd9bbb5221ed08b952230f2a6250ad98360de73",
-      "after_sha256": "7651c1d5d29ea8043059a672e56bdd4a024c134a0d667d25bfb56a0e94a77b0c",
-      "owners": {
-        "defiler_provenance_predecessor": {
-          "before": "c45995e27697a870c516bc8889157b5f564fb2a8db3fc5fec17f9b8abdaf8678",
-          "after": "90c3d5136cd71b09797fefcca246f10a93a16866d0d135436399e2891e46c46a"
-        }
-      }
-    },
-    "tests/support/terrain_batch03.py": {
-      "before_sha256": "af07dca55e3058be2b8a2642df289a73566ed3b3f0d2c8b045caa7431ea059fa",
-      "after_sha256": "d6326168f61a0d3eb56a378c9d82f5bed4bbbdb22bb82b3efd54aad48f44c55d",
-      "owners": {
-        "path_payload": {
-          "before": "a782c4b7aa311c63d75a487dc2b14164d93beabce6dcfaeabbf95bd682b7d8b8",
-          "after": "18baee8fe0c476f135c8b0f2117077e05be708372dda62e58438ba84af241732"
+        "deploy_native": {
+          "before": null,
+          "after": "fd5bef2d40d3e46007106ca8d17e4f3a6cbffb9e0b63e80b3c1c437fdf21c39e"
+        },
+        "native_choice": {
+          "before": null,
+          "after": "24dc6594368438de5b6d1dab8afc169ee0748344e7d4ccfd0bbfbae8c7ed911a"
+        },
+        "native_declaration": {
+          "before": null,
+          "after": "2046f7e3b0948b8315f768a83457a979b7a7879970a76ead585f0284ff97999f"
+        },
+        "native_fire": {
+          "before": null,
+          "after": "b606ee73e41f9353cbab9c925af5556efe75a4b485193095a87c3f51ed0c63c4"
+        },
+        "native_request": {
+          "before": null,
+          "after": "2fa99749159833c76edaec5ecb2d227cd2bcab338a11a2761ac02dd533a33c7b"
+        },
+        "native_selection": {
+          "before": null,
+          "after": "7193512ef8b23bf0812f64dbe6920358b47e3fec021cc5b82cf4ae26512bb8be"
+        },
+        "native_session": {
+          "before": null,
+          "after": "ed17263f6a1575ad17ef39419f78fd85ffd8dda6097ad263925499a1e5b3b981"
+        },
+        "native_sorcerer_overwatch": {
+          "before": null,
+          "after": "c3120703f2123454ed8dae8c45ad78f899f49bde7a028a31769b0eae17ac9ca5"
+        },
+        "translate_native": {
+          "before": null,
+          "after": "af6de980195bf5ebe42e5edc41fc769ed2efe172b7c01e15bd5b0f5e21178fb5"
         }
       }
     },
     "tools/ability_support_sources.py": {
-      "before_sha256": "de7f781cbd8d1a8016a64bcee58feb24722876c258192cdf96bebe0a939d4873",
-      "after_sha256": "dd89b8d7453ac23d7ea3ede565be979c8abdc1c631460e228e265e398fba4692",
+      "before_sha256": "dd89b8d7453ac23d7ea3ede565be979c8abdc1c631460e228e265e398fba4692",
+      "after_sha256": "179fb1af416e0385271d7383f92c48b1005bede7900e95adf7654ba0e50f97ed",
       "owners": {
         "@module": {
-          "before": "0cf32e1b562df58010654b2f9447a5a83966ca3b8dac07c5ec4f1f8e1d2f5af6",
-          "after": "fa53eb355f191b18ea0a1dc7e9968350f8491f0f1a21547264504623c9860681"
+          "before": "fa53eb355f191b18ea0a1dc7e9968350f8491f0f1a21547264504623c9860681",
+          "after": "80603ee67290b56e096fdbd68278889c9ad7ace4ef6b8624f3851430fd5be333"
         },
         "ability_support_index_inputs": {
-          "before": "c4c927908a0d934709737aadd9297c2431503f2078ec5b0e667742191e5c8d75",
-          "after": "d5db6e92d55d148f7316c354a8be7f69b0a129ed5d617828653bee7d5c5297d4"
+          "before": "d5db6e92d55d148f7316c354a8be7f69b0a129ed5d617828653bee7d5c5297d4",
+          "after": "fa3e5a33381e4304a9dff50575346c6bfcf633d557689994d250331fac1fc16a"
         },
         "load_ability_support_sources": {
-          "before": "2355ed0e2433ae4e256a5840b749b89644120bce89c053cbe8ff0131b5a3c494",
-          "after": "2802a7285098899f07d0a47ac6393f65b709a5a3d8eab4b3f54c5f6842256c10"
+          "before": "2802a7285098899f07d0a47ac6393f65b709a5a3d8eab4b3f54c5f6842256c10",
+          "after": "d93bb882b2d4ed690e7d698be2b76bfdbbd006f750f8c8e5553e6e021d47d0bc"
         }
       }
     },
     "tools/emperors_children_support_report.py": {
-      "before_sha256": "3f61891f9e933c289f937449957bd00369c6ff1ae112f35a1b273f453cd8a088",
-      "after_sha256": "da4affe91b538e6bef0dab236414f678ade5d6ae8496d69494b8c55d5208b840",
+      "before_sha256": "da4affe91b538e6bef0dab236414f678ade5d6ae8496d69494b8c55d5208b840",
+      "after_sha256": "c614b4e3ca243976c83a5decd0b67e2b9aa80587171b0573320be9ae9c69f29f",
       "owners": {
         "@module": {
-          "before": "1e998f5607acedf574c7ae24b3b25effef0cc1cd39aa6324c9d11491b1d58877",
-          "after": "0d2c6d3bfdc4f79903c7869175a25962b27eff3132bcd225edb57f1b904c673a"
+          "before": "0d2c6d3bfdc4f79903c7869175a25962b27eff3132bcd225edb57f1b904c673a",
+          "after": "cd195084586f902fd167b932478942326dde58139834ecee20ff93326b53fd66"
         },
-        "emperors_children_secondary_reference_audit_markdown": {
-          "before": "69cc69747cccf03caff4deb22d30f2c53c06b0184043aa5a901fef7e290b5dd1",
-          "after": "8021bef891dfea8196e0152350317b2c6a449c9e8b384c32e108eeff6dfbf54d"
+        "emperors_children_datasheet_support_markdown": {
+          "before": "c565a67ca141f5bd25d9912cb71db29310a07f0723577e7f5a58de2706ecc31d",
+          "after": "f9f4c739e0b8f76c2326eb03a0407d64a052cc63f110a914175d6988cca78b97"
         }
       }
     },
-    "tools/generate_emperors_children_current_source.py": {
+    "tools/generate_ability_support_matrix.py": {
+      "before_sha256": "1c30c7d8813aff9e9eeccb9d2305c6823c084ba955f6ae2ae83b517076f14760",
+      "after_sha256": "637133b98493843facac8dea1a0887905e6443c3a0b355af1a1670b08288d4b8",
+      "owners": {
+        "@module": {
+          "before": "09dd7e273d5024f31d2ab3eaa5afaa63dfdc684fcd9085d671ee4f503caa285b",
+          "after": "6643a9b33a30d026df6925f9fdafd868953e3ffb22478cdfb9fd91c350b4cd73"
+        },
+        "_ability_support_catalog_package": {
+          "before": "17abfed629bcd9fa3290e442589c82b6d587fd62b363518d9d189c726e01abf0",
+          "after": "f23859c4b6aa641a420700d63c2304a1b2f3f72a75dbd9e21ed414bcda5a0f2f"
+        }
+      }
+    },
+    "tools/generate_emperors_children_sorcerer_rule_ir.py": {
       "before_sha256": null,
-      "after_sha256": "203f52b8c0a7a8fd876ff6478c13a0846cbc65b7d13a0ba76481f9d20fc40020",
+      "after_sha256": "30837c0b676babc008f2f76031e2098f7eb1d0311889f4fe3d4027a8276b7987",
       "owners": {
         "@module": {
           "before": null,
-          "after": "19b5d16c3e4f6a816c00502069a3956b3a52985f5b0bbb83c784de05067c9c6d"
+          "after": "2020eb9d183e5cfdd5b934158d22b62dc0a1f1a5a33e45f0a06a083268f04bb9"
+        },
+        "_parameters": {
+          "before": null,
+          "after": "01dceacd35b2af3d04be14ec77df5abbcef5ed4435b9f73e25e412e01c6e512d"
+        },
+        "_rule": {
+          "before": null,
+          "after": "f9820518aeb9bc137afbf3e94c6b7b031510396def041a1b6cbd2cfbecc4fa4c"
+        },
+        "_span": {
+          "before": null,
+          "after": "f4c4ebbd51f82d82335965ef9690d235a51936eed0dee21d83ba6ea0abd3c902"
+        },
+        "_warped_interference": {
+          "before": null,
+          "after": "6c8603c27e1500df2fca395f27234226f67d98d886287a851b062cbce599801f"
+        },
+        "_wracking_agonies": {
+          "before": null,
+          "after": "c843debb68fb441409bc95a74ad312866ad74035e84d67f0b7712f4d26b78cba"
+        },
+        "generated_artifact_payload": {
+          "before": null,
+          "after": "88dce55263143b627b3ae65d68d6c32263e392754615b860020c8016830602fa"
+        }
+      }
+    },
+    "tools/generate_emperors_children_sorcerer_source.py": {
+      "before_sha256": null,
+      "after_sha256": "25b23b2fd423d3bbd583349426d9c0cb5343e40a329417fe8456ac7102b41a25",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "35a746d545fecc2a71caddc92a4d18b30570725f7b11fcad33bc4ce9c5691d01"
         },
         "generated_overlay_pack": {
           "before": null,
-          "after": "f8f8ff8b0ff9f0ea99b1ce0f40a831b2695448952fe4f108af5cf71d1a25ea9e"
+          "after": "794d8e831d5929c7a7c8b35751a82d923900a2c73aa0c89d0baafa5761e15852"
         },
         "main": {
           "before": null,
@@ -520,85 +894,55 @@
         }
       }
     },
-    "tools/generate_emperors_children_fulgrim_rule_ir.py": {
-      "before_sha256": "247dfdb905008a789b4007ba348562f3161c3468c89069d34f1798bb154282fc",
-      "after_sha256": "6818b6f20ee9d52688fe8d175e4389dc6a9306b510366ba0ea511a2593de470d",
+    "tools/generate_faction_rule_ir_bundles.py": {
+      "before_sha256": "69fa8af2eb269300056120117296b58ed45593c9a98df0e66e3cc3519dfdedfe",
+      "after_sha256": "2e808930722e2258cd484783ac81cc6f674222db1a0cbf9ef7e971deec4f4ad6",
       "owners": {
         "@module": {
-          "before": "70657d3707f7f53ebc9238b189850a19a893b2c9f5571e62772657645dfc2901",
-          "after": "0e4cf6c0fcec708612ca0f25b51fcebe540d766a1a55d8610e94958df626e7c3"
-        },
-        "_serpentine_rule_ir": {
-          "before": "b47458b1133131f26b867a1859ea19dfe3d193c9a120e983c97c6b36f32fb9e4",
-          "after": null
-        },
-        "_validated_source_rows": {
-          "before": "7ff0fddf1490e8748f8fa2f06e48819feb654e78921897c35fcc7adee5ce7d1a",
-          "after": "64c81e406e9df4382ad87da9ff45887bff9c02d614fa0b2dcc22287163a38fcb"
-        },
-        "generated_artifact_payload": {
-          "before": "b45d21958cafb1c4798f0bce977ed1c695c9e7e8def13af42f0fc14b8c8ff6a0",
-          "after": "be5aa0029db11cba15bf874eed0306b9fd2ee46f9e20624407e6ce71ede333b4"
+          "before": "dd65e4793382bb6ddac30b0b33cdaf0941a9e22e733d50a0d4d6acaadc1d3237",
+          "after": "36a761d0b21c725fd3848f1195418da9dad7df921e62982fc9476066d1e7c138"
         }
       }
     },
     "tools/performance_policy.py": {
-      "before_sha256": "74462b456e357fac5d5490243248d061eed0459838d5b75a3baa7bb5ec0daf7c",
-      "after_sha256": "1d2cc450f4e99ec241ab06ed543fe22339aa9bc13819fef0e7cd5ad29b8ecfd6",
+      "before_sha256": "1d2cc450f4e99ec241ab06ed543fe22339aa9bc13819fef0e7cd5ad29b8ecfd6",
+      "after_sha256": "b817dce873c0b3b0e7538658cdbf4a127876be757d5a39a7447d764e3b49a049",
       "owners": {
-        "ec_current_rule_semantics_smoke_operations": {
+        "sorcerer_source_rule_semantics_smoke_operations": {
           "before": null,
-          "after": "a02ce51813dba5336a58c489e352c6bebacc51b3c3b028988e0b7a5eb4ca9b24"
+          "after": "0e327769001de6fa96c84559567ab72e7ff88a39d764fec1e428616033a511a7"
         },
         "validate_assessment": {
-          "before": "49681ed10336c46027393b353b97c093a025a2fbe79b6fa1aa1c83cae8b5152f",
-          "after": "a384ee8c6e4ce5d8cfed1dd67e0851bf7ee7110031ec7b186c47dcaf2b2d89fd"
-        }
-      }
-    },
-    "tools/source_scope_provenance.py": {
-      "before_sha256": "26b77718d94a586afebf33f90d1ca1eb0c7df17a5e922f054b28d5901abe938b",
-      "after_sha256": "7d5dbcca852a9ae237fe79b8d518e8b1a08f776a8af448ee19439746735ad732",
-      "owners": {
-        "@module": {
-          "before": "1532245b40263f4bf785016ece32c06d045f59aba03971ce235438ae6d783ccd",
-          "after": "c7986d732f5f19ac7a15368424ced5a5191a14689f265d777004e4d84b5ee635"
-        },
-        "current_ec_overlay_provenance": {
-          "before": null,
-          "after": "f793516e2369317415c064a243d26f700fd4754bc13bdb9b6c1d3e92047a1fb3"
-        },
-        "registered_provenance_text": {
-          "before": "2f456bf69529efece50711b54eea4467b1d70e0f15242ae442d377450510e9f9",
-          "after": "566d10a21e15afcbca5d708bba0f76a284757f8038f00ae5c6408241913e15ac"
+          "before": "a384ee8c6e4ce5d8cfed1dd67e0851bf7ee7110031ec7b186c47dcaf2b2d89fd",
+          "after": "68324012fae158a7d4a09af5264a79ae98b62ce3c5e94bc7ba147aa04fac989e"
         }
       }
     }
   },
   "rows": {
+    "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
     "ci/quality_shards/all.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "ci/quality_shards/shard-1.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -606,9 +950,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -616,9 +960,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -626,9 +970,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -636,9 +980,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -646,9 +990,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -656,9 +1000,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -666,9 +1010,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -676,9 +1020,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "data/generated/ability_coverage/ability_coverage_rows.json": {
       "category": "rule_semantics",
@@ -686,9 +1030,9 @@
         "supported-vyper-source-title-binding"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "data/generated/ability_coverage/ability_support_category_rows.json": {
       "category": "rule_semantics",
@@ -696,9 +1040,9 @@
         "supported-vyper-source-title-binding"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
       "category": "rule_semantics",
@@ -706,9 +1050,9 @@
         "order121-generated-semantic-evidence"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "data/generated/ability_coverage/datasheet_support_rows.json": {
       "category": "rule_semantics",
@@ -716,9 +1060,9 @@
         "supported-vyper-source-title-binding"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -726,107 +1070,105 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
-    "data/source_audits/ec_current_2026_11/browser-captures.json": {
+    "data/source_audits/sorcerer_2026_11/core-dependency-observations.json": {
       "category": "rule_semantics",
       "operations": [
-        "ec-current-source-exact-01"
+        "sorcerer-admission-exact-01"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
-    "data/source_audits/ec_current_2026_11/historical-court-catalog.json": {
+    "data/source_audits/sorcerer_2026_11/geometry.json": {
       "category": "rule_semantics",
       "operations": [
-        "ec-current-source-exact-02"
+        "sorcerer-admission-exact-02"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
-    "data/source_audits/ec_current_2026_11/historical-fulgrim-rule-ir.json": {
+    "data/source_audits/sorcerer_2026_11/review.json": {
       "category": "rule_semantics",
       "operations": [
-        "ec-current-source-exact-03"
+        "sorcerer-admission-exact-03"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
-    "data/source_audits/ec_current_2026_11/packaged-catalog-partition.json": {
+    "data/source_audits/sorcerer_2026_11/source-observation-current.json": {
       "category": "rule_semantics",
       "operations": [
-        "ec-current-source-exact-04"
+        "sorcerer-admission-exact-04"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
-    },
-    "data/source_audits/ec_current_2026_11/review.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "ec-current-source-exact-05"
-      ],
-      "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "docs/FACTION_RULES_SOURCE_POLICY.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "docs/factions/emperors-children.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
-    },
-    "docs/performance/policy-v3/ec-current-source-smoke-scope.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "docs/performance/policy-v3/sorcerer-source-smoke-scope.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -834,9 +1176,174 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/core/datasheet.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-datasheet-identity",
+        "sorcerer-admission-exact-05"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/core/datasheet_model_validation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-06"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/core/model_geometry_catalog.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-07"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/engine/army_mustering.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-datasheet-identity",
+        "sorcerer-admission-exact-08"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/engine/attack_modifier_snapshots.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-09"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-10"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/engine/catalog_attack_context_rule_runtime.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-11"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/engine/catalog_cover_grants.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-12"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/engine/catalog_cover_support.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-13"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/engine/catalog_datasheet_rule_runtime.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order124-nested-conditions",
+        "sorcerer-admission-exact-14"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/engine/catalog_datasheet_rule_support.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order124-nested-conditions",
+        "sorcerer-admission-exact-15"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/engine/native_gathering_cover_rules.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "s25-src-warhammer40k_core-engine-native_gathering_cover_rules"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/engine/roster_bearer_validation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-datasheet-identity",
+        "sorcerer-admission-exact-16"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/engine/roster_catalog_identity.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-17"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/engine/unit_factory.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-18"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "src/warhammer40k_core/rules/catalog_generation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-19"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/__init__.py": {
       "category": "rule_semantics",
@@ -844,9 +1351,9 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/artifacts/catalog.json": {
       "category": "rule_semantics",
@@ -854,29 +1361,29 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_current_2026_11.overlay-pack.json": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_sorcerer_2026_11.overlay-pack.json": {
       "category": "rule_semantics",
       "operations": [
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_current_2026_11.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_sorcerer_2026_11.py": {
       "category": "rule_semantics",
       "operations": [
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/__init__.py": {
       "category": "rule_semantics",
@@ -884,9 +1391,9 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/_artifacts.py": {
       "category": "rule_semantics",
@@ -894,9 +1401,9 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/package.json": {
       "category": "rule_semantics",
@@ -904,9 +1411,9 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/emperors-children.json": {
       "category": "rule_semantics",
@@ -914,76 +1421,47 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
-    "tests/code_quality/test_category_migration_preservation.py": {
+    "src/warhammer40k_core/rules/wahapedia_bridge_defaults.py": {
       "category": "rule_semantics",
       "operations": [
-        "supported-defiler-exact-predecessor-controls"
+        "sorcerer-admission-exact-20"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "tests/code_quality/test_current_comparison_routing.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
-    },
-    "tests/code_quality/test_registered_source_scopes.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "tests/factions/emperors_children/test_selected_consumers.py": {
       "category": "rule_semantics",
       "operations": [
-        "ec-current-source-exact-06"
+        "sorcerer-admission-exact-22"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
-    "tests/factions/emperors_children/test_shared_attack_consumers.py": {
+    "tests/support/sorcerer_native.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-b7575b3e0b8cba2c",
-        "supported-ec-source-fixture-controls"
+        "sorcerer-admission-exact-23"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
-    },
-    "tests/support/acts_preservation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-defiler-exact-predecessor-projection"
-      ],
-      "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
-    },
-    "tests/support/terrain_batch03.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-8eba466c6c37b42b"
-      ],
-      "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "tools/ability_support_sources.py": {
       "category": "rule_semantics",
@@ -992,62 +1470,72 @@
         "supported-vyper-source-title-binding"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "tools/emperors_children_support_report.py": {
       "category": "rule_semantics",
       "operations": [
-        "ec-current-source-exact-07"
+        "ec-current-source-exact-07",
+        "sorcerer-admission-exact-24"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
-    "tools/generate_emperors_children_current_source.py": {
+    "tools/generate_ability_support_matrix.py": {
       "category": "rule_semantics",
       "operations": [
-        "ec-current-source-exact-08"
+        "qualification40-exact-ded6452f144f095b"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
-    "tools/generate_emperors_children_fulgrim_rule_ir.py": {
+    "tools/generate_emperors_children_sorcerer_rule_ir.py": {
       "category": "rule_semantics",
       "operations": [
-        "ec-current-source-exact-09"
+        "sorcerer-admission-exact-25"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "tools/generate_emperors_children_sorcerer_source.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-26"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "tools/generate_faction_rule_ir_bundles.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-27"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "tools/performance_policy.py": {
       "category": "rule_semantics",
       "operations": [
         "ci64-provenance-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
         "ci67-transaction-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
-        "ec-current-source-exact-13"
+        "sorcerer-admission-exact-28"
       ],
       "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
-    },
-    "tools/source_scope_provenance.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "ec-current-source-exact-10",
-        "registered-source-provenance-projection"
-      ],
-      "selected_families": [],
-      "rationale": "Reconcile current Fulgrim MOBILE and retired Serpentine, six stale source profile fields, and deterministic existing-consumer artifact propagation.",
-      "source_obligation": "Observed current preferred mirror: Terminator and Lucius T6, both Terminator combi profiles S5/AP-1; Fulgrim MOBILE replaces retired Serpentine. Preserve raw history, identities, prices, options and geometry.",
-      "unchanged_work": "Existing overlay preimage validation, catalog generation, classified-terrain transit, attack, persistence and replay algorithms are unchanged. The finite source addition and bound source-index input use an exact-base reviewed smoke disposition; all serial smoke and current integrity gates remain required."
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     }
   },
   "milestone": "ordinary",

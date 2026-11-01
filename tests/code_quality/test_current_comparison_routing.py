@@ -442,3 +442,39 @@ def test_current_ec_source_smoke_scope_requires_exact_base_bytes_owners_and_cate
             assert not ec_current_rule_semantics_smoke_operations(
                 base=base, path=path, category="rule_semantics", change=drifted
             )
+
+
+def test_sorcerer_source_smoke_scope_requires_exact_base_bytes_owners_and_category() -> None:
+    import copy
+
+    from tools.performance_policy import (
+        object_value,
+        read_object,
+        sorcerer_source_rule_semantics_smoke_operations,
+    )
+
+    scope = read_object(ROOT / "docs/performance/policy-v3/sorcerer-source-smoke-scope.json")
+    for path, operation in {
+        "tools/ability_support_sources.py": "qualification40-exact-b0712fa66a9cc38e",
+        "tools/generate_ability_support_matrix.py": "qualification40-exact-ded6452f144f095b",
+    }.items():
+        base = "7827235d328bf5b82201c8fece29dab7356ba3e3"
+        change = object_value(object_value(scope["changes"])[path])
+        assert sorcerer_source_rule_semantics_smoke_operations(
+            base=base, path=path, category="rule_semantics", change=change
+        ) == frozenset({operation})
+        for candidate_base, candidate_path, category in (
+            ("0" * 40, path, "rule_semantics"),
+            (base, path + ".extra", "rule_semantics"),
+            (base, path, "algorithm_or_search"),
+            (base, path, "cache_policy"),
+        ):
+            assert not sorcerer_source_rule_semantics_smoke_operations(
+                base=candidate_base, path=candidate_path, category=category, change=change
+            )
+        for key in ("before_sha256", "after_sha256", "owners"):
+            drifted = copy.deepcopy(change)
+            drifted[key] = {} if key == "owners" else "0" * 64
+            assert not sorcerer_source_rule_semantics_smoke_operations(
+                base=base, path=path, category="rule_semantics", change=drifted
+            )

@@ -194,15 +194,23 @@ _DATASHEET_REVIEW_ROWS = (
         group=_EMPERORS_CHILDREN_GROUP,
         datasheet="Sorcerer",
         datasheet_id="000004085",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All consumed",
         supported_semantics=(
-            "Leader and the Thrill Seekers army-rule handler are implemented paths."
+            "Leader and Thrill Seekers use existing native paths. Warped Interference grants "
+            "ranged Cover through generic leading-unit source ownership and attack modifiers. "
+            "Wracking Agonies selects one INFANTRY unit actually hit by this model's Agonising "
+            "Energies in its own Shooting phase and persists Move -2 and Charge -2 until the "
+            "next own turn starts. Both weapon profiles use native post-shoot decisions."
         ),
-        semantics_needed=(
-            "Warped Interference (Psychic) ranged-cover grant and Wracking Agonies (Psychic) "
-            "persisted Move and Charge-roll penalties on a unit hit by Agonising Energies."
+        semantics_needed="None in the exact current source ability rows.",
+        catalog_blockers=(
+            "Current T5 and bolt pistol S5/AP-1 are source-bound; MFM remains 55 points. "
+            "The standard plastic foot Sorcerer uses an explicitly provisional 65 mm overall "
+            "height estimate relayed from another AI and accepted by the owner, with a 40 mm "
+            "base. This is not a verified assembled measurement. Its typed required geometry "
+            "record preserves provenance and rejects omission; selected-game detachment "
+            "capabilities remain separate. See data/source_audits/sorcerer_2026_11/review.json."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_EMPERORS_CHILDREN_GROUP,
@@ -885,6 +893,7 @@ def emperors_children_datasheet_support_markdown(
             "000004081",
             "000004083",
             "000004084",
+            "000004085",
             "000004086",
             "000004088",
             "000004089",

@@ -1,0 +1,25 @@
+{
+  "schema": "explicit-provisional-model-geometry-v1",
+  "datasheet_id": "000004085",
+  "model_profile_name": "Sorcerer",
+  "sculpt": "Standard plastic Chaos Space Marines Sorcerer on foot, 2019 sculpt",
+  "configuration": "Standard assembled sculpt on 40 mm round base, intact staff; excludes older metal sculpt and Terminator Armour",
+  "height_mm": 65.0,
+  "reported_estimate_range_mm": [
+    60.0,
+    65.0
+  ],
+  "measurement_origin": "Bottom of base at table surface",
+  "measurement_endpoint": "Highest point of staff",
+  "method": "Product-photo comparison to stated 40 mm base, performed by another AI and relayed by the user",
+  "provider_identity": "Unknown other AI; not independently physically measured",
+  "confidence": "Provisional, unverified photo-based estimate; no quantitative error bound established",
+  "evidence_kind": "user_supplied_estimate",
+  "reviewer_status": "provisional_estimate",
+  "reference_url": "https://www.tafelridder.nl/chaos-space-marines-sorcerer.html",
+  "user_estimate_message": "Sentinel_c048cbc9696c81919bb1b74cf2d14f09,2026-11-01T20:05:08.900513Z",
+  "user_origin_clarification_message": "Sentinel_8929faa8d58c8191a2d87fd76aae2201,2026-11-01T20:09:25Z",
+  "policy_authorization_message": "Sentinel_c1320e7d08308191934ede5691cc2b49,2026-11-01T20:10:23Z",
+  "replacement_policy": "Replace this explicit versioned estimate when better exact-sculpt measurements are obtained; regenerate geometry and runtime identity, preserving this historical evidence.",
+  "limits": "The 40 mm base is independently source-backed. It does not verify this height. This entry creates no default for any other model or unknown dimension."
+}

@@ -1,0 +1,64 @@
+{
+  "schema": "sorcerer-current-source-research-v1",
+  "provider": "40k.app",
+  "provider_authority": "user-preferred project-authoritative unofficial non-GW mirror",
+  "admission": "research observations; implementation must bind under current source governance",
+  "unit": {
+    "url": "https://www.40k.app/factions/emperors-children/units/sorcerer",
+    "observed_at": "2026-11-01T20:11:47.430Z",
+    "capture_scope": "complete main.innerText",
+    "captured_text": "40K.APP\nFACTIONS\nEMPEROR\u2019S CHILDREN\nSorcerer\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nSorcerer 40mm\n7\"\n5\n3+\n4\n6+\n1\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\n\u27a4 Agonising Energies (witchfire)\nPSYCHIC\n18\"\nD6\n3+\n5\n-1\nD3\n\u27a4 Agonising Energies (focused witchfire)\nDEVASTATING WOUNDS\nHAZARDOUS\nPSYCHIC\n18\"\nD6\n3+\n6\n-2\nD3\nBolt pistol\nPISTOL\n12\"\n1\n3+\n5\n-1\n1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nForce weapon\nPSYCHIC\n4\n3+\n6\n-2\nD3\nKEYWORDS\nCHAOS\nCHARACTER\nGRENADES\nINFANTRY\nPSYKER\nSLAANESH\nSORCERER\nCOSTS\n1 model\n55 pts\nUNIT COMPOSITION\n1 Sorcerer\n\nThis model is equipped with: Agonising Energies; bolt pistol; force weapon.\n\nLeads\nINFRACTORS\nNOISE MARINES\nTORMENTORS\nBecome a supporter and remove ads\nCORE ABILITIES\nLEADER\nFACTION ABILITIES\nTHRILL SEEKERS\nUNIT ABILITIES\nWarped Interference\n\nWhile this model is leading a unit, each time a ranged attack targets that unit, models in it have the Benefit of Cover against that attack.\n\nWracking Agonies\n\nIn your Shooting phase, after this model has shot, select one INFANTRY unit hit by one or more of those attacks made with its Agonising Energies. Until the start of your next turn, that unit is wracked with agonies. While a unit is wracked with agonies, subtract 2\" from its Move characteristic and subtract 2 from Charge rolls made for it.\n\nSTATS\n13%\nof Emperor\u2019s Children lists\n#15\nmost-taken in faction\n11%\nfrom 17% since last update\nIN ARMY LISTS\nPopular detachments\nPEERLESS BLADESMEN\nCARNIVAL OF EXCESS\nSPECTACLE OF SLAUGHTER\nMost often leads\nTORMENTORS\nNOISE MARINES\nINFRACTORS\nOften taken with\nFLAWLESS BLADES\nNOISE MARINES\nINFRACTORS\nLORD EXULTANT\nTORMENTORS",
+    "characters": 1584,
+    "fnv1a32_utf16": "7581805d",
+    "sha256_utf8": "6399d4c41d0a9bb22e7bee2b0fe045eced4e9e45305f8a997f70012a4c571ae8",
+    "retention_method": "Fresh complete browser rendering matched retained text and fingerprint; retained exact UTF-8 transcription reused."
+  },
+  "history": {
+    "url": "https://www.40k.app/factions/emperors-children/units/sorcerer/updates",
+    "observed_at": "2026-11-01T20:13:59.042Z",
+    "capture_scope": "complete main.innerText",
+    "captured_text": "40K.APP\nFACTIONS\nEMPEROR\u2019S CHILDREN\nSorcerer\nDATASHEET\nUPDATES\nVERSION 981\nReleased 2026-10-14\nSorcerer\nStats Changed\nSTAT\tWAS\tNOW\nToughness\t4\t5\nVERSION 909\nReleased 2026-07-22\nPoints changes\n1 model\n60 pts \u2192 55 pts\nVERSION 867\nReleased 2026-06-19\nAdded to the faction\nAdded\nPoints cost\n60 pts",
+    "characters": 293,
+    "fnv1a32_utf16": "9582a4ed",
+    "sha256_utf8": "5918f7426d505e8e10e2c726c6023e337bb1ace6f4578080cb93274a6da98060"
+  },
+  "army_rules": {
+    "url": "https://www.40k.app/factions/emperors-children/army-rules",
+    "observed_at": "2026-11-01T20:12:28.400Z",
+    "capture_scope": "complete main.innerText",
+    "captured_text": "40K.APP\nFACTIONS\nEmperor\u2019s Children\nDATASHEETS\nARMY RULES\nDETACHMENTS\nUPDATES\nCREATE LIST\nTHRILL SEEKERS\n\nIf your Army Faction is EMPEROR\u2019S CHILDREN, this unit is eligible to shoot and declare a charge in a turn in which it Advanced or Fell Back, but when doing so:\n\nIt cannot target a unit it was within Engagement Range of at the start of the turn.\nIt cannot target a unit that was the target of another unit\u2019s charge or attack this phase.\nBecome a supporter and remove ads\nPACT OF EXCESS\n\nWhen mustering your army, unless specifically stated otherwise, you cannot select LEGIONS OF EXCESS as your Army Faction.",
+    "characters": 613,
+    "fnv1a32_utf16": "d3e4fe5e",
+    "sha256_utf8": "f7126d625ae0c17199c3a0af40cf052179e3f911c73bb7eeb774d8a4cb357f3d"
+  },
+  "attached_units": {
+    "url": "https://www.40k.app/rules/19-attached-units",
+    "observed_at": "2026-11-01T20:13:18.698Z",
+    "capture_scope": "complete main.innerText with both commentary controls expanded",
+    "captured_text": "40K.APP\nRULES\n19\nAttached Units\nCORE RULES\nSTRATAGEMS\n19.00\nATTACHED UNITS\n\nThe heroes of your army rarely fight alone. Instead, they typically lead bands of warriors, forming an attached unit that acts as a single entity. This section explains how to form attached units and how they function on the battlefield.\n\n19.01\nFORMING ATTACHED UNITS\n\nSome units have the Leader or Support ability listed on their datasheet (24.22 & 24.34). Such units are known as leader units and support units respectively. Both of these abilities allow such units to lead other friendly units (known as bodyguard units) to form attached units. An attached unit is a single unit for all rules purposes. Leader and support units can only lead specific bodyguard units, as listed in the Warhammer 40,000 app\n\n19.01.01\nAttached Units After Their Bodyguard Unit is Destroyed\n\nSome units have rules stating that when the bodyguard unit in an attached unit is destroyed, leader/support units that were attached to them become separate units with their original starting strengths.\n\nWhen the bodyguard unit in an attached unit affected by such a rule is destroyed, all of those leader/support units remain a single unit for all rules purposes.\n\nBecome a supporter and remove ads\n19.02\nATTACKING ATTACHED UNITS\n\nEach time an attack targets an attached unit, if that unit contains one or more bodyguard models, use the highest T characteristic of the bodyguard models in that unit while resolving that attack, even if a leader/support unit in that attached unit has a different T characteristic. If that unit only contains leader/support models, use the highest T characteristic of those models while resolving that attack instead.\n\nRules that are triggered when a unit is destroyed are only triggered when the last model that started the battle in an attached unit is destroyed.\n\n19.03\nKEYWORDS IN ATTACHED UNITS\n\nAn attached unit has all of the keywords of all of its component units. As such, an attached unit is affected by any rule that applies to units with any of those keywords. Note that models in an attached unit do not gain the keywords of other models in that unit that they do not already have. Remember that attacks target units, not models.\n\nExample: An attached unit contains a leader model with the PSYKER keyword. While that model is part of that unit, that unit has the PSYKER keyword, even if the bodyguard models do not have that keyword. If that unit is attacked by a weapon with the [ANTI\u2011PSYKER 4+] ability, any unmodified wound roll of 4+ made against that unit is a critical wound, even if the attack itself is not allocated to that leader model.\n\n19.04\nABILITIES IN ATTACHED UNITS\n\nAbilities/rules that affect a single specified model (e.g. from an enhancement or an item of wargear) only ever apply to that model, even while part of an attached unit.\n\nOtherwise, abilities/rules that affect a unit (or models in it) apply to every model in an attached unit, until the source of that ability/rule is destroyed, as shown below.\n\nSOURCE OF ABILITY/RULE\tAPPLIES TO THE ATTACHED UNIT UNTIL\nLeader/support unit\tThe last model in that leader/support unit is destroyed.*\nBodyguard unit\t\n(e.g. from a datasheet ability) | The last model in that bodyguard unit is destroyed | | A specific model\n(e.g. the bearer of an enhancement or an item of wargear) | That model is destroyed |\n\n*This means leader/support units continue to benefit from their own 'while this model is leading a unit' abilities even after their bodyguard unit is destroyed, provided they started the battle in an attached unit.\n\nIn all of the above cases, if that last model was destroyed as the result of an attack, the ability it was conferring upon the attached unit applies until the attacking unit has resolved all of its attacks.\n\n19.04.01\nOnly In Death Does Duty End\n\nLeader and support units often have abilities that make the models they are leading more powerful. In the same way, some bodyguard units\u2019 abilities can enhance the power of those leading them. Abilities in Attached Units (19.04) means that once the models conferring such effects are destroyed, that attached unit does not continue to benefit from them. Should those models later be revived, however, those abilities will once more apply to their attached unit.\n\n18\nTRANSPORTS\n20\nSTRATEGIC RESERVES",
+    "characters": 4331,
+    "fnv1a32_utf16": "54b6a20e",
+    "sha256_utf8": "7c14484b4f7e268ba2b1250b29e8f5b3a49bd2ea3f410b3172f56532ac80f7c3"
+  },
+  "update_index": {
+    "url": "https://www.40k.app/factions/updates",
+    "observed_at": "2026-11-01T20:13:59.060Z",
+    "visible_versions": [
+      995,
+      981,
+      972,
+      963,
+      946,
+      931,
+      925,
+      913,
+      909,
+      879,
+      875
+    ],
+    "global_latest": "995 / 2026-10-16",
+    "latest_ec": "981 / 2026-10-14",
+    "latest_ec_url": "https://www.40k.app/981/factions/emperors-children/updates",
+    "qualification": "current index inference only; no API/App-binary attestation; no per-field date inferred"
+  }
+}

@@ -15,7 +15,8 @@ The legacy repository remains valuable as:
 CORE V2 is not a blank rewrite. It is a strict reconstruction with enforced invariants.
 
 Source-linked model geometry requires representative model height with provenance
-before runtime catalog use.
+before runtime catalog use. Explicit provisional estimates retain their uncertainty and
+source identity under [the geometry authority policy](docs/FACTION_RULES_SOURCE_POLICY.md).
 
 ## 2. Non-negotiable invariants
 

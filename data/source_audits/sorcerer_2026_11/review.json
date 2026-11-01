@@ -1,0 +1,46 @@
+{
+  "authority": "User-preferred 40k.app mirror, observed rendered browser text; not an official GW API or raw HTTP attestation.",
+  "base": "7827235d328bf5b82201c8fece29dab7356ba3e3",
+  "captures": {
+    "core-dependency-observations.json": "7e2aa187bee183be8b23f830f98deb6b3de096cda851f9bb9338c39caa21cd26",
+    "geometry.json": "e816092e57ac7aea294a2628781605bc21baf3f34f1d1cec8d6b0536ec81182c",
+    "source-observation-current.json": "7045ea750defe53c819b69828490a9fa644ed8520c335a49fd574c6986e61a8b"
+  },
+  "complete_unit_review": [
+    "All model characteristics",
+    "Both Agonising Energies profiles and bolt pistol/force weapon",
+    "One-model composition and default equipment",
+    "Core Leader and all three eligible bodyguards",
+    "Thrill Seekers",
+    "Warped Interference",
+    "Wracking Agonies",
+    "Base 40 mm"
+  ],
+  "dependencies": {
+    "Core 13.08": "Cover worsens Ballistic Skill by 1; generic source-linked Cover uses the same attack and witness consumers.",
+    "Core 19.04": "Reuse current source ownership and attached-unit identity: started-attached leaders retain own leading effects after bodyguard death; attack-caused source destruction is deferred through the attacking unit.",
+    "Core 24.15": "Focused Agonising Energies retains Hazardous resolution after attacks.",
+    "Core 24.18": "Ignores Cover denies the new grant through the existing shared Cover gate.",
+    "Core 24.22, 24.27": "Existing strict Leader muster and Pistol/Close Quarters selection owners remain authoritative.",
+    "Core 24.29": "Psychic modifier choices continue through native attack decisions and can ignore the Cover penalty.",
+    "Thrill Seekers": "Complete current army text agrees with the existing native advance/fall-back shooting and charge permission consumer."
+  },
+  "geometry_boundary": {
+    "call_site_audit": "All UnitFactory constructors and ModelProfileDefinition constructors inspected. Muster and RosterModelResolver are reachable Sorcerer constructors. Remaining materialization/handoff calls consume explicit materialization descriptors absent from Sorcerer. Core ArmyCatalog constructors build independent fixture profiles. Return/revival updates existing ModelInstance values with dataclasses.replace, preserving geometry. Typed payload roundtrip preserves the new flag.",
+    "impact": "The admitted provisional 65 mm configuration was silently replaced, changing visibility geometry and losing its provenance.",
+    "legacy_limit": "Historical unflagged profiles retain their preexisting fallback behavior. No universal historical geometry-hardening claim.",
+    "repair": "Typed ModelProfileDefinition.requires_geometry_record is emitted for explicit provisional records and omitted when false. UnitFactory rejects missing required records; roster model validation receives the same supplied records. Unknown dimensions cannot substitute a heuristic for this admitted provisional profile.",
+    "reproduction": "Strict public GameConfig with model_geometries=None or Sorcerer record removed previously reached secondary selection with a 56 mm keyword heuristic."
+  },
+  "historical_sources": "Raw snapshot, June/October overlays and PR607 source artifacts remain unchanged. Observation date is not a claim of per-field publication date.",
+  "observation_date": "2026-11-01",
+  "partition": "Existing 26 datasheets retain game values; five later datasheets have generated option/source ordinal suffix shifts from four inserted Sorcerer weapon profiles, and Yriel leader provenance ordinal shifts. Existing 38 geometry records, enhancements and stratagems remain unchanged. Two existing EC detachments gain Sorcerer membership; no new factions or detachments.",
+  "qualification": "Focused evidence is retained outside the repository. Full exact-head behavior, active quality, both type checkers, independent reviews and hosted CI remain required; this audit is not a completion certificate.",
+  "runtime_owners": {
+    "Warped Interference": "Exact generic leading-ranged-Cover classifier; model ability grants; existing source ownership and attack Cover computation; source-linked modifier snapshots.",
+    "Wracking Agonies": "Existing post-shoot hit-target selection, own-phase/attacker-model/weapon filters, selected-unit modifiers and next-own-turn expiration. Both Agonising profiles are explicitly bound. Repeated same-source named condition uses existing effect-slot deduplication.",
+    "geometry": "Explicit provisional_estimate/user_supplied_estimate evidence. Overall 65 mm from bottom of base to staff tip is an OTHER-AI photo estimate relayed and authorized by the owner, not a verified physical measurement. Source origin already includes base; no guessed offset."
+  },
+  "schema": "sorcerer-native-admission-source-review-v1",
+  "scope": "Admit only Emperor's Children Sorcerer 000004085 to the existing native catalog; correct dormant T4 to T5 and bolt pistol S4/AP0 to S5/AP-1; retain MFM 55 points."
+}
