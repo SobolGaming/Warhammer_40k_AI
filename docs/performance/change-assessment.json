@@ -73,6 +73,16 @@
           "after": "c59ea9a43551a20bd7d2d70c7bfcf73eabb4e44f38288445b110e75c912dfc9d"
         }
       }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "9c0d031999f886cd0c21bfd7ead0a233e485fb0cd005da26cab2282fa616efa7",
+      "after_sha256": "a60344c5b940809207b25d7add3f30734faff2cbd8296511437b958a134eb899",
+      "owners": {
+        "@document": {
+          "before": "9c0d031999f886cd0c21bfd7ead0a233e485fb0cd005da26cab2282fa616efa7",
+          "after": "a60344c5b940809207b25d7add3f30734faff2cbd8296511437b958a134eb899"
+        }
+      }
     }
   },
   "rows": {
@@ -130,6 +140,16 @@
       "category": "rule_semantics",
       "operations": [
         "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453"
+      ],
+      "selected_families": [],
+      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
+      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
+      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
       "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
