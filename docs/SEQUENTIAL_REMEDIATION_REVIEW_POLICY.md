@@ -154,3 +154,16 @@ The 260-case list remains finite and code-pinned. These include adversarial chec
 of retained historical helpers; they are not passing results. Keep helper code,
 active production and preflight/postflight validators, 1,848 active quality checks
 and all 4,886 selected gameplay cases. No additional omission is authorized.
+
+## Coverage floor update — 1 November 2026
+
+After Defiler PR604, the owner directed raising the active coverage requirement
+from 64% to 65%. Configuration, the combined CI coverage gate and active local
+commands enforce 65%. Full-package branch measurement, default omissions and
+exclusions, required behavioral selection, the exact 260 deferred quality cases,
+and all timing budgets remain unchanged. Later coverage work must restore 85%.
+
+The PR591 cutover ledger and its authenticated 64% field remain historical source
+records. Their admission checks retain that exact value; they do not configure the
+active coverage threshold. Prior measurements, approvals and qualification records
+retain their original meaning. This update does not claim any gate has passed.
