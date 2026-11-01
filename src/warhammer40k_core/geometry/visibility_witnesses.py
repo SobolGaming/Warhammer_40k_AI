@@ -226,6 +226,42 @@ def _world(domain: ModelDomain, u: Fraction, v: Fraction, z: Fraction) -> Ration
     return (domain.center[0] + a[0] * u + b[0] * v, domain.center[1] + a[1] * u + b[1] * v, z)
 
 
+def unequal_circle_tangent_candidates(
+    observer: ModelDomain, target: ModelDomain
+) -> tuple[RationalPoint2, ...]:
+    """Propose exact circle-chart points near unequal-radius facing boundaries.
+
+    For D=Ct-Co and k=ro-rt, a facing boundary normal satisfies n.D=k.
+    Its direction is k*D +/- sqrt(|D|^2-k^2)*J(D). Rational root bounds and
+    limited chart parameters are SEARCH HINTS only: every returned point still
+    needs exact target membership, facing, and all-origin occlusion checks.
+    Missing or unsupported directions leave the existing candidates/fallback.
+    """
+    for domain in (observer, target):
+        a, b = domain.axes
+        if not domain.curved or a[1] or b[0] or a[0] != b[1] or a[0] <= 0:
+            return ()
+    difference = observer.axes[0][0] - target.axes[0][0]
+    if difference == 0:
+        return ()
+    dx, dy = target.center[0] - observer.center[0], target.center[1] - observer.center[1]
+    discriminant = dx * dx + dy * dy - difference * difference
+    if discriminant <= 0:
+        return ()
+    root = rational_sqrt_bounds(discriminant)[1]
+    result: list[RationalPoint2] = []
+    for sign in (-1, 1):
+        x = difference * dx - sign * root * dy
+        y = difference * dy + sign * root * dx
+        norm = rational_sqrt_bounds(x * x + y * y)[1]
+        parameter = (y / (norm + abs(x))).limit_denominator(4096)
+        for shift in map(Fraction, ("0", "-1/4096", "1/4096", "-1/65536", "1/65536")):
+            p = parameter + shift
+            denominator = 1 + p * p
+            result.append(((1 if x >= 0 else -1) * (1 - p * p) / denominator, 2 * p / denominator))
+    return tuple(dict.fromkeys(result))
+
+
 def target_part_candidates(
     observer: ModelDomain, target: ModelDomain, blockers: tuple[VisibilityPrism, ...]
 ) -> tuple[RationalPoint3, ...]:
@@ -238,6 +274,7 @@ def target_part_candidates(
         (Fraction(-1), Fraction(0)),
         (Fraction(1), Fraction(0)),
     ]
+    local_candidates.extend(unequal_circle_tangent_candidates(observer, target))
     dx, dy = target.center[0] - observer.center[0], target.center[1] - observer.center[1]
     if target.curved and (dx or dy):
         for sign in (-1, 1):

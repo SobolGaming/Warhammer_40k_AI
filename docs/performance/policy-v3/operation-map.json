@@ -31608,6 +31608,61 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "sorcerer-admission-exact-33": {
+      "paths": [
+        "data/source_audits/sorcerer_2026_11/visibility-correction.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-34": {
+      "paths": [
+        "tests/factions/emperors_children/test_selected_consumers.py"
+      ],
+      "owners": [
+        "test_sorcerer_original_rear_blocker_scene_completes_shooting_and_exact_replay"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-35": {
+      "paths": [
+        "tests/fixtures/sorcerer_visibility_domains.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-36": {
+      "paths": [
+        "tests/rules/section06/test_visibility.py"
+      ],
+      "owners": [
+        "_retained_visibility_domains",
+        "test_exact_corridor_contact_survives_rear_proof_search",
+        "test_facing_witness_requires_a_horizontal_origin_at_exact_tangency",
+        "test_rear_plane_analytic_ellipse_support_and_multiple_blockers",
+        "test_rear_plane_certificate_declines_unproved_scope",
+        "test_rear_plane_certificate_preserves_strict_rational_boundary",
+        "test_rear_plane_certifies_retained_diagonal_concave_blocker",
+        "test_rear_plane_empty_scene_agrees_with_complete_quantified_reference",
+        "test_rear_plane_full_proof_does_not_hide_a_different_any_visibility_blocker",
+        "test_rear_plane_requires_strict_vertical_disjointness",
+        "test_unequal_circle_candidates_prove_retained_hidden_part_and_clear_gap",
+        "test_unequal_circle_search_retains_fallback_for_other_domains"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

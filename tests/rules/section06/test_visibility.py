@@ -16,6 +16,7 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFloorDefinition,
     TerrainWallDefinition,
 )
+from warhammer40k_core.geometry.visibility_exact import VisibilityPrism
 
 
 @pytest.mark.parametrize(("edge", "clear"), [(0.49 / 25.4, False), (0.51 / 25.4, True)])
@@ -233,7 +234,9 @@ def test_rear_plane_certificate_preserves_strict_rational_boundary(
     assert full_visibility_by_rear_plane_separation(observer, target, (blocker,)) is (offset > 0)
 
 
-@pytest.mark.parametrize("invalid_scope", ["upper-cap", "lower-cap", "overlap", "flat"])
+@pytest.mark.parametrize(
+    "invalid_scope", ["upper-cap", "lower-cap", "overlap", "coincident", "tangent", "flat"]
+)
 def test_rear_plane_certificate_declines_unproved_scope(invalid_scope: str) -> None:
     from fractions import Fraction as F
 
@@ -258,15 +261,275 @@ def test_rear_plane_certificate_declines_unproved_scope(invalid_scope: str) -> N
         observer = replace(observer, upper=F(3))
     elif invalid_scope == "lower-cap":
         observer = replace(observer, lower=F(-1))
-    elif invalid_scope == "overlap":
+    elif invalid_scope in {"overlap", "coincident", "tangent"}:
         assert isinstance(target.footprint, RationalEllipse)
+        x = F({"overlap": 2, "coincident": 0, "tangent": 3}[invalid_scope])
         target = replace(
             target,
-            footprint=replace(target.footprint, center=(F(2), F(0))),
-            bounds=(F(0), F(-2), F(4), F(2)),
+            footprint=replace(target.footprint, center=(x, F(0))),
+            bounds=(x - 2, F(-2), x + 2, F(2)),
         )
     else:
         target = replace(
             target, footprint=((F(9), F(-1)), (F(11), F(-1)), (F(11), F(1)), (F(9), F(1)))
         )
     assert not full_visibility_by_rear_plane_separation(observer, target, ())
+
+
+def _retained_visibility_domains(
+    case: str,
+) -> tuple[VisibilityPrism, VisibilityPrism, tuple[VisibilityPrism, ...]]:
+    import json
+    from fractions import Fraction as F
+    from pathlib import Path
+    from typing import Any, cast
+
+    from warhammer40k_core.geometry.visibility_exact import RationalEllipse, RationalPolygon
+
+    fixture = Path(__file__).resolve().parents[2] / "fixtures/sorcerer_visibility_domains.json"
+    row: dict[str, Any] = json.loads(fixture.read_text())["cases"][case]
+
+    def point(values: list[str]) -> tuple[F, F]:
+        return F(values[0]), F(values[1])
+
+    def prism(raw: dict[str, Any]) -> VisibilityPrism:
+        source = raw["footprint"]
+        footprint: RationalEllipse | RationalPolygon
+        if isinstance(source, dict):
+            source = cast(dict[str, list[str]], source)
+            footprint = RationalEllipse(
+                point(source["center"]), point(source["first_axis"]), point(source["second_axis"])
+            )
+        else:
+            footprint = tuple(point(p) for p in source)
+        bounds = raw["bounds"]
+        return VisibilityPrism(
+            footprint,
+            F(raw["lower"]),
+            F(raw["upper"]),
+            (F(bounds[0]), F(bounds[1]), F(bounds[2]), F(bounds[3])),
+        )
+
+    return prism(row["observer"]), prism(row["target"]), tuple(prism(b) for b in row["blockers"])
+
+
+def test_rear_plane_certifies_retained_diagonal_concave_blocker() -> None:
+    from warhammer40k_core.geometry.visibility_certificates import (
+        full_visibility_by_rear_plane_separation,
+    )
+
+    observer, target, blockers = _retained_visibility_domains("original")
+    assert full_visibility_by_rear_plane_separation(observer, target, blockers)
+
+
+def test_unequal_circle_candidates_prove_retained_hidden_part_and_clear_gap() -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.continuous_visibility import resolve_visibility_pair_uncached
+    from warhammer40k_core.geometry.visibility_formulas import (
+        ModelDomain,
+        decide_target_part_visible,
+    )
+    from warhammer40k_core.geometry.visibility_witnesses import (
+        point_has_self_visible_origin,
+        point_in_model,
+        self_visible_corridors_blocked,
+        target_part_candidates,
+    )
+
+    observer, target, blockers = _retained_visibility_domains("continuation")
+    origin, destination = ModelDomain.from_prism(observer), ModelDomain.from_prism(target)
+    witnesses = tuple(
+        p
+        for p in target_part_candidates(origin, destination, blockers)
+        if point_has_self_visible_origin(origin, destination, p)
+        and self_visible_corridors_blocked(observer, destination, p, blockers)
+    )
+    assert witnesses
+    # Completed original existential NRA predicates independently check this
+    # actual generated point. The full historical forall/exists stall remains
+    # retained; these are not a claimed completed whole-query comparison.
+    assert not decide_target_part_visible(origin, destination, witnesses[0], blockers)
+    assert decide_target_part_visible(origin, destination, witnesses[0], blockers[:1])
+    assert all(point_in_model(destination, p) for p in witnesses)
+    result = resolve_visibility_pair_uncached(observer, target, blockers, blockers)
+    assert result.model_visible
+    assert not result.model_fully_visible
+    assert result.full_visibility_proof == "hidden_target_part"
+    assert result.hidden_target_part in witnesses
+    # Removing the near-observer blocker removes the hidden-part proof. This is
+    # an adjacent control; the original native scene remains unchanged elsewhere.
+    assert not self_visible_corridors_blocked(observer, destination, witnesses[0], blockers[:1])
+    clear = resolve_visibility_pair_uncached(observer, target, blockers[:1], blockers[:1])
+    assert clear.model_visible
+    assert clear.model_fully_visible
+    invalid_facing = (destination.center[0] + destination.axes[0][0], destination.center[1], F(0))
+    assert point_in_model(destination, invalid_facing)
+    assert not point_has_self_visible_origin(origin, destination, invalid_facing)
+
+
+@pytest.mark.parametrize("scope", ["equal", "ellipse", "flat", "coincident", "contained"])
+def test_unequal_circle_search_retains_fallback_for_other_domains(scope: str) -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_formulas import ModelDomain
+    from warhammer40k_core.geometry.visibility_witnesses import (
+        target_part_candidates,
+        unequal_circle_tangent_candidates,
+    )
+
+    first, last, _ = _retained_visibility_domains("continuation")
+    observer, target = ModelDomain.from_prism(first), ModelDomain.from_prism(last)
+    if scope == "equal":
+        observer = replace(observer, axes=target.axes)
+    elif scope == "ellipse":
+        target = replace(target, axes=((F(1), F(0)), (F(0), F(2))))
+    elif scope == "flat":
+        target = replace(target, curved=False)
+    elif scope == "coincident":
+        observer = replace(observer, center=target.center)
+    else:
+        observer = replace(observer, center=(target.center[0] + F(1, 100), target.center[1]))
+    assert not unequal_circle_tangent_candidates(observer, target)
+    assert target_part_candidates(observer, target, ())
+
+
+@pytest.mark.parametrize("height", ["below", "lower-contact", "upper-contact", "above"])
+def test_rear_plane_requires_strict_vertical_disjointness(height: str) -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_certificates import (
+        full_visibility_by_rear_plane_separation,
+    )
+
+    observer, target, blockers = _retained_visibility_domains("continuation")
+    front = blockers[1]
+    if height in {"below", "lower-contact"}:
+        upper = target.lower - (F(1, 10**9) if height == "below" else 0)
+        front = replace(front, lower=upper - 1, upper=upper)
+    else:
+        lower = target.upper + (F(1, 10**9) if height == "above" else 0)
+        front = replace(front, lower=lower, upper=lower + 1)
+    assert full_visibility_by_rear_plane_separation(observer, target, (blockers[0], front)) is (
+        height in {"below", "above"}
+    )
+
+
+def test_rear_plane_analytic_ellipse_support_and_multiple_blockers() -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_certificates import (
+        full_visibility_by_rear_plane_separation,
+    )
+    from warhammer40k_core.geometry.visibility_exact import RationalEllipse
+
+    observer, target, blockers = _retained_visibility_domains("original")
+    ellipse = VisibilityPrism(
+        RationalEllipse((F(40), F(10)), (F(1), F(1)), (F(-2), F(2))),
+        F(0),
+        target.upper,
+        (F(37), F(7), F(43), F(13)),
+    )
+    assert full_visibility_by_rear_plane_separation(observer, target, (*blockers, ellipse))
+    assert isinstance(ellipse.footprint, RationalEllipse)
+    front = replace(
+        ellipse,
+        footprint=replace(ellipse.footprint, center=(F(20), F(4))),
+        bounds=(F(17), F(1), F(23), F(7)),
+    )
+    assert not full_visibility_by_rear_plane_separation(observer, target, (*blockers, front))
+
+
+def test_rear_plane_full_proof_does_not_hide_a_different_any_visibility_blocker() -> None:
+    from warhammer40k_core.geometry.continuous_visibility import resolve_visibility_pair_uncached
+
+    observer, target, blockers = _retained_visibility_domains("original")
+    result = resolve_visibility_pair_uncached(observer, target, (target,), blockers)
+    assert not result.model_visible
+    assert not result.model_fully_visible
+
+
+def test_rear_plane_empty_scene_agrees_with_complete_quantified_reference() -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_certificates import (
+        full_visibility_by_rear_plane_separation,
+    )
+    from warhammer40k_core.geometry.visibility_exact import RationalEllipse
+    from warhammer40k_core.geometry.visibility_formulas import ModelDomain, decide_full
+
+    observer = VisibilityPrism(
+        RationalEllipse((F(0), F(0)), (F(1), F(0)), (F(0), F(1))),
+        F(0),
+        F(1),
+        (F(-1), F(-1), F(1), F(1)),
+    )
+    target = VisibilityPrism(
+        RationalEllipse((F(10), F(0)), (F(1), F(0)), (F(0), F(1))),
+        F(0),
+        F(1),
+        (F(9), F(-1), F(11), F(1)),
+    )
+    assert full_visibility_by_rear_plane_separation(observer, target, ())
+    assert decide_full(ModelDomain.from_prism(observer), ModelDomain.from_prism(target), ())
+
+
+@pytest.mark.parametrize("shape", ["ellipse", "flat"])
+@pytest.mark.parametrize("offset_sign", [-1, 0, 1])
+def test_exact_corridor_contact_survives_rear_proof_search(shape: str, offset_sign: int) -> None:
+    # Narrow active port of the quarantined test_visibility_pathing.py exact
+    # strip-tangency concept; the legacy module and its admission remain intact.
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_exact import CORRIDOR_RADIUS, RationalEllipse
+
+    edge = CORRIDOR_RADIUS + F(offset_sign, 10**30)
+    if shape == "ellipse":
+        obstacle = VisibilityPrism(
+            RationalEllipse((F(0), edge + 2), (F(1), F(0)), (F(0), F(2))),
+            F(0),
+            F(2),
+            (F(-1), edge, F(1), edge + 4),
+        )
+    else:
+        obstacle = VisibilityPrism(
+            ((F(-1), edge), (F(1), edge), (F(1), edge + 1), (F(-1), edge + 1)),
+            F(0),
+            F(2),
+            (F(-1), edge, F(1), edge + 1),
+        )
+    assert obstacle.intersects_corridor((F(-3), F(0), F(1)), (F(3), F(0), F(1))) is (
+        offset_sign <= 0
+    )
+
+
+@pytest.mark.parametrize("displaced", [False, True])
+def test_facing_witness_requires_a_horizontal_origin_at_exact_tangency(displaced: bool) -> None:
+    # Port the relevant vertical-only tangent-support invariant with real exact
+    # prisms and the public complete target-part predicate, without private hooks.
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_exact import RationalEllipse
+    from warhammer40k_core.geometry.visibility_formulas import (
+        ModelDomain,
+        decide_target_part_visible,
+    )
+    from warhammer40k_core.geometry.visibility_witnesses import point_has_self_visible_origin
+
+    y = F(1 if displaced else 0)
+    observer = VisibilityPrism(
+        RationalEllipse((F(1, 2), y), (F(1, 2), F(0)), (F(0), F(1))),
+        F(0),
+        F(1),
+        (F(0), y - 1, F(1), y + 1),
+    )
+    target = VisibilityPrism(
+        RationalEllipse((F(0), F(0)), (F(1), F(0)), (F(0), F(1))),
+        F(2),
+        F(3),
+        (F(-1), F(-1), F(1), F(1)),
+    )
+    origin, destination = ModelDomain.from_prism(observer), ModelDomain.from_prism(target)
+    point = (F(1), F(0), F(5, 2))
+    assert point_has_self_visible_origin(origin, destination, point) is displaced
+    assert decide_target_part_visible(origin, destination, point, ()) is displaced

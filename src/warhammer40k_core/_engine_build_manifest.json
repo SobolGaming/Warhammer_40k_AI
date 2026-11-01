@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c8a6cd100d7e7832ccf580a016245a200b01b99fdaeb882f0aecf2bf4810de66",
-  "fingerprint": "c8a6cd100d7e7832ccf580a016245a200b01b99fdaeb882f0aecf2bf4810de66",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:617011195977d5ecb3d7445dffe6bce8d4031328abfe55b51ec1ef67b33c3448",
+  "fingerprint": "617011195977d5ecb3d7445dffe6bce8d4031328abfe55b51ec1ef67b33c3448",
   "resource_count": 3175,
   "resources": [
     {
@@ -13790,9 +13790,9 @@
       "sha256": "f42cb6e021ba8316d798cd25a136c02832a696dfc6cce832d0957499ba2b3d14"
     },
     {
-      "byte_length": 15566,
+      "byte_length": 17318,
       "path": "warhammer40k_core/geometry/visibility_witnesses.py",
-      "sha256": "188f0313c7aef47ef8767307ef1e6e086553852fc5bf283002919431515bfcb2"
+      "sha256": "fdce5f1135b6ece5ec80eabeeef9a8df4a5bd1edc8faa69ec76d568c62a4783a"
     },
     {
       "byte_length": 11749,

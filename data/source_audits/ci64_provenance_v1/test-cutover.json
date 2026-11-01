@@ -1267,10 +1267,10 @@
       "sha256": "56bbaf8fcf6671bbfbe66e56e539d6b9a4406ddfe66a6452383f3acfa02c4947"
     },
     "tests/rules/section06/test_visibility.py": {
-      "blob_sha1": "15f67f417dce0163eecffcec875c55a869725b6c",
-      "bytes": 10136,
+      "blob_sha1": "3bc28e261496ba856ebd690ad84087b751cc7e6d",
+      "bytes": 21303,
       "mode": "100644",
-      "sha256": "19694fdb47591ca5b9067881478c1ab47e02a30019a4af419c2cb3ef0812e11f"
+      "sha256": "8c1452eeb7c5c5c2ec0c0619fc45a2fa000d1323a1d7b6872f4934354854b61e"
     },
     "tests/rules/section06/test_visibility_ownership.py": {
       "blob_sha1": "19870e0cd81980c745fd0d4dda60596ca6d2bc4e",
