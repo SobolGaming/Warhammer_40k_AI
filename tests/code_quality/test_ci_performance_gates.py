@@ -293,23 +293,38 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
     assert cutover["coverage"]["current_floor"] == 64
     assert len(sharding.deferred_comparison_cases(cutover)) == 260
 
-    from coverage import CoverageData
-
     source = tmp_path / "coverage_boundary.py"
     source.write_text("\n".join(f"value_{line} = {line}" for line in range(1, 101)) + "\n")
+    driver = tmp_path / "coverage_driver.py"
+    driver.write_text(
+        "import sys\n"
+        "from pathlib import Path\n"
+        "source = Path(sys.argv[1])\n"
+        "prefix = ''.join(source.read_text().splitlines(keepends=True)[:int(sys.argv[2])])\n"
+        "exec(compile(prefix, str(source), 'exec'))\n"
+    )
     for covered, expected_status in ((64, 2), (65, 0)):
         data_file = tmp_path / f".coverage.{covered}"
-        data = CoverageData(basename=str(data_file))
-        data.add_arcs(
-            {
-                str(source): [
-                    (-1, 1),
-                    *((line, line + 1) for line in range(1, covered)),
-                    (covered, -1),
-                ]
-            }
+        executed = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "coverage",
+                "run",
+                "--rcfile=" + str(ROOT / "pyproject.toml"),
+                "--branch",
+                "--source=" + str(tmp_path),
+                "--data-file=" + str(data_file),
+                str(driver),
+                str(source),
+                str(covered),
+            ],
+            cwd=tmp_path,
+            capture_output=True,
+            text=True,
+            check=False,
         )
-        data.write()
+        assert executed.returncode == 0, executed.stdout + executed.stderr
         # Exercise both config-default local reporting and CI's explicit override.
         for override in ([], ["--fail-under=65"]):
             result = subprocess.run(
