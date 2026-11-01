@@ -142,7 +142,7 @@ def native_session(
     return session
 
 
-def deploy_native(session: LocalGameSession) -> None:
+def deploy_native(session: LocalGameSession, *, original_visibility_scene: bool = False) -> None:
     from tests.deployment_submission_helpers import deployment_placement_payload_for_request
 
     from warhammer40k_core.engine.phase import LifecycleStatusKind
@@ -169,6 +169,8 @@ def deploy_native(session: LocalGameSession) -> None:
                 if ":second-sorcerer:" in model:
                     return Pose.at(5.5, 4.5)
                 if unit_id == "opponent:sorcerer":
+                    if original_visibility_scene:
+                        return Pose.at(31.0, 4.5)
                     return Pose.at(31.5, 1.5) if ":000004086:" in model else Pose.at(31.0, 1.4)
                 state = session.lifecycle.state
                 assert state is not None
@@ -183,7 +185,10 @@ def deploy_native(session: LocalGameSession) -> None:
                         return Pose.at(1.4, 1.2)
                     return Pose.at(3.1 + (i % 3) * 1.7, 1.2 + (i // 3) * 1.7)
                 if unit_id == "opponent:bodyguard":
-                    return Pose.at(34.0 + (i % 3) * 1.5, 1.4 + (i // 3) * 1.5)
+                    return Pose.at(
+                        (31.0 if original_visibility_scene else 34.0) + (i % 3) * 1.5,
+                        1.4 + (i // 3) * 1.5,
+                    )
                 if player == "owner" and ":sorcerer:" in model:
                     return Pose.at(6.5, 2.9)
                 return Pose.at(

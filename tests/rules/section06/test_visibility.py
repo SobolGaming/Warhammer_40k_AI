@@ -192,3 +192,81 @@ def test_ruins_rules_footprint_can_block_without_physical_wall(
         .resolve_line_of_sight()
         .unit_fully_visible
     )
+
+
+@pytest.mark.parametrize(("observer_radius", "target_radius"), [(1, 1), (1, 2), (2, 1)])
+@pytest.mark.parametrize("offset", [-1, 0, 1])
+def test_rear_plane_certificate_preserves_strict_rational_boundary(
+    observer_radius: int, target_radius: int, offset: int
+) -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_certificates import (
+        full_visibility_by_rear_plane_separation,
+    )
+    from warhammer40k_core.geometry.visibility_exact import (
+        CORRIDOR_RADIUS,
+        RationalEllipse,
+        VisibilityPrism,
+    )
+
+    observer = VisibilityPrism(
+        RationalEllipse((F(0), F(0)), (F(observer_radius), F(0)), (F(0), F(observer_radius))),
+        F(0),
+        F(1),
+        (F(-observer_radius), F(-observer_radius), F(observer_radius), F(observer_radius)),
+    )
+    target = VisibilityPrism(
+        RationalEllipse((F(10), F(0)), (F(target_radius), F(0)), (F(0), F(target_radius))),
+        F(0),
+        F(2),
+        (F(10 - target_radius), F(-target_radius), F(10 + target_radius), F(target_radius)),
+    )
+    boundary = F(10) + F(target_radius * (observer_radius - target_radius), 10) + CORRIDOR_RADIUS
+    left = boundary + F(offset, 10**9)
+    blocker = VisibilityPrism(
+        ((left, F(-3)), (left + 1, F(-3)), (left + 1, F(3)), (left, F(3))),
+        F(0),
+        F(2),
+        (left, F(-3), left + 1, F(3)),
+    )
+    assert full_visibility_by_rear_plane_separation(observer, target, (blocker,)) is (offset > 0)
+
+
+@pytest.mark.parametrize("invalid_scope", ["upper-cap", "lower-cap", "overlap", "flat"])
+def test_rear_plane_certificate_declines_unproved_scope(invalid_scope: str) -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_certificates import (
+        full_visibility_by_rear_plane_separation,
+    )
+    from warhammer40k_core.geometry.visibility_exact import RationalEllipse, VisibilityPrism
+
+    observer = VisibilityPrism(
+        RationalEllipse((F(0), F(0)), (F(1), F(0)), (F(0), F(1))),
+        F(0),
+        F(1),
+        (F(-1), F(-1), F(1), F(1)),
+    )
+    target = VisibilityPrism(
+        RationalEllipse((F(10), F(0)), (F(2), F(0)), (F(0), F(2))),
+        F(0),
+        F(2),
+        (F(8), F(-2), F(12), F(2)),
+    )
+    if invalid_scope == "upper-cap":
+        observer = replace(observer, upper=F(3))
+    elif invalid_scope == "lower-cap":
+        observer = replace(observer, lower=F(-1))
+    elif invalid_scope == "overlap":
+        assert isinstance(target.footprint, RationalEllipse)
+        target = replace(
+            target,
+            footprint=replace(target.footprint, center=(F(2), F(0))),
+            bounds=(F(0), F(-2), F(4), F(2)),
+        )
+    else:
+        target = replace(
+            target, footprint=((F(9), F(-1)), (F(11), F(-1)), (F(11), F(1)), (F(9), F(1)))
+        )
+    assert not full_visibility_by_rear_plane_separation(observer, target, ())

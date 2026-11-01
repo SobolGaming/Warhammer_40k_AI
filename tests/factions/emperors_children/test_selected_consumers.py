@@ -1494,3 +1494,40 @@ def test_sorcerer_native_overwatch_hits_cannot_trigger_own_shooting_wracking(
         and effect.effect_payload.get("rule_id") == "sorcerer:datasheet:000004085:4"
         for effect in state.persisting_effects
     )
+
+
+def test_sorcerer_original_rear_blocker_scene_completes_shooting_and_exact_replay() -> None:
+    from tests.support.sorcerer_native import (
+        deploy_native,
+        native_declaration,
+        native_fire,
+        native_session,
+        translate_native,
+    )
+    from warhammer40k_core.engine.replay import ReplayRunStatus
+
+    session = native_session(enemy_attached=False)
+    deploy_native(session, original_visibility_scene=True)
+    translate_native(session, "attached-unit:owner:bodyguard", 7.0)
+    # Retain the original accepted 494.54-second diagnostic scene, including the
+    # lone Sorcerer at (31, 4.5) and its separate bodyguards starting at (31, 1.4).
+    # Declaration enumerates every real target before selecting the attack.
+    native_declaration(session, "attached-unit:owner:bodyguard")
+    native_fire(
+        session,
+        profile_id="000004085:agonising-energies:witchfire",
+        target_id="opponent:sorcerer",
+    )
+    hits = [p["payload"] for p in events(session, "attack_sequence_step") if p["step"] == "hit"]
+    assert hits
+    assert all(isinstance(hit, dict) and hit["target_number"] == 3 for hit in hits)
+    assert any(isinstance(hit, dict) and hit["successful"] is True for hit in hits)
+    persisted = json.loads(json.dumps(session.to_persistence_payload()))
+    restored = LocalGameSession.from_persistence_payload(persisted)
+    assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
+    for viewer in ("owner", "opponent"):
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+    result = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="sorcerer-original-rear-blocker-scene")
+    ).run()
+    assert result.status is ReplayRunStatus.REPRODUCED

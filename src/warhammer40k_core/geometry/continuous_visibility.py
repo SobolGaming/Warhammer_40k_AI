@@ -22,6 +22,7 @@ from warhammer40k_core.geometry.visibility_certificates import (
     full_visibility_by_observer_caps,
     full_visibility_by_parallel_circle_corridors,
     full_visibility_by_rear_circle_separation,
+    full_visibility_by_rear_plane_separation,
 )
 from warhammer40k_core.geometry.visibility_exact import (
     CORRIDOR_RADIUS,
@@ -297,6 +298,7 @@ def resolve_visibility_pair_uncached(
         full_visibility_by_observer_caps(observer, target, every_blockers)
         or full_visibility_by_parallel_circle_corridors(observer, target, every_blockers)
         or full_visibility_by_rear_circle_separation(observer, target, every_blockers)
+        or full_visibility_by_rear_plane_separation(observer, target, every_blockers)
     )
     if full_proved and set(any_blockers).issubset(every_blockers):
         return ContinuousVisibilityEvidence(

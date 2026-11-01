@@ -269,6 +269,50 @@ def all_corridors_blocked_by_endpoint_containment(
     )
 
 
+def full_visibility_by_rear_plane_separation(
+    observer: VisibilityPrism, target: VisibilityPrism, blockers: tuple[VisibilityPrism, ...]
+) -> bool:
+    """Enclose all facing circle parts strictly before every rear blocker.
+
+    Let D=Ct-Co, with circle radii ro, rt. A self-visible side point Ct+rt*n
+    has unit normal n and n.D <= ro-rt: some observer origin must reach its
+    outside half-space. Hence its D-projection is <= Ct.D+rt*(ro-rt).
+    Every observer origin projects <= Co.D+ro*|D|. A flat 1mm corridor adds
+    at most corridor_radius*|D| to the larger endpoint bound. Outward rational
+    square-root bounds only enlarge this enclosure. Strict blocker separation
+    therefore proves all such corridors clear, including closed tangency.
+    The contained height interval excludes visible target caps; disjoint XY
+    circles ensure nonvertical origins. Failure leaves the complete predicate.
+    """
+    first_radius, last_radius = circle_radius(observer), circle_radius(target)
+    if (
+        first_radius is None
+        or last_radius is None
+        or observer.lower < target.lower
+        or observer.upper > target.upper
+    ):
+        return False
+    assert isinstance(observer.footprint, RationalEllipse)
+    assert isinstance(target.footprint, RationalEllipse)
+    start, end = observer.footprint.center, target.footprint.center
+    dx, dy = end[0] - start[0], end[1] - start[1]
+    length2 = dx * dx + dy * dy
+    if length2 <= (first_radius + last_radius) ** 2:
+        return False
+    length_upper = rational_sqrt_bounds(length2)[1]
+    origin_bound = dx * start[0] + dy * start[1] + first_radius * length_upper
+    facing_bound = dx * end[0] + dy * end[1] + last_radius * (first_radius - last_radius)
+    corridor_bound = max(origin_bound, facing_bound) + CORRIDOR_RADIUS * length_upper
+    for blocker in blockers:
+        if blocker.upper < target.lower or blocker.lower > target.upper:
+            continue
+        base, square = _prism_support(blocker, (-dx, -dy, Fraction(0)))
+        blocker_lower_bound = -base - rational_sqrt_bounds(square)[1]
+        if blocker_lower_bound <= corridor_bound:
+            return False
+    return True
+
+
 def full_visibility_by_rear_circle_separation(
     observer: VisibilityPrism, target: VisibilityPrism, blockers: tuple[VisibilityPrism, ...]
 ) -> bool:
