@@ -156,11 +156,11 @@
     },
     "docs/performance/current/defiler-c15-v4.json": {
       "before_sha256": null,
-      "after_sha256": "31569136f5f652f61d17156adab9e8037ea30c6e8db45b68af2d15dea99ee170",
+      "after_sha256": "f9a7c0c72204c9e00642ec489466905f07f5e9a89635298f7d0ed517174a7fa8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "31569136f5f652f61d17156adab9e8037ea30c6e8db45b68af2d15dea99ee170"
+          "after": "f9a7c0c72204c9e00642ec489466905f07f5e9a89635298f7d0ed517174a7fa8"
         }
       }
     },
