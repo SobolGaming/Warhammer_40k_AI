@@ -1,0 +1,183 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "visibility",
+  "workload_id": "order78-gone-to-ground-v2",
+  "base_revision": "7827235d328bf5b82201c8fece29dab7356ba3e3",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:617011195977d5ecb3d7445dffe6bce8d4031328abfe55b51ec1ef67b33c3448",
+  "head_input_digest": "2ea076b810bd279dc9bd8b5e05c8eab07447973177766df0ba9dbe2a83fbf251",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:42a3c9eaab5fd7e0b8771d0cf2bfcfc46f647b5c909bd650bea6789198b1f749",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359395840,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "logical_cpus": 64,
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "fdf2689406de0469904b7af9d24c8e15246e29eb31c37503b0e0fdd8b6b80f1d",
+    "fixture_sha256": "ffc3a2b57e54eff0c73cfe73ddb9afb963f3d3ecb12081b1f3cb02242f038986",
+    "samples": {
+      "dense-outside": [
+        0.15121045399996547,
+        0.09742304700012028,
+        0.09714462900001308,
+        0.0967344299999695,
+        0.09669234900002266,
+        0.09622262400012005,
+        0.09597312400001101
+      ],
+      "dense-inside": [
+        0.15600214999994932,
+        0.09639601499998207,
+        0.09533847400007289,
+        0.09549373599998034,
+        0.09510701499993957,
+        0.09497669000006681,
+        0.09578155300005164
+      ],
+      "attached-outside": [
+        0.2647993989999122,
+        0.1908287300000211,
+        0.190191711000125,
+        0.1986181970000871,
+        0.19061785099984263,
+        0.18955269899993255,
+        0.1917921239999032
+      ],
+      "light-outside": [
+        0.07225099800007229,
+        0.06278417900011846,
+        0.06298209999999926,
+        0.06280592600001,
+        0.06280141799993544,
+        0.06287003500005994,
+        0.06231513000011546
+      ],
+      "not-hidden": [
+        0.06079619100000855,
+        0.059943981000060376,
+        0.06006098500006374,
+        0.06062203999999838,
+        0.059952368000040224,
+        0.06083594999995512,
+        0.060442337000040425
+      ],
+      "fully-visible": [
+        0.025876976000063223,
+        0.02332948500020393,
+        0.023510406000013973,
+        0.02362265099986871,
+        0.02341668999997637,
+        0.02343685899995762,
+        0.02461167500018746
+      ],
+      "associated-policy-only-woods": [
+        0.15481621499998255,
+        0.09861844200008818,
+        0.09901752099995065,
+        0.0993327590001627,
+        0.09893395599988253,
+        0.09907559999987825,
+        0.1006963550000819
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:617011195977d5ecb3d7445dffe6bce8d4031328abfe55b51ec1ef67b33c3448",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359395840,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "logical_cpus": 64,
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "fdf2689406de0469904b7af9d24c8e15246e29eb31c37503b0e0fdd8b6b80f1d",
+    "fixture_sha256": "ffc3a2b57e54eff0c73cfe73ddb9afb963f3d3ecb12081b1f3cb02242f038986",
+    "samples": {
+      "dense-outside": [
+        0.15461524400006965,
+        0.09707220200016309,
+        0.09416540699999132,
+        0.09407931199984887,
+        0.09440583700006755,
+        0.09383921199992074,
+        0.09639582299996619
+      ],
+      "dense-inside": [
+        0.14844429200002196,
+        0.09834274299987555,
+        0.09410290999994686,
+        0.09415208800010078,
+        0.09406179300003714,
+        0.09360543299999335,
+        0.09481076700012636
+      ],
+      "attached-outside": [
+        0.268564539999943,
+        0.19351993300006143,
+        0.1943556239998543,
+        0.18914038899993102,
+        0.1873131510001258,
+        0.19342631699987578,
+        0.18682877500009454
+      ],
+      "light-outside": [
+        0.07905391100007364,
+        0.063287414999877,
+        0.06449083799998334,
+        0.06340135999994345,
+        0.06531513999993876,
+        0.06256766699993932,
+        0.06260424700008116
+      ],
+      "not-hidden": [
+        0.05949696099992252,
+        0.058970984000097815,
+        0.05999531900010879,
+        0.058877589000076114,
+        0.05907111100009388,
+        0.05908045099999981,
+        0.058887178000077256
+      ],
+      "fully-visible": [
+        0.026055767000116248,
+        0.02337857200018334,
+        0.023455667999996876,
+        0.023530606000122134,
+        0.02370416599978853,
+        0.02338434199987205,
+        0.023512806000098863
+      ],
+      "associated-policy-only-woods": [
+        0.14475311399996826,
+        0.09740276699994865,
+        0.09714866900003472,
+        0.10338584700002684,
+        0.10301340599994546,
+        0.09760506699990401,
+        0.09835634199998822
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    {
+      "record": "data/source_audits/sorcerer_2026_11/visibility-diagnostic.json",
+      "qualification": "Original native 494.54s interruption and identical raw-query base/head 45s timeouts produced no answer; not completed samples or a native base Sorcerer comparison."
+    },
+    {
+      "record": "data/source_audits/sorcerer_2026_11/visibility-correction.json",
+      "qualification": "Retains rejected bounded probes and first-certificate 180s native timeout. Current original scene completion is a separate native correctness regression, not a fabricated matched-baseline speedup."
+    }
+  ]
+}

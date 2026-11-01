@@ -1,0 +1,111 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "setup",
+  "workload_id": "order101-failed-setup-restore-view-replay-v1",
+  "base_revision": "7827235d328bf5b82201c8fece29dab7356ba3e3",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:617011195977d5ecb3d7445dffe6bce8d4031328abfe55b51ec1ef67b33c3448",
+  "head_input_digest": "2ea076b810bd279dc9bd8b5e05c8eab07447973177766df0ba9dbe2a83fbf251",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:42a3c9eaab5fd7e0b8771d0cf2bfcfc46f647b5c909bd650bea6789198b1f749",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359395840,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "logical_cpus": 64,
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "aa2a5bdaaaf26d8746cb800c482e3403092d7fa37741809abe5caba1741b6069",
+    "fixture_sha256": "ffc3a2b57e54eff0c73cfe73ddb9afb963f3d3ecb12081b1f3cb02242f038986",
+    "samples": {
+      "cargo-5": [
+        1.8358215159998963,
+        1.8484566390000055,
+        1.7771245189999263,
+        1.872019463000015,
+        1.8015325370001847,
+        1.7926075899999887,
+        1.9393695639998896
+      ],
+      "cargo-100": [
+        1.7902466600000935,
+        1.8954095560000042,
+        1.78163344099994,
+        1.7621915619999982,
+        1.8572777320000569,
+        1.823622978000003,
+        1.879292525999972
+      ],
+      "loaded-deep-strike": [
+        3.0195301140001902,
+        2.9682988219999515,
+        3.009584976000042,
+        3.047792640000125,
+        3.0070871189998343,
+        3.023325146000161,
+        3.020446381000056
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:617011195977d5ecb3d7445dffe6bce8d4031328abfe55b51ec1ef67b33c3448",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359395840,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "logical_cpus": 64,
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "aa2a5bdaaaf26d8746cb800c482e3403092d7fa37741809abe5caba1741b6069",
+    "fixture_sha256": "ffc3a2b57e54eff0c73cfe73ddb9afb963f3d3ecb12081b1f3cb02242f038986",
+    "samples": {
+      "cargo-5": [
+        1.8014020260000052,
+        1.8634119209998516,
+        1.777923697999995,
+        1.8578730570000062,
+        1.764633344999993,
+        1.7547461919998568,
+        1.8400408509999124
+      ],
+      "cargo-100": [
+        1.7553979319998234,
+        1.878119728999991,
+        1.830952878999824,
+        1.7779912490000243,
+        1.8546467880000819,
+        1.7741956269999264,
+        1.8624342440000419
+      ],
+      "loaded-deep-strike": [
+        2.978392135000149,
+        2.974930713000049,
+        2.9743501220000326,
+        2.9719026860000213,
+        3.01011590600001,
+        3.0953981270001805,
+        2.987129075999974
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    {
+      "record": "data/source_audits/sorcerer_2026_11/visibility-diagnostic.json",
+      "qualification": "Original native 494.54s interruption and identical raw-query base/head 45s timeouts produced no answer; not completed samples or a native base Sorcerer comparison."
+    },
+    {
+      "record": "data/source_audits/sorcerer_2026_11/visibility-correction.json",
+      "qualification": "Retains rejected bounded probes and first-certificate 180s native timeout. Current original scene completion is a separate native correctness regression, not a fabricated matched-baseline speedup."
+    }
+  ]
+}

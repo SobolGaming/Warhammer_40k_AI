@@ -424,6 +424,46 @@
         }
       }
     },
+    "docs/performance/current/sorcerer-movement.json": {
+      "before_sha256": null,
+      "after_sha256": "e464a8e60a6cb1f57ee8d70f18b9df614b36e6c66f2a1c4fba231952204ccad7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e464a8e60a6cb1f57ee8d70f18b9df614b36e6c66f2a1c4fba231952204ccad7"
+        }
+      }
+    },
+    "docs/performance/current/sorcerer-reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "691d57850bc7b5dba00c8444f045d8ff3068475e3e522cbf8531c7642c6f480d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "691d57850bc7b5dba00c8444f045d8ff3068475e3e522cbf8531c7642c6f480d"
+        }
+      }
+    },
+    "docs/performance/current/sorcerer-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "9cb552a9121ca7ce0d31dcb1da5ac1c07c4b909a067b5cbec1893dc43cbac383",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9cb552a9121ca7ce0d31dcb1da5ac1c07c4b909a067b5cbec1893dc43cbac383"
+        }
+      }
+    },
+    "docs/performance/current/sorcerer-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "a2cb3c3e810fd9e77a3ca99d9c2ab91bd8d1817ea4d16ac9b17d951701cb5d0e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a2cb3c3e810fd9e77a3ca99d9c2ab91bd8d1817ea4d16ac9b17d951701cb5d0e"
+        }
+      }
+    },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "215c6b071b95ec666f21f66e4ca00de24f65ecda8471cf9a8cb5d1f60fb7fd17",
       "after_sha256": "6c759a2a1bc9ae9f97694e89d4cad3608cddff78d748df8ac695e17377e73b13",
@@ -1643,6 +1683,38 @@
       "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, the existing path-search, cache, concurrency and shared selected-target expiration contracts are unchanged; separately classified geometry rows implement the authorized exact proof termination repair. Native legal controls exercise the added work. Only the three exact source-inventory/provenance owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
     },
     "docs/factions/emperors-children.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, the existing path-search, cache, concurrency and shared selected-target expiration contracts are unchanged; separately classified geometry rows implement the authorized exact proof termination repair. Native legal controls exercise the added work. Only the three exact source-inventory/provenance owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "docs/performance/current/sorcerer-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, the existing path-search, cache, concurrency and shared selected-target expiration contracts are unchanged; separately classified geometry rows implement the authorized exact proof termination repair. Native legal controls exercise the added work. Only the three exact source-inventory/provenance owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "docs/performance/current/sorcerer-reconstruction.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, the existing path-search, cache, concurrency and shared selected-target expiration contracts are unchanged; separately classified geometry rows implement the authorized exact proof termination repair. Native legal controls exercise the added work. Only the three exact source-inventory/provenance owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "docs/performance/current/sorcerer-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, the existing path-search, cache, concurrency and shared selected-target expiration contracts are unchanged; separately classified geometry rows implement the authorized exact proof termination repair. Native legal controls exercise the added work. Only the three exact source-inventory/provenance owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "docs/performance/current/sorcerer-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
