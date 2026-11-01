@@ -1,639 +1,143 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "c15bd1564bd62a7c1ba9069a5ee6bbc7a6b94ce8",
+  "base": "2b848f28308f74c913a74829cfe7f5c40c298bb2",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bd8506753f1f308d8b8a03d9b422d357e15a33f68c8fb1dce7a5cabec34d9874",
   "operation_map_sha256": "4b43ce8f3dd96067931fc612355ec8f7bc18c3dda7fa63f53b2cb866fe6fb439",
   "changes": {
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "860aa5e3a0caaf35d6b589ad2c8d84c4f4c894a0b0189bb79d16259c34c53f36",
-      "after_sha256": "bbbded4504168f2b34df6f133ba457d7b5d0b57f9eab64772dcb4491bec56bfa",
+    ".github/pull_request_template.md": {
+      "before_sha256": "7769f0ddafc7d0bad30d8c4c129307c63e431144f99ba4373bb685d0527ad03a",
+      "after_sha256": "a86c7d1ca027bb625ffbb12d92982446026d3be0360f2acd900a9408e2dbfb22",
       "owners": {
         "@document": {
-          "before": "860aa5e3a0caaf35d6b589ad2c8d84c4f4c894a0b0189bb79d16259c34c53f36",
-          "after": "bbbded4504168f2b34df6f133ba457d7b5d0b57f9eab64772dcb4491bec56bfa"
+          "before": "7769f0ddafc7d0bad30d8c4c129307c63e431144f99ba4373bb685d0527ad03a",
+          "after": "a86c7d1ca027bb625ffbb12d92982446026d3be0360f2acd900a9408e2dbfb22"
         }
       }
     },
-    "ci/quality_shards/shard-1.txt": {
-      "before_sha256": "3ac301fdbcc5d8fe238c0e8dd6ec6b4b0df6cda00ac9fcdc4cbf1107694944bb",
-      "after_sha256": "c0b335c8af253f7f4b39508293d48266ba99e4d93692b2da8047086e9ea0bd30",
+    ".github/workflows/ci.yml": {
+      "before_sha256": "eb86b54a0df6cff7b6cdc8187dce619f8d9bc60494e65554f580bb8e3816044a",
+      "after_sha256": "295594b4150b13a49b0f092125e10c7378234ab180b52a0f2b62c6bc0ffd2132",
       "owners": {
         "@document": {
-          "before": "3ac301fdbcc5d8fe238c0e8dd6ec6b4b0df6cda00ac9fcdc4cbf1107694944bb",
-          "after": "c0b335c8af253f7f4b39508293d48266ba99e4d93692b2da8047086e9ea0bd30"
+          "before": "eb86b54a0df6cff7b6cdc8187dce619f8d9bc60494e65554f580bb8e3816044a",
+          "after": "295594b4150b13a49b0f092125e10c7378234ab180b52a0f2b62c6bc0ffd2132"
         }
       }
     },
-    "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "a6e543deb2f7394aa872358984489967131e62166db6f6cedf91b3a7ea9ea4a3",
-      "after_sha256": "bf6a9f542b8fec903e3e3839053c1cb822e0b7e9321967fd30a2d69d586e5dbd",
+    "AGENTS.md": {
+      "before_sha256": "b74cbd4b92504927db1d47cb87ed686fe552c844e751b72d8c0e1596f5cc3c28",
+      "after_sha256": "9b8aa614baa3d56f75eef7ee6ac2b206d7ad058f3245073917e51b3c288726c8",
       "owners": {
         "@document": {
-          "before": "a6e543deb2f7394aa872358984489967131e62166db6f6cedf91b3a7ea9ea4a3",
-          "after": "bf6a9f542b8fec903e3e3839053c1cb822e0b7e9321967fd30a2d69d586e5dbd"
+          "before": "b74cbd4b92504927db1d47cb87ed686fe552c844e751b72d8c0e1596f5cc3c28",
+          "after": "9b8aa614baa3d56f75eef7ee6ac2b206d7ad058f3245073917e51b3c288726c8"
         }
       }
     },
-    "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "6d1bb57575304bfa3aea611a929211fadeeb1e15bb06d98e275d704fdf65cbb9",
-      "after_sha256": "ddd36d2f8548b239f3a5f83bca51915d9c742941acb1b43ca12344049a57e33b",
+    "README.md": {
+      "before_sha256": "6876c8b78d8736b86e2f5215981247bdb24d5b21c1056aee661ce6dd03c50932",
+      "after_sha256": "aaacce152217fc7072d8b90db4b105d39e6ec9b1c65b51bfaaa5b0cd9872cb2a",
       "owners": {
         "@document": {
-          "before": "6d1bb57575304bfa3aea611a929211fadeeb1e15bb06d98e275d704fdf65cbb9",
-          "after": "ddd36d2f8548b239f3a5f83bca51915d9c742941acb1b43ca12344049a57e33b"
+          "before": "6876c8b78d8736b86e2f5215981247bdb24d5b21c1056aee661ce6dd03c50932",
+          "after": "aaacce152217fc7072d8b90db4b105d39e6ec9b1c65b51bfaaa5b0cd9872cb2a"
         }
       }
     },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "c9ea5adc49ab3ba36eb31c5a390ca193c26990aac5a1e6d80ab308d232bb95d1",
-      "after_sha256": "fadc88117bf2aed64656ba6664e155b8ecb2e69a2f59a75e995905e88efc9b0d",
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+      "before_sha256": "fde188b6bea4e5eabc8f1ce48bde83dff18b14425192d69727c0ffdcfb6498a2",
+      "after_sha256": "5af5813b54b3db5d7ac8e814f7d45c7ad8c5be275c18cfac3f0f7b7761ec365b",
       "owners": {
         "@document": {
-          "before": "c9ea5adc49ab3ba36eb31c5a390ca193c26990aac5a1e6d80ab308d232bb95d1",
-          "after": "fadc88117bf2aed64656ba6664e155b8ecb2e69a2f59a75e995905e88efc9b0d"
+          "before": "fde188b6bea4e5eabc8f1ce48bde83dff18b14425192d69727c0ffdcfb6498a2",
+          "after": "5af5813b54b3db5d7ac8e814f7d45c7ad8c5be275c18cfac3f0f7b7761ec365b"
         }
       }
     },
-    "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "39f09d494a76a12dd4d0d3694192ef504ac3036abcff5328f15b93f6a46cbac2",
-      "after_sha256": "be2a7c6029966089a830c8cd20350cdcc1f24d77eb77644eaa8f063683993fcf",
+    "pyproject.toml": {
+      "before_sha256": "42c1a1c4db411da62bba612820d1922dd50b838e7f93bfd3ceb11aa7b516f513",
+      "after_sha256": "067e65a29893a6e8c60235b87b350c933ec1077cddbe44e0e6325d553e5246f7",
       "owners": {
         "@document": {
-          "before": "39f09d494a76a12dd4d0d3694192ef504ac3036abcff5328f15b93f6a46cbac2",
-          "after": "be2a7c6029966089a830c8cd20350cdcc1f24d77eb77644eaa8f063683993fcf"
+          "before": "42c1a1c4db411da62bba612820d1922dd50b838e7f93bfd3ceb11aa7b516f513",
+          "after": "067e65a29893a6e8c60235b87b350c933ec1077cddbe44e0e6325d553e5246f7"
         }
       }
     },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "73b478878561de60795877fad50321cdaee84405cc7f1cbd037e7ee72222c3d7",
-      "after_sha256": "07a27dd35b099290ebb38f577c91e6680d6152348b4a967c24d92d006b2c95c0",
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "before_sha256": "ec4760ea3dbb6935fb3d4e4b47cdaf1b988b2a2b1e4f3a909f0df04265b56daa",
+      "after_sha256": "c20f05bc27038384c60626a9e6e9fe3f6340d53af8ddb9e667806db0bc97014c",
       "owners": {
-        "@document": {
-          "before": "73b478878561de60795877fad50321cdaee84405cc7f1cbd037e7ee72222c3d7",
-          "after": "07a27dd35b099290ebb38f577c91e6680d6152348b4a967c24d92d006b2c95c0"
-        }
-      }
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "3db4893a370c7bdcd1a6df6ffe987ddbc506b72767e83f58bbd2d68ef583ae1d",
-      "after_sha256": "3368e350431cfd07d0f6ef43d32ea8926bfb79d67282080c66e3bf2079a1beae",
-      "owners": {
-        "@document": {
-          "before": "3db4893a370c7bdcd1a6df6ffe987ddbc506b72767e83f58bbd2d68ef583ae1d",
-          "after": "3368e350431cfd07d0f6ef43d32ea8926bfb79d67282080c66e3bf2079a1beae"
-        }
-      }
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "e130c301456657b4b7a8e9149b26b13c83751369d22d85f3aa44c0c01eebadd7",
-      "after_sha256": "11117af551300bff69519a03e0fb9f1039d9c15251e27c2a998dfb58d39c09bf",
-      "owners": {
-        "@document": {
-          "before": "e130c301456657b4b7a8e9149b26b13c83751369d22d85f3aa44c0c01eebadd7",
-          "after": "11117af551300bff69519a03e0fb9f1039d9c15251e27c2a998dfb58d39c09bf"
-        }
-      }
-    },
-    "contracts/examples/support-profile.json": {
-      "before_sha256": "10a722027532bb55e95623ba74ee09b6457f1b61e31f9d0bdd611af72459acf5",
-      "after_sha256": "1b7e0ea7f94e0daa42606ffed52f25abf676f9212cc745f2398aab5c7eedbd26",
-      "owners": {
-        "@document": {
-          "before": "10a722027532bb55e95623ba74ee09b6457f1b61e31f9d0bdd611af72459acf5",
-          "after": "1b7e0ea7f94e0daa42606ffed52f25abf676f9212cc745f2398aab5c7eedbd26"
-        }
-      }
-    },
-    "contracts/manifest.json": {
-      "before_sha256": "f2680e3095311a2abbb9ed2432dde76d909d1c285273c500f8a71d444d1b78e7",
-      "after_sha256": "4027b90e6b7e3156379b8d4f07fd2be3e14e3408088393f4ffe6f07aae7cce20",
-      "owners": {
-        "@document": {
-          "before": "f2680e3095311a2abbb9ed2432dde76d909d1c285273c500f8a71d444d1b78e7",
-          "after": "4027b90e6b7e3156379b8d4f07fd2be3e14e3408088393f4ffe6f07aae7cce20"
-        }
-      }
-    },
-    "data/generated/ability_coverage/maulerfiend_cross_faction_support.json": {
-      "before_sha256": "60cb39279be4fd3ed00e8c6a80edb69b13dc992c24be6d16cde45c90f9be3fd1",
-      "after_sha256": "5a5f1ab5259af2c79a2084afd38f086afa131e3ef5f76f389d436d5ccd700fc4",
-      "owners": {
-        "@document": {
-          "before": "60cb39279be4fd3ed00e8c6a80edb69b13dc992c24be6d16cde45c90f9be3fd1",
-          "after": "5a5f1ab5259af2c79a2084afd38f086afa131e3ef5f76f389d436d5ccd700fc4"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "947e1b2b80ca2a0c9b6d520768308e60795b3cfa05d9fe178ed6974b78958045",
-      "after_sha256": "f0b95cda76ffe54a113ff27bc4569d7bd1e955ab3c68ed6a22e675f0a4537724",
-      "owners": {
-        "@document": {
-          "before": "947e1b2b80ca2a0c9b6d520768308e60795b3cfa05d9fe178ed6974b78958045",
-          "after": "f0b95cda76ffe54a113ff27bc4569d7bd1e955ab3c68ed6a22e675f0a4537724"
-        }
-      }
-    },
-    "data/source_audits/supported_rules_2026_10/defiler-replacement.json": {
-      "before_sha256": null,
-      "after_sha256": "b5614ab0deae4aac06303d752875fc3f1f7cf430527c32ef045f577e30d4002e",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "b5614ab0deae4aac06303d752875fc3f1f7cf430527c32ef045f577e30d4002e"
-        }
-      }
-    },
-    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "5a2f73abb38c6b32ca6be7fffb03b85072a2b53ef4464611e15dbfacd3851448",
-      "after_sha256": "39414038e934794d357ae402408ed0e33780ceb26cf79a518f909c0e23670737",
-      "owners": {
-        "@document": {
-          "before": "5a2f73abb38c6b32ca6be7fffb03b85072a2b53ef4464611e15dbfacd3851448",
-          "after": "39414038e934794d357ae402408ed0e33780ceb26cf79a518f909c0e23670737"
-        }
-      }
-    },
-    "docs/performance/current/defiler-c15-v4.json": {
-      "before_sha256": null,
-      "after_sha256": "e7d9b8d6761b4935dfd45b631f5e959515d3a160173f6b17fccf907e74880c5d",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e7d9b8d6761b4935dfd45b631f5e959515d3a160173f6b17fccf907e74880c5d"
-        }
-      }
-    },
-    "docs/performance/policy-v3/defiler-input-roles-v4.json": {
-      "before_sha256": null,
-      "after_sha256": "e8ffff573fad9ae0e065061bf2de00cd1999fd1a77a3d80419709920cc596553",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e8ffff573fad9ae0e065061bf2de00cd1999fd1a77a3d80419709920cc596553"
-        }
-      }
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "b472a1f517312aac42d2933473e542b292df2b7efe6c848eb0263ca8796653dc",
-      "after_sha256": "f5921e8ff9a1fbe68d89e9e440f1a1918360e35b7edcdad62b8c0e321d724d27",
-      "owners": {
-        "@document": {
-          "before": "b472a1f517312aac42d2933473e542b292df2b7efe6c848eb0263ca8796653dc",
-          "after": "f5921e8ff9a1fbe68d89e9e440f1a1918360e35b7edcdad62b8c0e321d724d27"
-        }
-      }
-    },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "84802f2714b63b34c0bc3676385a5f2e2dba60433fb01478482318dd936cb59e",
-      "after_sha256": "b5d231f412fc65f0f15414dda1824f98737741c7927af34e10f74d44417d1428",
-      "owners": {
-        "@document": {
-          "before": "84802f2714b63b34c0bc3676385a5f2e2dba60433fb01478482318dd936cb59e",
-          "after": "b5d231f412fc65f0f15414dda1824f98737741c7927af34e10f74d44417d1428"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/wahapedia_bridge.py": {
-      "before_sha256": "247206b2adeb4a9bba60316f6dead31e749696d2ddd397939f9862c687f02d84",
-      "after_sha256": "31fbd8b184362e3f740faf9d2661757868bc758c987a17491f80b301c2350d07",
-      "owners": {
-        "@module": {
-          "before": "79d1a6cd74a9c2934af6d10973ea7edf5449b0f3c64d11cf1a996307cda4c6e1",
-          "after": "d681e054e14090dccddd13d46e6e0cb1d3318c756dedceea67ce5e018736636b"
-        },
-        "_bridge_options": {
-          "before": "7214d8b90f395b626ed5db8fd84422d79de6896f4689f05b3886cf85e547eff1",
-          "after": "b5a3129222ead8d081bc3a0254fb53d3651fd158e20f561497d2daba9e11aa20"
-        },
-        "_bridge_single_replacement_option": {
-          "before": "40a756f82119d0af30f2979dd3e851f744ad78fddc428fa03005bc655ac78b59",
-          "after": null
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/wahapedia_replacement_option_bridge.py": {
-      "before_sha256": "45dd5e0a1eeb36419d917663a7ff268a8fc5cc0a23a03fcb64224b91ce61b524",
-      "after_sha256": "93f9a23bfd6c6d02cb1f4afc2bc67795d1537be93f4242575c839dcab69ad3c0",
-      "owners": {
-        "@module": {
-          "before": "5e49278f61d8885853afa83d0f81e613feb877c4bfecd28bc055901b95ce6b8e",
-          "after": "a9b732082478d676b3c0f7cd5b55fa0ef5bbb160d6e0a42799f07ee85c040a54"
-        },
-        "append_single_replacement_rows": {
-          "before": null,
-          "after": "d4180f8bd27748f37b8c2a12c36a0a399d709663da328d317d70518e9b3fa50e"
-        }
-      }
-    },
-    "tests/category_migration_preservation.py": {
-      "before_sha256": "8c4754b916b030076052106253c48237c34f5cda4ef3a3974fcc201357a4a36c",
-      "after_sha256": "5f91ec564b053985c625e628ccf7179c747fecad8fdd342db9de4633ad397ae8",
-      "owners": {
-        "@module": {
-          "before": "432db5b99303db530b44fe90ac9f47c8c7feb90be926bcc42070dc0894f25618",
-          "after": "b3ce91bfb989c8d85d45285720614379dfbce9fbb0d9c8b252d6cc3091dd5bbe"
-        },
-        "edition_registered_predecessor": {
-          "before": "1148ba23158d45caa9ca319fd493959b99636e2bc1f217446c2b525ea7315b7e",
-          "after": "f0a864b0255a7dfeadf203afafd565f78168c5d85004e344db95b2bc97ebf425"
-        }
-      }
-    },
-    "tests/code_quality/test_category_migration_preservation.py": {
-      "before_sha256": "e81f17e87fb9a6788780b0a060e3f91b161b2a410d1a6b90e73f906b3c9550ff",
-      "after_sha256": "cc5bde48d53cff504ad25831491955066401602a9095f26b5ac3c10e9a907c99",
-      "owners": {
-        "test_acts_comparison_registration_preserves_exact_historical_helper": {
-          "before": "5bc5d2751f0161ffdb4811b87367a809cb9c27a04948b2e56f10de06c4fe43a2",
-          "after": "99425c355596fb16128e909219de25dc34c1de8f05d119b7876e8038da520568"
-        },
-        "test_defiler_registration_retains_exact_acts_predecessor": {
-          "before": null,
-          "after": "fa9cddcda7979741f7565f43975e3cc8c52a1ce80bd3b7b0aa610ad15bf6de05"
-        }
-      }
-    },
-    "tests/code_quality/test_registered_source_scopes.py": {
-      "before_sha256": "da4dcc1d5912c040c6f3916c5fa75af42959670386d097c05db36314c3a85e4f",
-      "after_sha256": "f6b8f381b48aa92d15ec271f3e46789a8d36a7c72a402c63dd1e652c91bb4e85",
-      "owners": {
-        "test_defiler_scope_preserves_closed_inputs_provenance_and_six_real_samples": {
-          "before": null,
-          "after": "09e4e64f37530f60b64937a186687be126bdc78565d873ec2c22950581282031"
-        }
-      }
-    },
-    "tests/rules/section22/test_wargear.py": {
-      "before_sha256": "33d497758a238dfc3762c4bba9b3536477b63d1a2725b31d3307c2bf26856136",
-      "after_sha256": "de4c4be0bd385f15f3d21f29b9d2228f7ec541d248030ca096ceef73b2ffeca7",
-      "owners": {
-        "@module": {
-          "before": "15397a308d044516c743d52875e1020e9c62468475410e95ba3bc8bfa6a86c8a",
-          "after": "aaffa568d64264a726ed653b187483650e309beaba1fdfc19ae65246f7635ce8"
-        },
-        "_selected_unit": {
-          "before": null,
-          "after": "ed71c231f43cde98072b7c93c9bfa6dc4e80bc8a131bcda411bfaa3e7146daaa"
-        },
-        "replacement_package": {
-          "before": null,
-          "after": "7c7b1f4ed187ef3f0d07490f44d7e889a4ac100ca815a7353c2b3b2c31afcfa7"
-        },
-        "test_native_defiler_default_and_independent_slot_controls": {
-          "before": null,
-          "after": "c85cb3a917a75cfe82d4c002da48e92e647fb0a14101e298f004a0e628edb923"
-        },
-        "test_native_plural_replacement_removes_all_named_source_copies": {
-          "before": null,
-          "after": "817fa9ea6385073e85df454156b77997d48ae0027007bfdeab3365656a53f5a2"
-        },
-        "test_native_single_copy_option_preserves_other_default_copy": {
-          "before": null,
-          "after": "e1782ee3737790b2ddd37ed7364768474f0c156ee0f0340a26f75e9b09813d58"
-        },
-        "test_native_singular_item_replaced_with_two_copies": {
-          "before": null,
-          "after": "10403aa0378c52aabf706f0db22e6c46d9b13867478628f9a2e6e4c22b2d38e6"
-        },
-        "test_plural_source_boundary_requires_and_preserves_explicit_removal_count": {
-          "before": null,
-          "after": "efca3dcf3a238148d3057c1a45028a1a1f17300743be94334268c1459a333cee"
-        }
-      }
-    },
-    "tests/support/acts_preservation.py": {
-      "before_sha256": "bb8e0f47febc5c8892425f453497a829e64d2c99e775ff3f974936bac816d2a6",
-      "after_sha256": "1efa8cfb9a482e851645c5e4ffd9bbb5221ed08b952230f2a6250ad98360de73",
-      "owners": {
-        "defiler_provenance_predecessor": {
-          "before": null,
-          "after": "c45995e27697a870c516bc8889157b5f564fb2a8db3fc5fec17f9b8abdaf8678"
-        }
-      }
-    },
-    "tools/maulerfiend_cross_faction_support.py": {
-      "before_sha256": "25907bdf26c262a8f2b0e9a7b358496a6940697fe6e03b64d4d40f0dd40b5fd6",
-      "after_sha256": "230bd3d389b8783198857c4604b8bec63dde89eca1b5219e77b4eb2212efc371",
-      "owners": {
-        "@module": {
-          "before": "aecaabcd3620e7e4c5ded776a3aa75321e0ca0e9f0873520620039fdf85fd405",
-          "after": "9e21a241dcd40eb18ead15259ea4a44151578713140275f2fdbef72d4d243bf7"
-        }
-      }
-    },
-    "tools/performance_tool_inputs_v4.py": {
-      "before_sha256": "f52fb7dfc01ba55abe6b2468ef36a24e662a5146feb4541f71fdbfe3c0ae4af8",
-      "after_sha256": "3efafb9acf69551cd4737c3c75b70d15d18736e7dfff40b46365fba9a80a399e",
-      "owners": {
-        "@module": {
-          "before": "c1f71ac652771dedf80a40f9472910eec28fbcc9c3737476fe5924e48d2de996",
-          "after": "a87b62c44f229d08ccf273481bb289a939278e2d6f7358d971e5e7ac86c359ac"
-        }
-      }
-    },
-    "tools/source_scope_provenance.py": {
-      "before_sha256": "40ef539dc75aa669df54a099d7788b74ca68453c7ae18a1e009194c48a42f64a",
-      "after_sha256": "26b77718d94a586afebf33f90d1ca1eb0c7df17a5e922f054b28d5901abe938b",
-      "owners": {
-        "@module": {
-          "before": "5cf1e6ba288fe28372a4d1e0eac6812dfc871efe0a5213a7731830fff67a2092",
-          "after": "1532245b40263f4bf785016ece32c06d045f59aba03971ce235438ae6d783ccd"
+        "test_quality_gate_requires_every_independent_lane_even_when_skipped": {
+          "before": "d90f7cf92d0ecbc93ed61725c6956383b3e190b8852fcfa62957eff2bb8132ee",
+          "after": "c59ea9a43551a20bd7d2d70c7bfcf73eabb4e44f38288445b110e75c912dfc9d"
         }
       }
     }
   },
   "rows": {
-    "ci/quality_shards/all.txt": {
+    ".github/pull_request_template.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
+      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
+      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
+      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
     },
-    "ci/quality_shards/shard-1.txt": {
+    ".github/workflows/ci.yml": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
+      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
+      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
+      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
     },
-    "ci/quality_shards/shard-4.txt": {
+    "AGENTS.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
+      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
+      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
+      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
     },
-    "contracts/examples/persistence/session-persistence.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "contracts/examples/support-profile.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "contracts/manifest.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "data/generated/ability_coverage/maulerfiend_cross_faction_support.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-defiler-generated-owner-locator"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "data/source_audits/supported_rules_2026_10/defiler-replacement.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-rules-current-source-audit"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+    "README.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
+      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
+      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
+      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
     },
-    "docs/performance/current/defiler-c15-v4.json": {
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
+      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
+      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
+      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
     },
-    "docs/performance/policy-v3/defiler-input-roles-v4.json": {
-      "category": "governance",
-      "operations": [],
+    "pyproject.toml": {
+      "category": "dependency_environment",
+      "operations": [
+        "development-dependency"
+      ],
       "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
+      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
+      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
+      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
     },
-    "docs/performance/policy-v3/operation-map.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
+    "tests/code_quality/test_ci_performance_gates.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453"
       ],
       "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "src/warhammer40k_core/rules/wahapedia_bridge.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order113-attack-counts",
-        "supported-defiler-source-dispatch-extraction"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "src/warhammer40k_core/rules/wahapedia_replacement_option_bridge.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-defiler-source-plural-replacement"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "tests/category_migration_preservation.py": {
-      "category": "measured_workload",
-      "operations": [
-        "registered-source-provenance-preservation",
-        "supported-vyper-exact-base-performance-admission"
-      ],
-      "selected_families": [
-        "external_contract_source_reuse"
-      ],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "tests/code_quality/test_category_migration_preservation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-acts-migration-quality-controls",
-        "supported-defiler-exact-predecessor-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "tests/code_quality/test_registered_source_scopes.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-defiler-exact-scope-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "tests/rules/section22/test_wargear.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-739a5464cbc90fd9",
-        "supported-defiler-native-and-source-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "tests/support/acts_preservation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-defiler-exact-predecessor-projection"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "tools/maulerfiend_cross_faction_support.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-defiler-generated-evidence-owner"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "tools/performance_tool_inputs_v4.py": {
-      "category": "measured_workload",
-      "operations": [
-        "supported-vyper-exact-base-performance-admission"
-      ],
-      "selected_families": [
-        "external_contract_source_reuse"
-      ],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
-    },
-    "tools/source_scope_provenance.py": {
-      "category": "measured_workload",
-      "operations": [
-        "registered-source-provenance-projection"
-      ],
-      "selected_families": [
-        "external_contract_source_reuse"
-      ],
-      "rationale": "Preserve source-specified replacement multiplicity for the existing five Defiler options through shared source-boundary extraction. Existing sensitive qualification owners retain exact-base comparisons.",
-      "source_obligation": "Retained31October2026 preferred mirror clauses require both excruciator cannons replaced by two cutters. Exact item names and singular1-to-N options remain one-copy replacements; physical equipment, selection and persistence controls preserve that distinction.",
-      "unchanged_work": "No engine mutation, schema, runtime dependency or supported-content expansion. Existing REPLACE_WARGEAR plus ordered conditional removals encode the source obligation. Finite exactc15 registration preserves original timed harness, true common inputs, six real samples and complete generated trees under unchanged budgets."
+      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
+      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
+      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "external_contract_source_reuse": "docs/performance/current/defiler-c15-v4.json"
-  },
+  "comparisons": {},
   "full_game": null
 }

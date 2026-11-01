@@ -251,6 +251,7 @@ def test_junit_profiles_reject_incomplete_or_invalid_runs(
 
 def test_quality_gate_requires_every_independent_lane_even_when_skipped(
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     monkeypatch.setattr("sys.argv", ["build_test_shards.py", "--check"])
     assert sharding.main() == 0
@@ -276,16 +277,59 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
         assert workflow.count(f"manifest: ci/test_shards/shard-{shard}.txt") == 1
     coverage = workflow.partition("\n  coverage-gate:\n")[2]
     assert "scripts/check_shard_coverage.py coverage-data --shard-count 12" in coverage
-    assert "uv run --no-sync coverage report --fail-under=64" in coverage
+    assert "uv run --no-sync coverage report --fail-under=65" in coverage
     configuration = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     coverage_config = configuration["tool"]["coverage"]
     assert coverage_config["run"] == {"branch": True, "source": ["warhammer40k_core"]}
     assert coverage_config["report"] == {
         "show_missing": True,
         "skip_covered": True,
-        "fail_under": 64,
+        "fail_under": 65,
     }
     assert "scripts/build_test_shards.py --check --shard-count 12" in workflow
+
+    # The cutover is immutable historical authority, independent of today's gate.
+    cutover = json.loads((ROOT / sharding.CUTOVER_PATH).read_text(encoding="utf-8"))
+    assert cutover["coverage"]["current_floor"] == 64
+    assert len(sharding.deferred_comparison_cases(cutover)) == 260
+
+    from coverage import CoverageData
+
+    source = tmp_path / "coverage_boundary.py"
+    source.write_text("\n".join(f"value_{line} = {line}" for line in range(1, 101)) + "\n")
+    for covered, expected_status in ((64, 2), (65, 0)):
+        data_file = tmp_path / f".coverage.{covered}"
+        data = CoverageData(basename=str(data_file))
+        data.add_arcs(
+            {
+                str(source): [
+                    (-1, 1),
+                    *((line, line + 1) for line in range(1, covered)),
+                    (covered, -1),
+                ]
+            }
+        )
+        data.write()
+        # Exercise both config-default local reporting and CI's explicit override.
+        for override in ([], ["--fail-under=65"]):
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "coverage",
+                    "report",
+                    "--rcfile=" + str(ROOT / "pyproject.toml"),
+                    "--data-file=" + str(data_file),
+                    *override,
+                    str(source),
+                ],
+                cwd=tmp_path,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            assert result.returncode == expected_status, result.stdout + result.stderr
+            assert f"{covered}%" in result.stdout
 
 
 @pytest.mark.parametrize("newline", ["\n", "\r\n", "\r"])

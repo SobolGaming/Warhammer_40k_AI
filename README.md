@@ -211,7 +211,7 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=64
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=65
 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports
@@ -265,7 +265,7 @@ Focused subsets and `--lf` are for iteration, never replacements for this final 
 PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
   uv run pytest tests --ignore=tests/code_quality \
   -n auto --dist=worksteal \
-  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=64
+  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=65
 ```
 
 The `PATH` prefix exposes the Node.js runtime bundled with Codex desktop to the executable
@@ -273,7 +273,7 @@ viewer-renderer regressions. It is safe when that directory is absent: an indepe
 `node` later on the existing `PATH` remains available. Keep this prefix on full-suite runs so those
 tests do not fail only because the desktop shell omitted the bundled runtime.
 
-CI shards this same behavioral suite, combines branch coverage, and applies the temporary 64%
+CI shards this same behavioral suite, combines branch coverage, and applies the temporary 65%
 gate after every shard succeeds. Full type checking and architecture checks also remain required
 in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
 format for a shorter edit/commit loop.
@@ -284,7 +284,7 @@ performance command remains limited to 180 seconds, and quality lanes retain the
 600-second limit. Report actual end-to-end time and queue overhead; a per-step
 cutoff does not establish that the total goal passed.
 
-The current owner-approved coverage floor is 64%; later coverage work must restore 85%. The full
+The current owner-approved coverage floor is 65%; later coverage work must restore 85%. The full
 warhammer40k_core package and branch metric remain unchanged, with no added coverage
 omissions or exclusions. This policy change does not claim either threshold has passed;
 all required tests and other gates must still succeed. See the

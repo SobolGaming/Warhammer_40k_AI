@@ -400,7 +400,7 @@ canonical complete covered command below remains the required CI workload.
 
 ## Required commands before PR
 
-The temporary owner-approved coverage floor is 64%; post-merge coverage work must restore
+The temporary owner-approved coverage floor is 65%; post-merge coverage work must restore
 85%. Keep full-package branch coverage and all other required gates. See
 docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md.
 
@@ -410,7 +410,7 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=64
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=65
 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports
