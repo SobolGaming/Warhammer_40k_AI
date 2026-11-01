@@ -15,6 +15,7 @@ from warhammer40k_core.rules.wahapedia_bridge_patterns import (
     SCALED_MODEL_REPLACEMENT_WITH_PAIRED_CHOICES_RE,
     SCALED_OPTION_DUPLICATE_RESTRICTION_RE,
 )
+from warhammer40k_core.rules.wahapedia_loadout_bridge import LoadoutAssignments
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow
 
 
@@ -94,6 +95,79 @@ def append_extended_replacement_rows(
         error_type=error_type,
     )
     return True
+
+
+def append_single_replacement_rows(
+    *,
+    row: NormalizedSourceRow,
+    datasheet_id: str,
+    model_profile_id: str,
+    wargear_ids_by_name: dict[str, str],
+    match: re.Match[str],
+    loadout_assignments: LoadoutAssignments | None,
+    bridged_rows: dict[str, list[dict[str, str]]],
+    error_type: type[ValueError],
+) -> None:
+    """Translate one source clause, retaining the multiplicity of a plural target."""
+    replacement_count = _positive_int(
+        match.group("replacement_count"), field_name="replacement_count", error_type=error_type
+    )
+    replaced_name = match.group("replaced")
+    replaced_wargear_id = _required_wargear_id(
+        wargear_ids_by_name, replaced_name, error_type=error_type
+    )
+    replacement_wargear_id = _required_wargear_id(
+        wargear_ids_by_name, match.group("replacement"), error_type=error_type
+    )
+    # An exact catalog item (including names such as "lasher tendrils") denotes
+    # one item. Only the plural alias of a singular item denotes its whole
+    # source-assigned loadout; the number added is independent of the number removed.
+    removed_count = 1
+    if _name_key(replaced_name, error_type=error_type) not in wargear_ids_by_name:
+        if loadout_assignments is None:
+            raise error_type("Plural replacement requires an explicit source loadout.")
+        removed_count = loadout_assignments.count_for(
+            replaced_name, model_profile_id=model_profile_id
+        )
+        if removed_count < 1:
+            raise error_type("Plural replacement target is absent from the source loadout.")
+    source_line = _required_field(row, "line", error_type=error_type)
+    common = {
+        "datasheet_id": datasheet_id,
+        "description": _raw_or_field(row, "description"),
+        "option_id": (
+            f"{datasheet_id}:{_name_key(match.group('replacement'), error_type=error_type)}:"
+            f"option-{source_line}"
+        ),
+        "model_profile_id": model_profile_id,
+        "default_wargear_ids": "",
+        "allowed_wargear_ids": replacement_wargear_id,
+        "min_selections": "0",
+        "max_selections": "1",
+        "condition_kind": "",
+        "condition_wargear_ids": "",
+        "effect_wargear_id": replacement_wargear_id,
+        "effect_replaced_wargear_id": replaced_wargear_id,
+        "effect_model_count": "1",
+        "source_ids": ",".join(_source_ids(row)),
+    }
+    bridged_rows["Datasheets_options"].append(
+        {
+            **common,
+            "line": source_line,
+            "effect_kind": WargearOptionEffectKind.REPLACE_WARGEAR.value,
+            "effect_wargear_count": str(replacement_count),
+        }
+    )
+    bridged_rows["Datasheets_options"].extend(
+        {
+            **common,
+            "line": f"{source_line}.{effect_index}",
+            "effect_kind": WargearOptionEffectKind.REMOVE_WARGEAR_IF_SELECTED.value,
+            "effect_wargear_count": "0",
+        }
+        for effect_index in range(2, removed_count + 1)
+    )
 
 
 def _append_named_model_replacement_rows(

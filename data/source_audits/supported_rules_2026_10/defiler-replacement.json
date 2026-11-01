@@ -1,0 +1,115 @@
+{
+  "schema": "supported-defiler-replacement-audit-v1",
+  "base": "c15bd1564bd62a7c1ba9069a5ee6bbc7a6b94ce8",
+  "invariant": "An optional source-authorized replacement removes the complete named source loadout and adds exactly its replacement quantity on the chosen physical model.",
+  "observations": [
+    {
+      "faction": "chaos-space-marines",
+      "datasheet_id": "000000969",
+      "url": "https://www.40k.app/factions/chaos-space-marines/units/defiler",
+      "locale": "en",
+      "retained_utc": "2026-10-31T21:26:08.109129+00:00",
+      "sha256": "c9a529d5a60ffe035b3d07b5064d729c81761387900f4b4d76225164474abde2",
+      "capture_surface": "complete rendered main.innerText; CUA ordinary browser",
+      "authority": "project_authoritative_app_mirror",
+      "admission": "research_only_not_new_F00_registration",
+      "individual_field_change_version": "unverified",
+      "operative_clauses": [
+        "This model\u2019s excruciator cannons can be replaced with 2 magma cutters."
+      ]
+    },
+    {
+      "faction": "death-guard",
+      "datasheet_id": "000004209",
+      "url": "https://www.40k.app/factions/death-guard/units/defiler",
+      "locale": "en",
+      "retained_utc": "2026-10-31T21:26:08.109129+00:00",
+      "sha256": "88a6e1091c2e291d7d450f00afdc6f7191d8ffe1c84ee207c1922eed6df4cd55",
+      "capture_surface": "complete rendered main.innerText; CUA ordinary browser",
+      "authority": "project_authoritative_app_mirror",
+      "admission": "research_only_not_new_F00_registration",
+      "individual_field_change_version": "unverified",
+      "operative_clauses": [
+        "This model\u2019s excruciator cannons can be replaced with 2 magma cutters."
+      ]
+    },
+    {
+      "faction": "emperors-children",
+      "datasheet_id": "000004208",
+      "url": "https://www.40k.app/factions/emperors-children/units/defiler",
+      "locale": "en",
+      "retained_utc": "2026-10-31T21:26:08.109129+00:00",
+      "sha256": "cfcef276f1a9b61976474fffd5b594f07884d91c484f751f11c77a5076620ad7",
+      "capture_surface": "complete rendered main.innerText; CUA ordinary browser",
+      "authority": "project_authoritative_app_mirror",
+      "admission": "research_only_not_new_F00_registration",
+      "individual_field_change_version": "unverified",
+      "operative_clauses": [
+        "This model\u2019s excruciator cannons can be replaced with 2 magma cutters."
+      ]
+    },
+    {
+      "faction": "thousand-sons",
+      "datasheet_id": "000001030",
+      "url": "https://www.40k.app/factions/thousand-sons/units/defiler",
+      "locale": "en",
+      "retained_utc": "2026-10-31T21:26:08.109129+00:00",
+      "sha256": "4e645f6e7a5c71027a8fa929278f3561f0bc70f7388275f62f2374ecd0083483",
+      "capture_surface": "complete rendered main.innerText; CUA ordinary browser",
+      "authority": "project_authoritative_app_mirror",
+      "admission": "research_only_not_new_F00_registration",
+      "individual_field_change_version": "unverified",
+      "operative_clauses": [
+        "This model\u2019s excruciator cannons can be replaced with 2 pyraflux magma cutters."
+      ]
+    },
+    {
+      "faction": "world-eaters",
+      "datasheet_id": "000004207",
+      "url": "https://www.40k.app/factions/world-eaters/units/defiler",
+      "locale": "en",
+      "retained_utc": "2026-10-31T21:26:08.109129+00:00",
+      "sha256": "58b061718bd87e78d56a53e5ab910a4da4074693797165f853438d4a50588e1d",
+      "capture_surface": "complete rendered main.innerText; CUA ordinary browser",
+      "authority": "project_authoritative_app_mirror",
+      "admission": "research_only_not_new_F00_registration",
+      "individual_field_change_version": "unverified",
+      "operative_clauses": [
+        "This model\u2019s excruciator cannons can be replaced with 2 magma cutters."
+      ]
+    }
+  ],
+  "source_limits": "Retained31October2026 ordinary rendered-browser captures, independently checksum verified; project-authoritative unofficial App mirror, not official API evidence or a newly registered F00 package. Existing historical source packages and hashes unchanged. No profile, pricing or faction rule correction inferred.",
+  "reproduction": {
+    "entry": "fresh current source catalog -> UnitMusterSelection/WargearSelection -> UnitFactory.instantiate_unit -> own_models[0].wargear_ids",
+    "before": "all five source row :2 selections leave cannon1/cutters2",
+    "after": "all five produce cannon0/cutters2",
+    "normal_reachability": "ordinary supported native model selection; no synthetic engine helper injection",
+    "regression": "tests/rules/section22/test_wargear.py"
+  },
+  "implementation": {
+    "owner": "rules/wahapedia_replacement_option_bridge.py:append_single_replacement_rows",
+    "source_target": "plural name alias resolves singular item; removal multiplicity from existing model-profile LoadoutAssignments",
+    "encoding": "one REPLACE_WARGEAR then one REMOVE_WARGEAR_IF_SELECTED per additional removed source copy",
+    "unchanged": "exact item names remain one-copy replacements; engine semantics, schemas, IDs, source packages and runtime dispatch are unchanged"
+  },
+  "same_class_search": {
+    "status": "Complete fresh canonical catalogs at exact c15 and candidate:59 datasheets/355 options on each side; only the five Defiler :2 cutter options change. All350 other option payloads and every option ID are byte-equivalent after canonical JSON encoding. Raw all-source grammar scan is triage only; no unadmitted support added.",
+    "nearby_controls": [
+      "CSM Maulerfiend lasher tendrils1 -> cutters2",
+      "War Walker one shuriken cannon replacement retains the other copy",
+      "Wraithlord one catapult replacement retains the other copy",
+      "all five default loadouts, single/duplicate electroscourge and independent double lascannons",
+      "native selections and unit payloads round trip and deterministically reconstruct"
+    ],
+    "changed_option_ids": [
+      "000000969:magma-cutters:option-2",
+      "000001030:pyraflux-magma-cutters:option-2",
+      "000004207:magma-cutters:option-2",
+      "000004208:magma-cutters:option-2",
+      "000004209:magma-cutters:option-2"
+    ]
+  },
+  "adapter_contract": "Existing option IDs and typed effect, selection and persistence envelopes apply. No new player decision family or adapter payload shape; regenerate build-bound examples only.",
+  "qualification": "Focused regression evidence only; exact-head complete coverage, active quality, generated/package/performance gates, independent coding review, parent audit and hosted CI remain required."
+}

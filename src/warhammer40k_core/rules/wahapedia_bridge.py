@@ -102,6 +102,7 @@ from warhammer40k_core.rules.wahapedia_materialization_keywords import (
 from warhammer40k_core.rules.wahapedia_model_keywords import scoped_model_keyword_fields
 from warhammer40k_core.rules.wahapedia_replacement_option_bridge import (
     append_extended_replacement_rows,
+    append_single_replacement_rows,
     replacement_choices,
 )
 from warhammer40k_core.rules.wahapedia_rule_source import historical_rule_source_text_from_row_field
@@ -1030,13 +1031,15 @@ def _bridge_options(
             continue
         single_replacement_match = SINGLE_REPLACEMENT_RE.fullmatch(description)
         if single_replacement_match is not None:
-            _bridge_single_replacement_option(
+            append_single_replacement_rows(
                 row=row,
                 datasheet_id=datasheet_id,
                 model_profile_id=_single_model_profile_id(composition_entries),
                 wargear_ids_by_name=wargear_ids_by_name,
                 match=single_replacement_match,
+                loadout_assignments=loadout_assignments,
                 bridged_rows=bridged_rows,
+                error_type=WahapediaBridgeError,
             )
             continue
         match = OPTION_RE.fullmatch(description)
@@ -1300,46 +1303,6 @@ def _bridge_replacement_with_choices_option(
                 "source_ids": _joined(_source_ids(row)),
             }
         )
-
-
-def _bridge_single_replacement_option(
-    *,
-    row: NormalizedSourceRow,
-    datasheet_id: str,
-    model_profile_id: str,
-    wargear_ids_by_name: dict[str, str],
-    match: re.Match[str],
-    bridged_rows: dict[str, list[dict[str, str]]],
-) -> None:
-    replacement_count = _positive_int_from_text(
-        "replacement_count", match.group("replacement_count")
-    )
-    replaced_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replaced"))
-    replacement_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replacement"))
-    bridged_rows["Datasheets_options"].append(
-        {
-            "datasheet_id": datasheet_id,
-            "line": _required_field(row, "line"),
-            "description": _raw_or_field(row, "description"),
-            "option_id": (
-                f"{datasheet_id}:{_slug(match.group('replacement'))}:option-"
-                f"{_required_field(row, 'line')}"
-            ),
-            "model_profile_id": model_profile_id,
-            "default_wargear_ids": "",
-            "allowed_wargear_ids": replacement_wargear_id,
-            "min_selections": "0",
-            "max_selections": "1",
-            "condition_kind": "",
-            "condition_wargear_ids": "",
-            "effect_kind": WargearOptionEffectKind.REPLACE_WARGEAR.value,
-            "effect_wargear_id": replacement_wargear_id,
-            "effect_replaced_wargear_id": replaced_wargear_id,
-            "effect_model_count": "1",
-            "effect_wargear_count": str(replacement_count),
-            "source_ids": _joined(_source_ids(row)),
-        }
-    )
 
 
 def _bridge_leader_links(

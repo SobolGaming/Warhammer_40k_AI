@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0cafa6aa78d589fc98ad9b1c1f0f2aa3ceb3bf0a11102819c6d0b12605ca6981",
-  "fingerprint": "0cafa6aa78d589fc98ad9b1c1f0f2aa3ceb3bf0a11102819c6d0b12605ca6981",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bd8506753f1f308d8b8a03d9b422d357e15a33f68c8fb1dce7a5cabec34d9874",
+  "fingerprint": "bd8506753f1f308d8b8a03d9b422d357e15a33f68c8fb1dce7a5cabec34d9874",
   "resource_count": 3167,
   "resources": [
     {
@@ -15710,9 +15710,9 @@
       "sha256": "0a8de84d0ede8ba2519cda36ca3a9d62432452d53f4ce18b9c9223f81b31dda5"
     },
     {
-      "byte_length": 92499,
+      "byte_length": 91036,
       "path": "warhammer40k_core/rules/wahapedia_bridge.py",
-      "sha256": "247206b2adeb4a9bba60316f6dead31e749696d2ddd397939f9862c687f02d84"
+      "sha256": "31fbd8b184362e3f740faf9d2661757868bc758c987a17491f80b301c2350d07"
     },
     {
       "byte_length": 4348,
@@ -15795,9 +15795,9 @@
       "sha256": "9dac7f2196f99f70f5e7cb73234cbb7efc04f316750a7d9b9862ca8673e852bd"
     },
     {
-      "byte_length": 14384,
+      "byte_length": 17459,
       "path": "warhammer40k_core/rules/wahapedia_replacement_option_bridge.py",
-      "sha256": "45dd5e0a1eeb36419d917663a7ff268a8fc5cc0a23a03fcb64224b91ce61b524"
+      "sha256": "93f9a23bfd6c6d02cb1f4afc2bc67795d1537be93f4242575c839dcab69ad3c0"
     },
     {
       "byte_length": 1125,

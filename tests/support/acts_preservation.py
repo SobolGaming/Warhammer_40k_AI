@@ -160,3 +160,15 @@ def acts_inactive_predecessor(root: Path, current: bytes) -> bytes:
     if projected != current:
         raise ValueError(error)
     return before
+
+
+def defiler_provenance_predecessor(current: bytes) -> bytes:
+    """Reverse the one exact comparison-scope addition before the Acts proof."""
+    old = b"COMPARISON_ONLY_SCOPE_BASES = (scopes.ACTS_BASE,)"
+    new = b"COMPARISON_ONLY_SCOPE_BASES = (scopes.ACTS_BASE, scopes.DEFILER_BASE)"
+    if current.count(new) != 1:
+        raise ValueError("Exact registered edition provenance inputs changed.")
+    predecessor = current.replace(new, old, 1)
+    if hashlib.sha256(predecessor).hexdigest() != PROVENANCE_AFTER_SHA256:
+        raise ValueError("Exact registered edition provenance inputs changed.")
+    return predecessor
