@@ -43,6 +43,10 @@
   },
   "schema": "sorcerer-native-admission-source-review-v1",
   "scope": "Admit only Emperor's Children Sorcerer 000004085 to the existing native catalog; correct dormant T4 to T5 and bolt pistol S4/AP0 to S5/AP-1; retain MFM 55 points.",
+  "verification_limits": {
+    "Core19 source lifetimes": "Existing shared active-source/RulesUnitView and lifecycle controls cover bodyguard loss, attack-retained source destruction and revival. No separate full native Sorcerer casualty battle was executed.",
+    "Wracking source removal": "Duration after source removal relies on the unchanged shared persisting-effect lifetime owner and its controls; no separate full native Sorcerer source-death battle was executed."
+  },
   "visibility_limit": {
     "completion": "No unqualified support-complete or ready/merge claim until a scoped solver correction or explicit owner disposition. The unchanged base and admission-head algorithms both exceed the equal diagnostic deadline on the same mathematical input; this does not remove the native-play limitation.",
     "record": "visibility-diagnostic.json",

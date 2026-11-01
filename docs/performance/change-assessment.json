@@ -34,6 +34,136 @@
         }
       }
     },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "d181aa11cf1225fbd014c1e62ee3c984c0c9df408c744e2f4f1a4fed95b1aae3",
+      "after_sha256": "31e3daca9c93ec018372409fdbdaa53fb83aa39809b04bfcbbf5020496654870",
+      "owners": {
+        "@document": {
+          "before": "d181aa11cf1225fbd014c1e62ee3c984c0c9df408c744e2f4f1a4fed95b1aae3",
+          "after": "31e3daca9c93ec018372409fdbdaa53fb83aa39809b04bfcbbf5020496654870"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "783a7f92642e584d29ab30fb557804b41d7fe378ceb9bd9f4f43cb3ebd30636c",
+      "after_sha256": "ff5ac876aad1f92d0a0403c6df18bdbec0f3c36b2f9f971eb586b2d44fbae39a",
+      "owners": {
+        "@document": {
+          "before": "783a7f92642e584d29ab30fb557804b41d7fe378ceb9bd9f4f43cb3ebd30636c",
+          "after": "ff5ac876aad1f92d0a0403c6df18bdbec0f3c36b2f9f971eb586b2d44fbae39a"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "9b800fecded3b058039acc503170dcfadca558ddef9f26300be38d993ae50148",
+      "after_sha256": "fca631e48b746581d725e5ca90c266464094234650ab3d4d8b75af17dbd63a6d",
+      "owners": {
+        "@document": {
+          "before": "9b800fecded3b058039acc503170dcfadca558ddef9f26300be38d993ae50148",
+          "after": "fca631e48b746581d725e5ca90c266464094234650ab3d4d8b75af17dbd63a6d"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "52b517768dba4d141429132a9ae7f4d01a28b0b6c86c06ded116b60994d46649",
+      "after_sha256": "69848d7d5b1204310e5b8dedc4ca9b9f319c18cc39b895d936460bb62682350f",
+      "owners": {
+        "@document": {
+          "before": "52b517768dba4d141429132a9ae7f4d01a28b0b6c86c06ded116b60994d46649",
+          "after": "69848d7d5b1204310e5b8dedc4ca9b9f319c18cc39b895d936460bb62682350f"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "c8d78a8c953c3c04f8e1396454f84c10877c97f2a4e5b0d68d045ab28f122fa2",
+      "after_sha256": "291d40f5de538a52a5972b33469f1bc07bad5048babe423a7e3de49c574e9d80",
+      "owners": {
+        "@document": {
+          "before": "c8d78a8c953c3c04f8e1396454f84c10877c97f2a4e5b0d68d045ab28f122fa2",
+          "after": "291d40f5de538a52a5972b33469f1bc07bad5048babe423a7e3de49c574e9d80"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "e79468b04d8cbf773f490a1a9428323dd5f55d29e9848b94fa7174b7c1f8bdab",
+      "after_sha256": "4fa89e4e2a557dfaca2ffe87797fdc56bdfcd5dbadf49f6bdaed9c16ec9c59ff",
+      "owners": {
+        "@document": {
+          "before": "e79468b04d8cbf773f490a1a9428323dd5f55d29e9848b94fa7174b7c1f8bdab",
+          "after": "4fa89e4e2a557dfaca2ffe87797fdc56bdfcd5dbadf49f6bdaed9c16ec9c59ff"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "363355a1db78be5e318a87fe64428efd70bf4071bae424be113903e709306678",
+      "after_sha256": "4cc1cb1edd4fb99a1bd9e1ff8206894b847ba087d5f95bd1fcabc9f12626c916",
+      "owners": {
+        "@document": {
+          "before": "363355a1db78be5e318a87fe64428efd70bf4071bae424be113903e709306678",
+          "after": "4cc1cb1edd4fb99a1bd9e1ff8206894b847ba087d5f95bd1fcabc9f12626c916"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "10df4b77ea853c5d149381c5625df78d65d5ed35018558e315256915f2e2805c",
+      "after_sha256": "8c74e097c9f885f46c0ac739af6e222c2808140477c954b00293d5b7abbdd6af",
+      "owners": {
+        "@document": {
+          "before": "10df4b77ea853c5d149381c5625df78d65d5ed35018558e315256915f2e2805c",
+          "after": "8c74e097c9f885f46c0ac739af6e222c2808140477c954b00293d5b7abbdd6af"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "ab67fb2b41db4e9970f92fd2a02ad4f1e862cf8081a7f848a77b75af01666b60",
+      "after_sha256": "297ff93ac7f1700b8f3c94a43736eae12c9c5c4357698fa98905ffe03e8f4acb",
+      "owners": {
+        "@document": {
+          "before": "ab67fb2b41db4e9970f92fd2a02ad4f1e862cf8081a7f848a77b75af01666b60",
+          "after": "297ff93ac7f1700b8f3c94a43736eae12c9c5c4357698fa98905ffe03e8f4acb"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "fe0eb73fa4fb00dddfd1f83c718ac08da16e354cb5e83c79f1636038f35bb06d",
+      "after_sha256": "2cd1d6d846893d7dea3ad45e8cc671b4458ad3efa12a058d961d08dbaa7f2730",
+      "owners": {
+        "@document": {
+          "before": "fe0eb73fa4fb00dddfd1f83c718ac08da16e354cb5e83c79f1636038f35bb06d",
+          "after": "2cd1d6d846893d7dea3ad45e8cc671b4458ad3efa12a058d961d08dbaa7f2730"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "46c9f95ac8e9aae25b1ef89d66759e342a19e172d80b760afe3305841f9923ff",
+      "after_sha256": "18ab6760e70889c76822fbec038b7c91e66274b73694c009c5ba77ade0bfc909",
+      "owners": {
+        "@document": {
+          "before": "46c9f95ac8e9aae25b1ef89d66759e342a19e172d80b760afe3305841f9923ff",
+          "after": "18ab6760e70889c76822fbec038b7c91e66274b73694c009c5ba77ade0bfc909"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "1edcf67c53ecf9b6feb08960cf0df342092f5be2b7dd8d904a93c31bf348f5bf",
+      "after_sha256": "4c92e34ae35e57e0d5da46a81f47eaf03200f307e853dea1da19d5c56f03a2ba",
+      "owners": {
+        "@document": {
+          "before": "1edcf67c53ecf9b6feb08960cf0df342092f5be2b7dd8d904a93c31bf348f5bf",
+          "after": "4c92e34ae35e57e0d5da46a81f47eaf03200f307e853dea1da19d5c56f03a2ba"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "0b64b8d0c4aaa59cb5e1cf890a2946302e907da5931f8f6d617881c09cdd86d8",
+      "after_sha256": "3040d70ad7763f468b7c09172a0ad07a57757f2dade3a2a3a46568c2ef193b97",
+      "owners": {
+        "@document": {
+          "before": "0b64b8d0c4aaa59cb5e1cf890a2946302e907da5931f8f6d617881c09cdd86d8",
+          "after": "3040d70ad7763f468b7c09172a0ad07a57757f2dade3a2a3a46568c2ef193b97"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "c3f2031d306ae4341431eeb5d5b0baedf7405bf1b9a5469eedfebb14c1562c64",
       "after_sha256": "2891779bd5d7795c98df9d15aabe75e4dabc8851a9dd1534f917333390599ed1",
@@ -186,11 +316,11 @@
     },
     "data/source_audits/sorcerer_2026_11/review.json": {
       "before_sha256": null,
-      "after_sha256": "0226509050ea210660850bb87aefdb2e186279bda7a6503f3a2eb8a9f99c0c81",
+      "after_sha256": "87bd75aa91dac63fb822ba47813a8513f5e6d418f3f5515b378ec78007713b0c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0226509050ea210660850bb87aefdb2e186279bda7a6503f3a2eb8a9f99c0c81"
+          "after": "87bd75aa91dac63fb822ba47813a8513f5e6d418f3f5515b378ec78007713b0c"
         }
       }
     },
@@ -963,6 +1093,136 @@
     "ci/quality_shards/shard-1.txt": {
       "category": "governance",
       "operations": [],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
+      "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
+      "unchanged_work": "Rule-required branches add typed geometry admission, source-linked Cover grants and causal commitments. Existing legacy profile payloads omit the new false flag; source ownership, visibility solving, path search, caches, concurrency and shared selected-target expiration algorithms are unchanged. Native legal controls exercise the added work. Only the two exact source-inventory owners use the finite source smoke recognition; no performance improvement or universal geometry/visibility certification is claimed."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
       "selected_families": [],
       "rationale": "Admit the current Sorcerer through shared catalog, source ownership, attack and persistence paths, with explicit provisional geometry and strict omission rejection.",
       "source_obligation": "Current complete Sorcerer: T5, pistol S5/AP-1, 55 points, Leader targets, led-unit ranged Cover and Agonising-hit INFANTRY Move/Charge penalties until next own turn. Owner authorizes a distinctly provisional 65 mm overall estimate.",
