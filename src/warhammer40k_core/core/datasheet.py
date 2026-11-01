@@ -31,7 +31,7 @@ from warhammer40k_core.core.datasheet_composition import validate_unit_compositi
 from warhammer40k_core.core.datasheet_identity import effective_datasheet_keywords as _effective
 from warhammer40k_core.core.datasheet_identity import normalized_datasheet_identity
 from warhammer40k_core.core.datasheet_model_validation import (
-    validate_model_profile_tuple as _validate_model_profile_tuple,
+    validate_model_profile_tuple,
 )
 from warhammer40k_core.core.random_profile_values import (
     ProfileCharacteristicValue,
@@ -45,6 +45,8 @@ from warhammer40k_core.core.wargear_selection_limits import (
     DatasheetWargearSelectionLimit,
     DatasheetWargearSelectionLimitPayload,
 )
+
+_validate_model_profile_tuple = validate_model_profile_tuple
 
 
 class DatasheetCatalogError(ValueError):
