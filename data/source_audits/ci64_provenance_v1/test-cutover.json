@@ -2168,9 +2168,9 @@
     },
     "tests/rules/section22/test_wargear.py": {
       "mode": "100644",
-      "blob_sha1": "088e2d123f6bfcc9b034b45ffaba001278ad9c31",
-      "sha256": "de4c4be0bd385f15f3d21f29b9d2228f7ec541d248030ca096ceef73b2ffeca7",
-      "bytes": 9543
+      "blob_sha1": "7a1c10ae466e46c2d7809bb7c82641d7820a051e",
+      "sha256": "4d778300236723e9715177cb997f36cd5de7a3367f0a6149f85fe2efd5e33655",
+      "bytes": 26073
     },
     "tests/rules/section23/test_combat.py": {
       "blob_sha1": "7a13845b938d97c452e0a2c4a9be3e32a1a63fc1",

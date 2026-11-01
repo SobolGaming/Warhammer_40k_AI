@@ -23,16 +23,16 @@ def validate_scaled_wargear_selections(
         raise error_type("Scaled wargear unit model count must be a positive integer.")
     if type(selections) is not tuple or not selections:
         raise error_type("Scaled wargear validation requires selections.")
-    limits_by_group: dict[str, tuple[int, int, int]] = {}
+    limits_by_group: dict[str, tuple[int, int]] = {}
     group_selection_counts: dict[str, int] = {}
     for selection in selections:
         if type(selection) is not ScaledWargearSelection:
             raise error_type("Scaled wargear selections contain an invalid value.")
         _validate_scaled_wargear_selection(selection=selection, error_type=error_type)
+        # Option caps belong to each role; only increment and total cap are shared.
         signature = (
             selection.models_per_increment,
             selection.max_group_selections_per_increment,
-            selection.max_option_selections_per_increment,
         )
         existing = limits_by_group.get(selection.selection_group_id)
         if existing is not None and existing != signature:
@@ -45,7 +45,7 @@ def validate_scaled_wargear_selections(
             group_selection_counts.get(selection.selection_group_id, 0) + selection.selected_count
         )
     for group_id, selected_count in group_selection_counts.items():
-        models_per_increment, max_group_per_increment, _max_option = limits_by_group[group_id]
+        models_per_increment, max_group_per_increment = limits_by_group[group_id]
         increments = unit_model_count // models_per_increment
         if selected_count > increments * max_group_per_increment:
             raise error_type("WargearSelection group exceeds its model-count-scaled limit.")

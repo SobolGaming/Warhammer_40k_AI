@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bd8506753f1f308d8b8a03d9b422d357e15a33f68c8fb1dce7a5cabec34d9874",
-  "fingerprint": "bd8506753f1f308d8b8a03d9b422d357e15a33f68c8fb1dce7a5cabec34d9874",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:694ff5590e479d06893468cee9cbe482b49398b49a982274fdb8ffd041ef89fe",
+  "fingerprint": "694ff5590e479d06893468cee9cbe482b49398b49a982274fdb8ffd041ef89fe",
   "resource_count": 3167,
   "resources": [
     {
@@ -12585,9 +12585,9 @@
       "sha256": "a36e338d700fd8166ee3500e45175237fdfd20eb757aeb5370588e336b696afa"
     },
     {
-      "byte_length": 3758,
+      "byte_length": 3765,
       "path": "warhammer40k_core/engine/scaled_wargear_limits.py",
-      "sha256": "eff1b12afc234d082040310e01f3b02c7010ab77ce8ac4c515c7bf4a23b2f37e"
+      "sha256": "f70aee2c798d6253bfeeea2f17be5e3f77cec901aba5e47d6e937158a5a6a1f9"
     },
     {
       "byte_length": 152869,

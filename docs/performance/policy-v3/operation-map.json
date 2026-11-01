@@ -31013,6 +31013,41 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "scaled-wargear-role-limits": {
+      "paths": [
+        "src/warhammer40k_core/engine/scaled_wargear_limits.py"
+      ],
+      "owners": [
+        "validate_scaled_wargear_selections"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "scaled-wargear-native-regressions": {
+      "paths": [
+        "tests/rules/section22/test_wargear.py"
+      ],
+      "owners": [
+        "@module",
+        "_terminator_selection",
+        "terminator_package",
+        "test_native_adjacent_unscaled_defaults_still_construct",
+        "test_native_equal_role_caps_keep_shared_chainfist_limit",
+        "test_native_scaled_group_metadata_drift_rejects_even_without_choices",
+        "test_native_terminator_composition_remains_five_models",
+        "test_native_terminator_excess_role_and_group_choices_reject",
+        "test_native_terminator_muster_and_army_persistence",
+        "test_native_terminator_role_caps_construct_and_roundtrip",
+        "test_native_terminator_session_persistence_and_replay",
+        "test_shared_scaled_owner_enforces_each_role_cap_before_group_total",
+        "test_shared_scaled_owner_preserves_multiple_increment_arithmetic",
+        "test_shared_scaled_owner_validates_unselected_role_metadata"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

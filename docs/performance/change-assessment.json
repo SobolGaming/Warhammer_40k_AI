@@ -1,160 +1,339 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "2b848f28308f74c913a74829cfe7f5c40c298bb2",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bd8506753f1f308d8b8a03d9b422d357e15a33f68c8fb1dce7a5cabec34d9874",
-  "operation_map_sha256": "4b43ce8f3dd96067931fc612355ec8f7bc18c3dda7fa63f53b2cb866fe6fb439",
+  "base": "c598bb4c6b3de8604b4540c93e35df8bac5c9fd4",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:694ff5590e479d06893468cee9cbe482b49398b49a982274fdb8ffd041ef89fe",
+  "operation_map_sha256": "1f06d4c866a4654d8835373d1d8b583c6ef82bd0bea4fe9957dd2b4dbb8fec8e",
   "changes": {
-    ".github/pull_request_template.md": {
-      "before_sha256": "7769f0ddafc7d0bad30d8c4c129307c63e431144f99ba4373bb685d0527ad03a",
-      "after_sha256": "a86c7d1ca027bb625ffbb12d92982446026d3be0360f2acd900a9408e2dbfb22",
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "ddd36d2f8548b239f3a5f83bca51915d9c742941acb1b43ca12344049a57e33b",
+      "after_sha256": "7025bc6c20c413ae2926670e93ba775186c046dd80602a89f2157fd4a50d7109",
       "owners": {
         "@document": {
-          "before": "7769f0ddafc7d0bad30d8c4c129307c63e431144f99ba4373bb685d0527ad03a",
-          "after": "a86c7d1ca027bb625ffbb12d92982446026d3be0360f2acd900a9408e2dbfb22"
+          "before": "ddd36d2f8548b239f3a5f83bca51915d9c742941acb1b43ca12344049a57e33b",
+          "after": "7025bc6c20c413ae2926670e93ba775186c046dd80602a89f2157fd4a50d7109"
         }
       }
     },
-    ".github/workflows/ci.yml": {
-      "before_sha256": "eb86b54a0df6cff7b6cdc8187dce619f8d9bc60494e65554f580bb8e3816044a",
-      "after_sha256": "295594b4150b13a49b0f092125e10c7378234ab180b52a0f2b62c6bc0ffd2132",
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "fadc88117bf2aed64656ba6664e155b8ecb2e69a2f59a75e995905e88efc9b0d",
+      "after_sha256": "957bf42f9da97aba2cdb7792afdb787ccfd7c3a62415cbdbe07de601453e1e13",
       "owners": {
         "@document": {
-          "before": "eb86b54a0df6cff7b6cdc8187dce619f8d9bc60494e65554f580bb8e3816044a",
-          "after": "295594b4150b13a49b0f092125e10c7378234ab180b52a0f2b62c6bc0ffd2132"
+          "before": "fadc88117bf2aed64656ba6664e155b8ecb2e69a2f59a75e995905e88efc9b0d",
+          "after": "957bf42f9da97aba2cdb7792afdb787ccfd7c3a62415cbdbe07de601453e1e13"
         }
       }
     },
-    "AGENTS.md": {
-      "before_sha256": "b74cbd4b92504927db1d47cb87ed686fe552c844e751b72d8c0e1596f5cc3c28",
-      "after_sha256": "9b8aa614baa3d56f75eef7ee6ac2b206d7ad058f3245073917e51b3c288726c8",
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "be2a7c6029966089a830c8cd20350cdcc1f24d77eb77644eaa8f063683993fcf",
+      "after_sha256": "385147a9d0c2f4071654d08aea33c8a7cc9bc8e843081f8b02d1b483a7be9bec",
       "owners": {
         "@document": {
-          "before": "b74cbd4b92504927db1d47cb87ed686fe552c844e751b72d8c0e1596f5cc3c28",
-          "after": "9b8aa614baa3d56f75eef7ee6ac2b206d7ad058f3245073917e51b3c288726c8"
+          "before": "be2a7c6029966089a830c8cd20350cdcc1f24d77eb77644eaa8f063683993fcf",
+          "after": "385147a9d0c2f4071654d08aea33c8a7cc9bc8e843081f8b02d1b483a7be9bec"
         }
       }
     },
-    "README.md": {
-      "before_sha256": "6876c8b78d8736b86e2f5215981247bdb24d5b21c1056aee661ce6dd03c50932",
-      "after_sha256": "aaacce152217fc7072d8b90db4b105d39e6ec9b1c65b51bfaaa5b0cd9872cb2a",
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "07a27dd35b099290ebb38f577c91e6680d6152348b4a967c24d92d006b2c95c0",
+      "after_sha256": "131bf2c711c5d95daddb039c0cfa72ed017c437f1a875241dcb68a6a7c8cfdf3",
       "owners": {
         "@document": {
-          "before": "6876c8b78d8736b86e2f5215981247bdb24d5b21c1056aee661ce6dd03c50932",
-          "after": "aaacce152217fc7072d8b90db4b105d39e6ec9b1c65b51bfaaa5b0cd9872cb2a"
+          "before": "07a27dd35b099290ebb38f577c91e6680d6152348b4a967c24d92d006b2c95c0",
+          "after": "131bf2c711c5d95daddb039c0cfa72ed017c437f1a875241dcb68a6a7c8cfdf3"
         }
       }
     },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "before_sha256": "fde188b6bea4e5eabc8f1ce48bde83dff18b14425192d69727c0ffdcfb6498a2",
-      "after_sha256": "5af5813b54b3db5d7ac8e814f7d45c7ad8c5be275c18cfac3f0f7b7761ec365b",
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "3368e350431cfd07d0f6ef43d32ea8926bfb79d67282080c66e3bf2079a1beae",
+      "after_sha256": "d6e872f73875842d54fdb4d3e84645b96255b4046265cab053c90b14289a1c48",
       "owners": {
         "@document": {
-          "before": "fde188b6bea4e5eabc8f1ce48bde83dff18b14425192d69727c0ffdcfb6498a2",
-          "after": "5af5813b54b3db5d7ac8e814f7d45c7ad8c5be275c18cfac3f0f7b7761ec365b"
+          "before": "3368e350431cfd07d0f6ef43d32ea8926bfb79d67282080c66e3bf2079a1beae",
+          "after": "d6e872f73875842d54fdb4d3e84645b96255b4046265cab053c90b14289a1c48"
         }
       }
     },
-    "pyproject.toml": {
-      "before_sha256": "42c1a1c4db411da62bba612820d1922dd50b838e7f93bfd3ceb11aa7b516f513",
-      "after_sha256": "067e65a29893a6e8c60235b87b350c933ec1077cddbe44e0e6325d553e5246f7",
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "11117af551300bff69519a03e0fb9f1039d9c15251e27c2a998dfb58d39c09bf",
+      "after_sha256": "0cefe8d1a7de5123cf43e5d3094b3a5676a291208950d6a0619ef3ca1888fdbe",
       "owners": {
         "@document": {
-          "before": "42c1a1c4db411da62bba612820d1922dd50b838e7f93bfd3ceb11aa7b516f513",
-          "after": "067e65a29893a6e8c60235b87b350c933ec1077cddbe44e0e6325d553e5246f7"
+          "before": "11117af551300bff69519a03e0fb9f1039d9c15251e27c2a998dfb58d39c09bf",
+          "after": "0cefe8d1a7de5123cf43e5d3094b3a5676a291208950d6a0619ef3ca1888fdbe"
         }
       }
     },
-    "tests/code_quality/test_ci_performance_gates.py": {
-      "before_sha256": "ec4760ea3dbb6935fb3d4e4b47cdaf1b988b2a2b1e4f3a909f0df04265b56daa",
-      "after_sha256": "054e621925a4d5be98b90fa76f6f5f3823033dcbb1db27e6edfda0550b194fff",
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "1b7e0ea7f94e0daa42606ffed52f25abf676f9212cc745f2398aab5c7eedbd26",
+      "after_sha256": "b596fe8867c9a366cba90c14fb2648040e41a959c02c3ce4d43783909a36c1e5",
       "owners": {
-        "test_quality_gate_requires_every_independent_lane_even_when_skipped": {
-          "before": "d90f7cf92d0ecbc93ed61725c6956383b3e190b8852fcfa62957eff2bb8132ee",
-          "after": "f14ca5b0f6c2fcc1ff32a1ef4822a7d50f5b9f1256b971d4875ad07041a1ec3e"
+        "@document": {
+          "before": "1b7e0ea7f94e0daa42606ffed52f25abf676f9212cc745f2398aab5c7eedbd26",
+          "after": "b596fe8867c9a366cba90c14fb2648040e41a959c02c3ce4d43783909a36c1e5"
         }
       }
     },
-    "tests/rules/section07/coverage.json": {
-      "before_sha256": "9c0d031999f886cd0c21bfd7ead0a233e485fb0cd005da26cab2282fa616efa7",
-      "after_sha256": "a60344c5b940809207b25d7add3f30734faff2cbd8296511437b958a134eb899",
+    "contracts/manifest.json": {
+      "before_sha256": "4027b90e6b7e3156379b8d4f07fd2be3e14e3408088393f4ffe6f07aae7cce20",
+      "after_sha256": "b4a144e2d967e7db00a190eebb99436617142b53f56791352aabfe10b43f5560",
       "owners": {
         "@document": {
-          "before": "9c0d031999f886cd0c21bfd7ead0a233e485fb0cd005da26cab2282fa616efa7",
-          "after": "a60344c5b940809207b25d7add3f30734faff2cbd8296511437b958a134eb899"
+          "before": "4027b90e6b7e3156379b8d4f07fd2be3e14e3408088393f4ffe6f07aae7cce20",
+          "after": "b4a144e2d967e7db00a190eebb99436617142b53f56791352aabfe10b43f5560"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "before_sha256": "f0b95cda76ffe54a113ff27bc4569d7bd1e955ab3c68ed6a22e675f0a4537724",
+      "after_sha256": "ef66340351dc99c0e45b810a7d677fdeb86dcf075fdaa17d7e3c96774dad9cf9",
+      "owners": {
+        "@document": {
+          "before": "f0b95cda76ffe54a113ff27bc4569d7bd1e955ab3c68ed6a22e675f0a4537724",
+          "after": "ef66340351dc99c0e45b810a7d677fdeb86dcf075fdaa17d7e3c96774dad9cf9"
+        }
+      }
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "before_sha256": "39414038e934794d357ae402408ed0e33780ceb26cf79a518f909c0e23670737",
+      "after_sha256": "c617e1b01e56027ac7563eef82165470e28a4148eb400250d6185f14f667cc7f",
+      "owners": {
+        "@document": {
+          "before": "39414038e934794d357ae402408ed0e33780ceb26cf79a518f909c0e23670737",
+          "after": "c617e1b01e56027ac7563eef82165470e28a4148eb400250d6185f14f667cc7f"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "f5921e8ff9a1fbe68d89e9e440f1a1918360e35b7edcdad62b8c0e321d724d27",
+      "after_sha256": "47d89c89ab2f547ee9ba079a3137d7c77382f3f64241ce4aaf4e164bb4bfdbd0",
+      "owners": {
+        "@document": {
+          "before": "f5921e8ff9a1fbe68d89e9e440f1a1918360e35b7edcdad62b8c0e321d724d27",
+          "after": "47d89c89ab2f547ee9ba079a3137d7c77382f3f64241ce4aaf4e164bb4bfdbd0"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "b5d231f412fc65f0f15414dda1824f98737741c7927af34e10f74d44417d1428",
+      "after_sha256": "5ae5d8bdf28233329969dde232ec832c5aa7fc13fe41e6e3d84ec0b80935f4e2",
+      "owners": {
+        "@document": {
+          "before": "b5d231f412fc65f0f15414dda1824f98737741c7927af34e10f74d44417d1428",
+          "after": "5ae5d8bdf28233329969dde232ec832c5aa7fc13fe41e6e3d84ec0b80935f4e2"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/scaled_wargear_limits.py": {
+      "before_sha256": "eff1b12afc234d082040310e01f3b02c7010ab77ce8ac4c515c7bf4a23b2f37e",
+      "after_sha256": "f70aee2c798d6253bfeeea2f17be5e3f77cec901aba5e47d6e937158a5a6a1f9",
+      "owners": {
+        "validate_scaled_wargear_selections": {
+          "before": "048583698b28d883536bfe731c2dc8fbdac431f04302b79918a0fcaa7caa59a5",
+          "after": "8c0af198dbfd78e8c84cc394fa0b8e38f2d0a8624ff69ea565b3bc963176e3ef"
+        }
+      }
+    },
+    "tests/rules/section22/test_wargear.py": {
+      "before_sha256": "de4c4be0bd385f15f3d21f29b9d2228f7ec541d248030ca096ceef73b2ffeca7",
+      "after_sha256": "4d778300236723e9715177cb997f36cd5de7a3367f0a6149f85fe2efd5e33655",
+      "owners": {
+        "@module": {
+          "before": "aaffa568d64264a726ed653b187483650e309beaba1fdfc19ae65246f7635ce8",
+          "after": "88bb9ee190440a5f428149029a729e1c7bb2253e2dcf171fa8436ab15e3c095e"
+        },
+        "_terminator_selection": {
+          "before": null,
+          "after": "60eb79e6991ccb3e99dccc9a4f170d02ad376d41a729a985b3fdb5ca54eb352c"
+        },
+        "terminator_package": {
+          "before": null,
+          "after": "b237c32354a081dbe8a37c4d87ee8deed1746297cdbf3890cf8fbaa0e54904b5"
+        },
+        "test_native_adjacent_unscaled_defaults_still_construct": {
+          "before": null,
+          "after": "e409f0595abf3fb0b0f0cc483c61bc42be46cc91923482efc0b5c69f71fba527"
+        },
+        "test_native_equal_role_caps_keep_shared_chainfist_limit": {
+          "before": null,
+          "after": "df76a3c3fe4999d5ba548977ed1a387b2b05684d65a93be8483c6ddbca91e9f3"
+        },
+        "test_native_scaled_group_metadata_drift_rejects_even_without_choices": {
+          "before": null,
+          "after": "0e4ccb0fcd0f8bc84f80aa5a118a2a3e66183d4f365107a6ba8a256d73ed84b0"
+        },
+        "test_native_terminator_composition_remains_five_models": {
+          "before": null,
+          "after": "e2ac39c9dd70f69f29724849a958edc04b849f8482b58c67e3e0e404ba5b286e"
+        },
+        "test_native_terminator_excess_role_and_group_choices_reject": {
+          "before": null,
+          "after": "928302e43303e59170af375aa0b7b70c3f281a881658237f1eba22802db00d3b"
+        },
+        "test_native_terminator_muster_and_army_persistence": {
+          "before": null,
+          "after": "6a89d40625264cad70c18a7e032d1e705cb86de60272a4fcc1b07886b7d254ad"
+        },
+        "test_native_terminator_role_caps_construct_and_roundtrip": {
+          "before": null,
+          "after": "e89990cbb035bb538ef63014d719f479a08d9c609c79ba70378074385f7f20ac"
+        },
+        "test_native_terminator_session_persistence_and_replay": {
+          "before": null,
+          "after": "fd52c7d75f4473204c89834c30f64cc0d85caf64afc1452f4b08dc4ac499744d"
+        },
+        "test_shared_scaled_owner_enforces_each_role_cap_before_group_total": {
+          "before": null,
+          "after": "7f1931bbc66881c547abf5d6b232207bf253ca5f08e3bb228f651c9619588c64"
+        },
+        "test_shared_scaled_owner_preserves_multiple_increment_arithmetic": {
+          "before": null,
+          "after": "a1ec06bb80afe6d969511179ee7a3412598e0351dc5a4d94941d5a3a7627d447"
+        },
+        "test_shared_scaled_owner_validates_unselected_role_metadata": {
+          "before": null,
+          "after": "a7066ba0f9ccd631acbe98daacc490d88c21f34e0cdf6095e8cf2f3e7415de00"
         }
       }
     }
   },
   "rows": {
-    ".github/pull_request_template.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
-      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
-      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
-    },
-    ".github/workflows/ci.yml": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
-      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
-      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
-    },
-    "AGENTS.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
-      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
-      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
-    },
-    "README.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
-      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
-      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
-    },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
-      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
-      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
-    },
-    "pyproject.toml": {
-      "category": "dependency_environment",
-      "operations": [
-        "development-dependency"
-      ],
-      "selected_families": [],
-      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
-      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
-      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
-    },
-    "tests/code_quality/test_ci_performance_gates.py": {
+    "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
-      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
-      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
     },
-    "tests/rules/section07/coverage.json": {
+    "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-b6886d3bc2fb1ca4"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Raise the owner-authorized active coverage floor from 64% to 65% without changing measured runtime work or test selection.",
-      "source_obligation": "Owner direction on 1 November 2026 after Defiler PR604 requires 65% full-package branch coverage. Historical cutover 64% remains authenticated historical evidence.",
-      "unchanged_work": "Only the reporting threshold, active documented commands and policy boundary controls change. Runtime source, dependencies and lock, branch denominator, exclusions, 260 deferrals and timing budgets remain identical."
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
+      ],
+      "selected_families": [],
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
+    },
+    "src/warhammer40k_core/engine/scaled_wargear_limits.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scaled-wargear-role-limits"
+      ],
+      "selected_families": [],
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
+    },
+    "tests/rules/section22/test_wargear.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-739a5464cbc90fd9",
+        "scaled-wargear-native-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Repair the shared scaled-wargear group invariant: role-specific option caps are independent; only increment and aggregate group cap must match.",
+      "source_obligation": "Authorized N1 repair: existing source option 000004081:4 allows three power fists per five models, with ordinary cap3 and Champion cap1; native default and legal choices must construct.",
+      "unchanged_work": "The same linear option validation and aggregate counting execute; no search, caching, serializer, dependency, source catalog or algorithm change. Generated runtime identity and examples follow the sole predicate correction; focused regressions and source bindings preserve the complete active inventory."
     }
   },
   "milestone": "ordinary",
