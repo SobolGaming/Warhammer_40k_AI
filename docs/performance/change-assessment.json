@@ -16,21 +16,21 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": "f7c492c6dec38fa7957b812f2394d1ebb2d5fc3c204cb49608944d5115a82ff7",
-      "after_sha256": "bad6c83a2cfe3d108572467221e98bfaf2f2b90e056c7e356e8ebc1b23f004f3",
+      "after_sha256": "6a86bab8f27800949b46f8db49266ae788119bf352982af04247a77450de6c55",
       "owners": {
         "@document": {
           "before": "f7c492c6dec38fa7957b812f2394d1ebb2d5fc3c204cb49608944d5115a82ff7",
-          "after": "bad6c83a2cfe3d108572467221e98bfaf2f2b90e056c7e356e8ebc1b23f004f3"
+          "after": "6a86bab8f27800949b46f8db49266ae788119bf352982af04247a77450de6c55"
         }
       }
     },
     "ci/quality_shards/shard-2.txt": {
       "before_sha256": "49bb3cf2812abe7c883eecb92f8b0841d71665dd6769df302658725c90edb954",
-      "after_sha256": "9216f31366757a751b5ded3a2571aa3fb92538d43f50ca414578428488fe97f9",
+      "after_sha256": "626f3dac3cd4dd5ffff19591e808ae72fb79b3f0e83ec3b89cc092169c2d0e34",
       "owners": {
         "@document": {
           "before": "49bb3cf2812abe7c883eecb92f8b0841d71665dd6769df302658725c90edb954",
-          "after": "9216f31366757a751b5ded3a2571aa3fb92538d43f50ca414578428488fe97f9"
+          "after": "626f3dac3cd4dd5ffff19591e808ae72fb79b3f0e83ec3b89cc092169c2d0e34"
         }
       }
     },
@@ -399,6 +399,36 @@
         "@document": {
           "before": "eaaa28239507347510bf6b756ab813026e7d5c1585c67bda7445ebdc449032e3",
           "after": "58fabaf0d11cbcfcdd067fe10bea60df3d9e61afd45de6e5b9998147b69134c7"
+        }
+      }
+    },
+    "tests/code_quality/test_order123_datasheet_identity.py": {
+      "before_sha256": "4e659b09d7b8f437f0a291383309700eb7d32f5e1a2bbef5fcdf78eb1af89a99",
+      "after_sha256": "2be670c6ff38437d70f860d8578aa9e5326fa2f7da9b9b32d83574a3da39721b",
+      "owners": {
+        "@module": {
+          "before": "a373c89b05e0b59a39a80a94afe7842dab8c72fd8258507bac28afb6fedfb1f0",
+          "after": "90509aeb468b865e00b350531010f1dfd67cd61d7e8b28e2f3f9b51c11229412"
+        },
+        "_assert_official_catalog_history": {
+          "before": null,
+          "after": "bbeca2372acc92dc7cb33c3f6239c3f01d553cd40208afd3af391c454698696f"
+        },
+        "_historical_catalog_bytes": {
+          "before": null,
+          "after": "8021e4c4e15106799c37734349bf03bf82b976e512b668374b43223630ed354d"
+        },
+        "test_name_keyword_permission_preserves_exact_source_and_official_admission": {
+          "before": "09cb71cbd44b49184d064a595619dd887b11466adfab01705806f7310e43abb2",
+          "after": "2eb3dfef6583efe2460a3ed5c82255f292eea46fd4ccb914a42ce8493dc5c237"
+        },
+        "test_official_catalog_history_requires_admitted_current_catalog": {
+          "before": null,
+          "after": "b786e86dfd819d20a999cbd6d04eca8c9999360af589518079f3179f8ebd9135"
+        },
+        "test_official_catalog_history_requires_original_evidence": {
+          "before": null,
+          "after": "a154de9e1fbdb1546ec6005aabc22cabc9128b4c7a3b5f49aaab8e66f3b099a6"
         }
       }
     },
@@ -909,6 +939,14 @@
       "operations": [
         "source-record"
       ],
+      "selected_families": [],
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+    },
+    "tests/code_quality/test_order123_datasheet_identity.py": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
       "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
