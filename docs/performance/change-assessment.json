@@ -24,6 +24,136 @@
         }
       }
     },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "411dfa779766c781dc33fadcf4c2773edb112f5c46fa94eb181e7024ad0a0dd9",
+      "after_sha256": "b2f292dd98acccf985ab4c031ed9c93e70333aa1d752686818daa6c4bfb62075",
+      "owners": {
+        "@document": {
+          "before": "411dfa779766c781dc33fadcf4c2773edb112f5c46fa94eb181e7024ad0a0dd9",
+          "after": "b2f292dd98acccf985ab4c031ed9c93e70333aa1d752686818daa6c4bfb62075"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "1735d28412b3f41a244ccce8bea455de5cced5529d13a64813e251a43f9c1457",
+      "after_sha256": "80bd456030bc3285e27bdcfb07c86f0d2f00044435a06c82baafb870fb86e0e4",
+      "owners": {
+        "@document": {
+          "before": "1735d28412b3f41a244ccce8bea455de5cced5529d13a64813e251a43f9c1457",
+          "after": "80bd456030bc3285e27bdcfb07c86f0d2f00044435a06c82baafb870fb86e0e4"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "b14b688a671186abc7d4c9d0fc4c947404a88fd0d0b4a1f78a316b66292e600d",
+      "after_sha256": "b778f76ea2e3c7178e5647724f8f15588662428e275894bc6cd1eae658907941",
+      "owners": {
+        "@document": {
+          "before": "b14b688a671186abc7d4c9d0fc4c947404a88fd0d0b4a1f78a316b66292e600d",
+          "after": "b778f76ea2e3c7178e5647724f8f15588662428e275894bc6cd1eae658907941"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "05e3355481b48a22d01817159fb8ba757c191b202caf21e8991ecc193231da19",
+      "after_sha256": "4e89fb95f904f90805135c28ccef337beb96343c2cb78e449c7c6318950ffe25",
+      "owners": {
+        "@document": {
+          "before": "05e3355481b48a22d01817159fb8ba757c191b202caf21e8991ecc193231da19",
+          "after": "4e89fb95f904f90805135c28ccef337beb96343c2cb78e449c7c6318950ffe25"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "e5d5f45a6b231e164a4732977a6c619f074e6db99ab4ca82ee4490d7890c75d3",
+      "after_sha256": "daf723dc1a27505303d369921ff7fad606cd9932dfcfd5237d9445a7c64c0616",
+      "owners": {
+        "@document": {
+          "before": "e5d5f45a6b231e164a4732977a6c619f074e6db99ab4ca82ee4490d7890c75d3",
+          "after": "daf723dc1a27505303d369921ff7fad606cd9932dfcfd5237d9445a7c64c0616"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "cade5d5dda3ecedfa1f639dbb397433aadb80d0af73230effd64c81659f04844",
+      "after_sha256": "6a372b011a54d675e8d194b1969081fc033c25a87f744dcc2402e7fe26973670",
+      "owners": {
+        "@document": {
+          "before": "cade5d5dda3ecedfa1f639dbb397433aadb80d0af73230effd64c81659f04844",
+          "after": "6a372b011a54d675e8d194b1969081fc033c25a87f744dcc2402e7fe26973670"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "9a34f0ead302cb530e8de202104ae494b2a18669dc0cf244713721497ee455ff",
+      "after_sha256": "f1a78cf9721bb4993240769113d3039b21257d8ac9088500d403d3485f99e4b8",
+      "owners": {
+        "@document": {
+          "before": "9a34f0ead302cb530e8de202104ae494b2a18669dc0cf244713721497ee455ff",
+          "after": "f1a78cf9721bb4993240769113d3039b21257d8ac9088500d403d3485f99e4b8"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "097343a35fd6234f4cc1b8e8badbe564ccaff98662b2f916c00539c76c8bae99",
+      "after_sha256": "c3b6937e3e6f0fff641ca7a67c1991bfefa7165e75d948bd08f7803245cb9317",
+      "owners": {
+        "@document": {
+          "before": "097343a35fd6234f4cc1b8e8badbe564ccaff98662b2f916c00539c76c8bae99",
+          "after": "c3b6937e3e6f0fff641ca7a67c1991bfefa7165e75d948bd08f7803245cb9317"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "5993ac5ac91f0f53f33aa3427f547ab1e34bb641443b094c38239770fe9d8bad",
+      "after_sha256": "c391be74b3c1eae71a1581b444c7d6d1e7d047ce2c76f467404c9bb21878c7d0",
+      "owners": {
+        "@document": {
+          "before": "5993ac5ac91f0f53f33aa3427f547ab1e34bb641443b094c38239770fe9d8bad",
+          "after": "c391be74b3c1eae71a1581b444c7d6d1e7d047ce2c76f467404c9bb21878c7d0"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "76733ce0487f18ea7e231d010922edb53e017cde94affa8b504506e8c476a273",
+      "after_sha256": "51a1abd54ae6213431e0e021d8e92df9d9bdee0ca5f1507e3ef71c604b29e2dc",
+      "owners": {
+        "@document": {
+          "before": "76733ce0487f18ea7e231d010922edb53e017cde94affa8b504506e8c476a273",
+          "after": "51a1abd54ae6213431e0e021d8e92df9d9bdee0ca5f1507e3ef71c604b29e2dc"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "1f68ed25fa91be7ea9415fb3ee07ef781568c1c5e4cd87af69fe6183d0ec8f43",
+      "after_sha256": "4a4edebb943404eafb53447e65790893701251b8ece47a3543968d5bd466a977",
+      "owners": {
+        "@document": {
+          "before": "1f68ed25fa91be7ea9415fb3ee07ef781568c1c5e4cd87af69fe6183d0ec8f43",
+          "after": "4a4edebb943404eafb53447e65790893701251b8ece47a3543968d5bd466a977"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "19a56e7b22c93c9d1326488dcd698f3bce7b7e4a3dc7ffec11346e89a0828d64",
+      "after_sha256": "b45ec5356e0c84d91e997a85822adbf8c9f1729c7e809f6fd3630f48b55d9dac",
+      "owners": {
+        "@document": {
+          "before": "19a56e7b22c93c9d1326488dcd698f3bce7b7e4a3dc7ffec11346e89a0828d64",
+          "after": "b45ec5356e0c84d91e997a85822adbf8c9f1729c7e809f6fd3630f48b55d9dac"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "462ddd3d147d8968b67d8b40d26ee9d0e491aca0c9556c1cefe28c93ffbca3d0",
+      "after_sha256": "cf623a092b1faba847cb622ee0e318c9b2fe16c945b8dcf0d5192e5e878936bd",
+      "owners": {
+        "@document": {
+          "before": "462ddd3d147d8968b67d8b40d26ee9d0e491aca0c9556c1cefe28c93ffbca3d0",
+          "after": "cf623a092b1faba847cb622ee0e318c9b2fe16c945b8dcf0d5192e5e878936bd"
+        }
+      }
+    },
     "contracts/examples/decisions/family-coverage.json": {
       "before_sha256": "3a5733b869e2350531bf7826590a84a1f968a669d974d0f585b701ab6f19d6db",
       "after_sha256": "8045875b2263b95d4fc42d0d66fc30807eb82b10d1b802365518113cfb1827c1",
@@ -915,6 +1045,136 @@
     "ci/quality_shards/shard-1.txt": {
       "category": "governance",
       "operations": [],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
       "selected_families": [],
       "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
       "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
