@@ -194,6 +194,26 @@
         }
       }
     },
+    "docs/performance/current/banshee-eldrad-dice.json": {
+      "before_sha256": null,
+      "after_sha256": "88deb85eba413a1abbe1b26eb1397b46d574a47d740ccce7c683ff126fed957e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "88deb85eba413a1abbe1b26eb1397b46d574a47d740ccce7c683ff126fed957e"
+        }
+      }
+    },
+    "docs/performance/current/banshee-eldrad-reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "061954f70ded51719d2898f8c5b6adb544259f357d365b06049760135d0f615b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "061954f70ded51719d2898f8c5b6adb544259f357d365b06049760135d0f615b"
+        }
+      }
+    },
     "docs/performance/policy-v3/banshee-eldrad-source-smoke-scope.json": {
       "before_sha256": null,
       "after_sha256": "6d5fd7da1d713cca7458de7bbc94d79afcbcec91be8c273abb8d72286aae895e",
@@ -962,6 +982,22 @@
       "rationale": "Exact source-only overlay admission and provenance registration; retain original sensitive mapping and apply only the authenticated actual-base source-semantics smoke recognition.",
       "source_obligation": "Register only the authenticated current Banshee and Eldrad two-page F00 audit and the existing SUPERSEDE_ROW operation excluding obsolete Eldrad 000000568 to Warlock Conclave 000000584 at retained row108. Bind the overlay and complete audit through the existing source loader/index, and register its exact path/hash for truthful historical base-version projection. No native bodyguards or geometry are admitted.",
       "unchanged_work": "These exact two files compose one finite preimage-bound source overlay, include its audit/index inputs, and register the exact historical base-version projection. Existing source-index/cache/token, overlay validation, provenance projection, contract and harness algorithms remain unchanged. The mandatory sensitive source-reuse mappings and family remain intact. Only these exact rule_semantics diffs at base675c3b22 follow the standing bounded-source-repair serial-smoke default. All other bases/paths/owners/hashes/categories retain original requirements. Separate fresh dice and reconstruction comparisons cover the shared native repair development workloads. No source-reuse speedup or full-game certification is claimed; all local/remote correctness, source/work/cache and timing gates remain required."
+    },
+    "docs/performance/current/banshee-eldrad-dice.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain newly measured same-host serial actual-base/head samples for the registered development workload with original counts, complete semantic checks and unchanged relative budgets.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/banshee-eldrad-reconstruction.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain newly measured same-host serial actual-base/head samples for the registered development workload with original counts, complete semantic checks and unchanged relative budgets.",
+      "source_obligation": null,
+      "unchanged_work": null
     }
   },
   "milestone": "ordinary",
