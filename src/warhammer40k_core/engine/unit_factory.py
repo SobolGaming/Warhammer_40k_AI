@@ -1193,6 +1193,8 @@ def _model_geometry_for_profile(
             if geometry_record.model_profile_id != profile.model_profile_id:
                 raise UnitFactoryError("Model geometry record model_profile_id drift.")
             return ModelGeometry.from_catalog_record(geometry_record)
+        if profile.requires_geometry_record:
+            raise UnitFactoryError("Model profile requires an explicit model geometry record.")
         return ModelGeometry.from_base_size(
             profile.base_size,
             keywords=keywords,

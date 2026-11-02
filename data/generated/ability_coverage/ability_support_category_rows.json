@@ -1511,25 +1511,36 @@
         "datasheet_id": "000000611",
         "datasheet_name": "Night Spinner",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000004085:wracking-agonies-psychic",
+        "ability_name": "Wracking Agonies (Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004085/datasheet/000004085:wracking-agonies-psychic/none",
+        "datasheet_id": "000004085",
+        "datasheet_name": "Sorcerer",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
-      "Monofilament Web"
+      "Monofilament Web",
+      "Wracking Agonies (Psychic)"
     ],
     "category_id": "datasheet.roll_modifier.charge.selected_unit",
     "category_name": "Datasheet Roll Modifier Charge Selected Unit",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000000611/datasheet/000000611:monofilament-web/none"
+      "chaos-daemons-bridge-catalog/000000611/datasheet/000000611:monofilament-web/none",
+      "chaos-daemons-bridge-catalog/000004085/datasheet/000004085:wracking-agonies-psychic/none"
     ],
     "datasheet_names": [
-      "Night Spinner"
+      "Night Spinner",
+      "Sorcerer"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:post-shoot-hit-target-effect"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -2720,29 +2731,40 @@
         "datasheet_id": "000000611",
         "datasheet_name": "Night Spinner",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000004085:wracking-agonies-psychic",
+        "ability_name": "Wracking Agonies (Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004085/datasheet/000004085:wracking-agonies-psychic/none",
+        "datasheet_id": "000004085",
+        "datasheet_name": "Sorcerer",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
       "Burning Lance",
-      "Monofilament Web"
+      "Monofilament Web",
+      "Wracking Agonies (Psychic)"
     ],
     "category_id": "datasheet.rule_ir.modify_characteristic.selected_unit",
     "category_name": "Datasheet Rule Ir Modify Characteristic Selected Unit",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000574/datasheet/000000574:burning-lance/none",
-      "chaos-daemons-bridge-catalog/000000611/datasheet/000000611:monofilament-web/none"
+      "chaos-daemons-bridge-catalog/000000611/datasheet/000000611:monofilament-web/none",
+      "chaos-daemons-bridge-catalog/000004085/datasheet/000004085:wracking-agonies-psychic/none"
     ],
     "datasheet_names": [
       "Fuegan",
-      "Night Spinner"
+      "Night Spinner",
+      "Sorcerer"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:conditional-leading-weapon-range-modifier",
       "catalog-ir:post-shoot-hit-target-effect"
     ],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -4084,6 +4106,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000004085:warped-interference-psychic",
+        "ability_name": "Warped Interference (Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004085/datasheet/000004085:warped-interference-psychic/none",
+        "datasheet_id": "000004085",
+        "datasheet_name": "Sorcerer",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000595:mandiblasters",
         "ability_name": "Mandiblasters",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000595/datasheet/000000595:mandiblasters/none",
@@ -4104,20 +4134,23 @@
       "Daemonic Patrons",
       "Mandiblasters",
       "Objective Defiled",
-      "Shadow Form"
+      "Shadow Form",
+      "Warped Interference (Psychic)"
     ],
     "category_id": "datasheet.rule_ir.set_contextual_status.this_unit",
     "category_name": "Datasheet Rule Ir Set Contextual Status This Unit",
-    "coverage_row_count": 4,
+    "coverage_row_count": 5,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-form/none",
       "chaos-daemons-bridge-catalog/000004089/datasheet/000004089:daemonic-patrons/none",
+      "chaos-daemons-bridge-catalog/000004085/datasheet/000004085:warped-interference-psychic/none",
       "chaos-daemons-bridge-catalog/000000595/datasheet/000000595:mandiblasters/none",
       "chaos-daemons-bridge-catalog/000004079/datasheet/000004079:objective-defiled/none"
     ],
     "datasheet_names": [
       "Be'lakor",
       "Flawless Blades",
+      "Sorcerer",
       "Striking Scorpions",
       "Tormentors"
     ],
@@ -4126,10 +4159,11 @@
       "catalog-ir:critical-hit-threshold",
       "catalog-ir:fight-end-failed-activation-model-destruction",
       "catalog-ir:fight-selected-critical-wound-threshold",
+      "catalog-ir:leading-ranged-cover",
       "catalog-ir:shadow-form-choice"
     ],
     "source_kind_counts": {
-      "datasheet": 4
+      "datasheet": 5
     },
     "support_stages": [
       "engine_consumed"
@@ -4555,6 +4589,14 @@
       {
         "ability_id": "000009994",
         "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004085/faction/000009994/none",
+        "datasheet_id": "000004085",
+        "datasheet_name": "Sorcerer",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004079/faction/000009994/none",
         "datasheet_id": "000004079",
         "datasheet_name": "Tormentors",
@@ -4566,7 +4608,7 @@
     ],
     "category_id": "faction.army_rule.thrill_seekers",
     "category_name": "Emperor's Children Army Rule",
-    "coverage_row_count": 14,
+    "coverage_row_count": 15,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004090/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004081/faction/000009994/none",
@@ -4581,6 +4623,7 @@
       "chaos-daemons-bridge-catalog/000004083/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004091/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004088/faction/000009994/none",
+      "chaos-daemons-bridge-catalog/000004085/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004079/faction/000009994/none"
     ],
     "datasheet_names": [
@@ -4597,6 +4640,7 @@
       "Lucius the Eternal",
       "Maulerfiend",
       "Noise Marines",
+      "Sorcerer",
       "Tormentors"
     ],
     "runtime_consumer_ids": [
@@ -4606,7 +4650,7 @@
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
     ],
     "source_kind_counts": {
-      "faction": 14
+      "faction": 15
     },
     "support_stages": [
       "engine_consumed"
@@ -5237,6 +5281,14 @@
         "datasheet_id": "000004193",
         "datasheet_name": "Prince Yriel",
         "source_kind": "core"
+      },
+      {
+        "ability_id": "000008346",
+        "ability_name": "Leader",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004085/core/000008346/none",
+        "datasheet_id": "000004085",
+        "datasheet_name": "Sorcerer",
+        "source_kind": "core"
       }
     ],
     "ability_names": [
@@ -5244,7 +5296,7 @@
     ],
     "category_id": "core.leader",
     "category_name": "Leader",
-    "coverage_row_count": 11,
+    "coverage_row_count": 12,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/core/000008346/none",
       "chaos-daemons-bridge-catalog/000002759/core/000008346/none",
@@ -5256,7 +5308,8 @@
       "chaos-daemons-bridge-catalog/000004078/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004084/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004083/core/000008346/none",
-      "chaos-daemons-bridge-catalog/000004193/core/000008346/none"
+      "chaos-daemons-bridge-catalog/000004193/core/000008346/none",
+      "chaos-daemons-bridge-catalog/000004085/core/000008346/none"
     ],
     "datasheet_names": [
       "Autarch",
@@ -5269,13 +5322,14 @@
       "Lord Exultant",
       "Lord Kakophonist",
       "Lucius the Eternal",
-      "Prince Yriel"
+      "Prince Yriel",
+      "Sorcerer"
     ],
     "runtime_consumer_ids": [
       "descriptor:army-mustering:leader-attachment"
     ],
     "source_kind_counts": {
-      "core": 11
+      "core": 12
     },
     "support_stages": [
       "engine_consumed"

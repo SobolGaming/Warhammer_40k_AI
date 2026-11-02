@@ -103,10 +103,10 @@
       "sha256": "0edf3bc19424cf7882c9a24db3e877fd353696a3ed6718fb0d0ab4e9454ecc44"
     },
     "tests/factions/emperors_children/test_selected_consumers.py": {
-      "blob_sha1": "5002dd60dd550d54a68e1925d26422412c7646e9",
-      "bytes": 41534,
+      "blob_sha1": "000ded52c0b21a2a589aa397ab89b3ddc2b30b3b",
+      "bytes": 65338,
       "mode": "100644",
-      "sha256": "ec5a51f2118a2038a598c6a2ac149e2b4b72dce06460ac743408cea1e39032c5"
+      "sha256": "267dd235cbc553c6097dca6eb647719c323308e83874d28dfc8473afb988df17"
     },
     "tests/factions/emperors_children/test_shared_attack_consumers.py": {
       "blob_sha1": "4d6141e4a647edbcf7aaa841f7349262e66c08a9",
@@ -1267,10 +1267,10 @@
       "sha256": "56bbaf8fcf6671bbfbe66e56e539d6b9a4406ddfe66a6452383f3acfa02c4947"
     },
     "tests/rules/section06/test_visibility.py": {
-      "blob_sha1": "9a0c17ebe48477eb86b71991f1c77e9399ff88e7",
-      "bytes": 7201,
+      "blob_sha1": "3bc28e261496ba856ebd690ad84087b751cc7e6d",
+      "bytes": 21303,
       "mode": "100644",
-      "sha256": "9682ea3cb79f7bec5d68e1da5d70f2f2c75cadf8d8b99f4fc5f3b3dfd2d36503"
+      "sha256": "8c1452eeb7c5c5c2ec0c0619fc45a2fa000d1323a1d7b6872f4934354854b61e"
     },
     "tests/rules/section06/test_visibility_ownership.py": {
       "blob_sha1": "19870e0cd81980c745fd0d4dda60596ca6d2bc4e",

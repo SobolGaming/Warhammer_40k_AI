@@ -313,6 +313,11 @@ _SOURCE_PACKAGE_DESCRIPTOR_BY_ID: Final = MappingProxyType(
             package_hash="dfc876685dbb22509fa6bc5b9943566502ab0be41b0d6c4318501a6a31cdcdd7",
             wire_type=_PdfSingleDatasheetSourcePackageWire,
         ),
+        "40k-app-11e-emperors-children-sorcerer-2026-11-01": _SourcePackageDescriptor(
+            artifact_schema="core-v2-emperors-children-sorcerer-rule-ir-v1",
+            package_hash="67ff10b2c732cdabfb455d937749cbe146bd83c657bb285083bb0623162f0b6e",
+            wire_type=_SnapshotSingleDatasheetSourcePackageWire,
+        ),
         "gw-11e-aeldari-night-spinner-datasheet-2026-06-14": _SourcePackageDescriptor(
             artifact_schema="core-v2-aeldari-night-spinner-rule-ir-v1",
             package_hash="48799f43bc37a0550a7e98108f4e7db1751f3b6ab81d91c129608861a5807bf4",

@@ -63,6 +63,9 @@ from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
 from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
     source_applies_to_rules_unit as _source_applies_to_rules_unit,
 )
+from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
+    source_currently_leading_rules_unit as _source_currently_leading_rules_unit,
+)
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     CatalogAllocatedAttackDamageModifierDescriptor,
     CatalogConditionalAttackRerollDescriptor,
@@ -519,12 +522,20 @@ class CatalogDatasheetRuleRuntime:
         return tuple(bindings)
 
     def model_ability_grant_bindings(self) -> tuple[ModelAbilityGrantBinding, ...]:
+        from warhammer40k_core.engine.catalog_cover_grants import (
+            catalog_cover_grant_binding,
+            clause_is_leading_cover,
+        )
         from warhammer40k_core.engine.catalog_lone_operative_grants import (
             lone_operative_grant_binding,
         )
         from warhammer40k_core.engine.catalog_stealth_grants import catalog_stealth_grant_bindings
 
         return (
+            *(
+                catalog_cover_grant_binding(source)
+                for source in self._sources(clause_is_leading_cover)
+            ),
             *catalog_stealth_grant_bindings(
                 aura_sources=self._sources(clause_is_stealth_aura),
                 self_sources=self._sources(clause_is_passive_self_stealth),
@@ -1242,23 +1253,6 @@ def _source_keyword_gate_applies(source: _CatalogClauseSource) -> bool:
     }
     keywords = {*source.unit.keywords, *source.unit.faction_keywords}
     return required.issubset(keywords)
-
-
-def _source_currently_leading_rules_unit(
-    *, source: _CatalogClauseSource, context_unit_id: str, state: object
-) -> bool:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Catalog datasheet leading query requires GameState.")
-    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=context_unit_id)
-    if not rules_unit.is_attached_rules_unit:
-        return False
-    return any(
-        component.unit.unit_instance_id == source.unit.unit_instance_id
-        and component.role in {"leader", "support"}
-        for component in rules_unit.components
-    )
 
 
 def _rules_unit_charged_this_turn(*, state: object, unit_instance_id: str) -> bool:

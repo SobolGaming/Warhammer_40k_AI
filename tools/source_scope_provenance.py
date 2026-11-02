@@ -58,11 +58,21 @@ CURRENT_EC_OVERLAY = (
 )
 CURRENT_EC_OVERLAY_SHA256 = "eb081b3b482fb52d8ebdca367937675134199359f799607aeb98d93984b80d59"
 
+SORCERER_OVERLAY = (
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+    "emperors_children_sorcerer_2026_11.overlay-pack.json"
+)
+SORCERER_OVERLAY_SHA256 = "735e021d0df16ee20f54f742a562152bed109c77ea600e35c90420abc8c7ab7a"
+
 
 def current_ec_overlay_provenance(root: Path, path: Path, raw: bytes) -> str | None:
-    if path != root / CURRENT_EC_OVERLAY:
+    reviewed_hash = {
+        root / CURRENT_EC_OVERLAY: CURRENT_EC_OVERLAY_SHA256,
+        root / SORCERER_OVERLAY: SORCERER_OVERLAY_SHA256,
+    }.get(path)
+    if reviewed_hash is None:
         return None
-    if path.is_symlink() or hashlib.sha256(raw).hexdigest() != CURRENT_EC_OVERLAY_SHA256:
+    if path.is_symlink() or hashlib.sha256(raw).hexdigest() != reviewed_hash:
         raise ValueError("Current EC overlay requires its exact reviewed bytes.")
     value = inputs.input_object(json.loads(raw, object_pairs_hook=inputs.unique_input_object))
     historical = {

@@ -30,6 +30,9 @@ from warhammer40k_core.core.datasheet_ability import (
 from warhammer40k_core.core.datasheet_composition import validate_unit_composition_counts
 from warhammer40k_core.core.datasheet_identity import effective_datasheet_keywords as _effective
 from warhammer40k_core.core.datasheet_identity import normalized_datasheet_identity
+from warhammer40k_core.core.datasheet_model_validation import (
+    validate_model_profile_tuple,
+)
 from warhammer40k_core.core.random_profile_values import (
     ProfileCharacteristicValue,
     ProfileCharacteristicValuePayload,
@@ -42,6 +45,8 @@ from warhammer40k_core.core.wargear_selection_limits import (
     DatasheetWargearSelectionLimit,
     DatasheetWargearSelectionLimitPayload,
 )
+
+_validate_model_profile_tuple = validate_model_profile_tuple
 
 
 class DatasheetCatalogError(ValueError):
@@ -128,6 +133,7 @@ class BaseSizeDefinitionPayload(TypedDict):
 
 
 class ModelProfileDefinitionPayload(TypedDict):
+    requires_geometry_record: NotRequired[bool]
     model_profile_id: str
     name: str
     characteristics: list[ProfileCharacteristicValuePayload]
@@ -304,8 +310,13 @@ class ModelProfileDefinition:
     characteristics: tuple[ProfileCharacteristicValue, ...]
     base_size: BaseSizeDefinition
     source_ids: tuple[str, ...] = ()
+    requires_geometry_record: bool = False
 
     def __post_init__(self) -> None:
+        if type(self.requires_geometry_record) is not bool:
+            raise DatasheetCatalogError(
+                "ModelProfileDefinition requires_geometry_record must be bool."
+            )
         object.__setattr__(
             self,
             "model_profile_id",
@@ -347,13 +358,16 @@ class ModelProfileDefinition:
         raise DatasheetCatalogError("ModelProfileDefinition characteristic was not found.")
 
     def to_payload(self) -> ModelProfileDefinitionPayload:
-        return {
+        payload: ModelProfileDefinitionPayload = {
             "model_profile_id": self.model_profile_id,
             "name": self.name,
             "characteristics": [value.to_payload() for value in self.characteristics],
             "base_size": self.base_size.to_payload(),
             "source_ids": list(self.source_ids),
         }
+        if self.requires_geometry_record:
+            payload["requires_geometry_record"] = True
+        return payload
 
     @classmethod
     def from_payload(cls, payload: ModelProfileDefinitionPayload) -> Self:
@@ -365,6 +379,7 @@ class ModelProfileDefinition:
             ),
             base_size=BaseSizeDefinition.from_payload(payload["base_size"]),
             source_ids=tuple(payload["source_ids"]),
+            requires_geometry_record=payload.get("requires_geometry_record", False),
         )
 
 
@@ -1587,26 +1602,6 @@ def _validate_required_model_characteristics(
         raise DatasheetCatalogError(
             f"ModelProfileDefinition missing required characteristics: {missing_tokens}."
         )
-
-
-def _validate_model_profile_tuple(
-    field_name: str,
-    values: tuple[ModelProfileDefinition, ...],
-) -> tuple[ModelProfileDefinition, ...]:
-    if type(values) is not tuple:
-        raise DatasheetCatalogError(f"{field_name} must be a tuple.")
-    if not values:
-        raise DatasheetCatalogError(f"{field_name} must not be empty.")
-    seen: set[str] = set()
-    validated: list[ModelProfileDefinition] = []
-    for value in values:
-        if type(value) is not ModelProfileDefinition:
-            raise DatasheetCatalogError(f"{field_name} must contain model profile definitions.")
-        if value.model_profile_id in seen:
-            raise DatasheetCatalogError(f"{field_name} must not contain duplicate IDs.")
-        seen.add(value.model_profile_id)
-        validated.append(value)
-    return tuple(validated)
 
 
 def _validate_composition_tuple(

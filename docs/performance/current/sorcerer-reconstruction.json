@@ -1,0 +1,165 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "reconstruction",
+  "workload_id": "loaded-ingress-reconstruction-v1",
+  "base_revision": "7827235d328bf5b82201c8fece29dab7356ba3e3",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:617011195977d5ecb3d7445dffe6bce8d4031328abfe55b51ec1ef67b33c3448",
+  "head_input_digest": "2ea076b810bd279dc9bd8b5e05c8eab07447973177766df0ba9dbe2a83fbf251",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:42a3c9eaab5fd7e0b8771d0cf2bfcfc46f647b5c909bd650bea6789198b1f749",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359395840,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "logical_cpus": 64,
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "5e0787cba828b3717ddd07bb16b0c68926d77b9416eaac062e1199408f1beebf",
+    "fixture_sha256": "ffc3a2b57e54eff0c73cfe73ddb9afb963f3d3ecb12081b1f3cb02242f038986",
+    "samples": {
+      "ingress/restore": [
+        1.4209214699999393,
+        1.5161767460001556,
+        1.4000540740000815,
+        1.4788301389999106,
+        1.389697002000048,
+        1.4956130160001067,
+        1.4037374810000074
+      ],
+      "ingress/fork": [
+        1.5185844769998766,
+        1.4183797460000278,
+        1.5190882910001164,
+        1.4216008759999568,
+        1.516934031000119,
+        1.5183895039999697,
+        1.4172175799999422
+      ],
+      "rapid_disembark/restore": [
+        1.5350794040000437,
+        1.439232415999868,
+        1.540458125999976,
+        1.4427229430000352,
+        1.5412943690000702,
+        1.4461979099999098,
+        1.5353673170000093
+      ],
+      "rapid_disembark/fork": [
+        1.4664526089998162,
+        1.5863512579999224,
+        1.470736264999914,
+        1.4555250849998629,
+        1.6226230770000711,
+        1.4854350299999624,
+        1.5573325349998868
+      ],
+      "later_decision/restore": [
+        1.459308831999806,
+        1.5626191659998767,
+        1.5518657779998648,
+        1.4487723050001478,
+        1.5885203099999217,
+        1.4548243940000702,
+        1.5358782710000014
+      ],
+      "later_decision/fork": [
+        1.4702692489997844,
+        1.578846723999959,
+        1.473091969000052,
+        1.5635357399999066,
+        1.577213453000013,
+        1.4812061699999504,
+        1.5675980100002107
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:617011195977d5ecb3d7445dffe6bce8d4031328abfe55b51ec1ef67b33c3448",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359395840,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "logical_cpus": 64,
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "5e0787cba828b3717ddd07bb16b0c68926d77b9416eaac062e1199408f1beebf",
+    "fixture_sha256": "ffc3a2b57e54eff0c73cfe73ddb9afb963f3d3ecb12081b1f3cb02242f038986",
+    "samples": {
+      "ingress/restore": [
+        1.4293592590001936,
+        1.4801766539999335,
+        1.3952427090000583,
+        1.491402904000097,
+        1.3951098229999843,
+        1.4846679849999873,
+        1.3929115779999393
+      ],
+      "ingress/fork": [
+        1.52884339000002,
+        1.4219792589999543,
+        1.5227168069998243,
+        1.4248087150001538,
+        1.5267611489998671,
+        1.5184212290000687,
+        1.4185165709998273
+      ],
+      "rapid_disembark/restore": [
+        1.5444908590000068,
+        1.4427178319999712,
+        1.545820079999885,
+        1.447208622000062,
+        1.5478954440000052,
+        1.4451506180000706,
+        1.5383151149999321
+      ],
+      "rapid_disembark/fork": [
+        1.4850428929998998,
+        1.577990624999984,
+        1.4820370909999383,
+        1.4764849219998268,
+        1.5773244740000791,
+        1.4782853570000043,
+        1.5787932559999263
+      ],
+      "later_decision/restore": [
+        1.4628902080000898,
+        1.5468175710000196,
+        1.5517353580000872,
+        1.451056625000092,
+        1.545864020000181,
+        1.4588315639998655,
+        1.55651815300007
+      ],
+      "later_decision/fork": [
+        1.4834024510000745,
+        1.5720099440000013,
+        1.4887243939999735,
+        1.5727016509999885,
+        1.57118744100012,
+        1.4770041570000103,
+        1.5799504239998896
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    {
+      "record": "data/source_audits/sorcerer_2026_11/visibility-diagnostic.json",
+      "qualification": "Original native 494.54s interruption and identical raw-query base/head 45s timeouts produced no answer; not completed samples or a native base Sorcerer comparison."
+    },
+    {
+      "record": "data/source_audits/sorcerer_2026_11/visibility-correction.json",
+      "qualification": "Retains rejected bounded probes and first-certificate 180s native timeout. Current original scene completion is a separate native correctness regression, not a fabricated matched-baseline speedup."
+    }
+  ]
+}

@@ -140,7 +140,22 @@ measurements require explicit review for that exact sculpt/configuration; they
 are not official evidence. Footprint/support base, height and any z-offset must
 have the required accepted evidence. New provider authority does not promote
 existing unreviewed geometry. Missing base, height, hull or variant evidence
-blocks fieldability, independently of source loading and semantic execution.
+blocks fieldability, independently of source loading and semantic execution,
+except for an explicit provisional record under the owner-approved policy below.
+
+On 1 November 2026 the owner authorized unverified estimates and crowd-sourced
+geometry for now. Each admitted estimate must have an explicit nonzero dimension,
+exact sculpt/configuration, origin and endpoint, source/method, uncertainty and
+replacement policy in its linked versioned evidence document. Preserve its
+`provisional_estimate` review status in catalog, persistence and replay payloads;
+do not relabel it as verified/official evidence. User-relayed AI estimates use
+`user_supplied_estimate`, not `manual_measurement`. Such estimates cannot use the
+`accepted` status. Existing `needs_review` entries remain blocked until explicitly
+dispositioned; missing/unknown dimensions have no fallback. The Sorcerer example
+is [the provisional geometry record](../data/source_audits/sorcerer_2026_11/geometry.json).
+Its 65 mm overall height is an unverified other-AI photo estimate relayed by the
+user (reported 60–65 mm), not a physical measurement or official height. Better
+measurements replace the active version while preserving historical provenance.
 The F00 page-observation schema cannot certify geometry or supply numeric
 defaults; an Exorcist Hull obligation demonstrates that boundary.
 

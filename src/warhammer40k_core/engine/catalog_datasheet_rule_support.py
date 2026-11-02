@@ -5,6 +5,11 @@ from types import MappingProxyType
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import WeaponProfileError, weapon_keyword_from_token
+from warhammer40k_core.engine.catalog_cover_support import (
+    LEADING_COVER_CONSUMER_ID,
+    LEADING_COVER_TEMPLATE_ID,
+    clause_is_leading_cover,
+)
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     allocated_attack_damage_modifier_descriptor_for_clause,
     charged_melee_weapon_characteristic_aura_descriptor_for_clause,
@@ -192,6 +197,7 @@ def clause_has_invalid_exact_datasheet_runtime_shape(clause: RuleClause) -> bool
         or clause_has_invalid_exact_tracked_target_selection_shape(clause)
         or sticky_objective_clause_has_invalid_exact_shape(clause)
         or nested_attack_reroll_clause_has_invalid_shape(clause)
+        or (clause.template_id == LEADING_COVER_TEMPLATE_ID and not clause_is_leading_cover(clause))
     )
 
 
@@ -199,6 +205,8 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Datasheet RuleIR support requires RuleClause.")
     consumer_ids: set[str] = set()
+    if clause_is_leading_cover(clause):
+        consumer_ids.add(LEADING_COVER_CONSUMER_ID)
     if nested_attack_reroll_clause_is_supported(clause):
         consumer_ids.add(CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID)
     for effect in clause.effects:
@@ -342,6 +350,7 @@ def registered_consumer_ids() -> tuple[str, ...]:
     return tuple(
         sorted(
             {
+                LEADING_COVER_CONSUMER_ID,
                 CATALOG_IR_MUSTERING_SELECTION_CONSUMER_ID,
                 RETAINED_ATTACK_CONSUMER_ID,
                 CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,

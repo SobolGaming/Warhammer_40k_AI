@@ -6,6 +6,7 @@
     "000004079": "emperors-children",
     "000004080": "emperors-children",
     "000004083": "emperors-children",
+    "000004085": "emperors-children",
     "000004086": "emperors-children",
     "000004090": "emperors-children",
     "000004091": "emperors-children"
@@ -16,9 +17,338 @@
     "source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32"
   },
   "edition": 11,
-  "package_hash": "9be3564104f1f0379c1c7a10d110cdeaacd72bee22dc4817838128cda5cc6224",
+  "package_hash": "66fb9184b769035ff1afe283cd960f71d731c859c64a84e1fbd6392e5bf5280e",
   "shard_id": "emperors-children",
   "source_packages": {
+    "40k-app-11e-emperors-children-sorcerer-2026-11-01": {
+      "artifact_schema": "core-v2-emperors-children-sorcerer-rule-ir-v1",
+      "datasheet_id": "000004085",
+      "datasheet_name": "Sorcerer",
+      "package_hash": "67ff10b2c732cdabfb455d937749cbe146bd83c657bb285083bb0623162f0b6e",
+      "records": {
+        "000004085:3": {
+          "ability_name": "Warped Interference (Psychic)",
+          "normalized_text_sha256": "61452fbc19a87d9e09f2c641c9dfa30647b0cb1dec5e5fa01571cbb09c6f7c8b",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "sorcerer:000004085:3:clause:001",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "relationship",
+                        "value": "this_model_leading_unit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 34,
+                      "start": 0,
+                      "text": "While this model is leading a unit"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 34,
+                    "start": 0,
+                    "text": "While this model is leading a unit"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "set_contextual_status",
+                    "parameters": [
+                      {
+                        "key": "attack_kind",
+                        "value": "ranged"
+                      },
+                      {
+                        "key": "operation",
+                        "value": "grant"
+                      },
+                      {
+                        "key": "status",
+                        "value": "benefit_of_cover"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 139,
+                      "start": 81,
+                      "text": "models in it have the Benefit of Cover against that attack"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 140,
+                  "start": 0,
+                  "text": "While this model is leading a unit, each time a ranged attack targets that unit, models in it have the Benefit of Cover against that attack."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 79,
+                    "start": 70,
+                    "text": "that unit"
+                  }
+                },
+                "template_id": "catalog-ir:conditional-leading-ranged-cover",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "cfe217991d7daad21b3ab906e34c3bff771ac18e79b0d24adeb17a713078498b",
+            "normalized_text": "While this model is leading a unit, each time a ranged attack targets that unit, models in it have the Benefit of Cover against that attack.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "sorcerer:datasheet:000004085:3",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "40k-app-11e-emperors-children-sorcerer-2026-11-01:datasheet:000004085:3"
+          }
+        },
+        "000004085:4": {
+          "ability_name": "Wracking Agonies (Psychic)",
+          "normalized_text_sha256": "1395191494330055370ea730142231aeb8c0c7c8faf1937c85ba604431171c33",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "sorcerer:000004085:4:clause:001",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [],
+                "source_span": {
+                  "end": 144,
+                  "start": 0,
+                  "text": "In your Shooting phase, after this model has shot, select one INFANTRY unit hit by one or more of those attacks made with its Agonising Energies"
+                },
+                "target": {
+                  "kind": "enemy_unit",
+                  "parameters": [
+                    {
+                      "key": "allegiance",
+                      "value": "enemy"
+                    },
+                    {
+                      "key": "required_keyword",
+                      "value": "INFANTRY"
+                    },
+                    {
+                      "key": "target_relationship",
+                      "value": "hit_by_those_attacks"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 75,
+                    "start": 58,
+                    "text": "one INFANTRY unit"
+                  }
+                },
+                "template_id": "phase17c:selected-target-constraint",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "attacker_model_reference",
+                      "value": "this_model"
+                    },
+                    {
+                      "key": "edge",
+                      "value": "after"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "active_player"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "shooting"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "this_model"
+                    },
+                    {
+                      "key": "target_relationship",
+                      "value": "hit_by_those_attacks"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "just_after_friendly_unit_has_shot"
+                    },
+                    {
+                      "key": "weapon_names",
+                      "value": [
+                        "Agonising Energies - witchfire",
+                        "Agonising Energies - focused witchfire"
+                      ]
+                    }
+                  ],
+                  "source_span": {
+                    "end": 49,
+                    "start": 24,
+                    "text": "after this model has shot"
+                  }
+                },
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "sorcerer:000004085:4:clause:002",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "battle_round_offset",
+                      "value": 1
+                    },
+                    {
+                      "key": "boundary",
+                      "value": "start"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "turn"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "source_player"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 179,
+                    "start": 146,
+                    "text": "Until the start of your next turn"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "movement"
+                      },
+                      {
+                        "key": "delta",
+                        "value": -2
+                      }
+                    ],
+                    "source_span": {
+                      "end": 294,
+                      "start": 254,
+                      "text": "subtract 2\" from its Move characteristic"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 294,
+                  "start": 254,
+                  "text": "subtract 2\" from its Move characteristic"
+                },
+                "target": {
+                  "kind": "selected_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 190,
+                    "start": 181,
+                    "text": "that unit"
+                  }
+                },
+                "template_id": "phase17c:selected-unit-characteristic-modifier",
+                "trigger": null,
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "sorcerer:000004085:4:clause:003",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "battle_round_offset",
+                      "value": 1
+                    },
+                    {
+                      "key": "boundary",
+                      "value": "start"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "turn"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "source_player"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 179,
+                    "start": 146,
+                    "text": "Until the start of your next turn"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_dice_roll",
+                    "parameters": [
+                      {
+                        "key": "delta",
+                        "value": -2
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "charge"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 339,
+                      "start": 299,
+                      "text": "subtract 2 from Charge rolls made for it"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 339,
+                  "start": 299,
+                  "text": "subtract 2 from Charge rolls made for it"
+                },
+                "target": {
+                  "kind": "selected_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 190,
+                    "start": 181,
+                    "text": "that unit"
+                  }
+                },
+                "template_id": "phase17c:selected-unit-dice-roll-modifier",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "9361fd0fb6ec7950ebc990da14421c0173db7533d3660f04611cbce25fb5b0a8",
+            "normalized_text": "In your Shooting phase, after this model has shot, select one INFANTRY unit hit by one or more of those attacks made with its Agonising Energies. Until the start of your next turn, that unit is wracked with agonies. While a unit is wracked with agonies, subtract 2\" from its Move characteristic and subtract 2 from Charge rolls made for it.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "sorcerer:datasheet:000004085:4",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "40k-app-11e-emperors-children-sorcerer-2026-11-01:datasheet:000004085:4"
+          }
+        }
+      },
+      "source_artifact_hash": "7045ea750defe53c819b69828490a9fa644ed8520c335a49fd574c6986e61a8b",
+      "source_package_id": "40k-app-11e-emperors-children-sorcerer-2026-11-01",
+      "source_snapshot_filename": "source-observation-current.json",
+      "source_snapshot_sha256": "7045ea750defe53c819b69828490a9fa644ed8520c335a49fd574c6986e61a8b"
+    },
     "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08": {
       "artifact_schema": "core-v2-emperors-children-daemon-prince-of-slaanesh-rule-ir-v1",
       "datasheets": [

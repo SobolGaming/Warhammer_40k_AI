@@ -14,6 +14,7 @@ from warhammer40k_core.core.datasheet import (
 )
 from warhammer40k_core.core.detachment import EnhancementDefinition, EnhancementSubtype
 from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.engine.army_mustering import (
     AELDARI_FACTION_ID,
     ANHRATHE_KEYWORD,
@@ -58,6 +59,7 @@ class RosterModelResolver:
 
     catalog: ArmyCatalog
     request: ArmyMusterRequest
+    model_geometries: tuple[ModelGeometryCatalogRecord, ...] = ()
     _units: dict[str, UnitInstance] = field(default_factory=dict[str, UnitInstance], init=False)
 
     def unit(
@@ -72,7 +74,9 @@ class RosterModelResolver:
                 for row in self.request.unit_selections
                 if row.unit_selection_id == unit_selection_id
             )
-            self._units[unit_selection_id] = UnitFactory(catalog=self.catalog).instantiate_unit(
+            self._units[unit_selection_id] = UnitFactory(
+                catalog=self.catalog, model_geometries=self.model_geometries
+            ).instantiate_unit(
                 army_id=self.request.army_id, selection=selection, datasheet=datasheet
             )
         return self._units[unit_selection_id]

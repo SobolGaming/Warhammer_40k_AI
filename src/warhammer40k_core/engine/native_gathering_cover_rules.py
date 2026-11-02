@@ -5,6 +5,7 @@ from __future__ import annotations
 from hashlib import sha256
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.engine.catalog_cover_grants import catalog_cover_inventory
 from warhammer40k_core.engine.core_stratagem_effects import unit_effects_grant_benefit_of_cover
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.obscuring_model_cover import obscuring_model_cover_inventories
@@ -25,6 +26,11 @@ def cover_gathering_inventories(
         dict[str, JsonValue],
         validate_json_value(
             {
+                **catalog_cover_inventory(
+                    state=state,
+                    target_unit_instance_id=pool.target_unit_instance_id,
+                    runtime_modifier_registry=registry,
+                ),
                 "effects": [
                     effect.to_payload()
                     for effect in state.persisting_effects_for_unit(pool.target_unit_instance_id)

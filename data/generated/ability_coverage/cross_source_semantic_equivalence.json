@@ -7011,7 +7011,7 @@
     }
   ],
   "equivalent_group_count": 322,
-  "exact_text_only_member_count": 3177,
+  "exact_text_only_member_count": 3175,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -57186,12 +57186,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "71f00155dbed10bd9798dc6440e17da0dac2def5562ef5f5b680d5d3da7bcade",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "040c4093c5add53f305e951f2eeda259a49ab1849b02531b6078001dd9a690d3",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004085:3",
@@ -57201,25 +57199,25 @@
       "rule_id": "000004085:3",
       "rule_name": "Warped Interference (Psychic)",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:leading-ranged-cover"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "2845689725e14a5b558035ee6975165171c84763e1d567cbef45915ea03c8220",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004085:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004085:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "85cd6abe170e35115c1ae5d11fde8b0ebf85573032f9c81f7017bda9d04a90dc",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "3971fc6bbcb81a9dfa969ead5c9dbd17c2f2d1f43523fdc6ffdcda487916b197",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004085:4",
@@ -57229,16 +57227,18 @@
       "rule_id": "000004085:4",
       "rule_name": "Wracking Agonies (Psychic)",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "51a04fdffd1fb9cdf89952b85ce096eec20c5d583e47446237fb1b41e0848123",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004085:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004085:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -121990,8 +121990,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "b6eff6e3c68748a4554ed202336efa2890bf4714a367e1e850de7a50a3994dc9",
+  "source_payload_checksum_sha256": "8bbda7eb5822898c01df7dfb54abb2abb3d7fb480699a3c1eba0ac2c76e99f42",
   "source_text_unavailable_member_count": 111,
-  "structured_member_count": 806,
+  "structured_member_count": 808,
   "upstream_execution_checksum_sha256": "6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c"
 }

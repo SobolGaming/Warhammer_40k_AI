@@ -165,6 +165,41 @@ def acts_inactive_predecessor(root: Path, current: bytes) -> bytes:
 def defiler_provenance_predecessor(current: bytes) -> bytes:
     """Reverse exact current admissions, then retain the original Defiler/Acts proof."""
     if hashlib.sha256(current).hexdigest() == (
+        "e755f0325fd4b8d2877f6389962177483d0731a97d880929b8541da9d1da71be"
+    ):
+        # Reverse only the exact Sorcerer table addition before the retained EC proof.
+        addition = (
+            b"\n"
+            b"SORCERER_OVERLAY = (\n"
+            b'    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"\n'
+            b'    "emperors_children_sorcerer_2026_11.overlay-pack.json"\n'
+            b")\n"
+            b'SORCERER_OVERLAY_SHA256 = "'
+            b'735e021d0df16ee20f54f742a562152bed109c77ea600e35c90420abc8c7ab7a"\n'
+        )
+        successor = (
+            b"    reviewed_hash = {\n"
+            b"        root / CURRENT_EC_OVERLAY: CURRENT_EC_OVERLAY_SHA256,\n"
+            b"        root / SORCERER_OVERLAY: SORCERER_OVERLAY_SHA256,\n"
+            b"    }.get(path)\n"
+            b"    if reviewed_hash is None:\n"
+            b"        return None\n"
+            b"    if path.is_symlink() or hashlib.sha256(raw).hexdigest() != reviewed_hash:\n"
+        )
+        predecessor = (
+            b"    if path != root / CURRENT_EC_OVERLAY:\n"
+            b"        return None\n"
+            b"    if path.is_symlink() or hashlib.sha256(raw).hexdigest() != "
+            b"CURRENT_EC_OVERLAY_SHA256:\n"
+        )
+        if current.count(addition) != 1 or current.count(successor) != 1:
+            raise ValueError("Exact registered edition provenance inputs changed.")
+        current = current.replace(addition, b"", 1).replace(successor, predecessor, 1)
+        if hashlib.sha256(current).hexdigest() != (
+            "7d5dbcca852a9ae237fe79b8d518e8b1a08f776a8af448ee19439746735ad732"
+        ):
+            raise ValueError("Exact registered edition provenance inputs changed.")
+    if hashlib.sha256(current).hexdigest() == (
         "7d5dbcca852a9ae237fe79b8d518e8b1a08f776a8af448ee19439746735ad732"
     ):
         # Authenticate the complete EC successor before removing its two finite additions.

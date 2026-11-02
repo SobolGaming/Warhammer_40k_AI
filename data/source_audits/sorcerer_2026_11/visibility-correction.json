@@ -1,0 +1,68 @@
+{
+  "schema": "sorcerer-exact-visibility-correction-v1",
+  "base": "7827235d328bf5b82201c8fece29dab7356ba3e3",
+  "authorization": "Owner authorized a bounded exact termination repair for the preserved legal scene, without changed geometry, approximate visibility, relaxed budgets or general solver redesign.",
+  "historical_diagnostic": "visibility-diagnostic.json",
+  "original_formula_sha256": "8ab3672f48b939980bbca8c86b2ea9dcb0fbd944422dca51b21bab552a117cbc",
+  "continuation_formula": {
+    "sha256": "e81c5de2f809169e0154b289325a2efc19ac1497e436c8a6bdd58894ccd611cd",
+    "characters": 12689363,
+    "entry": "Same shooting-declaration enumeration, next observer(10.5,2.9), same Sorcerer target and additional near-observer concave blocker.",
+    "retention": "Private task-5/visibility-continuation-1/query-0646.json and full observational call/return trace; no Boolean result before diagnostic termination."
+  },
+  "proofs": {
+    "rear_plane": "For circles and D=Ct-Co, every self-visible side normal satisfies n.D<=ro-rt, so target projection<=Ct.D+rt*(ro-rt). Observer projection<=Co.D+ro*|D|. Adding corridorRadius*|D| bounds every valid strip. Exact conservative rational support separation must be strict. Contained vertical interval excludes visible caps; XY disjointness excludes zero-horizontal origins.",
+    "unequal_tangents": "The boundary n.D=ro-rt has direction (ro-rt)D +/- sqrt(|D|^2-(ro-rt)^2)J(D). At most ten rational unit-circle chart candidates are added. Rounded/limited parameters select candidates only; exact membership/facing and unchanged all-origin occlusion proof remain mandatory. A miss preserves all old candidates and complete algebraic fallback."
+  },
+  "unchanged_authorities": {
+    "src/warhammer40k_core/geometry/visibility_algebra.py": "51631bc2979f18f22730801b70a62d92db886dc976f93bac57bf384c5dfb8143",
+    "src/warhammer40k_core/geometry/visibility_formulas.py": "18b1800abe19163fb9cbb3624cd75349d6ab47e8a531e0889051d27e44e1d643",
+    "src/warhammer40k_core/geometry/visibility_exact.py": "bb5bc4c7e52e0958a68894d5e8062540b4234523c1efd08c76a58fb0f6f838df"
+  },
+  "fixture": {
+    "path": "tests/fixtures/sorcerer_visibility_domains.json",
+    "sha256": "4bac745821fe1f921e55b5e706fa4babb9abf394e50fd5f2a113513880fb4507",
+    "meaning": "Exact captured original and continuation geometry. Original public native regression reconstructs the scene independently through accepted setup/movement."
+  },
+  "candidate_native_completion": {
+    "runtime": "warhammer40k-core-v2:runtime-tree-sha256-v1:617011195977d5ecb3d7445dffe6bce8d4031328abfe55b51ec1ef67b33c3448",
+    "source_input_hashes": {
+      "src/warhammer40k_core/geometry/visibility_witnesses.py": "fdce5f1135b6ece5ec80eabeeef9a8df4a5bd1edc8faa69ec76d568c62a4783a",
+      "src/warhammer40k_core/geometry/visibility_certificates.py": "ddee3df9e4a5c7bbb060738f88eb6b3c5533ed336535e86ca7bef9fe36810ecb",
+      "src/warhammer40k_core/geometry/continuous_visibility.py": "19ddccbcc1a433f837dba8ec539c3f5ca321b8061a2c69d78ffed750986d912c",
+      "tests/support/sorcerer_native.py": "a9b61862e9301900e115f51851a5d47a6d7c4fc3c02705d16496d3881d401b26",
+      "tests/factions/emperors_children/test_selected_consumers.py": "267dd235cbc553c6097dca6eb647719c323308e83874d28dfc8473afb988df17",
+      "src/warhammer40k_core/_engine_build_manifest.json": "fae787ecfc9f4370450530411d998510121d90c82af4de606c3991c27a5956f2"
+    },
+    "pytest_seconds": 70.99,
+    "command_seconds": 79.912581201,
+    "result": "PASS: original setup, 7-inch movement, all-target declaration, actual successful Agonising hits, no never-attached Cover, JSON restoration, both viewer projections and REPRODUCED replay.",
+    "diagnostic_stack": "A 60s faulthandler progress dump occurred during turn timing continuation; the test subsequently passed. This was not an active budget failure.",
+    "private_receipt": "task-5/rear-plane-original-native-2.json/.log/.xml"
+  },
+  "reference_controls": {
+    "full_empty_blockers": "Original complete quantified predicate returned True in0.1686s.",
+    "actual_generated_hidden_point": "Original complete existential target-part predicate returned False in14.1876s, agreeing with exact F-membership and all-origin blocked proof.",
+    "same_point_clear_gap": "Original complete existential predicate returned True in2.1286s after removing only the near-observer blocker in this separately labelled adjacent control.",
+    "limit": "No completed reference result exists for either retained whole forall/exists hard query. These completed smaller predicates do not claim otherwise."
+  },
+  "failed_attempts": {
+    "original": "494.54s agent interrupt retained in historical diagnostic.",
+    "equal_raw_base_head": "Both original complete raw-query replays stopped at their unchanged45s diagnostic deadlines without answers.",
+    "rejected_experiments": "Five bounded generic normalization/local identity candidates in private visibility-correction-attempts-1.json; none adopted.",
+    "first_certificate_native": "First rear-plane-only candidate fc2278d7/c8a6cd... failed to finish the full original test in180.036s; second continuation query revealed.",
+    "simple_nonempty_full_reference": "One adjacent full forall/exists probe hit30s; retained, not passing."
+  },
+  "legacy_concept_disposition": {
+    "legacy_path": "tests/unit/test_visibility_pathing.py",
+    "sha256": "da8420295b157cb0773da63cec8fee6a025e024e354cfc93b8dca57b6c82ebb3",
+    "execution": "UNRUN: explicit collection rejected by unchanged legacy quarantine. Owner-side review chose active-concept ports, not guard bypass.",
+    "active_ports": [
+      "test_exact_corridor_contact_survives_rear_proof_search: ellipse/flat strict contact at +/-1e-30 and equality",
+      "test_facing_witness_requires_a_horizontal_origin_at_exact_tangency: vertical-only versus displaced tangent, checked by complete target-part authority"
+    ],
+    "other_concepts": "Active section06 controls retain partial/full visibility, body-height and 1mm clearance; added exact-source domains, unequal radii, cap/overlap/coincidence/tangency guards, analytic support, multiple blockers, vertical contact and any/full blocker-set separation."
+  },
+  "performance_plan": "Existing mandatory geometry-search plus uncached-owner cache-policy selectors require visibility, movement, setup and reconstruction actual-base matched comparisons. Original maps, families, samples and budgets remain unchanged.",
+  "qualification": "Candidate focused proof/native evidence only. Final exact-head full covered behavior, all active quality, both types, generated/contracts/package gates, four matched families, serial smoke, independent coding+Astra reviews and hosted CI remain required."
+}

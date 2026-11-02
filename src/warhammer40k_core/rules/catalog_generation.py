@@ -409,6 +409,13 @@ def _model_profile_from_row(
             ),
         ),
         base_size=base_size,
+        requires_geometry_record=(
+            geometry_record is not None
+            and any(
+                evidence.reviewer_status is GeometryReviewStatus.PROVISIONAL_ESTIMATE
+                for evidence in geometry_record.evidence
+            )
+        ),
         source_ids=_deduplicated_ids((*_source_ids_from_row(row), *geometry_source_ids)),
     )
 
@@ -1109,7 +1116,10 @@ def _geometry_record_from_model_row(
             _required_field(row=row, column_name="height_reviewer_status")
         ),
     )
-    if height_evidence.reviewer_status is not GeometryReviewStatus.ACCEPTED:
+    if height_evidence.reviewer_status not in {
+        GeometryReviewStatus.ACCEPTED,
+        GeometryReviewStatus.PROVISIONAL_ESTIMATE,
+    }:
         return _geometry_diagnostic(
             row=row,
             model_profile_id=model_profile_id,

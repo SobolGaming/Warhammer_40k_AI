@@ -4544,6 +4544,86 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000008346",
+    "ability_name": "Leader",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004085/core/000008346/none",
+    "datasheet_id": "000004085",
+    "datasheet_name": "Sorcerer",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:army-mustering:leader-attachment"
+    ],
+    "semantic_categories": [
+      "core.leader"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004085:warped-interference-psychic",
+    "ability_name": "Warped Interference (Psychic)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004085/datasheet/000004085:warped-interference-psychic/none",
+    "datasheet_id": "000004085",
+    "datasheet_name": "Sorcerer",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:leading-ranged-cover"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.set_contextual_status.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004085:wracking-agonies-psychic",
+    "ability_name": "Wracking Agonies (Psychic)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004085/datasheet/000004085:wracking-agonies-psychic/none",
+    "datasheet_id": "000004085",
+    "datasheet_name": "Sorcerer",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:post-shoot-hit-target-effect"
+    ],
+    "semantic_categories": [
+      "datasheet.roll_modifier.charge.selected_unit",
+      "datasheet.rule_ir.modify_characteristic.selected_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009994",
+    "ability_name": "Thrill Seekers",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004085/faction/000009994/none",
+    "datasheet_id": "000004085",
+    "datasheet_name": "Sorcerer",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.thrill_seekers"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008339",
     "ability_name": "Deadly Demise",
     "catalog_id": "chaos-daemons-bridge-catalog",

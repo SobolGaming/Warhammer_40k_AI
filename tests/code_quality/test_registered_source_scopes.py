@@ -571,3 +571,58 @@ def test_current_ec_overlay_projects_only_exact_historical_base(tmp_path: Path) 
     linked.symlink_to(path)
     with pytest.raises(ValueError, match="exact reviewed bytes"):
         provenance.registered_provenance_text(tmp_path, linked, raw, historical_snapshot_inputs)
+
+
+def test_sorcerer_overlay_projects_only_exact_historical_base(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tests.support.acts_preservation import defiler_provenance_predecessor
+
+    path = ROOT / provenance.SORCERER_OVERLAY
+    raw = path.read_bytes()
+    projected = provenance.registered_provenance_text(ROOT, path, raw, historical_snapshot_inputs)
+    assert projected is not None
+    expected = json.loads(raw)
+    del expected["base_source_package_id"]["version"]
+    assert json.loads(projected) == expected
+    assert not any(token in projected for token in retired_identity_tokens())
+    assert path.read_bytes() == raw
+    assert (
+        provenance.registered_provenance_text(
+            ROOT, ROOT / "unregistered-sorcerer-overlay.json", raw, historical_snapshot_inputs
+        )
+        is None
+    )
+    for mutation in ("base_source_package_id", "target_edition", "adjacent_identity"):
+        changed = json.loads(raw)
+        changed[mutation] = retired_identity_tokens()[0]
+        with pytest.raises(ValueError, match="exact reviewed bytes"):
+            provenance.registered_provenance_text(
+                ROOT, path, json.dumps(changed).encode(), historical_snapshot_inputs
+            )
+    linked = tmp_path / provenance.SORCERER_OVERLAY
+    linked.parent.mkdir(parents=True)
+    linked.symlink_to(path)
+    with pytest.raises(ValueError, match="exact reviewed bytes"):
+        provenance.registered_provenance_text(tmp_path, linked, raw, historical_snapshot_inputs)
+    # Even a newly reviewed hash cannot hide an operative retired-edition token.
+    operative = json.loads(raw)
+    operative["operations"][0]["reason"] = retired_identity_tokens()[0]
+    operative_raw = json.dumps(operative).encode()
+    with monkeypatch.context() as scoped:
+        scoped.setattr(
+            provenance, "SORCERER_OVERLAY_SHA256", hashlib.sha256(operative_raw).hexdigest()
+        )
+        text = provenance.registered_provenance_text(
+            ROOT, path, operative_raw, historical_snapshot_inputs
+        )
+        assert text is not None
+        assert retired_identity_tokens()[0] in text
+    helper = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    assert hashlib.sha256(defiler_provenance_predecessor(helper)).hexdigest() == (
+        "40ef539dc75aa669df54a099d7788b74ca68453c7ae18a1e009194c48a42f64a"
+    )
+    with pytest.raises(ValueError, match="registered edition provenance inputs changed"):
+        defiler_provenance_predecessor(
+            helper.replace(b"SORCERER_OVERLAY_SHA256", b"ALTERED_SORCERER_OVERLAY_SHA256")
+        )

@@ -31201,6 +31201,468 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "sorcerer-admission-exact-01": {
+      "paths": [
+        "data/source_audits/sorcerer_2026_11/core-dependency-observations.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-02": {
+      "paths": [
+        "data/source_audits/sorcerer_2026_11/geometry.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-03": {
+      "paths": [
+        "data/source_audits/sorcerer_2026_11/review.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-04": {
+      "paths": [
+        "data/source_audits/sorcerer_2026_11/source-observation-current.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-05": {
+      "paths": [
+        "src/warhammer40k_core/core/datasheet.py"
+      ],
+      "owners": [
+        "ModelProfileDefinition",
+        "ModelProfileDefinition.__post_init__",
+        "ModelProfileDefinition.from_payload",
+        "ModelProfileDefinition.to_payload",
+        "ModelProfileDefinitionPayload",
+        "_validate_model_profile_tuple"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-06": {
+      "paths": [
+        "src/warhammer40k_core/core/datasheet_model_validation.py"
+      ],
+      "owners": [
+        "@module",
+        "validate_model_profile_tuple"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-07": {
+      "paths": [
+        "src/warhammer40k_core/core/model_geometry_catalog.py"
+      ],
+      "owners": [
+        "GeometryEvidenceKind",
+        "GeometryReviewStatus",
+        "ModelFootprintPartDefinition.from_evidence",
+        "ModelGeometrySourceEvidence.__post_init__",
+        "ModelGeometrySourceEvidence.require_accepted",
+        "ModelGeometrySourceEvidence.require_admissible",
+        "ModelHeightDefinition.from_evidence",
+        "ModelZOffsetDefinition.from_evidence",
+        "_validate_linked_evidence"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-08": {
+      "paths": [
+        "src/warhammer40k_core/engine/army_mustering.py"
+      ],
+      "owners": [
+        "_validate_request_matches_catalog",
+        "muster_army",
+        "validate_roster_legality"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-09": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_modifier_snapshots.py"
+      ],
+      "owners": [
+        "@module",
+        "attack_modifier_snapshots"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-10": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_hit_wound.py"
+      ],
+      "owners": [
+        "_benefit_of_cover_ballistic_skill_penalty"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-11": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_attack_context_rule_runtime.py"
+      ],
+      "owners": [
+        "source_currently_leading_rules_unit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-12": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_cover_grants.py"
+      ],
+      "owners": [
+        "@module",
+        "_grant_handler",
+        "catalog_cover_grant_binding",
+        "catalog_cover_inventory"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-13": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_cover_support.py"
+      ],
+      "owners": [
+        "@module",
+        "clause_is_leading_cover"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-14": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_datasheet_rule_runtime.py"
+      ],
+      "owners": [
+        "CatalogDatasheetRuleRuntime.model_ability_grant_bindings",
+        "_source_currently_leading_rules_unit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-15": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_datasheet_rule_support.py"
+      ],
+      "owners": [
+        "registered_consumer_ids"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-16": {
+      "paths": [
+        "src/warhammer40k_core/engine/roster_bearer_validation.py"
+      ],
+      "owners": [
+        "RosterModelResolver",
+        "RosterModelResolver.unit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-17": {
+      "paths": [
+        "src/warhammer40k_core/engine/roster_catalog_identity.py"
+      ],
+      "owners": [
+        "@module",
+        "validate_request_matches_catalog"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-18": {
+      "paths": [
+        "src/warhammer40k_core/engine/unit_factory.py"
+      ],
+      "owners": [
+        "_model_geometry_for_profile"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-19": {
+      "paths": [
+        "src/warhammer40k_core/rules/catalog_generation.py"
+      ],
+      "owners": [
+        "_geometry_record_from_model_row",
+        "_model_profile_from_row"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-20": {
+      "paths": [
+        "src/warhammer40k_core/rules/wahapedia_bridge_defaults.py"
+      ],
+      "owners": [
+        "@module"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-21": {
+      "paths": [
+        "tests/code_quality/test_current_comparison_routing.py"
+      ],
+      "owners": [
+        "test_sorcerer_source_smoke_scope_requires_exact_base_bytes_owners_and_category"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-22": {
+      "paths": [
+        "tests/factions/emperors_children/test_selected_consumers.py"
+      ],
+      "owners": [
+        "sorcerer_native_shooting_checkpoint",
+        "test_explicit_provisional_geometry_preserves_uncertainty_and_rejects_unknowns",
+        "test_leading_cover_rejects_unrecognized_source_descriptor_scope",
+        "test_sorcerer_bodyguard_hits_do_not_activate_its_wracking_agony",
+        "test_sorcerer_current_native_muster_geometry_equipment_and_leader_targets",
+        "test_sorcerer_muster_rejects_illegal_bodyguard_counts_equipment_and_missing_geometry",
+        "test_sorcerer_native_agonising_hits_on_non_infantry_do_not_offer_wracking",
+        "test_sorcerer_native_bolt_pistol_hits_do_not_offer_wracking",
+        "test_sorcerer_native_cover_is_conditional_and_respects_ignores_cover",
+        "test_sorcerer_native_misses_do_not_offer_wracking",
+        "test_sorcerer_native_overwatch_hits_cannot_trigger_own_shooting_wracking",
+        "test_sorcerer_native_shooting_cover_wracking_and_exact_replay",
+        "test_sorcerer_strict_public_setup_requires_provisional_geometry",
+        "test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-23": {
+      "paths": [
+        "tests/support/sorcerer_native.py"
+      ],
+      "owners": [
+        "@module",
+        "deploy_native",
+        "native_choice",
+        "native_declaration",
+        "native_fire",
+        "native_request",
+        "native_selection",
+        "native_session",
+        "native_sorcerer_overwatch",
+        "translate_native"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-24": {
+      "paths": [
+        "tools/emperors_children_support_report.py"
+      ],
+      "owners": [
+        "emperors_children_datasheet_support_markdown"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-25": {
+      "paths": [
+        "tools/generate_emperors_children_sorcerer_rule_ir.py"
+      ],
+      "owners": [
+        "@module",
+        "_parameters",
+        "_rule",
+        "_span",
+        "_warped_interference",
+        "_wracking_agonies",
+        "generated_artifact_payload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-26": {
+      "paths": [
+        "tools/generate_emperors_children_sorcerer_source.py"
+      ],
+      "owners": [
+        "@module",
+        "generated_overlay_pack",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-27": {
+      "paths": [
+        "tools/generate_faction_rule_ir_bundles.py"
+      ],
+      "owners": [
+        "@module"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-28": {
+      "paths": [
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "sorcerer_source_rule_semantics_smoke_operations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-29": {
+      "paths": [
+        "data/source_audits/sorcerer_2026_11/visibility-diagnostic.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-30": {
+      "paths": [
+        "tests/support/sorcerer_native.py"
+      ],
+      "owners": [
+        "assert_native_movement_budget"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-31": {
+      "paths": [
+        "data/source_audits/sorcerer_2026_11/provenance-successor.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-32": {
+      "paths": [
+        "tests/code_quality/test_registered_source_scopes.py"
+      ],
+      "owners": [
+        "test_sorcerer_overlay_projects_only_exact_historical_base"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-33": {
+      "paths": [
+        "data/source_audits/sorcerer_2026_11/visibility-correction.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-34": {
+      "paths": [
+        "tests/factions/emperors_children/test_selected_consumers.py"
+      ],
+      "owners": [
+        "test_sorcerer_original_rear_blocker_scene_completes_shooting_and_exact_replay"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-35": {
+      "paths": [
+        "tests/fixtures/sorcerer_visibility_domains.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "sorcerer-admission-exact-36": {
+      "paths": [
+        "tests/rules/section06/test_visibility.py"
+      ],
+      "owners": [
+        "_retained_visibility_domains",
+        "test_exact_corridor_contact_survives_rear_proof_search",
+        "test_facing_witness_requires_a_horizontal_origin_at_exact_tangency",
+        "test_rear_plane_analytic_ellipse_support_and_multiple_blockers",
+        "test_rear_plane_certificate_declines_unproved_scope",
+        "test_rear_plane_certificate_preserves_strict_rational_boundary",
+        "test_rear_plane_certifies_retained_diagonal_concave_blocker",
+        "test_rear_plane_empty_scene_agrees_with_complete_quantified_reference",
+        "test_rear_plane_full_proof_does_not_hide_a_different_any_visibility_blocker",
+        "test_rear_plane_requires_strict_vertical_disjointness",
+        "test_unequal_circle_candidates_prove_retained_hidden_part_and_clear_gap",
+        "test_unequal_circle_search_retains_fallback_for_other_domains"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

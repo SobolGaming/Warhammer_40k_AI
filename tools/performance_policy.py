@@ -336,6 +336,32 @@ def ec_current_rule_semantics_smoke_operations(
     return frozenset({operations[path]})
 
 
+def sorcerer_source_rule_semantics_smoke_operations(
+    *, base: str, path: str, category: str, change: object
+) -> frozenset[str]:
+    """Bind the finite current-source admissions to exact reviewed owner bytes."""
+    operations = {
+        "tools/ability_support_sources.py": "qualification40-exact-b0712fa66a9cc38e",
+        "tools/generate_ability_support_matrix.py": "qualification40-exact-ded6452f144f095b",
+        "tools/source_scope_provenance.py": "registered-source-provenance-projection",
+    }
+    if (
+        base != "7827235d328bf5b82201c8fece29dab7356ba3e3"
+        or path not in operations
+        or category != "rule_semantics"
+    ):
+        return frozenset()
+    scope = read_object(
+        Path(__file__).resolve().parents[1]
+        / "docs/performance/policy-v3/sorcerer-source-smoke-scope.json"
+    )
+    if scope["base"] != base or object_value(scope["changes"]).get(path) != change:
+        return frozenset()
+    if object_value(scope["smoke_operations"]).get(path) != [operations[path]]:
+        raise ValueError("Sorcerer source smoke scope must retain each sole exact operation.")
+    return frozenset({operations[path]})
+
+
 def d12_rule_semantics_smoke_operations(
     *, base: str, path: str, category: str, change: object
 ) -> frozenset[str]:
@@ -595,6 +621,9 @@ def validate_assessment(
             )
             | _d04_smoke_operations(base=base, path=path, category=category, change=changes[path])
             | ec_current_rule_semantics_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | sorcerer_source_rule_semantics_smoke_operations(
                 base=base, path=path, category=category, change=changes[path]
             )
             | d12_rule_semantics_smoke_operations(

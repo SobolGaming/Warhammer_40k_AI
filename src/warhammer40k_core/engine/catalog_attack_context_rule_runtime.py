@@ -273,3 +273,20 @@ def rules_units_within(
         placed_alive_attacker_models_only=False,
         placed_alive_target_models_only=False,
     )
+
+
+def source_currently_leading_rules_unit(
+    *, source: CatalogDatasheetClauseSource, context_unit_id: str, state: object
+) -> bool:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Catalog datasheet leading query requires GameState.")
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=context_unit_id)
+    if not rules_unit.is_attached_rules_unit:
+        return False
+    return any(
+        component.unit.unit_instance_id == source.unit.unit_instance_id
+        and component.role in {"leader", "support"}
+        for component in rules_unit.components
+    )
