@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0e0e472702044a85b431808cb60d03ed6b7541e7674564955ee1bd8cef32e185",
-  "fingerprint": "0e0e472702044a85b431808cb60d03ed6b7541e7674564955ee1bd8cef32e185",
-  "resource_count": 3183,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bdc45689262eff59f08b038948636d1e12ed069bc4a737a1f509ed15522c86a9",
+  "fingerprint": "bdc45689262eff59f08b038948636d1e12ed069bc4a737a1f509ed15522c86a9",
+  "resource_count": 3185,
   "resources": [
     {
       "byte_length": 113,
@@ -14225,9 +14225,14 @@
       "sha256": "a63c25996e95c03f0953fc3841e47228d6d9533cdb4ef34a8e2324bc29d0f902"
     },
     {
-      "byte_length": 9708,
+      "byte_length": 10518,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/__init__.py",
-      "sha256": "9a6a1695db8e0b3904047b36924a2a3abb947569bac145ee6998e0f798382ec6"
+      "sha256": "6d3a0d876721cf0864a43163f977106020d8a0ba7d519e59908150c2c2ca5ec8"
+    },
+    {
+      "byte_length": 6279,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/_current_source.py",
+      "sha256": "d782b12da39766f1450a3591d15740740cb55875737be531bcd488db0d38420d"
     },
     {
       "byte_length": 26732,
@@ -14235,9 +14240,14 @@
       "sha256": "885cc8f5b87ca33670910bc13d6080591b3fa927d5cb5ef24954dc180cdf5596"
     },
     {
-      "byte_length": 162841,
+      "byte_length": 161451,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/catalog.json",
-      "sha256": "eec0195ebc35da304780ef213f73ffda307121c2a8d0d5c6a74d20d99c127663"
+      "sha256": "e87f2461e2216565bee477771ebee970caf5bff111eae3328c9d29feccc2f948"
+    },
+    {
+      "byte_length": 2946,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/deadly-demise-current-source.json",
+      "sha256": "b54d283b513d2cc4f7d032e26cec33ee5a551e573896d9ca1631062ab7bb10b1"
     },
     {
       "byte_length": 6708,
@@ -14862,12 +14872,12 @@
     {
       "byte_length": 6911,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/__init__.py",
-      "sha256": "936eea176343df1b73cc2adc11992afc628fd866898827e34c70feeca87f945e"
+      "sha256": "a84e029036b363c27408deb6d7fcc6e0d5d020a04b16ec5f7b4cd6ac59b0d96f"
     },
     {
-      "byte_length": 880401,
+      "byte_length": 877740,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/artifacts/catalog.json",
-      "sha256": "eaaa28239507347510bf6b756ab813026e7d5c1585c67bda7445ebdc449032e3"
+      "sha256": "58fabaf0d11cbcfcdd067fe10bea60df3d9e61afd45de6e5b9998147b69134c7"
     },
     {
       "byte_length": 32341,

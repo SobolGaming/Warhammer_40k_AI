@@ -456,6 +456,12 @@
       "mode": "100644",
       "sha256": "70381d17abc9fe99eee60277a7869b2daf404cc79adfd098df9b9d42c8acbd6e"
     },
+    "tests/infrastructure/source/unit/test_deadly_demise_descriptions.py": {
+      "blob_sha1": "bda7fd66f4623736b1a7458f222c66ccdd32c1e2",
+      "bytes": 15233,
+      "mode": "100644",
+      "sha256": "e0c3d08c607471985df12becce5617104d2e48da96fa313fb66eba9c2daef869"
+    },
     "tests/infrastructure/source/unit/test_phase17a1_transition_patches.py": {
       "blob_sha1": "881eebd1474c6f8587862c17f728026198970d20",
       "bytes": 23115,

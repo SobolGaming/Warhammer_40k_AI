@@ -987,3 +987,188 @@ def test_ci64_operation_index_preserves_case_glob_and_literal_paths(
             _validate(value, changes, mapping)
     else:
         assert _validate(value, changes, mapping) == result
+
+
+def _deadly_demise_policy_predecessor(raw: bytes, proof: dict[str, object]) -> bytes:
+    import hashlib
+
+    if hashlib.sha256(raw).hexdigest() != proof["after_sha256"]:
+        raise ValueError("Descriptor policy successor bytes drifted.")
+    start = raw.index(b"def deadly_demise_description_smoke_operations(")
+    end = raw.index(b"def d12_rule_semantics_smoke_operations(", start)
+    block = raw[start:end]
+    call = (
+        b"            | deadly_demise_description_smoke_operations(\n"
+        b"                base=base, path=path, category=category, change=changes[path]\n"
+        b"            )\n"
+    )
+    if (
+        raw.count(block) != 1
+        or raw.count(call) != 1
+        or hashlib.sha256(block).hexdigest() != proof["function_block_sha256"]
+        or hashlib.sha256(call).hexdigest() != proof["union_call_sha256"]
+    ):
+        raise ValueError("Descriptor policy successor registration drifted.")
+    prior = raw.replace(block, b"", 1).replace(call, b"", 1)
+    if hashlib.sha256(prior).hexdigest() != proof["before_sha256"]:
+        raise ValueError("Descriptor policy predecessor bytes drifted.")
+    return prior
+
+
+def test_deadly_demise_description_smoke_scope_is_exact() -> None:
+    from tools.performance_policy import deadly_demise_description_smoke_operations
+
+    scope = read_object(
+        ROOT / "docs/performance/policy-v3/deadly-demise-description-smoke-scope.json"
+    )
+    base = "b9d5a54999e9d014cd823a7d2d5c654f05ba2666"
+    path = "tools/generate_ability_support_matrix.py"
+    change = object_value(scope["changes"])[path]
+    expected = frozenset({"qualification40-exact-ded6452f144f095b"})
+    assert (
+        deadly_demise_description_smoke_operations(
+            base=base, path=path, category="rule_semantics", change=change
+        )
+        == expected
+    )
+    for altered_base, altered_path, category in (
+        ("a" * 40, path, "rule_semantics"),
+        (base, "tools/ability_support_sources.py", "rule_semantics"),
+        (base, path, "algorithm_or_search"),
+        (base, path, "cache_policy"),
+        (base, path, "serialization_or_replay_work"),
+    ):
+        assert not deadly_demise_description_smoke_operations(
+            base=altered_base, path=altered_path, category=category, change=change
+        )
+    altered = copy.deepcopy(object_value(change))
+    altered["after_sha256"] = "0" * 64
+    assert not deadly_demise_description_smoke_operations(
+        base=base, path=path, category="rule_semantics", change=altered
+    )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "missing-owner",
+        "extra-owner",
+        "file-hash",
+        "operation",
+        "extra-binding",
+        "extra-field",
+        "proof",
+    ],
+)
+def test_deadly_demise_smoke_scope_rejects_unbounded_declarations(
+    monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
+    from tools import performance_policy as policy
+
+    scope = read_object(
+        ROOT / "docs/performance/policy-v3/deadly-demise-description-smoke-scope.json"
+    )
+    path = "tools/generate_ability_support_matrix.py"
+    change = object_value(scope["changes"])[path]
+    altered = copy.deepcopy(scope)
+    bindings = object_value(altered["changes"])
+    binding = object_value(bindings[path])
+    owners = object_value(binding["owners"])
+    if mutation == "missing-owner":
+        owners.pop("_ability_support_catalog_package")
+    elif mutation == "extra-owner":
+        owners["unreviewed"] = {"before": "1" * 64, "after": "2" * 64}
+    elif mutation == "file-hash":
+        binding["after_sha256"] = "not-a-hash"
+    elif mutation == "operation":
+        object_value(altered["smoke_operations"])[path] = ["cache-policy"]
+    elif mutation == "extra-binding":
+        bindings["unreviewed.py"] = copy.deepcopy(binding)
+    elif mutation == "proof":
+        object_value(altered["policy_successor"])["after_sha256"] = "0" * 64
+    else:
+        altered["unreviewed"] = True
+
+    def altered_scope(_selected: Path) -> dict[str, object]:
+        return altered
+
+    monkeypatch.setattr(policy, "read_object", altered_scope)
+    with pytest.raises(ValueError, match=r"Unexpected|Descriptor"):
+        policy.deadly_demise_description_smoke_operations(
+            base="b9d5a54999e9d014cd823a7d2d5c654f05ba2666",
+            path=path,
+            category="rule_semantics",
+            change=change,
+        )
+
+
+def test_deadly_demise_policy_successor_preserves_exact_predecessor() -> None:
+    scope = read_object(
+        ROOT / "docs/performance/policy-v3/deadly-demise-description-smoke-scope.json"
+    )
+    proof = object_value(scope["policy_successor"])
+    raw = (ROOT / "tools/performance_policy.py").read_bytes()
+    expected = subprocess.check_output(
+        ["git", "show", "b9d5a54999e9d014cd823a7d2d5c654f05ba2666:tools/performance_policy.py"],
+        cwd=ROOT,
+    )
+    assert _deadly_demise_policy_predecessor(raw, proof) == expected
+    start = raw.index(b"def deadly_demise_description_smoke_operations(")
+    end = raw.index(b"def d12_rule_semantics_smoke_operations(", start)
+    block = raw[start:end]
+    call = (
+        b"            | deadly_demise_description_smoke_operations(\n"
+        b"                base=base, path=path, category=category, change=changes[path]\n"
+        b"            )\n"
+    )
+    for changed in (
+        b"",
+        raw + b"\n",
+        raw.replace(block, b"", 1),
+        raw.replace(block, block + block, 1),
+        raw.replace(call, b"", 1),
+        raw.replace(call, call + call, 1),
+        raw.replace(b"selected_path =", b"altered_path =", 1),
+    ):
+        assert changed != raw
+        assert _deadly_demise_policy_predecessor(raw, proof) == expected
+        with pytest.raises(ValueError, match="Descriptor policy"):
+            _deadly_demise_policy_predecessor(changed, proof)
+        assert _deadly_demise_policy_predecessor(raw, proof) == expected
+
+
+def test_deadly_demise_scope_keeps_mandatory_mapping_and_detailed_categories() -> None:
+    path = "tools/generate_ability_support_matrix.py"
+    scope = read_object(
+        ROOT / "docs/performance/policy-v3/deadly-demise-description-smoke-scope.json"
+    )
+    operation = "qualification40-exact-ded6452f144f095b"
+    assessment, changes, mapping = _assessment(
+        path,
+        owner="_ability_support_catalog_package",
+        category="rule_semantics",
+        operations=(operation,),
+    )
+    base = "b9d5a54999e9d014cd823a7d2d5c654f05ba2666"
+    changes[path] = object_value(scope["changes"])[path]
+    assessment["base"] = base
+    assert (
+        validate_assessment(
+            assessment, base=base, changes=changes, runtime_id=BUILD, operation_map=mapping
+        )
+        == set()
+    )
+    rows = object_value(assessment["rows"])
+    row = object_value(rows[path])
+    row["operations"] = []
+    with pytest.raises(ValueError, match="operation"):
+        validate_assessment(
+            assessment, base=base, changes=changes, runtime_id=BUILD, operation_map=mapping
+        )
+    row["operations"] = [operation]
+    for category in ("algorithm_or_search", "cache_policy", "serialization_or_replay_work"):
+        row["category"] = category
+        with pytest.raises(ValueError, match="Missing required detailed comparisons"):
+            validate_assessment(
+                assessment, base=base, changes=changes, runtime_id=BUILD, operation_map=mapping
+            )

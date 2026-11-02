@@ -13,7 +13,7 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
     package_artifact_bytes,
 )
 
-from . import _reconciliation
+from . import _current_source, _reconciliation
 
 ChaosDaemonsRosterReconciliationError = _reconciliation.ChaosDaemonsRosterReconciliationError
 ExactRosterReconciliation = _reconciliation.ExactRosterReconciliation
@@ -24,9 +24,18 @@ raw_reconciliation_artifact_hash = _reconciliation.raw_reconciliation_artifact_h
 reconciliation_from_json_bytes = _reconciliation.reconciliation_from_json_bytes
 validate_catalog_against_reconciliation = _reconciliation.validate_catalog_against_reconciliation
 
+CURRENT_SOURCE_ARTIFACT: Final = (
+    _current_source.SOURCE_ARTIFACT_NAME,
+    _current_source.ARTIFACT_SHA256,
+)
+validate_current_catalog_against_reconciliation = (
+    _current_source.validate_current_catalog_against_reconciliation
+)
+
 ARTIFACT_PATH: Final = "artifacts/catalog.json"
 RECONCILIATION_ARTIFACT_PATH: Final = "artifacts/official-pdf-reconciliation.json"
 EXPECTED_PACKAGE_ID: Final = "data-package:core-v2:chaos-daemons-roster:2026-07"
+EXPECTED_PACKAGE_HASH: Final = "b63c0805b6878daf2eef2d4145e407361f7848bde3095074022f1b850db183ab"
 EXPECTED_CATALOG_ID: Final = "core-v2:chaos-daemons-roster:2026-07"
 EXPECTED_DATASHEET_IDS: Final = (
     "000001115",
@@ -157,6 +166,8 @@ def _validate_catalog_package(package: CanonicalCatalogPackage) -> None:
         raise ChaosDaemonsRosterCatalogError(
             "Chaos Daemons roster catalog package identity drifted."
         )
+    if package.package_hash() != EXPECTED_PACKAGE_HASH:
+        raise ChaosDaemonsRosterCatalogError("Chaos Daemons current catalog content hash drifted.")
     catalog = package.army_catalog
     if catalog.catalog_id != EXPECTED_CATALOG_ID:
         raise ChaosDaemonsRosterCatalogError("Chaos Daemons roster ArmyCatalog identity drifted.")
@@ -200,6 +211,10 @@ def _validate_catalog_package(package: CanonicalCatalogPackage) -> None:
         },
         EXPECTED_CURRENT_FACTION_SOURCE_ARTIFACT[0]: (EXPECTED_CURRENT_FACTION_SOURCE_ARTIFACT[1]),
         EXPECTED_RECONCILIATION_SOURCE_ARTIFACT[0]: (EXPECTED_RECONCILIATION_SOURCE_ARTIFACT[1]),
+        CURRENT_SOURCE_ARTIFACT[0]: CURRENT_SOURCE_ARTIFACT[1],
+        "core-abilities-2026-09.json": (
+            _current_source.current_source_derivation().core_artifact_sha256
+        ),
     }
     if any(
         source_artifact_hashes.get(artifact_name) != artifact_hash
@@ -210,7 +225,7 @@ def _validate_catalog_package(package: CanonicalCatalogPackage) -> None:
         )
     reconciliation = reconciliation_manifest()
     try:
-        _reconciliation.validate_catalog_against_reconciliation(
+        validate_current_catalog_against_reconciliation(
             catalog=catalog,
             reconciliation=reconciliation,
         )
@@ -222,6 +237,7 @@ def _validate_catalog_package(package: CanonicalCatalogPackage) -> None:
 
 __all__ = (
     "ARTIFACT_PATH",
+    "CURRENT_SOURCE_ARTIFACT",
     "EXPECTED_CATALOG_ID",
     "EXPECTED_CURRENT_FACTION_SOURCE_ARTIFACT",
     "EXPECTED_CURRENT_FACTION_SOURCE_PACKAGE_ID",
@@ -230,6 +246,7 @@ __all__ = (
     "EXPECTED_GENERATOR_INPUT_ARTIFACT_HASHES",
     "EXPECTED_GEOMETRY_BLOCKED_PROFILE_IDS",
     "EXPECTED_GEOMETRY_PROFILE_IDS",
+    "EXPECTED_PACKAGE_HASH",
     "EXPECTED_PACKAGE_ID",
     "EXPECTED_RECONCILIATION_SOURCE_ARTIFACT",
     "OFFICIAL_PDF_SHA256",
@@ -244,4 +261,5 @@ __all__ = (
     "reconciliation_from_json_bytes",
     "reconciliation_manifest",
     "validate_catalog_against_reconciliation",
+    "validate_current_catalog_against_reconciliation",
 )
