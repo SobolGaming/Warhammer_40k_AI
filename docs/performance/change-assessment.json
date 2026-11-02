@@ -366,21 +366,21 @@
     },
     "docs/performance/current/banshee-eldrad-dice.json": {
       "before_sha256": null,
-      "after_sha256": "88deb85eba413a1abbe1b26eb1397b46d574a47d740ccce7c683ff126fed957e",
+      "after_sha256": "5bcbe73c845a2cdd2b3b40688eb0e58e21c6089603e71268e9c62ba9fcc8d20d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "88deb85eba413a1abbe1b26eb1397b46d574a47d740ccce7c683ff126fed957e"
+          "after": "5bcbe73c845a2cdd2b3b40688eb0e58e21c6089603e71268e9c62ba9fcc8d20d"
         }
       }
     },
     "docs/performance/current/banshee-eldrad-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "061954f70ded51719d2898f8c5b6adb544259f357d365b06049760135d0f615b",
+      "after_sha256": "a9c9bc84c074b1ca71d4c3c73a78c9df3636cb74adefc6b59c6381d6a9aaf672",
       "owners": {
         "@document": {
           "before": null,
-          "after": "061954f70ded51719d2898f8c5b6adb544259f357d365b06049760135d0f615b"
+          "after": "a9c9bc84c074b1ca71d4c3c73a78c9df3636cb74adefc6b59c6381d6a9aaf672"
         }
       }
     },
