@@ -7,9 +7,7 @@ from tests.factions.aeldari.army_rule_helpers import (
     _AELDARI_UNIT_SELECTION_ID,
     _ENEMY_UNIT_ID,
     _ENEMY_UNIT_SELECTION_ID,
-    CONSOLIDATE_ACTION,
     DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID,
-    FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
     FIGHT_ACTIVATION_DECISION_TYPE,
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -20,29 +18,18 @@ from tests.factions.aeldari.army_rule_helpers import (
     BattlePhase,
     BattlePhaseKind,
     ChargeDeclarationContext,
-    ConsolidationModeKind,
     DamageKind,
     DecisionError,
     DecisionResult,
     EffectExpirationKind,
-    FightActivationAbilityContext,
-    FightActivationSelection,
-    FightEligibilityKind,
-    FightMovementProposal,
-    FightMovementStepState,
-    FightOrderingBandKind,
-    FightPhaseStepKind,
     FightTypeKind,
     JsonValue,
-    LifecycleStatusKind,
     LocalGameSession,
     MeleeDeclarationProposalRequest,
     MovementEndSurgeContext,
     MovementEndSurgeGrant,
     MovementMode,
     MovementPhaseActionKind,
-    MovementProposalRequest,
-    ParameterizedSubmission,
     Pose,
     ProposalKind,
     ShootingType,
@@ -55,7 +42,6 @@ from tests.factions.aeldari.army_rule_helpers import (
     _displacement_batch_for_unit,
     _drain_fight_movement_requests,
     _event_payload,
-    _last_event_payload,
     _persisting_effects_for_unit_by_kind,
     _place_unit_poses,
     _prepared_aeldari_state_at_phase,
@@ -118,7 +104,8 @@ def test_aeldari_star_engines_grants_advanced_vehicle_assault_until_end_of_turn(
     assert army_rule.OPPORTUNITY_SEIZED_HOOK_ID in summary["movement_end_surge_hook_ids"]
     assert army_rule.FLITTING_SHADOWS_HOOK_ID in summary["charge_declaration_hook_ids"]
     assert army_rule.FADE_BACK_HOOK_ID in summary["shooting_end_surge_hook_ids"]
-    assert army_rule.SUDDEN_STRIKE_HOOK_ID in summary["fight_activation_ability_hook_ids"]
+    assert army_rule.SUDDEN_STRIKE_HOOK_ID in summary["move_completion_rule_hook_ids"]
+    assert army_rule.SUDDEN_STRIKE_HOOK_ID not in summary["fight_activation_ability_hook_ids"]
 
     action_status = lifecycle.submit_decision(
         DecisionResult.for_request(
@@ -550,44 +537,14 @@ def test_aeldari_flitting_shadows_charge_declaration_grant_blocks_overwatch() ->
     assert payload["fire_overwatch_forbidden"] is True
 
 
-def test_aeldari_sudden_strike_fight_option_extends_pile_in_and_consolidation() -> None:
-    fight_state = _prepared_aeldari_state_at_phase(BattlePhase.FIGHT)
-    activation = FightActivationSelection(
-        player_id="player-a",
-        battle_round=fight_state.battle_round,
-        unit_instance_id=_AELDARI_UNIT_ID,
-        ordering_band=FightOrderingBandKind.REMAINING_COMBATS,
-        fight_type=FightTypeKind.NORMAL,
-        eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
-        request_id="phase17g-aeldari-fight-activation-request",
-        result_id="phase17g-aeldari-fight-activation-result",
-    )
-    context = FightActivationAbilityContext(
-        state=fight_state,
-        game_id=fight_state.game_id,
-        battle_round=fight_state.battle_round,
-        active_player_id="player-a",
-        player_id="player-a",
-        unit_instance_id=_AELDARI_UNIT_ID,
-        activation=activation,
-        target_unit_instance_ids=(_ENEMY_UNIT_ID,),
-    )
-
-    option = army_rule.sudden_strike_fight_activation_option(context)
-
-    assert option is not None
-    assert option.hook_id == army_rule.SUDDEN_STRIKE_HOOK_ID
-    assert option.ability_id == army_rule.SUDDEN_STRIKE_MANEUVER
-    assert option.effect_kind == FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND
-    assert option.model_proximity_inches is None
-    assert option.pile_in_distance_inches == 6.0
-    assert option.consolidate_distance_inches == 6.0
-    spend_payload = cast(dict[str, JsonValue], option.decision_effect_payload)
-    assert spend_payload["maneuver"] == army_rule.SUDDEN_STRIKE_MANEUVER
-    assert spend_payload["battle_focus_token_cost"] == 1
+def test_sudden_strike_is_not_registered_at_fight_activation() -> None:
+    assert army_rule.SUDDEN_STRIKE_HOOK_ID not in {
+        binding.hook_id
+        for binding in army_rule.runtime_contribution().fight_activation_ability_hook_bindings
+    }
 
 
-def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -> None:
+def test_uncharged_aeldari_fight_activation_cannot_buy_sudden_strike() -> None:
     config = _aeldari_config(
         aeldari_datasheet_id=_AELDARI_FIGHT_DATASHEET_ID,
         aeldari_model_profile_id="core-character-leader",
@@ -607,7 +564,7 @@ def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -
     bundle = _runtime_content_bundle(lifecycle)
     summary = bundle.to_summary_payload()
 
-    assert army_rule.SUDDEN_STRIKE_HOOK_ID in summary["fight_activation_ability_hook_ids"]
+    assert army_rule.SUDDEN_STRIKE_HOOK_ID not in summary["fight_activation_ability_hook_ids"]
 
     activation_request = _decision_request(
         _drain_fight_movement_requests(
@@ -627,21 +584,14 @@ def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -
             ),
         )
     )
-    ability_request = _decision_request(ability_status)
-    assert ability_request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE
-
-    melee_status = lifecycle.submit_decision(
-        DecisionResult.for_request(
-            result_id="phase17g-aeldari-sudden-strike-use",
-            request=ability_request,
-            selected_option_id=f"use:{army_rule.SUDDEN_STRIKE_MANEUVER}",
+    melee_request = _decision_request(ability_status)
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    assert (
+        _persisting_effects_for_unit_by_kind(
+            state, _AELDARI_UNIT_ID, FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND
         )
+        == ()
     )
-    assert melee_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-
-    state = _state(lifecycle)
-    activation_fight_state = state.fight_phase_state
-    assert activation_fight_state is not None
     for kind in (ProposalKind.PILE_IN, ProposalKind.CONSOLIDATE):
         assert (
             fight_movement_maximum_distance_inches(
@@ -649,113 +599,9 @@ def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -
             )
             == 3.0
         )
-    state.replace_fight_phase_state(
-        activation_fight_state.with_current_step(
-            current_step=FightPhaseStepKind.PILE_IN,
-            policy=state.runtime_ruleset_descriptor().fight_policy,
-        )
-    )
-    assert (
-        fight_movement_maximum_distance_inches(
-            state=state,
-            unit_instance_id=_AELDARI_UNIT_ID,
-            proposal_kind=ProposalKind.PILE_IN,
-        )
-        == 6.0
-    )
-    state.replace_fight_phase_state(
-        activation_fight_state.with_current_step(
-            current_step=FightPhaseStepKind.CONSOLIDATE,
-            policy=state.runtime_ruleset_descriptor().fight_policy,
-        )
-    )
-    assert (
-        fight_movement_maximum_distance_inches(
-            state=state,
-            unit_instance_id=_AELDARI_UNIT_ID,
-            proposal_kind=ProposalKind.CONSOLIDATE,
-        )
-        == 6.0
-    )
-    state.replace_fight_phase_state(activation_fight_state)
-    used_event = _last_event_payload(lifecycle, "fight_activation_ability_used")
-    persisting_effect = cast(dict[str, JsonValue], used_event["persisting_effect"])
-    effect_payload = cast(dict[str, JsonValue], persisting_effect["effect_payload"])
-    assert effect_payload["effect_kind"] == FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND
-    assert effect_payload["pile_in_distance_inches"] == 6.0
-    assert effect_payload["consolidate_distance_inches"] == 6.0
-
-    _place_unit_poses(
-        state,
-        unit_instance_id=_AELDARI_UNIT_ID,
-        poses=(Pose.at(10.0, 20.0, 0.0),),
-    )
-    _place_unit_poses(
-        state,
-        unit_instance_id=_ENEMY_UNIT_ID,
-        poses=_unit_line_poses(x=14.0, y=20.0),
-    )
-    fight_state = state.fight_phase_state
-    assert fight_state is not None
-    policy = state.runtime_ruleset_descriptor().fight_policy
-    state.replace_fight_phase_state(
-        fight_state.with_active_activation(None)
-        .with_consolidate_state(
-            FightMovementStepState.start(
-                step=FightPhaseStepKind.CONSOLIDATE,
-                next_player_id="player-a",
-            )
-        )
-        .with_current_step(current_step=FightPhaseStepKind.CONSOLIDATE, policy=policy)
-    )
-    lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
-    consolidate_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    proposal_request = MovementProposalRequest.from_decision_request_payload(
-        consolidate_request.payload
-    )
-    assert proposal_request.proposal_kind is ProposalKind.CONSOLIDATE
-    assert proposal_request.context is not None
-    assert proposal_request.context["maximum_distance_inches"] == 6.0
-
-    consolidate_status = lifecycle.submit_decision(
-        ParameterizedSubmission(
-            request_id=consolidate_request.request_id,
-            result_id="phase17g-aeldari-sudden-strike-consolidate",
-            payload=cast(
-                JsonValue,
-                FightMovementProposal(
-                    proposal_request_id=proposal_request.request_id,
-                    proposal_kind=ProposalKind.CONSOLIDATE,
-                    unit_instance_id=_AELDARI_UNIT_ID,
-                    movement_phase_action=CONSOLIDATE_ACTION,
-                    movement_mode=MovementMode.CONSOLIDATE,
-                    consolidation_mode=ConsolidationModeKind.ENGAGING,
-                    consolidate_target_unit_instance_ids=(_ENEMY_UNIT_ID,),
-                    witness=straight_line_witness_for_unit(
-                        lifecycle,
-                        unit_instance_id=_AELDARI_UNIT_ID,
-                        dx=2.5,
-                        dy=2.0,
-                    ),
-                ).to_payload(),
-            ),
-        ).to_result(consolidate_request)
-    )
-
-    completed_event = _last_event_payload(lifecycle, "fight_movement_completed")
-    resolution = cast(dict[str, JsonValue], completed_event["resolution"])
-    endpoint_state = _state(lifecycle)
-    assert endpoint_state.battlefield_state is not None
-    assert consolidate_status.status_kind is not LifecycleStatusKind.INVALID
-    assert completed_event["result_id"] == "phase17g-aeldari-sudden-strike-consolidate"
-    assert completed_event["active_player_id"] == "player-a"
-    assert completed_event["movement_endpoint_placement"] == (
-        endpoint_state.battlefield_state.unit_placement_by_id(_AELDARI_UNIT_ID).to_payload()
-    )
-    assert resolution["maximum_distance_inches"] == 6.0
 
 
-def test_retained_only_aeldari_keeps_sudden_strike_and_pending_attacks() -> None:
+def test_retained_only_aeldari_keeps_pending_attacks_without_late_sudden_strike() -> None:
     config = _aeldari_config(
         aeldari_datasheet_id=_AELDARI_FIGHT_DATASHEET_ID,
         aeldari_model_profile_id="core-character-leader",
@@ -817,28 +663,19 @@ def test_retained_only_aeldari_keeps_sudden_strike_and_pending_attacks() -> None
     )
     melee_request = _decision_request(melee_status)
 
-    assert melee_request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE
-    melee_status = lifecycle.submit_decision(
-        DecisionResult.for_request(
-            request=melee_request,
-            result_id="retained-sudden-strike-selected",
-            selected_option_id=f"use:{army_rule.SUDDEN_STRIKE_MANEUVER}",
-        )
-    )
-    melee_request = _decision_request(melee_status)
     assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
     proposal_request = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
     assert {
         cast(str, cast(dict[str, JsonValue], row)["model_instance_id"])
         for row in proposal_request.available_weapons
     } == {model.model_instance_id}
-    assert any(
+    assert not any(
         event.event_type == "fight_activation_ability_requested"
         for event in lifecycle.decision_controller.event_log.records
     )
 
 
-def test_mixed_aeldari_with_retained_model_keeps_sudden_strike_authority() -> None:
+def test_mixed_aeldari_retained_model_keeps_attacks_without_late_sudden_strike() -> None:
     config = _aeldari_config(
         aeldari_datasheet_id=_AELDARI_FIGHT_SQUAD_DATASHEET_ID,
         aeldari_model_profile_id="core-intercessor-like",
@@ -904,10 +741,12 @@ def test_mixed_aeldari_with_retained_model_keeps_sudden_strike_authority() -> No
         )
     )
 
-    ability_request = _decision_request(ability_status)
-    assert ability_request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE
-    assert f"use:{army_rule.SUDDEN_STRIKE_MANEUVER}" in {
-        option.option_id for option in ability_request.options
+    melee_request = _decision_request(ability_status)
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    proposal = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
+    assert destroyed_model.model_instance_id in {
+        cast(str, cast(dict[str, JsonValue], row)["model_instance_id"])
+        for row in proposal.available_weapons
     }
 
 

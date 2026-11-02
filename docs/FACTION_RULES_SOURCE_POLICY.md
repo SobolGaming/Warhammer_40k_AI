@@ -186,3 +186,20 @@ remaining 40-view inventory (F01), implement faction semantics (F02–F07), or
 certify rosters, replay or faction coverage (F08–F09). No player-facing decision,
 proposal, visibility rule or adapter payload shape changes, so the existing
 adapter decision contract covers this PR without revision.
+
+
+## Bounded current-source observations — 2 November 2026
+
+F00 audit schema v2 supports an explicitly selected nonempty set of complete
+pages. It retains every v1 ownership, complete-suffix, geometry, official-history,
+fingerprint and exact registry/catalog authorization check. The original v1
+three-kind governance audit and immutable pin remain unchanged. The first v2
+selection contains only the Aeldari army page and Corsair Voidscarred page under
+the observed global App-data 995 snapshot. See the [bounded source review](AELDARI_CURRENT_SOURCE_REVIEW.md).
+
+Complete page tables require the existing structured-lines normalization mode:
+an AP cell `0` followed by a damage cell `D3` must not become zero dice. New v2
+source texts explicitly serialize this mode and authenticate it in the catalog
+hash. Original flat-mode source normalization and serialized payloads remain
+unchanged. Raw captures and operative suffixes remain exact; objective terminology
+still follows the non-Core scope, and explicit invalid dice still fail closed.

@@ -1,0 +1,47 @@
+{
+  "base": "5e26b4b4791d0c25579faebc28394ec25bb38b24",
+  "changes": {
+    "tools/ability_support_sources.py": {
+      "before_sha256": "179fb1af416e0385271d7383f92c48b1005bede7900e95adf7654ba0e50f97ed",
+      "after_sha256": "f3996b510be3c842cc4d4a72d6d220835357ceb330af60f3e1b7e6d4259d41d7",
+      "owners": {
+        "@module": {
+          "before": "80603ee67290b56e096fdbd68278889c9ad7ace4ef6b8624f3851430fd5be333",
+          "after": "c386a838c9d76bb70b357368b1ebeab9c09cda9e7bbaf498abae3f30ad76fe0f"
+        },
+        "ability_support_index_inputs": {
+          "before": "fa3e5a33381e4304a9dff50575346c6bfcf633d557689994d250331fac1fc16a",
+          "after": "36116d0f28fd950295611273cda7231eba486931fd99b2a5f1209a3b79dda71c"
+        },
+        "load_ability_support_sources": {
+          "before": "d93bb882b2d4ed690e7d698be2b76bfdbbd006f750f8c8e5553e6e021d47d0bc",
+          "after": "9bba1bc08a62d7c4899615c54bbad33f2304e87bb5a92fcb978e47fa842376a9"
+        }
+      }
+    },
+    "tools/source_scope_provenance.py": {
+      "before_sha256": "e755f0325fd4b8d2877f6389962177483d0731a97d880929b8541da9d1da71be",
+      "after_sha256": "6fff3740e89ac5f3215a08be7001dde5892405e17d5b0d9ae9f8a739914c586d",
+      "owners": {
+        "@module": {
+          "before": "aa0ff51d4fc2e1eaaf466bac56b8d2f76064ff475ad664c5467e536cceca7ad6",
+          "after": "0fe80cb139d183fc53516efe38304ef5edcc63487389e8743cd4ac52d3f4053e"
+        },
+        "current_ec_overlay_provenance": {
+          "before": "8d922d719988ff53b5da6ad73a14260c004bbad65f2f02792a1048f2a822b0c6",
+          "after": "cbc82f6f35e2d89e179b4bf2c48dfae0e14502ed29a2f0097b18ed41ab1a9d78"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tools/ability_support_sources.py": [
+      "qualification40-exact-b0712fa66a9cc38e"
+    ],
+    "tools/source_scope_provenance.py": [
+      "registered-source-provenance-projection"
+    ]
+  },
+  "source_obligation": "Apply only the authenticated current Aeldari two-field overlay: Corsair Voidscarred 000002532 specialist close combat weapon defaults and Battle Focus 000009894:AE Sudden Strike charge-completion/end-turn clause. Bind the overlay, complete F00 audit and authority-registry input bytes through the existing source loader and index. Register only the exact current Aeldari overlay path and SHA for historical base-version projection, retaining truthful historical identity and current active target.",
+  "unchanged_work": "These exact two files add one finite preimage-bound overlay, its audit/registry inputs, and its exact historical base-version projection registration. All existing provenance validator body predicates and projection operations remain unchanged. Source indexing, cache/token identity, immutable overlay validation, contract/role/harness algorithms and all other work remain unchanged. The mandatory sensitive qualification40-exact-b0712fa66a9cc38e and registered-source-provenance-projection mappings and external_contract_source_reuse family remain intact; only these exact rule_semantics diffs follow the standing ordinary-rule serial-smoke default. No family-wide exemption, source_data serialization/reconstruction exemption, source-reuse measurement or performance improvement is claimed. All other owners, families, full local/remote correctness gates and existing smoke/work/cache/runtime budgets remain required."
+}

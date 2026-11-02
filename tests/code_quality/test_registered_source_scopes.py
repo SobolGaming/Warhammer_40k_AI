@@ -626,3 +626,73 @@ def test_sorcerer_overlay_projects_only_exact_historical_base(
         defiler_provenance_predecessor(
             helper.replace(b"SORCERER_OVERLAY_SHA256", b"ALTERED_SORCERER_OVERLAY_SHA256")
         )
+
+
+def test_aeldari_overlay_projects_only_exact_historical_base(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tests.support.acts_preservation import defiler_provenance_predecessor
+
+    path = ROOT / provenance.AELDARI_OVERLAY
+    raw = path.read_bytes()
+    projected = provenance.registered_provenance_text(ROOT, path, raw, historical_snapshot_inputs)
+    assert projected is not None
+    expected = json.loads(raw)
+    del expected["base_source_package_id"]["version"]
+    assert json.loads(projected) == expected
+    assert not any(token in projected for token in retired_identity_tokens())
+    assert path.read_bytes() == raw
+    assert (
+        provenance.registered_provenance_text(
+            ROOT, ROOT / "unregistered-aeldari-overlay.json", raw, historical_snapshot_inputs
+        )
+        is None
+    )
+    with pytest.raises(ValueError, match="exact reviewed bytes"):
+        provenance.registered_provenance_text(ROOT, path, raw + b"\n", historical_snapshot_inputs)
+    for mutation in ("base_source_package_id", "target_edition", "schema_version"):
+        changed = json.loads(raw)
+        changed[mutation] = retired_identity_tokens()[0]
+        changed_raw = json.dumps(changed).encode()
+        with pytest.raises(ValueError, match="exact reviewed bytes"):
+            provenance.registered_provenance_text(
+                ROOT, path, changed_raw, historical_snapshot_inputs
+            )
+        # Review of new bytes cannot bypass the unchanged semantic identity checks.
+        with monkeypatch.context() as scoped:
+            scoped.setattr(
+                provenance, "AELDARI_OVERLAY_SHA256", hashlib.sha256(changed_raw).hexdigest()
+            )
+            with pytest.raises(ValueError, match="historical base identity changed"):
+                provenance.registered_provenance_text(
+                    ROOT, path, changed_raw, historical_snapshot_inputs
+                )
+    linked = tmp_path / provenance.AELDARI_OVERLAY
+    linked.parent.mkdir(parents=True)
+    linked.symlink_to(path)
+    with pytest.raises(ValueError, match="exact reviewed bytes"):
+        provenance.registered_provenance_text(tmp_path, linked, raw, historical_snapshot_inputs)
+    operative = json.loads(raw)
+    operative["operations"][0]["reason"] = retired_identity_tokens()[0]
+    operative_raw = json.dumps(operative).encode()
+    with monkeypatch.context() as scoped:
+        scoped.setattr(
+            provenance, "AELDARI_OVERLAY_SHA256", hashlib.sha256(operative_raw).hexdigest()
+        )
+        text = provenance.registered_provenance_text(
+            ROOT, path, operative_raw, historical_snapshot_inputs
+        )
+        assert text is not None
+        assert retired_identity_tokens()[0] in text
+    helper = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    assert hashlib.sha256(defiler_provenance_predecessor(helper)).hexdigest() == (
+        "40ef539dc75aa669df54a099d7788b74ca68453c7ae18a1e009194c48a42f64a"
+    )
+    binding = b"        root / AELDARI_OVERLAY: AELDARI_OVERLAY_SHA256,\n"
+    for changed_helper in (
+        helper.replace(b"AELDARI_OVERLAY_SHA256", b"ALTERED_AELDARI_OVERLAY_SHA256"),
+        helper.replace(binding, b""),
+        helper.replace(binding, binding + binding),
+    ):
+        with pytest.raises(ValueError, match="registered edition provenance inputs changed"):
+            defiler_provenance_predecessor(changed_helper)

@@ -94,3 +94,46 @@ def test_f00_policy_preserves_holds_and_distinguishes_source_from_execution() ->
     for record in faction_source_package().source_evidence_catalog.records:
         assert record.semantic_execution_status == "not_certified"
         assert not record.runtime_consumer_ids
+
+
+def test_aeldari_current_source_evidence_overlay_and_index_dependencies_agree() -> None:
+    import hashlib
+    import json
+
+    from tools.ability_support_sources import ability_support_index_inputs
+    from tools.aeldari_datasheet_semantic_coverage import SOURCE_JSON_DIR
+    from tools.generate_aeldari_current_source import generated_overlay_pack
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        aeldari_current_2026_11 as current,
+    )
+
+    root = Path(__file__).resolve().parents[2]
+    source_dir = SOURCE_JSON_DIR
+    data = root / "data/source_audits/aeldari_current_2026_11"
+    audit = current.source_audit()
+    assert (data / "source.audit.json").read_bytes() == Path(current.__file__).with_name(
+        current.AUDIT_ARTIFACT_NAME
+    ).read_bytes()
+    validate_official_artifacts(audit)
+    package = current.source_package()
+    scope = source_authority_registry().scope("warhammer_40000_11th_factions")
+    registered = next(
+        row for row in scope.source_packages if row.package_name == current.SOURCE_PACKAGE_NAME
+    )
+    assert registered.catalog_sha256 == package.source_catalog.catalog_sha256()
+    assert generated_overlay_pack().to_payload() == current.overlay_pack().to_payload()
+    inputs = set(ability_support_index_inputs(source_dir))
+    assert Path(current.__file__).with_name(current.ARTIFACT_NAME) in inputs
+    assert Path(current.__file__).with_name(current.AUDIT_ARTIFACT_NAME) in inputs
+    assert root / "src/warhammer40k_core/rules/source_authority_registry.json" in inputs
+    captures = json.loads((data / "browser-captures.json").read_bytes())
+    assert hashlib.sha256(captures["version_feed"]["text"].encode()).hexdigest() == (
+        "cd829c4c4b04d96ce0afe32582c6a80917bfea368c8b271e24eff0fc8b03e205"
+    )
+    for label, row in zip(("army_rules", "voidscarred"), audit.observations, strict=True):
+        assert captures[label]["captured_text"] == row.captured_text
+    assert all(
+        record.semantic_execution_status == "not_certified"
+        for record in package.source_evidence_catalog.records
+    )

@@ -31,6 +31,7 @@ from warhammer40k_core.engine import ingress_placement_history as _iph
 from warhammer40k_core.engine import lifecycle_history_origins as _history_origins
 from warhammer40k_core.engine import melee_commitment_dispatch as _melee_commitment_dispatch
 from warhammer40k_core.engine import mortal_wound_model_allocation as _mw_model
+from warhammer40k_core.engine import move_completion_effects as _move_completion_effects
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine import primary_mission_pending_request_integrity as _pmpri
@@ -1288,6 +1289,7 @@ class GameLifecycle:
                 ),
                 *_cmmd.decision_dispatch_handlers(self),
                 *_unit_split_dispatch.decision_dispatch_handlers(self),
+                *_move_completion_effects.decision_dispatch_handlers(self),
                 *_coherency_cleanup.decision_dispatch_handlers(self),
                 *_target_replacement_dispatch.decision_dispatch_handlers(self),
                 *_melee_commitment_dispatch.decision_dispatch_handlers(self),

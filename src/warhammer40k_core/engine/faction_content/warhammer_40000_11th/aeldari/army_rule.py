@@ -35,12 +35,6 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_content.common import canonical_keyword as _canonical_keyword
 from warhammer40k_core.engine.faction_resources import FactionResourceTransactionKind
-from warhammer40k_core.engine.fight_activation_abilities import (
-    FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
-    FightActivationAbilityContext,
-    FightActivationAbilityHookBinding,
-    FightActivationAbilityOption,
-)
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import BattleSize
 from warhammer40k_core.engine.movement_end_surge_hooks import (
@@ -89,7 +83,6 @@ VEHICLE = "VEHICLE"
 TITANIC = "TITANIC"
 _BATTLE_FOCUS_TOKENS_BY_BATTLE_SIZE = {BattleSize.STRIKE_FORCE: 4}
 _SWIFT_MOVEMENT_BONUS_INCHES = 2
-_SUDDEN_STRIKE_FIGHT_MOVE_DISTANCE_INCHES = 6.0
 _AGILE_SURGE_DISTANCE_BONUS_INCHES = 1
 
 
@@ -132,13 +125,6 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=FADE_BACK_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=fade_back_surge_grants,
-            ),
-        ),
-        fight_activation_ability_hook_bindings=(
-            FightActivationAbilityHookBinding(
-                hook_id=SUDDEN_STRIKE_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=sudden_strike_fight_activation_option,
             ),
         ),
     )
@@ -258,22 +244,24 @@ def flitting_shadows_charge_declaration_grant(
 ) -> ChargeDeclarationGrant | None:
     if type(context) is not ChargeDeclarationContext:
         raise GameLifecycleError("Aeldari Flitting Shadows requires a ChargeDeclarationContext.")
-    army, unit = _eligible_agile_manoeuvre_army_and_unit(
-        state=context.state,
-        player_id=context.player_id,
-        unit_instance_id=context.unit_instance_id,
-        error_label="Aeldari Flitting Shadows",
-    )
-    if army is None or unit is None:
+    army = context.state.army_definition_for_player(context.player_id)
+    if army is None:
+        raise GameLifecycleError("Aeldari Flitting Shadows player army is missing.")
+    if army.detachment_selection.faction_id != AELDARI_FACTION_ID:
+        return None
+    unit = rules_unit_view_by_id(state=context.state, unit_instance_id=context.unit_instance_id)
+    if unit.owner_player_id != context.player_id:
+        raise GameLifecycleError("Aeldari Flitting Shadows unit is not in the acting army.")
+    if not {ASURYANI, AELDARI}.intersection(unit.faction_keywords):
         return None
     if _battle_focus_tokens_remaining(state=context.state, army=army) <= 0:
         return None
-    if _unit_already_performed_agile_manoeuvre_this_phase(
+    if rules_unit_already_performed_agile_manoeuvre_this_phase(
         state=context.state,
         player_id=context.player_id,
         battle_round=context.battle_round,
         phase=BattlePhaseKind.CHARGE,
-        unit=unit,
+        unit_instance_id=unit.unit_instance_id,
     ):
         return None
     if _maneuver_already_used_this_phase(
@@ -295,10 +283,10 @@ def flitting_shadows_charge_declaration_grant(
             "selection_request_id": context.selection_request_id,
             "selection_result_id": context.selection_result_id,
         },
-        decision_effect_payload=_battle_focus_spend_payload_with_refund(
+        decision_effect_payload=battle_focus_spend_payload_for_rules_unit(
             state=context.state,
             player_id=context.player_id,
-            unit=unit,
+            unit_instance_id=unit.unit_instance_id,
             payload={
                 "effect_kind": BATTLE_FOCUS_TOKEN_SPENT_EFFECT_KIND,
                 "maneuver": FLITTING_SHADOWS_MANEUVER,
@@ -541,70 +529,6 @@ def fade_back_surge_grants(
     return tuple(sorted(grants, key=lambda grant: grant.unit_instance_id))
 
 
-def sudden_strike_fight_activation_option(
-    context: FightActivationAbilityContext,
-) -> FightActivationAbilityOption | None:
-    if type(context) is not FightActivationAbilityContext:
-        raise GameLifecycleError("Aeldari Sudden Strike requires a FightActivationAbilityContext.")
-    army, unit = _eligible_agile_manoeuvre_army_and_unit(
-        state=context.state,
-        player_id=context.player_id,
-        unit_instance_id=context.unit_instance_id,
-        error_label="Aeldari Sudden Strike",
-    )
-    if army is None or unit is None:
-        return None
-    if _battle_focus_tokens_remaining(state=context.state, army=army) <= 0:
-        return None
-    if _unit_already_performed_agile_manoeuvre_this_phase(
-        state=context.state,
-        player_id=context.player_id,
-        battle_round=context.battle_round,
-        phase=BattlePhaseKind.FIGHT,
-        unit=unit,
-    ):
-        return None
-    if _maneuver_already_used_this_phase(
-        state=context.state,
-        player_id=context.player_id,
-        battle_round=context.battle_round,
-        phase=BattlePhaseKind.FIGHT,
-        maneuver=SUDDEN_STRIKE_MANEUVER,
-    ):
-        return None
-    return FightActivationAbilityOption(
-        hook_id=SUDDEN_STRIKE_HOOK_ID,
-        source_id=SOURCE_RULE_ID,
-        ability_id=SUDDEN_STRIKE_MANEUVER,
-        enhancement_id="aeldari_army_rule",
-        effect_kind=FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
-        pile_in_distance_inches=_SUDDEN_STRIKE_FIGHT_MOVE_DISTANCE_INCHES,
-        consolidate_distance_inches=_SUDDEN_STRIKE_FIGHT_MOVE_DISTANCE_INCHES,
-        replay_payload={
-            "effect_kind": AGILE_MANOEUVRE_EFFECT_KIND,
-            "maneuver": SUDDEN_STRIKE_MANEUVER,
-            "unit_instance_id": unit.unit_instance_id,
-            "activation_request_id": context.activation.request_id,
-            "activation_result_id": context.activation.result_id,
-            "pile_in_distance_inches": _SUDDEN_STRIKE_FIGHT_MOVE_DISTANCE_INCHES,
-            "consolidate_distance_inches": _SUDDEN_STRIKE_FIGHT_MOVE_DISTANCE_INCHES,
-        },
-        decision_effect_payload=_battle_focus_spend_payload_with_refund(
-            state=context.state,
-            player_id=context.player_id,
-            unit=unit,
-            payload={
-                "effect_kind": BATTLE_FOCUS_TOKEN_SPENT_EFFECT_KIND,
-                "maneuver": SUDDEN_STRIKE_MANEUVER,
-                "unit_instance_id": unit.unit_instance_id,
-                "battle_focus_token_cost": 1,
-                "activation_request_id": context.activation.request_id,
-                "activation_result_id": context.activation.result_id,
-            },
-        ),
-    )
-
-
 def _eligible_agile_manoeuvre_army_and_unit(
     *,
     state: GameState,
@@ -664,15 +588,23 @@ def _battle_focus_spend_payload_for_context(
 
 
 def _battle_focus_spend_payload_with_refund(
+    *, state: GameState, player_id: str, unit: UnitInstance, payload: dict[str, JsonValue]
+) -> JsonValue:
+    return battle_focus_spend_payload_for_rules_unit(
+        state=state, player_id=player_id, unit_instance_id=unit.unit_instance_id, payload=payload
+    )
+
+
+def battle_focus_spend_payload_for_rules_unit(
     *,
     state: GameState,
     player_id: str,
-    unit: UnitInstance,
+    unit_instance_id: str,
     payload: dict[str, JsonValue],
 ) -> JsonValue:
     refund_roll = conditional_faction_resource_refund_roll_payload(
         state=state,
-        rules_unit_instance_id=unit.unit_instance_id,
+        rules_unit_instance_id=unit_instance_id,
         player_id=player_id,
         resource_kind="battle_focus_token",
     )
@@ -716,6 +648,23 @@ def _unit_already_performed_agile_manoeuvre_this_phase(
     phase: BattlePhaseKind,
     unit: UnitInstance,
 ) -> bool:
+    return rules_unit_already_performed_agile_manoeuvre_this_phase(
+        state=state,
+        player_id=player_id,
+        battle_round=battle_round,
+        phase=phase,
+        unit_instance_id=unit.unit_instance_id,
+    )
+
+
+def rules_unit_already_performed_agile_manoeuvre_this_phase(
+    *,
+    state: GameState,
+    player_id: str,
+    battle_round: int,
+    phase: BattlePhaseKind,
+    unit_instance_id: str,
+) -> bool:
     for effect in _battle_focus_spend_effects(state=state, player_id=player_id):
         if effect.started_battle_round != battle_round:
             continue
@@ -724,7 +673,7 @@ def _unit_already_performed_agile_manoeuvre_this_phase(
         payload = _battle_focus_spend_payload(effect.effect_payload)
         if payload["turn_player_id"] != state.active_player_id:
             continue
-        if payload["unit_instance_id"] == unit.unit_instance_id:
+        if payload["unit_instance_id"] == unit_instance_id:
             return True
     return False
 

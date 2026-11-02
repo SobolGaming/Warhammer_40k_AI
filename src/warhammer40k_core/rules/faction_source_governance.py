@@ -93,7 +93,7 @@ class FactionSourceObservation(msgspec.Struct, frozen=True, forbid_unknown_field
 
 
 class FactionSourceAudit(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
-    audit_schema: Literal["core-v2-faction-source-audit-v1"]
+    audit_schema: Literal["core-v2-faction-source-audit-v1", "core-v2-faction-source-audit-v2"]
     audit_id: str
     policy_id: str
     edition: Literal["warhammer_40000_11th"]
@@ -174,7 +174,9 @@ def validate_faction_source_audit_bytes(raw: bytes) -> FactionSourceAudit:
     _unique(tuple(row.source_url for row in audit.observations), "owned source URLs")
     if set(audit.selected_source_ids) != {row.source_id for row in audit.observations}:
         raise FactionSourceError("Faction source observations must cover the selected inventory.")
-    if {row.content_kind for row in audit.observations} != {"faction", "detachment", "datasheet"}:
+    if audit.audit_schema == "core-v2-faction-source-audit-v1" and {
+        row.content_kind for row in audit.observations
+    } != {"faction", "detachment", "datasheet"}:
         raise FactionSourceError("F00 source review must exercise every admitted package kind.")
     return audit
 
@@ -217,7 +219,14 @@ def authorize_faction_observation(
         if identity != (source_id, transcription_sha256, source_title, observed_at, app_version):
             raise FactionSourceError("Faction evidence does not match its retained observation.")
         return
-    audit = faction_source_audit()
+    if audit_id == "aeldari-maintained-app-mirror-2026-11-02":
+        from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+            aeldari_current_2026_11,
+        )
+
+        audit = aeldari_current_2026_11.source_audit()
+    else:
+        audit = faction_source_audit()
     if audit.audit_id != audit_id:
         raise FactionSourceError("Faction source audit identity is unregistered.")
     for row in audit.observations:

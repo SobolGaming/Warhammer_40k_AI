@@ -89,3 +89,15 @@ July costs in the unit audits come from the per-faction JSON artifacts in `src/w
 4. For missing content, enumerate current army rules, detachment subrules and every unit field. Keep source presence distinct from engine support.
 5. Retain approved source artifacts under F00; link each clause to descriptors, consumers and meaningful regression evidence.
 6. Refresh the guides, audits and status gates together. Confirm every admitted URL has an owned audit and every guide link resolves. Do not promote historical report labels to full support without F08/F09 evidence.
+
+
+## Current Aeldari correction selection — 2 November 2026
+
+The [bounded F00 source review](AELDARI_CURRENT_SOURCE_REVIEW.md) registers complete
+current army-rules and Corsair Voidscarred pages from the non-affiliated 40k.app
+mirror. Global App-data 995 is the observed snapshot, not a per-field change date.
+It supersedes only Voidscarred specialist default close combat weapon omissions
+and Battle Focus Sudden Strike timing/lifetime. The historical inventories above,
+raw snapshots, predecessor overlays and official July PDF retain their original
+bytes and meaning. Current source loading does not certify complete faction
+gameplay, geometry, roster legality or the outstanding source corpus.

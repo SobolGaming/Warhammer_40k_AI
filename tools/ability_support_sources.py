@@ -19,6 +19,9 @@ from warhammer40k_core.rules.source_overlay import (
     apply_source_release_overlays,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    aeldari_current_2026_11 as aeldari_current,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     aeldari_vyper_title_2026_10 as vyper_title_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -162,10 +165,15 @@ def load_ability_support_sources(source_json_dir: Path) -> tuple[BridgeSourceArt
             aeldari_july_overlay_pack,
         ),
     )
-    return apply_source_release_overlays(
+    titled_aeldari_artifacts = apply_source_release_overlays(
         source_artifacts=aeldari_overlaid_artifacts,
         release_manifest=vyper_title_overlay.source_release_manifest(),
         overlay_packs=(vyper_title_overlay.overlay_pack(),),
+    )
+    return apply_source_release_overlays(
+        source_artifacts=titled_aeldari_artifacts,
+        release_manifest=aeldari_current.source_release_manifest(),
+        overlay_packs=(aeldari_current.overlay_pack(),),
     )
 
 
@@ -197,6 +205,9 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
                 coverage.RELEASE_MANIFEST_PATH,
                 Path(vyper_title_overlay.__file__).with_name(vyper_title_overlay.ARTIFACT_NAME),
                 Path(ec_current.__file__).with_name(ec_current.ARTIFACT_NAME),
+                Path(aeldari_current.__file__).with_name(aeldari_current.ARTIFACT_NAME),
+                Path(aeldari_current.__file__).with_name(aeldari_current.AUDIT_ARTIFACT_NAME),
+                rules / "source_authority_registry.json",
                 Path(sorcerer_current.__file__).with_name(sorcerer_current.ARTIFACT_NAME),
                 Path(emperors_children_profiles.__file__).with_name(
                     emperors_children_profiles.ARTIFACT_NAME

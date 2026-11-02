@@ -141,6 +141,7 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
     {
         "select_coherency_casualty": InteractionSpec(InteractionKind.ENTITY_SELECTION, ("model",)),
         "select_unit_split_membership": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
+        "select_move_completion_effect": InteractionSpec(InteractionKind.OPPORTUNITY_WINDOW),
         "discard_tactical_secondary_mission": InteractionSpec(InteractionKind.CONFIRMATION),
         "draw_tactical_secondary_missions": InteractionSpec(InteractionKind.CONFIRMATION),
         "replace_tactical_secondary_mission": InteractionSpec(InteractionKind.CONFIRMATION),

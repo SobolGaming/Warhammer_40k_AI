@@ -165,6 +165,27 @@ def acts_inactive_predecessor(root: Path, current: bytes) -> bytes:
 def defiler_provenance_predecessor(current: bytes) -> bytes:
     """Reverse exact current admissions, then retain the original Defiler/Acts proof."""
     if hashlib.sha256(current).hexdigest() == (
+        "6fff3740e89ac5f3215a08be7001dde5892405e17d5b0d9ae9f8a739914c586d"
+    ):
+        # Reverse only the exact Aeldari admission before the retained Sorcerer proof.
+        addition = (
+            b"\n"
+            b"AELDARI_OVERLAY = (\n"
+            b'    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"\n'
+            b'    "aeldari_current_2026_11.overlay-pack.json"\n'
+            b")\n"
+            b'AELDARI_OVERLAY_SHA256 = "'
+            b'e51d507c9852821b12e6a250d413dbf3c1c13fed27325a8506acaf3cd26605d5"\n'
+        )
+        entry = b"        root / AELDARI_OVERLAY: AELDARI_OVERLAY_SHA256,\n"
+        if current.count(addition) != 1 or current.count(entry) != 1:
+            raise ValueError("Exact registered edition provenance inputs changed.")
+        current = current.replace(addition, b"", 1).replace(entry, b"", 1)
+        if hashlib.sha256(current).hexdigest() != (
+            "e755f0325fd4b8d2877f6389962177483d0731a97d880929b8541da9d1da71be"
+        ):
+            raise ValueError("Exact registered edition provenance inputs changed.")
+    if hashlib.sha256(current).hexdigest() == (
         "e755f0325fd4b8d2877f6389962177483d0731a97d880929b8541da9d1da71be"
     ):
         # Reverse only the exact Sorcerer table addition before the retained EC proof.

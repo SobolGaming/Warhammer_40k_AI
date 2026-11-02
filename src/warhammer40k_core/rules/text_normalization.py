@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Self, TypedDict
 
 from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
@@ -11,6 +12,22 @@ from warhammer40k_core.rules.keywords import canonical_rule_keyword_tokens
 
 class TextNormalizationError(ValueError):
     """Raised when raw rule text cannot be normalized at the data boundary."""
+
+
+class SourceTextNormalizationMode(StrEnum):
+    FLAT = "flat"
+    STRUCTURED_LINES = "structured_lines"
+
+
+def source_text_normalization_mode_from_token(value: object) -> SourceTextNormalizationMode:
+    if type(value) is SourceTextNormalizationMode:
+        return value
+    if type(value) is not str:
+        raise TextNormalizationError("Source normalization mode must be a string token.")
+    try:
+        return SourceTextNormalizationMode(value)
+    except ValueError as exc:
+        raise TextNormalizationError("Source normalization mode is unsupported.") from exc
 
 
 class NormalizedRuleTextPayload(TypedDict):

@@ -5,7 +5,12 @@ from __future__ import annotations
 import re
 from enum import StrEnum
 
-from warhammer40k_core.rules.text_normalization import TextNormalizationError, normalize_rule_text
+from warhammer40k_core.rules.text_normalization import (
+    SourceTextNormalizationMode,
+    TextNormalizationError,
+    normalize_rule_text,
+    normalize_structured_source_text,
+)
 
 OBJECTIVE_TERMINOLOGY_SOURCE_ID = "gw-11e-core-objectives:objective-marker-terminology-faq"
 _MARKER_REFERENCE = re.compile(
@@ -30,12 +35,23 @@ def objective_rule_scope_from_token(value: object) -> ObjectiveRuleScope:
         raise TextNormalizationError("Objective terminology scope is unsupported.") from exc
 
 
-def normalize_objective_rule_text(raw_text: object, *, scope: ObjectiveRuleScope) -> str:
+def normalize_objective_rule_text(
+    raw_text: object,
+    *,
+    scope: ObjectiveRuleScope,
+    normalization_mode: SourceTextNormalizationMode = SourceTextNormalizationMode.FLAT,
+) -> str:
     if type(scope) is not ObjectiveRuleScope:
         raise TextNormalizationError(
             "Objective terminology requires an explicit typed source scope."
         )
-    normalized = normalize_rule_text(raw_text)
+    if type(normalization_mode) is not SourceTextNormalizationMode:
+        raise TextNormalizationError("Source normalization requires an explicit typed mode.")
+    normalized = (
+        normalize_structured_source_text(raw_text)
+        if normalization_mode is SourceTextNormalizationMode.STRUCTURED_LINES
+        else normalize_rule_text(raw_text)
+    )
     if scope is ObjectiveRuleScope.NON_CORE_RULES:
         return _MARKER_REFERENCE.sub(_objective_reference, normalized)
     return normalized

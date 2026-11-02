@@ -64,11 +64,18 @@ SORCERER_OVERLAY = (
 )
 SORCERER_OVERLAY_SHA256 = "735e021d0df16ee20f54f742a562152bed109c77ea600e35c90420abc8c7ab7a"
 
+AELDARI_OVERLAY = (
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+    "aeldari_current_2026_11.overlay-pack.json"
+)
+AELDARI_OVERLAY_SHA256 = "e51d507c9852821b12e6a250d413dbf3c1c13fed27325a8506acaf3cd26605d5"
+
 
 def current_ec_overlay_provenance(root: Path, path: Path, raw: bytes) -> str | None:
     reviewed_hash = {
         root / CURRENT_EC_OVERLAY: CURRENT_EC_OVERLAY_SHA256,
         root / SORCERER_OVERLAY: SORCERER_OVERLAY_SHA256,
+        root / AELDARI_OVERLAY: AELDARI_OVERLAY_SHA256,
     }.get(path)
     if reviewed_hash is None:
         return None

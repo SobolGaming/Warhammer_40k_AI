@@ -1,0 +1,52 @@
+{
+  "base_source_package_id": {
+    "namespace": "wahapedia",
+    "package_name": "source-mirror",
+    "version": "10th-edition-2026-06-14"
+  },
+  "catalog_version": {
+    "source_date": "2026-11-02",
+    "version_id": "warhammer-40000-11th-aeldari-current-2026-11"
+  },
+  "effective_date": "2026-11-02",
+  "operations": [
+    {
+      "effective_date": "2026-11-02",
+      "expected_preimage_hash": "7330a71f5dd6246f3db94637686beb7e60a5c3b2ebba98279322d270f5765cde",
+      "fields": {
+        "loadout": "Every Corsair Voidscarred and Voidscarred Felarch is equipped with: shuriken pistol; power sword; close combat weapon. A Shade Runner is equipped with: shuriken pistol; close combat weapon; paired Hekatarii blades. A Soul Weaver is equipped with: shuriken pistol; power sword; close combat weapon; channeller stones. A Way Seeker is equipped with: shuriken pistol; Executioner; close combat weapon; witch staff."
+      },
+      "op_id": "aeldari-current-source-1",
+      "operation_kind": "update_row",
+      "order_index": 1,
+      "reason": "Equip Shade Runner, Soul Weaver and Way Seeker with the existing close combat weapon; preserve all other defaults.",
+      "source_reference": "https://www.40k.app/factions/aeldari/units/corsair-voidscarred",
+      "source_row_id": "000002532",
+      "source_table": "Datasheets",
+      "target_edition": "warhammer-40000-11th"
+    },
+    {
+      "effective_date": "2026-11-02",
+      "expected_preimage_hash": "49583c617fde3085fddef56f48336617fd793878b4fa7e0c2dec3cac0e214fae",
+      "fields": {
+        "description": "If your Army Faction is Asuryani, at the start of the battle round, you receive a number of Battle Focus tokens based on the battle size, as shown in the table below.\nBATTLE SIZE | BATTLE FOCUS TOKENS |\nIncursion | 2 |\nStrike Force | 4 |\nOnslaught | 6 |\nEach time one of the triggers shown in the Agile Manoeuvres section below occurs, you can spend one Battle Focus token to enable the relevant eligible unit to perform that Agile Manoeuvre. A unit is eligible to perform an Agile Manoeuvre if it has this ability and has not already performed an Agile Manoeuvre in the same phase. Unless otherwise stated, you cannot trigger the same Agile Manoeuvre more than once per phase. At the end of the battle round, all unspent Battle Focus tokens are lost.\nAGILE MANOEUVRES\nSWIFT AS THE WIND\nTRIGGER: When an eligible unit from your army is selected to make a Normal, Advance or Fall Back move. You can trigger this Agile Manoeuvre more than once per phase (provided a different unit performs it each time).\nEFFECT: Until the end of the phase, add 2\" to the Move characteristic of models in that unit.\nFLITTING SHADOWS\nTRIGGER: When an eligible unit from your army is selected to make a Normal, Advance or Fall Back move, is set up on the battlefield, or declares a charge.\nEFFECT: Until the end of the turn, enemy units cannot use the Fire Overwatch Stratagem to shoot at that unit.\nSTAR ENGINES\nTRIGGER: When an eligible VEHICLE unit from your army is selected to make an Advance move.\nEFFECT: Until the end of the turn, Ranged weapons equipped by this unit have the [ASSAULT] ability.\nSUDDEN STRIKE\nTRIGGER: When an eligible unit from your army ends a charge move.\nEFFECT: Until the end of the turn, each time a model in that unit makes a Pile-in or Consolidation move, it can move up to 6\" instead of up to 3\".\nOPPORTUNITY SEIZED\nTRIGGER: When an enemy unit ends a Fall Back move.\nEFFECT: One eligible unit from your army (excluding TITANIC units) that started the phase within Engagement Range of that enemy unit can make a Normal move of up to D6+1\".\nFADE BACK\nTRIGGER: In your opponent's Shooting phase, just after an enemy unit has shot.\nEFFECT: One eligible unit from your army (excluding TITANIC units) that was hit by one or more of those attacks can make a Normal move of up to D6+1\"."
+      },
+      "op_id": "aeldari-current-source-2",
+      "operation_kind": "update_row",
+      "order_index": 2,
+      "reason": "Sudden Strike triggers at charge completion and lasts until end of turn. Preserve the other five manoeuvres and base token rules.",
+      "source_reference": "https://www.40k.app/factions/aeldari/army-rules",
+      "source_row_id": "000009894:AE",
+      "source_table": "Abilities",
+      "target_edition": "warhammer-40000-11th"
+    }
+  ],
+  "package_hash": "98c9ef07431d9ce380b55c3080c70565102eac8783d31e3d1f99c0a808ecd58f",
+  "package_id": {
+    "namespace": "40k-app",
+    "package_name": "aeldari-current",
+    "version": "reviewed-2026-11-02"
+  },
+  "schema_version": "phase17-source-overlay-v1",
+  "target_edition": "warhammer-40000-11th"
+}

@@ -196,3 +196,81 @@ __all__ += ["ROOT", "WAHAPEDIA_2026_06_14_JSON_DIR", "ParsedRuleTextPayload", "P
 __all__ += ["WAHAPEDIA_ABILITY_RULE_SOURCE_JSON_FILES", "canonical_stratagem_reference_id"]
 __all__ += ["canonical_stratagem_reference_name", "distance_predicate_kind_from_token"]
 __all__ += ["normalize_source_characters", "normalize_structured_source_text"]
+
+
+@pytest.mark.parametrize("raw", ["0\nD3", "2\nD6"])
+def test_complete_source_table_cells_do_not_form_a_dice_quantity(raw: str) -> None:
+    from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+    from warhammer40k_core.rules.source_data import RuleSourceText
+    from warhammer40k_core.rules.text_normalization import SourceTextNormalizationMode
+
+    source = RuleSourceText.from_raw(
+        source_id="reviewed:complete-table",
+        raw_text=raw,
+        objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
+        normalization_mode=SourceTextNormalizationMode.STRUCTURED_LINES,
+    )
+    assert source.raw_text == source.normalized_text == raw
+    assert len(source.parsed_tokens.dice_expressions) == 1
+    assert source.parsed_tokens.dice_expressions[0].expression.quantity == 1
+    assert source.parsed_tokens.dice_expressions[0].span.start == 2
+    assert RuleSourceText.from_payload(source.to_payload()) == source
+
+
+def test_structured_source_mode_preserves_objective_scope_and_rejects_invalid_dice() -> None:
+    from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+    from warhammer40k_core.rules.parsed_tokens import RuleTokenError
+    from warhammer40k_core.rules.source_data import RuleSourceText
+    from warhammer40k_core.rules.text_normalization import SourceTextNormalizationMode
+
+    for scope, expected in (
+        (ObjectiveRuleScope.CORE_RULES, "objective marker\nD3"),
+        (ObjectiveRuleScope.NON_CORE_RULES, "objective\nD3"),
+    ):
+        source = RuleSourceText.from_raw(
+            source_id="reviewed:scope",
+            raw_text="objective marker\nD3",
+            objective_scope=scope,
+            normalization_mode=SourceTextNormalizationMode.STRUCTURED_LINES,
+        )
+        assert source.normalized_text == expected
+        assert RuleSourceText.from_payload(source.to_payload()) == source
+    with pytest.raises(RuleTokenError, match="Dice expression"):
+        RuleSourceText.from_raw(
+            source_id="invalid:zero",
+            raw_text="0D3",
+            objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
+            normalization_mode=SourceTextNormalizationMode.STRUCTURED_LINES,
+        )
+
+
+def test_source_mode_is_authenticated_without_changing_legacy_flat_payloads() -> None:
+    from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+    from warhammer40k_core.rules.source_data import RuleSourceText, SourceDataError
+    from warhammer40k_core.rules.text_normalization import (
+        SourceTextNormalizationMode,
+        TextNormalizationError,
+    )
+
+    legacy = RuleSourceText.from_raw(
+        source_id="legacy:wrapped",
+        raw_text="Roll 2\nD6.",
+        objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
+    )
+    assert legacy.normalized_text == "Roll 2D6."
+    assert "normalization_mode" not in legacy.to_payload()
+    assert RuleSourceText.from_payload(legacy.to_payload()) == legacy
+    structured = RuleSourceText.from_raw(
+        source_id="current:table",
+        raw_text="2\nD6",
+        objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
+        normalization_mode=SourceTextNormalizationMode.STRUCTURED_LINES,
+    )
+    payload = structured.to_payload()
+    payload["normalization_mode"] = "unknown"
+    with pytest.raises(TextNormalizationError, match="unsupported"):
+        RuleSourceText.from_payload(payload)
+    payload = structured.to_payload()
+    del payload["normalization_mode"]
+    with pytest.raises(SourceDataError, match="scope"):
+        RuleSourceText.from_payload(payload)

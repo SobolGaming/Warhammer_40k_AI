@@ -16,7 +16,7 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 ARTIFACT_PATH: Final = "artifacts/catalog.json"
 EXPECTED_PACKAGE_ID: Final = "data-package:core-v2:court-of-slaughter-anvanth:2026-08"
 EXPECTED_CATALOG_ID: Final = "core-v2:court-of-slaughter-anvanth:2026-08"
-EXPECTED_PACKAGE_HASH: Final = "51b2a6730ed2c306e32a09ec3e756486d2fa42823d2f563ba48fd65192511924"
+EXPECTED_PACKAGE_HASH: Final = "f3b745d43dcbbb83bca92a0b5dd2689379a52af239b6842dcf41e79310dc7ec7"
 EXPECTED_BRIDGE_SOURCE_PREFIX: Final = (
     "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:"
 )

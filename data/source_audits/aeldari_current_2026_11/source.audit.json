@@ -1,0 +1,136 @@
+{
+  "app_version": "995",
+  "audit_id": "aeldari-maintained-app-mirror-2026-11-02",
+  "audit_schema": "core-v2-faction-source-audit-v2",
+  "edition": "warhammer_40000_11th",
+  "geometry_authority": {
+    "base_authority": "explicit_maintained_app_or_official_model_evidence",
+    "missing_data": "blocks_fieldability",
+    "variants": "exact_model_profile_and_variant_required",
+    "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+  },
+  "locale": "en",
+  "observations": [
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "b1f0bfc3034ca7a742e84c5b2504a36abf1d72c4cafaed336ea776e62b31c102",
+      "captured_text": "40K.APP\nFACTIONS\nAeldari\nDATASHEETS\nARMY RULES\nDETACHMENTS\nUPDATES\nCREATE LIST\nBATTLE FOCUS\n\nIf your Army Faction is ASURYANI, at the start of the battle round, you receive a number of Battle Focus tokens based on the battle size, as shown in the table below.\n\n\"In an Incursion sized battle, you receive 2 Battle Focus tokens at the start of the battle round. In a Strike Force sized battle, you receive 4 Battle Focus tokens at the start of the battle round. In an Onslaught sized battle, you receive 6 Battle Focus tokens at the start of the battle round.\"\n\nEach time one of the triggers shown in the Agile Manoeuvres section below occurs, you can spend one Battle Focus token to enable the relevant eligible unit to perform that Agile Manoeuvre. A unit is eligible to perform an Agile Manoeuvre if it has this ability and has not already performed an Agile Manoeuvre in the same phase. Unless otherwise stated, you cannot trigger the same Agile Manoeuvre more than once per phase. At the end of the battle round, all unspent Battle Focus tokens are lost.\n\nAGILE MANOEUVRES\nSwift as the Wind\n\nTrigger: When an eligible unit from your army is selected to make a Normal, Advance or Fall Back move. You can trigger this Agile Manoeuvre more than once per phase (provided a different unit performs it each time).\n\nEffect: Until the end of the phase, add 2\" to the Move characteristic of models in that unit.\n\nFlitting Shadows\n\nTrigger: When an eligible unit from your army is selected to make a Normal, Advance or Fall Back move, is set up on the battlefield, or declares a charge.\n\nEffect: Until the end of the turn, enemy units cannot use the Fire Overwatch Stratagem to shoot at that unit.\n\nStar Engines\n\nTrigger: When an eligible **VEHICLE** unit from your army is selected to make an Advance move.\n\nEffect: Until the end of the turn, Ranged weapons equipped by this unit have the **[ASSAULT]** ability.\n\nSudden Strike\n\nTrigger: When an eligible unit from your army ends a charge move.\n\nEffect: Until the end of the turn, each time a model in that unit makes a Pile\u2011in or Consolidation move, it can move up to 6\" instead of up to 3\".\n\nOpportunity Seized\n\nTrigger: When an enemy unit ends a Fall Back move.\n\nEffect: One eligible unit from your army (excluding **TITANIC** units) that started the phase within Engagement Range of that enemy unit can make a Normal move of up to D6+1\".\n\nFade Back\n\nTrigger: In your opponent\u2019s Shooting phase, just after an enemy unit has shot.\n\nEffect: One eligible unit from your army (excluding **TITANIC** units) that was hit by one or more of those attacks can make a Normal move of up to D6+1\".\n\nDiscover more\nWarhammer 40,000 miniatures\nFaction guides\nShop Miniatures\nWarhammer model kits\nWarhammer rulebooks\nWarhammer strategy guides\nDISPARATE PATHS\n\nWhen mustering your army, you can include HARLEQUINS units in your army, even though they do not have the ASURYANI Faction keyword. Unless otherwise stated, you cannot select HARLEQUINS or YNNARI as your Army Faction.",
+      "completeness": "complete_page",
+      "content_kind": "faction",
+      "geometry": [],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "aeldari-current-2026-11-02:army-rules",
+      "observed_at": "2026-11-02T02:05:46.999Z",
+      "official_source_ids": [
+        "gw-11e-aeldari-faction-pack-2026-07"
+      ],
+      "operative_start": "BATTLE FOCUS",
+      "operative_text": "BATTLE FOCUS\n\nIf your Army Faction is ASURYANI, at the start of the battle round, you receive a number of Battle Focus tokens based on the battle size, as shown in the table below.\n\n\"In an Incursion sized battle, you receive 2 Battle Focus tokens at the start of the battle round. In a Strike Force sized battle, you receive 4 Battle Focus tokens at the start of the battle round. In an Onslaught sized battle, you receive 6 Battle Focus tokens at the start of the battle round.\"\n\nEach time one of the triggers shown in the Agile Manoeuvres section below occurs, you can spend one Battle Focus token to enable the relevant eligible unit to perform that Agile Manoeuvre. A unit is eligible to perform an Agile Manoeuvre if it has this ability and has not already performed an Agile Manoeuvre in the same phase. Unless otherwise stated, you cannot trigger the same Agile Manoeuvre more than once per phase. At the end of the battle round, all unspent Battle Focus tokens are lost.\n\nAGILE MANOEUVRES\nSwift as the Wind\n\nTrigger: When an eligible unit from your army is selected to make a Normal, Advance or Fall Back move. You can trigger this Agile Manoeuvre more than once per phase (provided a different unit performs it each time).\n\nEffect: Until the end of the phase, add 2\" to the Move characteristic of models in that unit.\n\nFlitting Shadows\n\nTrigger: When an eligible unit from your army is selected to make a Normal, Advance or Fall Back move, is set up on the battlefield, or declares a charge.\n\nEffect: Until the end of the turn, enemy units cannot use the Fire Overwatch Stratagem to shoot at that unit.\n\nStar Engines\n\nTrigger: When an eligible **VEHICLE** unit from your army is selected to make an Advance move.\n\nEffect: Until the end of the turn, Ranged weapons equipped by this unit have the **[ASSAULT]** ability.\n\nSudden Strike\n\nTrigger: When an eligible unit from your army ends a charge move.\n\nEffect: Until the end of the turn, each time a model in that unit makes a Pile\u2011in or Consolidation move, it can move up to 6\" instead of up to 3\".\n\nOpportunity Seized\n\nTrigger: When an enemy unit ends a Fall Back move.\n\nEffect: One eligible unit from your army (excluding **TITANIC** units) that started the phase within Engagement Range of that enemy unit can make a Normal move of up to D6+1\".\n\nFade Back\n\nTrigger: In your opponent\u2019s Shooting phase, just after an enemy unit has shot.\n\nEffect: One eligible unit from your army (excluding **TITANIC** units) that was hit by one or more of those attacks can make a Normal move of up to D6+1\".\n\nDiscover more\nWarhammer 40,000 miniatures\nFaction guides\nShop Miniatures\nWarhammer model kits\nWarhammer rulebooks\nWarhammer strategy guides\nDISPARATE PATHS\n\nWhen mustering your army, you can include HARLEQUINS units in your army, even though they do not have the ASURYANI Faction keyword. Unless otherwise stated, you cannot select HARLEQUINS or YNNARI as your Army Faction.",
+      "owning_faction_source_id": "faction-app:aeldari",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Complete current own page reviewed against exact existing Aeldari identities. Army page retains all six expanded manoeuvres and Disparate Paths. Voidscarred is existing matched-play datasheet 000002532. This selection corrects only its default loadout and Battle Focus Sudden Strike; no new admission, geometry or broader gameplay certification. Version 995 is the global observation snapshot, not a per-clause modification date.",
+      "source_id": "faction-app:aeldari:army-rules",
+      "source_observation_sha256": "80061ffe0707473f28743780cdd5eb63e7d85364a210d2f92d108b3041c546c2",
+      "source_title": "Aeldari army rules",
+      "source_url": "https://www.40k.app/factions/aeldari/army-rules",
+      "transcription_sha256": "7f7a8eaf2842fb6082fe83e9ba188124fe19554cf7154e4b6b1b6daff720c070"
+    },
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "84e442f474aa002b3ef29610c5b1f334168c59b89633349880a15ee7e4371243",
+      "captured_text": "40K.APP\nFACTIONS\nAELDARI\nCorsair Voidscarred\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nVoidscarred Felarch 28.5mm\n7\"\n3\n4+\n1\n7+\n1\nWay Seeker 28.5mm\n7\"\n3\n4+\n1\n7+\n1\nShade Runner 28.5mm\n7\"\n3\n4+\n1\n7+\n1\nCorsair Voidscarred 28.5mm\n7\"\n3\n4+\n1\n7+\n1\nSoul Weaver 28.5mm\n7\"\n3\n4+\n1\n7+\n1\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nExecutioner\nANTI-INFANTRY 2+\nPSYCHIC\n18\"\n3\n3+\n6\n-2\nD3\nShuriken pistol\nASSAULT\nPISTOL\n12\"\n1\n3+\n4\n-1\n1\nNeuro disruptor\nANTI-INFANTRY 2+\nASSAULT\nPISTOL\n12\"\n1\n3+\n4\n-2\n1\nShuriken rifle\nASSAULT\nRAPID FIRE 1\n24\"\n1\n3+\n4\n-1\n1\nBlaster\nASSAULT\n18\"\n1\n3+\n8\n-4\nD6+1\nFusion pistol\nASSAULT\nMELTA 2\nPISTOL\n6\"\n1\n3+\n8\n-4\nD6\nLong rifle\nHEAVY\nPRECISION\n36\"\n1\n3+\n4\n-1\n2\nShredder\nASSAULT\nTORRENT\n18\"\nD6\n-\n6\n0\n1\nShuriken cannon\nLETHAL HITS\n24\"\n3\n3+\n6\n-1\n2\nWraithcannon\n18\"\n1\n3+\n14\n-4\nD6+1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nWitch staff\nANTI-INFANTRY 2+\nPSYCHIC\n2\n2+\n3\n0\nD3\nClose combat weapon\n3\n3+\n3\n0\n1\nPower sword\n3\n3+\n4\n-2\n1\nPaired Hekatarii blades\nTWIN-LINKED\n4\n2+\n3\n-2\n1\nKEYWORDS\nAELDARI\nANHRATHE\nCORSAIR VOIDSCARRED\nGRENADES\nINFANTRY\nPSYKER\nCOSTS\n5 models\n70 pts\n10 models\n140 pts\nUNIT COMPOSITION\n\nThis unit can contain a maximum of 10 models.\n\n1 Voidscarred Felarch\n4-9 Corsair Voidscarred\n0-1 Shade Runner\n0-1 Soul Weaver\n0-1 Way Seeker\n\nEvery Corsair Voidscarred and Voidscarred Felarch is equipped with: shuriken pistol; power sword; close combat weapon. A Shade Runner is equipped with: shuriken pistol; close combat weapon; paired Hekatarii blades. A Soul Weaver is equipped with: shuriken pistol; power sword; close combat weapon; channeller stones. A Way Seeker is equipped with: shuriken pistol; Executioner; close combat weapon; witch staff.\n\nLed by\nPRINCE YRIEL\nKHARSETH\nYVRAINE\nSupported by\nTHE VISARCH\nBecome a supporter and remove ads\nWARGEAR OPTIONS\nAny number of Corsair Voidscarred can each have their shuriken pistol and power sword replaced with 1 shuriken rifle.\nThe Voidscarred Felarch\u2019s shuriken pistol can be replaced with one of the following: \u25e6 1 neuro disruptor \u25e6 1 shuriken rifle\nThe Voidscarred Felarch can be equipped with 1 mistshield.\nFor every 5 models in this unit, 1 Corsair Voidscarred\u2019s shuriken rifle can be replaced with one of the following: \u25e6 1 blaster \u25e6 1 shredder\nIf this unit contains 10 models, 1 Corsair Voidscarred\u2019s shuriken rifle can be replaced with one of the following: \u25e6 1 shuriken cannon \u25e6 1 wraithcannon\nIf this unit contains 10 models, 1 Corsair Voidscarred\u2019s shuriken rifle can be replaced with 1 long rifle.\nIf this unit contains 10 models, 1 Corsair Voidscarred\u2019s power sword can be replaced with 1 fusion pistol.\n1 Corsair Voidscarred model equipped with a shuriken pistol and power sword can be equipped with 1 Faolch\u00fa.\nWARGEAR\nChanneller Stones\n\nOnce per turn, the first time a saving throw is failed for the bearer\u2019s unit, change the Damage characteristic of that attack to 0.\n\nFaolch\u00fa\n\nRanged weapons equipped by models in the bearer\u2019s unit have the [IGNORES COVER] ability.\n\nMistshield\n\nThe bearer has a 4+ invulnerable save.\n\nCORE ABILITIES\nSCOUTS 7\"\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nPiratical Raiders\n\nAt the start of the battle, select one unit from your opponent\u2019s army. Weapons equipped by models in this unit have the [LETHAL HITS] and [PRECISION] abilities while targeting that unit.\n\nSTATS\n11%\nof Aeldari lists\n#36\nmost-taken in faction\n11%\nfrom 14% since last update\nIN ARMY LISTS\nPopular detachments\nELDRITCH RAIDERS\nARMOURED WARHOST\nCORSAIR COTERIE\nMost often led by\nPRINCE YRIEL\nKHARSETH\nYVRAINE\nOften taken with\nPRINCE YRIEL\nCORSAIR VOIDREAVERS\nCORSAIR SKYREAVERS\nKHARSETH\nRANGERS",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "base_statement": "Corsair Voidscarred 28.5mm",
+          "base_status": "observed",
+          "fieldability_certified": false,
+          "height_status": "not_observed",
+          "model_role": "Corsair Voidscarred",
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        },
+        {
+          "base_statement": "Voidscarred Felarch 28.5mm",
+          "base_status": "observed",
+          "fieldability_certified": false,
+          "height_status": "not_observed",
+          "model_role": "Voidscarred Felarch",
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        },
+        {
+          "base_statement": "Shade Runner 28.5mm",
+          "base_status": "observed",
+          "fieldability_certified": false,
+          "height_status": "not_observed",
+          "model_role": "Shade Runner",
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        },
+        {
+          "base_statement": "Soul Weaver 28.5mm",
+          "base_status": "observed",
+          "fieldability_certified": false,
+          "height_status": "not_observed",
+          "model_role": "Soul Weaver",
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        },
+        {
+          "base_statement": "Way Seeker 28.5mm",
+          "base_status": "observed",
+          "fieldability_certified": false,
+          "height_status": "not_observed",
+          "model_role": "Way Seeker",
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "aeldari-current-2026-11-02:datasheet:corsair-voidscarred",
+      "observed_at": "2026-11-02T01:58:43.720Z",
+      "official_source_ids": [
+        "gw-11e-aeldari-faction-pack-2026-07"
+      ],
+      "operative_start": "Corsair Voidscarred\nDATASHEET",
+      "operative_text": "Corsair Voidscarred\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nVoidscarred Felarch 28.5mm\n7\"\n3\n4+\n1\n7+\n1\nWay Seeker 28.5mm\n7\"\n3\n4+\n1\n7+\n1\nShade Runner 28.5mm\n7\"\n3\n4+\n1\n7+\n1\nCorsair Voidscarred 28.5mm\n7\"\n3\n4+\n1\n7+\n1\nSoul Weaver 28.5mm\n7\"\n3\n4+\n1\n7+\n1\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nExecutioner\nANTI-INFANTRY 2+\nPSYCHIC\n18\"\n3\n3+\n6\n-2\nD3\nShuriken pistol\nASSAULT\nPISTOL\n12\"\n1\n3+\n4\n-1\n1\nNeuro disruptor\nANTI-INFANTRY 2+\nASSAULT\nPISTOL\n12\"\n1\n3+\n4\n-2\n1\nShuriken rifle\nASSAULT\nRAPID FIRE 1\n24\"\n1\n3+\n4\n-1\n1\nBlaster\nASSAULT\n18\"\n1\n3+\n8\n-4\nD6+1\nFusion pistol\nASSAULT\nMELTA 2\nPISTOL\n6\"\n1\n3+\n8\n-4\nD6\nLong rifle\nHEAVY\nPRECISION\n36\"\n1\n3+\n4\n-1\n2\nShredder\nASSAULT\nTORRENT\n18\"\nD6\n-\n6\n0\n1\nShuriken cannon\nLETHAL HITS\n24\"\n3\n3+\n6\n-1\n2\nWraithcannon\n18\"\n1\n3+\n14\n-4\nD6+1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nWitch staff\nANTI-INFANTRY 2+\nPSYCHIC\n2\n2+\n3\n0\nD3\nClose combat weapon\n3\n3+\n3\n0\n1\nPower sword\n3\n3+\n4\n-2\n1\nPaired Hekatarii blades\nTWIN-LINKED\n4\n2+\n3\n-2\n1\nKEYWORDS\nAELDARI\nANHRATHE\nCORSAIR VOIDSCARRED\nGRENADES\nINFANTRY\nPSYKER\nCOSTS\n5 models\n70 pts\n10 models\n140 pts\nUNIT COMPOSITION\n\nThis unit can contain a maximum of 10 models.\n\n1 Voidscarred Felarch\n4-9 Corsair Voidscarred\n0-1 Shade Runner\n0-1 Soul Weaver\n0-1 Way Seeker\n\nEvery Corsair Voidscarred and Voidscarred Felarch is equipped with: shuriken pistol; power sword; close combat weapon. A Shade Runner is equipped with: shuriken pistol; close combat weapon; paired Hekatarii blades. A Soul Weaver is equipped with: shuriken pistol; power sword; close combat weapon; channeller stones. A Way Seeker is equipped with: shuriken pistol; Executioner; close combat weapon; witch staff.\n\nLed by\nPRINCE YRIEL\nKHARSETH\nYVRAINE\nSupported by\nTHE VISARCH\nBecome a supporter and remove ads\nWARGEAR OPTIONS\nAny number of Corsair Voidscarred can each have their shuriken pistol and power sword replaced with 1 shuriken rifle.\nThe Voidscarred Felarch\u2019s shuriken pistol can be replaced with one of the following: \u25e6 1 neuro disruptor \u25e6 1 shuriken rifle\nThe Voidscarred Felarch can be equipped with 1 mistshield.\nFor every 5 models in this unit, 1 Corsair Voidscarred\u2019s shuriken rifle can be replaced with one of the following: \u25e6 1 blaster \u25e6 1 shredder\nIf this unit contains 10 models, 1 Corsair Voidscarred\u2019s shuriken rifle can be replaced with one of the following: \u25e6 1 shuriken cannon \u25e6 1 wraithcannon\nIf this unit contains 10 models, 1 Corsair Voidscarred\u2019s shuriken rifle can be replaced with 1 long rifle.\nIf this unit contains 10 models, 1 Corsair Voidscarred\u2019s power sword can be replaced with 1 fusion pistol.\n1 Corsair Voidscarred model equipped with a shuriken pistol and power sword can be equipped with 1 Faolch\u00fa.\nWARGEAR\nChanneller Stones\n\nOnce per turn, the first time a saving throw is failed for the bearer\u2019s unit, change the Damage characteristic of that attack to 0.\n\nFaolch\u00fa\n\nRanged weapons equipped by models in the bearer\u2019s unit have the [IGNORES COVER] ability.\n\nMistshield\n\nThe bearer has a 4+ invulnerable save.\n\nCORE ABILITIES\nSCOUTS 7\"\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nPiratical Raiders\n\nAt the start of the battle, select one unit from your opponent\u2019s army. Weapons equipped by models in this unit have the [LETHAL HITS] and [PRECISION] abilities while targeting that unit.\n\nSTATS\n11%\nof Aeldari lists\n#36\nmost-taken in faction\n11%\nfrom 14% since last update\nIN ARMY LISTS\nPopular detachments\nELDRITCH RAIDERS\nARMOURED WARHOST\nCORSAIR COTERIE\nMost often led by\nPRINCE YRIEL\nKHARSETH\nYVRAINE\nOften taken with\nPRINCE YRIEL\nCORSAIR VOIDREAVERS\nCORSAIR SKYREAVERS\nKHARSETH\nRANGERS",
+      "owning_faction_source_id": "faction-app:aeldari",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Complete current own page reviewed against exact existing Aeldari identities. Army page retains all six expanded manoeuvres and Disparate Paths. Voidscarred is existing matched-play datasheet 000002532. This selection corrects only its default loadout and Battle Focus Sudden Strike; no new admission, geometry or broader gameplay certification. Version 995 is the global observation snapshot, not a per-clause modification date.",
+      "source_id": "faction-app:aeldari:datasheet:corsair-voidscarred",
+      "source_observation_sha256": "50f26c0850856c9996c16b2879ac9878f9ec088f1125775f822983df39553e3b",
+      "source_title": "Corsair Voidscarred",
+      "source_url": "https://www.40k.app/factions/aeldari/units/corsair-voidscarred",
+      "transcription_sha256": "7fba1fe4811487e4268b030dfef7b9657e7864c9482886ddcd850b2032229a2f"
+    }
+  ],
+  "official_sources": [
+    {
+      "artifact_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_aeldari-qe1ykopo7h-blfkukhecc.pdf",
+      "provider_name": "Games Workshop",
+      "relationship": "historical_primary_not_current_corroboration",
+      "sha256": "2a1954801042948256c002095937be88c9d334994f0b01d7a63510c94d39fe1d",
+      "source_date": "2026-07-22",
+      "source_id": "gw-11e-aeldari-faction-pack-2026-07",
+      "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_faction_pack_aeldari-qe1ykopo7h-blfkukhecc.pdf"
+    }
+  ],
+  "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+  "selected_source_ids": [
+    "faction-app:aeldari:army-rules",
+    "faction-app:aeldari:datasheet:corsair-voidscarred"
+  ],
+  "version_evidence": {
+    "observed_at": "2026-11-02T01:55:52.585Z",
+    "source_url": "https://www.40k.app/factions/updates",
+    "statement": "Version 995\nReleased 2026-10-16.",
+    "transcription_sha256": "e6efd2e9a45a208c455693a1855a929e4da0696bc206eaec403958bb45017b54"
+  }
+}
