@@ -7,10 +7,10 @@
       "sha256": "b57c87563d26c3037d4285d0d03d21aa476f808e4c4c6cd65cfcfcb9661fea41"
     },
     "tests/factions/aeldari/unit/test_aeldari_army_rule.py": {
-      "blob_sha1": "d825eac3f98da38b4d30296050af0867fe62ae31",
-      "bytes": 32887,
+      "blob_sha1": "5e8c6199057f675447191089151408a8baeb4029",
+      "bytes": 32978,
       "mode": "100644",
-      "sha256": "dc3b49d17683701c5c2be58e0013c543add245f1c300c57b8d5d4457dfe78495"
+      "sha256": "c057292e55f5399d327fda0bf2e7008c08179b75c90e546f5113b738110e5e7a"
     },
     "tests/factions/aeldari/unit/test_aspect_shrine_tokens.py": {
       "blob_sha1": "f05c89adcdcb9cfeb13a1597740f7e815f629a83",

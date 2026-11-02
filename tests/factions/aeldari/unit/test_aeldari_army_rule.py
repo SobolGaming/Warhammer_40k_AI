@@ -104,7 +104,8 @@ def test_aeldari_star_engines_grants_advanced_vehicle_assault_until_end_of_turn(
     assert army_rule.OPPORTUNITY_SEIZED_HOOK_ID in summary["movement_end_surge_hook_ids"]
     assert army_rule.FLITTING_SHADOWS_HOOK_ID in summary["charge_declaration_hook_ids"]
     assert army_rule.FADE_BACK_HOOK_ID in summary["shooting_end_surge_hook_ids"]
-    assert army_rule.SUDDEN_STRIKE_HOOK_ID in summary["fight_activation_ability_hook_ids"]
+    assert army_rule.SUDDEN_STRIKE_HOOK_ID in summary["move_completion_rule_hook_ids"]
+    assert army_rule.SUDDEN_STRIKE_HOOK_ID not in summary["fight_activation_ability_hook_ids"]
 
     action_status = lifecycle.submit_decision(
         DecisionResult.for_request(

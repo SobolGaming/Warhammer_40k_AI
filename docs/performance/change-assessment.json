@@ -166,11 +166,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "2db20318c63934a79dc186b10bff3f8ec8ab5214f9e08e1eb637cd3bde1c35e2",
-      "after_sha256": "9dde10bdf08c235f4cd1349baff8be4a160f8bdca9df7a0b860ec08691e05016",
+      "after_sha256": "b0a2580b3c080b0fb5aa738cb7e1b129b394c74e6ace0d4639d9dfaf8ba2fb35",
       "owners": {
         "@document": {
           "before": "2db20318c63934a79dc186b10bff3f8ec8ab5214f9e08e1eb637cd3bde1c35e2",
-          "after": "9dde10bdf08c235f4cd1349baff8be4a160f8bdca9df7a0b860ec08691e05016"
+          "after": "b0a2580b3c080b0fb5aa738cb7e1b129b394c74e6ace0d4639d9dfaf8ba2fb35"
         }
       }
     },
@@ -211,6 +211,16 @@
         "@document": {
           "before": "8c86967963d870ff7f6782c5810f7656b2a1f3f0612c8e003a09d5e0c7728d2e",
           "after": "4d19f2afabd2c00283f41f9fa26969e5c9ccd319b06b386d349561da7cf830b0"
+        }
+      }
+    },
+    "docs/DECISION_SUBMISSION_CATALOG.md": {
+      "before_sha256": "3cb434fad44fc1ef72a16e3e893688363eb2db2589d4d19c9d95ab27deb15e8f",
+      "after_sha256": "aac1ff538554c2d6c08ad85f4e80ac8122d27281f22b8382ed22e988abe3c9ec",
+      "owners": {
+        "@document": {
+          "before": "3cb434fad44fc1ef72a16e3e893688363eb2db2589d4d19c9d95ab27deb15e8f",
+          "after": "aac1ff538554c2d6c08ad85f4e80ac8122d27281f22b8382ed22e988abe3c9ec"
         }
       }
     },
@@ -706,11 +716,15 @@
     },
     "tests/factions/aeldari/unit/test_aeldari_army_rule.py": {
       "before_sha256": "0ac2e935356ba1ba1a9da597d55261d338d4275001987a16384109d952e0ea1b",
-      "after_sha256": "dc3b49d17683701c5c2be58e0013c543add245f1c300c57b8d5d4457dfe78495",
+      "after_sha256": "c057292e55f5399d327fda0bf2e7008c08179b75c90e546f5113b738110e5e7a",
       "owners": {
         "@module": {
           "before": "153a03aefd86e49bf790bdb4d9ab40da3b9baf264ad50ddd333a38336dc38d24",
           "after": "f40d0643a9dc9bfe9629939b210730f9db9fb9dadb762b1bbce698b19328a5ce"
+        },
+        "test_aeldari_star_engines_grants_advanced_vehicle_assault_until_end_of_turn": {
+          "before": "cc1bcc69c5f04166e65827577743831406d8a438af46c968f0093166bd6e629d",
+          "after": "35c7b4d8437d7357bf306179d13f373c7c63c7931c74868dfae9f5a22f22d14a"
         },
         "test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect": {
           "before": "9ff2f8e83e15ef835bf55eddc967878621b386ed6b47269e1a979d2f0a959ede",
@@ -1081,6 +1095,14 @@
       "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Restore the current source-backed Voidscarred specialist weapons and charge-completion Sudden Strike through shared authoritative construction, decisions, effects, resources, restore and replay.",
+      "source_obligation": "Complete captured current Aeldari pages require default close combat weapons for Shade Runner, Soul Weaver and Way Seeker, and optional six-inch pile-in/consolidation after an eligible charge move until the end of that turn.",
+      "unchanged_work": "No search, cache, dependency, admission, geometry or budget expansion. Structured source-line normalization is explicit and default payload bytes are preserved. The Flitting Shadows prerequisite resolves authoritative attached identity only. Existing mandatory mappings remain; source_data serialization receives reconstruction measurements and inherited hot owners receive all four selected detailed families. Only the authenticated exact source-loader addition has the finite rule-semantics smoke recognition."
+    },
+    "docs/DECISION_SUBMISSION_CATALOG.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
