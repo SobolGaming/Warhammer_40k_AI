@@ -677,3 +677,92 @@ __all__ += ["chaos_space_marines_army_rule", "command_point_consumer_ids_for_cla
 __all__ += ["emperors_children_july", "emperors_children_june_manifest"]
 __all__ += ["load_official_source_manifest", "parameter_payload", "stratagem_phase_use_exception"]
 __all__ += ["thousand_sons_july", "thousand_sons_june_manifest"]
+
+
+def test_current_aeldari_overlay_changes_only_two_reviewed_source_fields() -> None:
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        aeldari_current_2026_11 as current,
+    )
+
+    root = REPOSITORY_ROOT
+    directory = root / "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json"
+    sources = tuple(
+        WahapediaJsonArtifact.from_payload(json.loads((directory / f"{table}.json").read_bytes()))
+        for table in ("Abilities", "Datasheets")
+    )
+    pack = current.overlay_pack()
+    result = apply_source_release_overlays(
+        source_artifacts=sources,
+        release_manifest=current.source_release_manifest(),
+        overlay_packs=(pack,),
+    )
+    changes = {
+        ("Datasheets", "000002532"): "loadout",
+        ("Abilities", "000009894:AE"): "description",
+    }
+    seen = set()
+    for before, after in zip(sources, result, strict=True):
+        assert len(before.rows) == len(after.rows)
+        for old, new in zip(before.rows, after.rows, strict=True):
+            assert old.source_row_id == new.source_row_id
+            key = (before.source_table, old.source_row_id)
+            old_fields, new_fields = old.runtime_fields_payload(), new.runtime_fields_payload()
+            if key not in changes:
+                assert old_fields == new_fields
+                continue
+            field = changes[key]
+            assert {name for name in old_fields if old_fields[name] != new_fields[name]} == {field}
+            seen.add(key)
+            if field == "loadout":
+                assert hashlib.sha256(old_fields[field].encode()).hexdigest() == (
+                    "ea729aeed225af2972751452092aab675d9c48870ca1e6543818338c3ece3546"
+                )
+                assert hashlib.sha256(new_fields[field].encode()).hexdigest() == (
+                    "2f2eeca5673f6923256ab53bed4f36fee0ee3e3469e37ee0dc437dbb95a7380f"
+                )
+                assert new_fields[field].count("close combat weapon") == 4
+            else:
+                old_clause = (
+                    old_fields[field]
+                    .split("SUDDEN STRIKE\n", 1)[1]
+                    .split("\nOPPORTUNITY SEIZED", 1)[0]
+                )
+                assert new_fields[field] == old_fields[field].replace(
+                    old_clause,
+                    old_clause.replace("is selected to fight", "ends a charge move").replace(
+                        "end of the phase", "end of the turn"
+                    ),
+                )
+    assert seen == set(changes)
+
+
+def test_current_aeldari_f00_pin_and_registry_authenticate_complete_pages() -> None:
+    from warhammer40k_core.rules.faction_source_governance import FactionSourceError
+    from warhammer40k_core.rules.source_catalog import SourceCatalog
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        aeldari_current_2026_11 as current,
+    )
+    from warhammer40k_core.rules.text_normalization import SourceTextNormalizationMode
+
+    audit = current.source_audit()
+    package = current.source_package()
+    assert audit.app_version == "995"
+    assert len(audit.observations) == len(package.evidence_required_source_ids) == 2
+    for row in audit.observations:
+        source = package.source_catalog.source_text_by_id(row.source_id)
+        assert source.raw_text == row.operative_text
+        assert source.normalization_mode is SourceTextNormalizationMode.STRUCTURED_LINES
+        assert len(row.captured_text) in {3007, 3546}
+        assert hashlib.sha256(row.captured_text.encode()).hexdigest() == row.capture_sha256
+        assert (
+            row.operative_text == row.captured_text[row.captured_text.index(row.operative_start) :]
+        )
+        assert all(not geometry.fieldability_certified for geometry in row.geometry)
+    payload = package.source_catalog.to_payload()
+    restored = SourceCatalog.from_payload(payload)
+    assert restored.catalog_sha256() == package.source_catalog.catalog_sha256()
+    raw = (
+        REPOSITORY_ROOT / "data/source_audits/aeldari_current_2026_11/source.audit.json"
+    ).read_bytes()
+    with pytest.raises(FactionSourceError, match="reviewed pin"):
+        current.source_audit_from_json_bytes(raw + b" ")

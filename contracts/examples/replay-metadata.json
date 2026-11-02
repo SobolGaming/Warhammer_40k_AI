@@ -17511,7 +17511,7 @@
       "battle_shock_hook_ids": [
         "catalog-ir:selected-target-test-roll-modifier"
       ],
-      "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
+      "bundle_summary_hash": "2ebb9d9d671358ed5ce9644adce5fbdd1dadcf93efda7d6981bbcbc6203d145d",
       "charge_declaration_hook_ids": [],
       "charge_roll_modifier_ids": [],
       "charge_target_restriction_hook_ids": [],
@@ -17539,6 +17539,7 @@
       ],
       "move_completion_rule_hook_ids": [
         "core-move-ability:super-heavy-walker:completion",
+        "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
         "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker-removal",
         "primary:surveil:move-marker-removal"
       ],

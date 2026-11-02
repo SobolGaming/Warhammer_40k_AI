@@ -23,13 +23,20 @@ from warhammer40k_core.rules.source_evidence import (
     RuleSourcePackage,
     SourceEvidenceCatalog,
 )
+from warhammer40k_core.rules.text_normalization import SourceTextNormalizationMode
 
 
 @cache
 def faction_source_package() -> RuleSourcePackage:
-    audit = faction_source_audit()
+    return faction_source_package_from_audit(faction_source_audit())
+
+
+def faction_source_package_from_audit(
+    audit: FactionSourceAudit, *, package_name: str = FACTION_SOURCE_PACKAGE_NAME
+) -> RuleSourcePackage:
+    """Construct through the shared evidence and exact registry authorization boundary."""
     return RuleSourcePackage(
-        source_catalog=faction_source_catalog(audit),
+        source_catalog=faction_source_catalog(audit, package_name=package_name),
         source_evidence_catalog=SourceEvidenceCatalog(
             records=tuple(
                 record for row in audit.observations for record in _evidence(row, audit.audit_id)
@@ -40,12 +47,14 @@ def faction_source_package() -> RuleSourcePackage:
     )
 
 
-def faction_source_catalog(audit: FactionSourceAudit) -> SourceCatalog:
+def faction_source_catalog(
+    audit: FactionSourceAudit, *, package_name: str = FACTION_SOURCE_PACKAGE_NAME
+) -> SourceCatalog:
     """Derive the complete catalog from a validated audit, without granting authority."""
     version = audit.package_version()
     package_id = DataPackageId(
         namespace="core-v2-reviewed-app-mirror",
-        package_name=FACTION_SOURCE_PACKAGE_NAME,
+        package_name=package_name,
         version=version,
     )
     return SourceCatalog(
@@ -62,6 +71,11 @@ def faction_source_catalog(audit: FactionSourceAudit) -> SourceCatalog:
                         source_id=row.source_id,
                         raw_text=row.operative_text,
                         objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
+                        normalization_mode=(
+                            SourceTextNormalizationMode.STRUCTURED_LINES
+                            if audit.audit_schema == "core-v2-faction-source-audit-v2"
+                            else SourceTextNormalizationMode.FLAT
+                        ),
                     ),
                 ),
             )

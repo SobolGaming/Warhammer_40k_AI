@@ -31663,6 +31663,288 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "aeldari-current-exact-01": {
+      "paths": [
+        "data/source_audits/aeldari_current_2026_11/browser-captures.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-02": {
+      "paths": [
+        "data/source_audits/aeldari_current_2026_11/review.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-03": {
+      "paths": [
+        "data/source_audits/aeldari_current_2026_11/source.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-04": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/unit_move_completed.py"
+      ],
+      "owners": [
+        "move_completion_rule_registry"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-05": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/aeldari/army_rule.py"
+      ],
+      "owners": [
+        "battle_focus_spend_payload_for_rules_unit",
+        "flitting_shadows_charge_declaration_grant",
+        "rules_unit_already_performed_agile_manoeuvre_this_phase",
+        "runtime_contribution",
+        "sudden_strike_fight_activation_option"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-06": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/aeldari/sudden_strike.py"
+      ],
+      "owners": [
+        "@module",
+        "_owns_trigger",
+        "binding",
+        "grant_for"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-07": {
+      "paths": [
+        "src/warhammer40k_core/engine/lifecycle_reaction_queue.py"
+      ],
+      "owners": [
+        "@module",
+        "validate_reaction_queue_consistency"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-08": {
+      "paths": [
+        "src/warhammer40k_core/engine/move_completion_effects.py"
+      ],
+      "owners": [
+        "@module",
+        "MoveCompletionEffectGrant",
+        "MoveCompletionEffectGrant.__post_init__",
+        "MoveCompletionEffectHost",
+        "MoveCompletionEffectHost._require_state",
+        "MoveCompletionEffectHost.advance_until_decision_or_terminal",
+        "_activate",
+        "_decisions",
+        "_request",
+        "_validate_pending",
+        "decision_dispatch_handlers",
+        "optional_move_completion_effect_binding"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-09": {
+      "paths": [
+        "src/warhammer40k_core/rules/faction_source_governance.py"
+      ],
+      "owners": [
+        "FactionSourceAudit",
+        "authorize_faction_observation",
+        "validate_faction_source_audit_bytes"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-10": {
+      "paths": [
+        "src/warhammer40k_core/rules/faction_source_package.py"
+      ],
+      "owners": [
+        "@module",
+        "faction_source_catalog",
+        "faction_source_package",
+        "faction_source_package_from_audit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-11": {
+      "paths": [
+        "src/warhammer40k_core/rules/objective_terminology.py"
+      ],
+      "owners": [
+        "@module",
+        "normalize_objective_rule_text"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-12": {
+      "paths": [
+        "src/warhammer40k_core/rules/source_data.py"
+      ],
+      "owners": [
+        "@module",
+        "RuleSourceText",
+        "RuleSourceText.__post_init__",
+        "RuleSourceText.from_payload",
+        "RuleSourceText.from_raw",
+        "RuleSourceText.to_payload",
+        "RuleSourceTextPayload"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "aeldari-current-exact-13": {
+      "paths": [
+        "src/warhammer40k_core/rules/text_normalization.py"
+      ],
+      "owners": [
+        "@module",
+        "SourceTextNormalizationMode",
+        "source_text_normalization_mode_from_token"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-14": {
+      "paths": [
+        "tests/code_quality/test_current_comparison_routing.py"
+      ],
+      "owners": [
+        "test_aeldari_source_smoke_scope_requires_exact_bindings_and_fails_closed"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-15": {
+      "paths": [
+        "tests/factions/aeldari/current_source_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "charge",
+        "definitions"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-16": {
+      "paths": [
+        "tests/factions/aeldari/unit/test_battle_focus_consumers.py"
+      ],
+      "owners": [
+        "current_aeldari_definitions",
+        "test_current_native_voidscarred_specialist_close_combat_loadouts",
+        "test_current_native_voidscarred_specialists_offer_close_combat_weapons",
+        "test_native_attached_sudden_strike_uses_group_and_source_refund",
+        "test_native_heroic_charge_offers_sudden_strike_in_opponents_turn",
+        "test_native_sudden_strike_charge_completion_choice_restore_and_replay",
+        "test_native_sudden_strike_decline_then_other_charge_spends_once_per_phase",
+        "test_native_sudden_strike_six_inch_consolidation_and_turn_expiry",
+        "test_sudden_strike_charge_end_resource_and_ability_boundaries"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-17": {
+      "paths": [
+        "tests/infrastructure/source/unit/test_rule_text_normalization.py"
+      ],
+      "owners": [
+        "test_complete_source_table_cells_do_not_form_a_dice_quantity",
+        "test_source_mode_is_authenticated_without_changing_legacy_flat_payloads",
+        "test_structured_source_mode_preserves_objective_scope_and_rejects_invalid_dice"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-18": {
+      "paths": [
+        "tests/infrastructure/source/unit/test_source_overlays.py"
+      ],
+      "owners": [
+        "test_current_aeldari_f00_pin_and_registry_authenticate_complete_pages",
+        "test_current_aeldari_overlay_changes_only_two_reviewed_source_fields"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-19": {
+      "paths": [
+        "tools/generate_aeldari_current_source.py"
+      ],
+      "owners": [
+        "@module",
+        "generated_overlay_pack",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-20": {
+      "paths": [
+        "tools/generate_court_of_slaughter_anvanth_catalog.py"
+      ],
+      "owners": [
+        "@module",
+        "build_catalog_package"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "aeldari-current-exact-21": {
+      "paths": [
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "aeldari_current_source_rule_semantics_smoke_operations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

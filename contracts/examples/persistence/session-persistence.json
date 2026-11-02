@@ -34,7 +34,7 @@
       }
     ]
   },
-  "content_hash": "fd408f70035cd9cf28410ba03be6ffc617e30e7f23f9e3941002101652541cd5",
+  "content_hash": "d742b5763208e45ddc841e6627854e88e009f55c919ee4e8dd6ef307b273c7ba",
   "cursor_codec": {
     "cursors": [
       {
@@ -92,7 +92,7 @@
     ],
     "secret_hex": "636f72652d76322d636f6e74726163742d70657273697374656e63652d637572736f722d6b6579"
   },
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:617011195977d5ecb3d7445dffe6bce8d4031328abfe55b51ec1ef67b33c3448",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:75beb12947d32f9a9220007fdaa9ec00a0c5b6faa67400fde990782af913ec2e",
   "engine_version": "0.1.0",
   "event_retention_limit": 4096,
   "external_contract_version": "45.0.0",
@@ -106,7 +106,7 @@
   "sessions": [
     {
       "adapter_session": {
-        "content_hash": "852df870de4c96e5e5c0059b336993b7af0097ed36082ee58a1467a07d04a8cc",
+        "content_hash": "dc4539824a2aca05bfa180a31d319f7b9ed2b456f38e85d3c9ad8f5bf25285c6",
         "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "event_log_hash": "0d15f64d60e629fbb38e466e875b4859668f00c0a15e034b5574b19969d829fa",
         "initial_replay_lifecycle": {
@@ -5195,7 +5195,7 @@
             "battle_shock_hook_ids": [
               "catalog-ir:selected-target-test-roll-modifier"
             ],
-            "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
+            "bundle_summary_hash": "2ebb9d9d671358ed5ce9644adce5fbdd1dadcf93efda7d6981bbcbc6203d145d",
             "charge_declaration_hook_ids": [],
             "charge_roll_modifier_ids": [],
             "charge_target_restriction_hook_ids": [],
@@ -5223,6 +5223,7 @@
             ],
             "move_completion_rule_hook_ids": [
               "core-move-ability:super-heavy-walker:completion",
+              "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
               "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker-removal",
               "primary:surveil:move-marker-removal"
             ],
@@ -12715,7 +12716,7 @@
             "battle_shock_hook_ids": [
               "catalog-ir:selected-target-test-roll-modifier"
             ],
-            "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
+            "bundle_summary_hash": "2ebb9d9d671358ed5ce9644adce5fbdd1dadcf93efda7d6981bbcbc6203d145d",
             "charge_declaration_hook_ids": [],
             "charge_roll_modifier_ids": [],
             "charge_target_restriction_hook_ids": [],
@@ -12743,6 +12744,7 @@
             ],
             "move_completion_rule_hook_ids": [
               "core-move-ability:super-heavy-walker:completion",
+              "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
               "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker-removal",
               "primary:surveil:move-marker-removal"
             ],
@@ -15149,7 +15151,7 @@
             ]
           }
         },
-        "lifecycle_hash": "825b9ffe88a0846f986372e2a8ba14c12eb529e8cd699d5ff220877942468d2b",
+        "lifecycle_hash": "bd3a80e5978ab14bdb9cfd3fb0305fb598ed140637e1414fd1739f7613836561",
         "replay_artifact": {
           "artifact_id": "session-persistence:phase18l-contract-persistence",
           "decision_records": [],
@@ -20240,7 +20242,7 @@
               "battle_shock_hook_ids": [
                 "catalog-ir:selected-target-test-roll-modifier"
               ],
-              "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
+              "bundle_summary_hash": "2ebb9d9d671358ed5ce9644adce5fbdd1dadcf93efda7d6981bbcbc6203d145d",
               "charge_declaration_hook_ids": [],
               "charge_roll_modifier_ids": [],
               "charge_target_restriction_hook_ids": [],
@@ -20268,6 +20270,7 @@
               ],
               "move_completion_rule_hook_ids": [
                 "core-move-ability:super-heavy-walker:completion",
+                "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
                 "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker-removal",
                 "primary:surveil:move-marker-removal"
               ],
@@ -22795,7 +22798,7 @@
             "session": {
               "catalog_id": "phase9a-canonical",
               "created_at": "2026-08-21T16:00:00Z",
-              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:617011195977d5ecb3d7445dffe6bce8d4031328abfe55b51ec1ef67b33c3448",
+              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:75beb12947d32f9a9220007fdaa9ec00a0c5b6faa67400fde990782af913ec2e",
               "engine_version": "0.1.0",
               "event_cursor": "I5ZnfrwbmogwuOF2tpyy0Xpa2v7pgVcQDvhwFkBBHx7C0Ijr2sQh0JcReLVcyv5T",
               "game_id": "phase18l-contract-persistence",
@@ -22842,7 +22845,7 @@
       "cursor_registry_finalized": false,
       "event_retention_limit": 4096,
       "game_id": "phase18l-contract-persistence",
-      "history_head": "9660fe318ff99abc44c133b1547004eccbb4096d34d602252d23d5729e6f6c9b",
+      "history_head": "6fa8215c8640bae1e4f984b7704c1ceb15faecbb5f14a6d9ff2fbcff902773ea",
       "last_activity_at": "2026-08-21T16:00:00Z",
       "lifecycle_status": {
         "decision_request": {
@@ -22944,8 +22947,8 @@
         },
         {
           "authoritative_session_hash": "8635775287d84aa963eb2c53bf0424b848dd9e8d1b5eb3e40fdc719f1dbb1ceb",
-          "authoritative_state_hash": "825b9ffe88a0846f986372e2a8ba14c12eb529e8cd699d5ff220877942468d2b",
-          "checkpoint_hash": "5bb1138197fb3bdbbe44f5defc35399ea218502b5e9aa66bf510cb11dd43d6d5",
+          "authoritative_state_hash": "bd3a80e5978ab14bdb9cfd3fb0305fb598ed140637e1414fd1739f7613836561",
+          "checkpoint_hash": "73fdeb3b83d364243265d7eebecc6235416104f03416172cbbe430c670dc55cd",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -22964,7 +22967,7 @@
             },
             "token": "oTZ-cS5GsOL0DWc0vOQScaJtuJjU2QCSNUKXEsjgYwPRp1XwiCf9f1AmYlEiC0CZ"
           },
-          "journal_entry_hash": "e130e6c5ed858630dfb5d35f3c84d2eff26aee176d7ed64b346991e62798d4f6",
+          "journal_entry_hash": "f5090d421c7e0e864ab4a79a75fb88f4bf904cb324cd8e6b6a4b410f67cde1fc",
           "origin": {
             "command_envelope": {
               "command_id": "phase18l-contract-start-000001",
@@ -22982,8 +22985,8 @@
             "origin_kind": "protocol_command"
           },
           "previous_revision_commitment": "ded2e7561be3e92512fd4f7c7ec7b237daeb31a1645ae7cfae0c5eafa210c8ac",
-          "response_hash": "77a1a43395dfcd3a64ffb57db7ae3166c744013d046e0e765402e42d527a1228",
-          "revision_commitment": "9660fe318ff99abc44c133b1547004eccbb4096d34d602252d23d5729e6f6c9b",
+          "response_hash": "bd8c6ac672ca23c16f0ffec8ee23400c136cb64de79a7afa575b655acfd42445",
+          "revision_commitment": "6fa8215c8640bae1e4f984b7704c1ceb15faecbb5f14a6d9ff2fbcff902773ea",
           "rng_draw_count": 0,
           "rng_history_count": 10,
           "rng_history_hash": "1a9ee08fc21e8e69edf35eb06fa2eac2c747d6b450f272be600aa2fdebca3305",
@@ -27997,7 +28000,7 @@
         },
         {
           "adapter_session": {
-            "content_hash": "852df870de4c96e5e5c0059b336993b7af0097ed36082ee58a1467a07d04a8cc",
+            "content_hash": "dc4539824a2aca05bfa180a31d319f7b9ed2b456f38e85d3c9ad8f5bf25285c6",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "0d15f64d60e629fbb38e466e875b4859668f00c0a15e034b5574b19969d829fa",
             "initial_replay_lifecycle": {
@@ -33086,7 +33089,7 @@
                 "battle_shock_hook_ids": [
                   "catalog-ir:selected-target-test-roll-modifier"
                 ],
-                "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
+                "bundle_summary_hash": "2ebb9d9d671358ed5ce9644adce5fbdd1dadcf93efda7d6981bbcbc6203d145d",
                 "charge_declaration_hook_ids": [],
                 "charge_roll_modifier_ids": [],
                 "charge_target_restriction_hook_ids": [],
@@ -33114,6 +33117,7 @@
                 ],
                 "move_completion_rule_hook_ids": [
                   "core-move-ability:super-heavy-walker:completion",
+                  "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
                   "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker-removal",
                   "primary:surveil:move-marker-removal"
                 ],
@@ -40606,7 +40610,7 @@
                 "battle_shock_hook_ids": [
                   "catalog-ir:selected-target-test-roll-modifier"
                 ],
-                "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
+                "bundle_summary_hash": "2ebb9d9d671358ed5ce9644adce5fbdd1dadcf93efda7d6981bbcbc6203d145d",
                 "charge_declaration_hook_ids": [],
                 "charge_roll_modifier_ids": [],
                 "charge_target_restriction_hook_ids": [],
@@ -40634,6 +40638,7 @@
                 ],
                 "move_completion_rule_hook_ids": [
                   "core-move-ability:super-heavy-walker:completion",
+                  "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
                   "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker-removal",
                   "primary:surveil:move-marker-removal"
                 ],
@@ -43040,7 +43045,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "825b9ffe88a0846f986372e2a8ba14c12eb529e8cd699d5ff220877942468d2b",
+            "lifecycle_hash": "bd3a80e5978ab14bdb9cfd3fb0305fb598ed140637e1414fd1739f7613836561",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -48131,7 +48136,7 @@
                   "battle_shock_hook_ids": [
                     "catalog-ir:selected-target-test-roll-modifier"
                   ],
-                  "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
+                  "bundle_summary_hash": "2ebb9d9d671358ed5ce9644adce5fbdd1dadcf93efda7d6981bbcbc6203d145d",
                   "charge_declaration_hook_ids": [],
                   "charge_roll_modifier_ids": [],
                   "charge_target_restriction_hook_ids": [],
@@ -48159,6 +48164,7 @@
                   ],
                   "move_completion_rule_hook_ids": [
                     "core-move-ability:super-heavy-walker:completion",
+                    "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
                     "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker-removal",
                     "primary:surveil:move-marker-removal"
                   ],

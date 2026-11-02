@@ -13,6 +13,9 @@ from warhammer40k_core.engine.catalog_setup_reactive_charge_move import (
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.move_completion_effects import (
+    SELECT_MOVE_COMPLETION_EFFECT_DECISION_TYPE,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -52,6 +55,7 @@ def validate_reaction_queue_consistency(
         "select_target_replacement",
         # Shared completion hooks finish before the interrupted Charge releases its frame.
         SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
+        SELECT_MOVE_COMPLETION_EFFECT_DECISION_TYPE,
         SEQUENCING_DECISION_TYPE,
     }
     if pending_request.decision_type not in reaction_frame_decision_types and not (

@@ -34,6 +34,7 @@ def move_completion_rule_registry() -> MoveCompletionRuleRegistry:
     from warhammer40k_core.engine.cult_ambush_marker_capture import (
         cult_marker_participants_at_trigger,
     )
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import sudden_strike
     from warhammer40k_core.engine.mission_action_policies import primary_mission_state_rule_for_id
     from warhammer40k_core.engine.move_keyword_completion import move_keyword_completion_bindings
     from warhammer40k_core.engine.surveil_move_capture import surveil_participants_at_trigger
@@ -41,6 +42,7 @@ def move_completion_rule_registry() -> MoveCompletionRuleRegistry:
     return MoveCompletionRuleRegistry(
         (
             *move_keyword_completion_bindings(),
+            sudden_strike.binding(),
             MoveCompletionRuleBinding(
                 hook_id=f"{SOURCE_RULE_ID}:marker-removal",
                 source_rule_id=SOURCE_RULE_ID,

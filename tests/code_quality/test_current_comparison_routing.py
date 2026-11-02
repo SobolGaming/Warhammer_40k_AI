@@ -479,3 +479,74 @@ def test_sorcerer_source_smoke_scope_requires_exact_base_bytes_owners_and_catego
             assert not sorcerer_source_rule_semantics_smoke_operations(
                 base=base, path=path, category="rule_semantics", change=drifted
             )
+
+
+def test_aeldari_source_smoke_scope_requires_exact_bindings_and_fails_closed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools import performance_policy as policy
+
+    scope = read_object(ROOT / "docs/performance/policy-v3/aeldari-current-source-smoke-scope.json")
+    path = "tools/ability_support_sources.py"
+    base = "5e26b4b4791d0c25579faebc28394ec25bb38b24"
+    change = object_value(object_value(scope["changes"])[path])
+    recognize = policy.aeldari_current_source_rule_semantics_smoke_operations
+    assert recognize(base=base, path=path, category="rule_semantics", change=change) == frozenset(
+        {"qualification40-exact-b0712fa66a9cc38e"}
+    )
+    for candidate_base, candidate_path, category in (
+        ("0" * 40, path, "rule_semantics"),
+        ("7827235d328bf5b82201c8fece29dab7356ba3e3", path, "rule_semantics"),
+        (base, path + ".extra", "rule_semantics"),
+        (base, "src/warhammer40k_core/rules/source_data.py", "rule_semantics"),
+        (base, path, "algorithm_or_search"),
+        (base, path, "cache_policy"),
+        (base, path, "serialization"),
+    ):
+        assert not recognize(
+            base=candidate_base, path=candidate_path, category=category, change=change
+        )
+    for candidate in (None, [], {}, "malformed"):
+        assert not recognize(base=base, path=path, category="rule_semantics", change=candidate)
+    for key in ("before_sha256", "after_sha256", "owners"):
+        drifted = copy.deepcopy(change)
+        drifted[key] = {} if key == "owners" else "0" * 64
+        assert not recognize(base=base, path=path, category="rule_semantics", change=drifted)
+    for mutation in ("missing_owner", "extra_owner", "owner_before", "owner_after"):
+        drifted = copy.deepcopy(change)
+        owners = object_value(drifted["owners"])
+        if mutation == "missing_owner":
+            owners.pop("@module")
+        elif mutation == "extra_owner":
+            owners["unreviewed"] = {"before": "0" * 64, "after": "1" * 64}
+        else:
+            object_value(owners["load_ability_support_sources"])[
+                mutation.removeprefix("owner_")
+            ] = "0" * 64
+        assert not recognize(base=base, path=path, category="rule_semantics", change=drifted)
+    for mutation in (
+        "missing_binding",
+        "malformed_binding",
+        "malformed_hash",
+        "missing_owner",
+        "wrong_operation",
+    ):
+        malformed = copy.deepcopy(scope)
+        bindings = object_value(malformed["changes"])
+        binding = object_value(bindings[path])
+        if mutation == "missing_binding":
+            bindings.pop(path)
+        elif mutation == "malformed_binding":
+            bindings[path] = None
+        elif mutation == "malformed_hash":
+            binding["after_sha256"] = None
+        elif mutation == "missing_owner":
+            object_value(binding["owners"]).pop("@module")
+        else:
+            malformed["smoke_operations"] = {path: ["unreviewed-operation"]}
+        with monkeypatch.context() as scoped:
+            scoped.setattr(policy, "read_object", lambda _path, value=malformed: value)
+            with pytest.raises(
+                ValueError, match=r"performance fields|JSON object|exact file|sole exact"
+            ):
+                recognize(base=base, path=path, category="rule_semantics", change=change)

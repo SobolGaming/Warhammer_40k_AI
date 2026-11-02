@@ -2006,6 +2006,26 @@
           "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
           "identity_kind": "versioned_observation",
           "identity_value": "946@2026-09-08T01:39:45+00:00"
+        },
+        {
+          "audit_id": "aeldari-maintained-app-mirror-2026-11-02",
+          "identity_kind": "versioned_observation",
+          "identity_value": "995@2026-11-02T02:05:46.999Z",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "provider_name": "40k.app",
+          "row_id": "aeldari-current-2026-11-02:army-rules",
+          "source_observation_sha256": "80061ffe0707473f28743780cdd5eb63e7d85364a210d2f92d108b3041c546c2",
+          "source_url": "https://www.40k.app/factions/aeldari/army-rules"
+        },
+        {
+          "audit_id": "aeldari-maintained-app-mirror-2026-11-02",
+          "identity_kind": "versioned_observation",
+          "identity_value": "995@2026-11-02T01:58:43.720Z",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "provider_name": "40k.app",
+          "row_id": "aeldari-current-2026-11-02:datasheet:corsair-voidscarred",
+          "source_observation_sha256": "50f26c0850856c9996c16b2879ac9878f9ec088f1125775f822983df39553e3b",
+          "source_url": "https://www.40k.app/factions/aeldari/units/corsair-voidscarred"
         }
       ],
       "legacy_observations": [],
@@ -2031,6 +2051,16 @@
             "faction-app:space-marines:hellblaster-squad:for-the-chapter"
           ],
           "catalog_sha256": "e1f80012ea30fdaf487ba1f4737e93da5b34dc40b70011f26592060c4d9a5ba0"
+        },
+        {
+          "allowed_rule_source_ids": [
+            "faction-app:aeldari:army-rules",
+            "faction-app:aeldari:datasheet:corsair-voidscarred"
+          ],
+          "catalog_sha256": "6c46dad732bb34ce5b98a1b619618855a6502044dc04f6ac541c3abd52096112",
+          "namespace": "core-v2-reviewed-app-mirror",
+          "package_name": "reviewed-aeldari-app-observations-2026-11",
+          "version": "app-data-995-observed-2026-11-02"
         }
       ],
       "source_package_extensions": []

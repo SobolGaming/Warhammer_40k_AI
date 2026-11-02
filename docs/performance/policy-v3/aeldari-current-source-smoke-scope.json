@@ -1,0 +1,30 @@
+{
+  "base": "5e26b4b4791d0c25579faebc28394ec25bb38b24",
+  "changes": {
+    "tools/ability_support_sources.py": {
+      "before_sha256": "179fb1af416e0385271d7383f92c48b1005bede7900e95adf7654ba0e50f97ed",
+      "after_sha256": "f3996b510be3c842cc4d4a72d6d220835357ceb330af60f3e1b7e6d4259d41d7",
+      "owners": {
+        "@module": {
+          "before": "80603ee67290b56e096fdbd68278889c9ad7ace4ef6b8624f3851430fd5be333",
+          "after": "c386a838c9d76bb70b357368b1ebeab9c09cda9e7bbaf498abae3f30ad76fe0f"
+        },
+        "ability_support_index_inputs": {
+          "before": "fa3e5a33381e4304a9dff50575346c6bfcf633d557689994d250331fac1fc16a",
+          "after": "36116d0f28fd950295611273cda7231eba486931fd99b2a5f1209a3b79dda71c"
+        },
+        "load_ability_support_sources": {
+          "before": "d93bb882b2d4ed690e7d698be2b76bfdbbd006f750f8c8e5553e6e021d47d0bc",
+          "after": "9bba1bc08a62d7c4899615c54bbad33f2304e87bb5a92fcb978e47fa842376a9"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tools/ability_support_sources.py": [
+      "qualification40-exact-b0712fa66a9cc38e"
+    ]
+  },
+  "source_obligation": "Apply only the authenticated current Aeldari two-field overlay: Corsair Voidscarred 000002532 specialist close combat weapon defaults and Battle Focus 000009894:AE Sudden Strike charge-completion/end-turn clause. Bind the overlay, complete F00 audit and authority-registry input bytes through the existing source loader and index.",
+  "unchanged_work": "This exact file adds one finite preimage-bound overlay and its audit/registry inputs. Source indexing, cache/token identity, immutable overlay validation, contract/harness algorithms and all other work remain unchanged. The mandatory sensitive qualification40-exact-b0712fa66a9cc38e mapping and external_contract_source_reuse family remain intact; only this exact rule_semantics diff follows the standing ordinary-rule serial-smoke default. No family-wide exemption, source_data serialization/reconstruction exemption, source-reuse measurement or performance improvement is claimed. All other owners, families, full local/remote correctness gates and existing smoke/work/cache/runtime budgets remain required."
+}
