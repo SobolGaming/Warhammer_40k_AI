@@ -41,6 +41,7 @@ from warhammer40k_core.rules.rule_ir import (
 )
 from warhammer40k_core.rules.source_catalog import SourceArtifactHash
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    aeldari_banshee_eldrad_2026_11,
     aeldari_current_2026_11,
     faction_detachments_2026_27,
     faction_subrules_2026_27,
@@ -134,6 +135,20 @@ def build_catalog_package() -> CanonicalCatalogPackage:
         army_catalog=catalog,
         source_artifacts=(
             *base_package.source_artifacts,
+            SourceArtifactHash(
+                artifact_name="aeldari-banshee-eldrad-2026-11-f00-audit.json",
+                artifact_hash=aeldari_banshee_eldrad_2026_11.AUDIT_SHA256,
+            ),
+            SourceArtifactHash(
+                artifact_name="aeldari-banshee-eldrad-2026-11-source-catalog.json",
+                artifact_hash=(
+                    aeldari_banshee_eldrad_2026_11.source_package().source_catalog.catalog_sha256()
+                ),
+            ),
+            SourceArtifactHash(
+                artifact_name="aeldari-banshee-eldrad-2026-11-overlay-pack.json",
+                artifact_hash=aeldari_banshee_eldrad_2026_11.overlay_pack().package_hash(),
+            ),
             SourceArtifactHash(
                 artifact_name="aeldari-current-2026-11-f00-audit.json",
                 artifact_hash=aeldari_current_2026_11.AUDIT_SHA256,

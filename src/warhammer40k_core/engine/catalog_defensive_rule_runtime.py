@@ -80,8 +80,8 @@ def conditional_invulnerable_save_handler(
         if (
             allocated_model_id is None
             or profile is None
-            or profile.range_profile.kind is not RangeProfileKind.DISTANCE
-            or descriptor.attack_kind != "ranged"
+            or (descriptor.attack_kind, profile.range_profile.kind)
+            not in {("ranged", RangeProfileKind.DISTANCE), ("melee", RangeProfileKind.MELEE)}
             or not source_applies_to_rules_unit(
                 context_unit_id=context.target_unit_instance_id,
                 state=context.state,

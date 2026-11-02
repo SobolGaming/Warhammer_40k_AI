@@ -375,6 +375,7 @@
     "ability_coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000594/core/000008340/none",
       "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:acrobatic/none",
+      "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:melee-invulnerable-save/none",
       "chaos-daemons-bridge-catalog/000000594/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000594/wargear/000000594:aspect-shrine-token/000000594:aspect-shrine-token"
     ],
@@ -408,7 +409,7 @@
       "corsair-coterie",
       "path-of-the-outcast"
     ],
-    "tests_evidence": "Runtime consumers: `catalog-ir:can-advance-and-charge`, `catalog-ir:can-fallback-and-charge`, `catalog-ir:dice-result-override`, `descriptor:fight-order:fights-first`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:can-advance-and-charge`, `catalog-ir:can-fallback-and-charge`, `catalog-ir:dice-result-override`, `catalog-ir:invulnerable-save-characteristic-query`, `descriptor:fight-order:fights-first`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },

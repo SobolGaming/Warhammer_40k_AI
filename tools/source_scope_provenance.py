@@ -71,11 +71,19 @@ AELDARI_OVERLAY = (
 AELDARI_OVERLAY_SHA256 = "e51d507c9852821b12e6a250d413dbf3c1c13fed27325a8506acaf3cd26605d5"
 
 
+BANSHEE_ELDRAD_OVERLAY = (
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+    "aeldari_banshee_eldrad_2026_11.overlay-pack.json"
+)
+BANSHEE_ELDRAD_OVERLAY_SHA256 = "cd9d05b05d32dfd29cd01db15bdf4ab9e7e758e55df7ef1fb8506c10ee317a06"
+
+
 def current_ec_overlay_provenance(root: Path, path: Path, raw: bytes) -> str | None:
     reviewed_hash = {
         root / CURRENT_EC_OVERLAY: CURRENT_EC_OVERLAY_SHA256,
         root / SORCERER_OVERLAY: SORCERER_OVERLAY_SHA256,
         root / AELDARI_OVERLAY: AELDARI_OVERLAY_SHA256,
+        root / BANSHEE_ELDRAD_OVERLAY: BANSHEE_ELDRAD_OVERLAY_SHA256,
     }.get(path)
     if reviewed_hash is None:
         return None

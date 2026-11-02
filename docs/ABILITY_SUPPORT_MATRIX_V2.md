@@ -330,7 +330,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:hit-roll-modifier` | Glutton for Punishment<br>Piratical Hero<br>Psychic Guidance<br>Revel in Desecration<br>Savage Exaltation |
 | `catalog-ir:hit-roll-reroll` | A Challenge Worthy of Skill<br>Assured Destruction<br>Fated Hero<br>Reavers of the Void<br>Shadow Lord (Aura, Psychic) |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
-| `catalog-ir:invulnerable-save-characteristic-query` | Forceshield<br>Mistshield<br>Ranged Invulnerable Save<br>Shimmershield |
+| `catalog-ir:invulnerable-save-characteristic-query` | Forceshield<br>Melee Invulnerable Save<br>Mistshield<br>Ranged Invulnerable Save<br>Shimmershield |
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon<br>Psychic Guidance |

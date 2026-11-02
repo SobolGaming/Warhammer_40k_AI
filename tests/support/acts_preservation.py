@@ -165,6 +165,27 @@ def acts_inactive_predecessor(root: Path, current: bytes) -> bytes:
 def defiler_provenance_predecessor(current: bytes) -> bytes:
     """Reverse exact current admissions, then retain the original Defiler/Acts proof."""
     if hashlib.sha256(current).hexdigest() == (
+        "0fb60a40d260ffb8cf901facf5dacdb1c91562cb382131b3fd795be66d683b9e"
+    ):
+        # Reverse only the exact Banshee/Eldrad admission to the reviewed PR base.
+        addition = (
+            b"BANSHEE_ELDRAD_OVERLAY = (\n"
+            b'    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"\n'
+            b'    "aeldari_banshee_eldrad_2026_11.overlay-pack.json"\n'
+            b")\n"
+            b'BANSHEE_ELDRAD_OVERLAY_SHA256 = "'
+            b'cd9d05b05d32dfd29cd01db15bdf4ab9e7e758e55df7ef1fb8506c10ee317a06"\n'
+            b"\n\n"
+        )
+        entry = b"        root / BANSHEE_ELDRAD_OVERLAY: BANSHEE_ELDRAD_OVERLAY_SHA256,\n"
+        if current.count(addition) != 1 or current.count(entry) != 1:
+            raise ValueError("Exact registered edition provenance inputs changed.")
+        current = current.replace(addition, b"", 1).replace(entry, b"", 1)
+        if hashlib.sha256(current).hexdigest() != (
+            "6fff3740e89ac5f3215a08be7001dde5892405e17d5b0d9ae9f8a739914c586d"
+        ):
+            raise ValueError("Exact registered edition provenance inputs changed.")
+    if hashlib.sha256(current).hexdigest() == (
         "6fff3740e89ac5f3215a08be7001dde5892405e17d5b0d9ae9f8a739914c586d"
     ):
         # Reverse only the exact Aeldari admission before the retained Sorcerer proof.

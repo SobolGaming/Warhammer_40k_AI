@@ -691,6 +691,25 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000000594:melee-invulnerable-save",
+    "ability_name": "Melee Invulnerable Save",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:melee-invulnerable-save/none",
+    "datasheet_id": "000000594",
+    "datasheet_name": "Howling Banshees",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:invulnerable-save-characteristic-query"
+    ],
+    "semantic_categories": [
+      "datasheet.characteristic_set.invulnerable_save.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000009894",
     "ability_name": "Battle Focus",
     "catalog_id": "chaos-daemons-bridge-catalog",

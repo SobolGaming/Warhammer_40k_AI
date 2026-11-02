@@ -1155,6 +1155,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000000594:melee-invulnerable-save",
+        "ability_name": "Melee Invulnerable Save",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:melee-invulnerable-save/none",
+        "datasheet_id": "000000594",
+        "datasheet_name": "Howling Banshees",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000592:ranged-invulnerable-save",
         "ability_name": "Ranged Invulnerable Save",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000592/datasheet/000000592:ranged-invulnerable-save/none",
@@ -1172,19 +1180,22 @@
       }
     ],
     "ability_names": [
+      "Melee Invulnerable Save",
       "Ranged Invulnerable Save",
       "Unholy Vigour"
     ],
     "category_id": "datasheet.characteristic_set.invulnerable_save.this_model",
     "category_name": "Datasheet Characteristic Set Invulnerable Save This Model",
-    "coverage_row_count": 3,
+    "coverage_row_count": 4,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:unholy-vigour/none",
+      "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:melee-invulnerable-save/none",
       "chaos-daemons-bridge-catalog/000000592/datasheet/000000592:ranged-invulnerable-save/none",
       "chaos-daemons-bridge-catalog/000002533/datasheet/000002533:ranged-invulnerable-save/none"
     ],
     "datasheet_names": [
       "Daemon Prince of Chaos",
+      "Howling Banshees",
       "Rangers",
       "Shroud Runners"
     ],
@@ -1193,7 +1204,7 @@
       "catalog-ir:once-per-battle-ability"
     ],
     "source_kind_counts": {
-      "datasheet": 3
+      "datasheet": 4
     },
     "support_stages": [
       "engine_consumed"

@@ -1,0 +1,121 @@
+{
+  "app_version": "995",
+  "audit_id": "aeldari-banshee-eldrad-app-mirror-2026-11-02",
+  "audit_schema": "core-v2-faction-source-audit-v2",
+  "edition": "warhammer_40000_11th",
+  "geometry_authority": {
+    "base_authority": "explicit_maintained_app_or_official_model_evidence",
+    "missing_data": "blocks_fieldability",
+    "variants": "exact_model_profile_and_variant_required",
+    "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+  },
+  "locale": "en",
+  "observations": [
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "61a6ae286b455da15be4c4e51bf687a649c7996e1991f3787eb99b4e918fbeb0",
+      "captured_text": "40K.APP\nFACTIONS\nAELDARI\nHowling Banshees\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nHowling Banshee Exarch 28.5mm\n\nInvulnerable save: 5+ - 4+ against melee attacks only\n\n8\"\n3\n4+\n2\n6+\n1\nHowling Banshee 28.5mm\n\nInvulnerable save: 5+ - 4+ against melee attacks only\n\n8\"\n3\n4+\n1\n6+\n1\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nShuriken pistol\nASSAULT\nPISTOL\n12\"\n1\n3+\n4\n-1\n1\nTriskele (Ranged)\nASSAULT\nANTI-INFANTRY 3+\n12\"\n3\n3+\n3\n-1\n1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nBanshee blade\nANTI-INFANTRY 3+\n2\n2+\n4\n-2\n2\nExecutioner\nANTI-INFANTRY 3+\n3\n2+\n6\n-3\n3\nMirrorswords\nANTI-INFANTRY 3+\n4\n2+\n4\n-2\n2\nTriskele (Melee)\nANTI-INFANTRY 3+\n6\n2+\n3\n-1\n1\nKEYWORDS\nAELDARI\nASPECT WARRIORS\nHOWLING BANSHEES\nINFANTRY\nCOSTS\n5 models\n85 pts\n10 models\n165 pts\nUNIT COMPOSITION\n1 Howling Banshee Exarch\n4-9 Howling Banshees\n\nEvery model is equipped with: shuriken pistol; Banshee blade.\n\nLed by\nAUTARCH\nJAIN ZAR\nWARGEAR OPTIONS\nThe Howling Banshee Exarch\u2019s Banshee blade can be replaced with 1 of the following: \u25e6 1 executioner \u25e6 1 triskele\nThe Howling Banshee Exarch\u2019s shuriken pistol and Banshee blade can be replaced with 1 mirrorswords.\nFor every 5 models in this unit, it can have 1 Aspect Shrine token.\nWARGEAR\nAspect Shrine Token\n\nOnce per battle for each Aspect Shrine token this unit has, you can change the result of one Hit roll or one Wound roll made for a model in this unit (excluding CHARACTER models) to an unmodified 6.\n\nDesigner\u2019s Note: Place an Aspect Shrine token next to the unit for each Aspect Shrine token it has, removing one each time this ability is used.\n\nCORE ABILITIES\nFIGHTS FIRST\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nAcrobatic\n\nThis unit is eligible to declare a charge in a turn in which it Advanced or Fell Back.\n\nSTATS\n26%\nof Aeldari lists, 1.2 per list\n#8\nmost-taken in faction\n29%\nfrom 28% since last update\nIN ARMY LISTS\nPopular detachments\nASPECT HOST\nARMOURED WARHOST\nSEER COUNCIL\nMost often led by\nJAIN ZAR\nAUTARCH\nOften taken with\nFIRE DRAGONS\nWARP SPIDERS\nJAIN ZAR\nAVATAR OF KHAINE\nSWOOPING HAWKS",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "base_statement": "Howling Banshee 28.5mm",
+          "base_status": "observed",
+          "fieldability_certified": false,
+          "height_status": "not_observed",
+          "model_role": "Howling Banshee",
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        },
+        {
+          "base_statement": "Howling Banshee Exarch 28.5mm",
+          "base_status": "observed",
+          "fieldability_certified": false,
+          "height_status": "not_observed",
+          "model_role": "Howling Banshee Exarch",
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "aeldari-banshee-eldrad-2026-11-02:datasheet:howling-banshees",
+      "observed_at": "2026-11-02T12:37:46.244Z",
+      "official_source_ids": [
+        "gw-11e-aeldari-faction-pack-2026-07"
+      ],
+      "operative_start": "Howling Banshees\nDATASHEET",
+      "operative_text": "Howling Banshees\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nHowling Banshee Exarch 28.5mm\n\nInvulnerable save: 5+ - 4+ against melee attacks only\n\n8\"\n3\n4+\n2\n6+\n1\nHowling Banshee 28.5mm\n\nInvulnerable save: 5+ - 4+ against melee attacks only\n\n8\"\n3\n4+\n1\n6+\n1\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nShuriken pistol\nASSAULT\nPISTOL\n12\"\n1\n3+\n4\n-1\n1\nTriskele (Ranged)\nASSAULT\nANTI-INFANTRY 3+\n12\"\n3\n3+\n3\n-1\n1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nBanshee blade\nANTI-INFANTRY 3+\n2\n2+\n4\n-2\n2\nExecutioner\nANTI-INFANTRY 3+\n3\n2+\n6\n-3\n3\nMirrorswords\nANTI-INFANTRY 3+\n4\n2+\n4\n-2\n2\nTriskele (Melee)\nANTI-INFANTRY 3+\n6\n2+\n3\n-1\n1\nKEYWORDS\nAELDARI\nASPECT WARRIORS\nHOWLING BANSHEES\nINFANTRY\nCOSTS\n5 models\n85 pts\n10 models\n165 pts\nUNIT COMPOSITION\n1 Howling Banshee Exarch\n4-9 Howling Banshees\n\nEvery model is equipped with: shuriken pistol; Banshee blade.\n\nLed by\nAUTARCH\nJAIN ZAR\nWARGEAR OPTIONS\nThe Howling Banshee Exarch\u2019s Banshee blade can be replaced with 1 of the following: \u25e6 1 executioner \u25e6 1 triskele\nThe Howling Banshee Exarch\u2019s shuriken pistol and Banshee blade can be replaced with 1 mirrorswords.\nFor every 5 models in this unit, it can have 1 Aspect Shrine token.\nWARGEAR\nAspect Shrine Token\n\nOnce per battle for each Aspect Shrine token this unit has, you can change the result of one Hit roll or one Wound roll made for a model in this unit (excluding CHARACTER models) to an unmodified 6.\n\nDesigner\u2019s Note: Place an Aspect Shrine token next to the unit for each Aspect Shrine token it has, removing one each time this ability is used.\n\nCORE ABILITIES\nFIGHTS FIRST\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nAcrobatic\n\nThis unit is eligible to declare a charge in a turn in which it Advanced or Fell Back.\n\nSTATS\n26%\nof Aeldari lists, 1.2 per list\n#8\nmost-taken in faction\n29%\nfrom 28% since last update\nIN ARMY LISTS\nPopular detachments\nASPECT HOST\nARMOURED WARHOST\nSEER COUNCIL\nMost often led by\nJAIN ZAR\nAUTARCH\nOften taken with\nFIRE DRAGONS\nWARP SPIDERS\nJAIN ZAR\nAVATAR OF KHAINE\nSWOOPING HAWKS",
+      "owning_faction_source_id": "faction-app:aeldari",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Complete own datasheet page, profile/rule section inventory and history reviewed in retained five-unit audit. Exact identities: Howling Banshees 000000594, Eldrad Ulthran 000000568. Banshee source already agrees: native conditional-save omission only. Remove only obsolete Eldrad -> Warlock Conclave 000000584 edge; retain Guardian Defenders 000000589 and Storm Guardians 000000590. All three bodyguards remain outside native60; no reproduced native illegal attachment, admission, geometry or full-game certification. App-data 995 labels the observation snapshot, not each field change date.",
+      "source_id": "faction-app:aeldari:datasheet:howling-banshees",
+      "source_observation_sha256": "99add58025fc8f12027869d3148bd4351d91199434c09d7faed8f396a7e5fb79",
+      "source_title": "Howling Banshees",
+      "source_url": "https://www.40k.app/factions/aeldari/units/howling-banshees",
+      "transcription_sha256": "aa68ca9e761e83f8a427006f7559743c280904c33936d64f0190deba901b0a83"
+    },
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "16dee0c633801caa712a08d2bc21cf7f55e5ff93c894f6b5562ccac69ccb9461",
+      "captured_text": "40K.APP\nFACTIONS\nAELDARI\nEldrad Ulthran\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nEldrad Ulthran 32mm\n\nInvulnerable save: 4+\n\n7\"\n4\n6+\n5\n6+\n1\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nMind War\nANTI-CHARACTER 4+\nPRECISION\nPSYCHIC\n18\"\n1\n2+\n5\n-2\nD6\nShuriken pistol\nASSAULT\nPISTOL\n12\"\n1\n2+\n4\n-1\n1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nThe Staff of Ulthamar and witchblade\nANTI-INFANTRY 2+\nPSYCHIC\n3\n2+\n5\n-1\n2\nKEYWORDS\nAELDARI\nCHARACTER\nELDRAD ULTHRAN\nEPIC HERO\nFARSEER\nINFANTRY\nPSYKER\nCOSTS\n1 model\n120 pts\nUNIT COMPOSITION\n1 Eldrad Ulthran \u2013 EPIC HERO\n\nThis model is equipped with: Mind War; shuriken pistol; Staff of Ulthamar and witchblade.\n\nLeads\nSTORM GUARDIANS\nGUARDIAN DEFENDERS\nCORE ABILITIES\nLEADER\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nDiviner of Futures\n\nAt the start of your Command phase, if this model is on the battlefield, you gain 1CP.\n\nDoom\n\nAt the end of your Movement phase, select one enemy unit within 18\" of and visible to this model. Until the start of your next Command phase, each time a friendly AELDARI model makes an attack that targets that enemy unit, add 1 to the Wound roll.\n\nSTATS\n25%\nof Aeldari lists\n#10\nmost-taken in faction\n28%\nfrom 24% since last update\nIN ARMY LISTS\nPopular detachments\nARMOURED WARHOST\nSEER COUNCIL\nSPIRIT CONCLAVE\nMost often leads\nSTORM GUARDIANS\nGUARDIAN DEFENDERS\nWARLOCK CONCLAVE\nOften taken with\nWAR WALKERS\nWRAITHLORD\nFARSEER\nGUARDIAN DEFENDERS\nWARLOCK CONCLAVE",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "base_statement": "Eldrad Ulthran 32mm",
+          "base_status": "observed",
+          "fieldability_certified": false,
+          "height_status": "not_observed",
+          "model_role": "Eldrad Ulthran",
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "aeldari-banshee-eldrad-2026-11-02:datasheet:eldrad-ulthran",
+      "observed_at": "2026-11-02T12:37:44.632Z",
+      "official_source_ids": [
+        "gw-11e-aeldari-faction-pack-2026-07"
+      ],
+      "operative_start": "Eldrad Ulthran\nDATASHEET",
+      "operative_text": "Eldrad Ulthran\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nEldrad Ulthran 32mm\n\nInvulnerable save: 4+\n\n7\"\n4\n6+\n5\n6+\n1\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nMind War\nANTI-CHARACTER 4+\nPRECISION\nPSYCHIC\n18\"\n1\n2+\n5\n-2\nD6\nShuriken pistol\nASSAULT\nPISTOL\n12\"\n1\n2+\n4\n-1\n1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nThe Staff of Ulthamar and witchblade\nANTI-INFANTRY 2+\nPSYCHIC\n3\n2+\n5\n-1\n2\nKEYWORDS\nAELDARI\nCHARACTER\nELDRAD ULTHRAN\nEPIC HERO\nFARSEER\nINFANTRY\nPSYKER\nCOSTS\n1 model\n120 pts\nUNIT COMPOSITION\n1 Eldrad Ulthran \u2013 EPIC HERO\n\nThis model is equipped with: Mind War; shuriken pistol; Staff of Ulthamar and witchblade.\n\nLeads\nSTORM GUARDIANS\nGUARDIAN DEFENDERS\nCORE ABILITIES\nLEADER\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nDiviner of Futures\n\nAt the start of your Command phase, if this model is on the battlefield, you gain 1CP.\n\nDoom\n\nAt the end of your Movement phase, select one enemy unit within 18\" of and visible to this model. Until the start of your next Command phase, each time a friendly AELDARI model makes an attack that targets that enemy unit, add 1 to the Wound roll.\n\nSTATS\n25%\nof Aeldari lists\n#10\nmost-taken in faction\n28%\nfrom 24% since last update\nIN ARMY LISTS\nPopular detachments\nARMOURED WARHOST\nSEER COUNCIL\nSPIRIT CONCLAVE\nMost often leads\nSTORM GUARDIANS\nGUARDIAN DEFENDERS\nWARLOCK CONCLAVE\nOften taken with\nWAR WALKERS\nWRAITHLORD\nFARSEER\nGUARDIAN DEFENDERS\nWARLOCK CONCLAVE",
+      "owning_faction_source_id": "faction-app:aeldari",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Complete own datasheet page, profile/rule section inventory and history reviewed in retained five-unit audit. Exact identities: Howling Banshees 000000594, Eldrad Ulthran 000000568. Banshee source already agrees: native conditional-save omission only. Remove only obsolete Eldrad -> Warlock Conclave 000000584 edge; retain Guardian Defenders 000000589 and Storm Guardians 000000590. All three bodyguards remain outside native60; no reproduced native illegal attachment, admission, geometry or full-game certification. App-data 995 labels the observation snapshot, not each field change date.",
+      "source_id": "faction-app:aeldari:datasheet:eldrad-ulthran",
+      "source_observation_sha256": "271b3f12d729b07b29ad91cedad3be6d17c6dda3bc231246ba8f89acad42dca1",
+      "source_title": "Eldrad Ulthran",
+      "source_url": "https://www.40k.app/factions/aeldari/units/eldrad-ulthran",
+      "transcription_sha256": "f4c2dd946f908ffea0c1bcd44794f45bce8ac83fc6592032c07013364cf08eb6"
+    }
+  ],
+  "official_sources": [
+    {
+      "artifact_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_aeldari-qe1ykopo7h-blfkukhecc.pdf",
+      "provider_name": "Games Workshop",
+      "relationship": "historical_primary_not_current_corroboration",
+      "sha256": "2a1954801042948256c002095937be88c9d334994f0b01d7a63510c94d39fe1d",
+      "source_date": "2026-07-22",
+      "source_id": "gw-11e-aeldari-faction-pack-2026-07",
+      "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_faction_pack_aeldari-qe1ykopo7h-blfkukhecc.pdf"
+    }
+  ],
+  "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+  "selected_source_ids": [
+    "faction-app:aeldari:datasheet:howling-banshees",
+    "faction-app:aeldari:datasheet:eldrad-ulthran"
+  ],
+  "version_evidence": {
+    "observed_at": "2026-11-02T12:37:35.731Z",
+    "source_url": "https://www.40k.app/factions/updates",
+    "statement": "Version 995\nReleased 2026-10-16.",
+    "transcription_sha256": "e6efd2e9a45a208c455693a1855a929e4da0696bc206eaec403958bb45017b54"
+  }
+}

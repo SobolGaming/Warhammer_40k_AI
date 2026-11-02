@@ -225,6 +225,12 @@ def authorize_faction_observation(
         )
 
         audit = aeldari_current_2026_11.source_audit()
+    elif audit_id == "aeldari-banshee-eldrad-app-mirror-2026-11-02":
+        from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+            aeldari_banshee_eldrad_2026_11,
+        )
+
+        audit = aeldari_banshee_eldrad_2026_11.source_audit()
     else:
         audit = faction_source_audit()
     if audit.audit_id != audit_id:

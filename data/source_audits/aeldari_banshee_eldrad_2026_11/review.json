@@ -1,0 +1,19 @@
+{
+  "before": {
+    "attached_id": "000000584",
+    "leader_id": "000000568"
+  },
+  "classification": "stale_inactive_source_relationship",
+  "current_bodyguard_ids": [
+    "000000589",
+    "000000590"
+  ],
+  "expected_preimage_hash": "3daa57851f8d102f8febb4259d67e80b4da8dd4aa3a56bb0e1f19f429525c5ab",
+  "finding": "S1",
+  "native_illegal_attachment_reproduced": false,
+  "reason": "Current Eldrad own page allows Guardian Defenders and Storm Guardians only; supersede the obsolete Warlock Conclave edge without admitting any bodyguard.",
+  "row_id": "000000568:000000584:108",
+  "source_id": "faction-app:aeldari:datasheet:eldrad-ulthran",
+  "source_url": "https://www.40k.app/factions/aeldari/units/eldrad-ulthran",
+  "table": "Datasheets_leader"
+}
