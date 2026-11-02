@@ -696,3 +696,60 @@ def test_aeldari_overlay_projects_only_exact_historical_base(
     ):
         with pytest.raises(ValueError, match="registered edition provenance inputs changed"):
             defiler_provenance_predecessor(changed_helper)
+
+
+def test_banshee_eldrad_provenance_successor_preserves_exact_base_and_original_chain() -> None:
+    import subprocess
+
+    from tests.support.acts_preservation import defiler_provenance_predecessor
+
+    current = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    prior = subprocess.check_output(
+        [
+            "git",
+            "show",
+            "675c3b2274c85e7b1926882648f717bd9ab09feb:tools/source_scope_provenance.py",
+        ],
+        cwd=ROOT,
+    )
+    assert hashlib.sha256(current).hexdigest() == (
+        "0fb60a40d260ffb8cf901facf5dacdb1c91562cb382131b3fd795be66d683b9e"
+    )
+    assert hashlib.sha256(prior).hexdigest() == (
+        "6fff3740e89ac5f3215a08be7001dde5892405e17d5b0d9ae9f8a739914c586d"
+    )
+    expected = defiler_provenance_predecessor(prior)
+    assert defiler_provenance_predecessor(current) == expected
+    assert hashlib.sha256(expected).hexdigest() == (
+        "40ef539dc75aa669df54a099d7788b74ca68453c7ae18a1e009194c48a42f64a"
+    )
+
+
+def test_banshee_eldrad_provenance_successor_rechecks_complete_bytes_after_success() -> None:
+    from tests.support.acts_preservation import defiler_provenance_predecessor
+
+    current = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    block_start = current.index(b"BANSHEE_ELDRAD_OVERLAY = (")
+    block_end = current.index(b"def current_ec_overlay_provenance(")
+    block = current[block_start:block_end]
+    entry = b"        root / BANSHEE_ELDRAD_OVERLAY: BANSHEE_ELDRAD_OVERLAY_SHA256,\n"
+    assert current.count(block) == current.count(entry) == 1
+    expected = defiler_provenance_predecessor(current)
+    for changed in (
+        b"",
+        current + b"\n",
+        current.replace(b"aeldari_banshee_eldrad_2026_11", b"unreviewed_source"),
+        current.replace(b"cd9d05b05d32dfd29", b"0000000000000000"),
+        current.replace(block, b"", 1),
+        current.replace(entry, b"", 1),
+        current.replace(block, block + block, 1),
+        current.replace(entry, entry + entry, 1),
+        current + b"UNREVIEWED = True\n",
+        current.replace(b"return contexts.get(relative)", b"return None"),
+    ):
+        assert changed != current
+        # A prior success cannot authorize changed bytes or a partial registration.
+        assert defiler_provenance_predecessor(current) == expected
+        with pytest.raises(ValueError, match="Exact registered edition provenance inputs changed"):
+            defiler_provenance_predecessor(changed)
+        assert defiler_provenance_predecessor(current) == expected
