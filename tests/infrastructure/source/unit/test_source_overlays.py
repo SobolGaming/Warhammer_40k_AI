@@ -680,12 +680,13 @@ __all__ += ["thousand_sons_july", "thousand_sons_june_manifest"]
 
 
 def test_current_aeldari_overlay_changes_only_two_reviewed_source_fields() -> None:
+    from tools.aeldari_datasheet_semantic_coverage import SOURCE_JSON_DIR
+
     from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
         aeldari_current_2026_11 as current,
     )
 
-    root = REPOSITORY_ROOT
-    directory = root / "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json"
+    directory = SOURCE_JSON_DIR
     sources = tuple(
         WahapediaJsonArtifact.from_payload(json.loads((directory / f"{table}.json").read_bytes()))
         for table in ("Abilities", "Datasheets")

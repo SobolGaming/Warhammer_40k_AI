@@ -365,11 +365,22 @@ def sorcerer_source_rule_semantics_smoke_operations(
 def aeldari_current_source_rule_semantics_smoke_operations(
     *, base: str, path: str, category: str, change: object
 ) -> frozenset[str]:
-    """Recognize only the reviewed two-field source admission and exact index inputs."""
-    operation = "qualification40-exact-b0712fa66a9cc38e"
+    """Recognize only exact Aeldari source admission and historical-base registration."""
+    operations = {
+        "tools/ability_support_sources.py": "qualification40-exact-b0712fa66a9cc38e",
+        "tools/source_scope_provenance.py": "registered-source-provenance-projection",
+    }
+    owner_sets = {
+        "tools/ability_support_sources.py": {
+            "@module",
+            "ability_support_index_inputs",
+            "load_ability_support_sources",
+        },
+        "tools/source_scope_provenance.py": {"@module", "current_ec_overlay_provenance"},
+    }
     if (
         base != "5e26b4b4791d0c25579faebc28394ec25bb38b24"
-        or path != "tools/ability_support_sources.py"
+        or path not in operations
         or category != "rule_semantics"
     ):
         return frozenset()
@@ -379,27 +390,30 @@ def aeldari_current_source_rule_semantics_smoke_operations(
     )
     _keys(scope, {"base", "changes", "smoke_operations", "source_obligation", "unchanged_work"})
     bindings = object_value(scope["changes"])
-    _keys(bindings, {path})
-    binding = object_value(bindings[path])
-    _keys(binding, {"before_sha256", "after_sha256", "owners"})
-    owners = object_value(binding["owners"])
-    _keys(owners, {"@module", "ability_support_index_inputs", "load_ability_support_sources"})
-    file_hashes = {"before": binding["before_sha256"], "after": binding["after_sha256"]}
-    for value in (file_hashes, *owners.values()):
-        hashes = object_value(value)
-        _keys(hashes, {"before", "after"})
-        if any(
-            not isinstance(digest_value, str)
-            or len(digest_value) != 64
-            or any(character not in "0123456789abcdef" for character in digest_value)
-            for digest_value in hashes.values()
-        ):
-            raise ValueError("Aeldari source smoke scope requires exact file and owner hashes.")
-    if scope["base"] != base or binding != change:
+    _keys(bindings, set(operations))
+    for binding_path, raw_binding in bindings.items():
+        binding = object_value(raw_binding)
+        _keys(binding, {"before_sha256", "after_sha256", "owners"})
+        owners = object_value(binding["owners"])
+        _keys(owners, owner_sets[binding_path])
+        file_hashes = {"before": binding["before_sha256"], "after": binding["after_sha256"]}
+        for value in (file_hashes, *owners.values()):
+            hashes = object_value(value)
+            _keys(hashes, {"before", "after"})
+            if any(
+                not isinstance(digest_value, str)
+                or len(digest_value) != 64
+                or any(character not in "0123456789abcdef" for character in digest_value)
+                for digest_value in hashes.values()
+            ):
+                raise ValueError("Aeldari source smoke scope requires exact file and owner hashes.")
+    if object_value(scope["smoke_operations"]) != {
+        name: [operation] for name, operation in operations.items()
+    }:
+        raise ValueError("Aeldari source smoke scope must retain each sole exact operation.")
+    if scope["base"] != base or bindings[path] != change:
         return frozenset()
-    if object_value(scope["smoke_operations"]) != {path: [operation]}:
-        raise ValueError("Aeldari source smoke scope must retain its sole exact operation.")
-    return frozenset({operation})
+    return frozenset({operations[path]})
 
 
 def d12_rule_semantics_smoke_operations(

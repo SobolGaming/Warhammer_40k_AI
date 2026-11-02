@@ -101,6 +101,7 @@ def test_aeldari_current_source_evidence_overlay_and_index_dependencies_agree() 
     import json
 
     from tools.ability_support_sources import ability_support_index_inputs
+    from tools.aeldari_datasheet_semantic_coverage import SOURCE_JSON_DIR
     from tools.generate_aeldari_current_source import generated_overlay_pack
 
     from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -108,7 +109,7 @@ def test_aeldari_current_source_evidence_overlay_and_index_dependencies_agree() 
     )
 
     root = Path(__file__).resolve().parents[2]
-    source_dir = root / "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json"
+    source_dir = SOURCE_JSON_DIR
     data = root / "data/source_audits/aeldari_current_2026_11"
     audit = current.source_audit()
     assert (data / "source.audit.json").read_bytes() == Path(current.__file__).with_name(

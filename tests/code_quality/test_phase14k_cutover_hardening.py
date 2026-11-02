@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 from typing import cast
+
+import pytest
 
 from tests.code_quality.source_index import combined_source_for, python_files, source_for
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -85,6 +88,40 @@ def test_phase14k_retired_attack_save_choice_surfaces_absent_from_runtime() -> N
     )
 
 
+def _assert_objective_source_boundary(tree: ast.Module) -> None:
+    source_type = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.ClassDef) and node.name == "RuleSourceText"
+    )
+    factory = next(
+        node
+        for node in source_type.body
+        if isinstance(node, ast.FunctionDef) and node.name == "from_raw"
+    )
+    assignments = [
+        node.value
+        for node in factory.body
+        if isinstance(node, ast.Assign)
+        and len(node.targets) == 1
+        and isinstance(node.targets[0], ast.Name)
+        and node.targets[0].id == "normalized_text"
+    ]
+    assert len(assignments) == 1
+    call = assignments[0]
+    assert isinstance(call, ast.Call)
+    assert isinstance(call.func, ast.Name)
+    assert call.func.id == "normalize_objective_rule_text"
+    assert len(call.args) == 1
+    assert isinstance(call.args[0], ast.Name)
+    assert call.args[0].id == "raw_text"
+    assert len(call.keywords) == 2
+    assert {keyword.arg: ast.dump(keyword.value) for keyword in call.keywords} == {
+        "scope": ast.dump(ast.Name(id="objective_scope", ctx=ast.Load())),
+        "normalization_mode": ast.dump(ast.Name(id="normalization_mode", ctx=ast.Load())),
+    }
+
+
 def test_p14_objective_consumers_share_group_geometry_and_boundary_terminology() -> None:
     consumer_paths = (
         "objective_control.py",
@@ -105,7 +142,7 @@ def test_p14_objective_consumers_share_group_geometry_and_boundary_terminology()
     assert "rules_unit.component_unit_id_for_model(" in query
     assert "model_placement_or_none(" in query
     boundary = source_for(SRC_ROOT / "rules" / "source_data.py")
-    assert "normalize_objective_rule_text(raw_text, scope=objective_scope)" in boundary
+    _assert_objective_source_boundary(ast.parse(boundary))
     for path in python_files(SRC_ROOT / "engine"):
         assert "normalize_objective_rule_text(" not in source_for(path)
 
@@ -493,3 +530,35 @@ def _source_for_path(path: Path) -> str:
     if path == SHOOTING_PHASE_PATH:
         return combined_source_for(SHOOTING_PHASE_SPLIT_PATHS)
     return source_for(path)
+
+
+def test_objective_source_boundary_guard_rejects_argument_and_normalizer_drift() -> None:
+    boundary = source_for(SRC_ROOT / "rules" / "source_data.py")
+    # Formatting changes preserve the AST boundary and must not fail the guard.
+    _assert_objective_source_boundary(ast.parse(ast.unparse(ast.parse(boundary))))
+    for mutation in ("callee", "raw", "scope", "mode", "missing_mode"):
+        tree = ast.parse(boundary)
+        factory = next(
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.FunctionDef) and node.name == "from_raw"
+        )
+        call = next(
+            node
+            for node in ast.walk(factory)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "normalize_objective_rule_text"
+        )
+        if mutation == "callee":
+            call.func = ast.Name(id="normalize_rule_text", ctx=ast.Load())
+        elif mutation == "raw":
+            call.args[0] = ast.Name(id="other_text", ctx=ast.Load())
+        elif mutation == "missing_mode":
+            call.keywords = [item for item in call.keywords if item.arg != "normalization_mode"]
+        else:
+            argument = "scope" if mutation == "scope" else "normalization_mode"
+            keyword = next(item for item in call.keywords if item.arg == argument)
+            keyword.value = ast.Constant(value=None)
+        with pytest.raises(AssertionError):
+            _assert_objective_source_boundary(tree)
