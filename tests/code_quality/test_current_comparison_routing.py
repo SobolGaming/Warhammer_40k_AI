@@ -481,17 +481,25 @@ def test_sorcerer_source_smoke_scope_requires_exact_base_bytes_owners_and_catego
             )
 
 
+@pytest.mark.parametrize(
+    ("base", "scope_name"),
+    [
+        ("5e26b4b4791d0c25579faebc28394ec25bb38b24", "aeldari-current-source-smoke-scope.json"),
+        ("675c3b2274c85e7b1926882648f717bd9ab09feb", "banshee-eldrad-source-smoke-scope.json"),
+    ],
+)
 def test_aeldari_source_smoke_scope_requires_exact_bindings_and_fails_closed(
     monkeypatch: pytest.MonkeyPatch,
+    base: str,
+    scope_name: str,
 ) -> None:
     from tools import performance_policy as policy
 
-    scope = read_object(ROOT / "docs/performance/policy-v3/aeldari-current-source-smoke-scope.json")
+    scope = read_object(ROOT / "docs/performance/policy-v3" / scope_name)
     for path, operation in {
         "tools/ability_support_sources.py": "qualification40-exact-b0712fa66a9cc38e",
         "tools/source_scope_provenance.py": "registered-source-provenance-projection",
     }.items():
-        base = "5e26b4b4791d0c25579faebc28394ec25bb38b24"
         change = object_value(object_value(scope["changes"])[path])
         recognize = policy.aeldari_current_source_rule_semantics_smoke_operations
         assert recognize(
@@ -500,6 +508,13 @@ def test_aeldari_source_smoke_scope_requires_exact_bindings_and_fails_closed(
         for candidate_base, candidate_path, category in (
             ("0" * 40, path, "rule_semantics"),
             ("7827235d328bf5b82201c8fece29dab7356ba3e3", path, "rule_semantics"),
+            (
+                "675c3b2274c85e7b1926882648f717bd9ab09feb"
+                if base == "5e26b4b4791d0c25579faebc28394ec25bb38b24"
+                else "5e26b4b4791d0c25579faebc28394ec25bb38b24",
+                path,
+                "rule_semantics",
+            ),
             (base, path + ".extra", "rule_semantics"),
             (base, "src/warhammer40k_core/rules/source_data.py", "rule_semantics"),
             (base, path, "algorithm_or_search"),

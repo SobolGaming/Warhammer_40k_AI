@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 from warhammer40k_core.rules.parsed_tokens import TextSpan
@@ -52,27 +53,43 @@ def conditional_invulnerable_save_bridge_for_model_row(
         )
     fields = model_source_row.runtime_fields_payload()
     description = fields.get("inv_sv_descr", "").strip()
-    if description.casefold() not in _RANGED_ONLY_DESCRIPTIONS:
+    improvement = re.fullmatch(
+        r"This invulnerable save is improved to ([2-6])\+ against (melee|ranged) attacks\.",
+        description,
+        flags=re.IGNORECASE,
+    )
+    if description.casefold() not in _RANGED_ONLY_DESCRIPTIONS and improvement is None:
         return None
     value_token = fields.get("inv_sv", "").strip().removesuffix("*")
     if not value_token.isdigit():
         raise WahapediaInvulnerableSaveBridgeError(
-            "Conditional ranged invulnerable save must have an integer characteristic."
+            "Conditional invulnerable save must have an integer characteristic."
         )
     target_number = int(value_token)
     if not 2 <= target_number <= 6:
         raise WahapediaInvulnerableSaveBridgeError(
-            "Conditional ranged invulnerable save must be between 2+ and 6+."
+            "Conditional invulnerable save must be between 2+ and 6+."
         )
+    base_invulnerable_save = "-"
+    attack_kind = "ranged"
+    if improvement is not None:
+        base_invulnerable_save = str(target_number)
+        improved_target = int(improvement.group(1))
+        if improved_target >= target_number:
+            raise WahapediaInvulnerableSaveBridgeError(
+                "Improved invulnerable save must be better than its base characteristic."
+            )
+        target_number = improved_target
+        attack_kind = improvement.group(2).casefold()
     source_id = model_source_row.stable_source_id()
-    ability_id = f"{datasheet_id}:ranged-invulnerable-save"
+    ability_id = f"{datasheet_id}:{attack_kind}-invulnerable-save"
     normalized_text = (
-        f"This model has a {target_number}+ invulnerable save against ranged attacks only."
+        f"This model has a {target_number}+ invulnerable save against {attack_kind} attacks only."
     )
     full_span = TextSpan(text=normalized_text, start=0, end=len(normalized_text))
     target_text = "This model"
     target_span = TextSpan(text=target_text, start=0, end=len(target_text))
-    condition_text = "against ranged attacks only"
+    condition_text = f"against {attack_kind} attacks only"
     condition_start = normalized_text.index(condition_text)
     condition_span = TextSpan(
         text=condition_text,
@@ -88,20 +105,20 @@ def conditional_invulnerable_save_bridge_for_model_row(
     )
     rule_ir = RuleIR(
         rule_id=f"phase17k:model-characteristic:{ability_id}",
-        source_id=f"{source_id}:conditional-ranged-invulnerable-save",
+        source_id=f"{source_id}:conditional-{attack_kind}-invulnerable-save",
         normalized_text=normalized_text,
         parser_version="wahapedia-model-characteristic-bridge:v1",
         clauses=(
             RuleClause(
                 clause_id=f"phase17k:model-characteristic:{ability_id}:clause:001",
-                template_id="phase17c:conditional-ranged-invulnerable-save",
+                template_id=f"phase17c:conditional-{attack_kind}-invulnerable-save",
                 source_span=full_span,
                 conditions=(
                     RuleCondition(
                         kind=RuleConditionKind.TARGET_CONSTRAINT,
                         source_span=condition_span,
                         parameters=(
-                            RuleParameter(key="attack_kind", value="ranged"),
+                            RuleParameter(key="attack_kind", value=attack_kind),
                             RuleParameter(key="gate_subject", value="incoming_attack"),
                         ),
                     ),
@@ -124,9 +141,9 @@ def conditional_invulnerable_save_bridge_for_model_row(
         ),
     )
     return ConditionalInvulnerableSaveBridge(
-        base_invulnerable_save="-",
+        base_invulnerable_save=base_invulnerable_save,
         ability_id=ability_id,
-        ability_name="Ranged Invulnerable Save",
+        ability_name=f"{attack_kind.title()} Invulnerable Save",
         normalized_text=normalized_text,
         rule_ir=rule_ir,
         source_ids=(source_id,),

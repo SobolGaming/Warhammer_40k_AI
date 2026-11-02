@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import unicodedata
 from collections.abc import Iterable
+from dataclasses import replace
 from typing import Protocol
 
 from warhammer40k_core.rules.wahapedia_invulnerable_save_bridge import (
@@ -73,11 +74,19 @@ def conditional_invulnerable_save_for_model_rows(
     )
     if not bridges:
         return None
-    if len(model_source_rows) != 1:
+    first = bridges[0]
+    # A datasheet-owned THIS_MODEL grant is sound only when every source model
+    # profile carries the same conditional characteristic. Never widen a partial
+    # or heterogeneous profile grant to all models in the source unit.
+    if len(bridges) != len(model_source_rows) or any(
+        bridge.base_invulnerable_save != first.base_invulnerable_save
+        or bridge.normalized_text != first.normalized_text
+        for bridge in bridges[1:]
+    ):
         raise error_type(
-            "Conditional invulnerable saves on multi-profile datasheets require profile-scoped IR."
+            "Conditional invulnerable saves on differing profiles require profile-scoped IR."
         )
-    return bridges[0]
+    return replace(first, source_ids=tuple(row.stable_source_id() for row in model_source_rows))
 
 
 def _model_stat_name_keys(name: str, *, error_type: type[ValueError]) -> tuple[str, ...]:

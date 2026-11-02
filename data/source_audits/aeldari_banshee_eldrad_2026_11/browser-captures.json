@@ -1,0 +1,773 @@
+{
+  "eldrad-ulthran": {
+    "captured_text": "40K.APP\nFACTIONS\nAELDARI\nEldrad Ulthran\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nEldrad Ulthran 32mm\n\nInvulnerable save: 4+\n\n7\"\n4\n6+\n5\n6+\n1\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nMind War\nANTI-CHARACTER 4+\nPRECISION\nPSYCHIC\n18\"\n1\n2+\n5\n-2\nD6\nShuriken pistol\nASSAULT\nPISTOL\n12\"\n1\n2+\n4\n-1\n1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nThe Staff of Ulthamar and witchblade\nANTI-INFANTRY 2+\nPSYCHIC\n3\n2+\n5\n-1\n2\nKEYWORDS\nAELDARI\nCHARACTER\nELDRAD ULTHRAN\nEPIC HERO\nFARSEER\nINFANTRY\nPSYKER\nCOSTS\n1 model\n120 pts\nUNIT COMPOSITION\n1 Eldrad Ulthran \u2013 EPIC HERO\n\nThis model is equipped with: Mind War; shuriken pistol; Staff of Ulthamar and witchblade.\n\nLeads\nSTORM GUARDIANS\nGUARDIAN DEFENDERS\nCORE ABILITIES\nLEADER\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nDiviner of Futures\n\nAt the start of your Command phase, if this model is on the battlefield, you gain 1CP.\n\nDoom\n\nAt the end of your Movement phase, select one enemy unit within 18\" of and visible to this model. Until the start of your next Command phase, each time a friendly AELDARI model makes an attack that targets that enemy unit, add 1 to the Wound roll.\n\nSTATS\n25%\nof Aeldari lists\n#10\nmost-taken in faction\n28%\nfrom 24% since last update\nIN ARMY LISTS\nPopular detachments\nARMOURED WARHOST\nSEER COUNCIL\nSPIRIT CONCLAVE\nMost often leads\nSTORM GUARDIANS\nGUARDIAN DEFENDERS\nWARLOCK CONCLAVE\nOften taken with\nWAR WALKERS\nWRAITHLORD\nFARSEER\nGUARDIAN DEFENDERS\nWARLOCK CONCLAVE",
+    "links": [
+      {
+        "text": "40K.APP",
+        "url": "https://www.40k.app/"
+      },
+      {
+        "text": "FACTIONS",
+        "url": "https://www.40k.app/factions"
+      },
+      {
+        "text": "AELDARI",
+        "url": "https://www.40k.app/factions/aeldari"
+      },
+      {
+        "text": "DATASHEET",
+        "url": "https://www.40k.app/factions/aeldari/units/eldrad-ulthran"
+      },
+      {
+        "text": "UPDATES",
+        "url": "https://www.40k.app/factions/aeldari/units/eldrad-ulthran/updates"
+      },
+      {
+        "text": "STORM GUARDIANS",
+        "url": "https://www.40k.app/factions/aeldari/units/storm-guardians"
+      },
+      {
+        "text": "GUARDIAN DEFENDERS",
+        "url": "https://www.40k.app/factions/aeldari/units/guardian-defenders"
+      },
+      {
+        "text": "ARMOURED WARHOST",
+        "url": "https://www.40k.app/factions/aeldari/detachments/armoured-warhost"
+      },
+      {
+        "text": "SEER COUNCIL",
+        "url": "https://www.40k.app/factions/aeldari/detachments/seer-council"
+      },
+      {
+        "text": "SPIRIT CONCLAVE",
+        "url": "https://www.40k.app/factions/aeldari/detachments/spirit-conclave"
+      },
+      {
+        "text": "STORM GUARDIANS",
+        "url": "https://www.40k.app/factions/aeldari/units/storm-guardians"
+      },
+      {
+        "text": "GUARDIAN DEFENDERS",
+        "url": "https://www.40k.app/factions/aeldari/units/guardian-defenders"
+      },
+      {
+        "text": "WARLOCK CONCLAVE",
+        "url": "https://www.40k.app/factions/aeldari/units/warlock-conclave"
+      },
+      {
+        "text": "WAR WALKERS",
+        "url": "https://www.40k.app/factions/aeldari/units/war-walkers"
+      },
+      {
+        "text": "WRAITHLORD",
+        "url": "https://www.40k.app/factions/aeldari/units/wraithlord"
+      },
+      {
+        "text": "FARSEER",
+        "url": "https://www.40k.app/factions/aeldari/units/farseer"
+      },
+      {
+        "text": "GUARDIAN DEFENDERS",
+        "url": "https://www.40k.app/factions/aeldari/units/guardian-defenders"
+      },
+      {
+        "text": "WARLOCK CONCLAVE",
+        "url": "https://www.40k.app/factions/aeldari/units/warlock-conclave"
+      }
+    ],
+    "name": "Eldrad Ulthran",
+    "observed_at": "2026-11-02T12:37:44.632Z",
+    "url": "https://www.40k.app/factions/aeldari/units/eldrad-ulthran"
+  },
+  "howling-banshees": {
+    "captured_text": "40K.APP\nFACTIONS\nAELDARI\nHowling Banshees\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nHowling Banshee Exarch 28.5mm\n\nInvulnerable save: 5+ - 4+ against melee attacks only\n\n8\"\n3\n4+\n2\n6+\n1\nHowling Banshee 28.5mm\n\nInvulnerable save: 5+ - 4+ against melee attacks only\n\n8\"\n3\n4+\n1\n6+\n1\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nShuriken pistol\nASSAULT\nPISTOL\n12\"\n1\n3+\n4\n-1\n1\nTriskele (Ranged)\nASSAULT\nANTI-INFANTRY 3+\n12\"\n3\n3+\n3\n-1\n1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nBanshee blade\nANTI-INFANTRY 3+\n2\n2+\n4\n-2\n2\nExecutioner\nANTI-INFANTRY 3+\n3\n2+\n6\n-3\n3\nMirrorswords\nANTI-INFANTRY 3+\n4\n2+\n4\n-2\n2\nTriskele (Melee)\nANTI-INFANTRY 3+\n6\n2+\n3\n-1\n1\nKEYWORDS\nAELDARI\nASPECT WARRIORS\nHOWLING BANSHEES\nINFANTRY\nCOSTS\n5 models\n85 pts\n10 models\n165 pts\nUNIT COMPOSITION\n1 Howling Banshee Exarch\n4-9 Howling Banshees\n\nEvery model is equipped with: shuriken pistol; Banshee blade.\n\nLed by\nAUTARCH\nJAIN ZAR\nWARGEAR OPTIONS\nThe Howling Banshee Exarch\u2019s Banshee blade can be replaced with 1 of the following: \u25e6 1 executioner \u25e6 1 triskele\nThe Howling Banshee Exarch\u2019s shuriken pistol and Banshee blade can be replaced with 1 mirrorswords.\nFor every 5 models in this unit, it can have 1 Aspect Shrine token.\nWARGEAR\nAspect Shrine Token\n\nOnce per battle for each Aspect Shrine token this unit has, you can change the result of one Hit roll or one Wound roll made for a model in this unit (excluding CHARACTER models) to an unmodified 6.\n\nDesigner\u2019s Note: Place an Aspect Shrine token next to the unit for each Aspect Shrine token it has, removing one each time this ability is used.\n\nCORE ABILITIES\nFIGHTS FIRST\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nAcrobatic\n\nThis unit is eligible to declare a charge in a turn in which it Advanced or Fell Back.\n\nSTATS\n26%\nof Aeldari lists, 1.2 per list\n#8\nmost-taken in faction\n29%\nfrom 28% since last update\nIN ARMY LISTS\nPopular detachments\nASPECT HOST\nARMOURED WARHOST\nSEER COUNCIL\nMost often led by\nJAIN ZAR\nAUTARCH\nOften taken with\nFIRE DRAGONS\nWARP SPIDERS\nJAIN ZAR\nAVATAR OF KHAINE\nSWOOPING HAWKS",
+    "links": [
+      {
+        "text": "40K.APP",
+        "url": "https://www.40k.app/"
+      },
+      {
+        "text": "FACTIONS",
+        "url": "https://www.40k.app/factions"
+      },
+      {
+        "text": "AELDARI",
+        "url": "https://www.40k.app/factions/aeldari"
+      },
+      {
+        "text": "DATASHEET",
+        "url": "https://www.40k.app/factions/aeldari/units/howling-banshees"
+      },
+      {
+        "text": "UPDATES",
+        "url": "https://www.40k.app/factions/aeldari/units/howling-banshees/updates"
+      },
+      {
+        "text": "AUTARCH",
+        "url": "https://www.40k.app/factions/aeldari/units/autarch"
+      },
+      {
+        "text": "JAIN ZAR",
+        "url": "https://www.40k.app/factions/aeldari/units/jain-zar"
+      },
+      {
+        "text": "ASPECT HOST",
+        "url": "https://www.40k.app/factions/aeldari/detachments/aspect-host"
+      },
+      {
+        "text": "ARMOURED WARHOST",
+        "url": "https://www.40k.app/factions/aeldari/detachments/armoured-warhost"
+      },
+      {
+        "text": "SEER COUNCIL",
+        "url": "https://www.40k.app/factions/aeldari/detachments/seer-council"
+      },
+      {
+        "text": "JAIN ZAR",
+        "url": "https://www.40k.app/factions/aeldari/units/jain-zar"
+      },
+      {
+        "text": "AUTARCH",
+        "url": "https://www.40k.app/factions/aeldari/units/autarch"
+      },
+      {
+        "text": "FIRE DRAGONS",
+        "url": "https://www.40k.app/factions/aeldari/units/fire-dragons"
+      },
+      {
+        "text": "WARP SPIDERS",
+        "url": "https://www.40k.app/factions/aeldari/units/warp-spiders"
+      },
+      {
+        "text": "JAIN ZAR",
+        "url": "https://www.40k.app/factions/aeldari/units/jain-zar"
+      },
+      {
+        "text": "AVATAR OF KHAINE",
+        "url": "https://www.40k.app/factions/aeldari/units/avatar-of-khaine"
+      },
+      {
+        "text": "SWOOPING HAWKS",
+        "url": "https://www.40k.app/factions/aeldari/units/swooping-hawks"
+      }
+    ],
+    "name": "Howling Banshees",
+    "observed_at": "2026-11-02T12:37:46.244Z",
+    "url": "https://www.40k.app/factions/aeldari/units/howling-banshees"
+  },
+  "version_feed": {
+    "captured_text": "40K.APP\nFACTIONS\nFactions\n\nExplore the factions of Warhammer 40,000, from humanity\u2019s indomitable armies to the galaxy\u2019s most ruthless predators.\n\nARMIES\nUPDATES\nVERSION 995\nReleased 2026-10-16.\n1 faction changed.\nGenestealer Cults\n1 unit\n1 change\nVERSION 981\nReleased 2026-10-14.\n11 factions changed.\nIMPERIUM\nAdepta Sororitas\n11 units\n11 changes\nAdeptus Custodes\n42 units \u00b7 18 detachments\n60 changes\nAnathema Psykana\n5 units\n5 changes\nAstra Militarum\n1 detachment\n1 change\nImperial Agents\n1 unit \u00b7 2 detachments\n3 changes\nSPACE MARINES\nDark Angels\n1 unit \u00b7 1 detachment\n2 changes\nDeathwatch\n1 detachment\n1 change\nRaven Guard\n1 unit\n1 change\nSpace Marines\n2 units \u00b7 5 detachments\n7 changes\nUltramarines\n1 detachment\n1 change\nCHAOS\nEmperor\u2019s Children\n2 units\n2 changes\nVERSION 972\nReleased 2026-10-02.\n7 factions changed.\nAstra Militarum\n1 detachment\n1 change\nDeathwatch\n1 detachment\n1 change\nEmperor\u2019s Children\n1 unit\n1 change\nImperial Agents\n1 detachment\n1 change\nSpace Marines\n42 units \u00b7 5 detachments\n47 changes\nSpace Wolves\n1 unit\n1 change\nUltramarines\n1 detachment\n1 change\nVERSION 963\nReleased 2026-09-30.\n37 factions changed.\nIMPERIUM\nAdepta Sororitas\n6 units\n6 changes\nAdeptus Custodes\n7 units\n7 changes\nAdeptus Mechanicus\n13 units \u00b7 3 detachments\n16 changes\nAstra Militarum\n9 units\n9 changes\nImperial Agents\n6 units \u00b7 1 detachment\n7 changes\nImperial Knights\n4 units\n4 changes\nSPACE MARINES\nBlack Templars\n18 units \u00b7 7 detachments\n25 changes\nBlood Angels\n15 units \u00b7 7 detachments\n22 changes\nDark Angels\n16 units \u00b7 8 detachments\n24 changes\nDeathwatch\n10 units \u00b7 1 detachment\n11 changes\nGrey Knights\n16 units\n16 changes\nImperial Fists\n3 units \u00b7 2 detachments\n5 changes\nIron Hands\n2 units \u00b7 2 detachments\n4 changes\nRaven Guard\n2 units \u00b7 1 detachment\n3 changes\nSalamanders\n2 units \u00b7 1 detachment\n3 changes\nSpace Marines\n103 units \u00b7 29 detachments\n132 changes\nSpace Wolves\n21 units \u00b7 7 detachments\n28 changes\nUltramarines\n10 units \u00b7 2 detachments\n12 changes\nWhite Scars\n2 units \u00b7 1 detachment\n3 changes\nCHAOS\nChaos Daemons\n4 units \u00b7 2 detachments\n6 changes\nChaos Knights\n5 units\n5 changes\nChaos Space Marines\n39 units\n39 changes\nDeath Guard\n18 units\n18 changes\nEmperor\u2019s Children\n10 units \u00b7 1 detachment\n11 changes\nLegions of Excess\n1 detachment\n1 change\nThousand Sons\n8 units \u00b7 1 detachment\n9 changes\nWorld Eaters\n11 units \u00b7 1 detachment\n12 changes\nXENOS\nAeldari\n11 units \u00b7 3 detachments\n14 changes\nDrukhari\n2 units\n2 changes\nGenestealer Cults\n5 units\n5 changes\nHarlequins\n3 units\n3 changes\nLeagues of Votann\n5 units \u00b7 2 detachments\n7 changes\nNecrons\n10 units \u00b7 1 detachment\n11 changes\nOrks\n37 units \u00b7 3 detachments\n40 changes\nT\u2019au Empire\n2 units\n2 changes\nTyranids\n10 units \u00b7 1 detachment\n11 changes\nYnnari\n2 units\n2 changes\nVERSION 946\nReleased 2026-09-02.\n3 factions changed.\nAdeptus Custodes\n1 unit\n1 change\nOrks\n73 units \u00b7 20 detachments\n93 changes\nSpace Marines\n2 units \u00b7 1 detachment\n3 changes\nVERSION 931\nReleased 2026-08-26.\n39 factions changed.\nIMPERIUM\nAdepta Sororitas\n11 units\n11 changes\nAdeptus Custodes\n13 units \u00b7 1 detachment\n14 changes\nAdeptus Mechanicus\n14 units\n14 changes\nAstra Militarum\n40 units \u00b7 1 detachment\n41 changes\nImperial Agents\n5 units\n5 changes\nImperial Knights\n22 units\n22 changes\nTitan Legions\n4 units\n4 changes\nSPACE MARINES\nBlack Templars\n8 units\n8 changes\nBlood Angels\n5 units\n5 changes\nDark Angels\n7 units \u00b7 1 detachment\n8 changes\nDeathwatch\n1 unit\n1 change\nGrey Knights\n16 units\n16 changes\nRaven Guard\n1 unit\n1 change\nSalamanders\n1 unit\n1 change\nSpace Marines\n33 units\n33 changes\nSpace Wolves\n6 units\n6 changes\nUltramarines\n2 units\n2 changes\nCHAOS\nBlood Legions\n2 units\n2 changes\nChaos Daemons\n22 units\n22 changes\nChaos Knights\n20 units\n20 changes\nChaos Space Marines\n18 units\n18 changes\nChaos Titan Legions\n4 units\n4 changes\nDeath Guard\n19 units\n19 changes\nEmperor\u2019s Children\n9 units\n9 changes\nLegions of Excess\n5 units \u00b7 1 detachment\n6 changes\nPlague Legions\n3 units\n3 changes\nScintillating Legions\n2 units\n2 changes\nThousand Sons\n18 units \u00b7 1 detachment\n19 changes\nWorld Eaters\n16 units\n16 changes\nXENOS\nAeldari\n22 units\n22 changes\nDrukhari\n7 units\n7 changes\nGenestealer Cults\n3 units\n3 changes\nHarlequins\n2 units\n2 changes\nLeagues of Votann\n12 units\n12 changes\nNecrons\n26 units\n26 changes\nOrks\n27 units\n27 changes\nT\u2019au Empire\n18 units \u00b7 1 detachment\n19 changes\nTyranids\n27 units \u00b7 1 detachment\n28 changes\nYnnari\n4 units\n4 changes\nVERSION 925\nReleased 2026-08-11.\n2 factions changed.\nAeldari\n4 units\n4 changes\nDark Angels\n1 unit\n1 change\nVERSION 913\nReleased 2026-08-04.\n3 factions changed.\nChaos Space Marines\n1 unit\n1 change\nNecrons\n1 unit\n1 change\nSpace Marines\n1 unit\n1 change\nVERSION 909\nReleased 2026-07-22.\n34 factions changed.\nIMPERIUM\nAdepta Sororitas\n13 units \u00b7 3 detachments\n16 changes\nAdeptus Custodes\n5 units \u00b7 2 detachments\n7 changes\nAdeptus Mechanicus\n11 units\n11 changes\nAstra Militarum\n23 units \u00b7 1 detachment\n24 changes\nImperial Agents\n9 units \u00b7 5 detachments\n14 changes\nImperial Knights\n1 unit\n1 change\nSPACE MARINES\nBlack Templars\n8 units\n8 changes\nBlood Angels\n1 unit\n1 change\nDark Angels\n10 units \u00b7 1 detachment\n11 changes\nGrey Knights\n5 units\n5 changes\nSpace Marines\n18 units \u00b7 6 detachments\n24 changes\nSpace Wolves\n7 units\n7 changes\nUltramarines\n8 units \u00b7 1 detachment\n9 changes\nWhite Scars\n1 unit \u00b7 1 detachment\n2 changes\nCHAOS\nBlood Legions\n1 unit\n1 change\nChaos Daemons\n6 units \u00b7 1 detachment\n7 changes\nChaos Knights\n3 units\n3 changes\nChaos Space Marines\n17 units \u00b7 1 detachment\n18 changes\nDeath Guard\n5 units\n5 changes\nEmperor\u2019s Children\n6 units\n6 changes\nLegions of Excess\n1 unit\n1 change\nScintillating Legions\n2 units\n2 changes\nThousand Sons\n9 units \u00b7 1 detachment\n10 changes\nWorld Eaters\n13 units \u00b7 2 detachments\n15 changes\nXENOS\nAeldari\n18 units\n18 changes\nDrukhari\n4 units\n4 changes\nGenestealer Cults\n8 units\n8 changes\nHarlequins\n4 units\n4 changes\nLeagues of Votann\n5 units \u00b7 1 detachment\n6 changes\nNecrons\n11 units\n11 changes\nOrks\n13 units \u00b7 3 detachments\n16 changes\nT\u2019au Empire\n10 units \u00b7 1 detachment\n11 changes\nTyranids\n9 units \u00b7 1 detachment\n10 changes\nYnnari\n3 units\n3 changes\nVERSION 879\nReleased 2026-06-23.\n2 factions changed.\nAeldari\n3 units\n3 changes\nSpace Marines\n3 units\n3 changes\nVERSION 875\nReleased 2026-06-19.\n9 factions changed.\nAdepta Sororitas\n1 unit\n1 change\nAdeptus Custodes\n1 unit\n1 change\nAdeptus Mechanicus\n1 unit\n1 change\nAeldari\n3 units\n3 changes\nChaos Space Marines\n1 unit\n1 change\nEmperor\u2019s Children\n2 units\n2 changes\nOrks\n8 units\n8 changes\nSpace Marines\n3 units\n3 changes\nT\u2019au Empire\n3 units\n3 changes",
+    "links": [
+      {
+        "text": "40K.APP",
+        "url": "https://www.40k.app/"
+      },
+      {
+        "text": "FACTIONS",
+        "url": "https://www.40k.app/factions"
+      },
+      {
+        "text": "ARMIES",
+        "url": "https://www.40k.app/factions"
+      },
+      {
+        "text": "UPDATES",
+        "url": "https://www.40k.app/factions/updates"
+      },
+      {
+        "text": "Genestealer Cults\n1 unit\n1 change",
+        "url": "https://www.40k.app/factions/genestealer-cults/updates"
+      },
+      {
+        "text": "Adepta Sororitas\n11 units\n11 changes",
+        "url": "https://www.40k.app/981/factions/adepta-sororitas/updates"
+      },
+      {
+        "text": "Adeptus Custodes\n42 units \u00b7 18 detachments\n60 changes",
+        "url": "https://www.40k.app/981/factions/adeptus-custodes/updates"
+      },
+      {
+        "text": "Anathema Psykana\n5 units\n5 changes",
+        "url": "https://www.40k.app/981/factions/anathema-psykana/updates"
+      },
+      {
+        "text": "Astra Militarum\n1 detachment\n1 change",
+        "url": "https://www.40k.app/981/factions/astra-militarum/updates"
+      },
+      {
+        "text": "Imperial Agents\n1 unit \u00b7 2 detachments\n3 changes",
+        "url": "https://www.40k.app/981/factions/imperial-agents/updates"
+      },
+      {
+        "text": "Dark Angels\n1 unit \u00b7 1 detachment\n2 changes",
+        "url": "https://www.40k.app/981/factions/dark-angels/updates"
+      },
+      {
+        "text": "Deathwatch\n1 detachment\n1 change",
+        "url": "https://www.40k.app/981/factions/deathwatch/updates"
+      },
+      {
+        "text": "Raven Guard\n1 unit\n1 change",
+        "url": "https://www.40k.app/981/factions/raven-guard/updates"
+      },
+      {
+        "text": "Space Marines\n2 units \u00b7 5 detachments\n7 changes",
+        "url": "https://www.40k.app/981/factions/space-marines/updates"
+      },
+      {
+        "text": "Ultramarines\n1 detachment\n1 change",
+        "url": "https://www.40k.app/981/factions/ultramarines/updates"
+      },
+      {
+        "text": "Emperor\u2019s Children\n2 units\n2 changes",
+        "url": "https://www.40k.app/981/factions/emperors-children/updates"
+      },
+      {
+        "text": "Astra Militarum\n1 detachment\n1 change",
+        "url": "https://www.40k.app/972/factions/astra-militarum/updates"
+      },
+      {
+        "text": "Deathwatch\n1 detachment\n1 change",
+        "url": "https://www.40k.app/972/factions/deathwatch/updates"
+      },
+      {
+        "text": "Emperor\u2019s Children\n1 unit\n1 change",
+        "url": "https://www.40k.app/972/factions/emperors-children/updates"
+      },
+      {
+        "text": "Imperial Agents\n1 detachment\n1 change",
+        "url": "https://www.40k.app/972/factions/imperial-agents/updates"
+      },
+      {
+        "text": "Space Marines\n42 units \u00b7 5 detachments\n47 changes",
+        "url": "https://www.40k.app/972/factions/space-marines/updates"
+      },
+      {
+        "text": "Space Wolves\n1 unit\n1 change",
+        "url": "https://www.40k.app/972/factions/space-wolves/updates"
+      },
+      {
+        "text": "Ultramarines\n1 detachment\n1 change",
+        "url": "https://www.40k.app/972/factions/ultramarines/updates"
+      },
+      {
+        "text": "Adepta Sororitas\n6 units\n6 changes",
+        "url": "https://www.40k.app/963/factions/adepta-sororitas/updates"
+      },
+      {
+        "text": "Adeptus Custodes\n7 units\n7 changes",
+        "url": "https://www.40k.app/963/factions/adeptus-custodes/updates"
+      },
+      {
+        "text": "Adeptus Mechanicus\n13 units \u00b7 3 detachments\n16 changes",
+        "url": "https://www.40k.app/963/factions/adeptus-mechanicus/updates"
+      },
+      {
+        "text": "Astra Militarum\n9 units\n9 changes",
+        "url": "https://www.40k.app/963/factions/astra-militarum/updates"
+      },
+      {
+        "text": "Imperial Agents\n6 units \u00b7 1 detachment\n7 changes",
+        "url": "https://www.40k.app/963/factions/imperial-agents/updates"
+      },
+      {
+        "text": "Imperial Knights\n4 units\n4 changes",
+        "url": "https://www.40k.app/963/factions/imperial-knights/updates"
+      },
+      {
+        "text": "Black Templars\n18 units \u00b7 7 detachments\n25 changes",
+        "url": "https://www.40k.app/963/factions/black-templars/updates"
+      },
+      {
+        "text": "Blood Angels\n15 units \u00b7 7 detachments\n22 changes",
+        "url": "https://www.40k.app/963/factions/blood-angels/updates"
+      },
+      {
+        "text": "Dark Angels\n16 units \u00b7 8 detachments\n24 changes",
+        "url": "https://www.40k.app/963/factions/dark-angels/updates"
+      },
+      {
+        "text": "Deathwatch\n10 units \u00b7 1 detachment\n11 changes",
+        "url": "https://www.40k.app/963/factions/deathwatch/updates"
+      },
+      {
+        "text": "Grey Knights\n16 units\n16 changes",
+        "url": "https://www.40k.app/963/factions/grey-knights/updates"
+      },
+      {
+        "text": "Imperial Fists\n3 units \u00b7 2 detachments\n5 changes",
+        "url": "https://www.40k.app/963/factions/imperial-fists/updates"
+      },
+      {
+        "text": "Iron Hands\n2 units \u00b7 2 detachments\n4 changes",
+        "url": "https://www.40k.app/963/factions/iron-hands/updates"
+      },
+      {
+        "text": "Raven Guard\n2 units \u00b7 1 detachment\n3 changes",
+        "url": "https://www.40k.app/963/factions/raven-guard/updates"
+      },
+      {
+        "text": "Salamanders\n2 units \u00b7 1 detachment\n3 changes",
+        "url": "https://www.40k.app/963/factions/salamanders/updates"
+      },
+      {
+        "text": "Space Marines\n103 units \u00b7 29 detachments\n132 changes",
+        "url": "https://www.40k.app/963/factions/space-marines/updates"
+      },
+      {
+        "text": "Space Wolves\n21 units \u00b7 7 detachments\n28 changes",
+        "url": "https://www.40k.app/963/factions/space-wolves/updates"
+      },
+      {
+        "text": "Ultramarines\n10 units \u00b7 2 detachments\n12 changes",
+        "url": "https://www.40k.app/963/factions/ultramarines/updates"
+      },
+      {
+        "text": "White Scars\n2 units \u00b7 1 detachment\n3 changes",
+        "url": "https://www.40k.app/963/factions/white-scars/updates"
+      },
+      {
+        "text": "Chaos Daemons\n4 units \u00b7 2 detachments\n6 changes",
+        "url": "https://www.40k.app/963/factions/chaos-daemons/updates"
+      },
+      {
+        "text": "Chaos Knights\n5 units\n5 changes",
+        "url": "https://www.40k.app/963/factions/chaos-knights/updates"
+      },
+      {
+        "text": "Chaos Space Marines\n39 units\n39 changes",
+        "url": "https://www.40k.app/963/factions/chaos-space-marines/updates"
+      },
+      {
+        "text": "Death Guard\n18 units\n18 changes",
+        "url": "https://www.40k.app/963/factions/death-guard/updates"
+      },
+      {
+        "text": "Emperor\u2019s Children\n10 units \u00b7 1 detachment\n11 changes",
+        "url": "https://www.40k.app/963/factions/emperors-children/updates"
+      },
+      {
+        "text": "Legions of Excess\n1 detachment\n1 change",
+        "url": "https://www.40k.app/963/factions/legions-of-excess/updates"
+      },
+      {
+        "text": "Thousand Sons\n8 units \u00b7 1 detachment\n9 changes",
+        "url": "https://www.40k.app/963/factions/thousand-sons/updates"
+      },
+      {
+        "text": "World Eaters\n11 units \u00b7 1 detachment\n12 changes",
+        "url": "https://www.40k.app/963/factions/world-eaters/updates"
+      },
+      {
+        "text": "Aeldari\n11 units \u00b7 3 detachments\n14 changes",
+        "url": "https://www.40k.app/963/factions/aeldari/updates"
+      },
+      {
+        "text": "Drukhari\n2 units\n2 changes",
+        "url": "https://www.40k.app/963/factions/drukhari/updates"
+      },
+      {
+        "text": "Genestealer Cults\n5 units\n5 changes",
+        "url": "https://www.40k.app/963/factions/genestealer-cults/updates"
+      },
+      {
+        "text": "Harlequins\n3 units\n3 changes",
+        "url": "https://www.40k.app/963/factions/harlequins/updates"
+      },
+      {
+        "text": "Leagues of Votann\n5 units \u00b7 2 detachments\n7 changes",
+        "url": "https://www.40k.app/963/factions/leagues-of-votann/updates"
+      },
+      {
+        "text": "Necrons\n10 units \u00b7 1 detachment\n11 changes",
+        "url": "https://www.40k.app/963/factions/necrons/updates"
+      },
+      {
+        "text": "Orks\n37 units \u00b7 3 detachments\n40 changes",
+        "url": "https://www.40k.app/963/factions/orks/updates"
+      },
+      {
+        "text": "T\u2019au Empire\n2 units\n2 changes",
+        "url": "https://www.40k.app/963/factions/tau-empire/updates"
+      },
+      {
+        "text": "Tyranids\n10 units \u00b7 1 detachment\n11 changes",
+        "url": "https://www.40k.app/963/factions/tyranids/updates"
+      },
+      {
+        "text": "Ynnari\n2 units\n2 changes",
+        "url": "https://www.40k.app/963/factions/ynnari/updates"
+      },
+      {
+        "text": "Adeptus Custodes\n1 unit\n1 change",
+        "url": "https://www.40k.app/946/factions/adeptus-custodes/updates"
+      },
+      {
+        "text": "Orks\n73 units \u00b7 20 detachments\n93 changes",
+        "url": "https://www.40k.app/946/factions/orks/updates"
+      },
+      {
+        "text": "Space Marines\n2 units \u00b7 1 detachment\n3 changes",
+        "url": "https://www.40k.app/946/factions/space-marines/updates"
+      },
+      {
+        "text": "Adepta Sororitas\n11 units\n11 changes",
+        "url": "https://www.40k.app/931/factions/adepta-sororitas/updates"
+      },
+      {
+        "text": "Adeptus Custodes\n13 units \u00b7 1 detachment\n14 changes",
+        "url": "https://www.40k.app/931/factions/adeptus-custodes/updates"
+      },
+      {
+        "text": "Adeptus Mechanicus\n14 units\n14 changes",
+        "url": "https://www.40k.app/931/factions/adeptus-mechanicus/updates"
+      },
+      {
+        "text": "Astra Militarum\n40 units \u00b7 1 detachment\n41 changes",
+        "url": "https://www.40k.app/931/factions/astra-militarum/updates"
+      },
+      {
+        "text": "Imperial Agents\n5 units\n5 changes",
+        "url": "https://www.40k.app/931/factions/imperial-agents/updates"
+      },
+      {
+        "text": "Imperial Knights\n22 units\n22 changes",
+        "url": "https://www.40k.app/931/factions/imperial-knights/updates"
+      },
+      {
+        "text": "Titan Legions\n4 units\n4 changes",
+        "url": "https://www.40k.app/931/factions/titan-legions/updates"
+      },
+      {
+        "text": "Black Templars\n8 units\n8 changes",
+        "url": "https://www.40k.app/931/factions/black-templars/updates"
+      },
+      {
+        "text": "Blood Angels\n5 units\n5 changes",
+        "url": "https://www.40k.app/931/factions/blood-angels/updates"
+      },
+      {
+        "text": "Dark Angels\n7 units \u00b7 1 detachment\n8 changes",
+        "url": "https://www.40k.app/931/factions/dark-angels/updates"
+      },
+      {
+        "text": "Deathwatch\n1 unit\n1 change",
+        "url": "https://www.40k.app/931/factions/deathwatch/updates"
+      },
+      {
+        "text": "Grey Knights\n16 units\n16 changes",
+        "url": "https://www.40k.app/931/factions/grey-knights/updates"
+      },
+      {
+        "text": "Raven Guard\n1 unit\n1 change",
+        "url": "https://www.40k.app/931/factions/raven-guard/updates"
+      },
+      {
+        "text": "Salamanders\n1 unit\n1 change",
+        "url": "https://www.40k.app/931/factions/salamanders/updates"
+      },
+      {
+        "text": "Space Marines\n33 units\n33 changes",
+        "url": "https://www.40k.app/931/factions/space-marines/updates"
+      },
+      {
+        "text": "Space Wolves\n6 units\n6 changes",
+        "url": "https://www.40k.app/931/factions/space-wolves/updates"
+      },
+      {
+        "text": "Ultramarines\n2 units\n2 changes",
+        "url": "https://www.40k.app/931/factions/ultramarines/updates"
+      },
+      {
+        "text": "Blood Legions\n2 units\n2 changes",
+        "url": "https://www.40k.app/931/factions/blood-legions/updates"
+      },
+      {
+        "text": "Chaos Daemons\n22 units\n22 changes",
+        "url": "https://www.40k.app/931/factions/chaos-daemons/updates"
+      },
+      {
+        "text": "Chaos Knights\n20 units\n20 changes",
+        "url": "https://www.40k.app/931/factions/chaos-knights/updates"
+      },
+      {
+        "text": "Chaos Space Marines\n18 units\n18 changes",
+        "url": "https://www.40k.app/931/factions/chaos-space-marines/updates"
+      },
+      {
+        "text": "Chaos Titan Legions\n4 units\n4 changes",
+        "url": "https://www.40k.app/931/factions/chaos-titan-legions/updates"
+      },
+      {
+        "text": "Death Guard\n19 units\n19 changes",
+        "url": "https://www.40k.app/931/factions/death-guard/updates"
+      },
+      {
+        "text": "Emperor\u2019s Children\n9 units\n9 changes",
+        "url": "https://www.40k.app/931/factions/emperors-children/updates"
+      },
+      {
+        "text": "Legions of Excess\n5 units \u00b7 1 detachment\n6 changes",
+        "url": "https://www.40k.app/931/factions/legions-of-excess/updates"
+      },
+      {
+        "text": "Plague Legions\n3 units\n3 changes",
+        "url": "https://www.40k.app/931/factions/plague-legions/updates"
+      },
+      {
+        "text": "Scintillating Legions\n2 units\n2 changes",
+        "url": "https://www.40k.app/931/factions/scintillating-legions/updates"
+      },
+      {
+        "text": "Thousand Sons\n18 units \u00b7 1 detachment\n19 changes",
+        "url": "https://www.40k.app/931/factions/thousand-sons/updates"
+      },
+      {
+        "text": "World Eaters\n16 units\n16 changes",
+        "url": "https://www.40k.app/931/factions/world-eaters/updates"
+      },
+      {
+        "text": "Aeldari\n22 units\n22 changes",
+        "url": "https://www.40k.app/931/factions/aeldari/updates"
+      },
+      {
+        "text": "Drukhari\n7 units\n7 changes",
+        "url": "https://www.40k.app/931/factions/drukhari/updates"
+      },
+      {
+        "text": "Genestealer Cults\n3 units\n3 changes",
+        "url": "https://www.40k.app/931/factions/genestealer-cults/updates"
+      },
+      {
+        "text": "Harlequins\n2 units\n2 changes",
+        "url": "https://www.40k.app/931/factions/harlequins/updates"
+      },
+      {
+        "text": "Leagues of Votann\n12 units\n12 changes",
+        "url": "https://www.40k.app/931/factions/leagues-of-votann/updates"
+      },
+      {
+        "text": "Necrons\n26 units\n26 changes",
+        "url": "https://www.40k.app/931/factions/necrons/updates"
+      },
+      {
+        "text": "Orks\n27 units\n27 changes",
+        "url": "https://www.40k.app/931/factions/orks/updates"
+      },
+      {
+        "text": "T\u2019au Empire\n18 units \u00b7 1 detachment\n19 changes",
+        "url": "https://www.40k.app/931/factions/tau-empire/updates"
+      },
+      {
+        "text": "Tyranids\n27 units \u00b7 1 detachment\n28 changes",
+        "url": "https://www.40k.app/931/factions/tyranids/updates"
+      },
+      {
+        "text": "Ynnari\n4 units\n4 changes",
+        "url": "https://www.40k.app/931/factions/ynnari/updates"
+      },
+      {
+        "text": "Aeldari\n4 units\n4 changes",
+        "url": "https://www.40k.app/925/factions/aeldari/updates"
+      },
+      {
+        "text": "Dark Angels\n1 unit\n1 change",
+        "url": "https://www.40k.app/925/factions/dark-angels/updates"
+      },
+      {
+        "text": "Chaos Space Marines\n1 unit\n1 change",
+        "url": "https://www.40k.app/913/factions/chaos-space-marines/updates"
+      },
+      {
+        "text": "Necrons\n1 unit\n1 change",
+        "url": "https://www.40k.app/913/factions/necrons/updates"
+      },
+      {
+        "text": "Space Marines\n1 unit\n1 change",
+        "url": "https://www.40k.app/913/factions/space-marines/updates"
+      },
+      {
+        "text": "Adepta Sororitas\n13 units \u00b7 3 detachments\n16 changes",
+        "url": "https://www.40k.app/909/factions/adepta-sororitas/updates"
+      },
+      {
+        "text": "Adeptus Custodes\n5 units \u00b7 2 detachments\n7 changes",
+        "url": "https://www.40k.app/909/factions/adeptus-custodes/updates"
+      },
+      {
+        "text": "Adeptus Mechanicus\n11 units\n11 changes",
+        "url": "https://www.40k.app/909/factions/adeptus-mechanicus/updates"
+      },
+      {
+        "text": "Astra Militarum\n23 units \u00b7 1 detachment\n24 changes",
+        "url": "https://www.40k.app/909/factions/astra-militarum/updates"
+      },
+      {
+        "text": "Imperial Agents\n9 units \u00b7 5 detachments\n14 changes",
+        "url": "https://www.40k.app/909/factions/imperial-agents/updates"
+      },
+      {
+        "text": "Imperial Knights\n1 unit\n1 change",
+        "url": "https://www.40k.app/909/factions/imperial-knights/updates"
+      },
+      {
+        "text": "Black Templars\n8 units\n8 changes",
+        "url": "https://www.40k.app/909/factions/black-templars/updates"
+      },
+      {
+        "text": "Blood Angels\n1 unit\n1 change",
+        "url": "https://www.40k.app/909/factions/blood-angels/updates"
+      },
+      {
+        "text": "Dark Angels\n10 units \u00b7 1 detachment\n11 changes",
+        "url": "https://www.40k.app/909/factions/dark-angels/updates"
+      },
+      {
+        "text": "Grey Knights\n5 units\n5 changes",
+        "url": "https://www.40k.app/909/factions/grey-knights/updates"
+      },
+      {
+        "text": "Space Marines\n18 units \u00b7 6 detachments\n24 changes",
+        "url": "https://www.40k.app/909/factions/space-marines/updates"
+      },
+      {
+        "text": "Space Wolves\n7 units\n7 changes",
+        "url": "https://www.40k.app/909/factions/space-wolves/updates"
+      },
+      {
+        "text": "Ultramarines\n8 units \u00b7 1 detachment\n9 changes",
+        "url": "https://www.40k.app/909/factions/ultramarines/updates"
+      },
+      {
+        "text": "White Scars\n1 unit \u00b7 1 detachment\n2 changes",
+        "url": "https://www.40k.app/909/factions/white-scars/updates"
+      },
+      {
+        "text": "Blood Legions\n1 unit\n1 change",
+        "url": "https://www.40k.app/909/factions/blood-legions/updates"
+      },
+      {
+        "text": "Chaos Daemons\n6 units \u00b7 1 detachment\n7 changes",
+        "url": "https://www.40k.app/909/factions/chaos-daemons/updates"
+      },
+      {
+        "text": "Chaos Knights\n3 units\n3 changes",
+        "url": "https://www.40k.app/909/factions/chaos-knights/updates"
+      },
+      {
+        "text": "Chaos Space Marines\n17 units \u00b7 1 detachment\n18 changes",
+        "url": "https://www.40k.app/909/factions/chaos-space-marines/updates"
+      },
+      {
+        "text": "Death Guard\n5 units\n5 changes",
+        "url": "https://www.40k.app/909/factions/death-guard/updates"
+      },
+      {
+        "text": "Emperor\u2019s Children\n6 units\n6 changes",
+        "url": "https://www.40k.app/909/factions/emperors-children/updates"
+      },
+      {
+        "text": "Legions of Excess\n1 unit\n1 change",
+        "url": "https://www.40k.app/909/factions/legions-of-excess/updates"
+      },
+      {
+        "text": "Scintillating Legions\n2 units\n2 changes",
+        "url": "https://www.40k.app/909/factions/scintillating-legions/updates"
+      },
+      {
+        "text": "Thousand Sons\n9 units \u00b7 1 detachment\n10 changes",
+        "url": "https://www.40k.app/909/factions/thousand-sons/updates"
+      },
+      {
+        "text": "World Eaters\n13 units \u00b7 2 detachments\n15 changes",
+        "url": "https://www.40k.app/909/factions/world-eaters/updates"
+      },
+      {
+        "text": "Aeldari\n18 units\n18 changes",
+        "url": "https://www.40k.app/909/factions/aeldari/updates"
+      },
+      {
+        "text": "Drukhari\n4 units\n4 changes",
+        "url": "https://www.40k.app/909/factions/drukhari/updates"
+      },
+      {
+        "text": "Genestealer Cults\n8 units\n8 changes",
+        "url": "https://www.40k.app/909/factions/genestealer-cults/updates"
+      },
+      {
+        "text": "Harlequins\n4 units\n4 changes",
+        "url": "https://www.40k.app/909/factions/harlequins/updates"
+      },
+      {
+        "text": "Leagues of Votann\n5 units \u00b7 1 detachment\n6 changes",
+        "url": "https://www.40k.app/909/factions/leagues-of-votann/updates"
+      },
+      {
+        "text": "Necrons\n11 units\n11 changes",
+        "url": "https://www.40k.app/909/factions/necrons/updates"
+      },
+      {
+        "text": "Orks\n13 units \u00b7 3 detachments\n16 changes",
+        "url": "https://www.40k.app/909/factions/orks/updates"
+      },
+      {
+        "text": "T\u2019au Empire\n10 units \u00b7 1 detachment\n11 changes",
+        "url": "https://www.40k.app/909/factions/tau-empire/updates"
+      },
+      {
+        "text": "Tyranids\n9 units \u00b7 1 detachment\n10 changes",
+        "url": "https://www.40k.app/909/factions/tyranids/updates"
+      },
+      {
+        "text": "Ynnari\n3 units\n3 changes",
+        "url": "https://www.40k.app/909/factions/ynnari/updates"
+      },
+      {
+        "text": "Aeldari\n3 units\n3 changes",
+        "url": "https://www.40k.app/879/factions/aeldari/updates"
+      },
+      {
+        "text": "Space Marines\n3 units\n3 changes",
+        "url": "https://www.40k.app/879/factions/space-marines/updates"
+      },
+      {
+        "text": "Adepta Sororitas\n1 unit\n1 change",
+        "url": "https://www.40k.app/875/factions/adepta-sororitas/updates"
+      },
+      {
+        "text": "Adeptus Custodes\n1 unit\n1 change",
+        "url": "https://www.40k.app/875/factions/adeptus-custodes/updates"
+      },
+      {
+        "text": "Adeptus Mechanicus\n1 unit\n1 change",
+        "url": "https://www.40k.app/875/factions/adeptus-mechanicus/updates"
+      },
+      {
+        "text": "Aeldari\n3 units\n3 changes",
+        "url": "https://www.40k.app/875/factions/aeldari/updates"
+      },
+      {
+        "text": "Chaos Space Marines\n1 unit\n1 change",
+        "url": "https://www.40k.app/875/factions/chaos-space-marines/updates"
+      },
+      {
+        "text": "Emperor\u2019s Children\n2 units\n2 changes",
+        "url": "https://www.40k.app/875/factions/emperors-children/updates"
+      },
+      {
+        "text": "Orks\n8 units\n8 changes",
+        "url": "https://www.40k.app/875/factions/orks/updates"
+      },
+      {
+        "text": "Space Marines\n3 units\n3 changes",
+        "url": "https://www.40k.app/875/factions/space-marines/updates"
+      },
+      {
+        "text": "T\u2019au Empire\n3 units\n3 changes",
+        "url": "https://www.40k.app/875/factions/tau-empire/updates"
+      }
+    ],
+    "observed_at": "2026-11-02T12:37:35.731Z",
+    "url": "https://www.40k.app/factions/updates"
+  }
+}

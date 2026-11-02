@@ -28,9 +28,20 @@ AUTARCH = "000000577"
 VOIDSCARRED = "000002532"
 
 
-def definitions(index: Path | None) -> Section02Definitions:
+def definitions(
+    index: Path | None,
+    *,
+    datasheet_ids: tuple[str, ...] = (
+        AUTARCH,
+        VOIDSCARRED,
+        "000000593",
+        "000004078",
+        "000002759",
+        "000000600",
+    ),
+) -> Section02Definitions:
     package = _ability_support_catalog_package(
-        datasheet_ids=(AUTARCH, VOIDSCARRED, "000000593", "000004078", "000002759", "000000600"),
+        datasheet_ids=datasheet_ids,
         source_index_dir=index,
     )
     catalog = package.army_catalog

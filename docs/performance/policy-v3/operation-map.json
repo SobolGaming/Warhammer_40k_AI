@@ -31956,6 +31956,120 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "banshee-eldrad-exact-01": {
+      "paths": [
+        "data/source_audits/aeldari_banshee_eldrad_2026_11/browser-captures.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "banshee-eldrad-exact-02": {
+      "paths": [
+        "data/source_audits/aeldari_banshee_eldrad_2026_11/review.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "banshee-eldrad-exact-03": {
+      "paths": [
+        "data/source_audits/aeldari_banshee_eldrad_2026_11/source.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "banshee-eldrad-exact-04": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_datasheet_rule_descriptors.py"
+      ],
+      "owners": [
+        "@module",
+        "conditional_invulnerable_save_descriptor_for_clause",
+        "exact_datasheet_runtime_descriptor_for_clause"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "banshee-eldrad-exact-05": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_defensive_rule_runtime.py"
+      ],
+      "owners": [
+        "conditional_invulnerable_save_handler"
+      ],
+      "families": [
+        "dice"
+      ],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "banshee-eldrad-exact-06": {
+      "paths": [
+        "src/warhammer40k_core/rules/wahapedia_invulnerable_save_bridge.py"
+      ],
+      "owners": [
+        "@module",
+        "conditional_invulnerable_save_bridge_for_model_row"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "banshee-eldrad-exact-07": {
+      "paths": [
+        "src/warhammer40k_core/rules/wahapedia_model_profile_mapping.py"
+      ],
+      "owners": [
+        "@module",
+        "conditional_invulnerable_save_for_model_rows"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "banshee-eldrad-exact-09": {
+      "paths": [
+        "tools/generate_aeldari_banshee_eldrad_source.py"
+      ],
+      "owners": [
+        "@module",
+        "generated_overlay_pack",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "banshee-eldrad-exact-08": {
+      "paths": [
+        "tests/factions/aeldari/unit/test_unit_abilities.py"
+      ],
+      "owners": [
+        "_submit_attack_choice",
+        "save_definitions",
+        "test_attached_bodyguard_save_does_not_transfer_to_leader",
+        "test_native_banshee_roles_keep_base_five_and_melee_four",
+        "test_native_fight_melee_save_restore_and_exact_replay",
+        "test_native_ranged_attack_keeps_five_plus_save"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

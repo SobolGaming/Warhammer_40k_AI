@@ -378,15 +378,14 @@ def aeldari_current_source_rule_semantics_smoke_operations(
         },
         "tools/source_scope_provenance.py": {"@module", "current_ec_overlay_provenance"},
     }
-    if (
-        base != "5e26b4b4791d0c25579faebc28394ec25bb38b24"
-        or path not in operations
-        or category != "rule_semantics"
-    ):
+    scope_names = {
+        "5e26b4b4791d0c25579faebc28394ec25bb38b24": "aeldari-current-source-smoke-scope.json",
+        "675c3b2274c85e7b1926882648f717bd9ab09feb": "banshee-eldrad-source-smoke-scope.json",
+    }
+    if base not in scope_names or path not in operations or category != "rule_semantics":
         return frozenset()
     scope = read_object(
-        Path(__file__).resolve().parents[1]
-        / "docs/performance/policy-v3/aeldari-current-source-smoke-scope.json"
+        Path(__file__).resolve().parents[1] / "docs/performance/policy-v3" / scope_names[base]
     )
     _keys(scope, {"base", "changes", "smoke_operations", "source_obligation", "unchanged_work"})
     bindings = object_value(scope["changes"])

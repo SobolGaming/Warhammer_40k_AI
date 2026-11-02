@@ -25,6 +25,7 @@ PASSIVE_MODEL_CHARACTERISTIC_SET_TEMPLATE_ID = "phase17c:passive-model-character
 FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_TEMPLATE_ID = "phase17c:first-failed-save-damage-replacement"
 CONDITIONAL_MODEL_FIGHT_ON_DEATH_TEMPLATE_ID = "phase17c:conditional-model-fight-on-death"
 CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID = "phase17c:conditional-ranged-invulnerable-save"
+CONDITIONAL_MELEE_INVULNERABLE_SAVE_TEMPLATE_ID = "phase17c:conditional-melee-invulnerable-save"
 CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID = (
     "phase17l:conditional-ranged-attack-full-rerolls"
 )
@@ -57,6 +58,7 @@ EXACT_DATASHEET_RUNTIME_TEMPLATE_IDS = frozenset(
         FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_TEMPLATE_ID,
         CONDITIONAL_MODEL_FIGHT_ON_DEATH_TEMPLATE_ID,
         CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID,
+        CONDITIONAL_MELEE_INVULNERABLE_SAVE_TEMPLATE_ID,
         CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID,
         CONDITIONAL_TARGET_KEYWORD_ATTACK_REROLLS_TEMPLATE_ID,
         OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID,
@@ -220,7 +222,10 @@ def exact_datasheet_runtime_descriptor_for_clause(
         return first_failed_save_damage_replacement_descriptor_for_clause(clause)
     if clause.template_id == CONDITIONAL_MODEL_FIGHT_ON_DEATH_TEMPLATE_ID:
         return fight_on_death_descriptor_for_clause(clause)
-    if clause.template_id == CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID:
+    if clause.template_id in {
+        CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID,
+        CONDITIONAL_MELEE_INVULNERABLE_SAVE_TEMPLATE_ID,
+    }:
         return conditional_invulnerable_save_descriptor_for_clause(clause)
     if clause.template_id in {
         CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID,
@@ -979,7 +984,11 @@ def conditional_invulnerable_save_descriptor_for_clause(
 ) -> CatalogConditionalInvulnerableSaveDescriptor | None:
     if (
         not clause.is_supported
-        or clause.template_id != CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID
+        or clause.template_id
+        not in {
+            CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID,
+            CONDITIONAL_MELEE_INVULNERABLE_SAVE_TEMPLATE_ID,
+        }
         or clause.trigger is not None
         or clause.target is None
         or clause.target.kind is not RuleTargetKind.THIS_MODEL
@@ -990,9 +999,14 @@ def conditional_invulnerable_save_descriptor_for_clause(
     ):
         return None
     condition = clause.conditions[0]
+    attack_kind = (
+        "melee"
+        if clause.template_id == CONDITIONAL_MELEE_INVULNERABLE_SAVE_TEMPLATE_ID
+        else "ranged"
+    )
     if condition.kind is not RuleConditionKind.TARGET_CONSTRAINT or parameter_payload(
         condition.parameters
-    ) != {"attack_kind": "ranged", "gate_subject": "incoming_attack"}:
+    ) != {"attack_kind": attack_kind, "gate_subject": "incoming_attack"}:
         return None
     effect = clause.effects[0]
     parameters = parameter_payload(effect.parameters)
@@ -1006,7 +1020,7 @@ def conditional_invulnerable_save_descriptor_for_clause(
         return None
     return CatalogConditionalInvulnerableSaveDescriptor(
         target_number=value,
-        attack_kind="ranged",
+        attack_kind=attack_kind,
     )
 
 

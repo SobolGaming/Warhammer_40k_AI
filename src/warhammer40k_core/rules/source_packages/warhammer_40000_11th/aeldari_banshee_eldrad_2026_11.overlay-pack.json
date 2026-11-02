@@ -1,0 +1,35 @@
+{
+  "base_source_package_id": {
+    "namespace": "wahapedia",
+    "package_name": "source-mirror",
+    "version": "10th-edition-2026-06-14"
+  },
+  "catalog_version": {
+    "source_date": "2026-11-02",
+    "version_id": "warhammer-40000-11th-aeldari-banshee-eldrad-2026-11"
+  },
+  "effective_date": "2026-11-02",
+  "operations": [
+    {
+      "effective_date": "2026-11-02",
+      "expected_preimage_hash": "3daa57851f8d102f8febb4259d67e80b4da8dd4aa3a56bb0e1f19f429525c5ab",
+      "fields": {},
+      "op_id": "eldrad-retire-warlock-conclave-2026-11-02",
+      "operation_kind": "supersede_row",
+      "order_index": 1,
+      "reason": "Current Eldrad own page allows Guardian Defenders and Storm Guardians only; supersede the obsolete Warlock Conclave edge without admitting any bodyguard.",
+      "source_reference": "https://www.40k.app/factions/aeldari/units/eldrad-ulthran",
+      "source_row_id": "000000568:000000584:108",
+      "source_table": "Datasheets_leader",
+      "target_edition": "warhammer-40000-11th"
+    }
+  ],
+  "package_hash": "dceb81a3fdc1467dff4be3daa5145bef841853654bdaa323a91d7b7c16491cad",
+  "package_id": {
+    "namespace": "40k-app",
+    "package_name": "aeldari-banshee-eldrad",
+    "version": "reviewed-2026-11-02"
+  },
+  "schema_version": "phase17-source-overlay-v1",
+  "target_edition": "warhammer-40000-11th"
+}

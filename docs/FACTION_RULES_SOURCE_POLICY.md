@@ -203,3 +203,9 @@ source texts explicitly serialize this mode and authenticate it in the catalog
 hash. Original flat-mode source normalization and serialized payloads remain
 unchanged. Raw captures and operative suffixes remain exact; objective terminology
 still follows the non-Core scope, and explicit invalid dice still fail closed.
+
+The separate [Banshee/Eldrad correction](BANSHEE_ELDRAD_CORRECTION_SCOPE.md)
+adds a new pinned v2 selection of their two complete own pages. It preserves the
+prior Aeldari audit unchanged and supersedes only Eldrad's obsolete Warlock
+Conclave relationship. Correct Banshee source text is not overwritten: its
+melee-only improvement is restored at the shared native characteristic bridge.

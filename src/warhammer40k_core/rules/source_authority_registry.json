@@ -2026,6 +2026,26 @@
           "row_id": "aeldari-current-2026-11-02:datasheet:corsair-voidscarred",
           "source_observation_sha256": "50f26c0850856c9996c16b2879ac9878f9ec088f1125775f822983df39553e3b",
           "source_url": "https://www.40k.app/factions/aeldari/units/corsair-voidscarred"
+        },
+        {
+          "audit_id": "aeldari-banshee-eldrad-app-mirror-2026-11-02",
+          "identity_kind": "versioned_observation",
+          "identity_value": "995@2026-11-02T12:37:46.244Z",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "provider_name": "40k.app",
+          "row_id": "aeldari-banshee-eldrad-2026-11-02:datasheet:howling-banshees",
+          "source_observation_sha256": "99add58025fc8f12027869d3148bd4351d91199434c09d7faed8f396a7e5fb79",
+          "source_url": "https://www.40k.app/factions/aeldari/units/howling-banshees"
+        },
+        {
+          "audit_id": "aeldari-banshee-eldrad-app-mirror-2026-11-02",
+          "identity_kind": "versioned_observation",
+          "identity_value": "995@2026-11-02T12:37:44.632Z",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "provider_name": "40k.app",
+          "row_id": "aeldari-banshee-eldrad-2026-11-02:datasheet:eldrad-ulthran",
+          "source_observation_sha256": "271b3f12d729b07b29ad91cedad3be6d17c6dda3bc231246ba8f89acad42dca1",
+          "source_url": "https://www.40k.app/factions/aeldari/units/eldrad-ulthran"
         }
       ],
       "legacy_observations": [],
@@ -2060,6 +2080,16 @@
           "catalog_sha256": "6c46dad732bb34ce5b98a1b619618855a6502044dc04f6ac541c3abd52096112",
           "namespace": "core-v2-reviewed-app-mirror",
           "package_name": "reviewed-aeldari-app-observations-2026-11",
+          "version": "app-data-995-observed-2026-11-02"
+        },
+        {
+          "allowed_rule_source_ids": [
+            "faction-app:aeldari:datasheet:eldrad-ulthran",
+            "faction-app:aeldari:datasheet:howling-banshees"
+          ],
+          "catalog_sha256": "9beb04839d004a5d6aa852b2731e2124dd9df7633da2472f82e87573bf11b278",
+          "namespace": "core-v2-reviewed-app-mirror",
+          "package_name": "reviewed-aeldari-banshee-eldrad-observations-2026-11",
           "version": "app-data-995-observed-2026-11-02"
         }
       ],

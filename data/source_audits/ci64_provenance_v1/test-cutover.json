@@ -31,10 +31,10 @@
       "sha256": "98aa14f618b2578760c34abbde73aeb8a3839f778e3c008acd51deaab8feac87"
     },
     "tests/factions/aeldari/unit/test_unit_abilities.py": {
-      "blob_sha1": "60fda07f45b09605274d54ac9396c0d840af5473",
-      "bytes": 14885,
+      "blob_sha1": "28e009f6c31d3abc7ca66f844f42ebb852fb923b",
+      "bytes": 27309,
       "mode": "100644",
-      "sha256": "ea5b3d4565ddafd564b5789636a035b70e5ba09f5eea139497279127e7d46047"
+      "sha256": "997de700eb7a4b3c3b500ee3a3b65039a3267d1232c7d836af537bd536cf8a11"
     },
     "tests/factions/black_templars/unit/test_black_templars_army_rule.py": {
       "blob_sha1": "d5246156bd0f1ce96e2e72c4f4f918b667d4210e",

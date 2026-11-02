@@ -1,0 +1,47 @@
+{
+  "base": "675c3b2274c85e7b1926882648f717bd9ab09feb",
+  "changes": {
+    "tools/ability_support_sources.py": {
+      "before_sha256": "f3996b510be3c842cc4d4a72d6d220835357ceb330af60f3e1b7e6d4259d41d7",
+      "after_sha256": "52609fca480137a66fb0fb7fb63a41631e442bed527abe4ce24bbdef43c77902",
+      "owners": {
+        "@module": {
+          "before": "c386a838c9d76bb70b357368b1ebeab9c09cda9e7bbaf498abae3f30ad76fe0f",
+          "after": "634bb8a3bc6870c25a130a01549d8d23e08384a2df1e1757d7e3b0ca8fca048a"
+        },
+        "ability_support_index_inputs": {
+          "before": "36116d0f28fd950295611273cda7231eba486931fd99b2a5f1209a3b79dda71c",
+          "after": "c8f0c0ac175ad6422bc43a2a84bfa6752e2963b68b0e276781158910133d4f28"
+        },
+        "load_ability_support_sources": {
+          "before": "9bba1bc08a62d7c4899615c54bbad33f2304e87bb5a92fcb978e47fa842376a9",
+          "after": "ce4545adb07cdfa5ff2889a48a24fd85d5fceebaad21aacb716ac8c78ab6617d"
+        }
+      }
+    },
+    "tools/source_scope_provenance.py": {
+      "before_sha256": "6fff3740e89ac5f3215a08be7001dde5892405e17d5b0d9ae9f8a739914c586d",
+      "after_sha256": "0fb60a40d260ffb8cf901facf5dacdb1c91562cb382131b3fd795be66d683b9e",
+      "owners": {
+        "@module": {
+          "before": "0fe80cb139d183fc53516efe38304ef5edcc63487389e8743cd4ac52d3f4053e",
+          "after": "996a6f9a8e034fd90ebfded4e7206f49d322d79ddd489287e8020ad37791524e"
+        },
+        "current_ec_overlay_provenance": {
+          "before": "cbc82f6f35e2d89e179b4bf2c48dfae0e14502ed29a2f0097b18ed41ab1a9d78",
+          "after": "a56b63fa017579a587e87a826b9bda899dce8157f42bb024ace42e4bf9ff5145"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tools/ability_support_sources.py": [
+      "qualification40-exact-b0712fa66a9cc38e"
+    ],
+    "tools/source_scope_provenance.py": [
+      "registered-source-provenance-projection"
+    ]
+  },
+  "source_obligation": "Register only the authenticated current Banshee and Eldrad two-page F00 audit and the existing SUPERSEDE_ROW operation excluding obsolete Eldrad 000000568 to Warlock Conclave 000000584 at retained row108. Bind the overlay and complete audit through the existing source loader/index, and register its exact path/hash for truthful historical base-version projection. No native bodyguards or geometry are admitted.",
+  "unchanged_work": "These exact two files compose one finite preimage-bound source overlay, include its audit/index inputs, and register the exact historical base-version projection. Existing source-index/cache/token, overlay validation, provenance projection, contract and harness algorithms remain unchanged. The mandatory sensitive source-reuse mappings and family remain intact. Only these exact rule_semantics diffs at base675c3b22 follow the standing bounded-source-repair serial-smoke default. All other bases/paths/owners/hashes/categories retain original requirements. Separate fresh dice and reconstruction comparisons cover the shared native repair development workloads. No source-reuse speedup or full-game certification is claimed; all local/remote correctness, source/work/cache and timing gates remain required."
+}

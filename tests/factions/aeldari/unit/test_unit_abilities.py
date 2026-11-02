@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from tests.factions.aeldari.consumer_helpers import (
     AVENGERS,
     ELDRAD,
@@ -46,6 +48,11 @@ from tests.factions.aeldari.consumer_helpers import (
     translate,
     weapon_rows,
 )
+from tests.factions.aeldari.current_source_helpers import definitions
+from tests.psychic_modifier_helpers import submit_fixture_request
+from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.fight_resolution import MeleeDeclarationProposalRequest
+from warhammer40k_core.engine.saves import SaveOption, save_options_for_model
 
 
 def test_rangers_infiltrators_and_ranged_invulnerable_queries_are_model_scoped(
@@ -396,3 +403,287 @@ def test_eldrad_leader_does_not_invent_selected_bodyguard_admission(
             ),
             model_geometries=d.package.model_geometries,
         )
+
+
+BANSHEES = "000000594"
+JAIN_ZAR = "000000572"
+
+
+@pytest.fixture(scope="module")
+def save_definitions(selected_army_source_index: Path | None) -> Section02Definitions:
+    return definitions(selected_army_source_index, datasheet_ids=(BANSHEES, JAIN_ZAR, LORD, ELDRAD))
+
+
+def test_native_banshee_roles_keep_base_five_and_melee_four(
+    save_definitions: Section02Definitions,
+) -> None:
+    d = save_definitions
+    s = scene(
+        d,
+        (selection(d, BANSHEES, "banshees"), selection(d, ELDRAD, "other")),
+        (selection(d, LORD, "enemy"),),
+    )
+    bundle = s.session.lifecycle._require_runtime_content_bundle()  # pyright: ignore[reportPrivateUsage]
+    unit = s.units["own:banshees"]
+    assert len({m.model_profile_id for m in unit.own_models}) == 2
+    for model in unit.own_models:
+        base = save_options_for_model(model=model, armor_penetration=-3)
+        assert next(o.target_number for o in base if o.save_kind is SaveKind.INVULNERABLE) == 5
+        context = SaveOptionModifierContext(
+            s.state,
+            unit.unit_instance_id,
+            (SaveOption(SaveKind.INVULNERABLE, 5, 5, 0),),
+            source_phase=BattlePhase.FIGHT,
+            weapon_profile=d.weapon(f"{LORD}:phoenix-power-spear"),
+            allocated_model_instance_id=model.model_instance_id,
+        )
+        options = bundle.runtime_modifier_registry.modified_save_options(context)
+        assert [(o.save_kind, o.target_number) for o in options] == [(SaveKind.INVULNERABLE, 4)]
+        for changed in (
+            replace(context, weapon_profile=d.weapon(f"{LORD}:bolt-pistol")),
+            replace(context, weapon_profile=None),
+            replace(context, allocated_model_instance_id=None),
+            replace(context, allocated_model_instance_id=s.units["own:other"].own_model_ids()[0]),
+            replace(context, target_unit_instance_id="own:other"),
+        ):
+            assert (
+                bundle.runtime_modifier_registry.modified_save_options(changed)
+                == context.save_options
+            )
+        # Weapon kind, not phase name, controls an incoming-attack restriction.
+        assert (
+            bundle.runtime_modifier_registry.modified_save_options(
+                replace(context, source_phase=BattlePhase.SHOOTING)
+            )
+            == options
+        )
+        assert (
+            bundle.runtime_modifier_registry.modified_save_options(
+                replace(context, save_options=(SaveOption(SaveKind.INVULNERABLE, 3, 3, 0),))
+            )[0].target_number
+            == 3
+        )
+
+
+@pytest.mark.parametrize(("role", "seed"), (("howling-banshees", 1), ("howling-banshee-exarch", 2)))
+def test_native_fight_melee_save_restore_and_exact_replay(
+    save_definitions: Section02Definitions, role: str, seed: int
+) -> None:
+    d = save_definitions
+    s = scene(
+        d,
+        (selection(d, BANSHEES, "banshees"),),
+        (selection(d, LORD, "enemy"),),
+        phase=BattlePhase.FIGHT,
+        seed=f"banshee-melee-save-{seed}",
+    )
+    unit = s.units["own:banshees"]
+    survivor = next(m for m in unit.own_models if m.model_profile_id == f"{BANSHEES}:{role}")
+    remaining = tuple(m for m in unit.own_models if m != survivor)
+    positions = {survivor.model_instance_id: Pose.at(10, 10)}
+    positions.update(
+        {m.model_instance_id: Pose.at(10 - 1.3 * (i + 1), 10) for i, m in enumerate(remaining)}
+    )
+    locate(s, "own:banshees", tuple(positions[m.model_instance_id] for m in unit.own_models))
+    locate(s, "foe:enemy", (Pose.at(12, 10),))
+    anchor(s)
+    status = s.session.advance_until_decision_or_terminal()
+    restored = None
+    for _ in range(100):
+        r = request(status)
+        if r.decision_type == "submit_melee_declaration" and r.actor_id == "opponent":
+            saved = s.session.to_persistence_payload()
+            restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(saved)))
+            assert restored.to_persistence_payload() == saved
+            for player in ("owner", "opponent"):
+                assert restored.view(viewer_player_id=player) == s.session.view(
+                    viewer_player_id=player
+                )
+        _submit_attack_choice(s.session, r, survivor.model_instance_id)
+        if restored is not None:
+            rr = restored.lifecycle.pending_decision_request()
+            assert rr is not None
+            assert rr.to_payload() == r.to_payload()
+            _submit_attack_choice(restored, rr, survivor.model_instance_id)
+            assert restored.to_persistence_payload() == s.session.to_persistence_payload()
+        if len(events(s.session, "attack_sequence_completed")) >= 2:
+            break
+        status = s.session.advance_until_decision_or_terminal()
+    else:
+        raise AssertionError("Native Fight attack did not finish")
+    saves = [
+        cast(dict[str, Any], e.payload)["payload"]
+        for e in s.session.lifecycle.decision_controller.event_log.records
+        if e.event_type == "attack_sequence_step"
+        and isinstance(e.payload, dict)
+        and e.payload.get("step") == "save"
+        and "foe:enemy" in str(e.payload.get("sequence_id"))
+    ]
+    assert any(
+        v["unmodified_roll"] == 4
+        and v["successful"]
+        and v["save_kind"] == "invulnerable"
+        and v["target_number"] == 4
+        and v["option"]["characteristic_trace"]["source_value"] == 5
+        and f":{role}:" in v["allocated_model_id"]
+        for v in saves
+    )
+    assert restored is not None
+    assert (
+        ReplayRunner.from_payload(s.session.replay_artifact(artifact_id="banshee-save"))
+        .run()
+        .reproduced_exactly
+    )
+
+
+def test_attached_bodyguard_save_does_not_transfer_to_leader(
+    save_definitions: Section02Definitions,
+) -> None:
+    d = save_definitions
+    s = scene(
+        d,
+        (selection(d, BANSHEES, "banshees"), selection(d, JAIN_ZAR, "leader")),
+        (selection(d, LORD, "enemy"),),
+        attachments=(AttachmentDeclaration("leader", "banshees"),),
+    )
+    attached = next(a for a in s.state.army_definitions if a.player_id == "owner").attached_units[0]
+    registry = s.session.lifecycle._require_runtime_content_bundle().runtime_modifier_registry  # pyright: ignore[reportPrivateUsage]
+    context = SaveOptionModifierContext(
+        s.state,
+        attached.attached_unit_instance_id,
+        (),
+        source_phase=BattlePhase.FIGHT,
+        weapon_profile=d.weapon(f"{LORD}:phoenix-power-spear"),
+        allocated_model_instance_id=s.units["own:banshees"].own_model_ids()[0],
+    )
+    for model_id in s.units["own:banshees"].own_model_ids():
+        options = registry.modified_save_options(
+            replace(context, allocated_model_instance_id=model_id)
+        )
+        assert [(o.save_kind, o.target_number) for o in options] == [(SaveKind.INVULNERABLE, 4)]
+    # Empty input isolates the Banshee grant from Jain Zar's own printed 4+ base.
+    assert (
+        registry.modified_save_options(
+            replace(context, allocated_model_instance_id=s.units["own:leader"].own_model_ids()[0])
+        )
+        == ()
+    )
+    assert (
+        registry.modified_save_options(
+            replace(context, weapon_profile=d.weapon(f"{LORD}:bolt-pistol"))
+        )
+        == ()
+    )
+
+
+def _submit_attack_choice(session: LocalGameSession, r: DecisionRequest, model_id: str) -> None:
+    if r.decision_type == "submit_melee_declaration" and r.actor_id == "opponent":
+        melee = MeleeDeclarationProposalRequest.from_decision_request(r)
+        weapon = next(
+            cast(dict[str, Any], w)
+            for w in melee.available_weapons
+            if isinstance(w, dict) and w["wargear_id"] == f"{LORD}:phoenix-power-spear"
+        )
+        status = session.submit_parameterized_payload(
+            request_id=r.request_id,
+            result_id=f"{r.request_id}:native-spear",
+            payload={
+                "proposal_request_id": melee.request_id,
+                "proposal_kind": melee.proposal_kind,
+                "player_id": melee.actor_id,
+                "battle_round": melee.battle_round,
+                "unit_instance_id": melee.unit_instance_id,
+                "source_decision_request_id": melee.source_decision_request_id,
+                "source_decision_result_id": melee.source_decision_result_id,
+                "declarations": [
+                    {
+                        "attacker_model_instance_id": weapon["model_instance_id"],
+                        "weapon_instance_id": weapon["weapon_instance_id"],
+                        "wargear_id": weapon["wargear_id"],
+                        "weapon_profile_id": weapon["weapon_profile_id"],
+                        "target_allocations": [{"target_unit_instance_id": "own:banshees"}],
+                    }
+                ],
+            },
+        )
+        assert status.status_kind.value != "invalid", status.to_payload()
+    elif r.decision_type == "select_allocation_order":
+        option = next(
+            o
+            for o in r.options
+            if model_id in cast(dict[str, Any], o.payload)["ordered_groups"][0]["model_ids"]
+        )
+        session.submit_option(
+            request_id=r.request_id,
+            option_id=option.option_id,
+            result_id=f"{r.request_id}:native-order",
+        )
+    elif r.decision_type == "select_damage_allocation_model" and any(
+        o.option_id == model_id for o in r.options
+    ):
+        session.submit_option(
+            request_id=r.request_id, option_id=model_id, result_id=f"{r.request_id}:native-model"
+        )
+    else:
+        submit_fixture_request(session, r)
+
+
+def test_native_ranged_attack_keeps_five_plus_save(save_definitions: Section02Definitions) -> None:
+    d = save_definitions
+    s = scene(
+        d,
+        (selection(d, BANSHEES, "banshees"),),
+        (selection(d, LORD, "enemy"),),
+        phase=BattlePhase.SHOOTING,
+        active="opponent",
+        seed="banshee-ranged-save-2",
+    )
+    unit = s.units["own:banshees"]
+    locate(s, "own:banshees", tuple(Pose.at(10 - i * 1.3, 10) for i in range(len(unit.own_models))))
+    locate(s, "foe:enemy", (Pose.at(16, 10),))
+    anchor(s)
+    request(s.session.advance_until_decision_or_terminal(), "select_shooting_unit")
+    r = shooting_request(s.session, "foe:enemy")
+    rows = [
+        row
+        for row in weapon_rows(r)
+        if row["wargear_id"] == f"{LORD}:plasma-pistol"
+        and str(row["weapon_profile_id"]).endswith(":standard")
+    ]
+    assert len(rows) == 1
+    status = s.session.submit_parameterized_payload(
+        request_id=r.request_id,
+        result_id=f"{r.request_id}:plasma",
+        payload=shooting_payload(r, rows, ("own:banshees",)),
+    )
+    for _ in range(30):
+        if events(s.session, "attack_sequence_completed"):
+            break
+        rr = request(status)
+        _submit_attack_choice(s.session, rr, unit.own_model_ids()[0])
+        status = s.session.advance_until_decision_or_terminal()
+    else:
+        raise AssertionError("Native ranged attack did not finish")
+    saves = [
+        cast(dict[str, Any], e.payload)["payload"]
+        for e in s.session.lifecycle.decision_controller.event_log.records
+        if e.event_type == "attack_sequence_step"
+        and isinstance(e.payload, dict)
+        and e.payload.get("step") == "save"
+    ]
+    assert saves, [
+        (v.get("step"), v.get("payload")) for v in events(s.session, "attack_sequence_step")
+    ]
+    assert any(
+        v["save_kind"] == "invulnerable" and v["target_number"] == 5 and v["successful"]
+        for v in saves
+    ), saves
+    for value in saves:
+        invulnerable = next(o for o in value["save_options"] if o["save_kind"] == "invulnerable")
+        assert invulnerable["target_number"] == 5
+        assert not any("conditional-melee" in source for source in invulnerable["source_rule_ids"])
+    assert (
+        ReplayRunner.from_payload(s.session.replay_artifact(artifact_id="banshee-ranged-save"))
+        .run()
+        .reproduced_exactly
+    )
