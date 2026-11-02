@@ -246,41 +246,41 @@
     },
     "docs/performance/current/aeldari-current-dice.json": {
       "before_sha256": null,
-      "after_sha256": "751e3a02b8b997ea7627e394a42382bee952dc44733a481f92c04f7002f93fad",
+      "after_sha256": "4f4d0c85845d23139cc8d077a94e705111faab0ae2eeaefc88b486cd66956595",
       "owners": {
         "@document": {
           "before": null,
-          "after": "751e3a02b8b997ea7627e394a42382bee952dc44733a481f92c04f7002f93fad"
+          "after": "4f4d0c85845d23139cc8d077a94e705111faab0ae2eeaefc88b486cd66956595"
         }
       }
     },
     "docs/performance/current/aeldari-current-dice_sustained.json": {
       "before_sha256": null,
-      "after_sha256": "4a83146c0d78adf4d388f0614e95740fdfd86b2fd4aaaffba65b8ad03952faa6",
+      "after_sha256": "8b95b88254265729778a0903fed788b0a0606d66e43f81e6a4ed75f856df7d02",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4a83146c0d78adf4d388f0614e95740fdfd86b2fd4aaaffba65b8ad03952faa6"
+          "after": "8b95b88254265729778a0903fed788b0a0606d66e43f81e6a4ed75f856df7d02"
         }
       }
     },
     "docs/performance/current/aeldari-current-movement.json": {
       "before_sha256": null,
-      "after_sha256": "22e19f8d924e61d7b27e0378ab4cbb38f1b3185cb7eeb9f8d6e3fd6486bb948b",
+      "after_sha256": "6a2a25c3e51e830a9b2e823d5e7a7a4bfbee6768f885c08acad8b91a1ab7bfd5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "22e19f8d924e61d7b27e0378ab4cbb38f1b3185cb7eeb9f8d6e3fd6486bb948b"
+          "after": "6a2a25c3e51e830a9b2e823d5e7a7a4bfbee6768f885c08acad8b91a1ab7bfd5"
         }
       }
     },
     "docs/performance/current/aeldari-current-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "a0fb03f6a37cc4374f6575b8daf46225dd475c920901bb79646b0034e97ca5aa",
+      "after_sha256": "d2842904635449f0014ec6d43df42dad3608c380cdb38245f95a618309002524",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a0fb03f6a37cc4374f6575b8daf46225dd475c920901bb79646b0034e97ca5aa"
+          "after": "d2842904635449f0014ec6d43df42dad3608c380cdb38245f95a618309002524"
         }
       }
     },

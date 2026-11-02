@@ -4,7 +4,7 @@
   "workload_id": "order80-normal-move-occurrence-v1",
   "base_revision": "5e26b4b4791d0c25579faebc28394ec25bb38b24",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:75beb12947d32f9a9220007fdaa9ec00a0c5b6faa67400fde990782af913ec2e",
-  "head_input_digest": "fa2b1149d66a9fe240b433078013a31f4b5b08006f0852c031c76df51cf584b5",
+  "head_input_digest": "03f88c17ff9a729d19433339390a74aa10afb7f0f129295756e2ed1cb72c23b9",
   "budget_profile": "current-change-relative-v1",
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:617011195977d5ecb3d7445dffe6bce8d4031328abfe55b51ec1ef67b33c3448",
@@ -18,17 +18,17 @@
     },
     "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
     "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
-    "fixture_sha256": "55f2a286d9df387128856df4ef9891d47ae1b018c003a653d446d1a987a71a92",
+    "fixture_sha256": "27f57d003620ad8ae91cc5458273fd15c23ed48caae349e2e4f1569a0f4f51bc",
     "samples": {
       "finite": [
-        3.453632103000018,
-        3.488425797000218,
-        3.4353973080001197
+        3.484974776999991,
+        3.478437052000004,
+        3.5079723100000137
       ],
       "parameterized": [
-        3.1676903789998505,
-        3.0842787849996967,
-        3.196804745999998
+        3.224118326999985,
+        3.1230506410000203,
+        3.229674278999994
       ]
     },
     "completed": true,
@@ -47,17 +47,17 @@
     },
     "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
     "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
-    "fixture_sha256": "55f2a286d9df387128856df4ef9891d47ae1b018c003a653d446d1a987a71a92",
+    "fixture_sha256": "27f57d003620ad8ae91cc5458273fd15c23ed48caae349e2e4f1569a0f4f51bc",
     "samples": {
       "finite": [
-        3.4660235809997175,
-        3.389967768999668,
-        3.4229055339997103
+        3.5339663910000354,
+        3.480645863999996,
+        3.483619475000012
       ],
       "parameterized": [
-        3.1584553590000723,
-        3.0727144610000323,
-        3.16442168399999
+        3.2381405699999846,
+        3.1528197619999787,
+        3.2433650269999816
       ]
     },
     "completed": true,
