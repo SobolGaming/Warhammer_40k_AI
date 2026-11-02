@@ -700,7 +700,7 @@ def test_current_aeldari_overlay_changes_only_two_reviewed_source_fields() -> No
         ("Datasheets", "000002532"): "loadout",
         ("Abilities", "000009894:AE"): "description",
     }
-    seen = set()
+    seen: set[tuple[str, str]] = set()
     for before, after in zip(sources, result, strict=True):
         assert len(before.rows) == len(after.rows)
         for old, new in zip(before.rows, after.rows, strict=True):

@@ -506,7 +506,8 @@ def test_aeldari_source_smoke_scope_requires_exact_bindings_and_fails_closed(
         assert not recognize(
             base=candidate_base, path=candidate_path, category=category, change=change
         )
-    for candidate in (None, [], {}, "malformed"):
+    malformed_candidates: tuple[object, ...] = (None, [], {}, "malformed")
+    for candidate in malformed_candidates:
         assert not recognize(base=base, path=path, category="rule_semantics", change=candidate)
     for key in ("before_sha256", "after_sha256", "owners"):
         drifted = copy.deepcopy(change)
@@ -545,7 +546,13 @@ def test_aeldari_source_smoke_scope_requires_exact_bindings_and_fails_closed(
         else:
             malformed["smoke_operations"] = {path: ["unreviewed-operation"]}
         with monkeypatch.context() as scoped:
-            scoped.setattr(policy, "read_object", lambda _path, value=malformed: value)
+
+            def read_malformed_scope(
+                _path: Path, value: dict[str, object] = malformed
+            ) -> dict[str, object]:
+                return value
+
+            scoped.setattr(policy, "read_object", read_malformed_scope)
             with pytest.raises(
                 ValueError, match=r"performance fields|JSON object|exact file|sole exact"
             ):

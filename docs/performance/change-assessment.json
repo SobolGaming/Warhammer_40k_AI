@@ -166,11 +166,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "2db20318c63934a79dc186b10bff3f8ec8ab5214f9e08e1eb637cd3bde1c35e2",
-      "after_sha256": "6e706d67b5443acc22f5fa38cf1fd21199c7677a9f74063f31dd2323cf366c91",
+      "after_sha256": "9dde10bdf08c235f4cd1349baff8be4a160f8bdca9df7a0b860ec08691e05016",
       "owners": {
         "@document": {
           "before": "2db20318c63934a79dc186b10bff3f8ec8ab5214f9e08e1eb637cd3bde1c35e2",
-          "after": "6e706d67b5443acc22f5fa38cf1fd21199c7677a9f74063f31dd2323cf366c91"
+          "after": "9dde10bdf08c235f4cd1349baff8be4a160f8bdca9df7a0b860ec08691e05016"
         }
       }
     },
@@ -668,11 +668,11 @@
     },
     "tests/code_quality/test_current_comparison_routing.py": {
       "before_sha256": "d92434f01a6db37b51c0fe8d81e0cfe83cdbb6fd1e93c1eb126a0986c2c9f68f",
-      "after_sha256": "e3e16f870fb608215fec4c8f33be145e7062c1c71b82452e7a986954648ed19c",
+      "after_sha256": "4d5f2c903908a154d4ab63b46ccb1b314901af6a3ee6ab19bd5133176f73ec16",
       "owners": {
         "test_aeldari_source_smoke_scope_requires_exact_bindings_and_fails_closed": {
           "before": null,
-          "after": "3c174581d1bc6ab0fb480ab23301564c69add2216dd5e1d688d6ffa35ae33b0f"
+          "after": "2406c042455ea86c1c6c85b39692fb477e9d06565b2069cc06d56ae2a7ac80f2"
         }
       }
     },
@@ -812,7 +812,7 @@
     },
     "tests/infrastructure/source/unit/test_source_overlays.py": {
       "before_sha256": "25ef150e96ce0e3236a57ac9afbaed5ef95ecd3a9aa7980fd999de4e86314e8e",
-      "after_sha256": "a2b123bd0ac3afe2d93636622716bbf69890885c48b48503479a231252500ec6",
+      "after_sha256": "0331602bea3659bdba05e8eb1ab5bd97d7f4b3164e0904ae41d7b1324a5e69e4",
       "owners": {
         "test_current_aeldari_f00_pin_and_registry_authenticate_complete_pages": {
           "before": null,
@@ -820,7 +820,7 @@
         },
         "test_current_aeldari_overlay_changes_only_two_reviewed_source_fields": {
           "before": null,
-          "after": "6c7885d7f607ab4ea5595ac700f2f43a48dc8d17bf24d526938ee34849c222ab"
+          "after": "49fc7c645b6b2e6e7438a6a79707a87512fdafa1a7adf2b5a93f861f1cd07e47"
         }
       }
     },
