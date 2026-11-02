@@ -22,7 +22,8 @@ charge-completion/end-of-turn. Its six-inch effect, other five manoeuvres, base
 2/4/6 token amounts, eligibility, phase quotas and round-end loss are preserved.
 The existing generic loadout parser already expresses all five model roles.
 The same-numbered historical Drukhari ability row is not an Aeldari-owned page
-and is unchanged. No unit, option, model, geometry or support admission is added.
+and is unchanged. Three mandatory default weapon entries are restored. No new optional upgrade,
+unit, model, geometry or support admission is added.
 
 Source consumption is shared: `aeldari_current_2026_11.source_package()` passes
 the ordinary F00 evidence and registry boundary; its two-operation overlay runs
