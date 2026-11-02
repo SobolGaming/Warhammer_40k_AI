@@ -415,6 +415,73 @@ def aeldari_current_source_rule_semantics_smoke_operations(
     return frozenset({operations[path]})
 
 
+def deadly_demise_description_smoke_operations(
+    *, base: str, path: str, category: str, change: object
+) -> frozenset[str]:
+    """Recognize only the exact current descriptor transcription declaration."""
+    selected_path = "tools/generate_ability_support_matrix.py"
+    operation = "qualification40-exact-ded6452f144f095b"
+    if (
+        base != "b9d5a54999e9d014cd823a7d2d5c654f05ba2666"
+        or path != selected_path
+        or category != "rule_semantics"
+    ):
+        return frozenset()
+    scope = read_object(
+        Path(__file__).resolve().parents[1]
+        / "docs/performance/policy-v3/deadly-demise-description-smoke-scope.json"
+    )
+    _keys(
+        scope,
+        {
+            "base",
+            "changes",
+            "smoke_operations",
+            "source_obligation",
+            "unchanged_work",
+            "policy_successor",
+        },
+    )
+    proof = object_value(scope["policy_successor"])
+    _keys(proof, {"before_sha256", "after_sha256", "function_block_sha256", "union_call_sha256"})
+    if (
+        proof["before_sha256"] != "8b64320d7e27669a897dc2e441acea3f9c0e37a6629841f3468e03a140f9cd63"
+        or proof["after_sha256"] != digest(Path(__file__).read_bytes())
+        or any(
+            not isinstance(value, str)
+            or len(value) != 64
+            or any(character not in "0123456789abcdef" for character in value)
+            for value in proof.values()
+        )
+    ):
+        raise ValueError("Descriptor policy source proof drifted.")
+    bindings = object_value(scope["changes"])
+    _keys(bindings, {selected_path})
+    binding = object_value(bindings[selected_path])
+    _keys(binding, {"before_sha256", "after_sha256", "owners"})
+    owners = object_value(binding["owners"])
+    _keys(owners, {"@module", "_ability_support_catalog_package"})
+    hashes = (
+        {"before": binding["before_sha256"], "after": binding["after_sha256"]},
+        *owners.values(),
+    )
+    for value in hashes:
+        pair = object_value(value)
+        _keys(pair, {"before", "after"})
+        if any(
+            not isinstance(digest_value, str)
+            or len(digest_value) != 64
+            or any(character not in "0123456789abcdef" for character in digest_value)
+            for digest_value in pair.values()
+        ):
+            raise ValueError("Descriptor smoke scope requires exact file and owner hashes.")
+    if object_value(scope["smoke_operations"]) != {selected_path: [operation]}:
+        raise ValueError("Descriptor smoke scope must retain its sole exact operation.")
+    if scope["base"] != base or bindings[path] != change:
+        return frozenset()
+    return frozenset({operation})
+
+
 def d12_rule_semantics_smoke_operations(
     *, base: str, path: str, category: str, change: object
 ) -> frozenset[str]:
@@ -680,6 +747,9 @@ def validate_assessment(
                 base=base, path=path, category=category, change=changes[path]
             )
             | aeldari_current_source_rule_semantics_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | deadly_demise_description_smoke_operations(
                 base=base, path=path, category=category, change=changes[path]
             )
             | d12_rule_semantics_smoke_operations(

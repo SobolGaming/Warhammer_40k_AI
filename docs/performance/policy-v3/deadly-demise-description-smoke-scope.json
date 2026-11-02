@@ -1,0 +1,32 @@
+{
+  "base": "b9d5a54999e9d014cd823a7d2d5c654f05ba2666",
+  "changes": {
+    "tools/generate_ability_support_matrix.py": {
+      "before_sha256": "637133b98493843facac8dea1a0887905e6443c3a0b355af1a1670b08288d4b8",
+      "after_sha256": "eb4558da6eb2316367fba4011274b67e9bc2b80110a724307dab11ff0229fc29",
+      "owners": {
+        "@module": {
+          "before": "6643a9b33a30d026df6925f9fdafd868953e3ffb22478cdfb9fd91c350b4cd73",
+          "after": "0a38d0547663e88a22f3dbb2892e7cc2aa04370add2684e67f07e9046b80bb03"
+        },
+        "_ability_support_catalog_package": {
+          "before": "f23859c4b6aa641a420700d63c2304a1b2f3f72a75dbd9e21ed414bcda5a0f2f",
+          "after": "3c60effbd21b2157b60b79e1c449594bf1c9918d7da69eebf0f8c4cc12f1fd0b"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tools/generate_ability_support_matrix.py": [
+      "qualification40-exact-ded6452f144f095b"
+    ]
+  },
+  "source_obligation": "Reconcile only the current Deadly Demise description from pinned Core authority; preserve every structured descriptor field and raw historical source.",
+  "unchanged_work": "No deliberate optimization, hot query, search, cache or serialization algorithm changed. Current catalog description/provenance construction only; unchanged real serial smoke and focused source/native controls remain mandatory. No speedup or full-game claim.",
+  "policy_successor": {
+    "before_sha256": "8b64320d7e27669a897dc2e441acea3f9c0e37a6629841f3468e03a140f9cd63",
+    "after_sha256": "78b0fb430315e772f592ae1cd01e95df78ceb98ca4ed91ee9ba74bb87a58efb9",
+    "function_block_sha256": "cdb3e694867f37ed243907975790d0f0a3bef3ef3c7a6c2e0f409d3dc78676b2",
+    "union_call_sha256": "1b754764feefb335a0b20875817b523faa2a9fd38d1855062941033178355729"
+  }
+}

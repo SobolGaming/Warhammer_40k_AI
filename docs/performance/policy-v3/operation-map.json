@@ -32082,6 +32082,93 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "deadly-demise-description-exact-01": {
+      "paths": [
+        "data/source_audits/deadly_demise_2026_11/catalog-description-delta.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "deadly-demise-description-exact-02": {
+      "paths": [
+        "tests/infrastructure/source/unit/test_deadly_demise_descriptions.py"
+      ],
+      "owners": [
+        "@module",
+        "_current_deadly_demise_packages",
+        "_deadly_demise_delta_audit",
+        "_historical_deadly_demise_package",
+        "_mutate_deadly_demise",
+        "test_deadly_demise_adapter_is_once_only_deterministic_and_noop_without_occurrences",
+        "test_deadly_demise_adapter_rejects_unlisted_occurrence",
+        "test_deadly_demise_adapter_rejects_wrong_catalog_owner",
+        "test_deadly_demise_adapter_rejects_wrong_current_source_text",
+        "test_deadly_demise_all_thirty_current_descriptions_preserve_entire_baseline_payloads",
+        "test_deadly_demise_current_adapter_rejects_unreviewed_inputs",
+        "test_deadly_demise_current_adapter_rejects_wrong_current_source_pin",
+        "test_deadly_demise_current_daemons_derivation_rejects_every_unlisted_delta",
+        "test_deadly_demise_derivation_manifest_rejects_altered_mapping",
+        "test_deadly_demise_description_preserves_native_profiles_and_typed_persistence",
+        "test_deadly_demise_preserves_historical_artifact_bytes_and_original_validator"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "deadly-demise-description-exact-03": {
+      "paths": [
+        "tools/core_deadly_demise_catalog_overlay.py"
+      ],
+      "owners": [
+        "@module",
+        "with_current_deadly_demise"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "deadly-demise-description-exact-04": {
+      "paths": [
+        "tools/generate_chaos_daemons_roster_catalog.py"
+      ],
+      "owners": [
+        "@module",
+        "build_catalog_package"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "deadly-demise-description-exact-05": {
+      "paths": [
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "deadly_demise_description_smoke_operations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "deadly-demise-description-exact-06": {
+      "paths": [
+        "tests/code_quality/test_performance_policy.py"
+      ],
+      "owners": [
+        "_deadly_demise_policy_predecessor",
+        "test_deadly_demise_description_smoke_scope_is_exact",
+        "test_deadly_demise_policy_successor_preserves_exact_predecessor",
+        "test_deadly_demise_scope_keeps_mandatory_mapping_and_detailed_categories",
+        "test_deadly_demise_smoke_scope_rejects_unbounded_declarations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

@@ -9,8 +9,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING or __package__:
+    from tools.core_deadly_demise_catalog_overlay import with_current_deadly_demise
     from tools.core_stealth_catalog_overlay import with_current_stealth
 else:
+    from core_deadly_demise_catalog_overlay import with_current_deadly_demise
     from core_stealth_catalog_overlay import with_current_stealth
 
 from warhammer40k_core.core.detachment import (
@@ -186,7 +188,18 @@ def build_catalog_package() -> CanonicalCatalogPackage:
         source_artifacts=source_artifacts_with_provenance,
     )
     package = with_current_stealth(package)
-    roster_catalog.validate_catalog_against_reconciliation(
+    package = with_current_deadly_demise(package)
+    package = replace(
+        package,
+        source_artifacts=(
+            *package.source_artifacts,
+            SourceArtifactHash(
+                artifact_name=roster_catalog.CURRENT_SOURCE_ARTIFACT[0],
+                artifact_hash=roster_catalog.CURRENT_SOURCE_ARTIFACT[1],
+            ),
+        ),
+    )
+    roster_catalog.validate_current_catalog_against_reconciliation(
         catalog=package.army_catalog,
         reconciliation=reconciliation,
     )

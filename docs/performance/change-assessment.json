@@ -1,794 +1,586 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "675c3b2274c85e7b1926882648f717bd9ab09feb",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0e0e472702044a85b431808cb60d03ed6b7541e7674564955ee1bd8cef32e185",
-  "operation_map_sha256": "b232fd808d87e46c477a726d29c2bffe84991d548a5414f8174960e4f3e02150",
+  "base": "b9d5a54999e9d014cd823a7d2d5c654f05ba2666",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bdc45689262eff59f08b038948636d1e12ed069bc4a737a1f509ed15522c86a9",
+  "operation_map_sha256": "3bac402857fdbe42bb935f4b69d9ffca3f2f896ff8e7cf5d6b0df7b58e8adb77",
   "changes": {
+    ".gitattributes": {
+      "before_sha256": "f57f8e08e66f9080d1ad3f560cd1d5dfef6d43a44ef221a0ad81898149ca1394",
+      "after_sha256": "d93587a7a0769216fbb473723990618e311cd70a8d1c610831e252f5b32e4703",
+      "owners": {
+        "@document": {
+          "before": "f57f8e08e66f9080d1ad3f560cd1d5dfef6d43a44ef221a0ad81898149ca1394",
+          "after": "d93587a7a0769216fbb473723990618e311cd70a8d1c610831e252f5b32e4703"
+        }
+      }
+    },
     "ci/quality_shards/all.txt": {
-      "before_sha256": "fd9f9bfd9ec8e976e3e87a7a0cd2f7faa6f70a3d554b298a89b6120dfe233e76",
-      "after_sha256": "f7c492c6dec38fa7957b812f2394d1ebb2d5fc3c204cb49608944d5115a82ff7",
+      "before_sha256": "f7c492c6dec38fa7957b812f2394d1ebb2d5fc3c204cb49608944d5115a82ff7",
+      "after_sha256": "bad6c83a2cfe3d108572467221e98bfaf2f2b90e056c7e356e8ebc1b23f004f3",
       "owners": {
         "@document": {
-          "before": "fd9f9bfd9ec8e976e3e87a7a0cd2f7faa6f70a3d554b298a89b6120dfe233e76",
-          "after": "f7c492c6dec38fa7957b812f2394d1ebb2d5fc3c204cb49608944d5115a82ff7"
+          "before": "f7c492c6dec38fa7957b812f2394d1ebb2d5fc3c204cb49608944d5115a82ff7",
+          "after": "bad6c83a2cfe3d108572467221e98bfaf2f2b90e056c7e356e8ebc1b23f004f3"
         }
       }
     },
-    "ci/quality_shards/shard-1.txt": {
-      "before_sha256": "02ff487b586ba26b2dc7c445664a58f857c1f7c7fc50c0b917d9b2dddf575748",
-      "after_sha256": "dd48654a882acbb29f5961e04465c27c84982fe46aae200871db6c78cce5d47c",
+    "ci/quality_shards/shard-2.txt": {
+      "before_sha256": "49bb3cf2812abe7c883eecb92f8b0841d71665dd6769df302658725c90edb954",
+      "after_sha256": "9216f31366757a751b5ded3a2571aa3fb92538d43f50ca414578428488fe97f9",
       "owners": {
         "@document": {
-          "before": "02ff487b586ba26b2dc7c445664a58f857c1f7c7fc50c0b917d9b2dddf575748",
-          "after": "dd48654a882acbb29f5961e04465c27c84982fe46aae200871db6c78cce5d47c"
-        }
-      }
-    },
-    "ci/quality_shards/shard-4-modules.txt": {
-      "before_sha256": "1ebce2d5411e189b136673e2448986bab44e6ea761da52123526716f855fc39c",
-      "after_sha256": "05ebbc406104ba0dac4483574f4a83fcd3cd88f95a0b846cb64cbdfe41f5f853",
-      "owners": {
-        "@document": {
-          "before": "1ebce2d5411e189b136673e2448986bab44e6ea761da52123526716f855fc39c",
-          "after": "05ebbc406104ba0dac4483574f4a83fcd3cd88f95a0b846cb64cbdfe41f5f853"
-        }
-      }
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "d7d3f351e753bbc6429d4e511cba0423f39c41e240633f2c63ed9e366f178660",
-      "after_sha256": "62a9c34b2d955bce83531578a397c89560f98b7dd953b6668ce8a6a0c61e0114",
-      "owners": {
-        "@document": {
-          "before": "d7d3f351e753bbc6429d4e511cba0423f39c41e240633f2c63ed9e366f178660",
-          "after": "62a9c34b2d955bce83531578a397c89560f98b7dd953b6668ce8a6a0c61e0114"
+          "before": "49bb3cf2812abe7c883eecb92f8b0841d71665dd6769df302658725c90edb954",
+          "after": "9216f31366757a751b5ded3a2571aa3fb92538d43f50ca414578428488fe97f9"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "dd79a7afbd7c313d11f872a5fbc73b9e7ae2848fd79236fe8cae028e5d1f71fa",
-      "after_sha256": "3cfda174ae614c5f8d2dddac5f2d204949a67d37ddd2e172dbb801ce8ec015db",
+      "before_sha256": "3cfda174ae614c5f8d2dddac5f2d204949a67d37ddd2e172dbb801ce8ec015db",
+      "after_sha256": "2a6f09d38e1b75d32d6c6b4ae36532471f112fb4ac6539bac6f4c1f99bd47ddd",
       "owners": {
         "@document": {
-          "before": "dd79a7afbd7c313d11f872a5fbc73b9e7ae2848fd79236fe8cae028e5d1f71fa",
-          "after": "3cfda174ae614c5f8d2dddac5f2d204949a67d37ddd2e172dbb801ce8ec015db"
+          "before": "3cfda174ae614c5f8d2dddac5f2d204949a67d37ddd2e172dbb801ce8ec015db",
+          "after": "2a6f09d38e1b75d32d6c6b4ae36532471f112fb4ac6539bac6f4c1f99bd47ddd"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "cc302ec565b189fd1696f7df9201bfbed38ac2197cb0988aa10d178e415f3558",
-      "after_sha256": "90c29550d19c13cd98b71e08a480c5c76f55030fa79e686bfef4d62e25c13763",
+      "before_sha256": "90c29550d19c13cd98b71e08a480c5c76f55030fa79e686bfef4d62e25c13763",
+      "after_sha256": "313adfb7f2fb73a12e189315e2c422953a7bdb6011d49360b0951405e2c93375",
       "owners": {
         "@document": {
-          "before": "cc302ec565b189fd1696f7df9201bfbed38ac2197cb0988aa10d178e415f3558",
-          "after": "90c29550d19c13cd98b71e08a480c5c76f55030fa79e686bfef4d62e25c13763"
+          "before": "90c29550d19c13cd98b71e08a480c5c76f55030fa79e686bfef4d62e25c13763",
+          "after": "313adfb7f2fb73a12e189315e2c422953a7bdb6011d49360b0951405e2c93375"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "fb812342a574b19f255e8cc46611d40ff47c649f9bd9f205b2ab50c798a52f2e",
-      "after_sha256": "d847ff1411e5823b946a57a6677355593127631e8b9da47c1674160adefa79f0",
+      "before_sha256": "d847ff1411e5823b946a57a6677355593127631e8b9da47c1674160adefa79f0",
+      "after_sha256": "c06486e0e198b1c8577a863590c8593a2b487646c92690d53b810560688a1eed",
       "owners": {
         "@document": {
-          "before": "fb812342a574b19f255e8cc46611d40ff47c649f9bd9f205b2ab50c798a52f2e",
-          "after": "d847ff1411e5823b946a57a6677355593127631e8b9da47c1674160adefa79f0"
+          "before": "d847ff1411e5823b946a57a6677355593127631e8b9da47c1674160adefa79f0",
+          "after": "c06486e0e198b1c8577a863590c8593a2b487646c92690d53b810560688a1eed"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "8eef6ab0ce4f90ecc7a7e8bae5427af761d6e2eb6eefebfc2ee2cd844b53c7d2",
-      "after_sha256": "dc3cc7cb473ff56ce8ead4fe6a4bacbd734421f8bfe9214e261fda3ea33024aa",
+      "before_sha256": "dc3cc7cb473ff56ce8ead4fe6a4bacbd734421f8bfe9214e261fda3ea33024aa",
+      "after_sha256": "88b18f8c59a29f580f14c4eb7368143ebef6e666bd5102f3de466e4e5384c795",
       "owners": {
         "@document": {
-          "before": "8eef6ab0ce4f90ecc7a7e8bae5427af761d6e2eb6eefebfc2ee2cd844b53c7d2",
-          "after": "dc3cc7cb473ff56ce8ead4fe6a4bacbd734421f8bfe9214e261fda3ea33024aa"
+          "before": "dc3cc7cb473ff56ce8ead4fe6a4bacbd734421f8bfe9214e261fda3ea33024aa",
+          "after": "88b18f8c59a29f580f14c4eb7368143ebef6e666bd5102f3de466e4e5384c795"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "f8b1dc67bc3a3a0d21df7908fed11593c0fe632ab78bc54df83cbb0a3f76604c",
-      "after_sha256": "63d4cc50a4ff75ddb85ca8e8d1aee9125480192ade9809e4b889a13e4098759c",
+      "before_sha256": "63d4cc50a4ff75ddb85ca8e8d1aee9125480192ade9809e4b889a13e4098759c",
+      "after_sha256": "75761f1f0d5373775b3c16d071a11cf44fc31cdb54387c740ac63f644af1ba54",
       "owners": {
         "@document": {
-          "before": "f8b1dc67bc3a3a0d21df7908fed11593c0fe632ab78bc54df83cbb0a3f76604c",
-          "after": "63d4cc50a4ff75ddb85ca8e8d1aee9125480192ade9809e4b889a13e4098759c"
+          "before": "63d4cc50a4ff75ddb85ca8e8d1aee9125480192ade9809e4b889a13e4098759c",
+          "after": "75761f1f0d5373775b3c16d071a11cf44fc31cdb54387c740ac63f644af1ba54"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "9ebde03e87c93971eb0a862f0a58e27afe7b013285437c5e32fa15d0d60fe19d",
-      "after_sha256": "b0fb05e1000c17d1950f0eebfe601472ae984fee7c33d84a4853e0190f960912",
+      "before_sha256": "b0fb05e1000c17d1950f0eebfe601472ae984fee7c33d84a4853e0190f960912",
+      "after_sha256": "70e46f944679651380f021482d388e2710665e9792be8bd661a77c170b392f95",
       "owners": {
         "@document": {
-          "before": "9ebde03e87c93971eb0a862f0a58e27afe7b013285437c5e32fa15d0d60fe19d",
-          "after": "b0fb05e1000c17d1950f0eebfe601472ae984fee7c33d84a4853e0190f960912"
+          "before": "b0fb05e1000c17d1950f0eebfe601472ae984fee7c33d84a4853e0190f960912",
+          "after": "70e46f944679651380f021482d388e2710665e9792be8bd661a77c170b392f95"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "452934b74dcf45b4a903a99945cc263a2afc5e6c36071dc7fdfad3b8e00c76cc",
-      "after_sha256": "ab6f94a99b9d6520d506f721802bd3933d85d13a9608435387288ff2d306527b",
+      "before_sha256": "ab6f94a99b9d6520d506f721802bd3933d85d13a9608435387288ff2d306527b",
+      "after_sha256": "7fae5b3bd4aacf1d2ac0438c3476daf09cc797545e60dd3afbff803e3240e9f4",
       "owners": {
         "@document": {
-          "before": "452934b74dcf45b4a903a99945cc263a2afc5e6c36071dc7fdfad3b8e00c76cc",
-          "after": "ab6f94a99b9d6520d506f721802bd3933d85d13a9608435387288ff2d306527b"
+          "before": "ab6f94a99b9d6520d506f721802bd3933d85d13a9608435387288ff2d306527b",
+          "after": "7fae5b3bd4aacf1d2ac0438c3476daf09cc797545e60dd3afbff803e3240e9f4"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "2cd151d90dd2f449f6c44c267a0561e5bc6a3509b8ecce96d1c2736722fdb591",
-      "after_sha256": "239c7a89741299c7512d50ec59c1781b5f35bf93066b90bb4f05af8f2252c05a",
+      "before_sha256": "239c7a89741299c7512d50ec59c1781b5f35bf93066b90bb4f05af8f2252c05a",
+      "after_sha256": "9acf4107b80f0af3dd2f1c42b3bee8c83d3721e07dbabfad8a0bf0bef7e28601",
       "owners": {
         "@document": {
-          "before": "2cd151d90dd2f449f6c44c267a0561e5bc6a3509b8ecce96d1c2736722fdb591",
-          "after": "239c7a89741299c7512d50ec59c1781b5f35bf93066b90bb4f05af8f2252c05a"
+          "before": "239c7a89741299c7512d50ec59c1781b5f35bf93066b90bb4f05af8f2252c05a",
+          "after": "9acf4107b80f0af3dd2f1c42b3bee8c83d3721e07dbabfad8a0bf0bef7e28601"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "cb00512b413518fee6ae8c306a2abdde9b62eec24b4442216292ebddbfbd2182",
-      "after_sha256": "b2e70909f27ec0449dd7d454ec1fd367bab3df0f490aaf2a724ceedd8b9fc764",
+      "before_sha256": "b2e70909f27ec0449dd7d454ec1fd367bab3df0f490aaf2a724ceedd8b9fc764",
+      "after_sha256": "37d6ae981faa7220060da67d83f0c0ca7a6a086ab3a44ab7faab4da0251755ab",
       "owners": {
         "@document": {
-          "before": "cb00512b413518fee6ae8c306a2abdde9b62eec24b4442216292ebddbfbd2182",
-          "after": "b2e70909f27ec0449dd7d454ec1fd367bab3df0f490aaf2a724ceedd8b9fc764"
+          "before": "b2e70909f27ec0449dd7d454ec1fd367bab3df0f490aaf2a724ceedd8b9fc764",
+          "after": "37d6ae981faa7220060da67d83f0c0ca7a6a086ab3a44ab7faab4da0251755ab"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "5f69f65f4776f5c4685e72ceb42e8eaffeaa5f2b24b0d5dbb5bea7892be9ba96",
-      "after_sha256": "4a03d34b8b13b1633c7b02cdd8c26bf46b85dc7d9b57111b357675d4c8cb3f5f",
+      "before_sha256": "4a03d34b8b13b1633c7b02cdd8c26bf46b85dc7d9b57111b357675d4c8cb3f5f",
+      "after_sha256": "cb247368db459b2f00904165c0dfccaa5f723ed8bc83017b11caa469c9690aea",
       "owners": {
         "@document": {
-          "before": "5f69f65f4776f5c4685e72ceb42e8eaffeaa5f2b24b0d5dbb5bea7892be9ba96",
-          "after": "4a03d34b8b13b1633c7b02cdd8c26bf46b85dc7d9b57111b357675d4c8cb3f5f"
+          "before": "4a03d34b8b13b1633c7b02cdd8c26bf46b85dc7d9b57111b357675d4c8cb3f5f",
+          "after": "cb247368db459b2f00904165c0dfccaa5f723ed8bc83017b11caa469c9690aea"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "79919c3565ec6e7ba44601c693c41a3684a742f82bab14f5df525783837cfa0d",
-      "after_sha256": "63103304c504bd65a279317dce294a377587bd030a36253ed56240307e6b898c",
+      "before_sha256": "63103304c504bd65a279317dce294a377587bd030a36253ed56240307e6b898c",
+      "after_sha256": "f8c77bf107bcb91f1e5690c8c02eb0a0160162820af8e5cbee1e0c22de4a29ed",
       "owners": {
         "@document": {
-          "before": "79919c3565ec6e7ba44601c693c41a3684a742f82bab14f5df525783837cfa0d",
-          "after": "63103304c504bd65a279317dce294a377587bd030a36253ed56240307e6b898c"
+          "before": "63103304c504bd65a279317dce294a377587bd030a36253ed56240307e6b898c",
+          "after": "f8c77bf107bcb91f1e5690c8c02eb0a0160162820af8e5cbee1e0c22de4a29ed"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "022e71277c08483ef37bcdf74ee80f31396c02a2e56dbc0a36a3c0ee68c2a6c7",
-      "after_sha256": "58c9a92afd4e0914dffec4c3f6cd0b67173b169cdd0968c14f991e39fdc0ec11",
+      "before_sha256": "58c9a92afd4e0914dffec4c3f6cd0b67173b169cdd0968c14f991e39fdc0ec11",
+      "after_sha256": "acedbecc4c7250dbe97c8e00ddd8414c387dfc2504ae8be4fff140e95acde33f",
       "owners": {
         "@document": {
-          "before": "022e71277c08483ef37bcdf74ee80f31396c02a2e56dbc0a36a3c0ee68c2a6c7",
-          "after": "58c9a92afd4e0914dffec4c3f6cd0b67173b169cdd0968c14f991e39fdc0ec11"
+          "before": "58c9a92afd4e0914dffec4c3f6cd0b67173b169cdd0968c14f991e39fdc0ec11",
+          "after": "acedbecc4c7250dbe97c8e00ddd8414c387dfc2504ae8be4fff140e95acde33f"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "0520b81cce999b11821ed43ecea055e51e582f609f0f832f79cb8ce5d679b6c6",
-      "after_sha256": "65da588768d1c6bea6b5aef12e27b83a572fac93b42c93d37fa43ed9f4d4aa46",
+      "before_sha256": "65da588768d1c6bea6b5aef12e27b83a572fac93b42c93d37fa43ed9f4d4aa46",
+      "after_sha256": "40a6f7fafe87e24e72a22f1f6ed2f4c2b42e16fed77b21545436eef4072418f4",
       "owners": {
         "@document": {
-          "before": "0520b81cce999b11821ed43ecea055e51e582f609f0f832f79cb8ce5d679b6c6",
-          "after": "65da588768d1c6bea6b5aef12e27b83a572fac93b42c93d37fa43ed9f4d4aa46"
+          "before": "65da588768d1c6bea6b5aef12e27b83a572fac93b42c93d37fa43ed9f4d4aa46",
+          "after": "40a6f7fafe87e24e72a22f1f6ed2f4c2b42e16fed77b21545436eef4072418f4"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "000231ee8c9d7f6778694ca8c37343966b906e938b58a861d0684061ba7bd222",
-      "after_sha256": "f7338d75fa031baa4f091f78a7a261cfe766aae9f7c2298afdc2c8d17ffddbb0",
+      "before_sha256": "f7338d75fa031baa4f091f78a7a261cfe766aae9f7c2298afdc2c8d17ffddbb0",
+      "after_sha256": "196f3f56425a16cfa73676726a7968dc94419902664f7caba4fd58de917c8b5d",
       "owners": {
         "@document": {
-          "before": "000231ee8c9d7f6778694ca8c37343966b906e938b58a861d0684061ba7bd222",
-          "after": "f7338d75fa031baa4f091f78a7a261cfe766aae9f7c2298afdc2c8d17ffddbb0"
+          "before": "f7338d75fa031baa4f091f78a7a261cfe766aae9f7c2298afdc2c8d17ffddbb0",
+          "after": "196f3f56425a16cfa73676726a7968dc94419902664f7caba4fd58de917c8b5d"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "1d9d3b2c55ffdcc13c49d6ef0ea346539b70298692b38518345b742c6ccffe65",
-      "after_sha256": "779534ea88842b54cf8e6b22b10f29b421628a07362d4141bde4f2e912463370",
+      "before_sha256": "779534ea88842b54cf8e6b22b10f29b421628a07362d4141bde4f2e912463370",
+      "after_sha256": "9d4fe51d4ff3100babf5f060be5d51b7d1dfd5c503ec005c8c453287fe9bc4b1",
       "owners": {
         "@document": {
-          "before": "1d9d3b2c55ffdcc13c49d6ef0ea346539b70298692b38518345b742c6ccffe65",
-          "after": "779534ea88842b54cf8e6b22b10f29b421628a07362d4141bde4f2e912463370"
+          "before": "779534ea88842b54cf8e6b22b10f29b421628a07362d4141bde4f2e912463370",
+          "after": "9d4fe51d4ff3100babf5f060be5d51b7d1dfd5c503ec005c8c453287fe9bc4b1"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "bf3d750b823797aa7d4d5ada71385e7baa251d363c26ecfc98b7aa462ef4c5c4",
-      "after_sha256": "ca2b9fd59689b4e86533884a54a9586e75f8797bccabfd3f7d457145259d6247",
+      "before_sha256": "ca2b9fd59689b4e86533884a54a9586e75f8797bccabfd3f7d457145259d6247",
+      "after_sha256": "1a1a61d81522488e844f66dd9fde546084e668d754c59160bd54b3090fb4167f",
       "owners": {
         "@document": {
-          "before": "bf3d750b823797aa7d4d5ada71385e7baa251d363c26ecfc98b7aa462ef4c5c4",
-          "after": "ca2b9fd59689b4e86533884a54a9586e75f8797bccabfd3f7d457145259d6247"
+          "before": "ca2b9fd59689b4e86533884a54a9586e75f8797bccabfd3f7d457145259d6247",
+          "after": "1a1a61d81522488e844f66dd9fde546084e668d754c59160bd54b3090fb4167f"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "5661c96dccde6dd6af6087f0842560c6965950253198c8f12c253cc995cad515",
-      "after_sha256": "1cf719be0a7d39438f8e700bda7b67bd9c8631461cc3c6943d4a9b885bc3c62b",
+      "before_sha256": "1cf719be0a7d39438f8e700bda7b67bd9c8631461cc3c6943d4a9b885bc3c62b",
+      "after_sha256": "44433f8d28cf4731fc6b5377f81ca596f2e1b4922cd345053494ec25c1206ea3",
       "owners": {
         "@document": {
-          "before": "5661c96dccde6dd6af6087f0842560c6965950253198c8f12c253cc995cad515",
-          "after": "1cf719be0a7d39438f8e700bda7b67bd9c8631461cc3c6943d4a9b885bc3c62b"
+          "before": "1cf719be0a7d39438f8e700bda7b67bd9c8631461cc3c6943d4a9b885bc3c62b",
+          "after": "44433f8d28cf4731fc6b5377f81ca596f2e1b4922cd345053494ec25c1206ea3"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "01943d556ad9190fb322a6ad0162a13269e5339d025250edadd32127528c3379",
-      "after_sha256": "d77a26d0d11ae89ffeb482260300b67f753f64fa75464f945aeea943830c434c",
+      "before_sha256": "d77a26d0d11ae89ffeb482260300b67f753f64fa75464f945aeea943830c434c",
+      "after_sha256": "d4797487495120660b47482883e7e1299d9e0e03695527a6f78b29b0b72e0a8e",
       "owners": {
         "@document": {
-          "before": "01943d556ad9190fb322a6ad0162a13269e5339d025250edadd32127528c3379",
-          "after": "d77a26d0d11ae89ffeb482260300b67f753f64fa75464f945aeea943830c434c"
+          "before": "d77a26d0d11ae89ffeb482260300b67f753f64fa75464f945aeea943830c434c",
+          "after": "d4797487495120660b47482883e7e1299d9e0e03695527a6f78b29b0b72e0a8e"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "ce744579f039c4746a7ffd8e5b48e74d87ae872b76996af1643bf8d0ae1f9382",
-      "after_sha256": "45617efabfa7ae4a1fed1c926c6b1bd1d56e72947529270bddbd1cde39d3f1e4",
+      "before_sha256": "45617efabfa7ae4a1fed1c926c6b1bd1d56e72947529270bddbd1cde39d3f1e4",
+      "after_sha256": "1d27eff650f78dab83ef83e8e47d59354e0c824c6785b0b4070f1bcc50da332b",
       "owners": {
         "@document": {
-          "before": "ce744579f039c4746a7ffd8e5b48e74d87ae872b76996af1643bf8d0ae1f9382",
-          "after": "45617efabfa7ae4a1fed1c926c6b1bd1d56e72947529270bddbd1cde39d3f1e4"
+          "before": "45617efabfa7ae4a1fed1c926c6b1bd1d56e72947529270bddbd1cde39d3f1e4",
+          "after": "1d27eff650f78dab83ef83e8e47d59354e0c824c6785b0b4070f1bcc50da332b"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "8dd37c0da15e1f7b226df837a1c51c2465d64ffe3f63ef6d91ee98cf63084541",
-      "after_sha256": "b86cc64f49806b2d4a5e3b369d940a8be970ef7cfd4fe254023f7c98ba3a249a",
+      "before_sha256": "b86cc64f49806b2d4a5e3b369d940a8be970ef7cfd4fe254023f7c98ba3a249a",
+      "after_sha256": "3d96c2a963ab06b3937b06849ab653e337b294a7502cb429b205db6a03f84d76",
       "owners": {
         "@document": {
-          "before": "8dd37c0da15e1f7b226df837a1c51c2465d64ffe3f63ef6d91ee98cf63084541",
-          "after": "b86cc64f49806b2d4a5e3b369d940a8be970ef7cfd4fe254023f7c98ba3a249a"
+          "before": "b86cc64f49806b2d4a5e3b369d940a8be970ef7cfd4fe254023f7c98ba3a249a",
+          "after": "3d96c2a963ab06b3937b06849ab653e337b294a7502cb429b205db6a03f84d76"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "e4e3871d19ebf41f01cbcf668eb8a7b2fd1928a65d5ee8861effaf22addbd43f",
-      "after_sha256": "62a88526b446bf6dc7d5b44d1013f3b1eeb414a5d267494a0c26a7b664e7c804",
+      "before_sha256": "62a88526b446bf6dc7d5b44d1013f3b1eeb414a5d267494a0c26a7b664e7c804",
+      "after_sha256": "d911f0870a0d2e81fe64acd27d0be13548073311e5c09ac226850f454d274fa0",
       "owners": {
         "@document": {
-          "before": "e4e3871d19ebf41f01cbcf668eb8a7b2fd1928a65d5ee8861effaf22addbd43f",
-          "after": "62a88526b446bf6dc7d5b44d1013f3b1eeb414a5d267494a0c26a7b664e7c804"
-        }
-      }
-    },
-    "data/generated/ability_coverage/ability_coverage_rows.json": {
-      "before_sha256": "87caaffa640988a5e8427e56d8a9a62515a88f4e92e3ef3116382421c4205952",
-      "after_sha256": "db1a4e4604050605e3f1910ed8c6a7ee52339081919816f6c737b903fee8976f",
-      "owners": {
-        "@document": {
-          "before": "87caaffa640988a5e8427e56d8a9a62515a88f4e92e3ef3116382421c4205952",
-          "after": "db1a4e4604050605e3f1910ed8c6a7ee52339081919816f6c737b903fee8976f"
-        }
-      }
-    },
-    "data/generated/ability_coverage/ability_support_category_rows.json": {
-      "before_sha256": "ff751c17e28dcb3982c56c01f184e72e4ffcb57173105a7a2506450935072149",
-      "after_sha256": "37d47ace645c29955074e3f1750c179003646b937562a1d67711c0af0b91664f",
-      "owners": {
-        "@document": {
-          "before": "ff751c17e28dcb3982c56c01f184e72e4ffcb57173105a7a2506450935072149",
-          "after": "37d47ace645c29955074e3f1750c179003646b937562a1d67711c0af0b91664f"
-        }
-      }
-    },
-    "data/generated/ability_coverage/datasheet_support_rows.json": {
-      "before_sha256": "b0a4e879ed07798a0abb4bd9e1ee25f22130419b8505b37e97706f9692d639eb",
-      "after_sha256": "1464002450e390641844a0044139cdfe4799a05f844bf585e1a885fb19014897",
-      "owners": {
-        "@document": {
-          "before": "b0a4e879ed07798a0abb4bd9e1ee25f22130419b8505b37e97706f9692d639eb",
-          "after": "1464002450e390641844a0044139cdfe4799a05f844bf585e1a885fb19014897"
-        }
-      }
-    },
-    "data/source_audits/aeldari_banshee_eldrad_2026_11/browser-captures.json": {
-      "before_sha256": null,
-      "after_sha256": "9efb98bb9ce697a537ba8c93ad20c0605bb7870a297a9f1709a3e5ae87d5cd11",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "9efb98bb9ce697a537ba8c93ad20c0605bb7870a297a9f1709a3e5ae87d5cd11"
-        }
-      }
-    },
-    "data/source_audits/aeldari_banshee_eldrad_2026_11/review.json": {
-      "before_sha256": null,
-      "after_sha256": "19582c8752051ea1b7553535b19d224c7e0d97e9d8cfcc0494112368f896ee24",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "19582c8752051ea1b7553535b19d224c7e0d97e9d8cfcc0494112368f896ee24"
-        }
-      }
-    },
-    "data/source_audits/aeldari_banshee_eldrad_2026_11/source.audit.json": {
-      "before_sha256": null,
-      "after_sha256": "51e632f19ebf8a2d8537946f5267a9fe19c4eeba9c632129f172e940dd098108",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "51e632f19ebf8a2d8537946f5267a9fe19c4eeba9c632129f172e940dd098108"
+          "before": "62a88526b446bf6dc7d5b44d1013f3b1eeb414a5d267494a0c26a7b664e7c804",
+          "after": "d911f0870a0d2e81fe64acd27d0be13548073311e5c09ac226850f454d274fa0"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "f899fd5f40d4f1a9498ed308aa6a1f4f6cb369295a424edb050b2156741a0fb8",
-      "after_sha256": "470c9e9c37dbfd5f16688de3f9fb1d2b1446628caceada05a9481d459546d7cd",
+      "before_sha256": "470c9e9c37dbfd5f16688de3f9fb1d2b1446628caceada05a9481d459546d7cd",
+      "after_sha256": "0a158d497b5cee88e6edfe38bd5ab4256e96152a9c0a570408238bdd7beaebe6",
       "owners": {
         "@document": {
-          "before": "f899fd5f40d4f1a9498ed308aa6a1f4f6cb369295a424edb050b2156741a0fb8",
-          "after": "470c9e9c37dbfd5f16688de3f9fb1d2b1446628caceada05a9481d459546d7cd"
+          "before": "470c9e9c37dbfd5f16688de3f9fb1d2b1446628caceada05a9481d459546d7cd",
+          "after": "0a158d497b5cee88e6edfe38bd5ab4256e96152a9c0a570408238bdd7beaebe6"
         }
       }
     },
-    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
-      "before_sha256": "8a7b16b5b936da2a2320f208a80b57fcf630cf1c101ccb8c7e3cee839e94a159",
-      "after_sha256": "b2e587690be0e9ad01865695202247446edfcb04ee92a9a6baf5b1984bde1078",
-      "owners": {
-        "@document": {
-          "before": "8a7b16b5b936da2a2320f208a80b57fcf630cf1c101ccb8c7e3cee839e94a159",
-          "after": "b2e587690be0e9ad01865695202247446edfcb04ee92a9a6baf5b1984bde1078"
-        }
-      }
-    },
-    "docs/BANSHEE_ELDRAD_CORRECTION_SCOPE.md": {
+    "data/source_audits/deadly_demise_2026_11/catalog-description-delta.json": {
       "before_sha256": null,
-      "after_sha256": "858561925dc18bd4ea2881779c83b31edf6d053f118c6cd04b16691352310747",
+      "after_sha256": "40aa60c665b221e0fb0d57879efe602dd43499812b73ef261074d689c74b32b4",
       "owners": {
         "@document": {
           "before": null,
-          "after": "858561925dc18bd4ea2881779c83b31edf6d053f118c6cd04b16691352310747"
+          "after": "40aa60c665b221e0fb0d57879efe602dd43499812b73ef261074d689c74b32b4"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "4d19f2afabd2c00283f41f9fa26969e5c9ccd319b06b386d349561da7cf830b0",
-      "after_sha256": "8bb6d0748c88ef0c446c513c2724af4c042c24bd88e26b538f7f0ffade481f7b",
+      "before_sha256": "8bb6d0748c88ef0c446c513c2724af4c042c24bd88e26b538f7f0ffade481f7b",
+      "after_sha256": "027aeeb8e51cfe096e63985684592b90232f9630492e1c6ed88f65b5cd35a90e",
       "owners": {
         "@document": {
-          "before": "4d19f2afabd2c00283f41f9fa26969e5c9ccd319b06b386d349561da7cf830b0",
-          "after": "8bb6d0748c88ef0c446c513c2724af4c042c24bd88e26b538f7f0ffade481f7b"
+          "before": "8bb6d0748c88ef0c446c513c2724af4c042c24bd88e26b538f7f0ffade481f7b",
+          "after": "027aeeb8e51cfe096e63985684592b90232f9630492e1c6ed88f65b5cd35a90e"
         }
       }
     },
-    "docs/FACTION_RULES_SOURCE_POLICY.md": {
-      "before_sha256": "182215fb072bd6cdb20a90f1bea96e80e00510895366330cc9ffe854f2850e92",
-      "after_sha256": "2a2aa96de27bfdcafdf8c33212973e92ffc8abb979206fbaf8147c5fefc499d6",
-      "owners": {
-        "@document": {
-          "before": "182215fb072bd6cdb20a90f1bea96e80e00510895366330cc9ffe854f2850e92",
-          "after": "2a2aa96de27bfdcafdf8c33212973e92ffc8abb979206fbaf8147c5fefc499d6"
-        }
-      }
-    },
-    "docs/performance/current/banshee-eldrad-dice.json": {
+    "docs/DEADLY_DEMISE_DESCRIPTION_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "5bcbe73c845a2cdd2b3b40688eb0e58e21c6089603e71268e9c62ba9fcc8d20d",
+      "after_sha256": "38d9cf972c5f36351a162210d3628988f130d00325d8942948c2b107368933e7",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5bcbe73c845a2cdd2b3b40688eb0e58e21c6089603e71268e9c62ba9fcc8d20d"
+          "after": "38d9cf972c5f36351a162210d3628988f130d00325d8942948c2b107368933e7"
         }
       }
     },
-    "docs/performance/current/banshee-eldrad-reconstruction.json": {
+    "docs/performance/policy-v3/deadly-demise-description-smoke-scope.json": {
       "before_sha256": null,
-      "after_sha256": "a9c9bc84c074b1ca71d4c3c73a78c9df3636cb74adefc6b59c6381d6a9aaf672",
+      "after_sha256": "5279a0aae6d74166b2d83e845014d31edc58c389247e53e00765755a2170a600",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a9c9bc84c074b1ca71d4c3c73a78c9df3636cb74adefc6b59c6381d6a9aaf672"
-        }
-      }
-    },
-    "docs/performance/policy-v3/banshee-eldrad-source-smoke-scope.json": {
-      "before_sha256": null,
-      "after_sha256": "6d5fd7da1d713cca7458de7bbc94d79afcbcec91be8c273abb8d72286aae895e",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "6d5fd7da1d713cca7458de7bbc94d79afcbcec91be8c273abb8d72286aae895e"
+          "after": "5279a0aae6d74166b2d83e845014d31edc58c389247e53e00765755a2170a600"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "2ef4bbb1bba68f7da18f29638a216f5b94f498e21a77d99302bd718b40f35c90",
-      "after_sha256": "d7ac2965fc06c7f8aa28651485da5b13b4dd8b5348bca425ca6ae4017b216586",
+      "before_sha256": "d7ac2965fc06c7f8aa28651485da5b13b4dd8b5348bca425ca6ae4017b216586",
+      "after_sha256": "9bc845288a9877db70691412b7d2e3c977ad84d83e2beb3cf1ebe8662e4dee13",
       "owners": {
         "@document": {
-          "before": "2ef4bbb1bba68f7da18f29638a216f5b94f498e21a77d99302bd718b40f35c90",
-          "after": "d7ac2965fc06c7f8aa28651485da5b13b4dd8b5348bca425ca6ae4017b216586"
+          "before": "d7ac2965fc06c7f8aa28651485da5b13b4dd8b5348bca425ca6ae4017b216586",
+          "after": "9bc845288a9877db70691412b7d2e3c977ad84d83e2beb3cf1ebe8662e4dee13"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "3f1bb70901cf87cd010ea38a54404e34ef94ba89719ce79fdf5500f72bd5502c",
-      "after_sha256": "c1831aa8a0c75434039efff7b74fc9c0a39112acbcd642d32616148de89ab892",
+      "before_sha256": "c1831aa8a0c75434039efff7b74fc9c0a39112acbcd642d32616148de89ab892",
+      "after_sha256": "5f0da0ae9a871a3c457a44fdd43b966b16fb75e864f474c9f5fe91c66cb1c222",
       "owners": {
         "@document": {
-          "before": "3f1bb70901cf87cd010ea38a54404e34ef94ba89719ce79fdf5500f72bd5502c",
-          "after": "c1831aa8a0c75434039efff7b74fc9c0a39112acbcd642d32616148de89ab892"
+          "before": "c1831aa8a0c75434039efff7b74fc9c0a39112acbcd642d32616148de89ab892",
+          "after": "5f0da0ae9a871a3c457a44fdd43b966b16fb75e864f474c9f5fe91c66cb1c222"
         }
       }
     },
-    "src/warhammer40k_core/engine/catalog_datasheet_rule_descriptors.py": {
-      "before_sha256": "e5e35916763616aa5fd3c337edbf174c1d9842a27ebf927e3aed43262f5a6d75",
-      "after_sha256": "901e10270c0ad5c20e21f4e7070e337098b3481fe7c86fef5dbe247cf5cb2196",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/__init__.py": {
+      "before_sha256": "9a6a1695db8e0b3904047b36924a2a3abb947569bac145ee6998e0f798382ec6",
+      "after_sha256": "6d3a0d876721cf0864a43163f977106020d8a0ba7d519e59908150c2c2ca5ec8",
       "owners": {
         "@module": {
-          "before": "ea69ccd67e36b15845d2c520184570d6cba93ef1da291d6deca493e45c9f6de3",
-          "after": "d883a648fb4eca57e562003a821842aaf98e39f8cf25dfdfa3574ba08a9f1256"
+          "before": "0ebccc9b447d0df8c93739f4984a3ccaca61154dd530eaa487ce9f166317a966",
+          "after": "0d9afd1ab047f6edc16d371669f9fc155b5fd7e0d62d9b991674dfb81084d24b"
         },
-        "conditional_invulnerable_save_descriptor_for_clause": {
-          "before": "675612842eaab47ed34e061b5725b61e61fa1d010a34d3bb431c0048870cd00f",
-          "after": "2178168acb6c6e7cd83e87ee6f1d80a3e2368999f73a73587be3229a06e079e1"
-        },
-        "exact_datasheet_runtime_descriptor_for_clause": {
-          "before": "d3f215f3ac15ca82c190e21c51795a565a0ba4ad19ca9bc337b678017d152e6d",
-          "after": "35e105274ad0227753276a8d9fc7ecb94f5f289eb9fa2655244bc9de1b91878d"
+        "_validate_catalog_package": {
+          "before": "e559bacb46da5bf9141480f77eb8acccac9ca55c3350b644c55d74015192034b",
+          "after": "9912673e5472f24d6eea2d208990688047ee43e8325f2e017bafa72becc2b0a9"
         }
       }
     },
-    "src/warhammer40k_core/engine/catalog_defensive_rule_runtime.py": {
-      "before_sha256": "8538ee46d76ad65f251a6c15798dd0b1d590ec377ed7fe98dbd1126371eaf0ed",
-      "after_sha256": "91c9870d078fab4b3e64fad3da8405b35d0446685f9cf0c20bfa01e397ccd2fc",
-      "owners": {
-        "conditional_invulnerable_save_handler": {
-          "before": "9865eb93ac3d54b7a007a386209bda47458658f082653ad7557c1400be558b4a",
-          "after": "ace7c46e99e71a8470b5e79e4ccac992958cd3515f5c6f4a6c1d4a95735139cb"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/faction_source_governance.py": {
-      "before_sha256": "b7fb80d6ee14dbeb485006bff64ff2f0159d3c17b894a3b079429234bf11f4f6",
-      "after_sha256": "f6062e2c0f886bdaefa09e0829ba0687f217995617dcb631e7319b6d1075961b",
-      "owners": {
-        "authorize_faction_observation": {
-          "before": "b0fadc4d2d21a041da68c262eca302ead4f86afd1b0f62e93a1fea20bc8cfb81",
-          "after": "9591f822441c4d301c6955ccf350e1ee4ef7f167d3b2ed82ecd95071b843a3b7"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_authority_registry.json": {
-      "before_sha256": "c6e9a52f5cc6ae043e72ed9b12f217de01058384676127791a99bebff0d772c3",
-      "after_sha256": "dff4289ada96d614d0bd61bcaea9e7a13e5e3a64dec956d0781cb4ba2052e424",
-      "owners": {
-        "@document": {
-          "before": "c6e9a52f5cc6ae043e72ed9b12f217de01058384676127791a99bebff0d772c3",
-          "after": "dff4289ada96d614d0bd61bcaea9e7a13e5e3a64dec956d0781cb4ba2052e424"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_authority_registry.py": {
-      "before_sha256": "d72dd354731040be1ceabd14acfffbd1c5a3f8f1648cf4fdf61acbd4271dffee",
-      "after_sha256": "14256ba93b0fb6cba40cc90e0a34ebaea7403a31508cbf5be4e5cc50830ca6b0",
-      "owners": {
-        "@module": {
-          "before": "0cd507ab821372e2d703743d780190b41ff6d137b9580065df321853ee5a22a0",
-          "after": "97f683759c30d4890e75aefad65826a329d96f298b638a23b09ea1962928002a"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_banshee_eldrad_2026_11.audit.json": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/_current_source.py": {
       "before_sha256": null,
-      "after_sha256": "51e632f19ebf8a2d8537946f5267a9fe19c4eeba9c632129f172e940dd098108",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "51e632f19ebf8a2d8537946f5267a9fe19c4eeba9c632129f172e940dd098108"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_banshee_eldrad_2026_11.overlay-pack.json": {
-      "before_sha256": null,
-      "after_sha256": "cd9d05b05d32dfd29cd01db15bdf4ab9e7e758e55df7ef1fb8506c10ee317a06",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "cd9d05b05d32dfd29cd01db15bdf4ab9e7e758e55df7ef1fb8506c10ee317a06"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_banshee_eldrad_2026_11.py": {
-      "before_sha256": null,
-      "after_sha256": "669a297ff6ffdb70987717841ab02a3203741e30292182f4401d7308858886d8",
+      "after_sha256": "d782b12da39766f1450a3591d15740740cb55875737be531bcd488db0d38420d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "ed2d05e6cf8333bca816223f45299ad31230646094f9edf63ca3fa2dde50828e"
+          "after": "1c05a87c2be01048a8574b1de5db2fabbb552e1eadef9428b9ce30f41d636e0c"
         },
-        "overlay_pack": {
+        "CurrentDescriptionDelta": {
           "before": null,
-          "after": "e28f6c3716d0416d22abcef5c2039daf4e58eef75b0b0206f97892d9fe9324a4"
+          "after": "a7a3d52608701d86ab1c8ae46fad90bf8f45f2b5c0134dbe09a294963be81f08"
         },
-        "overlay_pack_from_json_bytes": {
+        "CurrentSourceDerivation": {
           "before": null,
-          "after": "5ac46fa5c280b53ed8ea331330b349ef79c09cae5b8b7c27f9c7b685f329cd32"
+          "after": "0dc8bb7f2f92c652327bf76c1826f4531234691dc8f4abbcbc748be653257029"
         },
-        "source_audit": {
+        "current_source_derivation": {
           "before": null,
-          "after": "637cbbdcf5f710faba63ab4424cbc5dc450ffba464da022fce731799dcbdcdf7"
+          "after": "30036b59726c6e8d4d7019b0e207bd3f14448a1af123220a65fc8e481cf9b5bb"
         },
-        "source_audit_from_json_bytes": {
+        "current_source_from_json_bytes": {
           "before": null,
-          "after": "d4892ea30a9dc297f161db8d4fc3d733d1534b96c1193057f0a98e3f0f4aa6b9"
+          "after": "c4fc0ff0c78ab826dede992add2789b772b7014b3d3346e504695740ecf6fb30"
         },
-        "source_package": {
+        "historical_catalog_for_current_source": {
           "before": null,
-          "after": "6778785f86e94ceaffc290146df37bc7fff18cd5c64239694cde6aa6cbb6428f"
+          "after": "39c6c6b97ad318e1a12724675724d4ade415f2e6964f961c93e5c5985bd3190c"
         },
-        "source_release_manifest": {
+        "validate_current_catalog_against_reconciliation": {
           "before": null,
-          "after": "bbb9eb32f15d9582c22134b1f67b8cf9bc401654ed090a5563e1bdfe3aacc1c6"
+          "after": "9a9e01d94afda6d6bf0359796c34e2c61ffbf567df8dfbdb5217f5a60be18761"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/catalog.json": {
+      "before_sha256": "eec0195ebc35da304780ef213f73ffda307121c2a8d0d5c6a74d20d99c127663",
+      "after_sha256": "e87f2461e2216565bee477771ebee970caf5bff111eae3328c9d29feccc2f948",
+      "owners": {
+        "@document": {
+          "before": "eec0195ebc35da304780ef213f73ffda307121c2a8d0d5c6a74d20d99c127663",
+          "after": "e87f2461e2216565bee477771ebee970caf5bff111eae3328c9d29feccc2f948"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/deadly-demise-current-source.json": {
+      "before_sha256": null,
+      "after_sha256": "b54d283b513d2cc4f7d032e26cec33ee5a551e573896d9ca1631062ab7bb10b1",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b54d283b513d2cc4f7d032e26cec33ee5a551e573896d9ca1631062ab7bb10b1"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/__init__.py": {
-      "before_sha256": "fa45f59444557868287974491264a04050217cf37d7385916372d5f3d207dd17",
-      "after_sha256": "936eea176343df1b73cc2adc11992afc628fd866898827e34c70feeca87f945e",
+      "before_sha256": "936eea176343df1b73cc2adc11992afc628fd866898827e34c70feeca87f945e",
+      "after_sha256": "a84e029036b363c27408deb6d7fcc6e0d5d020a04b16ec5f7b4cd6ac59b0d96f",
       "owners": {
         "@module": {
-          "before": "c5f87fff8dd626113b96aa963e466b567a51fb7b26b661251a2e1890ee76217b",
-          "after": "4936ec1f0d11186b5533a197086ff6860762a05c5512e5c1dc61cb3c3e59ace0"
+          "before": "4936ec1f0d11186b5533a197086ff6860762a05c5512e5c1dc61cb3c3e59ace0",
+          "after": "24862537b7f89d649358d7d3d282dc0abfd56a0b0b413bab6396f6e0097be5e7"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/artifacts/catalog.json": {
-      "before_sha256": "1dc639cd4b254ede3af9ece69a88edecf3a219f38f06bb8ef8630bc04900d25c",
-      "after_sha256": "eaaa28239507347510bf6b756ab813026e7d5c1585c67bda7445ebdc449032e3",
+      "before_sha256": "eaaa28239507347510bf6b756ab813026e7d5c1585c67bda7445ebdc449032e3",
+      "after_sha256": "58fabaf0d11cbcfcdd067fe10bea60df3d9e61afd45de6e5b9998147b69134c7",
       "owners": {
         "@document": {
-          "before": "1dc639cd4b254ede3af9ece69a88edecf3a219f38f06bb8ef8630bc04900d25c",
-          "after": "eaaa28239507347510bf6b756ab813026e7d5c1585c67bda7445ebdc449032e3"
+          "before": "eaaa28239507347510bf6b756ab813026e7d5c1585c67bda7445ebdc449032e3",
+          "after": "58fabaf0d11cbcfcdd067fe10bea60df3d9e61afd45de6e5b9998147b69134c7"
         }
       }
     },
-    "src/warhammer40k_core/rules/wahapedia_invulnerable_save_bridge.py": {
-      "before_sha256": "d7d82c94812f12b55d1447f3e4f7af59e234f70cccada83b75337fe9dd3df9a7",
-      "after_sha256": "d89a5a8716f30d887f4c00fd1fb96ccbb711d33cbb133ea32b9c81527b8c6e61",
+    "tests/code_quality/test_performance_policy.py": {
+      "before_sha256": "050e2507a8f79b8ef64551e7d206167c51c0b0832e4870414995ab92ac16f99d",
+      "after_sha256": "84936408dcca21cd1c80460533cb7e953d57152e07565c3b972c1a0eeb54ea2f",
       "owners": {
-        "@module": {
-          "before": "81f5e0355387f4a88ff7c8b274348d1de8399b96b895fa1d5b723fd1a2dda21c",
-          "after": "b1fe5ec19630794c12c0085c6d3088df20933680d92cfaa9d3ee9ade431acff2"
+        "_deadly_demise_policy_predecessor": {
+          "before": null,
+          "after": "da185547a79a21848e1bef2e2874029cc460922b0eaabac049dd769406f3ab65"
         },
-        "conditional_invulnerable_save_bridge_for_model_row": {
-          "before": "43fa468bac9b9f76e37b3ecf6adf46582aadc049ec420564000b64ef0d1123bb",
-          "after": "69b9824a790f30282e19d51b5820aac7570a9618e6994740ebcdb668f609fea5"
+        "test_deadly_demise_description_smoke_scope_is_exact": {
+          "before": null,
+          "after": "a50bcd7d888bd67c7b2ad6fab88728d83ef8d39119ade6866d9ca6a5397e8656"
+        },
+        "test_deadly_demise_policy_successor_preserves_exact_predecessor": {
+          "before": null,
+          "after": "60f319dbded90808d05d126b75b77e317fef31160d10e2906d5bba64209ab428"
+        },
+        "test_deadly_demise_scope_keeps_mandatory_mapping_and_detailed_categories": {
+          "before": null,
+          "after": "454ee3407a42f392e0c3b241b310fc423a528e6c0245b1b477ecef20079caed5"
+        },
+        "test_deadly_demise_smoke_scope_rejects_unbounded_declarations": {
+          "before": null,
+          "after": "371e97e782bc8daa3c5c50b10d4e5965e3ebb59f2f1b0cb1a22c127032224eea"
         }
       }
     },
-    "src/warhammer40k_core/rules/wahapedia_model_profile_mapping.py": {
-      "before_sha256": "389f9d31186ae10df6150ad907baff7fd6a485254945984c66ee0d04daf8ca97",
-      "after_sha256": "6d448b301818821aadffb30656dfb2ff0c55d73fd5081c52198ee6fc81cddad1",
-      "owners": {
-        "@module": {
-          "before": "d53819c539fc16fcd8bf29abc290f752be7281d84632e1cfb8a8f8c3e1e36f11",
-          "after": "423a754f3eaa78e6c4ce904cc6a162dc59e492e4ed88ec0a37057ad9cb78530b"
-        },
-        "conditional_invulnerable_save_for_model_rows": {
-          "before": "bb6ff5ed98e4d534f4466cbc666a6321218e1f6d559229aa831dba4209705032",
-          "after": "6d4950b614a632849d6b5d5e03ae243e757a745f43161d64407806d7ba4a6aa2"
-        }
-      }
-    },
-    "tests/code_quality/test_banshee_eldrad_source.py": {
+    "tests/infrastructure/source/unit/test_deadly_demise_descriptions.py": {
       "before_sha256": null,
-      "after_sha256": "6e107a9c95de0b8372878cebaa6ab9d94885f6b1dd81e4a609f2de89e98fffcb",
+      "after_sha256": "e0c3d08c607471985df12becce5617104d2e48da96fa313fb66eba9c2daef869",
       "owners": {
         "@module": {
           "before": null,
-          "after": "fee0f95770a19441df25e91da37a16b85e72c0f7fe60edc59084e90718d85fb2"
+          "after": "079285fefcc29e3115ebd02f70e185c760d0bc87ed20069397ff39e59150b188"
         },
-        "original_sources": {
+        "_current_deadly_demise_packages": {
           "before": null,
-          "after": "2d7a488516544be7969995b7795fb8ed972e35102d54a3826966db188b6129b7"
+          "after": "c14f9bd97868d2707928539adf8a6988451c5a507bed1d8e39fcf1b765731ae2"
         },
-        "test_bounded_f00_capture_authority_and_generator": {
+        "_deadly_demise_delta_audit": {
           "before": null,
-          "after": "fbc32cb9a6b0d1f4384d44529517417af537e7b3cca4d56d3e767c8a737de862"
+          "after": "04b6607a8b1ff6c199e1e0518b0a35df5d4cbbe15af847cab12d41468013f503"
         },
-        "test_conditional_improvement_must_be_better": {
+        "_historical_deadly_demise_package": {
           "before": null,
-          "after": "662a85199e0d3307367008a3fc3a562432573e218a2ddd45fe7b26e03f794bbd"
+          "after": "cb35f33fb54fe129f1b1402f2fb611fbbfcbc5bbff5aa2803b7cf2a8bb801502"
         },
-        "test_only_obsolete_eldrad_edge_is_superseded": {
+        "_mutate_deadly_demise": {
           "before": null,
-          "after": "c5bffa9e1e843d26dc8f4327c1b90bd30b1a49d46bcfb33f01ec9482335f0a6a"
+          "after": "296877c449f43dd1fcbc3154f091cf272a1d2c888a08cbc122727dfec7b64d08"
         },
-        "test_shared_bridge_merges_only_homogeneous_all_model_rows": {
+        "test_deadly_demise_adapter_is_once_only_deterministic_and_noop_without_occurrences": {
           "before": null,
-          "after": "e3c33e8d0c03156b04db8c3aedd7c3c0ca108496094569c4b3afb01f9c847fa4"
+          "after": "e817ae06a3db7749695e5066d879d5491a065f569fc2844fe4f138fe727ad384"
+        },
+        "test_deadly_demise_adapter_rejects_unlisted_occurrence": {
+          "before": null,
+          "after": "8caaf7b0c1ac6edd6b66e48bbdeba42660c3e515699239271e35aaa22ed983cd"
+        },
+        "test_deadly_demise_adapter_rejects_wrong_catalog_owner": {
+          "before": null,
+          "after": "4fb7b6fb83d54af09e5dc4cc6b43e9c6e151062640164b9779b38b43cd81c952"
+        },
+        "test_deadly_demise_adapter_rejects_wrong_current_source_text": {
+          "before": null,
+          "after": "65aeaefc2ebb504739560dd8b774212ed5efebdbefd5fd5dfcd0bec211e9ce74"
+        },
+        "test_deadly_demise_all_thirty_current_descriptions_preserve_entire_baseline_payloads": {
+          "before": null,
+          "after": "add4c8287abe53f09e38d3d5863406c1f55cfff87619b4b4546cb91ddd0fcbd4"
+        },
+        "test_deadly_demise_current_adapter_rejects_unreviewed_inputs": {
+          "before": null,
+          "after": "ec5367de91fff0d4d993e8114943d38aff2856ad45eba8e8a35c70fc35b7a3c9"
+        },
+        "test_deadly_demise_current_adapter_rejects_wrong_current_source_pin": {
+          "before": null,
+          "after": "e829a2973d3739e7265c5d1a442d921f88339abe82385c4cabe57f0ae47f21de"
+        },
+        "test_deadly_demise_current_daemons_derivation_rejects_every_unlisted_delta": {
+          "before": null,
+          "after": "1e466cad1a0e5d96a75efdc0447fc0fd6d5bdad8ed82d4d779afd235c6683ad9"
+        },
+        "test_deadly_demise_derivation_manifest_rejects_altered_mapping": {
+          "before": null,
+          "after": "9c072c436e6031111f1c4216fd2f40d917fdb6192635cfd39d1cb7fe51cd47bd"
+        },
+        "test_deadly_demise_description_preserves_native_profiles_and_typed_persistence": {
+          "before": null,
+          "after": "ab1ef2fad82f8a9baebc7948a5c47ab423e83308963e7d1857cb57f8a5e28e51"
+        },
+        "test_deadly_demise_preserves_historical_artifact_bytes_and_original_validator": {
+          "before": null,
+          "after": "323a7a0bcb6b28f5294a8e3d8bffd249c4f62875a64ecf315d4ad45558062789"
         }
       }
     },
-    "tests/code_quality/test_current_comparison_routing.py": {
-      "before_sha256": "c07648324cc494118411b7b29ce64ac4d5a24c295efba8b15a2ae389241f54d9",
-      "after_sha256": "f5c5fccc729cf109e1d05ae7d9f9e0ad5f89ec702e6d0113a98c6fd0f79a82ac",
-      "owners": {
-        "test_aeldari_source_smoke_scope_requires_exact_bindings_and_fails_closed": {
-          "before": "6f2a1fb224446373262e4433fd4b6a8b30502dcb8ad1ce60e44b728462d9b4fb",
-          "after": "85f29d71a8c5a23c9ce297ae7989c640bc6aa0710789452b788054efa4dea558"
-        }
-      }
-    },
-    "tests/code_quality/test_registered_source_scopes.py": {
-      "before_sha256": "37b0f48e3485b68654728403c80e8f08097e79023a4b750383c08c29151d6b7b",
-      "after_sha256": "e9d1e7ce49b669ea5b679890892736ec50f922246140d2ccfc854eb4ce05aa0d",
-      "owners": {
-        "test_banshee_eldrad_provenance_successor_preserves_exact_base_and_original_chain": {
-          "before": null,
-          "after": "3cbbff7788228ce1ee3cf8adbf475af06aed8a75045accc3cce223b746609a81"
-        },
-        "test_banshee_eldrad_provenance_successor_rechecks_complete_bytes_after_success": {
-          "before": null,
-          "after": "98970272be6a1ec5b0d41494cad9bdbf426b8cc08582fea8d427a13e05d21c65"
-        }
-      }
-    },
-    "tests/factions/aeldari/current_source_helpers.py": {
-      "before_sha256": "cc9e72a5b072a000eb8c9d20b69a330c1d5b24980a13cf44af5ace439bf5945b",
-      "after_sha256": "957a38a2b0c61eb639852bc411ce897c764d41fd355e8479147af54de10226ff",
-      "owners": {
-        "definitions": {
-          "before": "b7c804a9ef40718d7bc0d88c109c5c4c0238584924cf883dd00746e6fd6aa6e9",
-          "after": "5a54a122bc9031ee6ef07ef103cc84c0bd2a2468f6a6168a5645d5acba6f4469"
-        }
-      }
-    },
-    "tests/factions/aeldari/unit/test_unit_abilities.py": {
-      "before_sha256": "ea5b3d4565ddafd564b5789636a035b70e5ba09f5eea139497279127e7d46047",
-      "after_sha256": "997de700eb7a4b3c3b500ee3a3b65039a3267d1232c7d836af537bd536cf8a11",
-      "owners": {
-        "@module": {
-          "before": "d6b2327eb4949c58aa5b883f35c5db7b82242062eb51f613b1e5ad6b57d9cab3",
-          "after": "ffd189df0e7b667e45175d667b96a756dbc0cf87c31fab1b425aae27e6961005"
-        },
-        "_submit_attack_choice": {
-          "before": null,
-          "after": "344460ca94967b77adbc3a14af81be0c5581f394dcb0a5d6ed601c80ed992aff"
-        },
-        "save_definitions": {
-          "before": null,
-          "after": "f124168be994e1989f4225260fea1ea0e1f032e810846cc63930625feeeb5b2a"
-        },
-        "test_attached_bodyguard_save_does_not_transfer_to_leader": {
-          "before": null,
-          "after": "8de30132536b31533b3a604edac8dbadcd038f79677fd175402f9fe6f087944d"
-        },
-        "test_native_banshee_roles_keep_base_five_and_melee_four": {
-          "before": null,
-          "after": "8f1d54ef3b90786c720be447577141e9f5f71ddd7850013cab642b8043feef4f"
-        },
-        "test_native_fight_melee_save_restore_and_exact_replay": {
-          "before": null,
-          "after": "56013f8bf0b36a3376300e3a45f05e01f20bcba0951971dbce16af3031a2f32b"
-        },
-        "test_native_ranged_attack_keeps_five_plus_save": {
-          "before": null,
-          "after": "d2c037ae8e235c33605e03cc0a48176d28262407d2efff05294f1da47e52db74"
-        }
-      }
-    },
-    "tests/support/acts_preservation.py": {
-      "before_sha256": "9714e682b0c0f81ef27cad67e903c1d3433f4a710581812d0f152d2f96c7d094",
-      "after_sha256": "4815ea4967b702e040add5c23b0c572e92a1b02b47b150b06d0a471a454beafa",
-      "owners": {
-        "defiler_provenance_predecessor": {
-          "before": "ea54bcc217621762ff5356e88f4171efd6cd264b336e6a7c62a898f57188e9c4",
-          "after": "6b3115e70e8e0fab353403a654f456254991b5f136e04a97c6344b86393a23c3"
-        }
-      }
-    },
-    "tools/ability_support_sources.py": {
-      "before_sha256": "f3996b510be3c842cc4d4a72d6d220835357ceb330af60f3e1b7e6d4259d41d7",
-      "after_sha256": "52609fca480137a66fb0fb7fb63a41631e442bed527abe4ce24bbdef43c77902",
-      "owners": {
-        "@module": {
-          "before": "c386a838c9d76bb70b357368b1ebeab9c09cda9e7bbaf498abae3f30ad76fe0f",
-          "after": "634bb8a3bc6870c25a130a01549d8d23e08384a2df1e1757d7e3b0ca8fca048a"
-        },
-        "ability_support_index_inputs": {
-          "before": "36116d0f28fd950295611273cda7231eba486931fd99b2a5f1209a3b79dda71c",
-          "after": "c8f0c0ac175ad6422bc43a2a84bfa6752e2963b68b0e276781158910133d4f28"
-        },
-        "load_ability_support_sources": {
-          "before": "9bba1bc08a62d7c4899615c54bbad33f2304e87bb5a92fcb978e47fa842376a9",
-          "after": "ce4545adb07cdfa5ff2889a48a24fd85d5fceebaad21aacb716ac8c78ab6617d"
-        }
-      }
-    },
-    "tools/generate_aeldari_banshee_eldrad_source.py": {
+    "tools/core_deadly_demise_catalog_overlay.py": {
       "before_sha256": null,
-      "after_sha256": "6b8d3b7563be691fe1b1f92b5fc3c7ace53ad9e11013673f73381830798260db",
+      "after_sha256": "44559c7260edd90ab0277489f579179cdccb4e1df3705e1777e17a45afae7ac8",
       "owners": {
         "@module": {
           "before": null,
-          "after": "d3adda199c2f0f7787de144ef0c590eb14739bd633bcd2ccc8404b3f3506a536"
+          "after": "9437b6e7fcf91f6074d51ca03a4a63b0345ebe2c4d54bf1675e22d00aaead043"
         },
-        "generated_overlay_pack": {
+        "with_current_deadly_demise": {
           "before": null,
-          "after": "644fb368d6c92cfcf6b4f4f72ae35c4d21836b252c4261d3c9ad0d655b65b583"
-        },
-        "main": {
-          "before": null,
-          "after": "507b41557bf791d7bae05bf4804bd6aaa88a31ad1194ab9e78f1d3bf7dd69414"
+          "after": "46fc83f5746f41585d8aca1d31b963c157fc7a825b012db4f3f12503f484ccea"
         }
       }
     },
-    "tools/generate_court_of_slaughter_anvanth_catalog.py": {
-      "before_sha256": "455bd0b57a8fabcf320dea2c8d845375d13b7dad8c65669f7288388993c0f14b",
-      "after_sha256": "e186434b61dd68ec878e1622d35945f941d694783776d47be74d0117a67b56cc",
+    "tools/generate_ability_support_matrix.py": {
+      "before_sha256": "637133b98493843facac8dea1a0887905e6443c3a0b355af1a1670b08288d4b8",
+      "after_sha256": "eb4558da6eb2316367fba4011274b67e9bc2b80110a724307dab11ff0229fc29",
       "owners": {
         "@module": {
-          "before": "0e2bfc176f3d29970525868587a566a757a21b0f47b281bd0d3cc0784af033fa",
-          "after": "ef19af0393d3cf4d4be3a93437e9a160b5f8aec2a99aed1241d94eb4038c6ef9"
+          "before": "6643a9b33a30d026df6925f9fdafd868953e3ffb22478cdfb9fd91c350b4cd73",
+          "after": "0a38d0547663e88a22f3dbb2892e7cc2aa04370add2684e67f07e9046b80bb03"
+        },
+        "_ability_support_catalog_package": {
+          "before": "f23859c4b6aa641a420700d63c2304a1b2f3f72a75dbd9e21ed414bcda5a0f2f",
+          "after": "3c60effbd21b2157b60b79e1c449594bf1c9918d7da69eebf0f8c4cc12f1fd0b"
+        }
+      }
+    },
+    "tools/generate_chaos_daemons_roster_catalog.py": {
+      "before_sha256": "f964fab9f31ee212c2923fc0b98174b64b31e44adc4fb9c06bf25ecf31280811",
+      "after_sha256": "beb857d3dec7d62d5f6efb804ea3c7ddbc97630630d16093de56db90170efde7",
+      "owners": {
+        "@module": {
+          "before": "6890916e5d898de232c3debe5a9656b217928a86916f614003f9d2b5fbf27664",
+          "after": "dcaba632cbb346169ce73118b4c50133064fedc302ce4b932865696534f30c17"
         },
         "build_catalog_package": {
-          "before": "7cce96e1818fe6e3c934590d5c7cd379b91d08590ed605d9003ce52fbde229a5",
-          "after": "e7f7558cf5f99515d2570a0e23eca3b5970e7d42d424c91e86eb8a3678eeae1c"
+          "before": "c2dc9b3d1571716baa307f84bdd9d917dbd69dd62c01228794dc1df6af166a25",
+          "after": "0bcf37754ca5a22779865dff9c6b05440677b6cde7fb60412e71afdbb39cdc86"
         }
       }
     },
     "tools/performance_policy.py": {
-      "before_sha256": "c9031a9d3f229942ec689fff0f774c38b2e35fe65788f1c6a4d1716e2fa1ceda",
-      "after_sha256": "8b64320d7e27669a897dc2e441acea3f9c0e37a6629841f3468e03a140f9cd63",
+      "before_sha256": "8b64320d7e27669a897dc2e441acea3f9c0e37a6629841f3468e03a140f9cd63",
+      "after_sha256": "78b0fb430315e772f592ae1cd01e95df78ceb98ca4ed91ee9ba74bb87a58efb9",
       "owners": {
-        "aeldari_current_source_rule_semantics_smoke_operations": {
-          "before": "9b157490c5626c41d0adbdd20e7aa3be48ea4577e964f17eb5f2ad7903bddb18",
-          "after": "1d83b09af9ee0c23c839ffc1553680701d0d56a05aa638655908f26d558f5c16"
-        }
-      }
-    },
-    "tools/source_scope_provenance.py": {
-      "before_sha256": "6fff3740e89ac5f3215a08be7001dde5892405e17d5b0d9ae9f8a739914c586d",
-      "after_sha256": "0fb60a40d260ffb8cf901facf5dacdb1c91562cb382131b3fd795be66d683b9e",
-      "owners": {
-        "@module": {
-          "before": "0fe80cb139d183fc53516efe38304ef5edcc63487389e8743cd4ac52d3f4053e",
-          "after": "996a6f9a8e034fd90ebfded4e7206f49d322d79ddd489287e8020ad37791524e"
+        "deadly_demise_description_smoke_operations": {
+          "before": null,
+          "after": "30726e1cfeb64f2c6c8deb439db619b68c13f525252dfe4a74fbecab33c589b1"
         },
-        "current_ec_overlay_provenance": {
-          "before": "cbc82f6f35e2d89e179b4bf2c48dfae0e14502ed29a2f0097b18ed41ab1a9d78",
-          "after": "a56b63fa017579a587e87a826b9bda899dce8157f42bb024ace42e4bf9ff5145"
+        "validate_assessment": {
+          "before": "09e9e7c6c900e73ee7bfa574520c0d5937f39ea5db1934093d38b99d98e7d140",
+          "after": "ff31b1a07d29729093bf089f19dfc1fc533c8f0b053571a527c148743dadf971"
         }
       }
     }
   },
   "rows": {
+    ".gitattributes": {
+      "category": "rule_semantics",
+      "operations": [
+        "d09-authenticated-source-bytes"
+      ],
+      "selected_families": [],
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+    },
     "ci/quality_shards/all.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
-    "ci/quality_shards/shard-1.txt": {
+    "ci/quality_shards/shard-2.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "ci/quality_shards/shard-4-modules.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -796,9 +588,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -806,9 +598,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -816,9 +608,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -826,9 +618,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -836,9 +628,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -846,9 +638,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -856,9 +648,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -866,9 +658,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -876,9 +668,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -886,9 +678,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -896,9 +688,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -906,9 +698,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -916,9 +708,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
-      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
-      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -926,9 +718,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -936,9 +728,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -946,9 +738,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -956,9 +748,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -966,9 +758,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -976,9 +768,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -986,9 +778,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -996,69 +788,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "data/generated/ability_coverage/ability_coverage_rows.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-vyper-source-title-binding"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "data/generated/ability_coverage/ability_support_category_rows.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-vyper-source-title-binding"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "data/generated/ability_coverage/datasheet_support_rows.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-vyper-source-title-binding"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "data/source_audits/aeldari_banshee_eldrad_2026_11/browser-captures.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "banshee-eldrad-exact-01"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "data/source_audits/aeldari_banshee_eldrad_2026_11/review.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "banshee-eldrad-exact-02"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "data/source_audits/aeldari_banshee_eldrad_2026_11/source.audit.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "banshee-eldrad-exact-03"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -1066,167 +798,101 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
-    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
-      "category": "governance",
-      "operations": [],
+    "data/source_audits/deadly_demise_2026_11/catalog-description-delta.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "deadly-demise-description-exact-01"
+      ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "docs/BANSHEE_ELDRAD_CORRECTION_SCOPE.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
-    "docs/FACTION_RULES_SOURCE_POLICY.md": {
+    "docs/DEADLY_DEMISE_DESCRIPTION_SCOPE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
-    "docs/performance/current/banshee-eldrad-dice.json": {
+    "docs/performance/policy-v3/deadly-demise-description-smoke-scope.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "docs/performance/current/banshee-eldrad-reconstruction.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "docs/performance/policy-v3/banshee-eldrad-source-smoke-scope.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "order109-unit-control-semantics"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
-    "src/warhammer40k_core/engine/catalog_datasheet_rule_descriptors.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "banshee-eldrad-exact-04"
-      ],
-      "selected_families": [
-        "reconstruction"
-      ],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "src/warhammer40k_core/engine/catalog_defensive_rule_runtime.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "banshee-eldrad-exact-05"
-      ],
-      "selected_families": [
-        "dice"
-      ],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "src/warhammer40k_core/rules/faction_source_governance.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "aeldari-current-exact-09"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "src/warhammer40k_core/rules/source_authority_registry.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-authority-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "src/warhammer40k_core/rules/source_authority_registry.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-authority-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_banshee_eldrad_2026_11.audit.json": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/__init__.py": {
       "category": "rule_semantics",
       "operations": [
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_banshee_eldrad_2026_11.overlay-pack.json": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/_current_source.py": {
       "category": "rule_semantics",
       "operations": [
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_banshee_eldrad_2026_11.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/catalog.json": {
       "category": "rule_semantics",
       "operations": [
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/deadly-demise-current-source.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/__init__.py": {
       "category": "rule_semantics",
@@ -1234,9 +900,9 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/artifacts/catalog.json": {
       "category": "rule_semantics",
@@ -1244,140 +910,72 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
-    "src/warhammer40k_core/rules/wahapedia_invulnerable_save_bridge.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "banshee-eldrad-exact-06"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "src/warhammer40k_core/rules/wahapedia_model_profile_mapping.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "banshee-eldrad-exact-07"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "tests/code_quality/test_banshee_eldrad_source.py": {
+    "tests/code_quality/test_performance_policy.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
-    "tests/code_quality/test_current_comparison_routing.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "tests/code_quality/test_registered_source_scopes.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "tests/factions/aeldari/current_source_helpers.py": {
+    "tests/infrastructure/source/unit/test_deadly_demise_descriptions.py": {
       "category": "rule_semantics",
       "operations": [
-        "aeldari-current-exact-15"
+        "deadly-demise-description-exact-02"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
-    "tests/factions/aeldari/unit/test_unit_abilities.py": {
+    "tools/core_deadly_demise_catalog_overlay.py": {
       "category": "rule_semantics",
       "operations": [
-        "banshee-eldrad-exact-08",
-        "qualification40-exact-dcb0f0cb9becac12"
+        "deadly-demise-description-exact-03"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
-    "tests/support/acts_preservation.py": {
+    "tools/generate_ability_support_matrix.py": {
       "category": "rule_semantics",
       "operations": [
-        "supported-defiler-exact-predecessor-projection"
+        "qualification40-exact-ded6452f144f095b"
       ],
       "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
-    "tools/ability_support_sources.py": {
+    "tools/generate_chaos_daemons_roster_catalog.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-b0712fa66a9cc38e",
-        "supported-vyper-source-title-binding"
+        "deadly-demise-description-exact-04"
       ],
       "selected_families": [],
-      "rationale": "Exact source-only overlay admission and provenance registration; retain original sensitive mapping and apply only the authenticated actual-base source-semantics smoke recognition.",
-      "source_obligation": "Register only the authenticated current Banshee and Eldrad two-page F00 audit and the existing SUPERSEDE_ROW operation excluding obsolete Eldrad 000000568 to Warlock Conclave 000000584 at retained row108. Bind the overlay and complete audit through the existing source loader/index, and register its exact path/hash for truthful historical base-version projection. No native bodyguards or geometry are admitted.",
-      "unchanged_work": "These exact two files compose one finite preimage-bound source overlay, include its audit/index inputs, and register the exact historical base-version projection. Existing source-index/cache/token, overlay validation, provenance projection, contract and harness algorithms remain unchanged. The mandatory sensitive source-reuse mappings and family remain intact. Only these exact rule_semantics diffs at base675c3b22 follow the standing bounded-source-repair serial-smoke default. All other bases/paths/owners/hashes/categories retain original requirements. Separate fresh dice and reconstruction comparisons cover the shared native repair development workloads. No source-reuse speedup or full-game certification is claimed; all local/remote correctness, source/work/cache and timing gates remain required."
-    },
-    "tools/generate_aeldari_banshee_eldrad_source.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "banshee-eldrad-exact-09"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "tools/generate_court_of_slaughter_anvanth_catalog.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "aeldari-current-exact-20"
-      ],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     },
     "tools/performance_policy.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
-      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
-      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
-    },
-    "tools/source_scope_provenance.py": {
       "category": "rule_semantics",
       "operations": [
-        "ec-current-source-exact-10",
-        "registered-source-provenance-projection"
+        "ci64-provenance-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
+        "ci67-transaction-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
+        "deadly-demise-description-exact-05"
       ],
       "selected_families": [],
-      "rationale": "Exact source-only overlay admission and provenance registration; retain original sensitive mapping and apply only the authenticated actual-base source-semantics smoke recognition.",
-      "source_obligation": "Register only the authenticated current Banshee and Eldrad two-page F00 audit and the existing SUPERSEDE_ROW operation excluding obsolete Eldrad 000000568 to Warlock Conclave 000000584 at retained row108. Bind the overlay and complete audit through the existing source loader/index, and register its exact path/hash for truthful historical base-version projection. No native bodyguards or geometry are admitted.",
-      "unchanged_work": "These exact two files compose one finite preimage-bound source overlay, include its audit/index inputs, and register the exact historical base-version projection. Existing source-index/cache/token, overlay validation, provenance projection, contract and harness algorithms remain unchanged. The mandatory sensitive source-reuse mappings and family remain intact. Only these exact rule_semantics diffs at base675c3b22 follow the standing bounded-source-repair serial-smoke default. All other bases/paths/owners/hashes/categories retain original requirements. Separate fresh dice and reconstruction comparisons cover the shared native repair development workloads. No source-reuse speedup or full-game certification is claimed; all local/remote correctness, source/work/cache and timing gates remain required."
+      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
+      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
+      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "dice": "docs/performance/current/banshee-eldrad-dice.json",
-    "reconstruction": "docs/performance/current/banshee-eldrad-reconstruction.json"
-  },
+  "comparisons": {},
   "full_game": null
 }

@@ -1,0 +1,42 @@
+{
+  "schema_version": "chaos-daemons-deadly-demise-current-source-v1",
+  "catalog_id": "core-v2:chaos-daemons-roster:2026-07",
+  "core_source_id": "gw-11e-core-abilities:core:deadly-demise",
+  "core_artifact_sha256": "c45ac9d1ea006d32f8fc803940f51f971e934acbd6f09c51ef263c64b7f69c7b",
+  "historical_text": "DEADLY DEMISE\nFrom detonating ammo stores to corrosive innards or frenzied death throes, some targets are deadly even in defeat.\nSome models have 'Deadly Demise x' listed in their abilities. When such a model is destroyed, roll one D6 before removing it from play (if such a model is a TRANSPORT, roll before any embarked models disembark). On a 6, each unit within 6\" of that model suffers a number of mortal wounds denoted by 'x' (if this is a random number, roll separately for each unit within 6\").\nExample: A TRANSPORT model with the Deadly Demise D3 ability is destroyed. Before any models disembark and before removing it from play, its controlling player rolls one D6, getting a 6. There are three units within 6\" of that destroyed model, so its controlling player rolls one D3 for each of them, inflicting mortal wounds accordingly.\n- Deadly Demise x: When this model is destroyed, roll one D6. On a 6, each unit within 6\" suffers 'x' mortal wounds.",
+  "historical_text_sha256": "77abd1f1b24c3a5190d0232154a41a1f0116c355fc748714fbdc5ed94717e0d0",
+  "current_text_sha256": "a5ca19362fe04090968372fe83f3398cfa1236d52d69a2a87ad6ca555f429ff4",
+  "historical_reconciliation_sha256": "689e0fb01ac80e2854edcc4c077ecd37aa3f5a470a6dc3e15480b00bc7e96db5",
+  "deltas": [
+    {
+      "datasheet_id": "000001120",
+      "ability_id": "000008339",
+      "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000001120:1",
+      "parameter_tokens": [
+        "D6"
+      ],
+      "historical_descriptor_sha256": "09d36b7fa3c269f4b66f62f576b4388f04d4c19a3c8d28a176999cdbb36ef0dc",
+      "historical_gameplay_sha256": "d8214ca79fc3b5aba5d9a498b692f4e9758651cb1af38349487fe9310c8fa898"
+    },
+    {
+      "datasheet_id": "000001148",
+      "ability_id": "000008339",
+      "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000001148:1",
+      "parameter_tokens": [
+        "D6"
+      ],
+      "historical_descriptor_sha256": "a9b4b9eb0bd8bf23c16f487fb88a221dfa7dded9f75ef46b325e041fa5efa2f5",
+      "historical_gameplay_sha256": "a9a80990b8d0174b9cf98d588bcefb4a5196ea8bc44391973c642b289a6de32b"
+    },
+    {
+      "datasheet_id": "000002582",
+      "ability_id": "000008339",
+      "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000002582:1",
+      "parameter_tokens": [
+        "D6"
+      ],
+      "historical_descriptor_sha256": "b155ce23cc935aba2a561833b4b099877c59b310a3dadc9317b8335986d2cde4",
+      "historical_gameplay_sha256": "838065a53d452edd3b2cfe998bf6dca91f2c1ab147e91cb61791e4e6f2cf4765"
+    }
+  ]
+}

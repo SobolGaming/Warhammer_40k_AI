@@ -24,6 +24,7 @@ if TYPE_CHECKING or __package__:
         aeldari_semantic_snapshot_markdown,
         aeldari_thirty_nine_k_pro_audit_markdown,
     )
+    from tools.core_deadly_demise_catalog_overlay import with_current_deadly_demise
     from tools.cross_source_semantic_equivalence import (
         DEFAULT_DOCS_PATH as DEFAULT_SEMANTIC_EQUIVALENCE_DOCS_PATH,
     )
@@ -66,6 +67,7 @@ else:
         aeldari_semantic_snapshot_markdown,
         aeldari_thirty_nine_k_pro_audit_markdown,
     )
+    from core_deadly_demise_catalog_overlay import with_current_deadly_demise
     from cross_source_semantic_equivalence import (
         DEFAULT_DOCS_PATH as DEFAULT_SEMANTIC_EQUIVALENCE_DOCS_PATH,
     )
@@ -1755,7 +1757,7 @@ def _ability_support_catalog_package(
         raise ValueError(
             "Ability support catalog could not preserve datasheets with geometry diagnostics."
         )
-    return report.package
+    return with_current_deadly_demise(report.package)
 
 
 def _ability_support_matrix_rows_from_package(
