@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0e0e472702044a85b431808cb60d03ed6b7541e7674564955ee1bd8cef32e185",
   "operation_map_sha256": "2827d2fa6ba07b95cc46287ef865c67da556e2883430265f19642e028f6d66f6",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "dd79a7afbd7c313d11f872a5fbc73b9e7ae2848fd79236fe8cae028e5d1f71fa",
+      "after_sha256": "e055286d0e406ab4adb8cddeeaf126a6077ba4d1584ae91ed0e183095652173b",
+      "owners": {
+        "@document": {
+          "before": "dd79a7afbd7c313d11f872a5fbc73b9e7ae2848fd79236fe8cae028e5d1f71fa",
+          "after": "e055286d0e406ab4adb8cddeeaf126a6077ba4d1584ae91ed0e183095652173b"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "cc302ec565b189fd1696f7df9201bfbed38ac2197cb0988aa10d178e415f3558",
+      "after_sha256": "afcb075139b331874187d9e709afe21a027275472153175ac7d4480637f1dfea",
+      "owners": {
+        "@document": {
+          "before": "cc302ec565b189fd1696f7df9201bfbed38ac2197cb0988aa10d178e415f3558",
+          "after": "afcb075139b331874187d9e709afe21a027275472153175ac7d4480637f1dfea"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "fb812342a574b19f255e8cc46611d40ff47c649f9bd9f205b2ab50c798a52f2e",
+      "after_sha256": "831f73d137a125d95c3f0e30e3eff065a204735254a5b099fc5d65db9e8e942e",
+      "owners": {
+        "@document": {
+          "before": "fb812342a574b19f255e8cc46611d40ff47c649f9bd9f205b2ab50c798a52f2e",
+          "after": "831f73d137a125d95c3f0e30e3eff065a204735254a5b099fc5d65db9e8e942e"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "8eef6ab0ce4f90ecc7a7e8bae5427af761d6e2eb6eefebfc2ee2cd844b53c7d2",
+      "after_sha256": "ed6f1a6bc8c2881ae1afbfc9639aa9b1192cb1ff1783dd2a8d70cc840e3ba912",
+      "owners": {
+        "@document": {
+          "before": "8eef6ab0ce4f90ecc7a7e8bae5427af761d6e2eb6eefebfc2ee2cd844b53c7d2",
+          "after": "ed6f1a6bc8c2881ae1afbfc9639aa9b1192cb1ff1783dd2a8d70cc840e3ba912"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "f8b1dc67bc3a3a0d21df7908fed11593c0fe632ab78bc54df83cbb0a3f76604c",
+      "after_sha256": "8cace30870e267eaafab3280bbf5f22d4113b802b4a95588ced5494e219c4b4f",
+      "owners": {
+        "@document": {
+          "before": "f8b1dc67bc3a3a0d21df7908fed11593c0fe632ab78bc54df83cbb0a3f76604c",
+          "after": "8cace30870e267eaafab3280bbf5f22d4113b802b4a95588ced5494e219c4b4f"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "9ebde03e87c93971eb0a862f0a58e27afe7b013285437c5e32fa15d0d60fe19d",
+      "after_sha256": "30fdd51c2750b855d771a545dfca6277437e92e1686ec3dcc89e4c336b76ec2e",
+      "owners": {
+        "@document": {
+          "before": "9ebde03e87c93971eb0a862f0a58e27afe7b013285437c5e32fa15d0d60fe19d",
+          "after": "30fdd51c2750b855d771a545dfca6277437e92e1686ec3dcc89e4c336b76ec2e"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "452934b74dcf45b4a903a99945cc263a2afc5e6c36071dc7fdfad3b8e00c76cc",
+      "after_sha256": "957dec5d8979e4daf55da1a51e75e37d5ab10d8ab38d9043bcd046dce8e278dd",
+      "owners": {
+        "@document": {
+          "before": "452934b74dcf45b4a903a99945cc263a2afc5e6c36071dc7fdfad3b8e00c76cc",
+          "after": "957dec5d8979e4daf55da1a51e75e37d5ab10d8ab38d9043bcd046dce8e278dd"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "2cd151d90dd2f449f6c44c267a0561e5bc6a3509b8ecce96d1c2736722fdb591",
+      "after_sha256": "a134e2e5fa9fd0b430af8af69c18f7465c1561c8378a215f6e027d33b3d8f614",
+      "owners": {
+        "@document": {
+          "before": "2cd151d90dd2f449f6c44c267a0561e5bc6a3509b8ecce96d1c2736722fdb591",
+          "after": "a134e2e5fa9fd0b430af8af69c18f7465c1561c8378a215f6e027d33b3d8f614"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "cb00512b413518fee6ae8c306a2abdde9b62eec24b4442216292ebddbfbd2182",
+      "after_sha256": "6d94a7d0ad0ddc26bc4f061eab9f80f21e48aa212b61ef25f3690d3943de83af",
+      "owners": {
+        "@document": {
+          "before": "cb00512b413518fee6ae8c306a2abdde9b62eec24b4442216292ebddbfbd2182",
+          "after": "6d94a7d0ad0ddc26bc4f061eab9f80f21e48aa212b61ef25f3690d3943de83af"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "5f69f65f4776f5c4685e72ceb42e8eaffeaa5f2b24b0d5dbb5bea7892be9ba96",
+      "after_sha256": "76b1522c5a71d69ee10a48485fe6e5604e660cb104a6f50e5ec8e13dc578de6b",
+      "owners": {
+        "@document": {
+          "before": "5f69f65f4776f5c4685e72ceb42e8eaffeaa5f2b24b0d5dbb5bea7892be9ba96",
+          "after": "76b1522c5a71d69ee10a48485fe6e5604e660cb104a6f50e5ec8e13dc578de6b"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "79919c3565ec6e7ba44601c693c41a3684a742f82bab14f5df525783837cfa0d",
+      "after_sha256": "4e44c3ab8095da64ef1e6f66a97461ffd7b7c76a432fa926d615e012e3b7141c",
+      "owners": {
+        "@document": {
+          "before": "79919c3565ec6e7ba44601c693c41a3684a742f82bab14f5df525783837cfa0d",
+          "after": "4e44c3ab8095da64ef1e6f66a97461ffd7b7c76a432fa926d615e012e3b7141c"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "022e71277c08483ef37bcdf74ee80f31396c02a2e56dbc0a36a3c0ee68c2a6c7",
+      "after_sha256": "c438039e4fb8e1bcbdc7a6da294ecc5df900843d3caa53a3912cc1a1071c034d",
+      "owners": {
+        "@document": {
+          "before": "022e71277c08483ef37bcdf74ee80f31396c02a2e56dbc0a36a3c0ee68c2a6c7",
+          "after": "c438039e4fb8e1bcbdc7a6da294ecc5df900843d3caa53a3912cc1a1071c034d"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "0520b81cce999b11821ed43ecea055e51e582f609f0f832f79cb8ce5d679b6c6",
+      "after_sha256": "47c2a007b0b450f75797fd7402908f8b580b875d3f29dd6580c0c39816262f53",
+      "owners": {
+        "@document": {
+          "before": "0520b81cce999b11821ed43ecea055e51e582f609f0f832f79cb8ce5d679b6c6",
+          "after": "47c2a007b0b450f75797fd7402908f8b580b875d3f29dd6580c0c39816262f53"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "000231ee8c9d7f6778694ca8c37343966b906e938b58a861d0684061ba7bd222",
       "after_sha256": "f7338d75fa031baa4f091f78a7a261cfe766aae9f7c2298afdc2c8d17ffddbb0",
@@ -564,6 +694,136 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh scheduling weights from the complete successful current local covered run.",
+      "source_obligation": "AGENTS/README require authentic complete current behavioral profiling; all5093cases/393files are included without invented or mixed-host timings.",
+      "unchanged_work": "Only shard scheduling metadata changes; runtime, source data, tests, registered workloads, operation map and dependencies are byte-identical to the covered and measured inputs. Local weights are planning data, not hosted-CI wall-time certification."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
@@ -739,6 +999,22 @@
       "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
     },
     "docs/FACTION_RULES_SOURCE_POLICY.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
+      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
+      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+    },
+    "docs/performance/current/banshee-eldrad-dice.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Restore the source-backed Banshee melee-only improved invulnerable save through existing generic descriptors and runtime modifier queries; supersede the obsolete inactive Eldrad-to-Warlock-Conclave source edge.",
+      "source_obligation": "Both current Banshee model rows require base 5+ and improved 4+ against melee attacks; current Eldrad source permits Guardian Defenders and Storm Guardians, excluding Warlock Conclave 000000584 at retained row 108.",
+      "unchanged_work": "Bounded source normalization, homogeneous model-row grant validation, descriptor selection and attack-kind predicate repair. Existing save resolution, dice work, serializer algorithms, search and runtime-cache policy, dependencies, geometry and native admission inventory remain unchanged. Source preparation composes one additional authenticated overlay row and bounded two-page audit; prior source/cache algorithms are preserved. Fresh dice and reconstruction comparisons screen existing shared development workloads; those fixtures do not include Banshees and do not certify its new rule outcome or full-game speed. Native rule outcomes are covered by dedicated regressions."
+    },
+    "docs/performance/current/banshee-eldrad-reconstruction.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -982,22 +1258,6 @@
       "rationale": "Exact source-only overlay admission and provenance registration; retain original sensitive mapping and apply only the authenticated actual-base source-semantics smoke recognition.",
       "source_obligation": "Register only the authenticated current Banshee and Eldrad two-page F00 audit and the existing SUPERSEDE_ROW operation excluding obsolete Eldrad 000000568 to Warlock Conclave 000000584 at retained row108. Bind the overlay and complete audit through the existing source loader/index, and register its exact path/hash for truthful historical base-version projection. No native bodyguards or geometry are admitted.",
       "unchanged_work": "These exact two files compose one finite preimage-bound source overlay, include its audit/index inputs, and register the exact historical base-version projection. Existing source-index/cache/token, overlay validation, provenance projection, contract and harness algorithms remain unchanged. The mandatory sensitive source-reuse mappings and family remain intact. Only these exact rule_semantics diffs at base675c3b22 follow the standing bounded-source-repair serial-smoke default. All other bases/paths/owners/hashes/categories retain original requirements. Separate fresh dice and reconstruction comparisons cover the shared native repair development workloads. No source-reuse speedup or full-game certification is claimed; all local/remote correctness, source/work/cache and timing gates remain required."
-    },
-    "docs/performance/current/banshee-eldrad-dice.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Retain newly measured same-host serial actual-base/head samples for the registered development workload with original counts, complete semantic checks and unchanged relative budgets.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/banshee-eldrad-reconstruction.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Retain newly measured same-host serial actual-base/head samples for the registered development workload with original counts, complete semantic checks and unchanged relative budgets.",
-      "source_obligation": null,
-      "unchanged_work": null
     }
   },
   "milestone": "ordinary",
