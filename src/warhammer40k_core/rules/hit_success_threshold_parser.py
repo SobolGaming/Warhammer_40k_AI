@@ -27,6 +27,11 @@ _CRITICAL_HIT_THRESHOLD_RE = re.compile(
     r"(?:\s+as\s+well)?(?=\s*(?:\.|,|;|$))",
     re.IGNORECASE,
 )
+_SELECTED_TARGET_MODEL_ATTACK_RE = re.compile(
+    r"\beach\s+time\s+a\s+friendly\s+(?P<keyword>[A-Z][A-Z0-9_'-]*)\s+"
+    r"model\s+makes\s+an\s+attack\s+that\s+targets\s+that\s+unit\b",
+    re.IGNORECASE,
+)
 _CHARGED_MELEE_SELF_RE = re.compile(
     r"^\s*Each\s+time\s+a\s+model\s+in\s+this\s+unit\s+makes\s+a\s+melee\s+attack,"
     r"\s*if\s+it\s+made\s+a\s+Charge\s+move\s+this\s+turn,\s*an?\s*$",
@@ -90,6 +95,7 @@ def hit_success_threshold_effects(
                     ("attack_role", "attacker"),
                     ("critical_threshold", int(match.group("threshold"))),
                     *_targeting_parameters(clause_text),
+                    *_selected_model_parameters(clause_text),
                     *(
                         (("weapon_scope", "melee"), ("requires_charge_move_this_turn", True))
                         if _CHARGED_MELEE_SELF_RE.fullmatch(clause_text[: match.start()])
@@ -101,6 +107,19 @@ def hit_success_threshold_effects(
         for match in _CRITICAL_HIT_THRESHOLD_RE.finditer(clause_text)
     )
     return tuple(effects)
+
+
+def selected_target_model_attack_match(text: str) -> re.Match[str] | None:
+    if _CRITICAL_HIT_THRESHOLD_RE.search(text) is None:
+        return None
+    return _SELECTED_TARGET_MODEL_ATTACK_RE.search(text)
+
+
+def _selected_model_parameters(text: str) -> tuple[tuple[str, RuleParameterValue], ...]:
+    match = selected_target_model_attack_match(text)
+    if match is None:
+        return ()
+    return (("required_model_keyword", match.group("keyword").upper()),)
 
 
 def _hit_success_threshold_parameter_pairs(

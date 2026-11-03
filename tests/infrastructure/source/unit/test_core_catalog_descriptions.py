@@ -556,3 +556,157 @@ def test_mandiblasters_successor_projection_rejects_unreviewed_bytes(mutation: s
         package = _mutate(package, "gameplay")
     with pytest.raises(AssertionError):
         before_core_description_correction(package)
+
+
+@pytest.mark.parametrize("surface", [0, 1])
+@pytest.mark.parametrize("mutation", ["text", "source", "compiled", "artifact"])
+def test_lhykhis_historical_projection_rejects_unreviewed_bytes(
+    surface: int, mutation: str
+) -> None:
+    from tests.core_description_helpers import before_lhykhis_correction
+
+    current = _packages()[surface]
+    owner = current.army_catalog.datasheet_by_id("000003909")
+    ability = next(a for a in owner.abilities if a.ability_id == "000003909:whispering-web")
+    changed = ability
+    if mutation == "text":
+        changed = replace(ability, effect_description=ability.effect_description + " Drift.")
+    elif mutation == "source":
+        changed = replace(ability, source_id=ability.source_id + ":drift")
+    elif mutation == "compiled":
+        assert ability.rule_ir_payload is not None
+        payload = json.loads(json.dumps(ability.rule_ir_payload))
+        next(
+            p
+            for p in payload["clauses"][1]["effects"][0]["parameters"]
+            if p["key"] == "required_model_keyword"
+        )["value"] = "DRIFT"
+        changed = replace(ability, rule_ir_payload=payload)
+    mutated = replace(
+        current,
+        army_catalog=replace(
+            current.army_catalog,
+            datasheets=tuple(
+                replace(row, abilities=tuple(changed if a is ability else a for a in row.abilities))
+                if row is owner
+                else row
+                for row in current.army_catalog.datasheets
+            ),
+        ),
+        source_artifacts=tuple(
+            replace(a, artifact_hash="0" * 64)
+            if mutation == "artifact" and a.artifact_name == "Datasheets_abilities.json"
+            else a
+            for a in current.source_artifacts
+        ),
+    )
+    with pytest.raises(AssertionError):
+        before_lhykhis_correction(mutated)
+
+
+def test_lhykhis_projection_rejects_current_artifact_without_its_source() -> None:
+    from tests.core_description_helpers import before_lhykhis_correction
+
+    current = _packages()[0]
+    without = replace(
+        current,
+        army_catalog=replace(
+            current.army_catalog,
+            datasheets=tuple(
+                replace(
+                    row,
+                    abilities=tuple(
+                        a for a in row.abilities if a.ability_id != "000003909:whispering-web"
+                    ),
+                )
+                for row in current.army_catalog.datasheets
+            ),
+        ),
+    )
+    with pytest.raises(AssertionError):
+        before_lhykhis_correction(without)
+    assert before_lhykhis_correction(_packages()[2]) == _packages()[2]
+
+
+def test_current_model_hit_successor_is_bound_by_source_index_provenance() -> None:
+    from tools.ability_support_sources import ability_support_index_inputs
+    from tools.generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR
+
+    from warhammer40k_core.rules import selected_model_hit_successor
+    from warhammer40k_core.rules.selected_source_index import source_input_hashes
+
+    inputs = ability_support_index_inputs(DEFAULT_SOURCE_JSON_DIR.resolve())
+    module = Path(selected_model_hit_successor.__file__).resolve()
+    artifact = (
+        module.parent
+        / "source_packages"
+        / "warhammer_40000_11th"
+        / "selected_model_hit_current_2026_11.json"
+    )
+    assert module in inputs
+    assert artifact in inputs
+    assert (
+        source_input_hashes(inputs)[str(artifact)] == selected_model_hit_successor.ARTIFACT_SHA256
+    )
+
+
+@pytest.mark.parametrize(
+    ("source_row_id", "expected_ir_hash"),
+    [
+        ("000000495:3", "dfb2fac2eb42b194de45fe0a23ee4e3ae25179c1709222c9f57795a168680b57"),
+        ("000002542:5", "22146807e5ef9fe63ee9b678d54ccdd5abd0017c68edb62efa6e3b62ace27f6e"),
+        ("000002753:8", "be3d98b3e87df1c4ab5992b42b5a2baaf1dc21ca131bf7a9074038c6eccb853f"),
+        ("000003885:8", "74b5e8b63b9dc7ad100d37c016c810dd2adee8149e74311d05f2e8234d4fd7b6"),
+        ("000003909:5", "24669fc8e965061719402530ca0fb87090f75a817629350401d332f042e74073"),
+    ],
+)
+def test_model_hit_threshold_compiler_preserves_neighboring_source_rules(
+    source_row_id: str, expected_ir_hash: str
+) -> None:
+    from tools.generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR
+
+    from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+    from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+    from warhammer40k_core.rules.rule_ir import parameter_payload
+    from warhammer40k_core.rules.source_data import RuleSourceText
+
+    # Four predecessor hashes were compiled from exact base3aad parser bytes.
+    # The Web positive retains its authenticated current successor hash.
+    rows = json.loads((DEFAULT_SOURCE_JSON_DIR / "Datasheets_abilities.json").read_text())["rows"]
+    row = next(row for row in rows if row["source_row_id"] == source_row_id)
+    source_id = (
+        "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5"
+        if source_row_id == "000003909:5"
+        else "compiler-preservation:" + source_row_id
+    )
+    compiled = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id=source_id,
+            raw_text=row["fields"]["description"],
+            objective_scope=ObjectiveRuleScope.HISTORICAL_TEXT,
+        ),
+        source_keyword_sequence_parts=("AELDARI", "TYRANIDS"),
+    ).rule_ir
+    assert compiled.is_supported
+    assert compiled.ir_hash() == expected_ir_hash
+    selected_attack_conditions = [
+        parameter_payload(condition.parameters)
+        for clause in compiled.clauses
+        for condition in clause.conditions
+        if parameter_payload(condition.parameters).get("relationship")
+        == "attack_targets_selected_unit"
+    ]
+    if source_row_id == "000003909:5":
+        assert selected_attack_conditions == [
+            {
+                "gate_subject": "attack_target",
+                "relationship": "attack_targets_selected_unit",
+                "target_reference": "selected_unit",
+            }
+        ]
+        assert (
+            parameter_payload(compiled.clauses[1].effects[0].parameters)["required_model_keyword"]
+            == "AELDARI"
+        )
+    else:
+        assert not selected_attack_conditions

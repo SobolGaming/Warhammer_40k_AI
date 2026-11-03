@@ -190,6 +190,42 @@ def _rule_ir(source_row_id: str, text: str) -> RuleIR:
         ).rule_ir
         if not compiled.is_supported:
             raise ValueError("Aeldari compiler-backed RuleIR became unsupported.")
+        if source_row_id == "000003909:5":
+            from dataclasses import replace
+
+            from warhammer40k_core.rules.rule_ir import parameter_payload
+            from warhammer40k_core.rules.selected_model_hit_successor import PREDECESSOR_IR_HASH
+
+            clause = compiled.clauses[1]
+            historical = replace(
+                compiled,
+                clauses=(
+                    compiled.clauses[0],
+                    replace(
+                        clause,
+                        conditions=tuple(
+                            condition
+                            for condition in clause.conditions
+                            if parameter_payload(condition.parameters).get("relationship")
+                            != "attack_targets_selected_unit"
+                        ),
+                        effects=tuple(
+                            replace(
+                                effect,
+                                parameters=tuple(
+                                    p
+                                    for p in effect.parameters
+                                    if p.key != "required_model_keyword"
+                                ),
+                            )
+                            for effect in clause.effects
+                        ),
+                    ),
+                ),
+            )
+            if historical.ir_hash() != PREDECESSOR_IR_HASH:
+                raise ValueError("Historical selected model hit lowering drifted.")
+            return historical
         return compiled
     builders = {
         "000000572:4": _whirling_death_clause,

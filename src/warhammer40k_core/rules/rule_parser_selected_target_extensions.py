@@ -131,6 +131,25 @@ def parse_selected_target_attack_conditions(
                 parameters=parameters_from_pairs(tuple(pairs)),
             )
         )
+    from warhammer40k_core.rules.hit_success_threshold_parser import (
+        selected_target_model_attack_match,
+    )
+
+    model_match = selected_target_model_attack_match(text)
+    if model_match is not None:
+        conditions.append(
+            RuleCondition(
+                kind=RuleConditionKind.TARGET_CONSTRAINT,
+                source_span=_span_from_match(source_span, model_match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("gate_subject", "attack_target"),
+                        ("relationship", "attack_targets_selected_unit"),
+                        ("target_reference", "selected_unit"),
+                    )
+                ),
+            )
+        )
     return tuple(conditions)
 
 

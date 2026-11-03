@@ -548,6 +548,20 @@ def _conservative_inventory(
         "failed_save_replacement": registry.failed_save_damage_replacement_bindings,
     }
     inventory: dict[str, JsonValue] = {}
+    from warhammer40k_core.engine.catalog_model_post_shoot_groups import (
+        model_shooting_boundary_sources,
+    )
+
+    if registry.modifier_permission_indexes:
+        model_sources = model_shooting_boundary_sources(
+            state=state,
+            sequence=sequence,
+            model_id=pool.attacker_model_instance_id,
+            ability_index=registry.modifier_permission_index(sequence.attacker_player_id),
+        )
+        if model_sources:
+            reasons.add("source-model-shot-timing-boundary")
+            inventory["model_shot_sources"] = list(model_sources)
     for family, sources in bindings.items():
         if any(
             source.gathering_dependency is AttackGatheringDependency.UNKNOWN for source in sources

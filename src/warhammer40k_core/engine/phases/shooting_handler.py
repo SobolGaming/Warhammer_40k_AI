@@ -5,6 +5,7 @@ from __future__ import annotations
 from warhammer40k_core.engine.attack_sequence_selection import target_has_character_for_attack_group
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 
+from warhammer40k_core.engine.model_shooting_completion import before_shooting_gathering
 from warhammer40k_core.engine.shooting_target_replacement import request_shooting_target_replacement
 from warhammer40k_core.engine.selected_target_stratagem_reactions import (
     request_after_unit_selected_as_target_stratagem_if_available,
@@ -185,7 +186,7 @@ class ShootingPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 attack_sequence=shooting_state.attack_sequence,
-                before_gathering=lambda sequence: request_shooting_target_replacement(
+                before_gathering=lambda sequence: before_shooting_gathering(
                     handler=self,
                     state=state,
                     decisions=decisions,
@@ -394,7 +395,7 @@ class ShootingPhaseHandler:
             decisions=decisions,
             ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             attack_sequence=out_of_phase_state.attack_sequence,
-            before_gathering=lambda sequence: request_shooting_target_replacement(
+            before_gathering=lambda sequence: before_shooting_gathering(
                 handler=self,
                 state=state,
                 decisions=decisions,

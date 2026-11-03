@@ -668,11 +668,22 @@ def test_lhykhis_selected_target_source_is_excluded_from_passive_query(
         if a.ability_id == "000003909:whispering-web"
     )
     assert source.rule_ir_payload is not None
-    rule = RuleIR.from_payload(cast(RuleIRPayload, source.rule_ir_payload))
+    current_rule = RuleIR.from_payload(cast(RuleIRPayload, source.rule_ir_payload))
+    assert (
+        current_rule.ir_hash() == "24669fc8e965061719402530ca0fb87090f75a817629350401d332f042e74073"
+    )
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
+
+    historical = faction_pack_rule_ir.datasheet_rule_ir_payload_by_source_row_id("000003909:5")
+    assert historical is not None
+    rule = RuleIR.from_payload(historical)
+    assert current_rule.normalized_text == rule.normalized_text
+    assert current_rule.source_id == rule.source_id
+    assert current_rule.clauses[0] == rule.clauses[0]
     assert rule.ir_hash() == "02b5c11d47776e8a050dd004db3f1d725c8ec1828e1624017c439bc0fa1c2219"
     assert clause_is_post_shoot_hit_target_selection(rule.clauses[0])
-    # Its selected-target execution is a separate pre-existing gap; the failed
-    # positive native probe remains external evidence, not a passing bug assertion.
+    # The predecessor selected-target execution gap remains preserved historical
+    # evidence; current native selected-target behavior is covered in test_lhykhis.
 
 
 def test_native_ordinary_fights_first_and_unattached_units_do_not_grant_mandiblasters(

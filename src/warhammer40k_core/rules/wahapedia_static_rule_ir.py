@@ -13,7 +13,12 @@ def compact_json(payload: object) -> str:
 
 
 def datasheet_rule_ir_payload_by_source_row_id(source_row_id: str) -> RuleIRPayload | None:
-    return faction_pack_rule_ir.datasheet_rule_ir_payload_by_source_row_id(source_row_id)
+    from warhammer40k_core.rules.selected_model_hit_successor import current_datasheet_rule_ir
+
+    return current_datasheet_rule_ir(
+        source_row_id,
+        faction_pack_rule_ir.datasheet_rule_ir_payload_by_source_row_id(source_row_id),
+    )
 
 
 def payload_by_source_row_id(source_row_id: str) -> RuleIRPayload | None:

@@ -3503,12 +3503,14 @@
           "raw_text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks. Until the end of the turn, each time a friendly Aeldari model makes an attack that targets that unit, an unmodified Hit roll of 5+ scores a Critical Hit.",
           "raw_text_sha256": "15db9ab0d9f420ce9a350f1d40d8da9c60001f2ec7457334b39dbb57508aa60f",
           "runtime_consumer_ids": [
-            "catalog-ir:critical-hit-threshold"
+            "catalog-ir:critical-hit-threshold",
+            "catalog-ir:post-shoot-hit-target-effect"
           ],
           "semantic_consumers": [
             {
               "runtime_consumer_ids": [
-                "catalog-ir:critical-hit-threshold"
+                "catalog-ir:critical-hit-threshold",
+                "catalog-ir:post-shoot-hit-target-effect"
               ],
               "semantic_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5:clause:002:effect:0",
               "semantic_kind": "set_contextual_status"

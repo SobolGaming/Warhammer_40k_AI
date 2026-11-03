@@ -4010,7 +4010,8 @@
       "Lhykhis"
     ],
     "runtime_consumer_ids": [
-      "catalog-ir:critical-hit-threshold"
+      "catalog-ir:critical-hit-threshold",
+      "catalog-ir:post-shoot-hit-target-effect"
     ],
     "source_kind_counts": {
       "datasheet": 1

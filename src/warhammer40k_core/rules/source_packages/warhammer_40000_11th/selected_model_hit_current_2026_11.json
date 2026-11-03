@@ -1,0 +1,209 @@
+{
+  "predecessor_ir_hash": "02b5c11d47776e8a050dd004db3f1d725c8ec1828e1624017c439bc0fa1c2219",
+  "rule_ir": {
+    "clauses": [
+      {
+        "clause_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5:clause:001",
+        "conditions": [],
+        "diagnostics": [],
+        "duration": null,
+        "effects": [],
+        "source_span": {
+          "end": 109,
+          "start": 0,
+          "text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks."
+        },
+        "target": {
+          "kind": "enemy_unit",
+          "parameters": [
+            {
+              "key": "allegiance",
+              "value": "enemy"
+            },
+            {
+              "key": "target_relationship",
+              "value": "hit_by_those_attacks"
+            }
+          ],
+          "source_span": {
+            "end": 108,
+            "start": 0,
+            "text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks"
+          }
+        },
+        "template_id": "phase17c:selected-target-constraint",
+        "trigger": {
+          "kind": "timing_window",
+          "parameters": [
+            {
+              "key": "edge",
+              "value": "after"
+            },
+            {
+              "key": "owner",
+              "value": "active_player"
+            },
+            {
+              "key": "phase",
+              "value": "shooting"
+            },
+            {
+              "key": "subject",
+              "value": "this_model"
+            },
+            {
+              "key": "target_relationship",
+              "value": "hit_by_those_attacks"
+            },
+            {
+              "key": "timing_window",
+              "value": "just_after_friendly_unit_has_shot"
+            }
+          ],
+          "source_span": {
+            "end": 108,
+            "start": 0,
+            "text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks"
+          }
+        },
+        "unsupported_reason": null
+      },
+      {
+        "clause_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5:clause:002",
+        "conditions": [
+          {
+            "kind": "target_constraint",
+            "parameters": [
+              {
+                "key": "gate_subject",
+                "value": "attack_target"
+              },
+              {
+                "key": "relationship",
+                "value": "attack_targets_selected_unit"
+              },
+              {
+                "key": "target_reference",
+                "value": "selected_unit"
+              }
+            ],
+            "source_span": {
+              "end": 210,
+              "start": 137,
+              "text": "each time a friendly Aeldari model makes an attack that targets that unit"
+            }
+          },
+          {
+            "kind": "keyword_gate",
+            "parameters": [
+              {
+                "key": "required_keyword",
+                "value": "AELDARI"
+              }
+            ],
+            "source_span": {
+              "end": 171,
+              "start": 149,
+              "text": "friendly Aeldari model"
+            }
+          }
+        ],
+        "diagnostics": [],
+        "duration": {
+          "kind": "until_timing_endpoint",
+          "parameters": [
+            {
+              "key": "endpoint",
+              "value": "turn"
+            }
+          ],
+          "source_span": {
+            "end": 135,
+            "start": 110,
+            "text": "Until the end of the turn"
+          }
+        },
+        "effects": [
+          {
+            "kind": "set_contextual_status",
+            "parameters": [
+              {
+                "key": "attack_role",
+                "value": "attacker"
+              },
+              {
+                "key": "critical_threshold",
+                "value": 5
+              },
+              {
+                "key": "required_model_keyword",
+                "value": "AELDARI"
+              },
+              {
+                "key": "roll_type",
+                "value": "hit"
+              },
+              {
+                "key": "status",
+                "value": "critical_hit_threshold"
+              }
+            ],
+            "source_span": {
+              "end": 262,
+              "start": 215,
+              "text": "unmodified Hit roll of 5+ scores a Critical Hit"
+            }
+          }
+        ],
+        "source_span": {
+          "end": 263,
+          "start": 110,
+          "text": "Until the end of the turn, each time a friendly Aeldari model makes an attack that targets that unit, an unmodified Hit roll of 5+ scores a Critical Hit."
+        },
+        "target": {
+          "kind": "friendly_unit",
+          "parameters": [
+            {
+              "key": "allegiance",
+              "value": "friendly"
+            },
+            {
+              "key": "required_keyword",
+              "value": "AELDARI"
+            }
+          ],
+          "source_span": {
+            "end": 171,
+            "start": 149,
+            "text": "friendly Aeldari model"
+          }
+        },
+        "template_id": "phase17c:contextual-status",
+        "trigger": {
+          "kind": "dice_roll",
+          "parameters": [
+            {
+              "key": "roll_type",
+              "value": "hit"
+            }
+          ],
+          "source_span": {
+            "end": 234,
+            "start": 137,
+            "text": "each time a friendly Aeldari model makes an attack that targets that unit, an unmodified Hit roll"
+          }
+        },
+        "unsupported_reason": null
+      }
+    ],
+    "diagnostics": [],
+    "ir_hash": "24669fc8e965061719402530ca0fb87090f75a817629350401d332f042e74073",
+    "normalized_text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks. Until the end of the turn, each time a friendly Aeldari model makes an attack that targets that unit, an unmodified Hit roll of 5+ scores a Critical Hit.",
+    "parser_version": "phase17c-rule-parser-v4",
+    "rule_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5",
+    "schema_version": "phase17c-rule-ir-v1",
+    "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5"
+  },
+  "schema_version": "selected-model-hit-current-v1",
+  "source_row_id": "000003909:5"
+}

@@ -8,6 +8,9 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     canonical_weapon_keyword_tokens,
 )
+from warhammer40k_core.engine.catalog_selected_hit_threshold import (
+    selected_target_hit_threshold_is_supported,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -663,6 +666,8 @@ def _effect_target_is_supported(target: RuleTargetSpec | None) -> bool:
 
 
 def _effect_trigger_is_supported(clause: RuleClause) -> bool:
+    if selected_target_hit_threshold_is_supported(clause):
+        return True
     trigger = clause.trigger
     if trigger is None:
         return True
@@ -793,7 +798,9 @@ def _selected_target_effect_is_supported(
             and parameters.get("ability") == "stealth"
         )
     elif effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS:
-        return _selected_target_poison_status_is_supported(effect, clause=clause)
+        return _selected_target_poison_status_is_supported(
+            effect, clause=clause
+        ) or selected_target_hit_threshold_is_supported(clause)
     else:
         return False
     return (

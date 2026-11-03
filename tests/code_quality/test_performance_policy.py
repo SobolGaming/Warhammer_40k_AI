@@ -1266,3 +1266,123 @@ def test_core_description_smoke_scope_rejects_unbounded_declarations(
             category="rule_semantics",
             change=change,
         )
+
+
+def test_whispering_web_smoke_scope_and_predecessor_are_exact() -> None:
+    from tools import performance_policy as policy
+
+    scope = read_object(ROOT / "docs/performance/policy-v3/whispering-web-smoke-scope.json")
+    base = "3aadf2721f23381cb57088f63ad8e79d19599cbd"
+    bindings = object_value(scope["changes"])
+    operations = object_value(scope["smoke_operations"])
+    for path, change in bindings.items():
+        expected = operations[path]
+        assert isinstance(expected, list)
+        assert all(isinstance(operation, str) for operation in cast(list[object], expected))
+        assert policy.whispering_web_smoke_operations(
+            base=base, path=path, category="rule_semantics", change=change
+        ) == frozenset(cast(list[str], expected))
+        for changed_base, changed_path, category in (
+            ("a" * 40, path, "rule_semantics"),
+            (base, "tools/unreviewed.py", "rule_semantics"),
+            (base, path, "algorithm_or_search"),
+            (base, path, "cache_policy"),
+            (base, path, "serialization_or_replay_work"),
+        ):
+            assert not policy.whispering_web_smoke_operations(
+                base=changed_base, path=changed_path, category=category, change=change
+            )
+        for part in ("file", "owner"):
+            changed = copy.deepcopy(object_value(change))
+            if part == "file":
+                changed["after_sha256"] = "0" * 64
+            else:
+                owners = object_value(changed["owners"])
+                object_value(next(iter(owners.values())))["after"] = "0" * 64
+            assert not policy.whispering_web_smoke_operations(
+                base=base, path=path, category="rule_semantics", change=changed
+            )
+    raw = (ROOT / "tools/performance_policy.py").read_bytes()
+    prior = subprocess.check_output(
+        ["git", "show", base + ":tools/performance_policy.py"], cwd=ROOT
+    )
+    assert policy.whispering_web_policy_predecessor(raw) == prior
+    assert policy.whispering_web_policy_predecessor(prior) == prior
+    for altered_raw in (b"", raw + b"\n", raw.replace(b"category !=", b"category ==", 1)):
+        with pytest.raises(ValueError, match="Whispering Web"):
+            policy.whispering_web_policy_predecessor(altered_raw)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "missing-owner",
+        "extra-owner",
+        "file-hash",
+        "owner-hash",
+        "existing-owner-null",
+        "new-owner-predecessor",
+        "operation",
+        "extra-binding",
+        "extra-field",
+        "proof-after",
+        "proof-before",
+        "proof-block",
+        "proof-call",
+        "proof-predecessor",
+        "proof-field",
+    ],
+)
+def test_whispering_web_smoke_scope_rejects_unbounded_declarations(
+    monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
+    from tools import performance_policy as policy
+
+    scope = read_object(ROOT / "docs/performance/policy-v3/whispering-web-smoke-scope.json")
+    path = "src/warhammer40k_core/engine/attack_completion_triggers.py"
+    change = object_value(scope["changes"])[path]
+    altered = copy.deepcopy(scope)
+    bindings = object_value(altered["changes"])
+    binding = object_value(bindings[path])
+    owners = object_value(binding["owners"])
+    proof = object_value(altered["policy_successor"])
+    if mutation == "missing-owner":
+        owners.pop("observe_attack_completion")
+    elif mutation == "extra-owner":
+        owners["unreviewed"] = {"before": "1" * 64, "after": "2" * 64}
+    elif mutation == "file-hash":
+        binding["after_sha256"] = "not-a-hash"
+    elif mutation == "owner-hash":
+        object_value(owners["observe_attack_completion"])["after"] = "not-a-hash"
+    elif mutation == "existing-owner-null":
+        object_value(owners["observe_attack_completion"])["before"] = None
+    elif mutation == "new-owner-predecessor":
+        object_value(owners["_model_context_for_trigger"])["before"] = "0" * 64
+    elif mutation == "operation":
+        object_value(altered["smoke_operations"])[path] = ["cache-policy"]
+    elif mutation == "extra-binding":
+        bindings["unreviewed.py"] = copy.deepcopy(binding)
+    elif mutation.startswith("proof-"):
+        key = {
+            "proof-after": "after_sha256",
+            "proof-before": "before_sha256",
+            "proof-block": "function_block_sha256",
+            "proof-call": "union_call_sha256",
+            "proof-predecessor": "predecessor_call_sha256",
+            "proof-field": "unreviewed",
+        }[mutation]
+        proof[key] = "0" * 64
+    else:
+        altered["unreviewed"] = True
+
+    def altered_scope(_selected: Path) -> dict[str, object]:
+        return altered
+
+    monkeypatch.setattr(policy, "read_object", altered_scope)
+    with pytest.raises(ValueError, match=r"Unexpected|Whispering Web"):
+        policy.whispering_web_smoke_operations(
+            base="3aadf2721f23381cb57088f63ad8e79d19599cbd",
+            path=path,
+            category="rule_semantics",
+            change=change,
+        )

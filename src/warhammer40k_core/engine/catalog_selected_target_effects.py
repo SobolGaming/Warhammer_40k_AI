@@ -14,9 +14,11 @@ from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
     AttackSequenceCompletedHookBinding,
-    successful_hit_target_unit_ids_for_sequence,
 )
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+from warhammer40k_core.engine.catalog_model_post_shoot_groups import (
+    post_shoot_groups_for_record as _post_shoot_groups_for_record,
+)
 from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
     post_fight_candidates,
     post_fight_hit_target_request,
@@ -70,9 +72,6 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     clause_is_fight_start_selection as _clause_is_fight_start_selection,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    clause_is_post_shoot_hit_target_selection as _clause_is_post_shoot_hit_target_selection,
-)
-from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     clause_is_shooting_start_selection as _clause_is_shooting_start_selection,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
@@ -118,13 +117,7 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     payload_string_tuple as _payload_string_tuple,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    post_shoot_selected_target_effect_clauses_after as _post_shoot_effect_clauses_after,
-)
-from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     post_shoot_target_once_per_turn as _post_shoot_target_once_per_turn,
-)
-from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    post_shoot_target_selection_is_optional as _post_shoot_target_selection_is_optional,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     record_has_supported_post_shoot_selected_target_effect as _record_has_supported_post_shoot,
@@ -146,12 +139,6 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     selection_source_model_ids_for_record as _source_ids,
-)
-from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    selection_subject as _selection_subject,
-)
-from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    selection_weapon_names as _selection_weapon_names,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     shooting_start_effect_clauses_after as _shooting_start_effect_clauses_after,
@@ -285,6 +272,7 @@ class CatalogSelectedTargetEffectRuntime:
                     source_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
                     handler=self.post_shoot_hit_target_request,
                     candidate_handler=self.post_shoot_candidates,
+                    supports_model_completion=True,
                 )
             )
         if _has_runtime_post_fight_records(self.ability_indexes_by_player_id, self.armies):
@@ -726,6 +714,7 @@ def post_shoot_hit_target_effect_groups(
                     record=record,
                     attack_sequence=context.attack_sequence,
                     attack_sequence_completed_event_id=(context.attack_sequence_completed_event_id),
+                    completed_model_instance_ids=context.completed_model_instance_ids,
                 )
             )
     return tuple(sorted(groups, key=lambda group: group.sort_key))
@@ -864,97 +853,7 @@ def _shooting_start_groups_for_record(
     return tuple(groups)
 
 
-def _post_shoot_groups_for_record(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    army: ArmyDefinition,
-    unit: UnitInstance,
-    current_model_instance_ids: tuple[str, ...],
-    record: AbilityCatalogRecord,
-    attack_sequence: AttackSequence,
-    attack_sequence_completed_event_id: str,
-) -> tuple[_SelectedTargetGroup, ...]:
-    clauses = _catalog_selected_target_clauses_from_record(record)
-    runtime_clause_id = _runtime_clause_id_from_record(record)
-    groups: list[_SelectedTargetGroup] = []
-    for index, selection_clause in enumerate(clauses):
-        if runtime_clause_id is not None and runtime_clause_id != selection_clause.clause_id:
-            continue
-        if not _clause_is_post_shoot_hit_target_selection(selection_clause):
-            continue
-        effect_clauses = _post_shoot_effect_clauses_after(clauses, index)
-        if not effect_clauses:
-            continue
-        for source_model_id in _source_ids(
-            record, unit, selection_clause, effect_clauses, current_model_instance_ids
-        ):
-            hit_target_ids = successful_hit_target_unit_ids_for_sequence(
-                decisions=decisions,
-                sequence=attack_sequence,
-                attacker_model_instance_id=(
-                    None
-                    if _selection_subject(selection_clause) == "this_models_unit"
-                    else source_model_id
-                ),
-                weapon_names=_selection_weapon_names(selection_clause),
-            )
-            if not hit_target_ids:
-                continue
-            target_ids = _eligible_selection_target_unit_ids(
-                state=state,
-                source_player_id=army.player_id,
-                source_unit_instance_id=unit.unit_instance_id,
-                source_model_instance_id=source_model_id,
-                selection_clause=selection_clause,
-                explicit_target_unit_ids=hit_target_ids,
-            )
-            target_ids = _post_shoot_target_ids_allowed_by_frequency(
-                state=state,
-                decisions=decisions,
-                record=record,
-                selection_clause=selection_clause,
-                target_unit_instance_ids=target_ids,
-            )
-            options = options_for_targets(
-                state=state,
-                record=record,
-                player_id=army.player_id,
-                unit=unit,
-                source_model_instance_id=source_model_id,
-                selection_clause=selection_clause,
-                effect_clauses=effect_clauses,
-                selected_target_unit_ids=target_ids,
-                phase=BattlePhase.SHOOTING,
-                hook_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
-                submission_kind=SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SUBMISSION_KIND,
-                attack_sequence=attack_sequence,
-                attack_sequence_completed_event_id=attack_sequence_completed_event_id,
-            )
-            if options:
-                groups.append(
-                    _SelectedTargetGroup(
-                        record=record,
-                        player_id=army.player_id,
-                        unit=unit,
-                        source_model_instance_id=source_model_id,
-                        selection_clause=selection_clause,
-                        effect_clauses=effect_clauses,
-                        options=options,
-                        phase=BattlePhase.SHOOTING,
-                        hook_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
-                        submission_kind=(
-                            SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SUBMISSION_KIND
-                        ),
-                        optional=_post_shoot_target_selection_is_optional(selection_clause),
-                        attack_sequence=attack_sequence,
-                        attack_sequence_completed_event_id=(attack_sequence_completed_event_id),
-                    )
-                )
-    return tuple(groups)
-
-
-def _post_shoot_target_ids_allowed_by_frequency(
+def post_shoot_target_ids_allowed_by_frequency(
     *,
     state: GameState,
     decisions: DecisionController,

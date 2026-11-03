@@ -29,8 +29,109 @@ _ABILITY_ARTIFACT_CURRENT = "9845d550d30aa6118d9adc2942ff21d0c03159fd9ab381f6742
 _ABILITY_ARTIFACT_PRIOR = "0311a59d21bbd08984f40ba3c0f9df1172be131d85777c0647b8cc50cbb186af"
 
 
+# Exact current-source successors, projected only for retained historical tests.
+_LHYKHIS_SURFACES = {
+    "chaos-daemons-bridge-catalog": (
+        "f8e6e6b487ff165b074bc9c1c63d1741379c01bdede33a704ab4871b5c67851d",
+        "d34ec334103b50d97cb9d9b1425f256a95bd77c4aba9067ae0c9eda0426d9c29",
+        "ebea4f8a7139244c4cb81640194f56885c7b67ae5b138f21f9cd2beec53771ce",
+        "9845d550d30aa6118d9adc2942ff21d0c03159fd9ab381f6742e7e08d35d26fd",
+    ),
+    "core-v2:court-of-slaughter-anvanth:2026-08": (
+        "4a701e1136c439e89354c514a9479de87f1e661474da12544fa601c3fdc09f51",
+        "57d17c969f0bc82a7f89b34c8da9a9dc89b1134dceeb86ff5d5eb9cd835b4ccf",
+        "aa73540c06410dd91aad443f004ad6a10b748a613921b986c97097849c4fc6c2",
+        "5c918c3456c6354af874fb39f5d8b5d51d8c4067af50834daa98be7be302eef9",
+    ),
+}
+
+
+def before_lhykhis_correction(package: CanonicalCatalogPackage) -> CanonicalCatalogPackage:
+    """Authenticate the entire descriptor and undo only the two reviewed IR additions."""
+    observed = tuple(
+        (row, ability)
+        for row in package.army_catalog.datasheets
+        for ability in row.abilities
+        if ability.ability_id == "000003909:whispering-web"
+    )
+    artifacts = tuple(
+        a for a in package.source_artifacts if a.artifact_name == "Datasheets_abilities.json"
+    )
+    if not observed:
+        assert all(
+            a.artifact_hash not in {s[2] for s in _LHYKHIS_SURFACES.values()} for a in artifacts
+        )
+        return package
+    assert len(observed) == len(artifacts) == 1
+    owner, ability = observed[0]
+    assert owner.datasheet_id == "000003909"
+    current_descriptor, prior_descriptor, current_artifact, prior_artifact = _LHYKHIS_SURFACES[
+        package.army_catalog.catalog_id
+    ]
+    assert artifacts[0].artifact_hash == current_artifact
+    assert (
+        sha256(
+            json.dumps(ability.to_payload(), sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        == current_descriptor
+    )
+    assert ability.rule_ir_payload is not None
+    rule = RuleIR.from_payload(cast(RuleIRPayload, ability.rule_ir_payload))
+    assert rule.ir_hash() == "24669fc8e965061719402530ca0fb87090f75a817629350401d332f042e74073"
+    clause = rule.clauses[1]
+    prior_rule = replace(
+        rule,
+        clauses=(
+            rule.clauses[0],
+            replace(
+                clause,
+                conditions=tuple(
+                    c for c in clause.conditions if c.kind.value != "target_constraint"
+                ),
+                effects=(
+                    replace(
+                        clause.effects[0],
+                        parameters=tuple(
+                            p
+                            for p in clause.effects[0].parameters
+                            if p.key != "required_model_keyword"
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+    assert (
+        prior_rule.ir_hash() == "02b5c11d47776e8a050dd004db3f1d725c8ec1828e1624017c439bc0fa1c2219"
+    )
+    prior = replace(ability, rule_ir_payload=cast(Any, prior_rule.to_payload()))
+    assert (
+        sha256(
+            json.dumps(prior.to_payload(), sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        == prior_descriptor
+    )
+    return replace(
+        package,
+        army_catalog=replace(
+            package.army_catalog,
+            datasheets=tuple(
+                replace(row, abilities=tuple(prior if a is ability else a for a in row.abilities))
+                if row is owner
+                else row
+                for row in package.army_catalog.datasheets
+            ),
+        ),
+        source_artifacts=tuple(
+            replace(a, artifact_hash=prior_artifact) if a is artifacts[0] else a
+            for a in package.source_artifacts
+        ),
+    )
+
+
 def before_mandiblasters_correction(package: CanonicalCatalogPackage) -> CanonicalCatalogPackage:
     """Project only exact reviewed descriptor and compiled-artifact successors."""
+    package = before_lhykhis_correction(package)
     observed = tuple(
         (row, ability)
         for row in package.army_catalog.datasheets
