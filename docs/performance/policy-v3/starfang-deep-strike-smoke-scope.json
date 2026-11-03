@@ -1,0 +1,54 @@
+{
+  "base": "79a27e4a26e180a28457712818d47e274df7c99a",
+  "changes": {
+    "tools/ability_support_sources.py": {
+      "before_sha256": "17504ae8b69e37652496458e6ff84e411f1d0a947f4688a9d2a74567cec6e93c",
+      "after_sha256": "19825e7ed02385118ff17fc49c6b3847512f783aaa98a0ac1a61f5105ab68e1a",
+      "owners": {
+        "@module": {
+          "before": "634bb8a3bc6870c25a130a01549d8d23e08384a2df1e1757d7e3b0ca8fca048a",
+          "after": "2e02f88b88e7caf177bce7541bc01e0da88f250d7a7f0a193b14846cdd633090"
+        },
+        "ability_support_index_inputs": {
+          "before": "bc225d2512cea46fb93cee1a4a80d49198d4fe1bd095c13428c83431a060b6b0",
+          "after": "15862eedd8bc266af0d4f942d08f3697e19d13a10af758f85ae23cd5109e8c69"
+        },
+        "load_ability_support_sources": {
+          "before": "ce4545adb07cdfa5ff2889a48a24fd85d5fceebaad21aacb716ac8c78ab6617d",
+          "after": "a19f4a1098c9371ffa3578dc1584a0a9f7b249d89db67741c84a187448d04025"
+        }
+      }
+    },
+    "tools/generate_ability_support_matrix.py": {
+      "before_sha256": "0fec8c2d95705cf06ff51dd17c5f9e3516e0b993707ec0050cf37464970b1759",
+      "after_sha256": "e2806e7406310c1a8b09af6344ce93bfac2f112f2d05f4f22fff00158d28228f",
+      "owners": {
+        "@module": {
+          "before": "b03c0ee85a150ef618aa48f24a76e9dc54851bbc301af5eb8281d9c71fc10d66",
+          "after": "1efb07e0c6023bb0ff8b130b232a95dc1de9aab002ec4728b4cc6d46789234cb"
+        },
+        "_ability_support_catalog_package": {
+          "before": "753f4e4226b06c68266b41631b9e063bf0407309aa0336d0459ca7ec522a42dc",
+          "after": "8301d8e9d5fa07dd2ad912037c05330cafdee7f9463d122b6fe3f016505749d8"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tools/ability_support_sources.py": [
+      "qualification40-exact-b0712fa66a9cc38e"
+    ],
+    "tools/generate_ability_support_matrix.py": [
+      "qualification40-exact-ded6452f144f095b"
+    ]
+  },
+  "source_obligation": "Correct only the ordinary STARFANG keyword source row, preserving the exact plural Starfangs datasheet name, and replace all 28 Deep Strike descriptions (17 native, 6 paired, 5 Daemons) with complete Core 24.09 wording admitted through typed source evidence and existing Core 20.04 Ingress dependency. The two Starfang source artifacts join the existing selected-source index inputs; the catalog generator applies the bounded description overlay.",
+  "unchanged_work": "The source/catalog pipeline adds bounded keyword-overlay admission, two selected-source inputs, complete description replacement and exact successor validation. Existing indexing/query/search algorithms, source-reuse cache policy, gameplay consumers, serializers, descriptor IDs/parameters and eight-inch native Deep Strike policy remain unchanged. Source data changes the real STARFANG membership result. This is a source-rule correction with no deliberate performance or dependency change; identical work counts or measured runtime equivalence are not asserted. All prior mappings, sensitivity, families, historical evidence and budgets remain; final serial current-runtime smoke and live semantic/work/cache checks are required. No timing, detailed-comparison or full-game success is claimed.",
+  "policy_successor": {
+    "before_sha256": "faa07162fff82c6d960d0f8288f8438f8d1bf8b726a502207b941c228eb8002c",
+    "after_sha256": "c34cf5ac0941885338e966bcb6c2d920b78f363d12b172c249e08dbd51896af4",
+    "function_block_sha256": "88a0832a03ee3d2c1d931fdc94cf87fbdbbca0c3b8200c31cf776c8e73f7b57b",
+    "union_call_sha256": "220b32eb02d9e2d79f7a7007780a2dc4f40f3fd3ba48891502db647ec3f9df47",
+    "predecessor_call_sha256": "baf49b042b90e8ea7d4c357be98b65b8b538fca32b840e000495cc9e28580d73"
+  }
+}

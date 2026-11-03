@@ -231,6 +231,12 @@ def authorize_faction_observation(
         )
 
         audit = aeldari_banshee_eldrad_2026_11.source_audit()
+    elif audit_id == "starfang-keyword-app-mirror-2026-11-03":
+        from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+            starfang_keyword_2026_11,
+        )
+
+        audit = starfang_keyword_2026_11.source_audit()
     else:
         audit = faction_source_audit()
     if audit.audit_id != audit_id:

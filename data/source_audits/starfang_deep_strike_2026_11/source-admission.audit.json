@@ -1,0 +1,33 @@
+{
+  "audit_id": "deep-strike-maintained-app-mirror-2026-11-03",
+  "rows": [
+    {
+      "row_id": "24.09:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/24-core-abilities",
+      "observed_at": "2026-11-03T17:17:33.254Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-abilities:core:deep-strike",
+      "transcription_sha256": "f30dacd179b74497c320f86d6ae5e0065a19bd6d8cc47b8317fc896c2fd59a4e",
+      "provider_non_affiliation_recorded": true,
+      "rendered_section_sha256": "1f5324cfe63123aaba50fd0d48cc4b179767cefc3fdc3d366172b2bd199e737b",
+      "reviewed_observations_sha256": "048e21d8284625e4ddb89111a06fdb064e499e80530428f2db6ed978c05798e1",
+      "source_observation_sha256": "95de02ae18aa854313193d5aa580abbc7dd52e3dfabf6218eb20a255caf1d628"
+    }
+  ],
+  "starfang": {
+    "audit_id": "starfang-keyword-app-mirror-2026-11-03",
+    "observation_sha256": "8c6e977af2b801324ce6f52258a5f758be61a7b06bd6fc130dc5223245e177ab",
+    "overlay_sha256": "477ce675ddebbf0f86ea4478a3b4ebf0656b59b9cbfe0e0e1b693406c5c16c78",
+    "old_row_id": "000004195:Starfangs:global:false:15639",
+    "new_row_id": "000004195:Starfang:global:false:15639",
+    "preimage": "055b20e2b17f63cd0abb28aef0691b11ffb99c7f11df66f68298ac5018582aac"
+  },
+  "dependency": {
+    "source_id": "gw-11e-core-reserve-lifetimes:ingress",
+    "artifact_sha256": "d22f5ca58b27172445f595ebe4a4763e372162950cb825d48cb7816073c488c1",
+    "transcription_sha256": "3ebcf9f594a98f20242c6e3272a5bb3ef63345bd1aff0657560b887321464eba"
+  },
+  "authority_limit": "Maintained App-data mirror; no official-primary, network-byte capture, App-build or complete gameplay certification claim. Version 995 labels the observed update listing, not the keyword-change date."
+}

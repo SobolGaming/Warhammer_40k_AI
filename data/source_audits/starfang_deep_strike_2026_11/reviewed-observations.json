@@ -1,0 +1,856 @@
+{
+  "schema": "starfang-deep-strike-observations-v1",
+  "fresh_observations": [
+    {
+      "label": "starfangs",
+      "url": "https://www.40k.app/factions/aeldari/units/starfangs",
+      "observed_utc": "2026-11-03T17:06:02.983Z",
+      "text_utf16_length": 1197,
+      "fnv1a_utf16": "edf140f2",
+      "main_text": "40K.APP\nFACTIONS\nAELDARI\nStarfangs\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nStarfangs 105x70mm Oval Base\n14\"\n6\n3+\n6\n7+\n2\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nDisintegrator cannon\nASSAULT\n36\"\n3\n3+\n6\n-3\n2\nStarfang grenade launcher\nASSAULT\nBLAST\n36\"\nD3\n3+\n6\n-3\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nWraithbone hull\n3\n4+\n6\n0\n1\nKEYWORDS\nAELDARI\nANHRATHE\nFLY\nGRENADES\nSMOKE\nSTARFANG\nVEHICLE\nCOSTS\n1 model\n70 pts\n2 models\n140 pts\nUNIT COMPOSITION\n1-2 Starfangs\n\nEvery model is equipped with: disintegrator cannon; Starfang grenade launcher; wraithbone hull.\n\nBecome a supporter and remove ads\nCORE ABILITIES\nDEADLY DEMISE 1\nSCOUTS 7\"\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nHallucinogen Grenades\n\nAt the start of your opponent’s Shooting phase, this unit can use this ability. If it does, select one AELDARI INFANTRY unit from your army visible to and within 36” of this unit: until the end of the phase, that unit has the Stealth ability.\n\nSTATS\n5%\nof Aeldari lists, 1.3 per list\n#50\nmost-taken in faction\n5%\nfrom 5% since last update\nIN ARMY LISTS\nPopular detachments\nCORSAIR COTERIE\nPATH OF THE OUTCAST\nELDRITCH RAIDERS\nOften taken with\nCORSAIR VOIDREAVERS\nPRINCE YRIEL\nCORSAIR SKYREAVERS\nKHARSETH\nSHROUD RUNNERS"
+    },
+    {
+      "label": "starfangs-updates",
+      "url": "https://www.40k.app/factions/aeldari/units/starfangs/updates",
+      "observed_utc": "2026-11-03T17:07:55.629Z",
+      "text_utf16_length": 603,
+      "fnv1a_utf16": "fb8fa946",
+      "main_text": "40K.APP\nFACTIONS\nAELDARI\nStarfangs\nDATASHEET\nUPDATES\nVERSION 931\nReleased 2026-08-26\nDeadly Demise 1\nAbility Updated\n\nThis ability always takes the form Deadly Demise X. Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6\" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6\").\n\nPrevious\nVERSION 867\nReleased 2026-06-19\nAdded to the faction\nAdded\nPoints cost\n70 pts"
+    },
+    {
+      "label": "core-deep-strike-24.09",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.09",
+      "observed_utc": "2026-11-03T17:17:33.254Z",
+      "text_utf16_length": 272,
+      "fnv1a_utf16": "bd1d5d31",
+      "section_id": "24.09",
+      "links": [
+        {
+          "href": "/rules/20-strategic-reserves#20.04",
+          "text": "20.04"
+        }
+      ],
+      "main_text": "24.09\nDEEP STRIKE\n\nEach time this unit makes an ingress move (20.04), if every model in this unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from all enemy units, even if that is within your opponent’s deployment zone."
+    },
+    {
+      "label": "core-ingress-20.04",
+      "url": "https://www.40k.app/rules/20-strategic-reserves#20.04",
+      "observed_utc": "2026-11-03T17:20:01.712Z",
+      "text_utf16_length": 646,
+      "fnv1a_utf16": "212ee5c9",
+      "section_id": "20.04",
+      "links": [
+        {
+          "href": "/rules/03-moving#03.02",
+          "text": "03.02"
+        }
+      ],
+      "main_text": "20.04\nINGRESS MOVE\n\nWhen eligible: Your unit is in strategic reserves (excluding units that are embarked within TRANSPORTS that are themselves in strategic reserves) Set-up distance: 6\" Effect: Your unit is set up as described in Set Up (03.02) While moving: Set up your unit wholly within the set-up distance of one or more battlefield edges and more than 8\" horizontally from all enemy units.\n\nBefore the Third Battle Round: While doing so, no models can be set up within your opponent’s deployment zone.\n\nAfter moving: Unless otherwise stated, until the start of the next Charge phase, your unit is not eligible to make any other type of move."
+    }
+  ],
+  "updates_context": {
+    "url": "https://www.40k.app/factions/updates",
+    "observed_utc": "2026-11-03T17:20:33.045Z",
+    "complete_rendered_observation_utf16_length": 6510,
+    "complete_rendered_observation_fnv1a_utf16": "9336872a",
+    "retained_excerpt": "40K.APP\nFACTIONS\nFactions\n\nExplore the factions of Warhammer 40,000, from humanity’s indomitable armies to the galaxy’s most ruthless predators.\n\nARMIES\nUPDATES\nVERSION 995\nReleased 2026-10-16.\n1 faction changed.\nGenestealer Cults\n1 unit\n1 change",
+    "latest_visible_version": 995,
+    "latest_visible_release_date": "2026-10-16",
+    "limit": "Context excerpt and complete-observation fingerprint only. Not an App build attestation or a date of the Starfang keyword change. Complete unrelated global listing is not retained in this plan."
+  },
+  "scope": {
+    "deep_strike": {
+      "occurrence_count": 28,
+      "unique_datasheets": 17,
+      "surface_counts": {
+        "native60": 17,
+        "paired27": 6,
+        "Daemons5": 5
+      },
+      "ability_id": "000008343",
+      "old_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+      "old_description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+      "proposed_description": "Each time this unit makes an ingress move (20.04), if every model in this unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from all enemy units, even if that is within your opponent’s deployment zone.",
+      "proposed_description_sha256": "f30dacd179b74497c320f86d6ae5e0065a19bd6d8cc47b8317fc896c2fd59a4e",
+      "proposed_source_id": "gw-11e-core-abilities:core:deep-strike",
+      "dependency_source_id": "gw-11e-core-reserve-lifetimes:ingress",
+      "new_complete_source_admission_required": true,
+      "occurrences": [
+        {
+          "surface": "native60",
+          "datasheet_id": "000000600",
+          "datasheet_name": "Swooping Hawks",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000000600:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "ead72fb0068734626971274943c7547262a188e658e822917a11d64cab6e87ff",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000000600:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000000601",
+          "datasheet_name": "Warp Spiders",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000000601:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "ff2107a4cb89938c7511f383ac2bee34dd0a66e9bdefa581baac190220a8f7bd",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000000601:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000001112",
+          "datasheet_name": "Flesh Hounds",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001112:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "ec68d1cc8a1746e617be8784fda84437ed204883b3072d897bc077b01aa34276",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001112:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000001114",
+          "datasheet_name": "Bloodletters",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001114:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "d3fab5b14f860cfad99794082bd747596a716e6d27a51675b9b1d44d3f8301ce",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001114:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000001115",
+          "datasheet_name": "Bloodcrushers",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001115:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "5e1974bf512eb989062171c6510b8844b8bc90d310a3379ef6d2a8094bb709cc",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001115:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000001120",
+          "datasheet_name": "Lord of Change",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001120:2",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "8139677396e106415690aac101a94c522a46f8160488fba90a92556644505893",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001120:2",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000001132",
+          "datasheet_name": "Plaguebearers",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001132:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "49825e77a725b94b8e4b150f73ec9338401913b9834afee055d8e7be3a290a65",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001132:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000001148",
+          "datasheet_name": "Be'lakor",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001148:2",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "199071d5b141652897e1d9c65901a6dda4e23dc883ede504cb5b85b0139ec4c7",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001148:2",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000001149",
+          "datasheet_name": "Daemon Prince of Chaos",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001149:2",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "4560eefbeaefc0aaaf8210d8ef68a58d60136207a79f158485c808a114982723",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001149:2",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000001151",
+          "datasheet_name": "Soul Grinder",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001151:2",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "3d444373c59bae6494bf180c68a5e120f13518fc0c5e7797dfbc610feba74e6f",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000001151:2",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000002582",
+          "datasheet_name": "Bloodthirster",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000002582:2",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "1acd34412cd6a9af2ee0eef733eae2b7a4a0bba2690201c1b48420bca9911ba2",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000002582:2",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000002758",
+          "datasheet_name": "Daemon Prince Of Chaos With Wings",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000002758:2",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "d62675faa2bef2beaadb996c6cc7297f9ec6f5bf80f43c188672edd75f34e267",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000002758:2",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000002759",
+          "datasheet_name": "Autarch Wayleaper",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000002759:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "eac7fbf08d0c5d934ac7707828e5ed4ae47de9ac900eb7be805f1c7647a8a677",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000002759:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000003909",
+          "datasheet_name": "Lhykhis",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000003909:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "428a776a38cea046688a45632bb45f3b58fb8480c2239275ff29c66c94139ece",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000003909:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000004077",
+          "datasheet_name": "Fulgrim",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000004077:2",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "fe183379469387891146e99daed0a50da480dcaf6b00087b70662a540870da8b",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000004077:2",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000004081",
+          "datasheet_name": "Chaos Terminators",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000004081:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "6378cbefc98775efd7de44911995d865ee023761e2cc3e8356ee1cc76641295f",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000004081:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "native60",
+          "datasheet_id": "000004196",
+          "datasheet_name": "Corsair Skyreavers",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000004196:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "4621a07d8f79f839e90e0b7d5a38a27c9d2b8ebe32368a3db0802e1319f2df4b",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000004196:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "paired27",
+          "datasheet_id": "000000600",
+          "datasheet_name": "Swooping Hawks",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:Datasheets_abilities:000000600:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "80a38145eeb0e414f9eaa258fb3fe78267d2d667a9db7d1bb010909903d8c180",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:Datasheets_abilities:000000600:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "paired27",
+          "datasheet_id": "000000601",
+          "datasheet_name": "Warp Spiders",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:Datasheets_abilities:000000601:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "c6647faf2b800d9943a9bfdd4bb5fb9c8f5d1922000a4dd0b1128c524bdd7d43",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:Datasheets_abilities:000000601:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "paired27",
+          "datasheet_id": "000002759",
+          "datasheet_name": "Autarch Wayleaper",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:Datasheets_abilities:000002759:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "84da4b22d83aa21f4d03f41066ad00252c5d3c71cbf378da14b5e2a1a1e61f1e",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:Datasheets_abilities:000002759:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "paired27",
+          "datasheet_id": "000003909",
+          "datasheet_name": "Lhykhis",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:Datasheets_abilities:000003909:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "ca31b81ce8639f52acff3eee25878c55bab7809d964dca7a8d909dcea8493081",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:Datasheets_abilities:000003909:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "paired27",
+          "datasheet_id": "000004077",
+          "datasheet_name": "Fulgrim",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:Datasheets_abilities:000004077:2",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "044a861020002c908faf520cc0aaf5c9f6d6246c325b5c8b8d2920d58881a5bf",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:Datasheets_abilities:000004077:2",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "paired27",
+          "datasheet_id": "000004081",
+          "datasheet_name": "Chaos Terminators",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:Datasheets_abilities:000004081:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "2049258169adb5bce6c963e17d2bb8f32908e559d9b3a1f38daa1aa2fcfc1e42",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:Datasheets_abilities:000004081:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "Daemons5",
+          "datasheet_id": "000001115",
+          "datasheet_name": "Bloodcrushers",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000001115:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "062d4429013f1eb1f0907559930129f42aa0b5d5edef594a76888c1d339de18f",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000001115:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "Daemons5",
+          "datasheet_id": "000001120",
+          "datasheet_name": "Lord of Change",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000001120:2",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "3d2dad10ac692576eed84166c2ddd70658f34448029225995a35a70f3c1d166d",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000001120:2",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "Daemons5",
+          "datasheet_id": "000001132",
+          "datasheet_name": "Plaguebearers",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000001132:1",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "3fdfd4d1cb3ec6435a138f072f63dfbca74a9b4130253ced59bfcf8c7091fe1a",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000001132:1",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "Daemons5",
+          "datasheet_id": "000001148",
+          "datasheet_name": "Be'lakor",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000001148:2",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "20ab527e549b57aec96f830a685be4cfd14bc3aafee72a90d4682668c3e0306b",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000001148:2",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        },
+        {
+          "surface": "Daemons5",
+          "datasheet_id": "000002582",
+          "datasheet_name": "Bloodthirster",
+          "ability_id": "000008343",
+          "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000002582:2",
+          "parameter_tokens": [],
+          "description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+          "description_sha256": "51b2cb455ebc05e08e88ce55cf9d541a642a41d9fd5c51200f78270ec366a44e",
+          "descriptor_sha256": "f03022cc4a698a217219d88c4f1f9a9ebb62655c6ca2f0305cbaa7cdf377e83f",
+          "descriptor": {
+            "ability_id": "000008343",
+            "name": "Deep Strike",
+            "source_id": "data-package:core-v2:chaos-daemons-roster-bridge:2026-07:Datasheets_abilities:000002582:2",
+            "support": "descriptor_only",
+            "source_kind": "core",
+            "effect_description": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+            "source_wargear_id": null,
+            "rule_ir_payload": null,
+            "rule_ir_diagnostics": [],
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ],
+            "parameter_tokens": []
+          }
+        }
+      ]
+    },
+    "surfaces": {
+      "native60": {
+        "datasheets": 60,
+        "package_id": "data-package:core-v2:chaos-daemons-bridge-catalog:phase17k-generated",
+        "package_hash": "3da400cd47a608ae88738cc48969d55a01fc77d9252b892337c010324345c7e0"
+      },
+      "paired27": {
+        "datasheets": 27,
+        "package_id": "data-package:core-v2:court-of-slaughter-anvanth:2026-08",
+        "package_hash": "b1a1a67580cdb5f5942864e54baa174d0a71d32633517d02c37468a8cb514b1e"
+      },
+      "Daemons5": {
+        "datasheets": 5,
+        "package_id": "data-package:core-v2:chaos-daemons-roster:2026-07",
+        "package_hash": "b63c0805b6878daf2eef2d4145e407361f7848bde3095074022f1b850db183ab"
+      }
+    }
+  },
+  "authority_limit": "Maintained App-data mirror; no official-primary, network-byte capture, App-build or complete gameplay certification claim. Version 995 labels the observed update listing, not the keyword-change date."
+}

@@ -10,9 +10,11 @@ from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING or __package__:
     from tools.core_deadly_demise_catalog_overlay import with_current_deadly_demise
+    from tools.core_deep_strike_catalog_overlay import with_current_deep_strike
     from tools.core_stealth_catalog_overlay import with_current_stealth
 else:
     from core_deadly_demise_catalog_overlay import with_current_deadly_demise
+    from core_deep_strike_catalog_overlay import with_current_deep_strike
     from core_stealth_catalog_overlay import with_current_stealth
 
 from warhammer40k_core.core.detachment import (
@@ -199,6 +201,7 @@ def build_catalog_package() -> CanonicalCatalogPackage:
             ),
         ),
     )
+    package = with_current_deep_strike(package)
     roster_catalog.validate_current_catalog_against_reconciliation(
         catalog=package.army_catalog,
         reconciliation=reconciliation,

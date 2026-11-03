@@ -1,0 +1,53 @@
+{
+  "package_id": {
+    "namespace": "40k-app",
+    "package_name": "starfang-keyword",
+    "version": "reviewed-2026-11-03"
+  },
+  "catalog_version": {
+    "version_id": "warhammer-40000-11th-starfang-keyword-2026-11",
+    "source_date": "2026-11-03"
+  },
+  "base_source_package_id": {
+    "namespace": "wahapedia",
+    "package_name": "source-mirror",
+    "version": "10th-edition-2026-06-14"
+  },
+  "target_edition": "warhammer-40000-11th",
+  "effective_date": "2026-11-03",
+  "operations": [
+    {
+      "op_id": "starfang-retire-plural-ordinary-keyword",
+      "order_index": 1,
+      "operation_kind": "supersede_row",
+      "target_edition": "warhammer-40000-11th",
+      "source_table": "Datasheets_keywords",
+      "source_row_id": "000004195:Starfangs:global:false:15639",
+      "source_reference": "https://www.40k.app/factions/aeldari/units/starfangs",
+      "effective_date": "2026-11-03",
+      "reason": "Correct ordinary STARFANG keyword; preserve plural exact name identity. Both row identities and the predecessor preimage are bound by this governed overlay.",
+      "expected_preimage_hash": "055b20e2b17f63cd0abb28aef0691b11ffb99c7f11df66f68298ac5018582aac",
+      "fields": {}
+    },
+    {
+      "op_id": "starfang-add-singular-ordinary-keyword",
+      "order_index": 15637,
+      "operation_kind": "add_row",
+      "target_edition": "warhammer-40000-11th",
+      "source_table": "Datasheets_keywords",
+      "source_row_id": "000004195:Starfang:global:false:15639",
+      "source_reference": "https://www.40k.app/factions/aeldari/units/starfangs",
+      "effective_date": "2026-11-03",
+      "reason": "Correct ordinary STARFANG keyword; preserve plural exact name identity. Both row identities and the predecessor preimage are bound by this governed overlay.",
+      "expected_preimage_hash": null,
+      "fields": {
+        "datasheet_id": "000004195",
+        "is_faction_keyword": "false",
+        "keyword": "Starfang",
+        "model": ""
+      }
+    }
+  ],
+  "schema_version": "phase17-source-overlay-v1",
+  "package_hash": "b9d8ba263883eea9122fd60dbfc3849aa7cfabd0492bc3f43cf512dbdaf93255"
+}

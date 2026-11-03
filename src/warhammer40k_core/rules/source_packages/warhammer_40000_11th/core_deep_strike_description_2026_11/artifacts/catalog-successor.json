@@ -1,0 +1,178 @@
+{
+  "schema": "core-v2-deep-strike-catalog-successor-v1",
+  "ability_id": "000008343",
+  "source_id": "gw-11e-core-abilities:core:deep-strike",
+  "dependency_source_id": "gw-11e-core-reserve-lifetimes:ingress",
+  "historical_text": "DEEP STRIKE\nSome units make their way to battle via tunnelling, teleportation, high-altitude descent or other extraordinary means that allow them to appear suddenly in the thick of the fighting.\nDuring the Declare Battle Formations step, if every model in a unit has this ability, you can set it up in Reserves instead of setting it up on the battlefield. If you do, in the Reinforcements step of one of your Movement phases you can set up this unit anywhere on the battlefield that is more than 9\" horizontally away from all enemy models. If a unit with the Deep Strike ability arrives from Strategic Reserves, the controlling player can choose for that unit to be set up either using the rules for Strategic Reserves or using the Deep Strike ability.\n- Unit can be set up in Reserves instead of on the battlefield.\n- Unit can be set up in your Reinforcements step, more than 9\" horizontally away from all enemy models.",
+  "current_text": "Each time this unit makes an ingress move (20.04), if every model in this unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from all enemy units, even if that is within your opponent’s deployment zone.",
+  "occurrences": [
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000000600",
+      "historical_descriptor_sha256": "ead72fb0068734626971274943c7547262a188e658e822917a11d64cab6e87ff",
+      "current_descriptor_sha256": "b9515afb1185942a78abc10560703e2b939d3a725805674fb561b6f95b53985d"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000000601",
+      "historical_descriptor_sha256": "ff2107a4cb89938c7511f383ac2bee34dd0a66e9bdefa581baac190220a8f7bd",
+      "current_descriptor_sha256": "5a5979392def7bc98e02b66752070694c22ca85caf98beaf0900b73930bcc834"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000001112",
+      "historical_descriptor_sha256": "ec68d1cc8a1746e617be8784fda84437ed204883b3072d897bc077b01aa34276",
+      "current_descriptor_sha256": "f152e1be7ec765c4e7a04c76c8a79514fd353ac74eddf0cf71753be08c18c4fc"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000001114",
+      "historical_descriptor_sha256": "d3fab5b14f860cfad99794082bd747596a716e6d27a51675b9b1d44d3f8301ce",
+      "current_descriptor_sha256": "576a3f6203253a48d23beb09b3772dfe1a09ecda84b141ffee19fdee52844983"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000001115",
+      "historical_descriptor_sha256": "5e1974bf512eb989062171c6510b8844b8bc90d310a3379ef6d2a8094bb709cc",
+      "current_descriptor_sha256": "67f52bf79d922205c2a280a9b2d16ab06fe557d3a9c0cbd76f64d8d657eda4a7"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000001120",
+      "historical_descriptor_sha256": "8139677396e106415690aac101a94c522a46f8160488fba90a92556644505893",
+      "current_descriptor_sha256": "6a9390f68bf9f19d0667269f03bf71691abb5c0c7b84aa4d4fc3f52a88351cce"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000001132",
+      "historical_descriptor_sha256": "49825e77a725b94b8e4b150f73ec9338401913b9834afee055d8e7be3a290a65",
+      "current_descriptor_sha256": "f24e0b6e3133c2cc9ff092f0152be329f0bf1a97504759ea91d8b4523f07fa7f"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000001148",
+      "historical_descriptor_sha256": "199071d5b141652897e1d9c65901a6dda4e23dc883ede504cb5b85b0139ec4c7",
+      "current_descriptor_sha256": "9985a39ade18e9606bf592038a29db4b21a1de90fe58cd8b6d7f1273375a0858"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000001149",
+      "historical_descriptor_sha256": "4560eefbeaefc0aaaf8210d8ef68a58d60136207a79f158485c808a114982723",
+      "current_descriptor_sha256": "da997fc9307dcc00b89324e2e68a2106eb754db4e42001a3a31d5d3d9ecad50f"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000001151",
+      "historical_descriptor_sha256": "3d444373c59bae6494bf180c68a5e120f13518fc0c5e7797dfbc610feba74e6f",
+      "current_descriptor_sha256": "e915471b503f4d133f073bb361517c94b25eec1cb698c454f55fcf84b949797d"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000002582",
+      "historical_descriptor_sha256": "1acd34412cd6a9af2ee0eef733eae2b7a4a0bba2690201c1b48420bca9911ba2",
+      "current_descriptor_sha256": "540f261ea824d4bd5750a1173955e11e0d76e76bfbc0c58b012b96376e9bef30"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000002758",
+      "historical_descriptor_sha256": "d62675faa2bef2beaadb996c6cc7297f9ec6f5bf80f43c188672edd75f34e267",
+      "current_descriptor_sha256": "522e659fa5d52664d0d7e5f4258fd13c78fbe7be41f8c2093716871f49003869"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000002759",
+      "historical_descriptor_sha256": "eac7fbf08d0c5d934ac7707828e5ed4ae47de9ac900eb7be805f1c7647a8a677",
+      "current_descriptor_sha256": "81806f0894c2f9836a02cecae5004d27d80d256ce1d0a46125463eddcd0791ca"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000003909",
+      "historical_descriptor_sha256": "428a776a38cea046688a45632bb45f3b58fb8480c2239275ff29c66c94139ece",
+      "current_descriptor_sha256": "d8753d8af315fd265ba942cc0a0f3acdd8a916f2a3eb9efcfa590ee1352e2ad4"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000004077",
+      "historical_descriptor_sha256": "fe183379469387891146e99daed0a50da480dcaf6b00087b70662a540870da8b",
+      "current_descriptor_sha256": "23e79f7407617ed787cf07947f3bd9ddec0382e5c244b71f24363c22c70af062"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000004081",
+      "historical_descriptor_sha256": "6378cbefc98775efd7de44911995d865ee023761e2cc3e8356ee1cc76641295f",
+      "current_descriptor_sha256": "5eeaa719cb76ee4ae7b8e91662aeaa2b3c172a1795db7d6724a12b91066734ef"
+    },
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "datasheet_id": "000004196",
+      "historical_descriptor_sha256": "4621a07d8f79f839e90e0b7d5a38a27c9d2b8ebe32368a3db0802e1319f2df4b",
+      "current_descriptor_sha256": "b61a73daa16204e98f467f0fdf6a8297a979c2f977c0a0c8aba22b973de12cf0"
+    },
+    {
+      "catalog_id": "core-v2:court-of-slaughter-anvanth:2026-08",
+      "datasheet_id": "000000600",
+      "historical_descriptor_sha256": "80a38145eeb0e414f9eaa258fb3fe78267d2d667a9db7d1bb010909903d8c180",
+      "current_descriptor_sha256": "994cba4daed6c3579933f31423c67cf6565c1099011a43ad09738f48b9f1252c"
+    },
+    {
+      "catalog_id": "core-v2:court-of-slaughter-anvanth:2026-08",
+      "datasheet_id": "000000601",
+      "historical_descriptor_sha256": "c6647faf2b800d9943a9bfdd4bb5fb9c8f5d1922000a4dd0b1128c524bdd7d43",
+      "current_descriptor_sha256": "a507ae185d137b00a1ebde26db29d10604e45e6982511e6275efd548f1a31c42"
+    },
+    {
+      "catalog_id": "core-v2:court-of-slaughter-anvanth:2026-08",
+      "datasheet_id": "000002759",
+      "historical_descriptor_sha256": "84da4b22d83aa21f4d03f41066ad00252c5d3c71cbf378da14b5e2a1a1e61f1e",
+      "current_descriptor_sha256": "ceae3bd3b9f13a3def993c9273c6c4a7bd2c7f5d956f0c4a9c1f70e2f3364ec5"
+    },
+    {
+      "catalog_id": "core-v2:court-of-slaughter-anvanth:2026-08",
+      "datasheet_id": "000003909",
+      "historical_descriptor_sha256": "ca31b81ce8639f52acff3eee25878c55bab7809d964dca7a8d909dcea8493081",
+      "current_descriptor_sha256": "e35ddaa7cc78ccf6c2dc588b4a6ec02aa56f1adb005038afae1de9c0cc22644b"
+    },
+    {
+      "catalog_id": "core-v2:court-of-slaughter-anvanth:2026-08",
+      "datasheet_id": "000004077",
+      "historical_descriptor_sha256": "044a861020002c908faf520cc0aaf5c9f6d6246c325b5c8b8d2920d58881a5bf",
+      "current_descriptor_sha256": "92a8adf26e5b2b327a4cbd6aec38e1caae3ed441463a8efdbd17e85ea0ff9294"
+    },
+    {
+      "catalog_id": "core-v2:court-of-slaughter-anvanth:2026-08",
+      "datasheet_id": "000004081",
+      "historical_descriptor_sha256": "2049258169adb5bce6c963e17d2bb8f32908e559d9b3a1f38daa1aa2fcfc1e42",
+      "current_descriptor_sha256": "dce64e0fd269fc121cc2c6aad898b452ec8d31d7b2150f04393b82cccd500c48"
+    },
+    {
+      "catalog_id": "core-v2:chaos-daemons-roster:2026-07",
+      "datasheet_id": "000001115",
+      "historical_descriptor_sha256": "062d4429013f1eb1f0907559930129f42aa0b5d5edef594a76888c1d339de18f",
+      "current_descriptor_sha256": "37bbf293f19a63d21ca4a94a8bab6c989e7b05487e32d9abcb978e59b54e8b2a"
+    },
+    {
+      "catalog_id": "core-v2:chaos-daemons-roster:2026-07",
+      "datasheet_id": "000001120",
+      "historical_descriptor_sha256": "3d2dad10ac692576eed84166c2ddd70658f34448029225995a35a70f3c1d166d",
+      "current_descriptor_sha256": "73e8a35ce6c768ef6e764d42c8274ad447f815050413628faa6d11a0683f3d2f"
+    },
+    {
+      "catalog_id": "core-v2:chaos-daemons-roster:2026-07",
+      "datasheet_id": "000001132",
+      "historical_descriptor_sha256": "3fdfd4d1cb3ec6435a138f072f63dfbca74a9b4130253ced59bfcf8c7091fe1a",
+      "current_descriptor_sha256": "13be3369fb6134c667356fb6ffe4486ba6d5ca3d9d4dc87b0cd6110c610a8d0f"
+    },
+    {
+      "catalog_id": "core-v2:chaos-daemons-roster:2026-07",
+      "datasheet_id": "000001148",
+      "historical_descriptor_sha256": "20ab527e549b57aec96f830a685be4cfd14bc3aafee72a90d4682668c3e0306b",
+      "current_descriptor_sha256": "d37541272cf331146bc6b3fde7b1e1d04e65cb4cec2881c442c674fe68a87f9a"
+    },
+    {
+      "catalog_id": "core-v2:chaos-daemons-roster:2026-07",
+      "datasheet_id": "000002582",
+      "historical_descriptor_sha256": "f03022cc4a698a217219d88c4f1f9a9ebb62655c6ca2f0305cbaa7cdf377e83f",
+      "current_descriptor_sha256": "fc793bb785279508f84b51522ca06ce1442709d8e468bbe86a74c591ac457370"
+    }
+  ]
+}
