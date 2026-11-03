@@ -649,7 +649,8 @@ def _current_applicable_rules(
             profile,
             pool.targeting_rule_ids,
             minimum,
-        )
+        ),
+        ability_indexes=registry.modifier_permission_indexes,
     )
     hit_snapshots = attack_modifier_snapshots(
         state=state,

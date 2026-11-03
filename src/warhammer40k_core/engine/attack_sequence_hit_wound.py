@@ -158,7 +158,12 @@ def _roll_hit(
             weapon_profile=pool.weapon_profile,
             targeting_rule_ids=pool.targeting_rule_ids,
             current_minimum_unmodified_success=base_minimum_success,
-        )
+        ),
+        ability_indexes=(
+            ()
+            if runtime_modifier_registry is None
+            else runtime_modifier_registry.modifier_permission_indexes
+        ),
     )
     minimum_success = thresholds.minimum_success
     unmodified_success_threshold_active = minimum_success < base_minimum_success

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.interpreted_dice import CriticalRollThreshold
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -24,7 +25,12 @@ class HitThresholds:
     success_requires_exact: bool
 
 
-def resolve_hit_thresholds(context: HitRollMinimumUnmodifiedSuccessContext) -> HitThresholds:
+def resolve_hit_thresholds(
+    context: HitRollMinimumUnmodifiedSuccessContext,
+    *,
+    ability_indexes: tuple[tuple[str, AbilityCatalogIndex], ...] = (),
+) -> HitThresholds:
+    from warhammer40k_core.engine.catalog_self_hit_thresholds import catalog_self_hit_thresholds
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
         _matching_generic_attack_effects,
         _required_int_parameter,  # pyright: ignore[reportPrivateUsage]
@@ -88,6 +94,11 @@ def resolve_hit_thresholds(context: HitRollMinimumUnmodifiedSuccessContext) -> H
             critical = min(critical, value)
         else:
             minimum = min(minimum, value)
+    if not is_snap:
+        for contribution in catalog_self_hit_thresholds(context, ability_indexes=ability_indexes):
+            critical = min(critical, contribution.critical_threshold)
+            critical_is_threshold = True
+            source_ids.add(contribution.source_id)
     # Indirect Shooting's stated failed faces remain failures. Critical hits
     # bypass the ordinary skill comparison, never that absolute failure floor.
     return HitThresholds(

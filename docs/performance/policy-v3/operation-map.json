@@ -32283,6 +32283,99 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "mandiblasters-exact-0bbc9da4c568bdf6": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_self_hit_thresholds.py"
+      ],
+      "owners": [
+        "@module",
+        "CatalogSelfHitThreshold",
+        "CatalogSelfHitThreshold.source_id",
+        "catalog_self_hit_thresholds",
+        "charged_melee_self_threshold"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "mandiblasters-exact-1e86fc748432639f": {
+      "paths": [
+        "src/warhammer40k_core/rules/hit_success_threshold_parser.py"
+      ],
+      "owners": [
+        "@module",
+        "hit_success_threshold_effects"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "mandiblasters-exact-5c7c867b4ca6a4b8": {
+      "paths": [
+        "tests/factions/aeldari/mandiblasters_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "finish_first_attack",
+        "hit_context",
+        "hit_payloads",
+        "indexes",
+        "restored_scene",
+        "scorpion_scene"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "mandiblasters-exact-4992c8267ad86082": {
+      "paths": [
+        "tests/factions/aeldari/unit/test_mandiblasters.py"
+      ],
+      "owners": [
+        "@module",
+        "native_definitions",
+        "test_all_fifteen_native_profiles_share_attached_charge_gate",
+        "test_attached_source_lifetime_tracks_engine_casualties",
+        "test_charge_expires_at_next_player_turn",
+        "test_critical_five_uses_unmodified_faces_and_snap_prohibition",
+        "test_last_bodyguard_destroyed_by_real_attack_retains_only_source_semantics",
+        "test_legally_equipped_native_melee_profiles_use_shared_hit_owner",
+        "test_lhykhis_selected_target_source_is_excluded_from_passive_query",
+        "test_loaded_catalog_cannot_silently_omit_the_attacking_owner",
+        "test_native_charge_fight_natural_faces_and_exact_replay",
+        "test_native_compiler_preserves_every_gate_and_rejects_partial_passive_shapes",
+        "test_native_ordinary_fights_first_and_unattached_units_do_not_grant_mandiblasters",
+        "test_native_pistol_shooting_is_not_critical_five_and_replays",
+        "test_passive_threshold_requires_loaded_active_record",
+        "test_rejected_move_and_unaccepted_charge_never_grant_threshold",
+        "test_valid_native_persistence_resumes_exactly"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "mandiblasters-exact-472add1cc90fc407": {
+      "paths": [
+        "tests/core_description_helpers.py"
+      ],
+      "owners": [
+        "before_mandiblasters_correction"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "mandiblasters-exact-fc4c15e5207e0763": {
+      "paths": [
+        "tests/infrastructure/source/unit/test_core_catalog_descriptions.py"
+      ],
+      "owners": [
+        "test_mandiblasters_successor_projection_rejects_unreviewed_bytes"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

@@ -18981,7 +18981,7 @@
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "1a22e58b2ff7d9aa4d963ac449b6dd3d79fcafb9e2a36801b727a1eb6aa8a6e3",
+      "equivalence_hash": "6d5035b555c817805bf77948e20a4fec099bf2ae542bf311e29f5f42584716a2",
       "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
@@ -18996,7 +18996,7 @@
         "catalog-ir:critical-hit-threshold"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": "2bcb313972d36c2f812773efdb22c9ac860add9c3d2e10d5aab305c35ecca2c9",
+      "semantic_hash": "742476a2fe74e57cd8566bebb7f9b28460307bf42cdc2973fc4dfeab46f2478a",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000595:5"
       ],
@@ -31170,9 +31170,7 @@
       "rule_id": "000001369:4",
       "rule_name": "Inflamed Infections",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [
-        "catalog-ir:critical-hit-threshold"
-      ],
+      "runtime_consumer_ids": [],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
       "semantic_hash": null,
       "source_row_ids": [
@@ -121990,7 +121988,7 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "8bbda7eb5822898c01df7dfb54abb2abb3d7fb480699a3c1eba0ac2c76e99f42",
+  "source_payload_checksum_sha256": "2a9af1b0d3752494a68c04fe758a06b43d02c00938fb86330bc8eda5a665e820",
   "source_text_unavailable_member_count": 111,
   "structured_member_count": 808,
   "upstream_execution_checksum_sha256": "6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c"

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.engine.catalog_self_hit_thresholds import charged_melee_self_threshold
 from warhammer40k_core.engine.mission_action_battle_shock import (
     ACTION_BATTLE_SHOCK_CONSUMER_ID,
     clause_grants_action_battle_shock_permission,
@@ -72,6 +73,10 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
             RuleTargetKind.THIS_UNIT,
         }
         and any(_effect_is_critical_hit_threshold(effect) for effect in clause.effects)
+        and (
+            clause.target.kind not in {RuleTargetKind.THIS_MODEL, RuleTargetKind.THIS_UNIT}
+            or charged_melee_self_threshold(clause) is not None
+        )
     ):
         consumer_ids.add(CATALOG_IR_CRITICAL_HIT_THRESHOLD_CONSUMER_ID)
     if _clause_targets_shadow_of_chaos_aura(clause):

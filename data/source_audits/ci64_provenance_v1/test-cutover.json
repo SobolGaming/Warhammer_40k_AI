@@ -30,6 +30,12 @@
       "mode": "100644",
       "sha256": "98aa14f618b2578760c34abbde73aeb8a3839f778e3c008acd51deaab8feac87"
     },
+    "tests/factions/aeldari/unit/test_mandiblasters.py": {
+      "blob_sha1": "cbdc7579a8bd76fbe7953753df74e1038f3af064",
+      "bytes": 29805,
+      "mode": "100644",
+      "sha256": "3158711fc1d9b0a1ab8226314d9c38457c65d90a064cf557e13a943b3d2c335a"
+    },
     "tests/factions/aeldari/unit/test_unit_abilities.py": {
       "blob_sha1": "28e009f6c31d3abc7ca66f844f42ebb852fb923b",
       "bytes": 27309,
@@ -457,10 +463,10 @@
       "sha256": "70381d17abc9fe99eee60277a7869b2daf404cc79adfd098df9b9d42c8acbd6e"
     },
     "tests/infrastructure/source/unit/test_core_catalog_descriptions.py": {
-      "blob_sha1": "da5683f50e2d7909516432819010ff8ef0f6eae5",
-      "bytes": 19229,
+      "blob_sha1": "0b59b06f5837eb74a06a1c66f30616f538553763",
+      "bytes": 22287,
       "mode": "100644",
-      "sha256": "f705e4369d9a9f48839cdbf1642f9e7603f8b60e978b6e6eeecb39e8f3034dc3"
+      "sha256": "5550b4d71c2414e3d5710bad9bc73df1a31e1bc872bc6c5a181de14cc88c6ea1"
     },
     "tests/infrastructure/source/unit/test_deadly_demise_descriptions.py": {
       "blob_sha1": "122cec857a065fa862665f787206a00cfb76d9cd",
