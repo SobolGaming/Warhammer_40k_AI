@@ -1,0 +1,74 @@
+{
+  "app_version": "995",
+  "audit_id": "starfang-keyword-app-mirror-2026-11-03",
+  "audit_schema": "core-v2-faction-source-audit-v2",
+  "edition": "warhammer_40000_11th",
+  "geometry_authority": {
+    "base_authority": "explicit_maintained_app_or_official_model_evidence",
+    "missing_data": "blocks_fieldability",
+    "variants": "exact_model_profile_and_variant_required",
+    "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+  },
+  "locale": "en",
+  "observations": [
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "556da0325516c6a60f6e61087f2b485979e46a28b2aa9d704deb7b27d8bf15e9",
+      "captured_text": "40K.APP\nFACTIONS\nAELDARI\nStarfangs\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nStarfangs 105x70mm Oval Base\n14\"\n6\n3+\n6\n7+\n2\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nDisintegrator cannon\nASSAULT\n36\"\n3\n3+\n6\n-3\n2\nStarfang grenade launcher\nASSAULT\nBLAST\n36\"\nD3\n3+\n6\n-3\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nWraithbone hull\n3\n4+\n6\n0\n1\nKEYWORDS\nAELDARI\nANHRATHE\nFLY\nGRENADES\nSMOKE\nSTARFANG\nVEHICLE\nCOSTS\n1 model\n70 pts\n2 models\n140 pts\nUNIT COMPOSITION\n1-2 Starfangs\n\nEvery model is equipped with: disintegrator cannon; Starfang grenade launcher; wraithbone hull.\n\nBecome a supporter and remove ads\nCORE ABILITIES\nDEADLY DEMISE 1\nSCOUTS 7\"\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nHallucinogen Grenades\n\nAt the start of your opponent’s Shooting phase, this unit can use this ability. If it does, select one AELDARI INFANTRY unit from your army visible to and within 36” of this unit: until the end of the phase, that unit has the Stealth ability.\n\nSTATS\n5%\nof Aeldari lists, 1.3 per list\n#50\nmost-taken in faction\n5%\nfrom 5% since last update\nIN ARMY LISTS\nPopular detachments\nCORSAIR COTERIE\nPATH OF THE OUTCAST\nELDRITCH RAIDERS\nOften taken with\nCORSAIR VOIDREAVERS\nPRINCE YRIEL\nCORSAIR SKYREAVERS\nKHARSETH\nSHROUD RUNNERS",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "base_statement": "Starfangs 105x70mm Oval Base",
+          "base_status": "observed",
+          "fieldability_certified": false,
+          "height_status": "not_observed",
+          "model_role": "Starfangs",
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "starfang-keyword-2026-11-03:datasheet:starfangs",
+      "observed_at": "2026-11-03T17:06:02.983Z",
+      "official_source_ids": [
+        "gw-11e-aeldari-faction-pack-2026-07"
+      ],
+      "operative_start": "Starfangs\nDATASHEET",
+      "operative_text": "Starfangs\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nStarfangs 105x70mm Oval Base\n14\"\n6\n3+\n6\n7+\n2\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nDisintegrator cannon\nASSAULT\n36\"\n3\n3+\n6\n-3\n2\nStarfang grenade launcher\nASSAULT\nBLAST\n36\"\nD3\n3+\n6\n-3\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nWraithbone hull\n3\n4+\n6\n0\n1\nKEYWORDS\nAELDARI\nANHRATHE\nFLY\nGRENADES\nSMOKE\nSTARFANG\nVEHICLE\nCOSTS\n1 model\n70 pts\n2 models\n140 pts\nUNIT COMPOSITION\n1-2 Starfangs\n\nEvery model is equipped with: disintegrator cannon; Starfang grenade launcher; wraithbone hull.\n\nBecome a supporter and remove ads\nCORE ABILITIES\nDEADLY DEMISE 1\nSCOUTS 7\"\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nHallucinogen Grenades\n\nAt the start of your opponent’s Shooting phase, this unit can use this ability. If it does, select one AELDARI INFANTRY unit from your army visible to and within 36” of this unit: until the end of the phase, that unit has the Stealth ability.\n\nSTATS\n5%\nof Aeldari lists, 1.3 per list\n#50\nmost-taken in faction\n5%\nfrom 5% since last update\nIN ARMY LISTS\nPopular detachments\nCORSAIR COTERIE\nPATH OF THE OUTCAST\nELDRITCH RAIDERS\nOften taken with\nCORSAIR VOIDREAVERS\nPRINCE YRIEL\nCORSAIR SKYREAVERS\nKHARSETH\nSHROUD RUNNERS",
+      "owning_faction_source_id": "faction-app:aeldari",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Complete retained Starfangs page; this admission corrects only ordinary keyword STARFANG. Preserve plural datasheet and model identity STARFANGS and all unrelated data. Version 995 is update-list context, not an App-build or keyword-change-date attestation. No new geometry or gameplay certification.",
+      "source_id": "faction-app:aeldari:datasheet:starfangs",
+      "source_observation_sha256": "8c6e977af2b801324ce6f52258a5f758be61a7b06bd6fc130dc5223245e177ab",
+      "source_title": "Starfangs",
+      "source_url": "https://www.40k.app/factions/aeldari/units/starfangs",
+      "transcription_sha256": "97c463b73c7c80009d1ca94f0d01e8e79817864690b469554a50994fb993fcef"
+    }
+  ],
+  "official_sources": [
+    {
+      "artifact_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_aeldari-qe1ykopo7h-blfkukhecc.pdf",
+      "provider_name": "Games Workshop",
+      "relationship": "historical_primary_not_current_corroboration",
+      "sha256": "2a1954801042948256c002095937be88c9d334994f0b01d7a63510c94d39fe1d",
+      "source_date": "2026-07-22",
+      "source_id": "gw-11e-aeldari-faction-pack-2026-07",
+      "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_faction_pack_aeldari-qe1ykopo7h-blfkukhecc.pdf"
+    }
+  ],
+  "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+  "selected_source_ids": [
+    "faction-app:aeldari:datasheet:starfangs"
+  ],
+  "version_evidence": {
+    "source_url": "https://www.40k.app/factions/updates",
+    "observed_at": "2026-11-03T17:20:33.045Z",
+    "statement": "Version 995\nReleased 2026-10-16.",
+    "transcription_sha256": "e6efd2e9a45a208c455693a1855a929e4da0696bc206eaec403958bb45017b54"
+  }
+}

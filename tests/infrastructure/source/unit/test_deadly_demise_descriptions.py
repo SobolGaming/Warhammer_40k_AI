@@ -19,6 +19,7 @@ from tools.generate_ability_support_matrix import (
 )
 
 from tests.core_description_helpers import before_core_description_correction
+from tests.starfang_deep_strike_helpers import before_starfang_deep_strike
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
 from warhammer40k_core.engine.core_ability_materialization import _deadly_demise_source_for_model
 from warhammer40k_core.engine.damage_allocation import (
@@ -149,7 +150,9 @@ def test_deadly_demise_preserves_historical_artifact_bytes_and_original_validato
     current = daemons_roster.catalog_package()
     reconciliation = daemons_roster.reconciliation_manifest()
     daemons_roster.validate_catalog_against_reconciliation(
-        catalog=_historical_deadly_demise_package(current).army_catalog,
+        catalog=_historical_deadly_demise_package(
+            before_starfang_deep_strike(current)
+        ).army_catalog,
         reconciliation=reconciliation,
     )
     with pytest.raises(

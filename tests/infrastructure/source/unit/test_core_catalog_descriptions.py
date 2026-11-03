@@ -20,6 +20,10 @@ from tests.core_description_helpers import (
     before_mandiblasters_correction,
     core_description_audit,
 )
+from tests.starfang_deep_strike_helpers import (
+    before_starfang_deep_strike,
+    before_starfang_source_registry,
+)
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
@@ -93,7 +97,7 @@ def test_all_39_occurrences_close_35_replacements_and_four_preserved_stealth() -
         assert CanonicalCatalogPackage.from_payload(package.to_payload()) == package
     assert (total, changed, preserved, len(owners)) == (39, 35, 4, 18)
     assert (
-        _packages()[2].package_hash()
+        before_starfang_deep_strike(_packages()[2]).package_hash()
         == "b63c0805b6878daf2eef2d4145e407361f7848bde3095074022f1b850db183ab"
     )
 
@@ -456,7 +460,7 @@ def test_source_registry_keeps_every_historical_registration_and_source_byte() -
     prior = json.loads(
         subprocess.check_output(["git", "show", base + ":" + registry_path], cwd=root)
     )
-    current = json.loads((root / registry_path).read_bytes())
+    current = before_starfang_source_registry(json.loads((root / registry_path).read_bytes()))
     assert current["scopes"][1:] == prior["scopes"][1:]
     old_scope, new_scope = prior["scopes"][0], current["scopes"][0]
     for field, value in old_scope.items():
@@ -625,7 +629,7 @@ def test_lhykhis_projection_rejects_current_artifact_without_its_source() -> Non
     )
     with pytest.raises(AssertionError):
         before_lhykhis_correction(without)
-    assert before_lhykhis_correction(_packages()[2]) == _packages()[2]
+    assert before_lhykhis_correction(_packages()[2]) == before_starfang_deep_strike(_packages()[2])
 
 
 def test_current_model_hit_successor_is_bound_by_source_index_provenance() -> None:

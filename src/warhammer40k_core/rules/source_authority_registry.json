@@ -1210,6 +1210,16 @@
           "audit_id": "core-descriptions-maintained-app-mirror-2026-11-03",
           "identity_kind": "observed_at",
           "identity_value": "2026-11-03T01:12:44.736Z"
+        },
+        {
+          "audit_id": "deep-strike-maintained-app-mirror-2026-11-03",
+          "row_id": "24.09:40k-app",
+          "source_observation_sha256": "95de02ae18aa854313193d5aa580abbc7dd52e3dfabf6218eb20a255caf1d628",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-11-03T17:17:33.254Z"
         }
       ],
       "legacy_observations": [
@@ -1998,6 +2008,15 @@
             "gw-11e-core-abilities:core:scouts"
           ],
           "catalog_sha256": "b45380e09906b5d5b03ded570a45d4680995457366224af4d4598858fea0f3ad"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-deep-strike-description",
+          "version": "maintained-app-mirror-observed-2026-11-03",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-abilities:core:deep-strike"
+          ],
+          "catalog_sha256": "b0aa31322899f228a564f23bc3b04243f9a335eae71236891a916bec1f501ad2"
         }
       ]
     },
@@ -2098,6 +2117,16 @@
           "row_id": "aeldari-banshee-eldrad-2026-11-02:datasheet:eldrad-ulthran",
           "source_observation_sha256": "271b3f12d729b07b29ad91cedad3be6d17c6dda3bc231246ba8f89acad42dca1",
           "source_url": "https://www.40k.app/factions/aeldari/units/eldrad-ulthran"
+        },
+        {
+          "audit_id": "starfang-keyword-app-mirror-2026-11-03",
+          "identity_kind": "versioned_observation",
+          "identity_value": "995@2026-11-03T17:06:02.983Z",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "provider_name": "40k.app",
+          "row_id": "starfang-keyword-2026-11-03:datasheet:starfangs",
+          "source_observation_sha256": "8c6e977af2b801324ce6f52258a5f758be61a7b06bd6fc130dc5223245e177ab",
+          "source_url": "https://www.40k.app/factions/aeldari/units/starfangs"
         }
       ],
       "legacy_observations": [],
@@ -2143,6 +2172,15 @@
           "namespace": "core-v2-reviewed-app-mirror",
           "package_name": "reviewed-aeldari-banshee-eldrad-observations-2026-11",
           "version": "app-data-995-observed-2026-11-02"
+        },
+        {
+          "allowed_rule_source_ids": [
+            "faction-app:aeldari:datasheet:starfangs"
+          ],
+          "catalog_sha256": "ee1551da8667dc50213610e1ce7844b1f740cccc1d1e9523990d24f8c2e1a501",
+          "namespace": "core-v2-reviewed-app-mirror",
+          "package_name": "reviewed-starfang-keyword-observations-2026-11",
+          "version": "app-data-995-observed-2026-11-03"
         }
       ],
       "source_package_extensions": []

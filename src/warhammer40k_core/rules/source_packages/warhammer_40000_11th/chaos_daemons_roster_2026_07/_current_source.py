@@ -8,6 +8,9 @@ from typing import TYPE_CHECKING, Final
 import msgspec
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.rules.core_deep_strike_successor import (
+    before_deep_strike_catalog,
+)
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import core_abilities_2026_09
 
@@ -147,5 +150,6 @@ def validate_current_catalog_against_reconciliation(
     *, catalog: ArmyCatalog, reconciliation: ExactRosterReconciliation
 ) -> None:
     validate_catalog_against_reconciliation(
-        catalog=historical_catalog_for_current_source(catalog), reconciliation=reconciliation
+        catalog=historical_catalog_for_current_source(before_deep_strike_catalog(catalog)),
+        reconciliation=reconciliation,
     )

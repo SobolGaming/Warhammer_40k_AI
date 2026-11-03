@@ -415,11 +415,159 @@ def aeldari_current_source_rule_semantics_smoke_operations(
     return frozenset({operations[path]})
 
 
+def starfang_deep_strike_policy_predecessor(raw: bytes) -> bytes:
+    """Authenticate the finite source-only admissions before historical policy proofs."""
+    before = "faa07162fff82c6d960d0f8288f8438f8d1bf8b726a502207b941c228eb8002c"
+    if digest(raw) == before:
+        return raw
+    scope = read_object(
+        Path(__file__).resolve().parents[1]
+        / "docs/performance/policy-v3/starfang-deep-strike-smoke-scope.json"
+    )
+    proof = object_value(scope["policy_successor"])
+    _keys(
+        proof,
+        {
+            "before_sha256",
+            "after_sha256",
+            "function_block_sha256",
+            "union_call_sha256",
+            "predecessor_call_sha256",
+        },
+    )
+    error = "Core description policy: Whispering Web successor: Starfang/Deep Strike"
+    if any(
+        not isinstance(value, str)
+        or len(value) != 64
+        or any(character not in "0123456789abcdef" for character in value)
+        for value in proof.values()
+    ):
+        raise ValueError(f"{error} requires exact proof hashes.")
+    if proof["before_sha256"] != before or digest(raw) != proof["after_sha256"]:
+        raise ValueError(f"{error} policy successor bytes drifted.")
+    start = raw.index(b"def starfang_deep_strike_policy_predecessor(")
+    end = raw.index(b"\ndef whispering_web_policy_predecessor(", start) + 1
+    block = raw[start:end]
+    call = (
+        b"            | starfang_deep_strike_smoke_operations(\n"
+        b"                base=base, path=path, category=category, change=changes[path]\n"
+        b"            )\n"
+    )
+    predecessor = b"    raw = starfang_deep_strike_policy_predecessor(raw)\n"
+    if any(
+        raw.count(part) != 1 or digest(part) != proof[key]
+        for part, key in (
+            (block, "function_block_sha256"),
+            (call, "union_call_sha256"),
+            (predecessor, "predecessor_call_sha256"),
+        )
+    ):
+        raise ValueError(f"{error} policy registration drifted.")
+    prior = raw.replace(block, b"", 1).replace(call, b"", 1).replace(predecessor, b"", 1)
+    if digest(prior) != before:
+        raise ValueError(f"{error} policy predecessor bytes drifted.")
+    return prior
+
+
+def starfang_deep_strike_smoke_operations(
+    *, base: str, path: str, category: str, change: object
+) -> frozenset[str]:
+    """Bind the exact source inputs, description hook and closed provenance admission."""
+    sources = "tools/ability_support_sources.py"
+    generator = "tools/generate_ability_support_matrix.py"
+    provenance = "tools/source_scope_provenance.py"
+    controls = "tests/code_quality/test_registered_source_scopes.py"
+    operations = {
+        sources: "qualification40-exact-b0712fa66a9cc38e",
+        generator: "qualification40-exact-ded6452f144f095b",
+        provenance: "registered-source-provenance-projection",
+        controls: "registered-source-scope-regression-controls",
+    }
+    if (
+        base != "79a27e4a26e180a28457712818d47e274df7c99a"
+        or category != "rule_semantics"
+        or path not in operations
+    ):
+        return frozenset()
+    scope = read_object(
+        Path(__file__).resolve().parents[1]
+        / "docs/performance/policy-v3/starfang-deep-strike-smoke-scope.json"
+    )
+    _keys(
+        scope,
+        {
+            "base",
+            "changes",
+            "smoke_operations",
+            "source_obligation",
+            "unchanged_work",
+            "policy_successor",
+            "helper_move_proof",
+        },
+    )
+    starfang_deep_strike_policy_predecessor(Path(__file__).read_bytes())
+    bindings = object_value(scope["changes"])
+    _keys(bindings, set(operations))
+    proof = object_value(scope["helper_move_proof"])
+    if (
+        canonical_digest(proof)
+        != "88e58238d33c8132d272849df2da4e628edc19ba6a0015d4f26f5804e93a2534"
+        or proof["source_change"] != bindings[controls]
+        or proof["helper_sha256"]
+        != digest(
+            (
+                Path(__file__).resolve().parents[1] / "tests/support/source_provenance.py"
+            ).read_bytes()
+        )
+    ):
+        raise ValueError("Starfang/Deep Strike exact helper-move proof drifted.")
+    deleted = {"_historical_report", "historical_snapshot_inputs", "retired_identity_tokens"}
+    expected_owners = {
+        sources: {"@module", "ability_support_index_inputs", "load_ability_support_sources"},
+        generator: {"@module", "_ability_support_catalog_package"},
+        provenance: {"@module", "current_ec_overlay_provenance"},
+        controls: deleted
+        | {
+            "@module",
+            "test_banshee_eldrad_provenance_successor_preserves_exact_base_and_original_chain",
+            "test_old_scope_binding_is_retained_but_cannot_qualify_new_scope",
+        },
+    }
+    for selected, value in bindings.items():
+        binding = object_value(value)
+        _keys(binding, {"before_sha256", "after_sha256", "owners"})
+        owners = object_value(binding["owners"])
+        _keys(owners, expected_owners[selected])
+        file_hashes = {"before": binding["before_sha256"], "after": binding["after_sha256"]}
+        for owner, pair_value in {"@file": file_hashes, **owners}.items():
+            pair = object_value(pair_value)
+            _keys(pair, {"before", "after"})
+            if selected == controls and owner in deleted:
+                if pair["after"] is not None:
+                    raise ValueError("Starfang/Deep Strike exact moved owner must be deleted.")
+                pair = {"before": pair["before"]}
+            if any(
+                not isinstance(value, str)
+                or len(value) != 64
+                or any(character not in "0123456789abcdef" for character in value)
+                for value in pair.values()
+            ):
+                raise ValueError("Starfang/Deep Strike smoke scope requires exact hashes.")
+    if object_value(scope["smoke_operations"]) != {
+        selected: [operation] for selected, operation in operations.items()
+    }:
+        raise ValueError("Starfang/Deep Strike smoke scope requires each sole exact operation.")
+    if scope["base"] != base or bindings[path] != change:
+        return frozenset()
+    return frozenset({operations[path]})
+
+
 def whispering_web_policy_predecessor(raw: bytes) -> bytes:
     """Authenticate the bounded source-rule registration and reconstruct prior bytes."""
     before = "a5c9691703b61c3d6689c5c388f3e86de3082b25ebd2e6aa8ab1c5b8c39e64af"
     if digest(raw) == before:
         return raw
+    raw = starfang_deep_strike_policy_predecessor(raw)
     scope = read_object(
         Path(__file__).resolve().parents[1]
         / "docs/performance/policy-v3/whispering-web-smoke-scope.json"
@@ -984,6 +1132,9 @@ def validate_assessment(
                 base=base, path=path, category=category, change=changes[path]
             )
             | aeldari_current_source_rule_semantics_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | starfang_deep_strike_smoke_operations(
                 base=base, path=path, category=category, change=changes[path]
             )
             | whispering_web_smoke_operations(

@@ -28,6 +28,7 @@ if TYPE_CHECKING or __package__:
         with_current_core_descriptions,
         with_current_deadly_demise,
     )
+    from tools.core_deep_strike_catalog_overlay import with_current_deep_strike
     from tools.cross_source_semantic_equivalence import (
         DEFAULT_DOCS_PATH as DEFAULT_SEMANTIC_EQUIVALENCE_DOCS_PATH,
     )
@@ -74,6 +75,7 @@ else:
         with_current_core_descriptions,
         with_current_deadly_demise,
     )
+    from core_deep_strike_catalog_overlay import with_current_deep_strike
     from cross_source_semantic_equivalence import (
         DEFAULT_DOCS_PATH as DEFAULT_SEMANTIC_EQUIVALENCE_DOCS_PATH,
     )
@@ -1763,7 +1765,9 @@ def _ability_support_catalog_package(
         raise ValueError(
             "Ability support catalog could not preserve datasheets with geometry diagnostics."
         )
-    return with_current_core_descriptions(with_current_deadly_demise(report.package))
+    return with_current_deep_strike(
+        with_current_core_descriptions(with_current_deadly_demise(report.package))
+    )
 
 
 def _ability_support_matrix_rows_from_package(

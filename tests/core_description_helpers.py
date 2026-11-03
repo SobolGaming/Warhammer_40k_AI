@@ -14,6 +14,7 @@ from tools.core_deadly_demise_catalog_overlay import (
     CORE_DESCRIPTION_SOURCE_IDS,
 )
 
+from tests.starfang_deep_strike_helpers import before_starfang_deep_strike
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
 from warhammer40k_core.rules.source_catalog import SourceArtifactHash
@@ -48,6 +49,7 @@ _LHYKHIS_SURFACES = {
 
 def before_lhykhis_correction(package: CanonicalCatalogPackage) -> CanonicalCatalogPackage:
     """Authenticate the entire descriptor and undo only the two reviewed IR additions."""
+    package = before_starfang_deep_strike(package)
     observed = tuple(
         (row, ability)
         for row in package.army_catalog.datasheets

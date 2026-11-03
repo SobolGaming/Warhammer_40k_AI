@@ -469,16 +469,16 @@
       "sha256": "70381d17abc9fe99eee60277a7869b2daf404cc79adfd098df9b9d42c8acbd6e"
     },
     "tests/infrastructure/source/unit/test_core_catalog_descriptions.py": {
-      "blob_sha1": "d5147a10af25caf92481c576f0361cafde4d1e4b",
-      "bytes": 28563,
+      "blob_sha1": "761af3b8b1b6acd4a0c7dc35f2a834e058b0953f",
+      "bytes": 28775,
       "mode": "100644",
-      "sha256": "be5b92846954913e2345a58ce2097d24228897ff370875508a15e8dc4752648b"
+      "sha256": "7e4e83a63ba0b1fa5921baad2b85c4d22b0ec2273f0b41d7a94cdab7602b5197"
     },
     "tests/infrastructure/source/unit/test_deadly_demise_descriptions.py": {
-      "blob_sha1": "122cec857a065fa862665f787206a00cfb76d9cd",
-      "bytes": 15413,
+      "blob_sha1": "d4eff8c4b51a69fbeb8363df58ebfc0d86380ad1",
+      "bytes": 15539,
       "mode": "100644",
-      "sha256": "380dd729247a1fdcdee6058eaca9c72aff36c543fa5454ee22a54d843c38eb22"
+      "sha256": "a0d4d94f34d91698894dc8448418c3e37f697f0803e3d5b2ed8e38346dab0802"
     },
     "tests/infrastructure/source/unit/test_phase17a1_transition_patches.py": {
       "blob_sha1": "881eebd1474c6f8587862c17f728026198970d20",
@@ -521,6 +521,12 @@
       "bytes": 7997,
       "mode": "100644",
       "sha256": "e1a4a0883ab20effef0518e0e49ff34e5d107f46f1c0f9b1596e5e17e0701357"
+    },
+    "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
+      "blob_sha1": "3f3498e673cf21426dbabf83bc4335c7ea177dcf",
+      "bytes": 16869,
+      "mode": "100644",
+      "sha256": "7800ccf354f37795e2dd5307785df3c62e8a8e736dfad26a1257483e76b81209"
     },
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
       "blob_sha1": "df3410c8205c6381c11e823fffa94fce68ff9b91",

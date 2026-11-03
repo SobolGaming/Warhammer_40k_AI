@@ -162,8 +162,42 @@ def acts_inactive_predecessor(root: Path, current: bytes) -> bytes:
     return before
 
 
+def starfang_provenance_predecessor(current: bytes) -> bytes:
+    """Authenticate the one Starfang registration before retaining all earlier proofs."""
+    before_hash = "0fb60a40d260ffb8cf901facf5dacdb1c91562cb382131b3fd795be66d683b9e"
+    after_hash = "5c41d1c6c8a0b6d186b60271758cab59d1a268d22d47214597dd60f991f90be6"
+    observed = hashlib.sha256(current).hexdigest()
+    if observed == before_hash:
+        return current
+    error = "Exact registered edition provenance inputs changed."
+    if observed != after_hash:
+        raise ValueError(error)
+    addition = (
+        b"STARFANG_OVERLAY = (\n"
+        b'    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"\n'
+        b'    "starfang_keyword_2026_11.overlay-pack.json"\n'
+        b")\n"
+        b'STARFANG_OVERLAY_SHA256 = "'
+        b'477ce675ddebbf0f86ea4478a3b4ebf0656b59b9cbfe0e0e1b693406c5c16c78"\n'
+        b"\n"
+        b"\n"
+    )
+    entry = b"        root / STARFANG_OVERLAY: STARFANG_OVERLAY_SHA256,\n"
+    if current.count(addition) != 1 or current.count(entry) != 1:
+        raise ValueError(error)
+    prior = current.replace(addition, b"", 1).replace(entry, b"", 1)
+    if hashlib.sha256(prior).hexdigest() != before_hash:
+        raise ValueError(error)
+    return prior
+
+
 def defiler_provenance_predecessor(current: bytes) -> bytes:
     """Reverse exact current admissions, then retain the original Defiler/Acts proof."""
+    if (
+        hashlib.sha256(current).hexdigest()
+        == "5c41d1c6c8a0b6d186b60271758cab59d1a268d22d47214597dd60f991f90be6"
+    ):
+        current = starfang_provenance_predecessor(current)
     if hashlib.sha256(current).hexdigest() == (
         "0fb60a40d260ffb8cf901facf5dacdb1c91562cb382131b3fd795be66d683b9e"
     ):

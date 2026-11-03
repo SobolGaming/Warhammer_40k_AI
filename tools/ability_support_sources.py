@@ -46,6 +46,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     emperors_children_sorcerer_2026_11 as sorcerer_current,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    starfang_keyword_2026_11 as starfang_keyword,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     thousand_sons_defiler_datasheet_overlay_2026_07 as chaos_defiler_overlay,
 )
 from warhammer40k_core.rules.wahapedia_bridge_rows import BridgeSourceArtifact
@@ -178,10 +181,15 @@ def load_ability_support_sources(source_json_dir: Path) -> tuple[BridgeSourceArt
         release_manifest=aeldari_current.source_release_manifest(),
         overlay_packs=(aeldari_current.overlay_pack(),),
     )
-    return apply_source_release_overlays(
+    banshee_eldrad_artifacts = apply_source_release_overlays(
         source_artifacts=current_aeldari_artifacts,
         release_manifest=banshee_eldrad.source_release_manifest(),
         overlay_packs=(banshee_eldrad.overlay_pack(),),
+    )
+    return apply_source_release_overlays(
+        source_artifacts=banshee_eldrad_artifacts,
+        release_manifest=starfang_keyword.source_release_manifest(),
+        overlay_packs=(starfang_keyword.overlay_pack(),),
     )
 
 
@@ -217,6 +225,8 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
                 Path(banshee_eldrad.__file__).with_name(banshee_eldrad.ARTIFACT_NAME),
                 Path(banshee_eldrad.__file__).with_name(banshee_eldrad.AUDIT_ARTIFACT_NAME),
                 Path(aeldari_current.__file__).with_name(aeldari_current.AUDIT_ARTIFACT_NAME),
+                Path(starfang_keyword.__file__).with_name(starfang_keyword.ARTIFACT_NAME),
+                Path(starfang_keyword.__file__).with_name(starfang_keyword.AUDIT_ARTIFACT_NAME),
                 rules / "source_authority_registry.json",
                 rules
                 / "source_packages"

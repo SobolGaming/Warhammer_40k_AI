@@ -35,7 +35,7 @@ validate_current_catalog_against_reconciliation = (
 ARTIFACT_PATH: Final = "artifacts/catalog.json"
 RECONCILIATION_ARTIFACT_PATH: Final = "artifacts/official-pdf-reconciliation.json"
 EXPECTED_PACKAGE_ID: Final = "data-package:core-v2:chaos-daemons-roster:2026-07"
-EXPECTED_PACKAGE_HASH: Final = "b63c0805b6878daf2eef2d4145e407361f7848bde3095074022f1b850db183ab"
+EXPECTED_PACKAGE_HASH: Final = "f910aa113e8da197636e8868b41e58b394961d234dee0e77c04aba31c6e6468f"
 EXPECTED_CATALOG_ID: Final = "core-v2:chaos-daemons-roster:2026-07"
 EXPECTED_DATASHEET_IDS: Final = (
     "000001115",

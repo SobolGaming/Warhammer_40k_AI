@@ -67,6 +67,9 @@ _CANONICAL_FACTION_ID_BY_SOURCE_ID = {
     "WE": "world-eaters",
 }
 _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
+    "core_deep_strike_description_2026_11": (
+        "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
+    ),
     "core_descriptions_2026_11": (
         "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
     ),

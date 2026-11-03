@@ -11,7 +11,7 @@
     "tests/factions/black_templars/unit/test_black_templars_army_rule.py": 1.134,
     "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py": 36.112,
     "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py": 21.254,
-    "tests/factions/chaos_daemons/unit/test_bloodcrushers_reserves.py": 2.098,
+    "tests/factions/chaos_daemons/unit/test_bloodcrushers_reserves.py": 32.675,
     "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py": 39.847,
     "tests/factions/chaos_daemons/unit/test_generic_ir_support_validation.py": 0.024,
     "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py": 1.957,
@@ -78,8 +78,8 @@
     "tests/infrastructure/runtime_hooks/unit/test_runtime_hook_bindings.py": 20.894,
     "tests/infrastructure/setup/unit/test_deployment.py": 4.814,
     "tests/infrastructure/setup/unit/test_setup_completion.py": 2.808,
-    "tests/infrastructure/source/unit/test_core_catalog_descriptions.py": 73.035,
-    "tests/infrastructure/source/unit/test_deadly_demise_descriptions.py": 110.049,
+    "tests/infrastructure/source/unit/test_core_catalog_descriptions.py": 62.545,
+    "tests/infrastructure/source/unit/test_deadly_demise_descriptions.py": 61.062,
     "tests/infrastructure/source/unit/test_phase17a1_transition_patches.py": 0.116,
     "tests/infrastructure/source/unit/test_rule_text_normalization.py": 0.016,
     "tests/infrastructure/source/unit/test_ruleset_descriptor.py": 0.007,
@@ -87,6 +87,7 @@
     "tests/infrastructure/source/unit/test_source_identity_part2.py": 0.043,
     "tests/infrastructure/source/unit/test_source_overlays.py": 2.312,
     "tests/infrastructure/source/unit/test_source_reconciliation.py": 0.053,
+    "tests/infrastructure/source/unit/test_starfang_deep_strike.py": 127.951,
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": 27.18,
     "tests/infrastructure/source_governance/unit/test_named_handler_budget.py": 5.721,
     "tests/infrastructure/source_governance/unit/test_support_evidence_inventories.py": 80.7,
@@ -420,76 +421,76 @@
   "profiles": [
     {
       "junit_sha256": [
-        "c110a9afadfe031969efb0761b4b8e3e30467b4970878ba55850f9a1939ece9d"
+        "70ee1924566d1f84228301cc6bb7574455caf47fd3a549210503e40f2a1df5cf"
       ],
-      "source": "Complete local covered candidate b36a112bbd2f8f3e8cd95da2e336012cbdf134a9; Linux CPython3.14.5, explicit16workers, worksteal, full package branches and unchanged65percentfloor; original JUnit retained in durable delivery evidence",
-      "test_cases": 5237,
-      "test_files": 397
+      "source": "Scheduling-only bootstrap: retained PR614 complete local covered behavior-final.xml plus complete current focused-source-tests-06 (135 passes), exact current collection; original measured testcase durations retained, no qualification claim. Inputs c110a9afadfe031969efb0761b4b8e3e30467b4970878ba55850f9a1939ece9d / 8e151924ac76c2152ab25be74ea9f7844eda47f1c7f52ce904dc7d9f7ae36465",
+      "test_cases": 5267,
+      "test_files": 398
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 703.266,
+      "duration_seconds": 711.516,
       "shard_id": 1,
-      "test_file_count": 31
+      "test_file_count": 30
     },
     {
-      "duration_seconds": 703.263,
+      "duration_seconds": 711.517,
       "shard_id": 2,
       "test_file_count": 34
     },
     {
-      "duration_seconds": 703.261,
+      "duration_seconds": 711.52,
       "shard_id": 3,
-      "test_file_count": 34
-    },
-    {
-      "duration_seconds": 703.266,
-      "shard_id": 4,
       "test_file_count": 35
     },
     {
-      "duration_seconds": 703.268,
+      "duration_seconds": 711.515,
+      "shard_id": 4,
+      "test_file_count": 34
+    },
+    {
+      "duration_seconds": 711.521,
       "shard_id": 5,
       "test_file_count": 35
     },
     {
-      "duration_seconds": 703.262,
+      "duration_seconds": 711.521,
       "shard_id": 6,
-      "test_file_count": 33
+      "test_file_count": 35
     },
     {
-      "duration_seconds": 703.261,
+      "duration_seconds": 711.52,
       "shard_id": 7,
       "test_file_count": 36
     },
     {
-      "duration_seconds": 703.266,
+      "duration_seconds": 711.517,
       "shard_id": 8,
-      "test_file_count": 36
+      "test_file_count": 35
     },
     {
-      "duration_seconds": 703.263,
+      "duration_seconds": 711.517,
       "shard_id": 9,
       "test_file_count": 35
     },
     {
-      "duration_seconds": 703.266,
+      "duration_seconds": 711.52,
       "shard_id": 10,
       "test_file_count": 36
     },
     {
-      "duration_seconds": 703.262,
+      "duration_seconds": 711.522,
       "shard_id": 11,
-      "test_file_count": 35
+      "test_file_count": 36
     },
     {
-      "duration_seconds": 703.266,
+      "duration_seconds": 711.515,
       "shard_id": 12,
       "test_file_count": 36
     }
   ],
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 8439.17
+  "total_test_duration_seconds": 8538.221
 }

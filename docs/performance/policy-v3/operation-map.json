@@ -32716,6 +32716,160 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "starfang-deep-strike-exact-64d28fb0f276ec0d": {
+      "paths": [
+        "data/source_audits/starfang_deep_strike_2026_11/catalog-delta.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "starfang-deep-strike-exact-942a5e720384da66": {
+      "paths": [
+        "data/source_audits/starfang_deep_strike_2026_11/reviewed-observations.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "starfang-deep-strike-exact-16cab14111963713": {
+      "paths": [
+        "data/source_audits/starfang_deep_strike_2026_11/source-admission.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "starfang-deep-strike-exact-54344d9a14bf8035": {
+      "paths": [
+        "src/warhammer40k_core/rules/core_deep_strike_successor.py"
+      ],
+      "owners": [
+        "@module",
+        "DeepStrikeSuccessorArtifact",
+        "DeepStrikeSuccessorOccurrence",
+        "before_deep_strike_catalog",
+        "descriptor_hash",
+        "successor_from_json_bytes"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "starfang-deep-strike-exact-8a566d77a945247d": {
+      "paths": [
+        "tests/infrastructure/source/unit/test_starfang_deep_strike.py"
+      ],
+      "owners": [
+        "@module",
+        "packages",
+        "test_current_deep_strike_preserves_native_8_inch_unrestricted_placement_policy",
+        "test_deep_strike_forward_is_exact_deterministic_and_once_only",
+        "test_exact_deep_strike_successor_rejects_unreviewed_delta",
+        "test_exact_three_surface_delta_reconstructs_all_original_payload_hashes",
+        "test_forward_deep_strike_boundary_rejects_unreviewed_inputs",
+        "test_keyword_overlay_explicit_identity_lineage_and_index_inputs",
+        "test_keyword_source_supersedes_exact_history_and_rejects_identity_rewrite",
+        "test_new_source_authority_tuple_fails_closed",
+        "test_new_source_bytes_are_immutable",
+        "test_package_owned_successor_artifact_is_typed_pinned_and_complete",
+        "test_selected_source_index_preserves_corrected_keyword_identity",
+        "test_source_only_admission_and_complete_dependency",
+        "test_starfang_native_canonical_keyword_retains_plural_name_and_roundtrip",
+        "test_three_surfaces_exact_28_complete_descriptions_and_catalog_roundtrip"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "starfang-deep-strike-exact-ee515e310a1c048b": {
+      "paths": [
+        "tests/starfang_deep_strike_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "before_starfang_deep_strike",
+        "before_starfang_source_registry",
+        "correction_audit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "starfang-deep-strike-exact-7ac0b8f112aa0e6f": {
+      "paths": [
+        "tests/support/acts_preservation.py"
+      ],
+      "owners": [
+        "starfang_provenance_predecessor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "starfang-deep-strike-exact-7da8217a280436c5": {
+      "paths": [
+        "tests/support/source_provenance.py"
+      ],
+      "owners": [
+        "@module",
+        "historical_snapshot_inputs",
+        "historical_source_report",
+        "retired_identity_tokens"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "starfang-deep-strike-exact-8b414eb3f1be10f4": {
+      "paths": [
+        "tools/build_starfang_deep_strike_source.py"
+      ],
+      "owners": [
+        "@module",
+        "_bytes",
+        "_canonical_hash",
+        "_hash",
+        "build_payloads",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "starfang-deep-strike-exact-7cab898c80060429": {
+      "paths": [
+        "tools/core_deep_strike_catalog_overlay.py"
+      ],
+      "owners": [
+        "@module",
+        "with_current_deep_strike"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "starfang-deep-strike-exact-1504c891c8d333f3": {
+      "paths": [
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "starfang_deep_strike_policy_predecessor",
+        "starfang_deep_strike_smoke_operations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
