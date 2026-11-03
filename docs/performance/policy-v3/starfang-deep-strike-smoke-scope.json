@@ -46,6 +46,36 @@
           "after": "efc89a02bfee3f2f36101b581a97ed77dc684fe7d24723eb43c99102c6ea093f"
         }
       }
+    },
+    "tests/code_quality/test_registered_source_scopes.py": {
+      "before_sha256": "e9d1e7ce49b669ea5b679890892736ec50f922246140d2ccfc854eb4ce05aa0d",
+      "after_sha256": "e71ce120b8c29896c9139e4048d112ea8c562963657c0bf3477e84073d710c17",
+      "owners": {
+        "@module": {
+          "before": "d5fdf1700de2f05e379e05a88be842db082cdbac56e552ce7f899769f2b58887",
+          "after": "b981a2d15516432e6588a8125460b132750fa7355e0c1cf803d1496b2a527aa4"
+        },
+        "_historical_report": {
+          "before": "41a4be892fdbbf57982c5ff204af03cd7cf6500328735b521c236e435414dc83",
+          "after": null
+        },
+        "historical_snapshot_inputs": {
+          "before": "71209cc42ec4cd5a78bcf6841b62935d25bb27ffce91da35609967d8e6e7cba5",
+          "after": null
+        },
+        "retired_identity_tokens": {
+          "before": "4b7af4782bd0a72f1409263c6511a440a73bb9e5f801856f1d636cfca07a3d1a",
+          "after": null
+        },
+        "test_banshee_eldrad_provenance_successor_preserves_exact_base_and_original_chain": {
+          "before": "3cbbff7788228ce1ee3cf8adbf475af06aed8a75045accc3cce223b746609a81",
+          "after": "7f7ff46daa4c1ffd895c8a570a66e31cc52c4fd6d78a13b03a60d98394a56319"
+        },
+        "test_old_scope_binding_is_retained_but_cannot_qualify_new_scope": {
+          "before": "0d98b75f6c2c65b605e121ebe2375cb44d90fed1383f21521d8f0512ecea492b",
+          "after": "879451c4b7683cb9e143ab9372ae47b64eb00857be6758c5ee5f8c03a0aad8b9"
+        }
+      }
     }
   },
   "smoke_operations": {
@@ -57,14 +87,60 @@
     ],
     "tools/source_scope_provenance.py": [
       "registered-source-provenance-projection"
+    ],
+    "tests/code_quality/test_registered_source_scopes.py": [
+      "registered-source-scope-regression-controls"
     ]
   },
-  "source_obligation": "Correct only the ordinary STARFANG keyword source row, preserving the exact plural Starfangs datasheet name, and replace all 28 Deep Strike descriptions (17 native, 6 paired, 5 Daemons) with complete Core 24.09 wording admitted through typed source evidence and existing Core 20.04 Ingress dependency. The two Starfang source artifacts join the existing selected-source index inputs; the catalog generator applies the bounded description overlay. The existing closed provenance map must admit only the exact Starfang overlay path and raw hash so active source validation can recognize this source successor.",
-  "unchanged_work": "The source/catalog pipeline adds bounded keyword-overlay admission, two selected-source inputs, complete description replacement, exact successor validation and one closed path/raw-hash provenance admission. Existing indexing/query/search algorithms, source-reuse cache policy, gameplay consumers, serializers, descriptor IDs/parameters and eight-inch native Deep Strike policy remain unchanged. Source data changes the real STARFANG membership result. This is a source-rule correction with no deliberate performance or dependency change; identical work counts or measured runtime equivalence are not asserted. All prior mappings, sensitivity, families, historical evidence and budgets remain; final serial current-runtime smoke and live semantic/work/cache checks are required. No timing, detailed-comparison or full-game success is claimed.",
+  "source_obligation": "Correct only the ordinary STARFANG keyword source row, preserving the exact plural Starfangs datasheet name, and replace all 28 Deep Strike descriptions (17 native, 6 paired, 5 Daemons) with complete Core 24.09 wording admitted through typed source evidence and existing Core 20.04 Ingress dependency. The two Starfang source artifacts join the existing selected-source index inputs; the catalog generator applies the bounded description overlay. The existing closed provenance map must admit only the exact Starfang overlay path and raw hash so active source validation can recognize this source successor. The required no-cross-test-import correction moves exactly three authenticated historical setup helpers to one named shared helper, with independent AST equivalence under the sole historical-report rename.",
+  "unchanged_work": "The source/catalog pipeline adds bounded keyword-overlay admission, two selected-source inputs, complete description replacement, exact successor validation and one closed path/raw-hash provenance admission. Existing indexing/query/search algorithms, source-reuse cache policy, gameplay consumers, serializers, descriptor IDs/parameters and eight-inch native Deep Strike policy remain unchanged. Source data changes the real STARFANG membership result. This is a source-rule correction with no deliberate performance or dependency change; identical work counts or measured runtime equivalence are not asserted. The exact helper move changes only test ownership and imports; its pinned proof allows null-after only for the three named removed owners, preserving their prior hashes and equivalent helper ASTs. All prior mappings, sensitivity, families, historical evidence and budgets remain; final serial current-runtime smoke and live semantic/work/cache checks are required. No timing, detailed-comparison or full-game success is claimed.",
+  "helper_move_proof": {
+    "source_path": "tests/code_quality/test_registered_source_scopes.py",
+    "helper_path": "tests/support/source_provenance.py",
+    "source_change": {
+      "before_sha256": "e9d1e7ce49b669ea5b679890892736ec50f922246140d2ccfc854eb4ce05aa0d",
+      "after_sha256": "e71ce120b8c29896c9139e4048d112ea8c562963657c0bf3477e84073d710c17",
+      "owners": {
+        "@module": {
+          "before": "d5fdf1700de2f05e379e05a88be842db082cdbac56e552ce7f899769f2b58887",
+          "after": "b981a2d15516432e6588a8125460b132750fa7355e0c1cf803d1496b2a527aa4"
+        },
+        "_historical_report": {
+          "before": "41a4be892fdbbf57982c5ff204af03cd7cf6500328735b521c236e435414dc83",
+          "after": null
+        },
+        "historical_snapshot_inputs": {
+          "before": "71209cc42ec4cd5a78bcf6841b62935d25bb27ffce91da35609967d8e6e7cba5",
+          "after": null
+        },
+        "retired_identity_tokens": {
+          "before": "4b7af4782bd0a72f1409263c6511a440a73bb9e5f801856f1d636cfca07a3d1a",
+          "after": null
+        },
+        "test_banshee_eldrad_provenance_successor_preserves_exact_base_and_original_chain": {
+          "before": "3cbbff7788228ce1ee3cf8adbf475af06aed8a75045accc3cce223b746609a81",
+          "after": "7f7ff46daa4c1ffd895c8a570a66e31cc52c4fd6d78a13b03a60d98394a56319"
+        },
+        "test_old_scope_binding_is_retained_but_cannot_qualify_new_scope": {
+          "before": "0d98b75f6c2c65b605e121ebe2375cb44d90fed1383f21521d8f0512ecea492b",
+          "after": "879451c4b7683cb9e143ab9372ae47b64eb00857be6758c5ee5f8c03a0aad8b9"
+        }
+      }
+    },
+    "helper_sha256": "f6e2e7d901f9ecc6f804885f13e0cf0897bfb531856fdfca2d1702a62ab6a25e",
+    "renames": {
+      "_historical_report": "historical_source_report"
+    },
+    "normalized_owner_sha256": {
+      "_historical_report": "33badb584de1f2d12189f93ec049a95cd9a3374ca4d4885e01205279ab24da28",
+      "historical_snapshot_inputs": "3aaf6941330d784508005a2ac836eea6cb7091f25509013e691bc5a9adf3e50b",
+      "retired_identity_tokens": "4b7af4782bd0a72f1409263c6511a440a73bb9e5f801856f1d636cfca07a3d1a"
+    }
+  },
   "policy_successor": {
     "before_sha256": "faa07162fff82c6d960d0f8288f8438f8d1bf8b726a502207b941c228eb8002c",
-    "after_sha256": "368698990a823432d161de6aed76c532a49d2e2a1e77af13d1b198bafbd28cb4",
-    "function_block_sha256": "ba1b011592df1625280db6829775313b59ad733e63d3da52e6e4af34fcd6f1ff",
+    "after_sha256": "53855381390dae96880a448d0bf3729fa9099280441aad539e5db56124134526",
+    "function_block_sha256": "749547289aaef46b6a8a9ab12698dd600491c47541b61ee3554ee2cb926b36ab",
     "union_call_sha256": "220b32eb02d9e2d79f7a7007780a2dc4f40f3fd3ba48891502db647ec3f9df47",
     "predecessor_call_sha256": "baf49b042b90e8ea7d4c357be98b65b8b538fca32b840e000495cc9e28580d73"
   }

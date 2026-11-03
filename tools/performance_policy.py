@@ -476,10 +476,12 @@ def starfang_deep_strike_smoke_operations(
     sources = "tools/ability_support_sources.py"
     generator = "tools/generate_ability_support_matrix.py"
     provenance = "tools/source_scope_provenance.py"
+    controls = "tests/code_quality/test_registered_source_scopes.py"
     operations = {
         sources: "qualification40-exact-b0712fa66a9cc38e",
         generator: "qualification40-exact-ded6452f144f095b",
         provenance: "registered-source-provenance-projection",
+        controls: "registered-source-scope-regression-controls",
     }
     if (
         base != "79a27e4a26e180a28457712818d47e274df7c99a"
@@ -500,15 +502,36 @@ def starfang_deep_strike_smoke_operations(
             "source_obligation",
             "unchanged_work",
             "policy_successor",
+            "helper_move_proof",
         },
     )
     starfang_deep_strike_policy_predecessor(Path(__file__).read_bytes())
     bindings = object_value(scope["changes"])
     _keys(bindings, set(operations))
+    proof = object_value(scope["helper_move_proof"])
+    if (
+        canonical_digest(proof)
+        != "88e58238d33c8132d272849df2da4e628edc19ba6a0015d4f26f5804e93a2534"
+        or proof["source_change"] != bindings[controls]
+        or proof["helper_sha256"]
+        != digest(
+            (
+                Path(__file__).resolve().parents[1] / "tests/support/source_provenance.py"
+            ).read_bytes()
+        )
+    ):
+        raise ValueError("Starfang/Deep Strike exact helper-move proof drifted.")
+    deleted = {"_historical_report", "historical_snapshot_inputs", "retired_identity_tokens"}
     expected_owners = {
         sources: {"@module", "ability_support_index_inputs", "load_ability_support_sources"},
         generator: {"@module", "_ability_support_catalog_package"},
         provenance: {"@module", "current_ec_overlay_provenance"},
+        controls: deleted
+        | {
+            "@module",
+            "test_banshee_eldrad_provenance_successor_preserves_exact_base_and_original_chain",
+            "test_old_scope_binding_is_retained_but_cannot_qualify_new_scope",
+        },
     }
     for selected, value in bindings.items():
         binding = object_value(value)
@@ -516,9 +539,13 @@ def starfang_deep_strike_smoke_operations(
         owners = object_value(binding["owners"])
         _keys(owners, expected_owners[selected])
         file_hashes = {"before": binding["before_sha256"], "after": binding["after_sha256"]}
-        for pair_value in (file_hashes, *owners.values()):
+        for owner, pair_value in {"@file": file_hashes, **owners}.items():
             pair = object_value(pair_value)
             _keys(pair, {"before", "after"})
+            if selected == controls and owner in deleted:
+                if pair["after"] is not None:
+                    raise ValueError("Starfang/Deep Strike exact moved owner must be deleted.")
+                pair = {"before": pair["before"]}
             if any(
                 not isinstance(value, str)
                 or len(value) != 64

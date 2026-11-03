@@ -15,6 +15,12 @@ from tools import performance_tool_inputs_v4 as scopes
 from tools import source_scope_provenance as provenance
 from tools.performance_policy import validate_comparison
 
+from tests.support.source_provenance import (
+    historical_snapshot_inputs,
+    historical_source_report,
+    retired_identity_tokens,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 SCOPE = scopes.registered_scope(scopes.EC_BASE)
 
@@ -40,30 +46,6 @@ def _binding(before: dict[str, str], after: dict[str, str]) -> dict[str, Any]:
         harness_base={p: after[p] for p in SCOPE.harness},
         harness_head={p: after[p] for p in SCOPE.harness},
     )
-
-
-def _historical_report() -> dict[str, Any]:
-    old = scopes.registered_scope()
-    raw = (ROOT / old.report_path).read_bytes()
-    assert hashlib.sha256(raw).hexdigest() == (
-        "a4e21f5863cc46e33df79f2a03c9cc15a1bd575118e147bf32ebd298074b3f6a"
-    )
-    return inputs.input_object(json.loads(raw))
-
-
-def historical_snapshot_inputs() -> dict[str, str]:
-    common = _historical_report()["input_binding"]["common"]
-    expected = {path: digest for path, digest in common.items() if f"{10}th-edition" in path}
-    observed = {path: hashlib.sha256((ROOT / path).read_bytes()).hexdigest() for path in expected}
-    assert observed == expected
-    assert inputs.digest(observed) == (
-        "b877588db3f751f764fb74e9b9d5a1e3c3ab2525480e2954d2598520492b3557"
-    )
-    return observed
-
-
-def retired_identity_tokens() -> tuple[str, ...]:
-    return (f"warhammer-40000-{10}th", f"{10}th-edition")
 
 
 def _report() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
@@ -305,7 +287,7 @@ def test_registered_exact_artifacts_reject_any_byte_drift(relative: str) -> None
 
 
 def test_old_scope_binding_is_retained_but_cannot_qualify_new_scope() -> None:
-    report = _historical_report()
+    report = historical_source_report()
     binding = report["input_binding"]
     specification = json.loads((ROOT / inputs.MAP_PATH).read_bytes())["families"][inputs.FAMILY]
     specification["input_binding"] = {

@@ -32817,6 +32817,20 @@
       "sensitive": false,
       "mandatory": false
     },
+    "starfang-deep-strike-exact-7da8217a280436c5": {
+      "paths": [
+        "tests/support/source_provenance.py"
+      ],
+      "owners": [
+        "@module",
+        "historical_snapshot_inputs",
+        "historical_source_report",
+        "retired_identity_tokens"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
     "starfang-deep-strike-exact-8b414eb3f1be10f4": {
       "paths": [
         "tools/build_starfang_deep_strike_source.py"

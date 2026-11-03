@@ -224,11 +224,11 @@ def test_starfang_overlay_projects_only_exact_historical_base(
 
     from tools import source_scope_provenance as provenance
 
-    from tests.code_quality.test_registered_source_scopes import (
+    from tests.support.acts_preservation import defiler_provenance_predecessor
+    from tests.support.source_provenance import (
         historical_snapshot_inputs,
         retired_identity_tokens,
     )
-    from tests.support.acts_preservation import defiler_provenance_predecessor
 
     path = ROOT / provenance.STARFANG_OVERLAY
     raw = path.read_bytes()
@@ -317,3 +317,122 @@ def test_starfang_provenance_predecessor_preserves_exact_bytes_and_rejects_drift
         with pytest.raises(ValueError, match="Exact registered edition provenance inputs changed"):
             starfang_provenance_predecessor(altered)
         assert starfang_provenance_predecessor(current) == prior
+
+
+def test_starfang_helper_move_is_exact_and_only_three_owners_are_deleted() -> None:
+    import hashlib
+
+    scope = read_object(SCOPE)
+    path = "tests/code_quality/test_registered_source_scopes.py"
+    binding = object_value(object_value(scope["changes"])[path])
+    owners = object_value(binding["owners"])
+    deleted = {"_historical_report", "historical_snapshot_inputs", "retired_identity_tokens"}
+    assert set(owners) == deleted | {
+        "@module",
+        "test_old_scope_binding_is_retained_but_cannot_qualify_new_scope",
+        "test_banshee_eldrad_provenance_successor_preserves_exact_base_and_original_chain",
+    }
+    assert {name for name, row in owners.items() if object_value(row)["after"] is None} == deleted
+    proof = object_value(scope["helper_move_proof"])
+    assert proof["source_path"] == path
+    assert proof["source_change"] == binding
+    assert proof["helper_path"] == "tests/support/source_provenance.py"
+    assert (
+        proof["helper_sha256"]
+        == hashlib.sha256((ROOT / "tests/support/source_provenance.py").read_bytes()).hexdigest()
+    )
+    assert proof["renames"] == {"_historical_report": "historical_source_report"}
+    assert set(object_value(proof["normalized_owner_sha256"])) == deleted
+
+
+@pytest.mark.parametrize("mutation", ["before", "non-null-after", "unlisted-deletion"])
+def test_starfang_helper_move_rejects_changed_actual_owner_binding(mutation: str) -> None:
+    scope = read_object(SCOPE)
+    path = "tests/code_quality/test_registered_source_scopes.py"
+    changed = copy.deepcopy(object_value(object_value(scope["changes"])[path]))
+    owners = object_value(changed["owners"])
+    if mutation == "before":
+        object_value(owners["_historical_report"])["before"] = "0" * 64
+    elif mutation == "non-null-after":
+        object_value(owners["_historical_report"])["after"] = "0" * 64
+    else:
+        object_value(owners["@module"])["after"] = None
+    assert not policy.starfang_deep_strike_smoke_operations(
+        base=BASE, path=path, category="rule_semantics", change=changed
+    )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "deleted-before",
+        "deleted-after",
+        "unlisted-deletion",
+        "original-path-deletion",
+        "helper-path",
+        "helper-sha",
+        "source-path",
+        "source-change",
+        "rename",
+        "owner-proof",
+    ],
+)
+def test_starfang_helper_move_rejects_unbounded_declaration_or_proof(
+    monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
+    scope = read_object(SCOPE)
+    path = "tests/code_quality/test_registered_source_scopes.py"
+    change = object_value(scope["changes"])[path]
+    altered = copy.deepcopy(scope)
+    owners = object_value(object_value(object_value(altered["changes"])[path])["owners"])
+    proof = object_value(altered["helper_move_proof"])
+    if mutation == "deleted-before":
+        object_value(owners["_historical_report"])["before"] = "0" * 64
+    elif mutation == "deleted-after":
+        object_value(owners["_historical_report"])["after"] = "0" * 64
+    elif mutation == "unlisted-deletion":
+        object_value(owners["@module"])["after"] = None
+    elif mutation == "original-path-deletion":
+        source = object_value(object_value(altered["changes"])["tools/ability_support_sources.py"])
+        object_value(object_value(source["owners"])["@module"])["after"] = None
+    elif mutation == "helper-path":
+        proof["helper_path"] = "tests/support/unreviewed.py"
+    elif mutation == "helper-sha":
+        proof["helper_sha256"] = "0" * 64
+    elif mutation == "source-path":
+        proof["source_path"] = "tests/code_quality/test_unreviewed.py"
+    elif mutation == "source-change":
+        object_value(proof["source_change"])["after_sha256"] = "0" * 64
+    elif mutation == "rename":
+        object_value(proof["renames"])["retired_identity_tokens"] = "unreviewed"
+    else:
+        object_value(proof["normalized_owner_sha256"])["historical_snapshot_inputs"] = "0" * 64
+
+    def altered_scope(_selected: Path) -> dict[str, object]:
+        return altered
+
+    monkeypatch.setattr(policy, "read_object", altered_scope)
+    with pytest.raises(ValueError, match=r"Starfang/Deep Strike|Unexpected"):
+        policy.starfang_deep_strike_smoke_operations(
+            base=BASE, path=path, category="rule_semantics", change=change
+        )
+
+
+def test_starfang_helper_move_rejects_changed_helper_bytes(monkeypatch: pytest.MonkeyPatch) -> None:
+    scope = read_object(SCOPE)
+    path = "tests/code_quality/test_registered_source_scopes.py"
+    helper = ROOT / "tests/support/source_provenance.py"
+    original_read_bytes = Path.read_bytes
+
+    def changed_helper_bytes(selected: Path) -> bytes:
+        raw = original_read_bytes(selected)
+        return raw + b"\n" if selected == helper else raw
+
+    monkeypatch.setattr(Path, "read_bytes", changed_helper_bytes)
+    with pytest.raises(ValueError, match="Starfang/Deep Strike"):
+        policy.starfang_deep_strike_smoke_operations(
+            base=BASE,
+            path=path,
+            category="rule_semantics",
+            change=object_value(scope["changes"])[path],
+        )
