@@ -14,6 +14,16 @@
         }
       }
     },
+    ".github/workflows/ci.yml": {
+      "before_sha256": "295594b4150b13a49b0f092125e10c7378234ab180b52a0f2b62c6bc0ffd2132",
+      "after_sha256": "1a680bbd62e193731b7d49b160fbd86e7a06e225f7b8192d00b6564f1ed1ba83",
+      "owners": {
+        "@document": {
+          "before": "295594b4150b13a49b0f092125e10c7378234ab180b52a0f2b62c6bc0ffd2132",
+          "after": "1a680bbd62e193731b7d49b160fbd86e7a06e225f7b8192d00b6564f1ed1ba83"
+        }
+      }
+    },
     "ci/quality_shards/all.txt": {
       "before_sha256": "6a86bab8f27800949b46f8db49266ae788119bf352982af04247a77450de6c55",
       "after_sha256": "b5d83f74c8bca5c58686bc36b8c78ef0d94cdd82e82a63e7cfb8b400db471a4b",
@@ -697,6 +707,14 @@
       ],
       "selected_families": [],
       "rationale": "Record the bounded current Core catalog description scope, source provenance, newline identity and required qualification metadata.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    ".github/workflows/ci.yml": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Fetch the exact retained b27 Core description baseline in the fresh hosted behavioral checkout so historical byte-preservation regressions can resolve it; preserve all existing CI controls, workers, dependencies and time budgets.",
       "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
       "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
