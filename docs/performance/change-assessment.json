@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "b27c5d4e5f75dd7f89353a968a88d1b24b2681a4",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aaf5d7e1bab136f761c9b0e6fc099b44e5e7da766f0ba6517223f1ae26033a31",
-  "operation_map_sha256": "b7a0883bd6f65a7a4aaa2603c68beb4e6fc70e9d6d610680daec43cbc795f4e3",
+  "operation_map_sha256": "3073bf25809a173399ea1fb7835710476627d940932d8e953b51582ad420825e",
   "changes": {
     ".gitattributes": {
       "before_sha256": "d93587a7a0769216fbb473723990618e311cd70a8d1c610831e252f5b32e4703",
@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": "6a86bab8f27800949b46f8db49266ae788119bf352982af04247a77450de6c55",
-      "after_sha256": "a9718812497a92431db5315b46afc52d524119f7c0aa8ea9bd1b9ea620d54a8a",
+      "after_sha256": "b5d83f74c8bca5c58686bc36b8c78ef0d94cdd82e82a63e7cfb8b400db471a4b",
       "owners": {
         "@document": {
           "before": "6a86bab8f27800949b46f8db49266ae788119bf352982af04247a77450de6c55",
-          "after": "a9718812497a92431db5315b46afc52d524119f7c0aa8ea9bd1b9ea620d54a8a"
+          "after": "b5d83f74c8bca5c58686bc36b8c78ef0d94cdd82e82a63e7cfb8b400db471a4b"
         }
       }
     },
@@ -31,6 +31,16 @@
         "@document": {
           "before": "6a23c9ab07b5508ab5bd525edb210b87d86d0bea0ce5a43d96815846dfedbabb",
           "after": "2ddb5ea6f33928f116405c646ca712a7178c0f0164886fd1510d7f56b4f1c2a7"
+        }
+      }
+    },
+    "ci/quality_shards/shard-3.txt": {
+      "before_sha256": "8c47defe3fd09fe2d4fdd9e8ad6ccc0b532e1f63c14b5bd2efefd233cf1d86bb",
+      "after_sha256": "175462c224db1ad2e0504c56c90093f5d4cb6b12c6a27dc7e9d383d1c153bf52",
+      "owners": {
+        "@document": {
+          "before": "8c47defe3fd09fe2d4fdd9e8ad6ccc0b532e1f63c14b5bd2efefd233cf1d86bb",
+          "after": "175462c224db1ad2e0504c56c90093f5d4cb6b12c6a27dc7e9d383d1c153bf52"
         }
       }
     },
@@ -316,11 +326,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "9bc845288a9877db70691412b7d2e3c977ad84d83e2beb3cf1ebe8662e4dee13",
-      "after_sha256": "1f681794a5e1a9fac61ae466d855ef5596abb5b075e3b299223082afad9e43d6",
+      "after_sha256": "0ed801bfd9ff01a921f4133989b4e7303d01ec231f0c63b3f4adab6b117183bb",
       "owners": {
         "@document": {
           "before": "9bc845288a9877db70691412b7d2e3c977ad84d83e2beb3cf1ebe8662e4dee13",
-          "after": "1f681794a5e1a9fac61ae466d855ef5596abb5b075e3b299223082afad9e43d6"
+          "after": "0ed801bfd9ff01a921f4133989b4e7303d01ec231f0c63b3f4adab6b117183bb"
         }
       }
     },
@@ -426,6 +436,24 @@
         }
       }
     },
+    "tests/code_quality/test_order135_current_core_audit.py": {
+      "before_sha256": "e3a0e336b9f6777fb4a3535ed3fd7bbe6c7022d96127e6a355e81de032925ab8",
+      "after_sha256": "7003e12a7ba15ff1b39ea650c10e75122e6de7fed951d1bfcfe2f0c346138528",
+      "owners": {
+        "@module": {
+          "before": "5269cfb1a5c54298057f8e2a4821358f82c71066c75013d6aca16de6d6ef8fe8",
+          "after": "8d5cd429765576dc0e2150ecd1fb1357469ad21f597f4fed046f397a69e0be98"
+        },
+        "test_order135_current_source_provider_composes_both_complete_packages": {
+          "before": "297f4f8ee85d917c5dc008993c787e810d10e76d7d97f11d7a0193386fc52458",
+          "after": "e6485ae5292e0897ac585e95ec201cae31c217980c072f82270cf0dfbc33b2a3"
+        },
+        "test_order135_visibility_registration_rejects_its_own_extension_drift": {
+          "before": null,
+          "after": "2d8f50636d314dbb51d05d8d250ca5eb4eac7d84143e535942358cfbd0261ddc"
+        }
+      }
+    },
     "tests/code_quality/test_performance_policy.py": {
       "before_sha256": "84936408dcca21cd1c80460533cb7e953d57152e07565c3b972c1a0eeb54ea2f",
       "after_sha256": "a87c90eb21a7f404ba5f1b04f3966aeb1adce9527571e5308f5bd7bc4e517ee5",
@@ -445,6 +473,16 @@
         "test_deadly_demise_smoke_scope_rejects_unbounded_declarations": {
           "before": "371e97e782bc8daa3c5c50b10d4e5965e3ebb59f2f1b0cb1a22c127032224eea",
           "after": "cce543380a6f53b660d37d3d3730cd16dbe1c939955256a1c9cb76b3bdea91ac"
+        }
+      }
+    },
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
+      "before_sha256": "727a3107c8af13b9cf2937fd06c59fbd84351dc93b5b01167b35c313b97af285",
+      "after_sha256": "b325a438be9edcf5d183e6cac1c59f43ffccbe7205dcaee7a308b8fa1861e825",
+      "owners": {
+        "@module": {
+          "before": "de49586f26c87e87d15e24ec11264feaf77a101881b1d0f3831feca8b5d3b117",
+          "after": "ca4fcfc3b77e83d8a1d4935ec8bb6c812bb16a001285b3e5c942e3016fb9b440"
         }
       }
     },
@@ -590,6 +628,16 @@
         }
       }
     },
+    "tools/core_rules_order135_audit.py": {
+      "before_sha256": "aff365a93f90812f184f58694921235042cb60f9b35a3c38f6673d2421cf03bb",
+      "after_sha256": "4b48410937d029ce797a3087b69559efc389fb6d5ad134fe90132a344f5a1861",
+      "owners": {
+        "visibility_source_registration": {
+          "before": "4997bdf1f8056a1b13a7676452c1c4c2324bb78f0c29c5b8149ea7c37b42e802",
+          "after": "3c7917c966bec28a51aa4960783636533a8e99a6799573eeba5841a8e4be9d67"
+        }
+      }
+    },
     "tools/generate_ability_support_matrix.py": {
       "before_sha256": "eb4558da6eb2316367fba4011274b67e9bc2b80110a724307dab11ff0229fc29",
       "after_sha256": "0fec8c2d95705cf06ff51dd17c5f9e3516e0b993707ec0050cf37464970b1759",
@@ -661,6 +709,14 @@
       "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/quality_shards/shard-2.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "ci/quality_shards/shard-3.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -1020,11 +1076,32 @@
       "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
       "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
+    "tests/code_quality/test_order135_current_core_audit.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-cutover-owners-ca1ae95238a3c1b280927432318310493c2c62a0bed139f212f98cca5fe097c3",
+        "core-description-exact-ca1ae95238a3c1b2"
+      ],
+      "selected_families": [],
+      "rationale": "Protect complete historical payloads, source authority and native parameter/recognition persistence with focused regression and exact policy controls.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
     "tests/code_quality/test_performance_policy.py": {
       "category": "rule_semantics",
       "operations": [
         "deadly-demise-description-exact-06",
         "core-description-exact-c8a1c41e8f12a86f"
+      ],
+      "selected_families": [],
+      "rationale": "Protect complete historical payloads, source authority and native parameter/recognition persistence with focused regression and exact policy controls.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-regression-controls"
       ],
       "selected_families": [],
       "rationale": "Protect complete historical payloads, source authority and native parameter/recognition persistence with focused regression and exact policy controls.",
@@ -1079,6 +1156,16 @@
       ],
       "selected_families": [],
       "rationale": "Apply five reviewed Core prose replacements at the native catalog boundary; preserve the existing Deadly Demise helper and all structured runtime fields.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "tools/core_rules_order135_audit.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-current-source-audit"
+      ],
+      "selected_families": [],
+      "rationale": "Record the bounded current Core catalog description scope, source provenance, newline identity and required qualification metadata.",
       "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
       "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },

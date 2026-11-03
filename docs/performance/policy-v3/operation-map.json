@@ -32271,6 +32271,18 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "core-description-exact-ca1ae95238a3c1b2": {
+      "paths": [
+        "tests/code_quality/test_order135_current_core_audit.py"
+      ],
+      "owners": [
+        "test_order135_current_source_provider_composes_both_complete_packages",
+        "test_order135_visibility_registration_rejects_its_own_extension_drift"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
