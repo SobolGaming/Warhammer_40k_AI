@@ -18,6 +18,7 @@ from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 
+from tests.core_description_helpers import before_core_description_correction
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
 from warhammer40k_core.engine.core_ability_materialization import _deadly_demise_source_for_model
 from warhammer40k_core.engine.damage_allocation import (
@@ -128,7 +129,12 @@ def test_deadly_demise_all_thirty_current_descriptions_preserve_entire_baseline_
             )
         total += len(rows)
         # Includes every unrelated field, ability, geometry, source identity and support flag.
-        assert _historical_deadly_demise_package(package).package_hash() == surface["package_hash"]
+        assert (
+            _historical_deadly_demise_package(
+                before_core_description_correction(package)
+            ).package_hash()
+            == surface["package_hash"]
+        )
         assert package.source_artifacts.count(SOURCE_ARTIFACT) == 1
         assert package.army_catalog.source_ids.count(SOURCE_ID) == 1
         assert CanonicalCatalogPackage.from_payload(package.to_payload()) == package

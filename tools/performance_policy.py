@@ -415,6 +415,101 @@ def aeldari_current_source_rule_semantics_smoke_operations(
     return frozenset({operations[path]})
 
 
+def core_description_policy_predecessor(raw: bytes) -> bytes:
+    """Authenticate this bounded registration before applying historical policy proofs."""
+    scope = read_object(
+        Path(__file__).resolve().parents[1]
+        / "docs/performance/policy-v3/core-description-smoke-scope.json"
+    )
+    proof = object_value(scope["policy_successor"])
+    _keys(proof, {"before_sha256", "after_sha256", "function_block_sha256", "union_call_sha256"})
+    if digest(raw) != proof["after_sha256"]:
+        raise ValueError("Core description policy successor bytes drifted.")
+    start = raw.index(b"def core_description_policy_predecessor(")
+    end = raw.index(b"\ndef deadly_demise_description_smoke_operations(", start) + 1
+    block = raw[start:end]
+    call = (
+        b"            | core_description_smoke_operations(\n"
+        b"                base=base, path=path, category=category, change=changes[path]\n"
+        b"            )\n"
+    )
+    old = b'proof["after_sha256"] != digest(Path(__file__).read_bytes())'
+    new = (
+        b'proof["after_sha256"]\n'
+        b"        != digest(core_description_policy_predecessor(Path(__file__).read_bytes()))"
+    )
+    if (
+        raw.count(block) != 1
+        or raw.count(call) != 1
+        or raw.count(new) != 1
+        or digest(block) != proof["function_block_sha256"]
+        or digest(call) != proof["union_call_sha256"]
+    ):
+        raise ValueError("Core description policy registration drifted.")
+    prior = raw.replace(block, b"", 1).replace(call, b"", 1).replace(new, old, 1)
+    if (
+        digest(prior) != proof["before_sha256"]
+        or proof["before_sha256"]
+        != "78b0fb430315e772f592ae1cd01e95df78ceb98ca4ed91ee9ba74bb87a58efb9"
+    ):
+        raise ValueError("Core description policy predecessor bytes drifted.")
+    return prior
+
+
+def core_description_smoke_operations(
+    *, base: str, path: str, category: str, change: object
+) -> frozenset[str]:
+    """Recognize only this exact base and current description boundary change."""
+    selected_path = "tools/generate_ability_support_matrix.py"
+    operation = "qualification40-exact-ded6452f144f095b"
+    if (
+        base != "b27c5d4e5f75dd7f89353a968a88d1b24b2681a4"
+        or path != selected_path
+        or category != "rule_semantics"
+    ):
+        return frozenset()
+    scope = read_object(
+        Path(__file__).resolve().parents[1]
+        / "docs/performance/policy-v3/core-description-smoke-scope.json"
+    )
+    _keys(
+        scope,
+        {
+            "base",
+            "changes",
+            "smoke_operations",
+            "source_obligation",
+            "unchanged_work",
+            "policy_successor",
+        },
+    )
+    core_description_policy_predecessor(Path(__file__).read_bytes())
+    bindings = object_value(scope["changes"])
+    _keys(bindings, {selected_path})
+    binding = object_value(bindings[selected_path])
+    _keys(binding, {"before_sha256", "after_sha256", "owners"})
+    owners = object_value(binding["owners"])
+    _keys(owners, {"@module", "_ability_support_catalog_package"})
+    for value in (
+        {"before": binding["before_sha256"], "after": binding["after_sha256"]},
+        *owners.values(),
+    ):
+        pair = object_value(value)
+        _keys(pair, {"before", "after"})
+        if any(
+            not isinstance(value, str)
+            or len(value) != 64
+            or any(character not in "0123456789abcdef" for character in value)
+            for value in pair.values()
+        ):
+            raise ValueError("Core description smoke scope requires exact hashes.")
+    if object_value(scope["smoke_operations"]) != {selected_path: [operation]}:
+        raise ValueError("Core description smoke scope requires its sole exact operation.")
+    if scope["base"] != base or binding != change:
+        return frozenset()
+    return frozenset({operation})
+
+
 def deadly_demise_description_smoke_operations(
     *, base: str, path: str, category: str, change: object
 ) -> frozenset[str]:
@@ -446,7 +541,8 @@ def deadly_demise_description_smoke_operations(
     _keys(proof, {"before_sha256", "after_sha256", "function_block_sha256", "union_call_sha256"})
     if (
         proof["before_sha256"] != "8b64320d7e27669a897dc2e441acea3f9c0e37a6629841f3468e03a140f9cd63"
-        or proof["after_sha256"] != digest(Path(__file__).read_bytes())
+        or proof["after_sha256"]
+        != digest(core_description_policy_predecessor(Path(__file__).read_bytes()))
         or any(
             not isinstance(value, str)
             or len(value) != 64
@@ -747,6 +843,9 @@ def validate_assessment(
                 base=base, path=path, category=category, change=changes[path]
             )
             | aeldari_current_source_rule_semantics_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | core_description_smoke_operations(
                 base=base, path=path, category=category, change=changes[path]
             )
             | deadly_demise_description_smoke_operations(

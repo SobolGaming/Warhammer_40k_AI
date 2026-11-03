@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bdc45689262eff59f08b038948636d1e12ed069bc4a737a1f509ed15522c86a9",
-  "fingerprint": "bdc45689262eff59f08b038948636d1e12ed069bc4a737a1f509ed15522c86a9",
-  "resource_count": 3185,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aaf5d7e1bab136f761c9b0e6fc099b44e5e7da766f0ba6517223f1ae26033a31",
+  "fingerprint": "aaf5d7e1bab136f761c9b0e6fc099b44e5e7da766f0ba6517223f1ae26033a31",
+  "resource_count": 3187,
   "resources": [
     {
       "byte_length": 113,
@@ -14120,14 +14120,14 @@
       "sha256": "78cb8b0a5fa15dcbfe5b30b36ae1d7fb06fc7d7a2a0b0b75db2761363f765d3f"
     },
     {
-      "byte_length": 109035,
+      "byte_length": 111753,
       "path": "warhammer40k_core/rules/source_authority_registry.json",
-      "sha256": "dff4289ada96d614d0bd61bcaea9e7a13e5e3a64dec956d0781cb4ba2052e424"
+      "sha256": "26636a65d4f7c4529b2fc8f3913add5f87ce968dca6e454b2a8555a17fdbc8dc"
     },
     {
       "byte_length": 26543,
       "path": "warhammer40k_core/rules/source_authority_registry.py",
-      "sha256": "14256ba93b0fb6cba40cc90e0a34ebaea7403a31508cbf5be4e5cc50830ca6b0"
+      "sha256": "c787eda074f99d9834870fa74b0b5a2f22dc1e319f0d19f32cf185f7a5cef122"
     },
     {
       "byte_length": 19955,
@@ -14403,6 +14403,16 @@
       "byte_length": 12466,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/artifacts/package.json",
       "sha256": "5422bd3564432cb008756895208bdb536aaa88b846576a3f13352e99d72fc1ed"
+    },
+    {
+      "byte_length": 5946,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_descriptions_2026_11/__init__.py",
+      "sha256": "bbdf193385f697ea3080bd03cfdf6b6dd218fdda52dd87f063d5ad5f0abbf01c"
+    },
+    {
+      "byte_length": 13739,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_descriptions_2026_11/artifacts/package.json",
+      "sha256": "8a82ba2800f48d34993ed332cc1a4d11e7eda895ee61bd2af36a51a98a51649e"
     },
     {
       "byte_length": 5445,
@@ -14872,12 +14882,12 @@
     {
       "byte_length": 6911,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/__init__.py",
-      "sha256": "a84e029036b363c27408deb6d7fcc6e0d5d020a04b16ec5f7b4cd6ac59b0d96f"
+      "sha256": "11d5467dbf2f8b3cd1865b735fb53fa5cbdfb7b25206f33fdf4633b5899c1b0b"
     },
     {
-      "byte_length": 877740,
+      "byte_length": 872268,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/artifacts/catalog.json",
-      "sha256": "58fabaf0d11cbcfcdd067fe10bea60df3d9e61afd45de6e5b9998147b69134c7"
+      "sha256": "5f20ecdd6733feeddb4d6d9c2c4ddfede20e4993b11cbf508f9ac3866ee27e9b"
     },
     {
       "byte_length": 32341,

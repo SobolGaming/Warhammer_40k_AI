@@ -1,586 +1,642 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "b9d5a54999e9d014cd823a7d2d5c654f05ba2666",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bdc45689262eff59f08b038948636d1e12ed069bc4a737a1f509ed15522c86a9",
-  "operation_map_sha256": "3bac402857fdbe42bb935f4b69d9ffca3f2f896ff8e7cf5d6b0df7b58e8adb77",
+  "base": "b27c5d4e5f75dd7f89353a968a88d1b24b2681a4",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aaf5d7e1bab136f761c9b0e6fc099b44e5e7da766f0ba6517223f1ae26033a31",
+  "operation_map_sha256": "b7a0883bd6f65a7a4aaa2603c68beb4e6fc70e9d6d610680daec43cbc795f4e3",
   "changes": {
     ".gitattributes": {
-      "before_sha256": "f57f8e08e66f9080d1ad3f560cd1d5dfef6d43a44ef221a0ad81898149ca1394",
-      "after_sha256": "d93587a7a0769216fbb473723990618e311cd70a8d1c610831e252f5b32e4703",
+      "before_sha256": "d93587a7a0769216fbb473723990618e311cd70a8d1c610831e252f5b32e4703",
+      "after_sha256": "70fd47366981aba480db0d2e41167d02f6e3364147271a195892e03d143d5fa5",
       "owners": {
         "@document": {
-          "before": "f57f8e08e66f9080d1ad3f560cd1d5dfef6d43a44ef221a0ad81898149ca1394",
-          "after": "d93587a7a0769216fbb473723990618e311cd70a8d1c610831e252f5b32e4703"
+          "before": "d93587a7a0769216fbb473723990618e311cd70a8d1c610831e252f5b32e4703",
+          "after": "70fd47366981aba480db0d2e41167d02f6e3364147271a195892e03d143d5fa5"
         }
       }
     },
     "ci/quality_shards/all.txt": {
-      "before_sha256": "f7c492c6dec38fa7957b812f2394d1ebb2d5fc3c204cb49608944d5115a82ff7",
-      "after_sha256": "6a86bab8f27800949b46f8db49266ae788119bf352982af04247a77450de6c55",
+      "before_sha256": "6a86bab8f27800949b46f8db49266ae788119bf352982af04247a77450de6c55",
+      "after_sha256": "a9718812497a92431db5315b46afc52d524119f7c0aa8ea9bd1b9ea620d54a8a",
       "owners": {
         "@document": {
-          "before": "f7c492c6dec38fa7957b812f2394d1ebb2d5fc3c204cb49608944d5115a82ff7",
-          "after": "6a86bab8f27800949b46f8db49266ae788119bf352982af04247a77450de6c55"
+          "before": "6a86bab8f27800949b46f8db49266ae788119bf352982af04247a77450de6c55",
+          "after": "a9718812497a92431db5315b46afc52d524119f7c0aa8ea9bd1b9ea620d54a8a"
         }
       }
     },
     "ci/quality_shards/shard-2.txt": {
-      "before_sha256": "49bb3cf2812abe7c883eecb92f8b0841d71665dd6769df302658725c90edb954",
-      "after_sha256": "6a23c9ab07b5508ab5bd525edb210b87d86d0bea0ce5a43d96815846dfedbabb",
+      "before_sha256": "6a23c9ab07b5508ab5bd525edb210b87d86d0bea0ce5a43d96815846dfedbabb",
+      "after_sha256": "2ddb5ea6f33928f116405c646ca712a7178c0f0164886fd1510d7f56b4f1c2a7",
       "owners": {
         "@document": {
-          "before": "49bb3cf2812abe7c883eecb92f8b0841d71665dd6769df302658725c90edb954",
-          "after": "6a23c9ab07b5508ab5bd525edb210b87d86d0bea0ce5a43d96815846dfedbabb"
+          "before": "6a23c9ab07b5508ab5bd525edb210b87d86d0bea0ce5a43d96815846dfedbabb",
+          "after": "2ddb5ea6f33928f116405c646ca712a7178c0f0164886fd1510d7f56b4f1c2a7"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "3cfda174ae614c5f8d2dddac5f2d204949a67d37ddd2e172dbb801ce8ec015db",
-      "after_sha256": "2a6f09d38e1b75d32d6c6b4ae36532471f112fb4ac6539bac6f4c1f99bd47ddd",
+      "before_sha256": "2a6f09d38e1b75d32d6c6b4ae36532471f112fb4ac6539bac6f4c1f99bd47ddd",
+      "after_sha256": "cd290c52d3a162c96b063bbf7359c1641b45d9f16f2c449c4e7c27153d241c4d",
       "owners": {
         "@document": {
-          "before": "3cfda174ae614c5f8d2dddac5f2d204949a67d37ddd2e172dbb801ce8ec015db",
-          "after": "2a6f09d38e1b75d32d6c6b4ae36532471f112fb4ac6539bac6f4c1f99bd47ddd"
+          "before": "2a6f09d38e1b75d32d6c6b4ae36532471f112fb4ac6539bac6f4c1f99bd47ddd",
+          "after": "cd290c52d3a162c96b063bbf7359c1641b45d9f16f2c449c4e7c27153d241c4d"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "90c29550d19c13cd98b71e08a480c5c76f55030fa79e686bfef4d62e25c13763",
-      "after_sha256": "313adfb7f2fb73a12e189315e2c422953a7bdb6011d49360b0951405e2c93375",
+      "before_sha256": "313adfb7f2fb73a12e189315e2c422953a7bdb6011d49360b0951405e2c93375",
+      "after_sha256": "371f314777489dd1fba3248191babc9e3cc716c7614c84b6b66b8c5b86db31e3",
       "owners": {
         "@document": {
-          "before": "90c29550d19c13cd98b71e08a480c5c76f55030fa79e686bfef4d62e25c13763",
-          "after": "313adfb7f2fb73a12e189315e2c422953a7bdb6011d49360b0951405e2c93375"
+          "before": "313adfb7f2fb73a12e189315e2c422953a7bdb6011d49360b0951405e2c93375",
+          "after": "371f314777489dd1fba3248191babc9e3cc716c7614c84b6b66b8c5b86db31e3"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "d847ff1411e5823b946a57a6677355593127631e8b9da47c1674160adefa79f0",
-      "after_sha256": "c06486e0e198b1c8577a863590c8593a2b487646c92690d53b810560688a1eed",
+      "before_sha256": "c06486e0e198b1c8577a863590c8593a2b487646c92690d53b810560688a1eed",
+      "after_sha256": "96542d087763693e4d174060da20efd27c68a16e16d29f741114eae120d71e93",
       "owners": {
         "@document": {
-          "before": "d847ff1411e5823b946a57a6677355593127631e8b9da47c1674160adefa79f0",
-          "after": "c06486e0e198b1c8577a863590c8593a2b487646c92690d53b810560688a1eed"
+          "before": "c06486e0e198b1c8577a863590c8593a2b487646c92690d53b810560688a1eed",
+          "after": "96542d087763693e4d174060da20efd27c68a16e16d29f741114eae120d71e93"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "dc3cc7cb473ff56ce8ead4fe6a4bacbd734421f8bfe9214e261fda3ea33024aa",
-      "after_sha256": "88b18f8c59a29f580f14c4eb7368143ebef6e666bd5102f3de466e4e5384c795",
+      "before_sha256": "88b18f8c59a29f580f14c4eb7368143ebef6e666bd5102f3de466e4e5384c795",
+      "after_sha256": "ae469ade8b46f0ddc88679043728d012123715c93e4bf2b1ced5153377f93bf0",
       "owners": {
         "@document": {
-          "before": "dc3cc7cb473ff56ce8ead4fe6a4bacbd734421f8bfe9214e261fda3ea33024aa",
-          "after": "88b18f8c59a29f580f14c4eb7368143ebef6e666bd5102f3de466e4e5384c795"
+          "before": "88b18f8c59a29f580f14c4eb7368143ebef6e666bd5102f3de466e4e5384c795",
+          "after": "ae469ade8b46f0ddc88679043728d012123715c93e4bf2b1ced5153377f93bf0"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "63d4cc50a4ff75ddb85ca8e8d1aee9125480192ade9809e4b889a13e4098759c",
-      "after_sha256": "75761f1f0d5373775b3c16d071a11cf44fc31cdb54387c740ac63f644af1ba54",
+      "before_sha256": "75761f1f0d5373775b3c16d071a11cf44fc31cdb54387c740ac63f644af1ba54",
+      "after_sha256": "33755a02a30391c81cba113e44ff53e023d4ea4af71aac58b18f6a2c3a9e95be",
       "owners": {
         "@document": {
-          "before": "63d4cc50a4ff75ddb85ca8e8d1aee9125480192ade9809e4b889a13e4098759c",
-          "after": "75761f1f0d5373775b3c16d071a11cf44fc31cdb54387c740ac63f644af1ba54"
+          "before": "75761f1f0d5373775b3c16d071a11cf44fc31cdb54387c740ac63f644af1ba54",
+          "after": "33755a02a30391c81cba113e44ff53e023d4ea4af71aac58b18f6a2c3a9e95be"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "b0fb05e1000c17d1950f0eebfe601472ae984fee7c33d84a4853e0190f960912",
-      "after_sha256": "70e46f944679651380f021482d388e2710665e9792be8bd661a77c170b392f95",
+      "before_sha256": "70e46f944679651380f021482d388e2710665e9792be8bd661a77c170b392f95",
+      "after_sha256": "1c310615bbc87b7f9b4d2283412e7bea36f696e65df52fb6d1a1010792ce3842",
       "owners": {
         "@document": {
-          "before": "b0fb05e1000c17d1950f0eebfe601472ae984fee7c33d84a4853e0190f960912",
-          "after": "70e46f944679651380f021482d388e2710665e9792be8bd661a77c170b392f95"
+          "before": "70e46f944679651380f021482d388e2710665e9792be8bd661a77c170b392f95",
+          "after": "1c310615bbc87b7f9b4d2283412e7bea36f696e65df52fb6d1a1010792ce3842"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "ab6f94a99b9d6520d506f721802bd3933d85d13a9608435387288ff2d306527b",
-      "after_sha256": "7fae5b3bd4aacf1d2ac0438c3476daf09cc797545e60dd3afbff803e3240e9f4",
+      "before_sha256": "7fae5b3bd4aacf1d2ac0438c3476daf09cc797545e60dd3afbff803e3240e9f4",
+      "after_sha256": "70afac6bffd6d71059fbfc6b7c9875cc9194610f63f140d3ecf45ba78a319cf6",
       "owners": {
         "@document": {
-          "before": "ab6f94a99b9d6520d506f721802bd3933d85d13a9608435387288ff2d306527b",
-          "after": "7fae5b3bd4aacf1d2ac0438c3476daf09cc797545e60dd3afbff803e3240e9f4"
+          "before": "7fae5b3bd4aacf1d2ac0438c3476daf09cc797545e60dd3afbff803e3240e9f4",
+          "after": "70afac6bffd6d71059fbfc6b7c9875cc9194610f63f140d3ecf45ba78a319cf6"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "239c7a89741299c7512d50ec59c1781b5f35bf93066b90bb4f05af8f2252c05a",
-      "after_sha256": "9acf4107b80f0af3dd2f1c42b3bee8c83d3721e07dbabfad8a0bf0bef7e28601",
+      "before_sha256": "9acf4107b80f0af3dd2f1c42b3bee8c83d3721e07dbabfad8a0bf0bef7e28601",
+      "after_sha256": "b0a9b7f04a8ff2776b50f0ded526e859c3d7f965e5743a3b275f27d939be2703",
       "owners": {
         "@document": {
-          "before": "239c7a89741299c7512d50ec59c1781b5f35bf93066b90bb4f05af8f2252c05a",
-          "after": "9acf4107b80f0af3dd2f1c42b3bee8c83d3721e07dbabfad8a0bf0bef7e28601"
+          "before": "9acf4107b80f0af3dd2f1c42b3bee8c83d3721e07dbabfad8a0bf0bef7e28601",
+          "after": "b0a9b7f04a8ff2776b50f0ded526e859c3d7f965e5743a3b275f27d939be2703"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "b2e70909f27ec0449dd7d454ec1fd367bab3df0f490aaf2a724ceedd8b9fc764",
-      "after_sha256": "37d6ae981faa7220060da67d83f0c0ca7a6a086ab3a44ab7faab4da0251755ab",
+      "before_sha256": "37d6ae981faa7220060da67d83f0c0ca7a6a086ab3a44ab7faab4da0251755ab",
+      "after_sha256": "67845d77098d0e5cebc51f22ff1032847bbf60b566f1bf18925491846bfa2717",
       "owners": {
         "@document": {
-          "before": "b2e70909f27ec0449dd7d454ec1fd367bab3df0f490aaf2a724ceedd8b9fc764",
-          "after": "37d6ae981faa7220060da67d83f0c0ca7a6a086ab3a44ab7faab4da0251755ab"
+          "before": "37d6ae981faa7220060da67d83f0c0ca7a6a086ab3a44ab7faab4da0251755ab",
+          "after": "67845d77098d0e5cebc51f22ff1032847bbf60b566f1bf18925491846bfa2717"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "4a03d34b8b13b1633c7b02cdd8c26bf46b85dc7d9b57111b357675d4c8cb3f5f",
-      "after_sha256": "cb247368db459b2f00904165c0dfccaa5f723ed8bc83017b11caa469c9690aea",
+      "before_sha256": "cb247368db459b2f00904165c0dfccaa5f723ed8bc83017b11caa469c9690aea",
+      "after_sha256": "16c987b196f98d97ce4fb666df3d8f1870521ae1d5cde2445dc9be28891cc8e0",
       "owners": {
         "@document": {
-          "before": "4a03d34b8b13b1633c7b02cdd8c26bf46b85dc7d9b57111b357675d4c8cb3f5f",
-          "after": "cb247368db459b2f00904165c0dfccaa5f723ed8bc83017b11caa469c9690aea"
+          "before": "cb247368db459b2f00904165c0dfccaa5f723ed8bc83017b11caa469c9690aea",
+          "after": "16c987b196f98d97ce4fb666df3d8f1870521ae1d5cde2445dc9be28891cc8e0"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "63103304c504bd65a279317dce294a377587bd030a36253ed56240307e6b898c",
-      "after_sha256": "f8c77bf107bcb91f1e5690c8c02eb0a0160162820af8e5cbee1e0c22de4a29ed",
+      "before_sha256": "f8c77bf107bcb91f1e5690c8c02eb0a0160162820af8e5cbee1e0c22de4a29ed",
+      "after_sha256": "2abb83a6d11f9b20791cc57ba9a08fda366f35aa90fa6ab42d1d7b9efee0108f",
       "owners": {
         "@document": {
-          "before": "63103304c504bd65a279317dce294a377587bd030a36253ed56240307e6b898c",
-          "after": "f8c77bf107bcb91f1e5690c8c02eb0a0160162820af8e5cbee1e0c22de4a29ed"
+          "before": "f8c77bf107bcb91f1e5690c8c02eb0a0160162820af8e5cbee1e0c22de4a29ed",
+          "after": "2abb83a6d11f9b20791cc57ba9a08fda366f35aa90fa6ab42d1d7b9efee0108f"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "58c9a92afd4e0914dffec4c3f6cd0b67173b169cdd0968c14f991e39fdc0ec11",
-      "after_sha256": "acedbecc4c7250dbe97c8e00ddd8414c387dfc2504ae8be4fff140e95acde33f",
+      "before_sha256": "acedbecc4c7250dbe97c8e00ddd8414c387dfc2504ae8be4fff140e95acde33f",
+      "after_sha256": "c05017b9dbb10006caa95cd70ed5af2942dc1e782d3997ed7bce1d079ef11861",
       "owners": {
         "@document": {
-          "before": "58c9a92afd4e0914dffec4c3f6cd0b67173b169cdd0968c14f991e39fdc0ec11",
-          "after": "acedbecc4c7250dbe97c8e00ddd8414c387dfc2504ae8be4fff140e95acde33f"
+          "before": "acedbecc4c7250dbe97c8e00ddd8414c387dfc2504ae8be4fff140e95acde33f",
+          "after": "c05017b9dbb10006caa95cd70ed5af2942dc1e782d3997ed7bce1d079ef11861"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "65da588768d1c6bea6b5aef12e27b83a572fac93b42c93d37fa43ed9f4d4aa46",
-      "after_sha256": "40a6f7fafe87e24e72a22f1f6ed2f4c2b42e16fed77b21545436eef4072418f4",
+      "before_sha256": "40a6f7fafe87e24e72a22f1f6ed2f4c2b42e16fed77b21545436eef4072418f4",
+      "after_sha256": "3e50ffaa70befab772f977d2ea70fb97d8ff494fa785daf5de12b925a17edea5",
       "owners": {
         "@document": {
-          "before": "65da588768d1c6bea6b5aef12e27b83a572fac93b42c93d37fa43ed9f4d4aa46",
-          "after": "40a6f7fafe87e24e72a22f1f6ed2f4c2b42e16fed77b21545436eef4072418f4"
+          "before": "40a6f7fafe87e24e72a22f1f6ed2f4c2b42e16fed77b21545436eef4072418f4",
+          "after": "3e50ffaa70befab772f977d2ea70fb97d8ff494fa785daf5de12b925a17edea5"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "f7338d75fa031baa4f091f78a7a261cfe766aae9f7c2298afdc2c8d17ffddbb0",
-      "after_sha256": "196f3f56425a16cfa73676726a7968dc94419902664f7caba4fd58de917c8b5d",
+      "before_sha256": "196f3f56425a16cfa73676726a7968dc94419902664f7caba4fd58de917c8b5d",
+      "after_sha256": "2b414a127ad50f60e1a3eaa576f0cd78e994d46902c287538b5e599c97c2268c",
       "owners": {
         "@document": {
-          "before": "f7338d75fa031baa4f091f78a7a261cfe766aae9f7c2298afdc2c8d17ffddbb0",
-          "after": "196f3f56425a16cfa73676726a7968dc94419902664f7caba4fd58de917c8b5d"
+          "before": "196f3f56425a16cfa73676726a7968dc94419902664f7caba4fd58de917c8b5d",
+          "after": "2b414a127ad50f60e1a3eaa576f0cd78e994d46902c287538b5e599c97c2268c"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "779534ea88842b54cf8e6b22b10f29b421628a07362d4141bde4f2e912463370",
-      "after_sha256": "9d4fe51d4ff3100babf5f060be5d51b7d1dfd5c503ec005c8c453287fe9bc4b1",
+      "before_sha256": "9d4fe51d4ff3100babf5f060be5d51b7d1dfd5c503ec005c8c453287fe9bc4b1",
+      "after_sha256": "009454fff68e10bdd4667c6d04d5875dfefa5d53c26d6f9c04c4aeafa66eab2e",
       "owners": {
         "@document": {
-          "before": "779534ea88842b54cf8e6b22b10f29b421628a07362d4141bde4f2e912463370",
-          "after": "9d4fe51d4ff3100babf5f060be5d51b7d1dfd5c503ec005c8c453287fe9bc4b1"
+          "before": "9d4fe51d4ff3100babf5f060be5d51b7d1dfd5c503ec005c8c453287fe9bc4b1",
+          "after": "009454fff68e10bdd4667c6d04d5875dfefa5d53c26d6f9c04c4aeafa66eab2e"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "ca2b9fd59689b4e86533884a54a9586e75f8797bccabfd3f7d457145259d6247",
-      "after_sha256": "1a1a61d81522488e844f66dd9fde546084e668d754c59160bd54b3090fb4167f",
+      "before_sha256": "1a1a61d81522488e844f66dd9fde546084e668d754c59160bd54b3090fb4167f",
+      "after_sha256": "d5809236ce49e567cd4331d0c95083cf765b2e1e5e863e920163f49fdbc4f31d",
       "owners": {
         "@document": {
-          "before": "ca2b9fd59689b4e86533884a54a9586e75f8797bccabfd3f7d457145259d6247",
-          "after": "1a1a61d81522488e844f66dd9fde546084e668d754c59160bd54b3090fb4167f"
+          "before": "1a1a61d81522488e844f66dd9fde546084e668d754c59160bd54b3090fb4167f",
+          "after": "d5809236ce49e567cd4331d0c95083cf765b2e1e5e863e920163f49fdbc4f31d"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "1cf719be0a7d39438f8e700bda7b67bd9c8631461cc3c6943d4a9b885bc3c62b",
-      "after_sha256": "44433f8d28cf4731fc6b5377f81ca596f2e1b4922cd345053494ec25c1206ea3",
+      "before_sha256": "44433f8d28cf4731fc6b5377f81ca596f2e1b4922cd345053494ec25c1206ea3",
+      "after_sha256": "8af0ec7a6186508fc7772b3fa377361bc9e3f3f9b2e008fc915b44e3ac2f041d",
       "owners": {
         "@document": {
-          "before": "1cf719be0a7d39438f8e700bda7b67bd9c8631461cc3c6943d4a9b885bc3c62b",
-          "after": "44433f8d28cf4731fc6b5377f81ca596f2e1b4922cd345053494ec25c1206ea3"
+          "before": "44433f8d28cf4731fc6b5377f81ca596f2e1b4922cd345053494ec25c1206ea3",
+          "after": "8af0ec7a6186508fc7772b3fa377361bc9e3f3f9b2e008fc915b44e3ac2f041d"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "d77a26d0d11ae89ffeb482260300b67f753f64fa75464f945aeea943830c434c",
-      "after_sha256": "d4797487495120660b47482883e7e1299d9e0e03695527a6f78b29b0b72e0a8e",
+      "before_sha256": "d4797487495120660b47482883e7e1299d9e0e03695527a6f78b29b0b72e0a8e",
+      "after_sha256": "727f3393b9c190f0be4dabf28c831672dd762699b79e7c8d6bf44f9c12736e79",
       "owners": {
         "@document": {
-          "before": "d77a26d0d11ae89ffeb482260300b67f753f64fa75464f945aeea943830c434c",
-          "after": "d4797487495120660b47482883e7e1299d9e0e03695527a6f78b29b0b72e0a8e"
+          "before": "d4797487495120660b47482883e7e1299d9e0e03695527a6f78b29b0b72e0a8e",
+          "after": "727f3393b9c190f0be4dabf28c831672dd762699b79e7c8d6bf44f9c12736e79"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "45617efabfa7ae4a1fed1c926c6b1bd1d56e72947529270bddbd1cde39d3f1e4",
-      "after_sha256": "1d27eff650f78dab83ef83e8e47d59354e0c824c6785b0b4070f1bcc50da332b",
+      "before_sha256": "1d27eff650f78dab83ef83e8e47d59354e0c824c6785b0b4070f1bcc50da332b",
+      "after_sha256": "c654eb96e44ce810dcc0de9480303c11baddc47506a87225d08a0746af4573cf",
       "owners": {
         "@document": {
-          "before": "45617efabfa7ae4a1fed1c926c6b1bd1d56e72947529270bddbd1cde39d3f1e4",
-          "after": "1d27eff650f78dab83ef83e8e47d59354e0c824c6785b0b4070f1bcc50da332b"
+          "before": "1d27eff650f78dab83ef83e8e47d59354e0c824c6785b0b4070f1bcc50da332b",
+          "after": "c654eb96e44ce810dcc0de9480303c11baddc47506a87225d08a0746af4573cf"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "b86cc64f49806b2d4a5e3b369d940a8be970ef7cfd4fe254023f7c98ba3a249a",
-      "after_sha256": "3d96c2a963ab06b3937b06849ab653e337b294a7502cb429b205db6a03f84d76",
+      "before_sha256": "3d96c2a963ab06b3937b06849ab653e337b294a7502cb429b205db6a03f84d76",
+      "after_sha256": "70d6c872e8b663d78c4c0a7207425030d66eb9004a643bd7726ad88c1cdd57b1",
       "owners": {
         "@document": {
-          "before": "b86cc64f49806b2d4a5e3b369d940a8be970ef7cfd4fe254023f7c98ba3a249a",
-          "after": "3d96c2a963ab06b3937b06849ab653e337b294a7502cb429b205db6a03f84d76"
+          "before": "3d96c2a963ab06b3937b06849ab653e337b294a7502cb429b205db6a03f84d76",
+          "after": "70d6c872e8b663d78c4c0a7207425030d66eb9004a643bd7726ad88c1cdd57b1"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "62a88526b446bf6dc7d5b44d1013f3b1eeb414a5d267494a0c26a7b664e7c804",
-      "after_sha256": "d911f0870a0d2e81fe64acd27d0be13548073311e5c09ac226850f454d274fa0",
+      "before_sha256": "d911f0870a0d2e81fe64acd27d0be13548073311e5c09ac226850f454d274fa0",
+      "after_sha256": "49a59861fd826ccad49afcdebfd96f7c53e3610526a2dce72620e64b365c4c21",
       "owners": {
         "@document": {
-          "before": "62a88526b446bf6dc7d5b44d1013f3b1eeb414a5d267494a0c26a7b664e7c804",
-          "after": "d911f0870a0d2e81fe64acd27d0be13548073311e5c09ac226850f454d274fa0"
+          "before": "d911f0870a0d2e81fe64acd27d0be13548073311e5c09ac226850f454d274fa0",
+          "after": "49a59861fd826ccad49afcdebfd96f7c53e3610526a2dce72620e64b365c4c21"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "470c9e9c37dbfd5f16688de3f9fb1d2b1446628caceada05a9481d459546d7cd",
-      "after_sha256": "0a158d497b5cee88e6edfe38bd5ab4256e96152a9c0a570408238bdd7beaebe6",
+      "before_sha256": "0a158d497b5cee88e6edfe38bd5ab4256e96152a9c0a570408238bdd7beaebe6",
+      "after_sha256": "cebbc18e355aa5277c97020acc605f1f4a6a19107750641f63b7f9a82da25598",
       "owners": {
         "@document": {
-          "before": "470c9e9c37dbfd5f16688de3f9fb1d2b1446628caceada05a9481d459546d7cd",
-          "after": "0a158d497b5cee88e6edfe38bd5ab4256e96152a9c0a570408238bdd7beaebe6"
+          "before": "0a158d497b5cee88e6edfe38bd5ab4256e96152a9c0a570408238bdd7beaebe6",
+          "after": "cebbc18e355aa5277c97020acc605f1f4a6a19107750641f63b7f9a82da25598"
         }
       }
     },
-    "data/source_audits/deadly_demise_2026_11/catalog-description-delta.json": {
+    "data/source_audits/core_descriptions_2026_11/catalog-description-delta.json": {
       "before_sha256": null,
-      "after_sha256": "40aa60c665b221e0fb0d57879efe602dd43499812b73ef261074d689c74b32b4",
+      "after_sha256": "124158a48519894f7deffcdd6ac45c500f994f67ecd099dd45edc1005cd524d5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "40aa60c665b221e0fb0d57879efe602dd43499812b73ef261074d689c74b32b4"
+          "after": "124158a48519894f7deffcdd6ac45c500f994f67ecd099dd45edc1005cd524d5"
+        }
+      }
+    },
+    "data/source_audits/core_descriptions_2026_11/reviewed-observations.json": {
+      "before_sha256": null,
+      "after_sha256": "2cc9783d22512e9135b450d44a12e694ab742edd8475f83ed55bbd63a6daf3e3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2cc9783d22512e9135b450d44a12e694ab742edd8475f83ed55bbd63a6daf3e3"
+        }
+      }
+    },
+    "data/source_audits/core_descriptions_2026_11/source-admission.audit.json": {
+      "before_sha256": null,
+      "after_sha256": "4a77ee6301c154d1e07577f21d9cb1315248aaab472d03a39101025153d0298e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4a77ee6301c154d1e07577f21d9cb1315248aaab472d03a39101025153d0298e"
+        }
+      }
+    },
+    "docs/CORE_CATALOG_DESCRIPTION_SCOPE.md": {
+      "before_sha256": null,
+      "after_sha256": "2bc2cc8cea3c0bef3a3e6d51f81956bbdc11bbfbb9ef98e0fad3c1fe35c3155b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2bc2cc8cea3c0bef3a3e6d51f81956bbdc11bbfbb9ef98e0fad3c1fe35c3155b"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "8bb6d0748c88ef0c446c513c2724af4c042c24bd88e26b538f7f0ffade481f7b",
-      "after_sha256": "027aeeb8e51cfe096e63985684592b90232f9630492e1c6ed88f65b5cd35a90e",
+      "before_sha256": "027aeeb8e51cfe096e63985684592b90232f9630492e1c6ed88f65b5cd35a90e",
+      "after_sha256": "6cfbfd6b21eabdd1ecdca31abc49192ea9006e44f0abdbefe204c43f9576ab50",
       "owners": {
         "@document": {
-          "before": "8bb6d0748c88ef0c446c513c2724af4c042c24bd88e26b538f7f0ffade481f7b",
-          "after": "027aeeb8e51cfe096e63985684592b90232f9630492e1c6ed88f65b5cd35a90e"
+          "before": "027aeeb8e51cfe096e63985684592b90232f9630492e1c6ed88f65b5cd35a90e",
+          "after": "6cfbfd6b21eabdd1ecdca31abc49192ea9006e44f0abdbefe204c43f9576ab50"
         }
       }
     },
-    "docs/DEADLY_DEMISE_DESCRIPTION_SCOPE.md": {
+    "docs/performance/policy-v3/core-description-smoke-scope.json": {
       "before_sha256": null,
-      "after_sha256": "38d9cf972c5f36351a162210d3628988f130d00325d8942948c2b107368933e7",
+      "after_sha256": "d420749692da08d02ecca27b6c1914708435ab61b10c5b8239e4ba44a3275a1f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "38d9cf972c5f36351a162210d3628988f130d00325d8942948c2b107368933e7"
-        }
-      }
-    },
-    "docs/performance/policy-v3/deadly-demise-description-smoke-scope.json": {
-      "before_sha256": null,
-      "after_sha256": "5279a0aae6d74166b2d83e845014d31edc58c389247e53e00765755a2170a600",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "5279a0aae6d74166b2d83e845014d31edc58c389247e53e00765755a2170a600"
+          "after": "d420749692da08d02ecca27b6c1914708435ab61b10c5b8239e4ba44a3275a1f"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "d7ac2965fc06c7f8aa28651485da5b13b4dd8b5348bca425ca6ae4017b216586",
-      "after_sha256": "9bc845288a9877db70691412b7d2e3c977ad84d83e2beb3cf1ebe8662e4dee13",
+      "before_sha256": "9bc845288a9877db70691412b7d2e3c977ad84d83e2beb3cf1ebe8662e4dee13",
+      "after_sha256": "1f681794a5e1a9fac61ae466d855ef5596abb5b075e3b299223082afad9e43d6",
       "owners": {
         "@document": {
-          "before": "d7ac2965fc06c7f8aa28651485da5b13b4dd8b5348bca425ca6ae4017b216586",
-          "after": "9bc845288a9877db70691412b7d2e3c977ad84d83e2beb3cf1ebe8662e4dee13"
+          "before": "9bc845288a9877db70691412b7d2e3c977ad84d83e2beb3cf1ebe8662e4dee13",
+          "after": "1f681794a5e1a9fac61ae466d855ef5596abb5b075e3b299223082afad9e43d6"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "c1831aa8a0c75434039efff7b74fc9c0a39112acbcd642d32616148de89ab892",
-      "after_sha256": "5f0da0ae9a871a3c457a44fdd43b966b16fb75e864f474c9f5fe91c66cb1c222",
+      "before_sha256": "5f0da0ae9a871a3c457a44fdd43b966b16fb75e864f474c9f5fe91c66cb1c222",
+      "after_sha256": "c7371b7a219a9bcfe5b1e675b7af3be6e1b51fb20fe468b6aa71980997383476",
       "owners": {
         "@document": {
-          "before": "c1831aa8a0c75434039efff7b74fc9c0a39112acbcd642d32616148de89ab892",
-          "after": "5f0da0ae9a871a3c457a44fdd43b966b16fb75e864f474c9f5fe91c66cb1c222"
+          "before": "5f0da0ae9a871a3c457a44fdd43b966b16fb75e864f474c9f5fe91c66cb1c222",
+          "after": "c7371b7a219a9bcfe5b1e675b7af3be6e1b51fb20fe468b6aa71980997383476"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/__init__.py": {
-      "before_sha256": "9a6a1695db8e0b3904047b36924a2a3abb947569bac145ee6998e0f798382ec6",
-      "after_sha256": "6d3a0d876721cf0864a43163f977106020d8a0ba7d519e59908150c2c2ca5ec8",
+    "src/warhammer40k_core/rules/source_authority_registry.json": {
+      "before_sha256": "dff4289ada96d614d0bd61bcaea9e7a13e5e3a64dec956d0781cb4ba2052e424",
+      "after_sha256": "26636a65d4f7c4529b2fc8f3913add5f87ce968dca6e454b2a8555a17fdbc8dc",
+      "owners": {
+        "@document": {
+          "before": "dff4289ada96d614d0bd61bcaea9e7a13e5e3a64dec956d0781cb4ba2052e424",
+          "after": "26636a65d4f7c4529b2fc8f3913add5f87ce968dca6e454b2a8555a17fdbc8dc"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_authority_registry.py": {
+      "before_sha256": "14256ba93b0fb6cba40cc90e0a34ebaea7403a31508cbf5be4e5cc50830ca6b0",
+      "after_sha256": "c787eda074f99d9834870fa74b0b5a2f22dc1e319f0d19f32cf185f7a5cef122",
       "owners": {
         "@module": {
-          "before": "0ebccc9b447d0df8c93739f4984a3ccaca61154dd530eaa487ce9f166317a966",
-          "after": "0d9afd1ab047f6edc16d371669f9fc155b5fd7e0d62d9b991674dfb81084d24b"
-        },
-        "_validate_catalog_package": {
-          "before": "e559bacb46da5bf9141480f77eb8acccac9ca55c3350b644c55d74015192034b",
-          "after": "9912673e5472f24d6eea2d208990688047ee43e8325f2e017bafa72becc2b0a9"
+          "before": "97f683759c30d4890e75aefad65826a329d96f298b638a23b09ea1962928002a",
+          "after": "bf0e2c1314092e7a6c742df34424c5004605d7dc5b9512fd16d6198e1d4d4b83"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/_current_source.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_descriptions_2026_11/__init__.py": {
       "before_sha256": null,
-      "after_sha256": "d782b12da39766f1450a3591d15740740cb55875737be531bcd488db0d38420d",
+      "after_sha256": "bbdf193385f697ea3080bd03cfdf6b6dd218fdda52dd87f063d5ad5f0abbf01c",
       "owners": {
         "@module": {
           "before": null,
-          "after": "1c05a87c2be01048a8574b1de5db2fabbb552e1eadef9428b9ce30f41d636e0c"
+          "after": "2ae9677ddf9045bb048fc19fb70bc022d6ebb365eb8d7ce9faa70d38d88bee11"
         },
-        "CurrentDescriptionDelta": {
+        "CoreDescriptionSourceArtifact": {
           "before": null,
-          "after": "a7a3d52608701d86ab1c8ae46fad90bf8f45f2b5c0134dbe09a294963be81f08"
+          "after": "768c7eaa6ed27481bbcf2a4cba5d3eb37f34443c3a76d94a361970f76032cc0c"
         },
-        "CurrentSourceDerivation": {
+        "CoreDescriptionSourceError": {
           "before": null,
-          "after": "0dc8bb7f2f92c652327bf76c1826f4531234691dc8f4abbcbc748be653257029"
+          "after": "eec04144ea2c75bd81b0a8e4391c588f3773d6ac2564b25587715e6fe50cfe7a"
         },
-        "current_source_derivation": {
+        "CoreDescriptionSourceRule": {
           "before": null,
-          "after": "30036b59726c6e8d4d7019b0e207bd3f14448a1af123220a65fc8e481cf9b5bb"
+          "after": "4ee6cc513ead0aa542f2fad2bb7152cfff163c51f9c27ba61c2023eb2793b571"
         },
-        "current_source_from_json_bytes": {
+        "_build_source_package": {
           "before": null,
-          "after": "c4fc0ff0c78ab826dede992add2789b772b7014b3d3346e504695740ecf6fb30"
+          "after": "84f92f84e9d3389b9a554e351ec1929ef885cce94e96646376c79dbd44097bcd"
         },
-        "historical_catalog_for_current_source": {
+        "source_evidence_records": {
           "before": null,
-          "after": "39c6c6b97ad318e1a12724675724d4ade415f2e6964f961c93e5c5985bd3190c"
+          "after": "34290270b4d80978cc9a8997bceca568a3b385acbdf6e5df32a2f6c691d955eb"
         },
-        "validate_current_catalog_against_reconciliation": {
+        "source_package": {
           "before": null,
-          "after": "9a9e01d94afda6d6bf0359796c34e2c61ffbf567df8dfbdb5217f5a60be18761"
+          "after": "5f93085d194f249203b99499fddb12a5ad6ee2c5949da3c1a7084651fd8a8e6e"
+        },
+        "source_rules": {
+          "before": null,
+          "after": "329be61ae4d8a974c2c99997a48ca17854f694968a0f3d27045a2a5996b192a6"
+        },
+        "validate_source_artifact_bytes": {
+          "before": null,
+          "after": "39ada0836b77cb50a95aeb2deeb115c93d308846eae48ee528265bd0da4bbce4"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/catalog.json": {
-      "before_sha256": "eec0195ebc35da304780ef213f73ffda307121c2a8d0d5c6a74d20d99c127663",
-      "after_sha256": "e87f2461e2216565bee477771ebee970caf5bff111eae3328c9d29feccc2f948",
-      "owners": {
-        "@document": {
-          "before": "eec0195ebc35da304780ef213f73ffda307121c2a8d0d5c6a74d20d99c127663",
-          "after": "e87f2461e2216565bee477771ebee970caf5bff111eae3328c9d29feccc2f948"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/deadly-demise-current-source.json": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_descriptions_2026_11/artifacts/package.json": {
       "before_sha256": null,
-      "after_sha256": "b54d283b513d2cc4f7d032e26cec33ee5a551e573896d9ca1631062ab7bb10b1",
+      "after_sha256": "8a82ba2800f48d34993ed332cc1a4d11e7eda895ee61bd2af36a51a98a51649e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b54d283b513d2cc4f7d032e26cec33ee5a551e573896d9ca1631062ab7bb10b1"
+          "after": "8a82ba2800f48d34993ed332cc1a4d11e7eda895ee61bd2af36a51a98a51649e"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/__init__.py": {
-      "before_sha256": "936eea176343df1b73cc2adc11992afc628fd866898827e34c70feeca87f945e",
-      "after_sha256": "a84e029036b363c27408deb6d7fcc6e0d5d020a04b16ec5f7b4cd6ac59b0d96f",
+      "before_sha256": "a84e029036b363c27408deb6d7fcc6e0d5d020a04b16ec5f7b4cd6ac59b0d96f",
+      "after_sha256": "11d5467dbf2f8b3cd1865b735fb53fa5cbdfb7b25206f33fdf4633b5899c1b0b",
       "owners": {
         "@module": {
-          "before": "4936ec1f0d11186b5533a197086ff6860762a05c5512e5c1dc61cb3c3e59ace0",
-          "after": "24862537b7f89d649358d7d3d282dc0abfd56a0b0b413bab6396f6e0097be5e7"
+          "before": "24862537b7f89d649358d7d3d282dc0abfd56a0b0b413bab6396f6e0097be5e7",
+          "after": "037d8b9ad78fc2ef07053770cc78df20629aa445e934e37ec860d2882741d8c1"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/artifacts/catalog.json": {
-      "before_sha256": "eaaa28239507347510bf6b756ab813026e7d5c1585c67bda7445ebdc449032e3",
-      "after_sha256": "58fabaf0d11cbcfcdd067fe10bea60df3d9e61afd45de6e5b9998147b69134c7",
+      "before_sha256": "58fabaf0d11cbcfcdd067fe10bea60df3d9e61afd45de6e5b9998147b69134c7",
+      "after_sha256": "5f20ecdd6733feeddb4d6d9c2c4ddfede20e4993b11cbf508f9ac3866ee27e9b",
       "owners": {
         "@document": {
-          "before": "eaaa28239507347510bf6b756ab813026e7d5c1585c67bda7445ebdc449032e3",
-          "after": "58fabaf0d11cbcfcdd067fe10bea60df3d9e61afd45de6e5b9998147b69134c7"
-        }
-      }
-    },
-    "tests/code_quality/test_order123_datasheet_identity.py": {
-      "before_sha256": "4e659b09d7b8f437f0a291383309700eb7d32f5e1a2bbef5fcdf78eb1af89a99",
-      "after_sha256": "2be670c6ff38437d70f860d8578aa9e5326fa2f7da9b9b32d83574a3da39721b",
-      "owners": {
-        "@module": {
-          "before": "a373c89b05e0b59a39a80a94afe7842dab8c72fd8258507bac28afb6fedfb1f0",
-          "after": "90509aeb468b865e00b350531010f1dfd67cd61d7e8b28e2f3f9b51c11229412"
-        },
-        "_assert_official_catalog_history": {
-          "before": null,
-          "after": "bbeca2372acc92dc7cb33c3f6239c3f01d553cd40208afd3af391c454698696f"
-        },
-        "_historical_catalog_bytes": {
-          "before": null,
-          "after": "8021e4c4e15106799c37734349bf03bf82b976e512b668374b43223630ed354d"
-        },
-        "test_name_keyword_permission_preserves_exact_source_and_official_admission": {
-          "before": "09cb71cbd44b49184d064a595619dd887b11466adfab01705806f7310e43abb2",
-          "after": "2eb3dfef6583efe2460a3ed5c82255f292eea46fd4ccb914a42ce8493dc5c237"
-        },
-        "test_official_catalog_history_requires_admitted_current_catalog": {
-          "before": null,
-          "after": "b786e86dfd819d20a999cbd6d04eca8c9999360af589518079f3179f8ebd9135"
-        },
-        "test_official_catalog_history_requires_original_evidence": {
-          "before": null,
-          "after": "a154de9e1fbdb1546ec6005aabc22cabc9128b4c7a3b5f49aaab8e66f3b099a6"
+          "before": "58fabaf0d11cbcfcdd067fe10bea60df3d9e61afd45de6e5b9998147b69134c7",
+          "after": "5f20ecdd6733feeddb4d6d9c2c4ddfede20e4993b11cbf508f9ac3866ee27e9b"
         }
       }
     },
     "tests/code_quality/test_performance_policy.py": {
-      "before_sha256": "050e2507a8f79b8ef64551e7d206167c51c0b0832e4870414995ab92ac16f99d",
-      "after_sha256": "84936408dcca21cd1c80460533cb7e953d57152e07565c3b972c1a0eeb54ea2f",
+      "before_sha256": "84936408dcca21cd1c80460533cb7e953d57152e07565c3b972c1a0eeb54ea2f",
+      "after_sha256": "a87c90eb21a7f404ba5f1b04f3966aeb1adce9527571e5308f5bd7bc4e517ee5",
       "owners": {
-        "_deadly_demise_policy_predecessor": {
+        "test_core_description_smoke_scope_and_policy_successor_are_exact": {
           "before": null,
-          "after": "da185547a79a21848e1bef2e2874029cc460922b0eaabac049dd769406f3ab65"
+          "after": "216258f5e844662d029625b78352b03fb093120de06689e1d8d58fbfd53ca767"
         },
-        "test_deadly_demise_description_smoke_scope_is_exact": {
+        "test_core_description_smoke_scope_rejects_unbounded_declarations": {
           "before": null,
-          "after": "a50bcd7d888bd67c7b2ad6fab88728d83ef8d39119ade6866d9ca6a5397e8656"
+          "after": "3d79ed6c7ba75545e903181e50c32154135c17d9aa9b7946631cd035a7a9fed1"
         },
         "test_deadly_demise_policy_successor_preserves_exact_predecessor": {
-          "before": null,
-          "after": "60f319dbded90808d05d126b75b77e317fef31160d10e2906d5bba64209ab428"
-        },
-        "test_deadly_demise_scope_keeps_mandatory_mapping_and_detailed_categories": {
-          "before": null,
-          "after": "454ee3407a42f392e0c3b241b310fc423a528e6c0245b1b477ecef20079caed5"
+          "before": "60f319dbded90808d05d126b75b77e317fef31160d10e2906d5bba64209ab428",
+          "after": "31292ed2a67ee4c6280221c07f25c8f7db73c7e5ea4f558df05f49461a48a85e"
         },
         "test_deadly_demise_smoke_scope_rejects_unbounded_declarations": {
+          "before": "371e97e782bc8daa3c5c50b10d4e5965e3ebb59f2f1b0cb1a22c127032224eea",
+          "after": "cce543380a6f53b660d37d3d3730cd16dbe1c939955256a1c9cb76b3bdea91ac"
+        }
+      }
+    },
+    "tests/core_description_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "714aed59f1c99715b2f4568357fc990e74ca7502c2b0f984d0b76d3f98d235e2",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "371e97e782bc8daa3c5c50b10d4e5965e3ebb59f2f1b0cb1a22c127032224eea"
+          "after": "b8e3471fcc8f34b7d802a12458fae8e95928da3b31b2ac777a45cfa23b412f64"
+        },
+        "before_core_description_correction": {
+          "before": null,
+          "after": "c5524c0dec0619dfb9bb6c75ef2653167d3d0d623c36bfe88c09ad8a5a7a7aaa"
+        },
+        "core_description_audit": {
+          "before": null,
+          "after": "ab5ec0c97aa8c13e62ecdc943381636c2236a2645836aa8dd358296563a7f81b"
+        }
+      }
+    },
+    "tests/infrastructure/source/unit/test_core_catalog_descriptions.py": {
+      "before_sha256": null,
+      "after_sha256": "f705e4369d9a9f48839cdbf1642f9e7603f8b60e978b6e6eeecb39e8f3034dc3",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "78fc6629d0800f13d6044ff7170ca9ad9d1d2853668e1d3b1298ef6e7414b2db"
+        },
+        "_mutate": {
+          "before": null,
+          "after": "f48fb95d051b0f86f702656c2840aa558fe17cbec1d03b0943d11f136d3e0fd7"
+        },
+        "_packages": {
+          "before": null,
+          "after": "f31294785d97904c1026149cfeb28a08a1ad763c0659a1c959a98d02e54b5f8d"
+        },
+        "test_adapter_once_only_deterministic_absent_noop_and_wrong_owner": {
+          "before": null,
+          "after": "ca41445fbead6ad24d03ad450c500b146feae80dc4416bcb039451822ed0e6b1"
+        },
+        "test_adapter_rejects_current_source_text_drift": {
+          "before": null,
+          "after": "75deff60fd355eff18bfda948cff90c665b1189aa6ca8eca025a2e394a313d31"
+        },
+        "test_adapter_rejects_unreviewed_owner_occurrence": {
+          "before": null,
+          "after": "464d1351532c7a6abf3070c14e45f241a286bcfbeab3af276c1cfabb126743bc"
+        },
+        "test_adapter_rejects_wrong_reviewed_input": {
+          "before": null,
+          "after": "bc6ac05b1d46bf2bb64aa885a492ea92721e7367cc5a4b8e18aa8c5aa0fcecc3"
+        },
+        "test_adapter_rejects_wrong_source_pin": {
+          "before": null,
+          "after": "80b928fabdb3e584caa1a00509156bcf0e2b0bf56de632585b16c50473119f1b"
+        },
+        "test_all_39_occurrences_close_35_replacements_and_four_preserved_stealth": {
+          "before": null,
+          "after": "f9fef2d80c99449e7b0df6fa5bec689347551b9986f018a5481932bda0d7fb00"
+        },
+        "test_historical_projection_authenticates_all_payload_fields": {
+          "before": null,
+          "after": "43704005adcdc0142f477b06e910cb01cd15a3df3c3a46ffbd012573e467286b"
+        },
+        "test_new_source_rejects_conflicting_same_observation_transcription": {
+          "before": null,
+          "after": "80219acd1823cc7325f75e40e5cd9c497dcb9159b78326a6e434c5a36f200701"
+        },
+        "test_new_source_rejects_unreviewed_artifact_bytes": {
+          "before": null,
+          "after": "b2d4e469def2100fdffb7151d1c46a4e2919cae904f0e6df0c95e64a3a518612"
+        },
+        "test_new_source_rejects_wrong_governed_tuple": {
+          "before": null,
+          "after": "fb571007eae7b3fe546e7209681a5dac3a60ee052b9d13447f842b27250c018a"
+        },
+        "test_other_core_recognition_and_lone_operative_identity_are_preserved": {
+          "before": null,
+          "after": "57501cdecf92c717ce99a7e2c30ea0e12baed014be1f056cf2f71bb7a2fd032b"
+        },
+        "test_scouts_parameters_and_native_factory_persistence_are_preserved": {
+          "before": null,
+          "after": "6c1c054c612c8094ec87c56b18bec498237c96b8d9b4764e47bb458a4647edcf"
+        },
+        "test_source_admission_truth_and_complete_scouts_dependency": {
+          "before": null,
+          "after": "9752eefce1bf809e5f96a7be968aa03373e718a989dd676138b6a00c55793845"
+        },
+        "test_source_registry_keeps_every_historical_registration_and_source_byte": {
+          "before": null,
+          "after": "a57cc460106e880a6901188b873766a8ded89b042fbcd81a6996215bcc2f41da"
         }
       }
     },
     "tests/infrastructure/source/unit/test_deadly_demise_descriptions.py": {
+      "before_sha256": "e0c3d08c607471985df12becce5617104d2e48da96fa313fb66eba9c2daef869",
+      "after_sha256": "380dd729247a1fdcdee6058eaca9c72aff36c543fa5454ee22a54d843c38eb22",
+      "owners": {
+        "@module": {
+          "before": "079285fefcc29e3115ebd02f70e185c760d0bc87ed20069397ff39e59150b188",
+          "after": "e2ee6c2a8b1a72511d723f5734e0c4e75c274d94bdc9fb2fc28309b8a97b5ee9"
+        },
+        "test_deadly_demise_all_thirty_current_descriptions_preserve_entire_baseline_payloads": {
+          "before": "add4c8287abe53f09e38d3d5863406c1f55cfff87619b4b4546cb91ddd0fcbd4",
+          "after": "69ef6bf692cbe69de864351f83af4b9ae009506b9123866e814a42608e731bf9"
+        }
+      }
+    },
+    "tools/build_core_descriptions_source.py": {
       "before_sha256": null,
-      "after_sha256": "e0c3d08c607471985df12becce5617104d2e48da96fa313fb66eba9c2daef869",
+      "after_sha256": "f544d5d97898897559f199e9dabe29540e7ef795e2864f3387b3047d77cc911e",
       "owners": {
         "@module": {
           "before": null,
-          "after": "079285fefcc29e3115ebd02f70e185c760d0bc87ed20069397ff39e59150b188"
+          "after": "c2842a74bee0b6847504dbd86e884ab49b0aed6b0c69c5b521738aa6c60b3845"
         },
-        "_current_deadly_demise_packages": {
+        "_hash": {
           "before": null,
-          "after": "c14f9bd97868d2707928539adf8a6988451c5a507bed1d8e39fcf1b765731ae2"
+          "after": "578a08ed9823c1c56fe5e277ab2ab2566ef1974c260519d29967c78af6cdc60d"
         },
-        "_deadly_demise_delta_audit": {
+        "build_payloads": {
           "before": null,
-          "after": "04b6607a8b1ff6c199e1e0518b0a35df5d4cbbe15af847cab12d41468013f503"
+          "after": "eba6c8f86e106226ce9a56c4629109d2e170451c28de698d1de8bc7bb95c011e"
         },
-        "_historical_deadly_demise_package": {
+        "main": {
           "before": null,
-          "after": "cb35f33fb54fe129f1b1402f2fb611fbbfcbc5bbff5aa2803b7cf2a8bb801502"
-        },
-        "_mutate_deadly_demise": {
-          "before": null,
-          "after": "296877c449f43dd1fcbc3154f091cf272a1d2c888a08cbc122727dfec7b64d08"
-        },
-        "test_deadly_demise_adapter_is_once_only_deterministic_and_noop_without_occurrences": {
-          "before": null,
-          "after": "e817ae06a3db7749695e5066d879d5491a065f569fc2844fe4f138fe727ad384"
-        },
-        "test_deadly_demise_adapter_rejects_unlisted_occurrence": {
-          "before": null,
-          "after": "8caaf7b0c1ac6edd6b66e48bbdeba42660c3e515699239271e35aaa22ed983cd"
-        },
-        "test_deadly_demise_adapter_rejects_wrong_catalog_owner": {
-          "before": null,
-          "after": "4fb7b6fb83d54af09e5dc4cc6b43e9c6e151062640164b9779b38b43cd81c952"
-        },
-        "test_deadly_demise_adapter_rejects_wrong_current_source_text": {
-          "before": null,
-          "after": "65aeaefc2ebb504739560dd8b774212ed5efebdbefd5fd5dfcd0bec211e9ce74"
-        },
-        "test_deadly_demise_all_thirty_current_descriptions_preserve_entire_baseline_payloads": {
-          "before": null,
-          "after": "add4c8287abe53f09e38d3d5863406c1f55cfff87619b4b4546cb91ddd0fcbd4"
-        },
-        "test_deadly_demise_current_adapter_rejects_unreviewed_inputs": {
-          "before": null,
-          "after": "ec5367de91fff0d4d993e8114943d38aff2856ad45eba8e8a35c70fc35b7a3c9"
-        },
-        "test_deadly_demise_current_adapter_rejects_wrong_current_source_pin": {
-          "before": null,
-          "after": "e829a2973d3739e7265c5d1a442d921f88339abe82385c4cabe57f0ae47f21de"
-        },
-        "test_deadly_demise_current_daemons_derivation_rejects_every_unlisted_delta": {
-          "before": null,
-          "after": "1e466cad1a0e5d96a75efdc0447fc0fd6d5bdad8ed82d4d779afd235c6683ad9"
-        },
-        "test_deadly_demise_derivation_manifest_rejects_altered_mapping": {
-          "before": null,
-          "after": "9c072c436e6031111f1c4216fd2f40d917fdb6192635cfd39d1cb7fe51cd47bd"
-        },
-        "test_deadly_demise_description_preserves_native_profiles_and_typed_persistence": {
-          "before": null,
-          "after": "ab1ef2fad82f8a9baebc7948a5c47ab423e83308963e7d1857cb57f8a5e28e51"
-        },
-        "test_deadly_demise_preserves_historical_artifact_bytes_and_original_validator": {
-          "before": null,
-          "after": "323a7a0bcb6b28f5294a8e3d8bffd249c4f62875a64ecf315d4ad45558062789"
+          "after": "365951d3f5246200c594969088153b3a6216a0eab40c31d60ef1b31f9732b903"
         }
       }
     },
     "tools/core_deadly_demise_catalog_overlay.py": {
-      "before_sha256": null,
-      "after_sha256": "44559c7260edd90ab0277489f579179cdccb4e1df3705e1777e17a45afae7ac8",
+      "before_sha256": "44559c7260edd90ab0277489f579179cdccb4e1df3705e1777e17a45afae7ac8",
+      "after_sha256": "d51980c399335297edd6e57b48d01674239c08198cf5ad950fcd593efbb5e363",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "9437b6e7fcf91f6074d51ca03a4a63b0345ebe2c4d54bf1675e22d00aaead043"
+          "before": "9437b6e7fcf91f6074d51ca03a4a63b0345ebe2c4d54bf1675e22d00aaead043",
+          "after": "3d3647336b220b2b6fb0ff01857726e549fca26cd8ce567bb3955fe042a97d6a"
         },
-        "with_current_deadly_demise": {
+        "with_current_core_descriptions": {
           "before": null,
-          "after": "46fc83f5746f41585d8aca1d31b963c157fc7a825b012db4f3f12503f484ccea"
+          "after": "6c63c1eefec70dbdf9f6e30b7bc6232c8ee415cf400710ad1ead5083053b83f6"
         }
       }
     },
     "tools/generate_ability_support_matrix.py": {
-      "before_sha256": "637133b98493843facac8dea1a0887905e6443c3a0b355af1a1670b08288d4b8",
-      "after_sha256": "eb4558da6eb2316367fba4011274b67e9bc2b80110a724307dab11ff0229fc29",
+      "before_sha256": "eb4558da6eb2316367fba4011274b67e9bc2b80110a724307dab11ff0229fc29",
+      "after_sha256": "0fec8c2d95705cf06ff51dd17c5f9e3516e0b993707ec0050cf37464970b1759",
       "owners": {
         "@module": {
-          "before": "6643a9b33a30d026df6925f9fdafd868953e3ffb22478cdfb9fd91c350b4cd73",
-          "after": "0a38d0547663e88a22f3dbb2892e7cc2aa04370add2684e67f07e9046b80bb03"
+          "before": "0a38d0547663e88a22f3dbb2892e7cc2aa04370add2684e67f07e9046b80bb03",
+          "after": "b03c0ee85a150ef618aa48f24a76e9dc54851bbc301af5eb8281d9c71fc10d66"
         },
         "_ability_support_catalog_package": {
-          "before": "f23859c4b6aa641a420700d63c2304a1b2f3f72a75dbd9e21ed414bcda5a0f2f",
-          "after": "3c60effbd21b2157b60b79e1c449594bf1c9918d7da69eebf0f8c4cc12f1fd0b"
+          "before": "3c60effbd21b2157b60b79e1c449594bf1c9918d7da69eebf0f8c4cc12f1fd0b",
+          "after": "753f4e4226b06c68266b41631b9e063bf0407309aa0336d0459ca7ec522a42dc"
         }
       }
     },
-    "tools/generate_chaos_daemons_roster_catalog.py": {
-      "before_sha256": "f964fab9f31ee212c2923fc0b98174b64b31e44adc4fb9c06bf25ecf31280811",
-      "after_sha256": "beb857d3dec7d62d5f6efb804ea3c7ddbc97630630d16093de56db90170efde7",
+    "tools/generate_court_of_slaughter_anvanth_catalog.py": {
+      "before_sha256": "e186434b61dd68ec878e1622d35945f941d694783776d47be74d0117a67b56cc",
+      "after_sha256": "2cfaa281577c47cd8614ce5ce51bcc811b381ffaff05cd78fb5e29f1371f25fb",
       "owners": {
         "@module": {
-          "before": "6890916e5d898de232c3debe5a9656b217928a86916f614003f9d2b5fbf27664",
-          "after": "dcaba632cbb346169ce73118b4c50133064fedc302ce4b932865696534f30c17"
+          "before": "ef19af0393d3cf4d4be3a93437e9a160b5f8aec2a99aed1241d94eb4038c6ef9",
+          "after": "ec3f9a9af70272d64911602cc0bf063cbbb6c55600fdc455c1f441566dde6c96"
         },
         "build_catalog_package": {
-          "before": "c2dc9b3d1571716baa307f84bdd9d917dbd69dd62c01228794dc1df6af166a25",
-          "after": "0bcf37754ca5a22779865dff9c6b05440677b6cde7fb60412e71afdbb39cdc86"
+          "before": "e7f7558cf5f99515d2570a0e23eca3b5970e7d42d424c91e86eb8a3678eeae1c",
+          "after": "ecfe9fe60c814ad63793d9acfafb10238c81c99c23156140e5d4ed28d43111b1"
         }
       }
     },
     "tools/performance_policy.py": {
-      "before_sha256": "8b64320d7e27669a897dc2e441acea3f9c0e37a6629841f3468e03a140f9cd63",
-      "after_sha256": "78b0fb430315e772f592ae1cd01e95df78ceb98ca4ed91ee9ba74bb87a58efb9",
+      "before_sha256": "78b0fb430315e772f592ae1cd01e95df78ceb98ca4ed91ee9ba74bb87a58efb9",
+      "after_sha256": "a5c9691703b61c3d6689c5c388f3e86de3082b25ebd2e6aa8ab1c5b8c39e64af",
       "owners": {
-        "deadly_demise_description_smoke_operations": {
+        "core_description_policy_predecessor": {
           "before": null,
-          "after": "30726e1cfeb64f2c6c8deb439db619b68c13f525252dfe4a74fbecab33c589b1"
+          "after": "d149e692484df57db0518e83a5f608c1253df3735894328636d5f84e7ece0b75"
+        },
+        "core_description_smoke_operations": {
+          "before": null,
+          "after": "88eb5b8d1a299ef00fa1f87463a5de271c2aa04b5f198b1b31eba015e9f988b4"
+        },
+        "deadly_demise_description_smoke_operations": {
+          "before": "30726e1cfeb64f2c6c8deb439db619b68c13f525252dfe4a74fbecab33c589b1",
+          "after": "67dcdfe987a0238d41eab0339542ece019d0ce62800bed809d15958e2fbd717a"
         },
         "validate_assessment": {
-          "before": "09e9e7c6c900e73ee7bfa574520c0d5937f39ea5db1934093d38b99d98e7d140",
-          "after": "ff31b1a07d29729093bf089f19dfc1fc533c8f0b053571a527c148743dadf971"
+          "before": "ff31b1a07d29729093bf089f19dfc1fc533c8f0b053571a527c148743dadf971",
+          "after": "824f9859e6ef7f15fd24290750fafd1271627fa808460e9d0e9e404136994251"
         }
       }
     }
@@ -592,25 +648,25 @@
         "d09-authenticated-source-bytes"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Record the bounded current Core catalog description scope, source provenance, newline identity and required qualification metadata.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/quality_shards/all.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/quality_shards/shard-2.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -618,9 +674,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -628,9 +684,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -638,9 +694,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -648,9 +704,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -658,9 +714,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -668,9 +724,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -678,9 +734,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -688,9 +744,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -698,9 +754,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -708,9 +764,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -718,9 +774,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -728,9 +784,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -738,9 +794,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -748,9 +804,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Regenerate current runtime/catalog provenance identities in build and contract publications without changing engine decisions or transport behavior.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -758,9 +814,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Regenerate current runtime/catalog provenance identities in build and contract publications without changing engine decisions or transport behavior.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -768,9 +824,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Regenerate current runtime/catalog provenance identities in build and contract publications without changing engine decisions or transport behavior.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -778,9 +834,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Regenerate current runtime/catalog provenance identities in build and contract publications without changing engine decisions or transport behavior.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -788,9 +844,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Regenerate current runtime/catalog provenance identities in build and contract publications without changing engine decisions or transport behavior.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -798,9 +854,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Regenerate current runtime/catalog provenance identities in build and contract publications without changing engine decisions or transport behavior.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -808,9 +864,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Regenerate current runtime/catalog provenance identities in build and contract publications without changing engine decisions or transport behavior.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -818,9 +874,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Regenerate current runtime/catalog provenance identities in build and contract publications without changing engine decisions or transport behavior.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -828,51 +884,71 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
-    "data/source_audits/deadly_demise_2026_11/catalog-description-delta.json": {
+    "data/source_audits/core_descriptions_2026_11/catalog-description-delta.json": {
       "category": "rule_semantics",
       "operations": [
-        "deadly-demise-description-exact-01"
+        "core-description-source-audit-documents"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Retain and deterministically validate rendered observations, reviewed transcriptions, exact current occurrence closure and immutable baseline projections.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "data/source_audits/core_descriptions_2026_11/reviewed-observations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "core-description-source-audit-documents"
+      ],
+      "selected_families": [],
+      "rationale": "Retain and deterministically validate rendered observations, reviewed transcriptions, exact current occurrence closure and immutable baseline projections.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "data/source_audits/core_descriptions_2026_11/source-admission.audit.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "core-description-source-audit-documents"
+      ],
+      "selected_families": [],
+      "rationale": "Retain and deterministically validate rendered observations, reviewed transcriptions, exact current occurrence closure and immutable baseline projections.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "docs/CORE_CATALOG_DESCRIPTION_SCOPE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the bounded current Core catalog description scope, source provenance, newline identity and required qualification metadata.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Record the bounded current Core catalog description scope, source provenance, newline identity and required qualification metadata.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
-    "docs/DEADLY_DEMISE_DESCRIPTION_SCOPE.md": {
+    "docs/performance/policy-v3/core-description-smoke-scope.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
-    },
-    "docs/performance/policy-v3/deadly-demise-description-smoke-scope.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Record the bounded current Core catalog description scope, source provenance, newline identity and required qualification metadata.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Record the bounded current Core catalog description scope, source provenance, newline identity and required qualification metadata.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -880,49 +956,49 @@
         "order109-unit-control-semantics"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Regenerate current runtime/catalog provenance identities in build and contract publications without changing engine decisions or transport behavior.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/__init__.py": {
+    "src/warhammer40k_core/rules/source_authority_registry.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-authority-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Append exact reviewed Core audit/package registration tuples and update the current registry byte pin while retaining every historical registration.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "src/warhammer40k_core/rules/source_authority_registry.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-authority-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Append exact reviewed Core audit/package registration tuples and update the current registry byte pin while retaining every historical registration.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_descriptions_2026_11/__init__.py": {
       "category": "rule_semantics",
       "operations": [
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Admit and validate complete Core description sources as loaded/not_certified, preserving stable rule IDs and explicitly linked Scout Move evidence.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/_current_source.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_descriptions_2026_11/artifacts/package.json": {
       "category": "rule_semantics",
       "operations": [
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/catalog.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-record"
-      ],
-      "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/deadly-demise-current-source.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-record"
-      ],
-      "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Admit and validate complete Core description sources as loaded/not_certified, preserving stable rule IDs and explicitly linked Scout Move evidence.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/__init__.py": {
       "category": "rule_semantics",
@@ -930,9 +1006,9 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Inherit the native description correction and remove redundant Stealth application, publishing the validated paired catalog identity.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/artifacts/catalog.json": {
       "category": "rule_semantics",
@@ -940,25 +1016,40 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
-    },
-    "tests/code_quality/test_order123_datasheet_identity.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Inherit the native description correction and remove redundant Stealth application, publishing the validated paired catalog identity.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "tests/code_quality/test_performance_policy.py": {
-      "category": "governance",
-      "operations": [],
+      "category": "rule_semantics",
+      "operations": [
+        "deadly-demise-description-exact-06",
+        "core-description-exact-c8a1c41e8f12a86f"
+      ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Protect complete historical payloads, source authority and native parameter/recognition persistence with focused regression and exact policy controls.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "tests/core_description_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "core-description-exact-472add1cc90fc407"
+      ],
+      "selected_families": [],
+      "rationale": "Protect complete historical payloads, source authority and native parameter/recognition persistence with focused regression and exact policy controls.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "tests/infrastructure/source/unit/test_core_catalog_descriptions.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "core-description-exact-fc4c15e5207e0763"
+      ],
+      "selected_families": [],
+      "rationale": "Protect complete historical payloads, source authority and native parameter/recognition persistence with focused regression and exact policy controls.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "tests/infrastructure/source/unit/test_deadly_demise_descriptions.py": {
       "category": "rule_semantics",
@@ -966,19 +1057,30 @@
         "deadly-demise-description-exact-02"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Protect complete historical payloads, source authority and native parameter/recognition persistence with focused regression and exact policy controls.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "tools/build_core_descriptions_source.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "core-description-exact-84fad3ea08abf916"
+      ],
+      "selected_families": [],
+      "rationale": "Retain and deterministically validate rendered observations, reviewed transcriptions, exact current occurrence closure and immutable baseline projections.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "tools/core_deadly_demise_catalog_overlay.py": {
       "category": "rule_semantics",
       "operations": [
-        "deadly-demise-description-exact-03"
+        "deadly-demise-description-exact-03",
+        "core-description-exact-7a1c91b1efe08d78"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Apply five reviewed Core prose replacements at the native catalog boundary; preserve the existing Deadly Demise helper and all structured runtime fields.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "tools/generate_ability_support_matrix.py": {
       "category": "rule_semantics",
@@ -986,31 +1088,32 @@
         "qualification40-exact-ded6452f144f095b"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Apply five reviewed Core prose replacements at the native catalog boundary; preserve the existing Deadly Demise helper and all structured runtime fields.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
-    "tools/generate_chaos_daemons_roster_catalog.py": {
+    "tools/generate_court_of_slaughter_anvanth_catalog.py": {
       "category": "rule_semantics",
       "operations": [
-        "deadly-demise-description-exact-04"
+        "aeldari-current-exact-20"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Inherit the native description correction and remove redundant Stealth application, publishing the validated paired catalog identity.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
     "tools/performance_policy.py": {
       "category": "rule_semantics",
       "operations": [
         "ci64-provenance-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
         "ci67-transaction-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
-        "deadly-demise-description-exact-05"
+        "deadly-demise-description-exact-05",
+        "core-description-exact-1504c891c8d333f3"
       ],
       "selected_families": [],
-      "rationale": "Exact current Deadly Demise descriptor transcription, provenance validation or its required generated and qualification metadata; no unrelated gameplay or dependency change.",
-      "source_obligation": "Use the already-pinned Core section24.08 description after emergency disembark, preserving exact historical bytes, occurrence identities and every structured parameter.",
-      "unchanged_work": "No hot query, algorithm, search, cache policy or gameplay serialization changed. Source-only current catalog construction and exact historical derivation validation; unchanged serial smoke and native parameter controls remain required, without speed claims."
+      "rationale": "Admit only the exact b27 Core description generator delta for serial smoke, authenticating its policy layer back to unchanged PR611 proof bytes.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     }
   },
   "milestone": "ordinary",

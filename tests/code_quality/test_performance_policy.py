@@ -1090,7 +1090,9 @@ def test_deadly_demise_smoke_scope_rejects_unbounded_declarations(
         altered["unreviewed"] = True
 
     def altered_scope(_selected: Path) -> dict[str, object]:
-        return altered
+        if _selected.name == "deadly-demise-description-smoke-scope.json":
+            return altered
+        return read_object(_selected)
 
     monkeypatch.setattr(policy, "read_object", altered_scope)
     with pytest.raises(ValueError, match=r"Unexpected|Descriptor"):
@@ -1107,7 +1109,9 @@ def test_deadly_demise_policy_successor_preserves_exact_predecessor() -> None:
         ROOT / "docs/performance/policy-v3/deadly-demise-description-smoke-scope.json"
     )
     proof = object_value(scope["policy_successor"])
-    raw = (ROOT / "tools/performance_policy.py").read_bytes()
+    from tools.performance_policy import core_description_policy_predecessor
+
+    raw = core_description_policy_predecessor((ROOT / "tools/performance_policy.py").read_bytes())
     expected = subprocess.check_output(
         ["git", "show", "b9d5a54999e9d014cd823a7d2d5c654f05ba2666:tools/performance_policy.py"],
         cwd=ROOT,
@@ -1172,3 +1176,93 @@ def test_deadly_demise_scope_keeps_mandatory_mapping_and_detailed_categories() -
             validate_assessment(
                 assessment, base=base, changes=changes, runtime_id=BUILD, operation_map=mapping
             )
+
+
+def test_core_description_smoke_scope_and_policy_successor_are_exact() -> None:
+    from tools.performance_policy import (
+        core_description_policy_predecessor,
+        core_description_smoke_operations,
+    )
+
+    scope = read_object(ROOT / "docs/performance/policy-v3/core-description-smoke-scope.json")
+    base = "b27c5d4e5f75dd7f89353a968a88d1b24b2681a4"
+    path = "tools/generate_ability_support_matrix.py"
+    change = object_value(scope["changes"])[path]
+    assert core_description_smoke_operations(
+        base=base, path=path, category="rule_semantics", change=change
+    ) == frozenset({"qualification40-exact-ded6452f144f095b"})
+    for altered_base, altered_path, category in (
+        ("a" * 40, path, "rule_semantics"),
+        (base, "tools/ability_support_sources.py", "rule_semantics"),
+        (base, path, "algorithm_or_search"),
+        (base, path, "cache_policy"),
+        (base, path, "serialization_or_replay_work"),
+    ):
+        assert not core_description_smoke_operations(
+            base=altered_base, path=altered_path, category=category, change=change
+        )
+    altered = copy.deepcopy(object_value(change))
+    altered["after_sha256"] = "0" * 64
+    assert not core_description_smoke_operations(
+        base=base, path=path, category="rule_semantics", change=altered
+    )
+    raw = (ROOT / "tools/performance_policy.py").read_bytes()
+    predecessor = subprocess.check_output(
+        ["git", "show", base + ":tools/performance_policy.py"], cwd=ROOT
+    )
+    assert core_description_policy_predecessor(raw) == predecessor
+    for changed in (b"", raw + b"\n", raw.replace(b"category !=", b"category ==", 1)):
+        with pytest.raises(ValueError, match="Core description policy"):
+            core_description_policy_predecessor(changed)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "missing-owner",
+        "extra-owner",
+        "file-hash",
+        "operation",
+        "extra-binding",
+        "extra-field",
+        "proof",
+    ],
+)
+def test_core_description_smoke_scope_rejects_unbounded_declarations(
+    monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
+    from tools import performance_policy as policy
+
+    scope = read_object(ROOT / "docs/performance/policy-v3/core-description-smoke-scope.json")
+    path = "tools/generate_ability_support_matrix.py"
+    change = object_value(scope["changes"])[path]
+    altered = copy.deepcopy(scope)
+    bindings = object_value(altered["changes"])
+    binding = object_value(bindings[path])
+    owners = object_value(binding["owners"])
+    if mutation == "missing-owner":
+        owners.pop("_ability_support_catalog_package")
+    elif mutation == "extra-owner":
+        owners["unreviewed"] = {"before": "1" * 64, "after": "2" * 64}
+    elif mutation == "file-hash":
+        binding["after_sha256"] = "not-a-hash"
+    elif mutation == "operation":
+        object_value(altered["smoke_operations"])[path] = ["cache-policy"]
+    elif mutation == "extra-binding":
+        bindings["unreviewed.py"] = copy.deepcopy(binding)
+    elif mutation == "proof":
+        object_value(altered["policy_successor"])["after_sha256"] = "0" * 64
+    else:
+        altered["unreviewed"] = True
+
+    def altered_scope(_selected: Path) -> dict[str, object]:
+        return altered
+
+    monkeypatch.setattr(policy, "read_object", altered_scope)
+    with pytest.raises(ValueError, match=r"Unexpected|Core description"):
+        policy.core_description_smoke_operations(
+            base="b27c5d4e5f75dd7f89353a968a88d1b24b2681a4",
+            path=path,
+            category="rule_semantics",
+            change=change,
+        )
