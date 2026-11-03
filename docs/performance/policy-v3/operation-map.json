@@ -32806,6 +32806,17 @@
       "sensitive": false,
       "mandatory": false
     },
+    "starfang-deep-strike-exact-7ac0b8f112aa0e6f": {
+      "paths": [
+        "tests/support/acts_preservation.py"
+      ],
+      "owners": [
+        "starfang_provenance_predecessor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
     "starfang-deep-strike-exact-8b414eb3f1be10f4": {
       "paths": [
         "tools/build_starfang_deep_strike_source.py"

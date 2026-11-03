@@ -416,7 +416,7 @@ def aeldari_current_source_rule_semantics_smoke_operations(
 
 
 def starfang_deep_strike_policy_predecessor(raw: bytes) -> bytes:
-    """Authenticate the two source-only admissions before historical policy proofs."""
+    """Authenticate the finite source-only admissions before historical policy proofs."""
     before = "faa07162fff82c6d960d0f8288f8438f8d1bf8b726a502207b941c228eb8002c"
     if digest(raw) == before:
         return raw
@@ -472,12 +472,14 @@ def starfang_deep_strike_policy_predecessor(raw: bytes) -> bytes:
 def starfang_deep_strike_smoke_operations(
     *, base: str, path: str, category: str, change: object
 ) -> frozenset[str]:
-    """Bind only the exact Starfang source inputs and Deep Strike description hook."""
+    """Bind the exact source inputs, description hook and closed provenance admission."""
     sources = "tools/ability_support_sources.py"
     generator = "tools/generate_ability_support_matrix.py"
+    provenance = "tools/source_scope_provenance.py"
     operations = {
         sources: "qualification40-exact-b0712fa66a9cc38e",
         generator: "qualification40-exact-ded6452f144f095b",
+        provenance: "registered-source-provenance-projection",
     }
     if (
         base != "79a27e4a26e180a28457712818d47e274df7c99a"
@@ -506,6 +508,7 @@ def starfang_deep_strike_smoke_operations(
     expected_owners = {
         sources: {"@module", "ability_support_index_inputs", "load_ability_support_sources"},
         generator: {"@module", "_ability_support_catalog_package"},
+        provenance: {"@module", "current_ec_overlay_provenance"},
     }
     for selected, value in bindings.items():
         binding = object_value(value)

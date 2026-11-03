@@ -701,9 +701,14 @@ def test_aeldari_overlay_projects_only_exact_historical_base(
 def test_banshee_eldrad_provenance_successor_preserves_exact_base_and_original_chain() -> None:
     import subprocess
 
-    from tests.support.acts_preservation import defiler_provenance_predecessor
+    from tests.support.acts_preservation import (
+        defiler_provenance_predecessor,
+        starfang_provenance_predecessor,
+    )
 
-    current = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    current = starfang_provenance_predecessor(
+        (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    )
     prior = subprocess.check_output(
         [
             "git",

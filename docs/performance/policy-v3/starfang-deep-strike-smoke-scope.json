@@ -32,6 +32,20 @@
           "after": "8301d8e9d5fa07dd2ad912037c05330cafdee7f9463d122b6fe3f016505749d8"
         }
       }
+    },
+    "tools/source_scope_provenance.py": {
+      "before_sha256": "0fb60a40d260ffb8cf901facf5dacdb1c91562cb382131b3fd795be66d683b9e",
+      "after_sha256": "5c41d1c6c8a0b6d186b60271758cab59d1a268d22d47214597dd60f991f90be6",
+      "owners": {
+        "@module": {
+          "before": "996a6f9a8e034fd90ebfded4e7206f49d322d79ddd489287e8020ad37791524e",
+          "after": "2b0b3678f2a7dc8901b3c76ee8d9fe9c7630328967961fe0fbe60f51c6490b56"
+        },
+        "current_ec_overlay_provenance": {
+          "before": "a56b63fa017579a587e87a826b9bda899dce8157f42bb024ace42e4bf9ff5145",
+          "after": "efc89a02bfee3f2f36101b581a97ed77dc684fe7d24723eb43c99102c6ea093f"
+        }
+      }
     }
   },
   "smoke_operations": {
@@ -40,14 +54,17 @@
     ],
     "tools/generate_ability_support_matrix.py": [
       "qualification40-exact-ded6452f144f095b"
+    ],
+    "tools/source_scope_provenance.py": [
+      "registered-source-provenance-projection"
     ]
   },
-  "source_obligation": "Correct only the ordinary STARFANG keyword source row, preserving the exact plural Starfangs datasheet name, and replace all 28 Deep Strike descriptions (17 native, 6 paired, 5 Daemons) with complete Core 24.09 wording admitted through typed source evidence and existing Core 20.04 Ingress dependency. The two Starfang source artifacts join the existing selected-source index inputs; the catalog generator applies the bounded description overlay.",
-  "unchanged_work": "The source/catalog pipeline adds bounded keyword-overlay admission, two selected-source inputs, complete description replacement and exact successor validation. Existing indexing/query/search algorithms, source-reuse cache policy, gameplay consumers, serializers, descriptor IDs/parameters and eight-inch native Deep Strike policy remain unchanged. Source data changes the real STARFANG membership result. This is a source-rule correction with no deliberate performance or dependency change; identical work counts or measured runtime equivalence are not asserted. All prior mappings, sensitivity, families, historical evidence and budgets remain; final serial current-runtime smoke and live semantic/work/cache checks are required. No timing, detailed-comparison or full-game success is claimed.",
+  "source_obligation": "Correct only the ordinary STARFANG keyword source row, preserving the exact plural Starfangs datasheet name, and replace all 28 Deep Strike descriptions (17 native, 6 paired, 5 Daemons) with complete Core 24.09 wording admitted through typed source evidence and existing Core 20.04 Ingress dependency. The two Starfang source artifacts join the existing selected-source index inputs; the catalog generator applies the bounded description overlay. The existing closed provenance map must admit only the exact Starfang overlay path and raw hash so active source validation can recognize this source successor.",
+  "unchanged_work": "The source/catalog pipeline adds bounded keyword-overlay admission, two selected-source inputs, complete description replacement, exact successor validation and one closed path/raw-hash provenance admission. Existing indexing/query/search algorithms, source-reuse cache policy, gameplay consumers, serializers, descriptor IDs/parameters and eight-inch native Deep Strike policy remain unchanged. Source data changes the real STARFANG membership result. This is a source-rule correction with no deliberate performance or dependency change; identical work counts or measured runtime equivalence are not asserted. All prior mappings, sensitivity, families, historical evidence and budgets remain; final serial current-runtime smoke and live semantic/work/cache checks are required. No timing, detailed-comparison or full-game success is claimed.",
   "policy_successor": {
     "before_sha256": "faa07162fff82c6d960d0f8288f8438f8d1bf8b726a502207b941c228eb8002c",
-    "after_sha256": "c34cf5ac0941885338e966bcb6c2d920b78f363d12b172c249e08dbd51896af4",
-    "function_block_sha256": "88a0832a03ee3d2c1d931fdc94cf87fbdbbca0c3b8200c31cf776c8e73f7b57b",
+    "after_sha256": "368698990a823432d161de6aed76c532a49d2e2a1e77af13d1b198bafbd28cb4",
+    "function_block_sha256": "ba1b011592df1625280db6829775313b59ad733e63d3da52e6e4af34fcd6f1ff",
     "union_call_sha256": "220b32eb02d9e2d79f7a7007780a2dc4f40f3fd3ba48891502db647ec3f9df47",
     "predecessor_call_sha256": "baf49b042b90e8ea7d4c357be98b65b8b538fca32b840e000495cc9e28580d73"
   }

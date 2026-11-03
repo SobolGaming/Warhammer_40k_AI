@@ -26,6 +26,9 @@ from warhammer40k_core.rules.source_authority_registry import (
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_evidence import RuleEvidenceError, SourceEvidenceCatalog
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_deep_strike_description_2026_11 as deep_strike,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_other_concepts_2026_08 as source,
 )
 
@@ -90,10 +93,11 @@ def test_order135_current_source_provider_composes_both_complete_packages() -> N
     assert mirror.app_version is None
     scope = source_authority_registry().scope(CORE_RULES_SOURCE_AUTHORITY_SCOPE)
     assert len(scope.source_packages) == 54
-    assert len(scope.all_source_packages()) == 56
+    assert len(scope.all_source_packages()) == 57
     assert {extension.package_name for extension in scope.source_package_extensions} == {
         "gw-11e-core-other-concepts-battlefield-edge",
         "gw-11e-core-descriptions",
+        "gw-11e-core-deep-strike-description",
     }
     (extension,) = (
         row
@@ -101,6 +105,34 @@ def test_order135_current_source_provider_composes_both_complete_packages() -> N
         if row.package_name == "gw-11e-core-other-concepts-battlefield-edge"
     )
     assert extension.catalog_sha256 == edge.source_catalog.catalog_sha256()
+    package = deep_strike.source_package()
+    (admitted,) = (
+        row
+        for row in scope.source_package_extensions
+        if row.package_name == "gw-11e-core-deep-strike-description"
+    )
+    assert admitted.namespace == "games-workshop"
+    assert admitted.version == "maintained-app-mirror-observed-2026-11-03"
+    assert admitted.allowed_rule_source_ids == ("gw-11e-core-abilities:core:deep-strike",)
+    assert admitted.catalog_sha256 == package.source_catalog.catalog_sha256()
+    assert admitted.catalog_sha256 == (
+        "b0aa31322899f228a564f23bc3b04243f9a335eae71236891a916bec1f501ad2"
+    )
+    assert admitted not in scope.source_packages
+    assert package.source_authority_scope == CORE_RULES_SOURCE_AUTHORITY_SCOPE
+    assert package.evidence_required_source_ids == admitted.allowed_rule_source_ids
+    assert {
+        (record.evidence_kind, record.authority)
+        for record in package.source_evidence_catalog.records
+    } == {
+        ("project_reviewed_app_transcription", "unverified_transcription_only"),
+        ("third_party_mirror", "project_authoritative_app_mirror"),
+    }
+    assert all(
+        (record.load_support_status, record.semantic_execution_status, record.runtime_consumer_ids)
+        == ("loaded", "not_certified", ())
+        for record in package.source_evidence_catalog.records
+    )
 
 
 @pytest.mark.parametrize("removed", [0, 1])
