@@ -17,9 +17,14 @@ from tools.generate_ability_support_matrix import (
 
 from tests.core_description_helpers import (
     before_core_description_correction,
+    before_mandiblasters_correction,
     core_description_audit,
 )
-from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetCatalogError,
+)
 from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.rules_units import RulesUnitComponent, RulesUnitView
 from warhammer40k_core.engine.stealth import (
@@ -186,7 +191,7 @@ def test_historical_projection_authenticates_all_payload_fields(mutation: str) -
 def test_adapter_once_only_deterministic_absent_noop_and_wrong_owner() -> None:
     current = _packages()[0]
     before = before_core_description_correction(current)
-    assert with_current_core_descriptions(before) == current
+    assert with_current_core_descriptions(before) == before_mandiblasters_correction(current)
     assert with_current_core_descriptions(before) == with_current_core_descriptions(before)
     with pytest.raises(ValueError, match="already applied"):
         with_current_core_descriptions(current)
@@ -472,3 +477,82 @@ def test_source_registry_keeps_every_historical_registration_and_source_byte() -
             ["git", "show", base + ":" + artifact.relative_to(root).as_posix()], cwd=root
         )
         assert artifact.read_bytes() == historical
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "text",
+        "identity",
+        "rule_ir",
+        "gate",
+        "missing",
+        "duplicate",
+        "artifact",
+        "other_artifact",
+        "other_descriptor",
+    ],
+)
+def test_mandiblasters_successor_projection_rejects_unreviewed_bytes(mutation: str) -> None:
+    from copy import deepcopy
+
+    package = _packages()[0]
+    owner = package.army_catalog.datasheet_by_id("000000595")
+    ability = next(a for a in owner.abilities if a.ability_id == "000000595:mandiblasters")
+    changed = ability
+    if mutation == "text":
+        changed = replace(ability, effect_description=ability.effect_description + " Drift.")
+    elif mutation == "identity":
+        changed = replace(ability, source_id=ability.source_id + ":drift")
+    elif mutation in {"rule_ir", "gate"}:
+        payload = deepcopy(ability.rule_ir_payload)
+        assert payload is not None
+        if mutation == "rule_ir":
+            payload["ir_hash"] = "0" * 64
+        else:
+            from typing import cast
+
+            raw = cast(dict[str, Any], payload)
+            raw["clauses"][0]["effects"][0]["parameters"] = [
+                p
+                for p in raw["clauses"][0]["effects"][0]["parameters"]
+                if p["key"] != "requires_charge_move_this_turn"
+            ]
+        changed = replace(ability, rule_ir_payload=payload)
+    abilities = tuple(changed if a is ability else a for a in owner.abilities)
+    if mutation == "missing":
+        abilities = tuple(a for a in abilities if a is not ability)
+    elif mutation == "duplicate":
+        abilities = (*abilities, replace(ability, source_id=ability.source_id + ":duplicate"))
+        # The real typed catalog rejects this malformed duplicate before a
+        # package can reach the historical projection. Preserve that boundary.
+        with pytest.raises(DatasheetCatalogError, match="duplicate ability IDs"):
+            replace(owner, abilities=abilities)
+        return
+    package = replace(
+        package,
+        army_catalog=replace(
+            package.army_catalog,
+            datasheets=tuple(
+                replace(row, abilities=abilities) if row is owner else row
+                for row in package.army_catalog.datasheets
+            ),
+        ),
+    )
+    if mutation in {"artifact", "other_artifact"}:
+        target = next(
+            a
+            for a in package.source_artifacts
+            if (a.artifact_name == "Datasheets_abilities.json") is (mutation == "artifact")
+        )
+        package = replace(
+            package,
+            source_artifacts=tuple(
+                replace(a, artifact_hash="0" * 64) if a is target else a
+                for a in package.source_artifacts
+            ),
+        )
+    elif mutation == "other_descriptor":
+        package = _mutate(package, "gameplay")
+    with pytest.raises(AssertionError):
+        before_core_description_correction(package)

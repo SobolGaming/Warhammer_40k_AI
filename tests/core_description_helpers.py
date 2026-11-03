@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import replace
 from functools import cache
+from hashlib import sha256
 from pathlib import Path
 from typing import Any, cast
 
@@ -14,7 +15,91 @@ from tools.core_deadly_demise_catalog_overlay import (
 )
 
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
+from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
 from warhammer40k_core.rules.source_catalog import SourceArtifactHash
+
+# This is an authenticated successor projection for old description-only tests,
+# not a runtime adapter or permission to erase arbitrary later source changes.
+_MANDIBLASTERS_CURRENT_DESCRIPTOR = (
+    "de7f25671f28ef4e1e172fa559a6965cd3090321d8d572ede41f7213a546f366"
+)
+_MANDIBLASTERS_PRIOR_DESCRIPTOR = "5703c37d361330d4eeae3d25d75d05bcd6fc394e24cb9338de96c7ea9ebde19a"
+_MANDIBLASTERS_PRIOR_IR = "ab5ab419648b4f1d43fa1d5e993c6a7568e887c1de509579e958a61548945555"
+_ABILITY_ARTIFACT_CURRENT = "9845d550d30aa6118d9adc2942ff21d0c03159fd9ab381f6742e7e08d35d26fd"
+_ABILITY_ARTIFACT_PRIOR = "0311a59d21bbd08984f40ba3c0f9df1172be131d85777c0647b8cc50cbb186af"
+
+
+def before_mandiblasters_correction(package: CanonicalCatalogPackage) -> CanonicalCatalogPackage:
+    """Project only exact reviewed descriptor and compiled-artifact successors."""
+    observed = tuple(
+        (row, ability)
+        for row in package.army_catalog.datasheets
+        for ability in row.abilities
+        if ability.ability_id == "000000595:mandiblasters"
+    )
+    artifacts = tuple(
+        a for a in package.source_artifacts if a.artifact_name == "Datasheets_abilities.json"
+    )
+    if not observed:
+        assert all(a.artifact_hash != _ABILITY_ARTIFACT_CURRENT for a in artifacts)
+        return package
+    assert len(observed) == 1
+    owner, ability = observed[0]
+    assert owner.datasheet_id == "000000595"
+    assert len(artifacts) == 1
+    assert artifacts[0].artifact_hash == _ABILITY_ARTIFACT_CURRENT
+    assert (
+        sha256(
+            json.dumps(ability.to_payload(), sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        == _MANDIBLASTERS_CURRENT_DESCRIPTOR
+    )
+    assert ability.rule_ir_payload is not None
+    rule = RuleIR.from_payload(cast(RuleIRPayload, ability.rule_ir_payload))
+    clause = rule.clauses[0]
+    effect = clause.effects[0]
+    prior_rule = replace(
+        rule,
+        clauses=(
+            replace(
+                clause,
+                effects=(
+                    replace(
+                        effect,
+                        parameters=tuple(
+                            p
+                            for p in effect.parameters
+                            if p.key not in {"weapon_scope", "requires_charge_move_this_turn"}
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+    assert prior_rule.ir_hash() == _MANDIBLASTERS_PRIOR_IR
+    prior = replace(ability, rule_ir_payload=cast(Any, prior_rule.to_payload()))
+    assert (
+        sha256(
+            json.dumps(prior.to_payload(), sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        == _MANDIBLASTERS_PRIOR_DESCRIPTOR
+    )
+    return replace(
+        package,
+        army_catalog=replace(
+            package.army_catalog,
+            datasheets=tuple(
+                replace(row, abilities=tuple(prior if a is ability else a for a in row.abilities))
+                if row is owner
+                else row
+                for row in package.army_catalog.datasheets
+            ),
+        ),
+        source_artifacts=tuple(
+            replace(a, artifact_hash=_ABILITY_ARTIFACT_PRIOR) if a is artifacts[0] else a
+            for a in package.source_artifacts
+        ),
+    )
 
 
 @cache
@@ -31,6 +116,7 @@ def core_description_audit() -> dict[str, Any]:
 
 def before_core_description_correction(package: CanonicalCatalogPackage) -> CanonicalCatalogPackage:
     """Authenticate complete current payload while projecting only the approved delta."""
+    package = before_mandiblasters_correction(package)
     audit = core_description_audit()
     surface = next(
         row for row in audit["surfaces"] if row["catalog_id"] == package.army_catalog.catalog_id

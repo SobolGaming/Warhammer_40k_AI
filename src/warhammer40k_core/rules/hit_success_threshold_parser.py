@@ -27,6 +27,11 @@ _CRITICAL_HIT_THRESHOLD_RE = re.compile(
     r"(?:\s+as\s+well)?(?=\s*(?:\.|,|;|$))",
     re.IGNORECASE,
 )
+_CHARGED_MELEE_SELF_RE = re.compile(
+    r"^\s*Each\s+time\s+a\s+model\s+in\s+this\s+unit\s+makes\s+a\s+melee\s+attack,"
+    r"\s*if\s+it\s+made\s+a\s+Charge\s+move\s+this\s+turn,\s*an?\s*$",
+    re.IGNORECASE,
+)
 _SNAP_SHOOTING_RE = re.compile(
     r"^\s*(?:when|while)\s+(?:(?:this|that)\s+(?:model|unit)\s+is\s+)?"
     r"Snap\s+Shooting\s*,",
@@ -85,6 +90,11 @@ def hit_success_threshold_effects(
                     ("attack_role", "attacker"),
                     ("critical_threshold", int(match.group("threshold"))),
                     *_targeting_parameters(clause_text),
+                    *(
+                        (("weapon_scope", "melee"), ("requires_charge_move_this_turn", True))
+                        if _CHARGED_MELEE_SELF_RE.fullmatch(clause_text[: match.start()])
+                        else ()
+                    ),
                 )
             ),
         )

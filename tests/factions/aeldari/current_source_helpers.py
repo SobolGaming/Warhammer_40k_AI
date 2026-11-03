@@ -114,6 +114,8 @@ def charge(
                 for o in r.options
                 if isinstance(o.payload, dict) and o.payload.get("target_ids") == [enemy_id]
             )
+        elif r.decision_type in {"select_core_ability_instance", "resolve_sequencing_order"}:
+            option = r.options[0]
         elif r.decision_type == "select_charge_declaration_grant" and use_flitting:
             option = next(o for o in r.options if "flitting_shadows" in o.option_id)
         else:
