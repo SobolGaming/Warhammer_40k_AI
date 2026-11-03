@@ -32376,6 +32376,346 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "lhykhis-exact-cffdf7e7a0c07b7a": {
+      "paths": [
+        "data/generated/ability_coverage/aeldari_ability_semantic_descriptions.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-41f5519113e60249": {
+      "paths": [
+        "data/generated/ability_coverage/aeldari_datasheet_semantic_coverage.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-483d16e8f55a5c3c": {
+      "paths": [
+        "data/source_manifests/aeldari_ability_semantic_description_text_v2.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-73ab472a68c6d196": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_completion_sequencing.py"
+      ],
+      "owners": [
+        "attack_completion_timing_context"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-72349955414de1ac": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_completion_triggers.py"
+      ],
+      "owners": [
+        "_model_context_for_trigger",
+        "observe_attack_completion"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-ca5d74660c5ad20d": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_completion_hooks.py"
+      ],
+      "owners": [
+        "AttackSequenceCompletedContext",
+        "AttackSequenceCompletedContext.__post_init__",
+        "AttackSequenceCompletedHookBinding",
+        "AttackSequenceCompletedHookBinding.__post_init__",
+        "AttackSequenceCompletedHookRegistry.candidates_for"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-02a3d5aeb86a46c9": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_model_post_shoot_groups.py"
+      ],
+      "owners": [
+        "@module",
+        "model_shooting_boundary_sources",
+        "post_shoot_groups_for_record"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-4ff18d7238dfdaaf": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_selected_hit_threshold.py"
+      ],
+      "owners": [
+        "@module",
+        "selected_target_hit_threshold_is_supported"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-a6a44fd11ba7104e": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_selected_target_effects.py"
+      ],
+      "owners": [
+        "CatalogSelectedTargetEffectRuntime.attack_sequence_completed_bindings",
+        "_post_shoot_groups_for_record",
+        "_post_shoot_target_ids_allowed_by_frequency",
+        "post_shoot_hit_target_effect_groups",
+        "post_shoot_target_ids_allowed_by_frequency"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-e2e16e9cbcbe16cd": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_selected_target_history_authority.py"
+      ],
+      "owners": [
+        "_authenticated_attack_sequence",
+        "validate_catalog_selected_target_loaded_source_authority"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-920cb2383c863617": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_selected_target_pair_support.py"
+      ],
+      "owners": [
+        "_effect_trigger_is_supported",
+        "_selected_target_effect_is_supported"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-f3b8b8f0b47f3905": {
+      "paths": [
+        "src/warhammer40k_core/engine/model_shooting_completion.py"
+      ],
+      "owners": [
+        "@module",
+        "before_shooting_gathering",
+        "model_completion_boundary",
+        "source_model_completion_event_id"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-4ae20fd642e2091e": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/shooting_handler.py"
+      ],
+      "owners": [
+        "ShootingPhaseHandler.advance_out_of_phase_shooting_if_needed"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-b3bbabdda8f5de9c": {
+      "paths": [
+        "src/warhammer40k_core/engine/rule_trigger_runtime.py"
+      ],
+      "owners": [
+        "_attack_candidates",
+        "_internal_action_in_progress",
+        "validate_trigger_order_candidates"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-1e86fc748432639f": {
+      "paths": [
+        "src/warhammer40k_core/rules/hit_success_threshold_parser.py"
+      ],
+      "owners": [
+        "_selected_model_parameters",
+        "selected_target_model_attack_match"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-02c073ca533cca5b": {
+      "paths": [
+        "src/warhammer40k_core/rules/rule_parser_selected_target_extensions.py"
+      ],
+      "owners": [
+        "parse_selected_target_attack_conditions"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-08ba79d7ecd48097": {
+      "paths": [
+        "src/warhammer40k_core/rules/selected_model_hit_successor.py"
+      ],
+      "owners": [
+        "@module",
+        "_successor",
+        "current_datasheet_rule_ir"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-417759c1e7ef73f6": {
+      "paths": [
+        "src/warhammer40k_core/rules/wahapedia_static_rule_ir.py"
+      ],
+      "owners": [
+        "datasheet_rule_ir_payload_by_source_row_id"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-472add1cc90fc407": {
+      "paths": [
+        "tests/core_description_helpers.py"
+      ],
+      "owners": [
+        "before_lhykhis_correction"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-95625f54eed53707": {
+      "paths": [
+        "tests/factions/aeldari/lhykhis_completion_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "assert_partial_completion_authority"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-cd892c3fbcd100de": {
+      "paths": [
+        "tests/factions/aeldari/lhykhis_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "_record_wounded_source",
+        "_verify_scene_geometry",
+        "activate_web",
+        "assert_native_source_loss",
+        "choose",
+        "declare_web",
+        "drive_to",
+        "hit_with_face",
+        "legal_shooting_payload",
+        "submit_melee_toward",
+        "web_scene"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-8c6a38960292a341": {
+      "paths": [
+        "tests/factions/aeldari/unit/test_lhykhis.py"
+      ],
+      "owners": [
+        "@module",
+        "native_definitions",
+        "test_attached_model_completion_selects_only_its_hits_and_restores",
+        "test_bodyguard_hits_or_empty_selection_cannot_activate_source",
+        "test_compiled_grant_requires_every_typed_gate",
+        "test_final_model_and_unit_candidates_share_core_sequencing",
+        "test_finite_selection_rejects_wrong_actor_stale_option_and_payload",
+        "test_later_native_ranged_attacks_use_mark_and_resume_pending_work",
+        "test_marked_native_ranged_and_melee_faces_use_shared_provenance",
+        "test_native_attached_target_survives_bodyguard_loss_with_same_mark_identity",
+        "test_native_charge_fight_critical_five_is_lethal_and_turn_expiry_replays",
+        "test_native_source_death_does_not_revoke_existing_turn_grant",
+        "test_native_source_last_killed_target_has_no_selection",
+        "test_native_torrent_hits_without_damage_require_target_choice",
+        "test_physical_attacker_keyword_cannot_be_borrowed_from_unit_union"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-fc4c15e5207e0763": {
+      "paths": [
+        "tests/infrastructure/source/unit/test_core_catalog_descriptions.py"
+      ],
+      "owners": [
+        "test_current_model_hit_successor_is_bound_by_source_index_provenance",
+        "test_lhykhis_historical_projection_rejects_unreviewed_bytes",
+        "test_lhykhis_projection_rejects_current_artifact_without_its_source",
+        "test_model_hit_threshold_compiler_preserves_neighboring_source_rules"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-fcc76b31fd760a97": {
+      "paths": [
+        "tools/generate_aeldari_banshees_phoenix_lords_spiritseer_rule_ir.py"
+      ],
+      "owners": [
+        "_rule_ir"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-799b009a3dedc70b": {
+      "paths": [
+        "tools/generate_selected_model_hit_current.py"
+      ],
+      "owners": [
+        "@module",
+        "generated_payload",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "lhykhis-exact-1504c891c8d333f3": {
+      "paths": [
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "whispering_web_policy_predecessor",
+        "whispering_web_smoke_operations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

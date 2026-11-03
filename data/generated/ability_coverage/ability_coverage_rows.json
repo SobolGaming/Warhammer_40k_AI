@@ -3832,7 +3832,8 @@
     "datasheet_name": "Lhykhis",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
-      "catalog-ir:critical-hit-threshold"
+      "catalog-ir:critical-hit-threshold",
+      "catalog-ir:post-shoot-hit-target-effect"
     ],
     "semantic_categories": [
       "datasheet.rule_ir.set_contextual_status.friendly_unit"

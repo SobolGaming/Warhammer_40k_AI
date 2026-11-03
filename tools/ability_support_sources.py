@@ -218,6 +218,10 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
                 Path(banshee_eldrad.__file__).with_name(banshee_eldrad.AUDIT_ARTIFACT_NAME),
                 Path(aeldari_current.__file__).with_name(aeldari_current.AUDIT_ARTIFACT_NAME),
                 rules / "source_authority_registry.json",
+                rules
+                / "source_packages"
+                / "warhammer_40000_11th"
+                / "selected_model_hit_current_2026_11.json",
                 Path(sorcerer_current.__file__).with_name(sorcerer_current.ARTIFACT_NAME),
                 Path(emperors_children_profiles.__file__).with_name(
                     emperors_children_profiles.ARTIFACT_NAME

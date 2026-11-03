@@ -1,7 +1,7 @@
 {
   "coverage_schema_version": "aeldari-datasheet-semantic-coverage-v4",
-  "coverage_sha256": "6966d27c80a9ac0a0eb4f11ecd53de7f68b6636797af55807c76c3e435e2f1b0",
-  "description_text_sha256": "11aecb7f4401baf9203720f4664dbe07a6ebb663ea0b3bd684a963c3bd5117ed",
+  "coverage_sha256": "fa38fcbc81eaceda7b128b28806e4bf02e5df50f59cb85ccd999d3e01692340f",
+  "description_text_sha256": "07ea3ea051c9e5858138d25fbf83acab21a52e05a9d270b90aff859851db9b72",
   "descriptions": [
     {
       "ability_id": "000000568:diviner-of-futures",
@@ -3425,16 +3425,18 @@
       "description": "Post-shoot target tracking and the Critical Hit threshold are consumed.",
       "diagnostic_reasons": [],
       "documentation_bucket": "supported",
-      "evidence_sha256": "3102732958645b5bd9cd1a336950b040aff960edd197b2f50e29266a3faa36a6",
+      "evidence_sha256": "dcde90472bbd8bf9039d6f12aaff888c77df3cc6d39745d9a50428a16187a1b5",
       "normalized_text_sha256": "15db9ab0d9f420ce9a350f1d40d8da9c60001f2ec7457334b39dbb57508aa60f",
       "raw_text_sha256": "15db9ab0d9f420ce9a350f1d40d8da9c60001f2ec7457334b39dbb57508aa60f",
       "runtime_consumer_ids": [
-        "catalog-ir:critical-hit-threshold"
+        "catalog-ir:critical-hit-threshold",
+        "catalog-ir:post-shoot-hit-target-effect"
       ],
       "semantic_consumers": [
         {
           "runtime_consumer_ids": [
-            "catalog-ir:critical-hit-threshold"
+            "catalog-ir:critical-hit-threshold",
+            "catalog-ir:post-shoot-hit-target-effect"
           ],
           "semantic_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5:clause:002:effect:0",
           "semantic_kind": "set_contextual_status"

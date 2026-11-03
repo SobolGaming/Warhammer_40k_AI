@@ -43,6 +43,11 @@ def observe_attack_completion(
                 "source_phase": context.source_phase.value,
                 "trigger_event_id": context.attack_sequence_completed_event_id,
                 "attack_sequence": context.attack_sequence.to_payload(),
+                **(
+                    {"completed_model_instance_ids": list(context.completed_model_instance_ids)}
+                    if context.completed_model_instance_ids is not None
+                    else {}
+                ),
             }
         ),
     )
@@ -57,6 +62,10 @@ def attack_context_for_trigger(
     runtime_modifiers: RuntimeModifierRegistry,
 ) -> AttackSequenceCompletedContext:
     payload = trigger.context
+    if isinstance(payload, dict) and "completed_model_instance_ids" in payload:
+        return _model_context_for_trigger(
+            state=state, decisions=decisions, trigger=trigger, runtime_modifiers=runtime_modifiers
+        )
     if (
         trigger.kind is not RuleTriggerKind.ATTACK_COMPLETION
         or not isinstance(payload, dict)
@@ -213,3 +222,55 @@ def resolve_attack_trigger(
     ):
         complete_rule_trigger(decisions=context.decisions, trigger=trigger)
     return status
+
+
+def _model_context_for_trigger(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    trigger: RuleTrigger,
+    runtime_modifiers: RuntimeModifierRegistry,
+) -> AttackSequenceCompletedContext:
+    from warhammer40k_core.engine.model_shooting_completion import model_completion_boundary
+
+    payload = trigger.context
+    if (
+        trigger.kind is not RuleTriggerKind.ATTACK_COMPLETION
+        or not isinstance(payload, dict)
+        or set(payload)
+        != {
+            "game_id",
+            "battle_round",
+            "phase",
+            "source_phase",
+            "trigger_event_id",
+            "attack_sequence",
+            "completed_model_instance_ids",
+        }
+        or type(payload["trigger_event_id"]) is not str
+    ):
+        raise GameLifecycleError("Model completion trigger schema drift.")
+    sequence, ids, evidence = model_completion_boundary(
+        decisions.event_log.records, payload["trigger_event_id"]
+    )
+    if (
+        payload["attack_sequence"] != sequence.to_payload()
+        or payload["completed_model_instance_ids"] != list(ids)
+        or payload["game_id"] != state.game_id
+        or evidence.get("game_id") != state.game_id
+        or payload["battle_round"] != evidence.get("battle_round")
+        or payload["phase"] != evidence.get("phase")
+        or payload["source_phase"] != evidence.get("attack_phase")
+        or sequence.source_phase is not BattlePhase.SHOOTING
+    ):
+        raise GameLifecycleError("Model completion trigger executor authority drift.")
+    return AttackSequenceCompletedContext(
+        state=state,
+        decisions=decisions,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        runtime_modifier_registry=runtime_modifiers,
+        source_phase=sequence.source_phase,
+        attack_sequence=sequence,
+        attack_sequence_completed_event_id=payload["trigger_event_id"],
+        completed_model_instance_ids=ids,
+    )

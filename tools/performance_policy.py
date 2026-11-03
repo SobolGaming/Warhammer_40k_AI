@@ -415,8 +415,149 @@ def aeldari_current_source_rule_semantics_smoke_operations(
     return frozenset({operations[path]})
 
 
+def whispering_web_policy_predecessor(raw: bytes) -> bytes:
+    """Authenticate the bounded source-rule registration and reconstruct prior bytes."""
+    before = "a5c9691703b61c3d6689c5c388f3e86de3082b25ebd2e6aa8ab1c5b8c39e64af"
+    if digest(raw) == before:
+        return raw
+    scope = read_object(
+        Path(__file__).resolve().parents[1]
+        / "docs/performance/policy-v3/whispering-web-smoke-scope.json"
+    )
+    proof = object_value(scope["policy_successor"])
+    _keys(
+        proof,
+        {
+            "before_sha256",
+            "after_sha256",
+            "function_block_sha256",
+            "union_call_sha256",
+            "predecessor_call_sha256",
+        },
+    )
+    if any(
+        not isinstance(value, str)
+        or len(value) != 64
+        or any(character not in "0123456789abcdef" for character in value)
+        for value in proof.values()
+    ):
+        raise ValueError("Core description policy: Whispering Web requires exact proof hashes.")
+    if proof["before_sha256"] != before or digest(raw) != proof["after_sha256"]:
+        raise ValueError("Core description policy: Whispering Web successor bytes drifted.")
+    start = raw.index(b"def whispering_web_policy_predecessor(")
+    end = raw.index(b"\ndef core_description_policy_predecessor(", start) + 1
+    block = raw[start:end]
+    call = (
+        b"            | whispering_web_smoke_operations(\n"
+        b"                base=base, path=path, category=category, change=changes[path]\n"
+        b"            )\n"
+    )
+    predecessor = b"    raw = whispering_web_policy_predecessor(raw)\n"
+    if any(
+        raw.count(part) != 1 or digest(part) != proof[key]
+        for part, key in (
+            (block, "function_block_sha256"),
+            (call, "union_call_sha256"),
+            (predecessor, "predecessor_call_sha256"),
+        )
+    ):
+        raise ValueError("Core description policy: Whispering Web registration drifted.")
+    prior = raw.replace(block, b"", 1).replace(call, b"", 1).replace(predecessor, b"", 1)
+    if digest(prior) != before:
+        raise ValueError("Core description policy: Whispering Web predecessor bytes drifted.")
+    return prior
+
+
+def whispering_web_smoke_operations(
+    *, base: str, path: str, category: str, change: object
+) -> frozenset[str]:
+    """Recognize only the exact current source repair and its required source input."""
+    completion = "src/warhammer40k_core/engine/attack_completion_triggers.py"
+    shooting = "src/warhammer40k_core/engine/phases/shooting_handler.py"
+    sources = "tools/ability_support_sources.py"
+    operations = {
+        completion: "cumulative-exact-008",
+        shooting: "order103-src-warhammer40k_core-engine-phases-shooting_handler",
+        sources: "qualification40-exact-b0712fa66a9cc38e",
+    }
+    if (
+        base != "3aadf2721f23381cb57088f63ad8e79d19599cbd"
+        or category != "rule_semantics"
+        or path not in operations
+    ):
+        return frozenset()
+    scope = read_object(
+        Path(__file__).resolve().parents[1]
+        / "docs/performance/policy-v3/whispering-web-smoke-scope.json"
+    )
+    _keys(
+        scope,
+        {
+            "base",
+            "changes",
+            "smoke_operations",
+            "source_obligation",
+            "unchanged_work",
+            "policy_successor",
+        },
+    )
+    whispering_web_policy_predecessor(Path(__file__).read_bytes())
+    bindings = object_value(scope["changes"])
+    _keys(bindings, set(operations))
+    expected_owners = {
+        completion: {
+            "_model_context_for_trigger",
+            "attack_context_for_trigger",
+            "observe_attack_completion",
+        },
+        shooting: {
+            "@module",
+            "ShootingPhaseHandler.advance_out_of_phase_shooting_if_needed",
+            "ShootingPhaseHandler.begin_phase",
+        },
+        sources: {"ability_support_index_inputs"},
+    }
+    for selected, value in bindings.items():
+        binding = object_value(value)
+        _keys(binding, {"before_sha256", "after_sha256", "owners"})
+        owners = object_value(binding["owners"])
+        _keys(owners, expected_owners[selected])
+        pairs = {
+            "@file": {"before": binding["before_sha256"], "after": binding["after_sha256"]},
+            **owners,
+        }
+        for owner, pair_value in pairs.items():
+            pair = object_value(pair_value)
+            _keys(pair, {"before", "after"})
+            for direction, value in pair.items():
+                if (
+                    selected == completion
+                    and owner == "_model_context_for_trigger"
+                    and direction == "before"
+                ):
+                    if value is not None:
+                        raise ValueError(
+                            "Whispering Web new completion owner must have no predecessor."
+                        )
+                    continue
+                if (
+                    not isinstance(value, str)
+                    or len(value) != 64
+                    or any(character not in "0123456789abcdef" for character in value)
+                ):
+                    raise ValueError("Whispering Web smoke scope requires exact hashes.")
+    if object_value(scope["smoke_operations"]) != {
+        selected: [operation] for selected, operation in operations.items()
+    }:
+        raise ValueError("Whispering Web smoke scope requires each sole exact operation.")
+    if scope["base"] != base or bindings[path] != change:
+        return frozenset()
+    return frozenset({operations[path]})
+
+
 def core_description_policy_predecessor(raw: bytes) -> bytes:
     """Authenticate this bounded registration before applying historical policy proofs."""
+    raw = whispering_web_policy_predecessor(raw)
     scope = read_object(
         Path(__file__).resolve().parents[1]
         / "docs/performance/policy-v3/core-description-smoke-scope.json"
@@ -843,6 +984,9 @@ def validate_assessment(
                 base=base, path=path, category=category, change=changes[path]
             )
             | aeldari_current_source_rule_semantics_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | whispering_web_smoke_operations(
                 base=base, path=path, category=category, change=changes[path]
             )
             | core_description_smoke_operations(

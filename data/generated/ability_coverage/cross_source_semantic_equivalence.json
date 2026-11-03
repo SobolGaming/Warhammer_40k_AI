@@ -52808,7 +52808,7 @@
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "557ac47c9ef569db4b2a3f4e2f84d51194113793f609fb05725291a36a336a91",
+      "equivalence_hash": "09a01b9d73a8298c371bb1f0e929943fdc1247f50031a118fd5439da1c8938ab",
       "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
@@ -52820,10 +52820,11 @@
       "rule_name": "Whispering Web",
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [
-        "catalog-ir:critical-hit-threshold"
+        "catalog-ir:critical-hit-threshold",
+        "catalog-ir:post-shoot-hit-target-effect"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": "44e6d83ef3307a66f4d50531915b4c2fdc7b33cb3eb447992bad2866e2ff5ba5",
+      "semantic_hash": "e631e8d4ba35a58e6285ceedca3bc9d3fb531c4a512d6e4de7cea066db9dbc74",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003909:5"
       ],
@@ -121988,7 +121989,7 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "2a9af1b0d3752494a68c04fe758a06b43d02c00938fb86330bc8eda5a665e820",
+  "source_payload_checksum_sha256": "af145c00446eba18cb6daff98fb69f41a94a7db124682215c9ce4bf50ee50788",
   "source_text_unavailable_member_count": 111,
   "structured_member_count": 808,
   "upstream_execution_checksum_sha256": "6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c"

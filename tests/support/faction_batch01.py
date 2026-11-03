@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from copy import deepcopy
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -183,8 +183,10 @@ def scene(
     active: str = "owner",
     seed: str = "faction-batch01",
     attachments: tuple[AttachmentDeclaration, ...] = (),
+    enemy_attachments: tuple[AttachmentDeclaration, ...] = (),
     setup: bool = False,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+    detachment_id_by_faction: Mapping[str, str] | None = None,
 ) -> Scene:
     from tests.support.section10_fixtures import shooting_mission
 
@@ -198,7 +200,11 @@ def scene(
             if set(f.faction_keywords) & set(sheet.keywords.faction_keywords)
         )
         faction = faction_definition.faction_id
-        detachment = next(did for fid, did in FACTIONS.values() if fid == faction)
+        detachment = (
+            detachment_id_by_faction[faction]
+            if detachment_id_by_faction is not None and faction in detachment_id_by_faction
+            else next(did for fid, did in FACTIONS.values() if fid == faction)
+        )
         requests.append(
             ArmyMusterRequest(
                 army_id=army_id,
@@ -209,7 +215,7 @@ def scene(
                 detachment_selection=DetachmentSelection(faction, (detachment,)),
                 force_disposition_id="take-and-hold" if player == "owner" else "purge-the-foe",
                 unit_selections=selections,
-                attachment_declarations=attachments if player == "owner" else (),
+                attachment_declarations=attachments if player == "owner" else enemy_attachments,
             )
         )
     mission = replace(shooting_mission(), terrain_features=terrain_features)

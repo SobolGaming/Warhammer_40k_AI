@@ -352,7 +352,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:passive-hit-reroll` | Reavers of the Void |
 | `catalog-ir:poisoned-command-mortal-wounds` | Daemonic Poisons |
 | `catalog-ir:post-fight-hit-target-effect` | Daemonic Poisons |
-| `catalog-ir:post-shoot-hit-target-effect` | Crystalline Targeting<br>Daemonic Poisons<br>Doom Siren<br>Fury of the Void (Psychic)<br>Harassment Fire<br>Lethal Obsession<br>Monofilament Web<br>Terrifying Crescendo<br>Wracking Agonies (Psychic) |
+| `catalog-ir:post-shoot-hit-target-effect` | Crystalline Targeting<br>Daemonic Poisons<br>Doom Siren<br>Fury of the Void (Psychic)<br>Harassment Fire<br>Lethal Obsession<br>Monofilament Web<br>Terrifying Crescendo<br>Whispering Web<br>Wracking Agonies (Psychic) |
 | `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth<br>Target Acquisition |
 | `catalog-ir:prebattle-redeploy-permission` | Prince of Corsairs |
 | `catalog-ir:prebattle-unit-split` | No current generated rows |

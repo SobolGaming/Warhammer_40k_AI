@@ -579,6 +579,23 @@ def _matching_generic_attack_effects(
             )
             if generic_effect is None:
                 continue
+            from warhammer40k_core.engine.catalog_model_scope import (
+                scoped_roll_model_ids_for_effect,
+            )
+
+            model_keyword = generic_effect.parameters.get("required_model_keyword")
+            if model_keyword is not None and type(model_keyword) is not str:
+                raise GameLifecycleError("Generic attack physical-model keyword must be a string.")
+            if model_keyword is not None and (
+                attacker_model_id is None
+                or attacker_model_id
+                not in scoped_roll_model_ids_for_effect(
+                    source_rules_unit=attacker_rules_unit,
+                    current_roll_model_instance_ids=(attacker_model_id,),
+                    effect_parameters={"required_model_keyword": model_keyword},
+                )
+            ):
+                continue
             if not generic_effect_role_applies(
                 effect=generic_effect,
                 role=role,

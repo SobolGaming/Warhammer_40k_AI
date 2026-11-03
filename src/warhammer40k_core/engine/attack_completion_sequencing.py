@@ -47,10 +47,18 @@ def attack_completion_timing_context(
             trigger_event_id=context.attack_sequence_completed_event_id,
             descriptor=TimingWindowDescriptor(
                 descriptor_id="attack-completion-sequencing",
-                trigger_kind=TimingTriggerKind.AFTER_UNIT_ATTACKS_RESOLVED,
+                trigger_kind=(
+                    TimingTriggerKind.AFTER_UNIT_ATTACKS_RESOLVED
+                    if context.completed_model_instance_ids is None
+                    else TimingTriggerKind.AFTER_MODEL_ATTACKS_RESOLVED
+                ),
                 source_rule_id=RULES_SEQUENCING_SOURCE_ID,
                 phase=phase,
-                source_step="attack_sequence_completed",
+                source_step=(
+                    "attack_sequence_completed"
+                    if context.completed_model_instance_ids is None
+                    else "attack_sequence_models_attacked"
+                ),
             ),
         ),
     )

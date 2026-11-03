@@ -188,6 +188,7 @@ def validate_catalog_selected_target_loaded_source_authority(
         payload=payload,
         player_id=player_id,
         source_rules_unit_id=source_rules_unit_ids[0],
+        selection_clause=selection_clause,
     )
     source_model_id = _optional_identifier(
         payload.get("source_model_instance_id"), "source model ID"
@@ -656,6 +657,7 @@ def _authenticated_attack_sequence(
     payload: dict[str, JsonValue],
     player_id: str,
     source_rules_unit_id: str,
+    selection_clause: RuleClause,
 ) -> AttackSequence:
     raw_sequence = _object(payload.get("attack_sequence"), "attack sequence")
     sequence = AttackSequence.from_payload(cast(AttackSequencePayload, raw_sequence))
@@ -666,8 +668,24 @@ def _authenticated_attack_sequence(
     completion = tuple(
         (index, event)
         for index, event in enumerate(event_records[:selection_boundary])
-        if event.event_id == completion_id and event.event_type == "attack_sequence_completed"
+        if event.event_id == completion_id
+        and event.event_type in {"attack_sequence_completed", "attack_sequence_models_attacked"}
     )
+    model_boundary = (
+        len(completion) == 1 and completion[0][1].event_type == "attack_sequence_models_attacked"
+    )
+    if model_boundary:
+        from warhammer40k_core.engine.model_shooting_completion import model_completion_boundary
+
+        authenticated, model_ids, _ = model_completion_boundary(
+            event_records[:selection_boundary], completion_id
+        )
+        if (
+            selection_subject(selection_clause) not in {"this_model", "bearer"}
+            or payload.get("source_model_instance_id") not in model_ids
+            or sequence != authenticated
+        ):
+            raise GameLifecycleError("Selected-target model completion authority drifted.")
     expected_completion = {
         "sequence_id": sequence.sequence_id,
         "attacker_player_id": sequence.attacker_player_id,
@@ -686,13 +704,18 @@ def _authenticated_attack_sequence(
     if (
         payload.get("attack_sequence_id") != sequence.sequence_id
         or sequence.source_phase is not BattlePhase.SHOOTING
-        or not sequence.is_complete
+        or (not model_boundary and not sequence.is_complete)
         or sequence.attacker_player_id != player_id
         or sequence.attacking_unit_instance_id != source_rules_unit_id
         or len(completion) != 1
         or not isinstance(completion[0][1].payload, dict)
-        or frozenset(completion[0][1].payload) != _COMPLETION_KEYS
-        or completion[0][1].payload != expected_completion
+        or (
+            not model_boundary
+            and (
+                frozenset(completion[0][1].payload) != _COMPLETION_KEYS
+                or completion[0][1].payload != expected_completion
+            )
+        )
         or len(declarations) != 1
         or not declarations[0][0] < completion[0][0] < selection_boundary
     ):

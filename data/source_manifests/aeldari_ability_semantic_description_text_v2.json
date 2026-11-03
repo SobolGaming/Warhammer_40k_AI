@@ -568,7 +568,7 @@
     {
       "ability_id": "000003909:whispering-web",
       "description": "Post-shoot target tracking and the Critical Hit threshold are consumed.",
-      "evidence_sha256": "3102732958645b5bd9cd1a336950b040aff960edd197b2f50e29266a3faa36a6"
+      "evidence_sha256": "dcde90472bbd8bf9039d6f12aaff888c77df3cc6d39745d9a50428a16187a1b5"
     },
     {
       "ability_id": "000003910:structural-collapse",

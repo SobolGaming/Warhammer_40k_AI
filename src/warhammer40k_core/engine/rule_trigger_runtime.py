@@ -199,6 +199,7 @@ def _attack_candidates(
             completed_event_id=context.attack_sequence_completed_event_id,
         )
         if context.source_phase is BattlePhase.SHOOTING
+        and context.completed_model_instance_ids is None
         else ()
     )
     return (*bundle.attack_sequence_completed_hook_registry.candidates_for(context), *additional)
@@ -216,6 +217,15 @@ def _internal_action_in_progress(state: GameState, trigger: RuleTrigger) -> bool
         if not isinstance(sequence, dict) or type(sequence.get("sequence_id")) is not str:
             raise GameLifecycleError("Attack trigger has no sequence identity.")
         own_sequence_id = cast(str, sequence["sequence_id"])
+    if (
+        trigger.kind is RuleTriggerKind.ATTACK_COMPLETION
+        and isinstance(trigger.context, dict)
+        and "completed_model_instance_ids" in trigger.context
+        and state.shooting_phase_state is not None
+        and state.shooting_phase_state.attack_sequence is not None
+        and state.shooting_phase_state.attack_sequence.sequence_id == own_sequence_id
+    ):
+        return False
     shooting = state.out_of_phase_shooting_state
     if shooting is not None:
         completed = shooting.pending_completed_attack_sequence
@@ -246,6 +256,7 @@ def validate_trigger_order_candidates(
         TimingTriggerKind.AFTER_UNIT_DESTROYED,
         TimingTriggerKind.AFTER_DICE_ROLL,
         TimingTriggerKind.AFTER_UNIT_ATTACKS_RESOLVED,
+        TimingTriggerKind.AFTER_MODEL_ATTACKS_RESOLVED,
         TimingTriggerKind.AFTER_UNIT_ENDS_MOVE,
         TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
         TimingTriggerKind.MODEL_PLACED_ON_BATTLEFIELD,

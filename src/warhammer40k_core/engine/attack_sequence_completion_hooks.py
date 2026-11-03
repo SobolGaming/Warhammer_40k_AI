@@ -37,10 +37,17 @@ class AttackSequenceCompletedContext:
     source_phase: BattlePhase
     attack_sequence: AttackSequence
     attack_sequence_completed_event_id: str
+    completed_model_instance_ids: tuple[str, ...] | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
 
+        if self.completed_model_instance_ids is not None:
+            if not self.completed_model_instance_ids:
+                raise GameLifecycleError("Model completion requires participating models.")
+            _validate_optional_identifier_tuple(
+                "completed_model_instance_ids", self.completed_model_instance_ids
+            )
         if type(self.state) is not GameState:
             raise GameLifecycleError("Attack sequence completion context requires GameState.")
         if type(self.decisions) is not DecisionController:
@@ -78,10 +85,13 @@ class AttackSequenceCompletedHookBinding:
     handler: AttackSequenceCompletedHandler
     candidate_handler: AttackSequenceCompletedCandidateHandler | None = None
     requires_attacks: bool = True
+    supports_model_completion: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+        if type(self.supports_model_completion) is not bool:
+            raise GameLifecycleError("Model completion provider capability must be boolean.")
         if type(self.requires_attacks) is not bool:
             raise GameLifecycleError("Attack completion participation requirement must be boolean.")
         if not callable(self.handler):
@@ -113,8 +123,11 @@ class AttackSequenceCompletedHookRegistry:
     ) -> tuple[TimingRuleCandidate, ...]:
         from warhammer40k_core.engine.hazardous_completion import hazardous_candidates
 
-        candidates = list(hazardous_candidates(context))
+        model_boundary = context.completed_model_instance_ids is not None
+        candidates = [] if model_boundary else list(hazardous_candidates(context))
         for binding in self.bindings:
+            if model_boundary and not binding.supports_model_completion:
+                continue
             if binding.requires_attacks and not context.attack_sequence.attack_pools:
                 continue
             if binding.candidate_handler is None:

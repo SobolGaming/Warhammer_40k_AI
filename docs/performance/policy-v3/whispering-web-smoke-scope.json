@@ -1,0 +1,71 @@
+{
+  "base": "3aadf2721f23381cb57088f63ad8e79d19599cbd",
+  "changes": {
+    "src/warhammer40k_core/engine/attack_completion_triggers.py": {
+      "before_sha256": "52eba2bc8e603e76d6bdbd52ccaf2618aabba00aa082bd69a5f3f84b0686666d",
+      "after_sha256": "c5b438abdbd6dc2bf4d6954fc2af9ad00fafb58325324fa42dc114fcba152554",
+      "owners": {
+        "_model_context_for_trigger": {
+          "before": null,
+          "after": "45fd6f4b80ba3172da724880525234d9834761cfcd274cb3de6e61cb5e27b2b7"
+        },
+        "attack_context_for_trigger": {
+          "before": "c0832467ecb3c06f6bf8fe83c3a4816c647a31a227cc47688ee51fd3d58cc511",
+          "after": "43fa16b860304b9e7ccc5ea8e3d32d757f887224d79a9cc13fd4440837519082"
+        },
+        "observe_attack_completion": {
+          "before": "8c5542c247fa16240de9bc727d4c27b3843eb23f9e8aff2c831f3b978b485c02",
+          "after": "dc1a4d0e63defd7f619cf9ac74c3dd28faae4ff604bddd185a2449d15c5938e3"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/shooting_handler.py": {
+      "before_sha256": "facf1635ba8b0c6a15e6688757c93a2726395d33168ce39cf708b45de41a5140",
+      "after_sha256": "466b585d5326fa9fac38d2fe9a895663f939cb3cc1cad477607ddab200b8766a",
+      "owners": {
+        "@module": {
+          "before": "89c6f48b13aa3ff0bcf7fe2e7038ef37b2cd56d3edadaffd880d4704bca2fd9c",
+          "after": "b820f148e67dbfa0b91c9634f0dd4377ad7f449916e38004e547d52500cfe776"
+        },
+        "ShootingPhaseHandler.advance_out_of_phase_shooting_if_needed": {
+          "before": "ae4848ccfa4ff1008a954b9393b7fc20df25596a1d71cadb0e68a922429c7491",
+          "after": "faaed4d3fcce7b35c00ebe521f04b5910e58f35a79cc70f949d88b3b0a1eb979"
+        },
+        "ShootingPhaseHandler.begin_phase": {
+          "before": "5e29fa769c071e8ab60409ae6dddb52067c1ae5a4822153a7b88888fa39f1ead",
+          "after": "47c935666896723fb07c99cd69cad38b5ba82265f16d7bec877ce775e51dbf6b"
+        }
+      }
+    },
+    "tools/ability_support_sources.py": {
+      "before_sha256": "52609fca480137a66fb0fb7fb63a41631e442bed527abe4ce24bbdef43c77902",
+      "after_sha256": "17504ae8b69e37652496458e6ff84e411f1d0a947f4688a9d2a74567cec6e93c",
+      "owners": {
+        "ability_support_index_inputs": {
+          "before": "c8f0c0ac175ad6422bc43a2a84bfa6752e2963b68b0e276781158910133d4f28",
+          "after": "bc225d2512cea46fb93cee1a4a80d49198d4fe1bd095c13428c83431a060b6b0"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "src/warhammer40k_core/engine/attack_completion_triggers.py": [
+      "cumulative-exact-008"
+    ],
+    "src/warhammer40k_core/engine/phases/shooting_handler.py": [
+      "order103-src-warhammer40k_core-engine-phases-shooting_handler"
+    ],
+    "tools/ability_support_sources.py": [
+      "qualification40-exact-b0712fa66a9cc38e"
+    ]
+  },
+  "source_obligation": "Current Whispering Web000003909:5 and Core04.03.04/01.03.02/19.03 require model-specific post-shoot timing, honest partial/final completion metadata, and physical-model keyword scope. The current generated RuleIR JSON must be an authenticated selected-source input.",
+  "unchanged_work": "Ordinary bounded source-rule repair using existing completion, trigger, candidate and effect owners; no deliberate algorithm/search/cache optimization, dependency change or established serious performance regression. One new source JSON is added to the existing sorted input set. All old operation mappings, sensitivity and budgets remain intact; final serial smoke and all live correctness/work/cache checks remain required. No speed or full-game claim.",
+  "policy_successor": {
+    "before_sha256": "a5c9691703b61c3d6689c5c388f3e86de3082b25ebd2e6aa8ab1c5b8c39e64af",
+    "after_sha256": "faa07162fff82c6d960d0f8288f8438f8d1bf8b726a502207b941c228eb8002c",
+    "function_block_sha256": "52345d60153b8a7bc3bffff31a656936718105dc0d8777ea540a2e653d8976d7",
+    "union_call_sha256": "d91949eac1326c9a54934fca15cdff6ce5c4a85bf3c74da0730bdabf8ac053c8",
+    "predecessor_call_sha256": "982bfbb9861e5b88583478e44e4e8c805bc8cb031b7d2e1603dbbf030b0ff7c6"
+  }
+}
