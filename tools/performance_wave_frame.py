@@ -30,7 +30,7 @@ def _hash(raw: bytes) -> str:
 
 def _scope() -> dict[str, Any]:
     value = json.loads((Path(__file__).resolve().parents[1] / SCOPE).read_bytes())
-    if type(value) is not dict or set(value) != {
+    if type(value) is not dict or set(cast(dict[str, Any], value)) != {
         "base",
         "changes",
         "smoke_operations",

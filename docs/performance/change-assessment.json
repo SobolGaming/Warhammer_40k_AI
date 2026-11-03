@@ -186,11 +186,11 @@
     },
     "docs/performance/policy-v3/wave-serpent-frame-smoke-scope.json": {
       "before_sha256": null,
-      "after_sha256": "4abf6904fbdc969360e48244a88728ba89c7b34dbc9c1b0e7b9a66320cfbb74c",
+      "after_sha256": "7ef236eba98fbe91e01d7aa0c87e8dc363700bed651d911d1ba1b0a65bb25611",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4abf6904fbdc969360e48244a88728ba89c7b34dbc9c1b0e7b9a66320cfbb74c"
+          "after": "7ef236eba98fbe91e01d7aa0c87e8dc363700bed651d911d1ba1b0a65bb25611"
         }
       }
     },
@@ -294,11 +294,11 @@
     },
     "tests/code_quality/test_starfang_source_policy.py": {
       "before_sha256": "1631031ad69f68bba907d14378a93223dc9b81a44ab200bdf9d6435d44156022",
-      "after_sha256": "b792ebe37c2f4d2c317e2f6477bbdbb7d707e18d2c0c99bc182545eba012a3b7",
+      "after_sha256": "5607e70538462825153076462ccf5096de516cf74fb60315d56280cd2bc8a007",
       "owners": {
         "test_wave_frame_performance_scope_is_exact_and_preserves_policy_chain": {
           "before": null,
-          "after": "55334981958c42f00c5deeb1f2e0dfd2425d9cbc86fa98ed046ab098fe4ba4c5"
+          "after": "3e2e8c0c2b5e4ca6622ba713007e66ffa783fb5a981dffe911a2b3d021ffb278"
         },
         "test_wave_frame_source_provenance_admission_is_exact": {
           "before": null,
@@ -454,7 +454,7 @@
     },
     "tools/performance_wave_frame.py": {
       "before_sha256": null,
-      "after_sha256": "445420e05c2877628201af982b341250f242e51724ee86329357bdd9b023c374",
+      "after_sha256": "8e5c6daec312da5b8982e015df90a9785d3a54545355a629313d4d9e3ac0fd0c",
       "owners": {
         "@module": {
           "before": null,
@@ -466,7 +466,7 @@
         },
         "_scope": {
           "before": null,
-          "after": "0421282013bbca58df212f711bde4ddd962d93e337873d33a94b3abcf8403830"
+          "after": "1007bd9014128ac646277a4d0698a43fc036af0c07fadc7337fa8a1dbc559439"
         },
         "wave_frame_policy_predecessor": {
           "before": null,

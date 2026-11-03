@@ -478,12 +478,12 @@ def test_wave_frame_performance_scope_is_exact_and_preserves_policy_chain() -> N
     )
     assert wave_frame_policy_predecessor(current) == before
     assert wave_frame_policy_predecessor(before) == before
-    for drift in (
+    for policy_drift in (
         current + b"\n",
         current.replace(b"wave_frame_smoke_operations", b"other_operation"),
     ):
         with pytest.raises(ValueError, match="Wave FRAME"):
-            wave_frame_policy_predecessor(drift)
+            wave_frame_policy_predecessor(policy_drift)
     assert policy.starfang_deep_strike_policy_predecessor(current) == subprocess.check_output(
         ["git", "show", BASE + ":tools/performance_policy.py"], cwd=ROOT
     )
