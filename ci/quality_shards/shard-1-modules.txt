@@ -1,3 +1,4 @@
+tests/code_quality/test_generated_faction_docs.py
 tests/code_quality/test_order97_inventory.py
 tests/code_quality/test_ws12_generated_data_artifacts.py
 tests/code_quality/test_performance_static_successor.py

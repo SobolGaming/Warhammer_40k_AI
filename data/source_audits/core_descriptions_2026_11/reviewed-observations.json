@@ -1,0 +1,241 @@
+{
+  "schema": "core-descriptions-reviewed-observations-v1",
+  "fresh_observation": {
+    "provider_name": "40k.app",
+    "source_url": "https://www.40k.app/rules/24-core-abilities",
+    "observed_at": "2026-11-03T01:12:44.736Z",
+    "app_version": null,
+    "app_build": null,
+    "locale": "en",
+    "capture_kind": "Fresh rendered browser DOM major-section observations; full selected section text",
+    "provider_non_affiliation_recorded": true,
+    "sections": {
+      "24.20": {
+        "section_id": "24.20",
+        "captured_text": "24.20\nINFILTRATORS\n\nDuring deployment, if every model in a unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from your opponent’s deployment zone and all enemy units.\n",
+        "transfer_verified": true,
+        "fnv1a32_utf16": "cf7a56b7"
+      },
+      "24.24": {
+        "section_id": "24.24",
+        "captured_text": "24.24\nLONE OPERATIVE\n\nUnless part of an attached unit, this unit is not visible to enemy models unless they are within 12\" of this unit, and it cannot be targeted by [INDIRECT FIRE] weapons unless the attacking model is within 12\" of this unit.\n\nIf this ability takes the form Lone Operative X\", unless part of an attached unit, this unit is not visible to enemy models unless they are within X\" of this unit, and it cannot be targeted by [INDIRECT FIRE] weapons unless the attacking model is within X\" of this unit.\n",
+        "transfer_verified": true,
+        "fnv1a32_utf16": "8c705edf"
+      },
+      "24.31": {
+        "section_id": "24.31",
+        "captured_text": "24.31\nSCOUTS\n\nThis ability always takes the form Scouts X\". In the Resolve Pre‑battle Abilities step, if every model in a unit has this ability, you can do one of the following:\n\nIf that unit is in strategic reserves, you can set up that unit anywhere that is wholly within your deployment zone.\nIf that unit is wholly within your deployment zone, it can make a scout move (24.32).\nIf that unit is embarked within a DEDICATED TRANSPORT that is wholly within your deployment zone, and if every model embarked within that DEDICATED TRANSPORT has the Scouts ability, that DEDICATED TRANSPORT can make a scout move.",
+        "transfer_verified": true,
+        "fnv1a32_utf16": "dd1e6377"
+      },
+      "24.32": {
+        "section_id": "24.32",
+        "captured_text": "24.32\nSCOUT MOVE\n\nWhen eligible: It is the Resolve Pre-battle Abilities step, and your unit is wholly within your deployment zone. Maximum distance: The X\" in Scouts X\" Effect: Your unit moves as described in Moving (03). After moving: Your unit must be more than 8\" horizontally from all enemy units.\n",
+        "transfer_verified": true,
+        "fnv1a32_utf16": "58018d5e"
+      }
+    },
+    "limits": "Major sections 24.20,24.24,24.31,24.32 only; linked 24.24.01 separately captured. No source or semantic admission is implied until new governed records and pins are validated."
+  },
+  "linked_lone_operative_companion": {
+    "url": "https://www.40k.app/rules/24-core-abilities#24.24.01",
+    "observed_at": "2026-11-03T01:13:04.037Z",
+    "section_id": "24.24.01",
+    "captured_text": "24.24.01\nAttached units and Lone Operative\n\nIf all models in an attached unit have Lone Operative, that unit will benefit from Lone Operative.\n\nIf a unit has Lone Operative, but models in that unit have different range values for Lone Operative, the highest value amongst that unit's models on the battlefield is applied to the whole unit.\n\nIf an attached unit below starting strength only contains models with Lone Operative, Lone Operative becomes active again.\n\nExample: A CHARACTER with Lone Operative is attached to a bodyguard unit that has Lone Operative 15\". Lone Operative 15\" is therefore used for the whole unit.\n\nExample: A CHARACTER with Lone Operative is attached to a bodyguard unit that does not have Lone Operative. Once all of the bodyguard models have been destroyed and only the CHARACTER remains, the CHARACTER's Lone Operative becomes active again.\n",
+    "transfer_check": {
+      "utf16_chars": 871,
+      "lines": 13,
+      "fnv1a32_utf16": "3a9749bc"
+    }
+  },
+  "prior_date_precision_observation": {
+    "url": "https://www.40k.app/rules/24-core-abilities",
+    "observed_date_utc": "2026-11-03",
+    "capture_kind": "Complete rendered major sections for selected five-unit core/weapon abilities; unrelated sections excluded. Collapsed supplementary notes are not claimed observed.",
+    "sections": {
+      "24.03": "24.03\n[ANTI]\n\nThis ability always takes the form [ANTI‑X Y+]. Each time an attack is made with an [ANTI] weapon, if the target unit has the keyword denoted by X, an unmodified wound roll of Y+ is a critical wound.\n\nExample: An attack made with an [ANTI‑VEHICLE 4+] weapon against a VEHICLE unit will result in a critical wound on an unmodified wound roll of 4+, while an attack made with an [ANTI‑PSYKER 2+] weapon against a PSYKER unit will result in a critical wound on an unmodified wound roll of 2+.\n",
+      "24.04": "24.04\n[ASSAULT]\n\nUnits containing one or more models with an [ASSAULT] weapon can shoot using assault shooting (10.05).\n",
+      "24.13": "24.13\nFIGHTS FIRST\n\nWhile every model in a unit has this ability, that unit is a Fights First unit.\n\nSee the Resolve Fights First Combats step in the Fight phase (12.04).\n",
+      "24.16": "24.16\n[HEAVY]\n\nIn your Shooting phase, each time an attack is made with a [HEAVY] weapon, add 1 to the hit roll if all of the following apply to the attacking unit:\n\nThat unit is unengaged.\u0007\nThat unit was not set up on the battlefield this turn.\nNo model in that unit has moved moret han 3\" this turn.",
+      "24.20": "24.20\nINFILTRATORS\n\nDuring deployment, if every model in a unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from your opponent’s deployment zone and all enemy units.\n",
+      "24.21": "24.21\n[LANCE]\n\nEach time an attack is made with a [LANCE] weapon, if the attacking model’s unit made a charge move this turn, add 1 to the wound roll.\n",
+      "24.23": "24.23\n[LETHAL HITS]\n\nEach time an attack made with a [LETHAL HITS] weapon results in a critical hit, you can choose for that attack to automatically wound the target.\n\nDesigner’s Note: Choosing to automatically wound the target means that no wound roll is made for that attack. You may decide against this, as it means that attack cannot result in a critical wound and so cannot trigger other abilities such as [DEVASTATING WOUNDS].\n",
+      "24.24": "24.24\nLONE OPERATIVE\n\nUnless part of an attached unit, this unit is not visible to enemy models unless they are within 12\" of this unit, and it cannot be targeted by [INDIRECT FIRE] weapons unless the attacking model is within 12\" of this unit.\n\nIf this ability takes the form Lone Operative X\", unless part of an attached unit, this unit is not visible to enemy models unless they are within X\" of this unit, and it cannot be targeted by [INDIRECT FIRE] weapons unless the attacking model is within X\" of this unit.\n",
+      "24.27": "24.27\n[PISTOL]\n\n[PISTOL] and [CLOSE‑QUARTERS] are identical for all rules purposes. See [CLOSE‑QUARTERS].\n\nDesigner’s Note: [PISTOL] is a pre-existing ability that will be superseded by [CLOSE-QUARTERS] as this edition of Warhammer 40,000 progresses. Both are functionally the same, but the latter is a more suitable term for weapons that function in this way.\n",
+      "24.28": "24.28\n[PRECISION]\n\nWhile resolving attacks made with one or more [PRECISION] weapons, at the start of the Allocation Order step (05.03), if the target unit contains one or more CHARACTER models visible to one or more of the attacking models, the active player can select one allocation group that contains one of those visible CHARACTER models. If they do, until those attacks are resolved, or until that CHARACTER group is destroyed (whichever happens first), that CHARACTER group is the current allocation group.\n",
+      "24.29": "24.29\n[PSYCHIC]\n\nEach time an attack is made with a [PSYCHIC] weapon, you can ignore any or all modifiers to that attack’s BS or WS characteristic and any or all modifiers to the hit roll. Attacks made with [PSYCHIC] weapons are known as psychic attacks (this can be important for the triggering of other rules).\n",
+      "24.31": "24.31\nSCOUTS\n\nThis ability always takes the form Scouts X\". In the Resolve Pre‑battle Abilities step, if every model in a unit has this ability, you can do one of the following:\n\nIf that unit is in strategic reserves, you can set up that unit anywhere that is wholly within your deployment zone.\nIf that unit is wholly within your deployment zone, it can make a scout move (24.32).\nIf that unit is embarked within a DEDICATED TRANSPORT that is wholly within your deployment zone, and if every model embarked within that DEDICATED TRANSPORT has the Scouts ability, that DEDICATED TRANSPORT can make a scout move.",
+      "24.32": "24.32\nSCOUT MOVE\n\nWhen eligible: It is the Resolve Pre-battle Abilities step, and your unit is wholly within your deployment zone. Maximum distance: The X\" in Scouts X\" Effect: Your unit moves as described in Moving (03). After moving: Your unit must be more than 8\" horizontally from all enemy units.\n",
+      "24.33": "24.33\nSTEALTH\n\nIf every model in a unit has this ability, each time a ranged attack targets that unit, that unit has the benefit of cover against that attack (13.08).\n",
+      "24.36": "24.36\n[SUSTAINED HITS]\n\nThis ability always takes the form [SUSTAINED HITS X]. Each time an attack made with a [SUSTAINED HITS] weapon results in a critical hit, that attack results in a number of additional hits on the target as denoted by X.\n\nExample: An attack made with a [SUSTAINED HITS 2] weapon results in a critical hit. That attack therefore hits the target three times (once from the critical hit, and twice more from the [SUSTAINED HITS 2] ability).\n",
+      "24.38": "24.38\n[TWIN-LINKED]\n\nEach time an attack is made with a [TWIN‑LINKED] weapon, you can re‑roll the wound roll.\n"
+    }
+  },
+  "selected_inventory_path": "data/source_audits/order97/selected-sources.json",
+  "selected_inventory_sha256": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-abilities:core:infiltrators",
+      "section_id": "24.20",
+      "source_text": "During deployment, if every model in a unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from your opponent’s deployment zone and all enemy units.",
+      "retained_inventory_row": {
+        "row_id": "rule:24:24.20:1",
+        "category": "24",
+        "locator": "24.20",
+        "title": "Infiltrators",
+        "occurrence": 1,
+        "source_sha256": "19e6a9f492e569a009f39f7e4afc66435f33118d46af4b3fbf7e9392dc5a2e30",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "text",
+            "sha256": "b0a21a45b4196411e285619f7bec0548da687c8fa4ab01312e608faae0302723",
+            "value": "During deployment, if every model in a unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from your opponent’s deployment zone and all enemy units."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "380a27a6331b1a656fb8670a015af3ba5d744a2e1fb2c00dcec2e8ea93f8de58",
+        "review_category": "24"
+      }
+    },
+    {
+      "source_id": "gw-11e-core-abilities:core:lone-operative",
+      "section_id": "24.24",
+      "source_text": "Unless part of an attached unit, this unit is not visible to enemy models unless they are within 12\" of this unit, and it cannot be targeted by [INDIRECT FIRE] weapons unless the attacking model is within 12\" of this unit.\n\nIf this ability takes the form Lone Operative X\", unless part of an attached unit, this unit is not visible to enemy models unless they are within X\" of this unit, and it cannot be targeted by [INDIRECT FIRE] weapons unless the attacking model is within X\" of this unit.",
+      "retained_inventory_row": {
+        "row_id": "rule:24:24.24:1",
+        "category": "24",
+        "locator": "24.24",
+        "title": "Lone Operative",
+        "occurrence": 1,
+        "source_sha256": "5c9ae5df494b6fd45bdb6b203ce5018c963fec413f5ad2cae4feeabfdd64db62",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "text",
+            "sha256": "13957fa6ca3c9138e4bade346e684d64634e4d8c517b3db9cac614ef705602ec",
+            "value": "Unless part of an \u0005attached\u0006 unit, this unit is \u0001not\u0002 \u0005visible\u0006 to enemy models unless they are within 12\" of this unit, and it cannot be targeted by \u0003[INDIRECT FIRE]\u0004 weapons unless the attacking model is within 12\" of this unit."
+          },
+          {
+            "ordinal": 2,
+            "kind": "text",
+            "sha256": "57f4f9757528690a3e3178641133409e70d8929cec35d75484b208087ee5d943",
+            "value": "If this ability takes the form \u0005Lone Operative X\"\u0006, unless part of an \u0005attached\u0006 unit, this unit is \u0001not\u0002 \u0005visible\u0006 to enemy models unless they are within \u0005X\"\u0006 of this unit, and it cannot be targeted by \u0003[INDIRECT FIRE]\u0004 weapons unless the attacking model is within \u0005X\"\u0006 of this unit."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "4c6f6aa68a319a9b18eb224e00d622a039ea3dff9fb109f6c8a9ad5bd24fc861",
+        "review_category": "24"
+      }
+    },
+    {
+      "source_id": "gw-11e-core-abilities:core:scouts",
+      "section_id": "24.31",
+      "source_text": "This ability always takes the form Scouts X\". In the Resolve Pre‑battle Abilities step, if every model in a unit has this ability, you can do one of the following:\n\nIf that unit is in strategic reserves, you can set up that unit anywhere that is wholly within your deployment zone.\nIf that unit is wholly within your deployment zone, it can make a scout move (24.32).\nIf that unit is embarked within a DEDICATED TRANSPORT that is wholly within your deployment zone, and if every model embarked within that DEDICATED TRANSPORT has the Scouts ability, that DEDICATED TRANSPORT can make a scout move.",
+      "retained_inventory_row": {
+        "row_id": "rule:24:24.31:1",
+        "category": "24",
+        "locator": "24.31",
+        "title": "Scouts",
+        "occurrence": 1,
+        "source_sha256": "593ac1d836c1bf8dbcdae786430264fe281166b54dbfd72ab8f20f33065b4d4b",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "text",
+            "sha256": "9231c0696ae6c03e2132bddf6cf18132d1f52302f7d9e6e157d943b126707cf8",
+            "value": "This ability always takes the form \u0005Scouts X\"\u0006. In the Resolve Pre‑battle Abilities step, if every model in a unit has this ability, you can do \u0001one\u0002 of the following:"
+          },
+          {
+            "ordinal": 2,
+            "kind": "text",
+            "sha256": "e6d85231a5fe57ae8d7c2f8d8e66a06dab6f14d76fa5ef1a4d9c0f9d3732a602",
+            "value": "• If that unit is in \u0005strategic reserves\u0006, you can set up that unit anywhere that is wholly within your deployment zone."
+          },
+          {
+            "ordinal": 3,
+            "kind": "text",
+            "sha256": "925b340f8e5f7bcd3e99af8c5af7ee602ff1b0512c2d69609a44ae4398d396fc",
+            "value": "• If that unit is wholly within your deployment zone, it can make a \u0005scout move\u0006 (24.32)."
+          },
+          {
+            "ordinal": 4,
+            "kind": "text",
+            "sha256": "56416c4d1ae31737bdf016e8c67074269f6f55026fcfe3462b97d0baa3b43c2e",
+            "value": "• If that unit is embarked within a \u0003DEDICATED TRANSPORT\u0004 that is wholly within your deployment zone, and if every model embarked within that \u0003DEDICATED TRANSPORT\u0004 has the \u0005Scouts\u0006 ability, that \u0003DEDICATED TRANSPORT\u0004 can make a \u0005scout move\u0006."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "86f370e892985f9cb78ecba163f14c9fdcba11ea0e89eec567c1161c51ec6890",
+        "review_category": "24"
+      }
+    },
+    {
+      "source_id": "gw-11e-core-abilities:core:scout-move",
+      "section_id": "24.32",
+      "source_text": "When eligible: It is the Resolve Pre-battle Abilities step, and your unit is wholly within your deployment zone. Maximum distance: The X\" in Scouts X\" Effect: Your unit moves as described in Moving (03). After moving: Your unit must be more than 8\" horizontally from all enemy units.",
+      "retained_inventory_row": {
+        "row_id": "rule:24:24.32:1",
+        "category": "24",
+        "locator": "24.32",
+        "title": "Scout Move",
+        "occurrence": 1,
+        "source_sha256": "6b84486fb027ed081ac0cc0ec85360d37dd74919eb99cb71ef4e19d3be0d5a2c",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "text",
+            "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+            "value": "\u000eEligible If"
+          },
+          {
+            "ordinal": 2,
+            "kind": "text",
+            "sha256": "e7f822ffd3294380f7f27391037ec83f87a008aacfc3cca1944d7ac85f6b50a2",
+            "value": "It is the Resolve Pre-battle Abilities step, and your unit is wholly within your deployment zone."
+          },
+          {
+            "ordinal": 3,
+            "kind": "text",
+            "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+            "value": "\u000eEffect"
+          },
+          {
+            "ordinal": 4,
+            "kind": "text",
+            "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab",
+            "value": "Your unit moves as described in Moving (03)."
+          },
+          {
+            "ordinal": 5,
+            "kind": "text",
+            "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315",
+            "value": "\u000eAfter Moving"
+          },
+          {
+            "ordinal": 6,
+            "kind": "text",
+            "sha256": "28cc20014f1305340be14d474a6887aecb0043ca8eebcaba37ae2dbc0835dd8c",
+            "value": "Your unit must be more than 8\" horizontally from all enemy units."
+          },
+          {
+            "ordinal": 7,
+            "kind": "text",
+            "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4",
+            "value": "\u000eMaximum Distance"
+          },
+          {
+            "ordinal": 8,
+            "kind": "text",
+            "sha256": "4872f3d78d46e7c0e00433ace31317de10aa5ab396144ba40c57bac9fd09d427",
+            "value": "The \u0005X\"\u0006 in \u0005Scouts X\"\u0006"
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "840809d15266604e597c9075a5b497349d04be43787588d8e630da388d1dcd9c",
+        "review_category": "24"
+      }
+    }
+  ],
+  "comparison": "All four fresh major sections agree with the prior rendered sections after explicit U+2019/apostrophe and U+2011/hyphen normalization. Approved description typography retained. Selected Game Datamissions inventory removes control markup and bullet characters; first three major bodies agree. Scout Move retains all four values with table-label/order differences (Eligible If vs When eligible); no complete byte equality claimed. Fights First uses the existing pinned operative sentence, omitting the current advisory See 12.04 sentence. Linked Lone Operative 24.24.01 is retained companion evidence, not separately admitted or execution-certified. No App build/version or network-byte capture is inferred."
+}

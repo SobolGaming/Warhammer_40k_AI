@@ -3,12 +3,14 @@
 import ast
 import hashlib
 import json
+import shutil
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
 from tools.core_rules_order135_audit import (
     AUDIT,
+    CAPTURE,
     OUTPUT,
     ROOT,
     CurrentAuditError,
@@ -88,8 +90,16 @@ def test_order135_current_source_provider_composes_both_complete_packages() -> N
     assert mirror.app_version is None
     scope = source_authority_registry().scope(CORE_RULES_SOURCE_AUTHORITY_SCOPE)
     assert len(scope.source_packages) == 54
-    assert len(scope.all_source_packages()) == 55
-    (extension,) = scope.source_package_extensions
+    assert len(scope.all_source_packages()) == 56
+    assert {extension.package_name for extension in scope.source_package_extensions} == {
+        "gw-11e-core-other-concepts-battlefield-edge",
+        "gw-11e-core-descriptions",
+    }
+    (extension,) = (
+        row
+        for row in scope.source_package_extensions
+        if row.package_name == "gw-11e-core-other-concepts-battlefield-edge"
+    )
     assert extension.catalog_sha256 == edge.source_catalog.catalog_sha256()
 
 
@@ -237,3 +247,52 @@ def test_integration_emergency_assertion_exception_rejects_obligation_drift(
         changed[0]["requirement_id"] = "unlisted-requirement"
     with pytest.raises(CurrentAuditError, match="Emergency"):
         integration_emergency_assertion_exception(tmp_path, changed)
+
+
+@pytest.mark.parametrize(
+    "mutation", ["missing", "duplicate", "namespace", "version", "source", "catalog"]
+)
+def test_order135_visibility_registration_rejects_its_own_extension_drift(
+    tmp_path: Path, mutation: str
+) -> None:
+    package = Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08"
+    )
+    registry_path = Path("src/warhammer40k_core/rules/source_authority_registry.json")
+    for relative in (
+        AUDIT / "visibility-source.audit.json",
+        CAPTURE,
+        package / "artifacts/package.json",
+        package / "__init__.py",
+        AUDIT / "baseline" / (str(package / "artifacts/package.json") + ".txt"),
+        registry_path,
+    ):
+        destination = tmp_path / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative, destination)
+    assert visibility_source_registration(tmp_path) == visibility_source_registration(ROOT)
+    registry = json.loads((tmp_path / registry_path).read_bytes())
+    scope = next(
+        row for row in registry["scopes"] if row["scope_id"] == CORE_RULES_SOURCE_AUTHORITY_SCOPE
+    )
+    extensions = scope["source_package_extensions"]
+    selected = next(
+        row
+        for row in extensions
+        if row["package_name"] == "gw-11e-core-other-concepts-battlefield-edge"
+    )
+    if mutation == "missing":
+        extensions.remove(selected)
+    elif mutation == "duplicate":
+        extensions.append(dict(selected))
+    elif mutation == "namespace":
+        selected["namespace"] = "unreviewed"
+    elif mutation == "version":
+        selected["version"] = "unreviewed"
+    elif mutation == "source":
+        selected["allowed_rule_source_ids"] = ["unreviewed"]
+    else:
+        selected["catalog_sha256"] = "0" * 64
+    (tmp_path / registry_path).write_text(json.dumps(registry), encoding="utf-8")
+    with pytest.raises(CurrentAuditError, match="source-package authorization"):
+        visibility_source_registration(tmp_path)

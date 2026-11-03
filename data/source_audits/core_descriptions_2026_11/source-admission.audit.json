@@ -1,0 +1,64 @@
+{
+  "audit_id": "core-descriptions-maintained-app-mirror-2026-11-03",
+  "observed_at": "2026-11-03T01:12:44.736Z",
+  "rows": [
+    {
+      "row_id": "24.20:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/24-core-abilities",
+      "observed_at": "2026-11-03T01:12:44.736Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-abilities:core:infiltrators",
+      "transcription_sha256": "a38c1fea40ae417ef57a6a04a9440b0b745c13061ca58409fe4c0bb90f648258",
+      "provider_non_affiliation_recorded": true,
+      "rendered_section_sha256": "1d7d5a43c5fae5cb39655020db07275c9ef2eba6f69d0f7d1acad09dc0efdd72",
+      "reviewed_observations_sha256": "2cc9783d22512e9135b450d44a12e694ab742edd8475f83ed55bbd63a6daf3e3",
+      "source_observation_sha256": "8e41c04135a54c4b5e810c6232b09a502107b48fc244b38375567224f3621a52"
+    },
+    {
+      "row_id": "24.24:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/24-core-abilities",
+      "observed_at": "2026-11-03T01:12:44.736Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-abilities:core:lone-operative",
+      "transcription_sha256": "1932185d8939b87c944cf0325c76fde4b6cebe63643b53589764189a6f00078e",
+      "provider_non_affiliation_recorded": true,
+      "rendered_section_sha256": "7883304b9464eb4347ea1a74a2d85c83f33ccf4fa7b6e605de8220c9d83b715a",
+      "reviewed_observations_sha256": "2cc9783d22512e9135b450d44a12e694ab742edd8475f83ed55bbd63a6daf3e3",
+      "source_observation_sha256": "2f07d331da04cb66cb9344fe1f705cf8812c83afe03ac35959ee273556e70169"
+    },
+    {
+      "row_id": "24.31:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/24-core-abilities",
+      "observed_at": "2026-11-03T01:12:44.736Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-abilities:core:scouts",
+      "transcription_sha256": "e031b0603c0345803a0fbe63f36f5994bd00c62706c45d8e491d1a1e4484fa87",
+      "provider_non_affiliation_recorded": true,
+      "rendered_section_sha256": "eef8b0fb4ba18c5e4cbd874972acc40da11091ccc91b4baaa291d493792c0b54",
+      "reviewed_observations_sha256": "2cc9783d22512e9135b450d44a12e694ab742edd8475f83ed55bbd63a6daf3e3",
+      "source_observation_sha256": "d23c4b608de32205ecb8c3c4f043781473fe1e47f190fad3bbae93963d421378"
+    },
+    {
+      "row_id": "24.32:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/24-core-abilities",
+      "observed_at": "2026-11-03T01:12:44.736Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-abilities:core:scout-move",
+      "transcription_sha256": "ff72b82ae24dbdc7c530bf08a6ae443017d9bb99d9f8a287b36cd0c2552354a7",
+      "provider_non_affiliation_recorded": true,
+      "rendered_section_sha256": "110f8064657855536c3d9ef5463b59ca55194412b3632665bc1b930a47a6889d",
+      "reviewed_observations_sha256": "2cc9783d22512e9135b450d44a12e694ab742edd8475f83ed55bbd63a6daf3e3",
+      "source_observation_sha256": "0a947a76c13745cd04c210fb8be8abf1922542cc0e7dd57dc003149ba351b370"
+    }
+  ],
+  "authority_limit": "Project-authoritative maintained mirror; no official-primary, App-build, network-byte-capture or runtime certification claim.",
+  "comparison": "All four fresh major sections agree with the prior rendered sections after explicit U+2019/apostrophe and U+2011/hyphen normalization. Approved description typography retained. Selected Game Datamissions inventory removes control markup and bullet characters; first three major bodies agree. Scout Move retains all four values with table-label/order differences (Eligible If vs When eligible); no complete byte equality claimed. Fights First uses the existing pinned operative sentence, omitting the current advisory See 12.04 sentence. Linked Lone Operative 24.24.01 is retained companion evidence, not separately admitted or execution-certified. No App build/version or network-byte capture is inferred."
+}

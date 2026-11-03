@@ -1,0 +1,32 @@
+{
+  "base": "b27c5d4e5f75dd7f89353a968a88d1b24b2681a4",
+  "changes": {
+    "tools/generate_ability_support_matrix.py": {
+      "before_sha256": "eb4558da6eb2316367fba4011274b67e9bc2b80110a724307dab11ff0229fc29",
+      "after_sha256": "0fec8c2d95705cf06ff51dd17c5f9e3516e0b993707ec0050cf37464970b1759",
+      "owners": {
+        "_ability_support_catalog_package": {
+          "before": "3c60effbd21b2157b60b79e1c449594bf1c9918d7da69eebf0f8c4cc12f1fd0b",
+          "after": "753f4e4226b06c68266b41631b9e063bf0407309aa0336d0459ca7ec522a42dc"
+        },
+        "@module": {
+          "before": "0a38d0547663e88a22f3dbb2892e7cc2aa04370add2684e67f07e9046b80bb03",
+          "after": "b03c0ee85a150ef618aa48f24a76e9dc54851bbc301af5eb8281d9c71fc10d66"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tools/generate_ability_support_matrix.py": [
+      "qualification40-exact-ded6452f144f095b"
+    ]
+  },
+  "source_obligation": "Correct only five current Core catalog descriptions and reviewed provenance; source-only admission for Infiltrators, Lone Operative, Scouts and Scout Move; preserve all runtime descriptors and old evidence.",
+  "unchanged_work": "No search/cache/serialization/gameplay algorithm change; exact whole-package projections and existing native consumers retain behavior. Required serial runtime smoke remains mandatory; no speed or full-game claim.",
+  "policy_successor": {
+    "before_sha256": "78b0fb430315e772f592ae1cd01e95df78ceb98ca4ed91ee9ba74bb87a58efb9",
+    "after_sha256": "a5c9691703b61c3d6689c5c388f3e86de3082b25ebd2e6aa8ab1c5b8c39e64af",
+    "function_block_sha256": "0d1eb53552b3fe589dca2503356d3fc94f4787bb33563c6eeb1e9d3f1a81a2d5",
+    "union_call_sha256": "940bc247cfc7ff5587597730a2f6087c92ad0dcd612d6630e7e58dbd32ba1adb"
+  }
+}

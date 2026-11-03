@@ -65,3 +65,11 @@ tests/unit/test_phase17g_adepta_sororitas_army_rule.py text eol=lf
 docs/performance/policy-v3/acts-provenance-20261031/inactive-acts-predecessor.py.txt -text
 docs/performance/policy-v3/acts-provenance-20261031/inactive-acts-api-recipe.json text eol=lf
 docs/performance/policy-v3/acts-provenance-20261031/source-scope-predecessor.py.txt -text
+
+tools/core_deadly_demise_catalog_overlay.py text eol=lf
+
+tools/build_core_descriptions_source.py text eol=lf
+
+src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_descriptions_2026_11/__init__.py text eol=lf
+
+tests/core_description_helpers.py text eol=lf

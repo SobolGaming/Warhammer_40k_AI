@@ -32169,6 +32169,120 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "core-description-exact-c8a1c41e8f12a86f": {
+      "paths": [
+        "tests/code_quality/test_performance_policy.py"
+      ],
+      "owners": [
+        "test_core_description_smoke_scope_and_policy_successor_are_exact",
+        "test_core_description_smoke_scope_rejects_unbounded_declarations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "core-description-exact-472add1cc90fc407": {
+      "paths": [
+        "tests/core_description_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "before_core_description_correction",
+        "core_description_audit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "core-description-exact-fc4c15e5207e0763": {
+      "paths": [
+        "tests/infrastructure/source/unit/test_core_catalog_descriptions.py"
+      ],
+      "owners": [
+        "@module",
+        "_mutate",
+        "_packages",
+        "test_adapter_once_only_deterministic_absent_noop_and_wrong_owner",
+        "test_adapter_rejects_current_source_text_drift",
+        "test_adapter_rejects_unreviewed_owner_occurrence",
+        "test_adapter_rejects_wrong_reviewed_input",
+        "test_adapter_rejects_wrong_source_pin",
+        "test_all_39_occurrences_close_35_replacements_and_four_preserved_stealth",
+        "test_historical_projection_authenticates_all_payload_fields",
+        "test_new_source_rejects_conflicting_same_observation_transcription",
+        "test_new_source_rejects_unreviewed_artifact_bytes",
+        "test_new_source_rejects_wrong_governed_tuple",
+        "test_other_core_recognition_and_lone_operative_identity_are_preserved",
+        "test_scouts_parameters_and_native_factory_persistence_are_preserved",
+        "test_source_admission_truth_and_complete_scouts_dependency",
+        "test_source_registry_keeps_every_historical_registration_and_source_byte"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "core-description-exact-84fad3ea08abf916": {
+      "paths": [
+        "tools/build_core_descriptions_source.py"
+      ],
+      "owners": [
+        "@module",
+        "_hash",
+        "build_payloads",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "core-description-exact-7a1c91b1efe08d78": {
+      "paths": [
+        "tools/core_deadly_demise_catalog_overlay.py"
+      ],
+      "owners": [
+        "with_current_core_descriptions"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "core-description-exact-1504c891c8d333f3": {
+      "paths": [
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "core_description_policy_predecessor",
+        "core_description_smoke_operations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "core-description-source-audit-documents": {
+      "paths": [
+        "data/source_audits/core_descriptions_2026_11/catalog-description-delta.json",
+        "data/source_audits/core_descriptions_2026_11/reviewed-observations.json",
+        "data/source_audits/core_descriptions_2026_11/source-admission.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "core-description-exact-ca1ae95238a3c1b2": {
+      "paths": [
+        "tests/code_quality/test_order135_current_core_audit.py"
+      ],
+      "owners": [
+        "test_order135_current_source_provider_composes_both_complete_packages",
+        "test_order135_visibility_registration_rejects_its_own_extension_drift"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

@@ -313,14 +313,21 @@ def visibility_source_registration(root: Path) -> dict[str, Any]:
         raise CurrentAuditError("Mandatory original/current source-provider composition drifted.")
     registry = _read(root, Path("src/warhammer40k_core/rules/source_authority_registry.json"))
     (scope,) = [s for s in registry["scopes"] if s["scope_id"] == "warhammer_40000_11th_core_rules"]
-    (extension,) = scope["source_package_extensions"]
-    if (
-        len(scope["source_packages"]) != 54
-        or extension["package_name"] != "gw-11e-core-other-concepts-battlefield-edge"
-        or extension["version"] != "maintained-app-mirror-observed-2026-10-01"
-        or extension["allowed_rule_source_ids"] != [row["rule_source_id"]]
-        or not extension["catalog_sha256"]
-    ):
+    extensions = [
+        extension
+        for extension in scope["source_package_extensions"]
+        if extension["package_name"] == "gw-11e-core-other-concepts-battlefield-edge"
+    ]
+    if len(extensions) != 1:
+        raise CurrentAuditError("Current visibility source-package authorization is not unique.")
+    (extension,) = extensions
+    if len(scope["source_packages"]) != 54 or extension != {
+        "namespace": "games-workshop",
+        "package_name": "gw-11e-core-other-concepts-battlefield-edge",
+        "version": "maintained-app-mirror-observed-2026-10-01",
+        "allowed_rule_source_ids": [row["rule_source_id"]],
+        "catalog_sha256": "5b94765d8456d7c2fb64aa48c5b97edaa868df030f06582598224231e01b1299",
+    }:
         raise CurrentAuditError("Current source-package authorization is incomplete.")
     return {
         "audit": audit,
