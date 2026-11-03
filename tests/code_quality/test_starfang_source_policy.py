@@ -436,3 +436,89 @@ def test_starfang_helper_move_rejects_changed_helper_bytes(monkeypatch: pytest.M
             category="rule_semantics",
             change=object_value(scope["changes"])[path],
         )
+
+
+def test_wave_frame_performance_scope_is_exact_and_preserves_policy_chain() -> None:
+    from tools.performance_wave_frame import BASE as FRAME_BASE
+    from tools.performance_wave_frame import (
+        OPERATIONS,
+        wave_frame_policy_predecessor,
+        wave_frame_smoke_operations,
+    )
+    from tools.performance_wave_frame import SCOPE as FRAME_SCOPE
+
+    scope = read_object(ROOT / FRAME_SCOPE)
+    for path, change in object_value(scope["changes"]).items():
+        assert wave_frame_smoke_operations(
+            base=FRAME_BASE, path=path, category="rule_semantics", change=change
+        ) == frozenset({OPERATIONS[path]})
+        for base, selected, category in (
+            ("0" * 40, path, "rule_semantics"),
+            (FRAME_BASE, "tools/unreviewed.py", "rule_semantics"),
+            (FRAME_BASE, path, "algorithm_or_search"),
+            (FRAME_BASE, path, "cache_policy"),
+            (FRAME_BASE, path, "serialization_or_replay_work"),
+        ):
+            assert not wave_frame_smoke_operations(
+                base=base, path=selected, category=category, change=change
+            )
+        drift = copy.deepcopy(object_value(change))
+        drift["after_sha256"] = "0" * 64
+        assert not wave_frame_smoke_operations(
+            base=FRAME_BASE, path=path, category="rule_semantics", change=drift
+        )
+        drift = copy.deepcopy(object_value(change))
+        object_value(next(iter(object_value(drift["owners"]).values())))["after"] = "0" * 64
+        assert not wave_frame_smoke_operations(
+            base=FRAME_BASE, path=path, category="rule_semantics", change=drift
+        )
+    current = (ROOT / "tools/performance_policy.py").read_bytes()
+    before = subprocess.check_output(
+        ["git", "show", FRAME_BASE + ":tools/performance_policy.py"], cwd=ROOT
+    )
+    assert wave_frame_policy_predecessor(current) == before
+    assert wave_frame_policy_predecessor(before) == before
+    for drift in (
+        current + b"\n",
+        current.replace(b"wave_frame_smoke_operations", b"other_operation"),
+    ):
+        with pytest.raises(ValueError, match="Wave FRAME"):
+            wave_frame_policy_predecessor(drift)
+    assert policy.starfang_deep_strike_policy_predecessor(current) == subprocess.check_output(
+        ["git", "show", BASE + ":tools/performance_policy.py"], cwd=ROOT
+    )
+
+
+def test_wave_frame_source_provenance_admission_is_exact() -> None:
+    from tools import source_scope_provenance as provenance
+
+    from tests.support.source_provenance import historical_snapshot_inputs
+    from tests.wave_serpent_frame_helpers import before_wave_provenance
+
+    path = ROOT / provenance.WAVE_FRAME_OVERLAY
+    raw = path.read_bytes()
+    projected = provenance.registered_provenance_text(ROOT, path, raw, historical_snapshot_inputs)
+    assert projected is not None
+    import json
+
+    expected = json.loads(raw)
+    del expected["base_source_package_id"]["version"]
+    assert json.loads(projected) == expected
+    with pytest.raises(ValueError, match="exact reviewed bytes"):
+        provenance.registered_provenance_text(ROOT, path, raw + b" ", historical_snapshot_inputs)
+    helper = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    prior = subprocess.check_output(
+        [
+            "git",
+            "show",
+            "6ca0ee47d44b227d805b15b5c1de8ca321003da8:tools/source_scope_provenance.py",
+        ],
+        cwd=ROOT,
+    )
+    assert before_wave_provenance(helper) == prior
+    for drift in (
+        helper + b"\n",
+        helper.replace(b"WAVE_FRAME_OVERLAY_SHA256", b"UNREVIEWED_OVERLAY_SHA256"),
+    ):
+        with pytest.raises(ValueError, match="registered edition provenance inputs changed"):
+            before_wave_provenance(drift)

@@ -1,0 +1,60 @@
+{
+  "base": "6ca0ee47d44b227d805b15b5c1de8ca321003da8",
+  "changes": {
+    "tools/ability_support_sources.py": {
+      "before_sha256": "19825e7ed02385118ff17fc49c6b3847512f783aaa98a0ac1a61f5105ab68e1a",
+      "after_sha256": "a77a2eefceb165576b6c28ebf8ea97e18dcfeb7094a77dccbc8f6b8bb017abcf",
+      "owners": {
+        "@module": {
+          "before": "2e02f88b88e7caf177bce7541bc01e0da88f250d7a7f0a193b14846cdd633090",
+          "after": "8705fbf50d90aff4ffaed70a3bc38c0bf6c9610d3181ac73d2cc2db0bb51909b"
+        },
+        "ability_support_index_inputs": {
+          "before": "15862eedd8bc266af0d4f942d08f3697e19d13a10af758f85ae23cd5109e8c69",
+          "after": "7c63b99d26804229e7cd4c3de696a7233392599edeaf99b1c49d23a41d269910"
+        },
+        "load_ability_support_sources": {
+          "before": "a19f4a1098c9371ffa3578dc1584a0a9f7b249d89db67741c84a187448d04025",
+          "after": "26f3ce58df69672727c21de7d7c8727f0194e3fa003af913ad9010f1dab87a5c"
+        },
+        "load_before_wave_frame_sources": {
+          "before": null,
+          "after": "0c80afefb380a838214aa89879883e143edc13ae29b211269d556c5ad9e29304"
+        }
+      }
+    },
+    "tools/source_scope_provenance.py": {
+      "before_sha256": "5c41d1c6c8a0b6d186b60271758cab59d1a268d22d47214597dd60f991f90be6",
+      "after_sha256": "03ba930bd1b77644853b875ee7d6f86620e730690cff8b5d1cd12e42c47814ba",
+      "owners": {
+        "@module": {
+          "before": "2b0b3678f2a7dc8901b3c76ee8d9fe9c7630328967961fe0fbe60f51c6490b56",
+          "after": "ad108e622449b489a8f07842482786c085c2c22a023c257e58d8eac57a2e60d2"
+        },
+        "current_ec_overlay_provenance": {
+          "before": "efc89a02bfee3f2f36101b581a97ed77dc684fe7d24723eb43c99102c6ea093f",
+          "after": "40ddc135890f5dc3e2766ace0c67a61f195eb6131d685441221a21429adf9066"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tools/ability_support_sources.py": [
+      "qualification40-exact-b0712fa66a9cc38e"
+    ],
+    "tools/source_scope_provenance.py": [
+      "registered-source-provenance-projection"
+    ]
+  },
+  "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
+  "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required.",
+  "policy_successor": {
+    "before_sha256": "53855381390dae96880a448d0bf3729fa9099280441aad539e5db56124134526",
+    "after_sha256": "879f0ca4328865a8f24c515abaa894dc8628a49865dcdb817902b94dc7e02a4a",
+    "import_sha256": "7a1d3e94c03c87d60aeccbe00d0b0f1cf1cba34c697fc1782cede7fd928df5a6",
+    "call_sha256": "101361d8910731de2a4101bf5c8e443e9bc6c8bf1d004274993772edd4d79194",
+    "predecessor_sha256": "2b6f6e2596dc44f75454ccd126099ae0d3f3e5ae8ebf81a9de1ffa686fe851e3",
+    "smoke_import_sha256": "0dfb6c4e06f2af84063fa6588829a9a97d4a1a574a0676688e284ce26c72930d"
+  },
+  "module_sha256": "445420e05c2877628201af982b341250f242e51724ee86329357bdd9b023c374"
+}

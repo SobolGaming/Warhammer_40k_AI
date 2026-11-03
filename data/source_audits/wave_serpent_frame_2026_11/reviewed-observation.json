@@ -1,0 +1,335 @@
+{
+  "base": "6ca0ee47d44b227d805b15b5c1de8ca321003da8",
+  "capture": {
+    "slug": "wave-serpent",
+    "url": "https://www.40k.app/factions/aeldari/units/wave-serpent",
+    "observed_utc": "2026-11-03T21:50:41.562Z",
+    "utf16_length": 2166,
+    "fnv1a_utf16": "c4637d76",
+    "captured_text": "40K.APP\nFACTIONS\nAELDARI\nWave Serpent\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nWave Serpent Large Flying Base\n\nInvulnerable save: 5+\n\n14\"\n9\n3+\n13\n7+\n2\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nShuriken cannon\nLETHAL HITS\n24\"\n3\n3+\n6\n-1\n2\nTwin bright lance\nTWIN-LINKED\n36\"\n1\n3+\n12\n-3\nD6+2\n➤ Twin missile launcher (starshot)\nTWIN-LINKED\n48\"\n1\n3+\n10\n-2\nD6\n➤ Twin missile launcher (sunburst)\nBLAST\nTWIN-LINKED\n48\"\nD6\n3+\n4\n-1\n1\nTwin scatter laser\nTWIN-LINKED\nSUSTAINED HITS 1\n36\"\n6\n3+\n5\n0\n1\nTwin shuriken cannon\nLETHAL HITS\nTWIN-LINKED\n24\"\n3\n3+\n6\n-1\n2\nTwin shuriken catapult\nASSAULT\nTWIN-LINKED\n18\"\n2\n3+\n4\n-1\n1\nTwin starcannon\nTWIN-LINKED\n36\"\n2\n3+\n8\n-3\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nWraithbone hull\n3\n4+\n6\n0\n1\nKEYWORDS\nAELDARI\nDEDICATED TRANSPORT\nFLY\nFRAME\nTRANSPORT\nVEHICLE\nWAVE SERPENT\nCOSTS\n1 model\n115 pts\n4th+ in your army\n+10 pts\nUNIT COMPOSITION\n1 Wave Serpent\n\nThis model is equipped with: twin shuriken cannon; twin shuriken catapult; wraithbone hull.\n\nBecome a supporter and remove ads\nWARGEAR OPTIONS\nThis model’s twin shuriken cannon can be replaced with one of the following: ◦ 1 twin missile launcher ◦ 1 twin bright lance ◦ 1 twin scatter laser ◦ 1 twin starcannon\nThis model’s twin shuriken catapult can be replaced with 1 shuriken cannon.\nCORE ABILITIES\nDEADLY DEMISE D3\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nWave Serpent Shield\n\nEach time a ranged attack targets this model, if the Strength characteristic of that attack is greater than the Toughness characteristic of this model, subtract 1 from the Wound roll.\n\nTRANSPORT\n\nThis model has a transport capacity of 12 ASURYANI INFANTRY models. Each WRAITH CONSTRUCT model takes the space of 2 models. It cannot transport JUMP PACK models or YNNARI models (excluding ASURYANI, YVRAINE and THE VISARCH models).\n\nDAMAGED: 1-4 WOUNDS REMAINING\n\nWhile this model has 1-4 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n23%\nof Aeldari lists, 1.3 per list\n#13\nmost-taken in faction\n29%\nfrom 23% since last update\nIN ARMY LISTS\nPopular detachments\nARMOURED WARHOST\nASPECT HOST\nSPIRIT CONCLAVE\nOften taken with\nFIRE DRAGONS\nWARP SPIDERS\nHOWLING BANSHEES\nWRAITHLORD\nSPIRITSEER"
+  },
+  "context": {
+    "url": "https://www.40k.app/factions/updates",
+    "observed_utc": "2026-11-03T21:48:13.587Z",
+    "latest_visible_version": 995,
+    "latest_visible_release_date": "2026-10-16",
+    "latest_visible_faction": "Genestealer Cults",
+    "complete_observed_main_dom_utf16_length": 6510,
+    "complete_observed_main_dom_fnv1a_utf16": "9336872a",
+    "capture_policy": "Complete global index read; retain only selected faction/version context, not unrelated faction source content.",
+    "aeldari_version_links": [
+      963,
+      931,
+      925,
+      909,
+      879,
+      875
+    ]
+  },
+  "predecessor_keyword_artifact_hash": "57547424449eddebc6e565d253ade49d21a54090d89cbcd087bf1652fc9fead6",
+  "predecessor_wave_rows": [
+    {
+      "source_package_id": {
+        "namespace": "wahapedia",
+        "package_name": "source-mirror",
+        "version": "10th-edition-2026-06-14"
+      },
+      "source_table": "Datasheets_keywords",
+      "source_row_id": "000000599:Aeldari:global:false:2314",
+      "source_row_number": 2314,
+      "fields": {
+        "datasheet_id": "000000599",
+        "is_faction_keyword": "false",
+        "keyword": "Aeldari",
+        "model": ""
+      },
+      "text_fields": [
+        {
+          "source_text_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Aeldari:global:false:2314:keyword",
+          "column_name": "keyword",
+          "raw_text": "Aeldari",
+          "sanitized_text": "Aeldari",
+          "normalized_text": "Aeldari",
+          "parsed_tokens": {
+            "normalized_text": "Aeldari",
+            "dice_expressions": [],
+            "range_expressions": [],
+            "distance_predicates": [],
+            "keywords": []
+          },
+          "html_sanitization": {
+            "source_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Aeldari:global:false:2314:keyword",
+            "raw_html": "Aeldari",
+            "sanitized_text": "Aeldari",
+            "converted_tags": [],
+            "stripped_tags": [],
+            "embedded_links": []
+          }
+        }
+      ]
+    },
+    {
+      "source_package_id": {
+        "namespace": "wahapedia",
+        "package_name": "source-mirror",
+        "version": "10th-edition-2026-06-14"
+      },
+      "source_table": "Datasheets_keywords",
+      "source_row_id": "000000599:Asuryani:global:true:2311",
+      "source_row_number": 2311,
+      "fields": {
+        "datasheet_id": "000000599",
+        "is_faction_keyword": "true",
+        "keyword": "Asuryani",
+        "model": ""
+      },
+      "text_fields": [
+        {
+          "source_text_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Asuryani:global:true:2311:keyword",
+          "column_name": "keyword",
+          "raw_text": "Asuryani",
+          "sanitized_text": "Asuryani",
+          "normalized_text": "Asuryani",
+          "parsed_tokens": {
+            "normalized_text": "Asuryani",
+            "dice_expressions": [],
+            "range_expressions": [],
+            "distance_predicates": [],
+            "keywords": []
+          },
+          "html_sanitization": {
+            "source_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Asuryani:global:true:2311:keyword",
+            "raw_html": "Asuryani",
+            "sanitized_text": "Asuryani",
+            "converted_tags": [],
+            "stripped_tags": [],
+            "embedded_links": []
+          }
+        }
+      ]
+    },
+    {
+      "source_package_id": {
+        "namespace": "wahapedia",
+        "package_name": "source-mirror",
+        "version": "10th-edition-2026-06-14"
+      },
+      "source_table": "Datasheets_keywords",
+      "source_row_id": "000000599:Dedicated Transport:global:false:2316",
+      "source_row_number": 2316,
+      "fields": {
+        "datasheet_id": "000000599",
+        "is_faction_keyword": "false",
+        "keyword": "Dedicated Transport",
+        "model": ""
+      },
+      "text_fields": [
+        {
+          "source_text_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Dedicated Transport:global:false:2316:keyword",
+          "column_name": "keyword",
+          "raw_text": "Dedicated Transport",
+          "sanitized_text": "Dedicated Transport",
+          "normalized_text": "Dedicated Transport",
+          "parsed_tokens": {
+            "normalized_text": "Dedicated Transport",
+            "dice_expressions": [],
+            "range_expressions": [],
+            "distance_predicates": [],
+            "keywords": []
+          },
+          "html_sanitization": {
+            "source_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Dedicated Transport:global:false:2316:keyword",
+            "raw_html": "Dedicated Transport",
+            "sanitized_text": "Dedicated Transport",
+            "converted_tags": [],
+            "stripped_tags": [],
+            "embedded_links": []
+          }
+        }
+      ]
+    },
+    {
+      "source_package_id": {
+        "namespace": "wahapedia",
+        "package_name": "source-mirror",
+        "version": "10th-edition-2026-06-14"
+      },
+      "source_table": "Datasheets_keywords",
+      "source_row_id": "000000599:Fly:global:false:2317",
+      "source_row_number": 2317,
+      "fields": {
+        "datasheet_id": "000000599",
+        "is_faction_keyword": "false",
+        "keyword": "Fly",
+        "model": ""
+      },
+      "text_fields": [
+        {
+          "source_text_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Fly:global:false:2317:keyword",
+          "column_name": "keyword",
+          "raw_text": "Fly",
+          "sanitized_text": "Fly",
+          "normalized_text": "Fly",
+          "parsed_tokens": {
+            "normalized_text": "Fly",
+            "dice_expressions": [],
+            "range_expressions": [],
+            "distance_predicates": [],
+            "keywords": []
+          },
+          "html_sanitization": {
+            "source_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Fly:global:false:2317:keyword",
+            "raw_html": "Fly",
+            "sanitized_text": "Fly",
+            "converted_tags": [],
+            "stripped_tags": [],
+            "embedded_links": []
+          }
+        }
+      ]
+    },
+    {
+      "source_package_id": {
+        "namespace": "wahapedia",
+        "package_name": "source-mirror",
+        "version": "10th-edition-2026-06-14"
+      },
+      "source_table": "Datasheets_keywords",
+      "source_row_id": "000000599:Transport:global:false:2315",
+      "source_row_number": 2315,
+      "fields": {
+        "datasheet_id": "000000599",
+        "is_faction_keyword": "false",
+        "keyword": "Transport",
+        "model": ""
+      },
+      "text_fields": [
+        {
+          "source_text_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Transport:global:false:2315:keyword",
+          "column_name": "keyword",
+          "raw_text": "Transport",
+          "sanitized_text": "Transport",
+          "normalized_text": "Transport",
+          "parsed_tokens": {
+            "normalized_text": "Transport",
+            "dice_expressions": [],
+            "range_expressions": [],
+            "distance_predicates": [],
+            "keywords": []
+          },
+          "html_sanitization": {
+            "source_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Transport:global:false:2315:keyword",
+            "raw_html": "Transport",
+            "sanitized_text": "Transport",
+            "converted_tags": [],
+            "stripped_tags": [],
+            "embedded_links": []
+          }
+        }
+      ]
+    },
+    {
+      "source_package_id": {
+        "namespace": "wahapedia",
+        "package_name": "source-mirror",
+        "version": "10th-edition-2026-06-14"
+      },
+      "source_table": "Datasheets_keywords",
+      "source_row_id": "000000599:Vehicle:global:false:2313",
+      "source_row_number": 2313,
+      "fields": {
+        "datasheet_id": "000000599",
+        "is_faction_keyword": "false",
+        "keyword": "Vehicle",
+        "model": ""
+      },
+      "text_fields": [
+        {
+          "source_text_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Vehicle:global:false:2313:keyword",
+          "column_name": "keyword",
+          "raw_text": "Vehicle",
+          "sanitized_text": "Vehicle",
+          "normalized_text": "Vehicle",
+          "parsed_tokens": {
+            "normalized_text": "Vehicle",
+            "dice_expressions": [],
+            "range_expressions": [],
+            "distance_predicates": [],
+            "keywords": []
+          },
+          "html_sanitization": {
+            "source_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Vehicle:global:false:2313:keyword",
+            "raw_html": "Vehicle",
+            "sanitized_text": "Vehicle",
+            "converted_tags": [],
+            "stripped_tags": [],
+            "embedded_links": []
+          }
+        }
+      ]
+    },
+    {
+      "source_package_id": {
+        "namespace": "wahapedia",
+        "package_name": "source-mirror",
+        "version": "10th-edition-2026-06-14"
+      },
+      "source_table": "Datasheets_keywords",
+      "source_row_id": "000000599:Wave Serpent:global:false:2318",
+      "source_row_number": 2318,
+      "fields": {
+        "datasheet_id": "000000599",
+        "is_faction_keyword": "false",
+        "keyword": "Wave Serpent",
+        "model": ""
+      },
+      "text_fields": [
+        {
+          "source_text_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Wave Serpent:global:false:2318:keyword",
+          "column_name": "keyword",
+          "raw_text": "Wave Serpent",
+          "sanitized_text": "Wave Serpent",
+          "normalized_text": "Wave Serpent",
+          "parsed_tokens": {
+            "normalized_text": "Wave Serpent",
+            "dice_expressions": [],
+            "range_expressions": [],
+            "distance_predicates": [],
+            "keywords": []
+          },
+          "html_sanitization": {
+            "source_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000000599:Wave Serpent:global:false:2318:keyword",
+            "raw_html": "Wave Serpent",
+            "sanitized_text": "Wave Serpent",
+            "converted_tags": [],
+            "stripped_tags": [],
+            "embedded_links": []
+          }
+        }
+      ]
+    },
+    {
+      "source_package_id": {
+        "namespace": "wahapedia",
+        "package_name": "source-mirror",
+        "version": "10th-edition-2026-06-14"
+      },
+      "source_table": "Datasheets_keywords",
+      "source_row_id": "000000599:blank-keyword:global:true:2312",
+      "source_row_number": 2312,
+      "fields": {
+        "datasheet_id": "000000599",
+        "is_faction_keyword": "true",
+        "keyword": "",
+        "model": "",
+        "core_v2_superseded_by": "aeldari-supersede-000000599-blank-faction-keyword",
+        "core_v2_superseded_reason": "Supersede the mirrored blank faction-keyword row before the strict Wave Serpent catalog bridge.",
+        "core_v2_superseded_source_reference": "pdf:aeldari-faction-pack:2026-06-09:p23"
+      },
+      "text_fields": []
+    }
+  ],
+  "new_row_id": "000000599:Frame:global:false:15879",
+  "new_order_index": 15877,
+  "authority_limit": "Complete rendered DOM observation from maintained unofficial App mirror; not official primary/network bytes or App-build attestation. Existing Core17.02 unchanged. Large Flying Base is nonnumeric; historical60mm and provisional2.75inch retained, no hull certification."
+}

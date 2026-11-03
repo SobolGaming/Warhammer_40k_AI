@@ -1,0 +1,40 @@
+{
+  "package_id": {
+    "namespace": "40k-app",
+    "package_name": "wave-serpent-frame",
+    "version": "reviewed-2026-11-03"
+  },
+  "catalog_version": {
+    "version_id": "warhammer-40000-11th-wave-serpent-frame-2026-11",
+    "source_date": "2026-11-03"
+  },
+  "base_source_package_id": {
+    "namespace": "wahapedia",
+    "package_name": "source-mirror",
+    "version": "10th-edition-2026-06-14"
+  },
+  "target_edition": "warhammer-40000-11th",
+  "effective_date": "2026-11-03",
+  "operations": [
+    {
+      "op_id": "wave-serpent-add-ordinary-frame",
+      "order_index": 15877,
+      "operation_kind": "add_row",
+      "target_edition": "warhammer-40000-11th",
+      "source_table": "Datasheets_keywords",
+      "source_row_id": "000000599:Frame:global:false:15879",
+      "source_reference": "https://www.40k.app/factions/aeldari/units/wave-serpent",
+      "effective_date": "2026-11-03",
+      "reason": "Add missing ordinary/global FRAME from complete current App observation; preserve every predecessor row. The source adapter binds exact predecessor table and keyword absence.",
+      "expected_preimage_hash": null,
+      "fields": {
+        "datasheet_id": "000000599",
+        "is_faction_keyword": "false",
+        "keyword": "Frame",
+        "model": ""
+      }
+    }
+  ],
+  "schema_version": "phase17-source-overlay-v1",
+  "package_hash": "636123003b395e11d6e392918915ab46afdf755126f820d96f659c049d816390"
+}

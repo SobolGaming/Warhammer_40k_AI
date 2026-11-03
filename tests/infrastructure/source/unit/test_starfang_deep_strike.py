@@ -258,11 +258,12 @@ def test_selected_source_index_preserves_corrected_keyword_identity(tmp_path: Pa
         input_files=ability_support_index_inputs(DEFAULT_SOURCE_JSON_DIR),
         load_sources=lambda: load_ability_support_sources(DEFAULT_SOURCE_JSON_DIR),
     )
-    selected = ("000004195", "000000600")
+    selected = ("000004195", "000000600", "000000599", "000000598", "000000613")
     ordinary = _ability_support_catalog_package(datasheet_ids=selected)
     indexed = _ability_support_catalog_package(datasheet_ids=selected, source_index_dir=directory)
     assert indexed.to_payload() == ordinary.to_payload()
     assert "STARFANG" in indexed.army_catalog.datasheet_by_id("000004195").keywords.keywords
+    assert "FRAME" in indexed.army_catalog.datasheet_by_id("000000599").keywords.keywords
 
 
 def test_deep_strike_forward_is_exact_deterministic_and_once_only() -> None:
@@ -388,3 +389,142 @@ def test_package_owned_successor_artifact_is_typed_pinned_and_complete() -> None
     assert artifact.current_text == CURRENT_TEXT
     with pytest.raises(ValueError, match="successor artifact bytes"):
         successor_from_json_bytes(raw + b" ")
+
+
+@pytest.mark.parametrize(
+    ("datasheet_id", "expected"), [("000000599", True), ("000000598", False), ("000000613", False)]
+)
+def test_wave_serpent_frame_native_factory_roundtrip_and_measurement_selector(
+    datasheet_id: str, expected: bool
+) -> None:
+    from warhammer40k_core.engine.battlefield_state import geometry_model_at_pose
+    from warhammer40k_core.geometry.pose import Pose
+
+    package = packages()[0]
+    sheet = package.army_catalog.datasheet_by_id(datasheet_id)
+    assert ("FRAME" in sheet.keywords.keywords) is expected
+    assert sheet.keywords.faction_keywords == ("ASURYANI",)
+    if expected:
+        assert sheet.keywords.keywords == (
+            "AELDARI",
+            "DEDICATED TRANSPORT",
+            "FLY",
+            "FRAME",
+            "TRANSPORT",
+            "VEHICLE",
+            "WAVE SERPENT",
+        )
+    profile = sheet.composition[0]
+    selection = UnitMusterSelection(
+        unit_selection_id="frame-source-" + datasheet_id,
+        datasheet_id=datasheet_id,
+        model_profile_selections=(
+            ModelProfileSelection(profile.model_profile_id, profile.min_models),
+        ),
+    )
+    selection = UnitMusterSelection.from_payload(json.loads(json.dumps(selection.to_payload())))
+    unit = UnitFactory(
+        catalog=package.army_catalog, model_geometries=package.model_geometries
+    ).instantiate_unit(army_id="frame-source", selection=selection, datasheet=sheet)
+    restored = UnitInstance.from_payload(json.loads(json.dumps(unit.to_payload())))
+    assert restored.to_payload() == unit.to_payload()
+    for model in restored.own_models:
+        assert ("FRAME" in model.keywords) is expected
+        assert (
+            geometry_model_at_pose(model=model, pose=Pose.at(10, 10)).measures_every_part
+            is expected
+        )
+    # This selects the existing geometry policy; no measured Wave hull is invented.
+
+
+def test_wave_serpent_frame_source_guards_and_exact_addition() -> None:
+    from tools.ability_support_sources import load_before_wave_frame_sources
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        wave_serpent_frame_2026_11 as frame,
+    )
+
+    before = load_before_wave_frame_sources(DEFAULT_SOURCE_JSON_DIR)
+    current = frame.apply_current_frame(before)
+    old = next(a for a in before if a.source_table == "Datasheets_keywords")
+    new = next(a for a in current if a.source_table == "Datasheets_keywords")
+    (operation,) = frame.overlay_pack().operations
+    assert operation.source_row_id == "000000599:Frame:global:false:15879"
+    assert operation.order_index == 15877
+    assert tuple(r for r in new.rows if r.source_row_id != operation.source_row_id) == old.rows
+    added = tuple(r for r in new.rows if r.source_row_id == operation.source_row_id)
+    assert len(added) == 1
+    assert new.rows.index(added[0]) == 2313
+    assert added[0].runtime_fields_payload() == {
+        "datasheet_id": "000000599",
+        "keyword": "Frame",
+        "model": "",
+        "is_faction_keyword": "false",
+    }
+    for prior, after in zip(before, current, strict=True):
+        if prior is not old:
+            assert after is prior
+    with pytest.raises(SourceOverlayError, match="keyword absence"):
+        frame.apply_current_frame(current)
+    drift = replace(old, rows=old.rows[:-1])
+    with pytest.raises(SourceOverlayError, match="predecessor drifted"):
+        frame.apply_current_frame(tuple(drift if a is old else a for a in before))
+    with pytest.raises(SourceOverlayError, match="one keyword predecessor"):
+        frame.apply_current_frame(tuple(a for a in before if a is not old))
+    with pytest.raises(SourceOverlayError, match="one keyword predecessor"):
+        frame.apply_current_frame((*before, old))
+
+
+@pytest.mark.parametrize("which", ["audit", "overlay"])
+def test_wave_serpent_frame_admission_bytes_are_pinned(which: str) -> None:
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        wave_serpent_frame_2026_11 as frame,
+    )
+
+    if which == "audit":
+        raw = Path(frame.__file__).with_name(frame.AUDIT_ARTIFACT_NAME).read_bytes()
+        with pytest.raises(FactionSourceError, match="reviewed pin"):
+            frame.source_audit_from_json_bytes(raw + b" ")
+    else:
+        raw = Path(frame.__file__).with_name(frame.ARTIFACT_NAME).read_bytes()
+        with pytest.raises(SourceOverlayError, match="reviewed pin"):
+            frame.overlay_pack_from_json_bytes(raw + b" ")
+
+
+def test_wave_serpent_frame_source_admission_and_index_inputs() -> None:
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        wave_serpent_frame_2026_11 as frame,
+    )
+
+    assert (
+        frame.source_package()
+        .source_catalog.source_text_by_id("faction-app:aeldari:datasheet:wave-serpent")
+        .raw_text
+        == frame.source_audit().observations[0].operative_text
+    )
+    inputs = ability_support_index_inputs(DEFAULT_SOURCE_JSON_DIR)
+    assert Path(frame.__file__).with_name(frame.ARTIFACT_NAME) in inputs
+    assert Path(frame.__file__).with_name(frame.AUDIT_ARTIFACT_NAME) in inputs
+
+
+def test_wave_serpent_frame_exact_native_delta_and_unchanged_counterparts() -> None:
+    from tests.wave_serpent_frame_helpers import before_wave_frame, frame_audit
+
+    audit = frame_audit("catalog-delta")
+    native, paired_catalog, daemons_catalog = packages()
+    assert before_wave_frame(native).package_hash() == audit["prior_package_hash"]
+    assert before_wave_frame(paired_catalog) is paired_catalog
+    assert before_wave_frame(daemons_catalog) is daemons_catalog
+    wave = native.army_catalog.datasheet_by_id("000000599")
+    changed = replace(wave, name=wave.name + " drift")
+    drift = replace(
+        native,
+        army_catalog=replace(
+            native.army_catalog,
+            datasheets=tuple(
+                changed if row is wave else row for row in native.army_catalog.datasheets
+            ),
+        ),
+    )
+    with pytest.raises(AssertionError):
+        before_wave_frame(drift)

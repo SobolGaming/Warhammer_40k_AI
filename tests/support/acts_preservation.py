@@ -164,6 +164,9 @@ def acts_inactive_predecessor(root: Path, current: bytes) -> bytes:
 
 def starfang_provenance_predecessor(current: bytes) -> bytes:
     """Authenticate the one Starfang registration before retaining all earlier proofs."""
+    from tests.wave_serpent_frame_helpers import before_wave_provenance
+
+    current = before_wave_provenance(current)
     before_hash = "0fb60a40d260ffb8cf901facf5dacdb1c91562cb382131b3fd795be66d683b9e"
     after_hash = "5c41d1c6c8a0b6d186b60271758cab59d1a268d22d47214597dd60f991f90be6"
     observed = hashlib.sha256(current).hexdigest()
@@ -193,6 +196,9 @@ def starfang_provenance_predecessor(current: bytes) -> bytes:
 
 def defiler_provenance_predecessor(current: bytes) -> bytes:
     """Reverse exact current admissions, then retain the original Defiler/Acts proof."""
+    from tests.wave_serpent_frame_helpers import before_wave_provenance
+
+    current = before_wave_provenance(current)
     if (
         hashlib.sha256(current).hexdigest()
         == "5c41d1c6c8a0b6d186b60271758cab59d1a268d22d47214597dd60f991f90be6"

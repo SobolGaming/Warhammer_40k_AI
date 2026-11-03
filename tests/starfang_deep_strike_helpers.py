@@ -27,6 +27,9 @@ def correction_audit() -> dict[str, Any]:
 
 
 def before_starfang_deep_strike(package: CanonicalCatalogPackage) -> CanonicalCatalogPackage:
+    from tests.wave_serpent_frame_helpers import before_wave_frame
+
+    package = before_wave_frame(package)
     surface = next(
         row
         for row in correction_audit()["surfaces"]
@@ -66,6 +69,10 @@ def before_starfang_deep_strike(package: CanonicalCatalogPackage) -> CanonicalCa
 def before_starfang_source_registry(value: dict[str, Any]) -> dict[str, Any]:
     """Authenticate exactly the two new admissions before retained registry controls."""
     from copy import deepcopy
+
+    from tests.wave_serpent_frame_helpers import before_wave_registry
+
+    value = before_wave_registry(value)
 
     assert (
         sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()

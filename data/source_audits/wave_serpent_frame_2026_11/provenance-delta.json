@@ -1,0 +1,6 @@
+{
+  "prior_sha256": "5c41d1c6c8a0b6d186b60271758cab59d1a268d22d47214597dd60f991f90be6",
+  "current_sha256": "03ba930bd1b77644853b875ee7d6f86620e730690cff8b5d1cd12e42c47814ba",
+  "block": "WAVE_FRAME_OVERLAY = (\n    \"src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/\"\n    \"wave_serpent_frame_2026_11.overlay-pack.json\"\n)\nWAVE_FRAME_OVERLAY_SHA256 = \"0e1eefbb84497d8204f91e9add31c3e9ece010f6783000c30f6c26a0eaf2b66a\"\n\n\n",
+  "entry": "        root / WAVE_FRAME_OVERLAY: WAVE_FRAME_OVERLAY_SHA256,\n"
+}
