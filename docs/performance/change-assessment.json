@@ -34,6 +34,26 @@
         }
       }
     },
+    "ci/quality_shards/shard-1-modules.txt": {
+      "before_sha256": "b3b500c620eadc8afa8031b7b5932bfaef5ad5851bc7e0441cc17c7453b84d16",
+      "after_sha256": "4b707b165208357a3ebdb63c338bc521d0a769604f240195e4e365effafa5021",
+      "owners": {
+        "@document": {
+          "before": "b3b500c620eadc8afa8031b7b5932bfaef5ad5851bc7e0441cc17c7453b84d16",
+          "after": "4b707b165208357a3ebdb63c338bc521d0a769604f240195e4e365effafa5021"
+        }
+      }
+    },
+    "ci/quality_shards/shard-1.txt": {
+      "before_sha256": "dd48654a882acbb29f5961e04465c27c84982fe46aae200871db6c78cce5d47c",
+      "after_sha256": "478497489c58b08fdd8345a26e03addb334507b749aa203ac8ad306249f900c1",
+      "owners": {
+        "@document": {
+          "before": "dd48654a882acbb29f5961e04465c27c84982fe46aae200871db6c78cce5d47c",
+          "after": "478497489c58b08fdd8345a26e03addb334507b749aa203ac8ad306249f900c1"
+        }
+      }
+    },
     "ci/quality_shards/shard-2.txt": {
       "before_sha256": "6a23c9ab07b5508ab5bd525edb210b87d86d0bea0ce5a43d96815846dfedbabb",
       "after_sha256": "2ddb5ea6f33928f116405c646ca712a7178c0f0164886fd1510d7f56b4f1c2a7",
@@ -51,6 +71,26 @@
         "@document": {
           "before": "8c47defe3fd09fe2d4fdd9e8ad6ccc0b532e1f63c14b5bd2efefd233cf1d86bb",
           "after": "175462c224db1ad2e0504c56c90093f5d4cb6b12c6a27dc7e9d383d1c153bf52"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4-modules.txt": {
+      "before_sha256": "05ebbc406104ba0dac4483574f4a83fcd3cd88f95a0b846cb64cbdfe41f5f853",
+      "after_sha256": "f55c24c4fd3cfcd520a94774038b608c5f31e1fe7f3404f18b8ad64914a3bb14",
+      "owners": {
+        "@document": {
+          "before": "05ebbc406104ba0dac4483574f4a83fcd3cd88f95a0b846cb64cbdfe41f5f853",
+          "after": "f55c24c4fd3cfcd520a94774038b608c5f31e1fe7f3404f18b8ad64914a3bb14"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "before_sha256": "62a9c34b2d955bce83531578a397c89560f98b7dd953b6668ce8a6a0c61e0114",
+      "after_sha256": "0cc80b918468a412541a9a8cf48304ca108727c82fc4e45f5ee74e68f46d4569",
+      "owners": {
+        "@document": {
+          "before": "62a9c34b2d955bce83531578a397c89560f98b7dd953b6668ce8a6a0c61e0114",
+          "after": "0cc80b918468a412541a9a8cf48304ca108727c82fc4e45f5ee74e68f46d4569"
         }
       }
     },
@@ -726,6 +766,22 @@
       "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
       "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
+    "ci/quality_shards/shard-1-modules.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Move the complete generated faction documentation module from quality lane 4 to measured lighter lane 1 after hosted run 41569636707 reached its unchanged whole-lane deadline with all tests passing; preserve every active/deferred case, actual per-module collection order, four workers, and all existing timing budgets.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "ci/quality_shards/shard-1.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Move the complete generated faction documentation module from quality lane 4 to measured lighter lane 1 after hosted run 41569636707 reached its unchanged whole-lane deadline with all tests passing; preserve every active/deferred case, actual per-module collection order, four workers, and all existing timing budgets.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
     "ci/quality_shards/shard-2.txt": {
       "category": "governance",
       "operations": [],
@@ -739,6 +795,22 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Refresh current admitted test hashes and representative shard scheduling inventories without changing historical selection, deferrals or coverage obligations.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "ci/quality_shards/shard-4-modules.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Move the complete generated faction documentation module from quality lane 4 to measured lighter lane 1 after hosted run 41569636707 reached its unchanged whole-lane deadline with all tests passing; preserve every active/deferred case, actual per-module collection order, four workers, and all existing timing budgets.",
+      "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
+      "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Move the complete generated faction documentation module from quality lane 4 to measured lighter lane 1 after hosted run 41569636707 reached its unchanged whole-lane deadline with all tests passing; preserve every active/deferred case, actual per-module collection order, four workers, and all existing timing budgets.",
       "source_obligation": "Complete current Core 24.20/24.24/24.31 plus 24.32 source-only admission; retain existing 24.33 Stealth and 24.13 Fights First pins, 39 occurrences/35 text replacements/4 preserved texts, all historical bytes and every runtime structured field.",
       "unchanged_work": "No deliberate optimization, hot-query, search/cache, gameplay orchestration or serialization algorithm change. Full-package historical projections and native parameter/typed persistence controls preserve semantics. Required serial current-runtime smoke and existing budgets remain; no speedup or full-game certification claimed."
     },
