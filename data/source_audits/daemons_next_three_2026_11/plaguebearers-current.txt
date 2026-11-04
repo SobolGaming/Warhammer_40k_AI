@@ -1,0 +1,110 @@
+40K.APP
+FACTIONS
+CHAOS DAEMONS
+Plaguebearers
+DATASHEET
+UPDATES
+MODELS
+M
+T
+SV
+W
+LD
+OC
+Plagueridden 32mm
+
+Invulnerable save: 5+
+
+5"
+5
+7+
+2
+7+
+2
+Plaguebearer 32mm
+
+Invulnerable save: 5+
+
+5"
+5
+7+
+2
+7+
+2
+MELEE WEAPONS
+A
+WS
+S
+AP
+D
+Plaguesword
+LETHAL HITS
+2
+3+
+4
+-1
+1
+KEYWORDS
+BATTLELINE
+CHAOS
+DAEMON
+INFANTRY
+NURGLE
+PLAGUEBEARERS
+COSTS
+10 models
+115 pts
+UNIT COMPOSITION
+1 Plagueridden
+9 Plaguebearers
+
+Every model is equipped with: plaguesword.
+
+Led by
+POXBRINGER
+SPOILPOX SCRIVENER
+SLOPPITY BILEPIPER
+EPIDEMIUS
+WARGEAR OPTIONS
+1 Plaguebearer that is not equipped with a daemonic icon can be equipped with 1 instrument of Chaos.
+1 Plaguebearer that is not equipped with an instrument of Chaos can be equipped with 1 daemonic icon.
+WARGEAR
+Daemonic Icon
+
+Models in the bearer’s unit have a Leadership characteristic of 6+.
+
+Instrument of Chaos
+
+Add 1 to Charge rolls made for the bearer’s unit.
+
+CORE ABILITIES
+DEEP STRIKE
+FACTION ABILITIES
+THE SHADOW OF CHAOS
+UNIT ABILITIES
+Infected Outbreak
+
+At the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent’s Level of Control over that objective marker is greater than yours at the end of a phase.
+
+STATS
+29%
+of Chaos Daemons lists, 2.1 per list
+#4
+most-taken in faction
+29%
+from 26% since last update
+IN ARMY LISTS
+Popular detachments
+PLAGUE LEGION
+WARPTIDE
+DAEMONIC INCURSION
+Most often led by
+POXBRINGER
+SLOPPITY BILEPIPER
+SPOILPOX SCRIVENER
+Often taken with
+GREAT UNCLEAN ONE
+NURGLINGS
+BEASTS OF NURGLE
+POXBRINGER
+ROTIGUS

@@ -1,0 +1,167 @@
+datasheet_id,owner,field,current_source,native,disposition,source_capture,limit
+000001112,000001112:flesh-hounds,movement,12,12,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:flesh-hounds,toughness,4,4,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:flesh-hounds,save,7,7,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:flesh-hounds,wounds,2,2,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:flesh-hounds,leadership,7,7,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:flesh-hounds,objective_control,1,1,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:flesh-hounds,invulnerable_save,5,5,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:flesh-hounds,base_mm,"[60, 35.5]","[60.0, 35.5]",agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:flesh-hounds,height_evidence,not measured in this audit,"{""canonical_units"": ""inches"", ""coordinate_frame"": ""model_centered_z_up"", ""evidence_id"": ""000001112:flesh-hounds:height"", ""height_inches"": 1.6, ""origin"": ""footprint_center_table_surface"", ""source_units"": ""inches""}",retained_geometry_not_newly_certified,flesh-hounds-current.txt,Existing base-only factory construction is not full physical fieldability. Preserve Blocked declarations for Lord/Plague.
+000001112,000001112:gore-hound,movement,12,12,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-hound,toughness,4,4,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-hound,save,7,7,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-hound,wounds,2,2,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-hound,leadership,7,7,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-hound,objective_control,1,1,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-hound,invulnerable_save,5,5,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-hound,base_mm,"[60, 35.5]","[60.0, 35.5]",agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-hound,height_evidence,not measured in this audit,"{""canonical_units"": ""inches"", ""coordinate_frame"": ""model_centered_z_up"", ""evidence_id"": ""000001112:gore-hound:height"", ""height_inches"": 1.6, ""origin"": ""footprint_center_table_surface"", ""source_units"": ""inches""}",retained_geometry_not_newly_certified,flesh-hounds-current.txt,Existing base-only factory construction is not full physical fieldability. Preserve Blocked declarations for Lord/Plague.
+000001112,000001112:flesh-hounds,composition_min_max,"[4, 9]","[4, 9]",agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-hound,composition_min_max,"[1, 1]","[1, 1]",agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112,ordinary_keyword:BEAST,true,true,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112,ordinary_keyword:CHAOS,true,true,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112,ordinary_keyword:DAEMON,true,true,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112,ordinary_keyword:FLESH HOUNDS,true,true,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112,ordinary_keyword:KHORNE,true,true,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112,ordinary_keyword:SHADOW LEGION,false,true,confirmed_keyword_drift,flesh-hounds-current.txt,Fresh complete own page plus conditional grant source; ordinary native keyword is unconditional. No off-detachment benefit claimed.
+000001112,000001112,faction_keyword:LEGIONES DAEMONICA,"[""LEGIONES DAEMONICA""]","[""LEGIONES DAEMONICA""]",agrees,flesh-hounds-current.txt,Existing owning faction retained; fresh army source supplies context. Own-page ordinary list does not display faction keyword.
+000001112,000001112:gore-hound,default:000001112:1:1:2:default,"[""000001112:burning-roar""]","[""000001112:burning-roar""]",agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:flesh-hounds,default:000001112:2:1:3:000001112:flesh-hounds:default,"[""000001112:gore-drenched-fangs""]","[""000001112:gore-drenched-fangs""]",agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-hound,default:000001112:2:1:3:000001112:gore-hound:default,"[""000001112:gore-drenched-fangs""]","[""000001112:gore-drenched-fangs""]",agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:flesh-hounds,default:000001112:ability-3:1:4:000001112:flesh-hounds:default,"[""000001112:collar-of-khorne""]","[""000001112:collar-of-khorne""]",agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-hound,default:000001112:ability-3:1:4:000001112:gore-hound:default,"[""000001112:collar-of-khorne""]","[""000001112:collar-of-khorne""]",agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:lord-of-change,movement,12,12,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:lord-of-change,toughness,10,10,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:lord-of-change,save,6,6,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:lord-of-change,wounds,18,18,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:lord-of-change,leadership,6,6,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:lord-of-change,objective_control,5,5,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:lord-of-change,invulnerable_save,4,4,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:lord-of-change,base_mm,[100],[100.0],agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:lord-of-change,height_evidence,not measured in this audit,null,geometry_record_absent,lord-of-change-current.txt,Existing base-only factory construction is not full physical fieldability. Preserve Blocked declarations for Lord/Plague.
+000001120,000001120:lord-of-change,composition_min_max,"[1, 1]","[1, 1]",agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120,ordinary_keyword:CHAOS,true,true,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120,ordinary_keyword:CHARACTER,true,true,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120,ordinary_keyword:DAEMON,true,true,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120,ordinary_keyword:FLY,true,true,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120,ordinary_keyword:LORD OF CHANGE,true,true,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120,ordinary_keyword:MONSTER,true,true,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120,ordinary_keyword:PSYKER,true,true,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120,ordinary_keyword:TZEENTCH,true,true,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120,ordinary_keyword:SHADOW LEGION,false,true,confirmed_keyword_drift,lord-of-change-current.txt,Fresh complete own page plus conditional grant source; ordinary native keyword is unconditional. No off-detachment benefit claimed.
+000001120,000001120,faction_keyword:LEGIONES DAEMONICA,"[""LEGIONES DAEMONICA""]","[""LEGIONES DAEMONICA""]",agrees,lord-of-change-current.txt,Existing owning faction retained; fresh army source supplies context. Own-page ordinary list does not display faction keyword.
+000001120,000001120:lord-of-change,default:000001120:2:1:6:default,"[""000001120:bolt-of-change""]","[""000001120:bolt-of-change""]",agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:lord-of-change,default:000001120:5:1:9:default,"[""000001120:staff-of-tzeentch""]","[""000001120:staff-of-tzeentch""]",agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguebearers,movement,5,5,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguebearers,toughness,5,5,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguebearers,save,7,7,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguebearers,wounds,2,2,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguebearers,leadership,7,7,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguebearers,objective_control,2,2,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguebearers,invulnerable_save,5,5,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguebearers,base_mm,[32],[32.0],agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguebearers,height_evidence,not measured in this audit,null,geometry_record_absent,plaguebearers-current.txt,Existing base-only factory construction is not full physical fieldability. Preserve Blocked declarations for Lord/Plague.
+000001132,000001132:plagueridden,movement,5,5,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plagueridden,toughness,5,5,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plagueridden,save,7,7,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plagueridden,wounds,2,2,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plagueridden,leadership,7,7,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plagueridden,objective_control,2,2,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plagueridden,invulnerable_save,5,5,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plagueridden,base_mm,[32],[32.0],agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plagueridden,height_evidence,not measured in this audit,null,geometry_record_absent,plaguebearers-current.txt,Existing base-only factory construction is not full physical fieldability. Preserve Blocked declarations for Lord/Plague.
+000001132,000001132:plaguebearers,composition_min_max,"[9, 9]","[9, 9]",agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plagueridden,composition_min_max,"[1, 1]","[1, 1]",agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132,ordinary_keyword:BATTLELINE,true,true,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132,ordinary_keyword:CHAOS,true,true,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132,ordinary_keyword:DAEMON,true,true,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132,ordinary_keyword:INFANTRY,true,true,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132,ordinary_keyword:NURGLE,true,true,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132,ordinary_keyword:PLAGUEBEARERS,true,true,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132,ordinary_keyword:SHADOW LEGION,false,true,confirmed_keyword_drift,plaguebearers-current.txt,Fresh complete own page plus conditional grant source; ordinary native keyword is unconditional. No off-detachment benefit claimed.
+000001132,000001132,faction_keyword:LEGIONES DAEMONICA,"[""LEGIONES DAEMONICA""]","[""LEGIONES DAEMONICA""]",agrees,plaguebearers-current.txt,Existing owning faction retained; fresh army source supplies context. Own-page ordinary list does not display faction keyword.
+000001132,000001132:plaguebearers,default:000001132:1:1:10:000001132:plaguebearers:default,"[""000001132:plaguesword""]","[""000001132:plaguesword""]",agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plagueridden,default:000001132:1:1:10:000001132:plagueridden:default,"[""000001132:plaguesword""]","[""000001132:plaguesword""]",agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:burning-roar:standard,range,12,12,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:burning-roar:standard,attacks,D6,D6,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:burning-roar:standard,skill,0,0,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:burning-roar:standard,strength,4,4,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:burning-roar:standard,AP,0,0,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:burning-roar:standard,damage,1,1,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:burning-roar:standard,keywords,"[""Ignores Cover"", ""Torrent""]","[""Ignores Cover"", ""Torrent""]",agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:burning-roar:standard,skill_kind,source_dash,source_dash,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-drenched-fangs:standard,range,melee,melee,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-drenched-fangs:standard,attacks,3,3,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-drenched-fangs:standard,skill,3,3,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-drenched-fangs:standard,strength,5,5,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-drenched-fangs:standard,AP,-1,-1,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-drenched-fangs:standard,damage,1,1,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-drenched-fangs:standard,keywords,[],[],agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:gore-drenched-fangs:standard,skill_kind,numeric,numeric,agrees,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:baleful-sword:standard,range,melee,melee,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:baleful-sword:standard,attacks,3,3,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:baleful-sword:standard,skill,3,3,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:baleful-sword:standard,strength,7,7,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:baleful-sword:standard,AP,-2,-2,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:baleful-sword:standard,damage,3,3,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:baleful-sword:standard,keywords,"[""Extra Attacks""]","[""Extra Attacks""]",agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:baleful-sword:standard,skill_kind,numeric,numeric,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:witchfire,range,18,18,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:witchfire,attacks,9,9,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:witchfire,skill,2,2,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:witchfire,strength,9,9,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:witchfire,AP,-1,-1,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:witchfire,damage,1,1,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:witchfire,keywords,"[""Psychic""]","[""Psychic""]",agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:witchfire,skill_kind,numeric,numeric,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:focused-witchfire,range,18,18,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:focused-witchfire,attacks,9,9,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:focused-witchfire,skill,2,2,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:focused-witchfire,strength,9,9,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:focused-witchfire,AP,-2,-2,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:focused-witchfire,damage,3,3,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:focused-witchfire,keywords,"[""Hazardous"", ""Psychic""]","[""Hazardous"", ""Psychic""]",agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:bolt-of-change:focused-witchfire,skill_kind,numeric,numeric,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:rod-of-sorcery:standard,range,18,18,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:rod-of-sorcery:standard,attacks,6,6,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:rod-of-sorcery:standard,skill,2,2,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:rod-of-sorcery:standard,strength,8,8,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:rod-of-sorcery:standard,AP,-1,-1,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:rod-of-sorcery:standard,damage,2,2,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:rod-of-sorcery:standard,keywords,"[""Psychic""]","[""Psychic""]",agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:rod-of-sorcery:standard,skill_kind,numeric,numeric,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:staff-of-tzeentch:standard,range,melee,melee,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:staff-of-tzeentch:standard,attacks,5,5,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:staff-of-tzeentch:standard,skill,3,3,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:staff-of-tzeentch:standard,strength,6,6,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:staff-of-tzeentch:standard,AP,-1,-1,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:staff-of-tzeentch:standard,damage,3,3,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:staff-of-tzeentch:standard,keywords,"[""Psychic""]","[""Psychic""]",agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:staff-of-tzeentch:standard,skill_kind,numeric,numeric,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguesword:standard,range,melee,melee,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguesword:standard,attacks,2,2,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguesword:standard,skill,3,3,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguesword:standard,strength,4,4,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguesword:standard,AP,-1,-1,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguesword:standard,damage,1,1,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguesword:standard,keywords,"[""Lethal Hits""]","[""Lethal Hits""]",agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:plaguesword:standard,skill_kind,numeric,numeric,agrees,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:collar-of-khorne,operative_ability_text,The bearer has the Feel No Pain 3+ ability against Psychic Attacks.,The bearer has the Feel No Pain 3+ ability against Psychic Attacks.,agrees_normalized,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,000001112:hunters-from-the-warp,operative_ability_text,"At the end of your opponent’s turn, if this unit is not within Engagement Range of one or more enemy units, you can remove it from the battlefield and place it into Strategic Reserves.","At the end of your opponent's turn, if this unit is not within Engagement Range of one or more enemy units, you can remove it from the battlefield and place it into Strategic Reserves.",agrees_normalized,flesh-hounds-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:greater-daemon-of-tzeentch-aura,operative_ability_text,"While a friendly TZEENTCH LEGIONES DAEMONICA unit is within 6"" of this model, that unit is within your army’s Shadow of Chaos.","While a friendly Tzeentch Legiones Daemonica unit is within 6"" of this model, that unit is within your army's Shadow of Chaos.",agrees_normalized,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:daemon-lord-of-tzeentch-aura,operative_ability_text,"While a friendly TZEENTCH LEGIONES DAEMONICA unit is within 6"" of this model, each time a model in that unit makes a ranged attack, add 1 to the Strength characteristic of that attack.","While a friendly Tzeentch Legiones Daemonica unit is within 6"" of this model, each time a model in that unit makes a ranged attack, add 1 to the Strength characteristic of that attack.",agrees_normalized,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:master-of-magicks-psychic,operative_ability_text,"In your Shooting phase, select one of the following abilities: [IGNORES COVER]; [LETHAL HITS]; [SUSTAINED HITS D3]. Until the end of the phase, this model’s Bolt of Change has that ability.","In your Shooting phase, select one of the following abilities: [IGNORES COVER]; [LETHAL HITS]; [SUSTAINED HITS D3]. Until the end of the phase, this model's Bolt of Change has that ability.",agrees_normalized,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:daemonic-icon,operative_ability_text,Models in the bearer’s unit have a Leadership characteristic of 6+.,Models in the bearer's unit have a Leadership characteristic of 6+.,agrees_normalized,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:instrument-of-chaos,operative_ability_text,Add 1 to Charge rolls made for the bearer’s unit.,Add 1 to Charge rolls made for the bearer's unit.,agrees_normalized,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001132,000001132:infected-outbreak,operative_ability_text,"At the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent’s Level of Control over that objective marker is greater than yours at the end of a phase.","If you control an objective marker at the end of your Command phase and this unit is within range of that objective marker, that objective marker remains under your control, even if you have no models within range of it, until your opponent controls it at the start or end of any turn.",source_descriptor_debt_not_behavior_defect,plaguebearers-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:damaged:001,wounds_min,1,1,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:damaged:001,wounds_max,7,7,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001120,000001120:damaged:001,modifier,-1,-1,agrees,lord-of-change-current.txt,Catalog/source comparison only; no full gameplay certification.
+000001112,gw-11e-mfm-2026-10:faction:chaos-daemons:unit:units-flesh-hounds,mfm_all_cost_brackets,"[80, 150]","[80, 150]",agrees,flesh-hounds-current.txt,Current October MFM source metadata only; no fresh complete army-cost/mustering traversal.
+000001120,gw-11e-mfm-2026-10:faction:chaos-daemons:unit:units-lord-of-change,mfm_all_cost_brackets,"[320, 340]","[320, 340]",agrees,lord-of-change-current.txt,Current October MFM source metadata only; no fresh complete army-cost/mustering traversal.
+000001132,gw-11e-mfm-2026-10:faction:chaos-daemons:unit:units-plaguebearers,mfm_all_cost_brackets,[115],[115],agrees,plaguebearers-current.txt,Current October MFM source metadata only; no fresh complete army-cost/mustering traversal.
+000001120,000001120:equipment-choice:option-1,optional_equipment,zero or one of rod/sword,zero or one of rod/sword,agrees_reviewed,lord-of-change-current.txt,Independent native default/rod/sword constructions passed; no new geometry.
+000001132,000001132:optional-equipment,icon_instrument_distinct_bearers,both allowed on different nonleader Plaguebearers,both allowed on different nonleader Plaguebearers,agrees_reviewed,plaguebearers-current.txt,Independent four legal variants/JSON roundtrips and same-bearer rejection passed.
+000001112,incoming-leaders,current_own_page_list,"[""Karanak""]","[""000001104"", ""000004102""]",incoming_context_only,flesh-hounds-current.txt,Raw duplicate historical Karanak identity4102 is not native60 admission; no leader admission or two-leader gameplay claim.
+000001132,incoming-leaders,current_own_page_list,"[""Poxbringer"", ""Spoilpox Scrivener"", ""Sloppity Bilepiper"", ""Epidemius""]","[""000001129"", ""000001467"", ""000001468"", ""000001469""]",incoming_context_only,plaguebearers-current.txt,Own-page recipient context only; no new leader source/admission certification.

@@ -1,0 +1,136 @@
+40K.APP
+FACTIONS
+CHAOS DAEMONS
+Lord of Change
+DATASHEET
+UPDATES
+MODELS
+M
+T
+SV
+W
+LD
+OC
+Lord of Change 100mm
+
+Invulnerable save: 4+
+
+12"
+10
+6+
+18
+6+
+5
+RANGED WEAPONS
+RNG
+A
+BS
+S
+AP
+D
+➤ Bolt of Change (witchfire)
+PSYCHIC
+18"
+9
+2+
+9
+-1
+1
+➤ Bolt of Change (focused witchfire)
+HAZARDOUS
+PSYCHIC
+18"
+9
+2+
+9
+-2
+3
+Rod of sorcery
+PSYCHIC
+18"
+6
+2+
+8
+-1
+2
+MELEE WEAPONS
+A
+WS
+S
+AP
+D
+Baleful sword
+EXTRA ATTACKS
+3
+3+
+7
+-2
+3
+Staff of Tzeentch
+PSYCHIC
+5
+3+
+6
+-1
+3
+KEYWORDS
+CHAOS
+CHARACTER
+DAEMON
+FLY
+LORD OF CHANGE
+MONSTER
+PSYKER
+TZEENTCH
+COSTS
+1 model
+320 pts
+3rd+ in your army
++20 pts
+UNIT COMPOSITION
+1 Lord of Change
+
+This model is equipped with: Bolt of Change; staff of Tzeentch.
+
+WARGEAR OPTIONS
+This model can be equipped with one of the following: ◦ 1 rod of sorcery ◦ 1 baleful sword
+CORE ABILITIES
+DEADLY DEMISE D6
+DEEP STRIKE
+FACTION ABILITIES
+THE SHADOW OF CHAOS
+UNIT ABILITIES
+Greater Daemon of Tzeentch
+
+While a friendly TZEENTCH LEGIONES DAEMONICA unit is within 6" of this model, that unit is within your army’s Shadow of Chaos.
+
+Daemon Lord of Tzeentch
+
+While a friendly TZEENTCH LEGIONES DAEMONICA unit is within 6" of this model, each time a model in that unit makes a ranged attack, add 1 to the Strength characteristic of that attack.
+
+Master of Magicks
+
+In your Shooting phase, select one of the following abilities: [IGNORES COVER]; [LETHAL HITS]; [SUSTAINED HITS D3]. Until the end of the phase, this model’s Bolt of Change has that ability.
+
+DAMAGED: 1-7 WOUNDS REMAINING
+
+While this model has 1-7 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.
+
+STATS
+19%
+of Chaos Daemons lists, 1.3 per list
+#14
+most-taken in faction
+15%
+from 27% since last update
+IN ARMY LISTS
+Popular detachments
+DAEMONIC INCURSION
+SCINTILLATING LEGION
+SHADOW LEGION
+Often taken with
+PINK HORRORS
+BE’LAKOR
+SCREAMERS
+FLAMERS
+KAIROS FATEWEAVER

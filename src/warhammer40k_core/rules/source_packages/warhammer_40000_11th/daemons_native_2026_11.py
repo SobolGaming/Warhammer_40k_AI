@@ -21,6 +21,9 @@ from warhammer40k_core.rules.source_overlay import (
     SourceReleaseManifest,
     apply_source_release_overlays,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    daemons_next_three_2026_11 as next_three,
+)
 from warhammer40k_core.rules.source_patch import source_row_hash
 from warhammer40k_core.rules.wahapedia_schema import WahapediaJsonArtifact
 
@@ -101,12 +104,13 @@ def apply_current_daemons(
     tables = tuple(a for a in artifacts if a.source_table == "Datasheets_keywords")
     if len(tables) != 1:
         raise SourceOverlayError("Daemons native correction requires one keyword table.")
-    for datasheet_id, row_id, preimage in KEYWORD_PREIMAGES:
+    next_three.source_package()
+    for datasheet_id, row_id, preimage in (*KEYWORD_PREIMAGES, *next_three.KEYWORD_PREIMAGES):
         matches = tuple(
             row
             for row in tables[0].rows
             if row.runtime_fields_payload()["datasheet_id"] == datasheet_id
-            and row.runtime_fields_payload()["keyword"].casefold() == "shadow legion"
+            and row.runtime_fields_payload()["keyword"].strip().casefold() == "shadow legion"
         )
         if len(matches) != 1:
             raise SourceOverlayError("Daemons native keyword preimage is missing or duplicated.")

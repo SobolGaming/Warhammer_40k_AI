@@ -214,6 +214,10 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
     catches added/deleted source-processing modules. Absolute paths intentionally
     require regeneration after moving a checkout.
     """
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        daemons_next_three_2026_11 as next_three,
+    )
+
     rules = Path(wahapedia_schema.__file__).resolve().parent
     repo = rules.parents[2]
     coverage = aeldari_datasheet_semantic_coverage
@@ -245,6 +249,7 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
                 Path(wave_frame.__file__).with_name(wave_frame.AUDIT_ARTIFACT_NAME),
                 Path(daemons_native.__file__).with_name(daemons_native.ARTIFACT_NAME),
                 Path(daemons_native.__file__).with_name(daemons_native.AUDIT_ARTIFACT_NAME),
+                Path(next_three.__file__).with_name(next_three.AUDIT_ARTIFACT_NAME),
                 rules / "source_authority_registry.json",
                 rules
                 / "source_packages"

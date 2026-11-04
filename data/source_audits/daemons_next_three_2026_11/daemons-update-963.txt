@@ -1,0 +1,35 @@
+40K.APP
+FACTIONS
+Chaos Daemons
+DATASHEETS
+ARMY RULES
+DETACHMENTS
+UPDATES
+CREATE LIST
+DETACHMENTS
+2 detachments changed.
+Cavalcade of Chaos
+From Beyond the Veil
+1 → 2 CP
+Legion of Excess
+Rapturous Agony
+added · 1 CP
+Thieves of Pain
+removed · was 1 CP
+DATASHEETS
+4 units changed.
+EPIC HEROES
+Skarbrand
+1 model
+315 pts → 330 pts
+MOUNTED
+Bloodcrushers
+6 models
+200 pts → 210 pts
+INFANTRY, SWARMS, BEASTS
+Fiends
+3rd+ in your army
++15 pts → +25 pts
+Flesh Hounds
+5 models
+75 pts → 80 pts

@@ -1,0 +1,14 @@
+40K.APP
+FACTIONS
+Factions
+
+Explore the factions of Warhammer 40,000, from humanity’s indomitable armies to the galaxy’s most ruthless predators.
+
+ARMIES
+UPDATES
+VERSION 995
+Released 2026-10-16.
+1 faction changed.
+Genestealer Cults
+1 unit
+1 change

@@ -1,0 +1,31 @@
+{
+  "base": "baeb3e1f0d12d00ec41f55046fc754e19cee5dd2",
+  "changes": {
+    "tools/ability_support_sources.py": {
+      "before_sha256": "421d6c695e6710e0c0594a3b89e17529831033b73d36d6dea3ef016563160a0d",
+      "after_sha256": "cd108fd9df9ee6357d9b0478884cf483b4586eb5ee9cc1c41bc22fac4256f5b1",
+      "owners": {
+        "ability_support_index_inputs": {
+          "before": "f5d8bae32c825cbe72086b1206181f39e5c150bb73f18442b868895b59829364",
+          "after": "10687843f5c3f25e9af7b4b4c659c8d499ee3f09b2e2ab888202d80df0ef46f7"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tools/ability_support_sources.py": [
+      "qualification40-exact-b0712fa66a9cc38e"
+    ]
+  },
+  "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+  "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required.",
+  "policy_successor": {
+    "before_sha256": "8cd7b97a934f6fb6c71270f0004850f7203a12ed3d19548f005b2156a3b8900c",
+    "after_sha256": "e4b05916324de6b7194627ec48e93da6c2b1ff1bec7d75378f399541f4104507",
+    "import_sha256": "8e2e66ea148b7897f1faee90932b5ed047f8b905129150f10cb0a755ade48a48",
+    "call_sha256": "2d9a508a630c23fedf1a914224d7203afbbc9ef1812ab1eb6029e555c5651a34",
+    "predecessor_sha256": "ce91e5e2679150d8e73e999fea468360907feb2203e6895a6035be32b269add6",
+    "smoke_import_sha256": "1d45b76025bbe89499f0498ea3e8a95c8124753e7e674162b5e993766662e1a3"
+  },
+  "module_sha256": "f707cadf9d16a335225f274530e285ab6338b7a2dd62f56aa07dc3b511c0d5cd"
+}

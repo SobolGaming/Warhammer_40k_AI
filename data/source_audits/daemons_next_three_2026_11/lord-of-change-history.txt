@@ -1,0 +1,32 @@
+40K.APP
+FACTIONS
+CHAOS DAEMONS
+Lord of Change
+DATASHEET
+UPDATES
+VERSION 931
+Released 2026-08-26
+Deadly Demise D6
+Ability Updated
+
+This ability always takes the form Deadly Demise X. Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6").
+
+Previous
+
+This ability always takes the form Deadly Demise X. Each time a model in this unit is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6").
+
+Example: An Impulsor with a unit of Intercessors embarked within it is destroyed by ranged attacks. First, any unresolved attacks made by the attacking unit are resolved. Then the Intercessors make an emergency disembark move. Then the roll is made for the Deadly Demise ability, and on a 6, that ability is resolved. Finally, the Impulsor is removed from the battlefield.
+
+VERSION 909
+Released 2026-07-22
+Points changes
+1 model
+300 pts → 320 pts
+3rd+ in your army
++15 pts → +20 pts
+VERSION 867
+Released 2026-06-19
+Added to the faction
+Added
+Points cost
+300 pts

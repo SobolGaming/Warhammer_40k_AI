@@ -1,0 +1,212 @@
+[
+  {
+    "url": "https://www.40k.app/factions/updates",
+    "observed_utc": "2026-11-04T07:11:06.461Z",
+    "length_utf16": 247,
+    "fnv1a_utf16": "fdcc38a",
+    "file": "app-updates-index-context.txt",
+    "sha256_utf8": "ec5a824fb4ce242fa2ecbeb1261ea7f8030e70f8f9194525773c6e409919f19d",
+    "json_sha256": "c25f5f48eca2a1271c5c36d6a75d994ac9387c0607a50c0d833cb99fbe5d47e5",
+    "method": "bounded main.innerText prefix through latest version995; not entire historical index"
+  },
+  {
+    "url": "https://www.40k.app/rules/24-core-abilities#24.08",
+    "observed_utc": "2026-11-04T07:21:21.643Z",
+    "length_utf16": 418,
+    "fnv1a_utf16": "4265cc66",
+    "file": "core-24.08.txt",
+    "sha256_utf8": "d50b4cd39d3057254cfce4617a50b1da14b9087a76003db2e73ce8f738833dc8",
+    "json_sha256": "5fa150602dc1b491cc0b1bb7046edabea684d775f25740b560c1aff16d4d8a53",
+    "method": "rendered selected section.innerText; closed FAQs excluded"
+  },
+  {
+    "url": "https://www.40k.app/rules/24-core-abilities#24.09",
+    "observed_utc": "2026-11-04T07:21:21.643Z",
+    "length_utf16": 272,
+    "fnv1a_utf16": "bd1d5d31",
+    "file": "core-24.09.txt",
+    "sha256_utf8": "1f5324cfe63123aaba50fd0d48cc4b179767cefc3fdc3d366172b2bd199e737b",
+    "json_sha256": "5b346e992e825447faa8aa685bb44c5cdb7aaaf29c24d3daf5c26b61c39de65c",
+    "method": "rendered selected section.innerText; closed FAQs excluded"
+  },
+  {
+    "url": "https://www.40k.app/rules/24-core-abilities#24.11",
+    "observed_utc": "2026-11-04T07:21:21.643Z",
+    "length_utf16": 402,
+    "fnv1a_utf16": "f72ac2eb",
+    "file": "core-24.11.txt",
+    "sha256_utf8": "f930a668b906976ab3777e4d24c4e7146946143e15666f88cb61c3386dbcdcf7",
+    "json_sha256": "fe0e22ffa0069b623f5b605be44706c426c38c814df44943e2388f49d43bd6f0",
+    "method": "rendered selected section.innerText; closed FAQs excluded"
+  },
+  {
+    "url": "https://www.40k.app/rules/24-core-abilities#24.12",
+    "observed_utc": "2026-11-04T07:21:21.644Z",
+    "length_utf16": 174,
+    "fnv1a_utf16": "123d2e2",
+    "file": "core-24.12.txt",
+    "sha256_utf8": "a1b22d5ccde9a11ab50ca34bd06c16d884465419442dcdab0cfca28a14db2cd8",
+    "json_sha256": "f2054bac85ad7a32f5495f39ede0dded6a44384c6557c20e92d15dc7a81820c0",
+    "method": "rendered selected section.innerText; closed FAQs excluded"
+  },
+  {
+    "url": "https://www.40k.app/rules/24-core-abilities#24.15",
+    "observed_utc": "2026-11-04T07:21:21.643Z",
+    "length_utf16": 263,
+    "fnv1a_utf16": "4a4a44d3",
+    "file": "core-24.15.txt",
+    "sha256_utf8": "cb4939c51b4a8fd7b85384e48fec82b5cca856c8d69ef5fe6c9c367f865dd6c4",
+    "json_sha256": "0593be2bd15ad3f9e9fcb826b48797ac628478e49760c14eee4f212c54ee0872",
+    "method": "rendered selected section.innerText; closed FAQs excluded"
+  },
+  {
+    "url": "https://www.40k.app/rules/24-core-abilities#24.18",
+    "observed_utc": "2026-11-04T07:21:21.643Z",
+    "length_utf16": 239,
+    "fnv1a_utf16": "5982b788",
+    "file": "core-24.18.txt",
+    "sha256_utf8": "5c62983b09f40a9f7a2e9f82b6775d9811e2c7f1c205e6c1bca25346f3249f6a",
+    "json_sha256": "338f0d4139c7129ff883176112b7b54ddd24eb2a5a1d90b1ec3292704a74b639",
+    "method": "rendered selected section.innerText; closed FAQs excluded"
+  },
+  {
+    "url": "https://www.40k.app/rules/24-core-abilities#24.23",
+    "observed_utc": "2026-11-04T07:21:21.644Z",
+    "length_utf16": 432,
+    "fnv1a_utf16": "cc75fe9",
+    "file": "core-24.23.txt",
+    "sha256_utf8": "b0386b21ac05e72d3b0967bb240aba2d5b71cea51d5b6590b86b7079586d9cd0",
+    "json_sha256": "5da965e960d61ad54c3e6c2e8a742c02a751314335832bd5731aec9678b75241",
+    "method": "rendered selected section.innerText; closed FAQs excluded"
+  },
+  {
+    "url": "https://www.40k.app/rules/24-core-abilities#24.29",
+    "observed_utc": "2026-11-04T07:21:21.643Z",
+    "length_utf16": 312,
+    "fnv1a_utf16": "5757b3b3",
+    "file": "core-24.29.txt",
+    "sha256_utf8": "c041f6dbe64222d39d050ef7116cd95e3f06b77ff46a392f6b980f8fea46a762",
+    "json_sha256": "6d2e4e0b367c5b180bb2dd83a9ce18886c8b6f02df91b33183ee32dce8ed8d75",
+    "method": "rendered selected section.innerText; closed FAQs excluded"
+  },
+  {
+    "url": "https://www.40k.app/rules/24-core-abilities#24.36",
+    "observed_utc": "2026-11-04T07:21:21.643Z",
+    "length_utf16": 460,
+    "fnv1a_utf16": "7c5e0496",
+    "file": "core-24.36.txt",
+    "sha256_utf8": "5eaafd474994d8ea5a45003b3e70363fe0c37eea719b17d115392f6757246a16",
+    "json_sha256": "988048fa638c4f9979f56b50fe8f59af1035751b3f72aa5e0a9d0d95848ba1d0",
+    "method": "rendered selected section.innerText; closed FAQs excluded"
+  },
+  {
+    "url": "https://www.40k.app/rules/24-core-abilities#24.37",
+    "observed_utc": "2026-11-04T07:21:21.644Z",
+    "length_utf16": 122,
+    "fnv1a_utf16": "4eeef923",
+    "file": "core-24.37.txt",
+    "sha256_utf8": "f988078fcef8914b2fc71ec65992ecda9cae772d3a166d09eec208f7a858f2cf",
+    "json_sha256": "55dccef996ebdcbf3ccb0d5de47779fa0f808004e4bca2aa7952fca0fe9ae6bd",
+    "method": "rendered selected section.innerText; closed FAQs excluded"
+  },
+  {
+    "url": "https://www.40k.app/rules/24-core-abilities#24.39",
+    "observed_utc": "2026-11-04T07:21:21.643Z",
+    "length_utf16": 215,
+    "fnv1a_utf16": "937a1544",
+    "file": "core-24.39.txt",
+    "sha256_utf8": "0135f79ca30f4f3174d38671fd6814c99c3e9ee1dedc204bf9f2606cd80cf432",
+    "json_sha256": "73e7fa607f99fec9daec272bf743d923a24b279b2bbfce8bfef0482541da9def",
+    "method": "rendered selected section.innerText; closed FAQs excluded"
+  },
+  {
+    "url": "https://www.40k.app/factions/chaos-daemons/army-rules",
+    "observed_utc": "2026-11-04T07:15:57.783Z",
+    "length_utf16": 2319,
+    "fnv1a_utf16": "129e9d3a",
+    "file": "daemons-army-rules-current.txt",
+    "sha256_utf8": "70d084d16ba36e406284650c2cda447e77c458f60f7a40aebacbd28ca9e030f2",
+    "json_sha256": "9723c5aed6d35b0ba72d97c04a5336d9b10e506ccbdc59ce8b02defc4b3d6a7c",
+    "method": "complete rendered main.innerText"
+  },
+  {
+    "url": "https://www.40k.app/963/factions/chaos-daemons/updates",
+    "observed_utc": "2026-11-04T07:11:42.861Z",
+    "length_utf16": 480,
+    "fnv1a_utf16": "fb2cb8fb",
+    "file": "daemons-update-963.txt",
+    "sha256_utf8": "88845d30c06b6a17f872c7968044aaa08deb339f909fec7c78fcb2686c9ca04e",
+    "json_sha256": "26edadc32af868bf1c6e526f9cecf6d1656a8689ed3bb97eb7c734da1e6cbe34",
+    "method": "complete rendered main.innerText"
+  },
+  {
+    "url": "https://www.40k.app/factions/chaos-daemons/units/flesh-hounds",
+    "observed_utc": "2026-11-04T07:12:09.862Z",
+    "length_utf16": 1386,
+    "fnv1a_utf16": "dac506f4",
+    "file": "flesh-hounds-current.txt",
+    "sha256_utf8": "7df98c8e13367816bb3604dca482294d464dae85b25351bc6475aaf3e43baa02",
+    "json_sha256": "a30753244cfc65604b9afea08e6607c5c86dd37c6a7fd6d144a288668a0894ff",
+    "method": "complete rendered main.innerText"
+  },
+  {
+    "url": "https://www.40k.app/factions/chaos-daemons/units/flesh-hounds/updates",
+    "observed_utc": "2026-11-04T07:15:57.436Z",
+    "length_utf16": 211,
+    "fnv1a_utf16": "9e5f1cec",
+    "file": "flesh-hounds-history.txt",
+    "sha256_utf8": "fefaf3409e144e21c499255cb601bc7650f679f34d2a5876776967249d8b8fa2",
+    "json_sha256": "752b9eaeb774754fdce2cd44084140d2d8ea4ba2d73553248c8cbe9028da1b2a",
+    "method": "complete rendered main.innerText"
+  },
+  {
+    "url": "https://www.40k.app/factions/chaos-daemons/units/lord-of-change",
+    "observed_utc": "2026-11-04T07:12:58.792Z",
+    "length_utf16": 1860,
+    "fnv1a_utf16": "4464771c",
+    "file": "lord-of-change-current.txt",
+    "sha256_utf8": "d72e1d5e553ab5108d6f7535abe79e57895e2dcb898a2cd6293ec66775a61e7a",
+    "json_sha256": "0194bc5ec602c9d8f7db0d7b0569fafb5c49ff88e5ac96f081914912790c1204",
+    "method": "complete rendered main.innerText"
+  },
+  {
+    "url": "https://www.40k.app/factions/chaos-daemons/units/lord-of-change/updates",
+    "observed_utc": "2026-11-04T07:15:33.630Z",
+    "length_utf16": 1494,
+    "fnv1a_utf16": "2d49054f",
+    "file": "lord-of-change-history.txt",
+    "sha256_utf8": "1c741dab073fe4088b5d4e4db46ff513868b9608d2b5ecd1fb8acac91168501b",
+    "json_sha256": "0677130afee83e20621069e935cec88a7806464cc48817230daadc1f7286e6ab",
+    "method": "complete rendered main.innerText"
+  },
+  {
+    "url": "https://www.40k.app/factions/chaos-daemons/units/plaguebearers",
+    "observed_utc": "2026-11-04T07:13:59.087Z",
+    "length_utf16": 1575,
+    "fnv1a_utf16": "e5a8481",
+    "file": "plaguebearers-current.txt",
+    "sha256_utf8": "f8a923578105c347d9e25b52b6cee70797b70480ee42ff5e85b5705889cd8c18",
+    "json_sha256": "991fa0912ba9fc6ea7ff648316af6170685d8fdb92d3bbf4ab5af15ec29c46cd",
+    "method": "complete rendered main.innerText"
+  },
+  {
+    "url": "https://www.40k.app/factions/chaos-daemons/units/plaguebearers/updates",
+    "observed_utc": "2026-11-04T07:15:15.682Z",
+    "length_utf16": 141,
+    "fnv1a_utf16": "6a6164c2",
+    "file": "plaguebearers-history.txt",
+    "sha256_utf8": "badfc228c670c5ab7a54b58b3edb488d180c08a6ded527efd3c22d2009d2b9ac",
+    "json_sha256": "836dcde8d9654bebc421866bede83b9bcf18acfab67eeb27344b91588d1f3fcd",
+    "method": "complete rendered main.innerText"
+  },
+  {
+    "url": "https://www.40k.app/factions/chaos-daemons/detachments/shadow-legion",
+    "observed_utc": "2026-11-04T07:16:18.160Z",
+    "length_utf16": 6359,
+    "fnv1a_utf16": "d823eaf9",
+    "file": "shadow-legion-current.txt",
+    "sha256_utf8": "ea876304ab89342cf2f30e80245d8b40152924365b0d406a0e8ab6e33122d05a",
+    "json_sha256": "e9bc7dbb69a7dd19cda731ff5d28c5c17ce48e79ee1bb34f728d88945ef39a97",
+    "method": "complete rendered main.innerText"
+  }
+]

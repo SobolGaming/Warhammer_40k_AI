@@ -1,290 +1,1016 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "b01e038f048be87df0c91640f249c800a63104aa",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9c67490093af232f0cbee6df778c3435068478d531d2bb512cc7a5081397092e",
-  "operation_map_sha256": "57134b8bcad14acfe0271368848b4a9d806a1c336b0842346ca23027c6cf8199",
+  "base": "baeb3e1f0d12d00ec41f55046fc754e19cee5dd2",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cd1d037058928b922eb4f9eea56ad238d4f1e397ce4e38d686931c90773acd40",
+  "operation_map_sha256": "201f801f17601a8edeafbbdf46fc76729159737510a183a04558cac4db231f0d",
   "changes": {
-    "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "bdf38a566cef29ce0d0e6dab002e8fddc6ef503fb497233b3576ff1069cd3ac9",
-      "after_sha256": "cc50d735821b85668cf1d38135ac52417fa949576d746ebeb9efa6582019a1f5",
+    ".gitattributes": {
+      "before_sha256": "70fd47366981aba480db0d2e41167d02f6e3364147271a195892e03d143d5fa5",
+      "after_sha256": "08098990225c863036a4b3db3255c8ab6f650188ebb752e632bb7df6d5a66d6c",
       "owners": {
         "@document": {
-          "before": "bdf38a566cef29ce0d0e6dab002e8fddc6ef503fb497233b3576ff1069cd3ac9",
-          "after": "cc50d735821b85668cf1d38135ac52417fa949576d746ebeb9efa6582019a1f5"
+          "before": "70fd47366981aba480db0d2e41167d02f6e3364147271a195892e03d143d5fa5",
+          "after": "08098990225c863036a4b3db3255c8ab6f650188ebb752e632bb7df6d5a66d6c"
+        }
+      }
+    },
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "da447700a6385e2eceee9ab0bbf090941e51361c4e3817d5369c56e4310bba6c",
+      "after_sha256": "cb6bec938c87a72e3f877bd6065f62116d2883fff0723082576c3a3abb851572",
+      "owners": {
+        "@document": {
+          "before": "da447700a6385e2eceee9ab0bbf090941e51361c4e3817d5369c56e4310bba6c",
+          "after": "cb6bec938c87a72e3f877bd6065f62116d2883fff0723082576c3a3abb851572"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "before_sha256": "44a34596e268f6d2ff09b58926385c82fb6661fe805597b74d3352efcf850dbd",
+      "after_sha256": "4d4859fa587a48beeb6683fc7dff877fae1490eb2c4a4cb48c3ef5e25f63e25d",
+      "owners": {
+        "@document": {
+          "before": "44a34596e268f6d2ff09b58926385c82fb6661fe805597b74d3352efcf850dbd",
+          "after": "4d4859fa587a48beeb6683fc7dff877fae1490eb2c4a4cb48c3ef5e25f63e25d"
+        }
+      }
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "cc50d735821b85668cf1d38135ac52417fa949576d746ebeb9efa6582019a1f5",
+      "after_sha256": "e227bdbf239c991d78f569ded4885d2579f5a524f87f36142081e0138d1c9587",
+      "owners": {
+        "@document": {
+          "before": "cc50d735821b85668cf1d38135ac52417fa949576d746ebeb9efa6582019a1f5",
+          "after": "e227bdbf239c991d78f569ded4885d2579f5a524f87f36142081e0138d1c9587"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "4d24948b2f834f23e96da26ffda203fec93b4ad198d6dcfb571c78629ac35933",
-      "after_sha256": "35cfe0555549faa404e57ce207d9c2c9c97dfab811c0fb88c9c6ce035cab03e9",
+      "before_sha256": "35cfe0555549faa404e57ce207d9c2c9c97dfab811c0fb88c9c6ce035cab03e9",
+      "after_sha256": "608f8f82024b45a572446a950a94b8825c9407b65c67a4ae58f4a4f036aa83d0",
       "owners": {
         "@document": {
-          "before": "4d24948b2f834f23e96da26ffda203fec93b4ad198d6dcfb571c78629ac35933",
-          "after": "35cfe0555549faa404e57ce207d9c2c9c97dfab811c0fb88c9c6ce035cab03e9"
+          "before": "35cfe0555549faa404e57ce207d9c2c9c97dfab811c0fb88c9c6ce035cab03e9",
+          "after": "608f8f82024b45a572446a950a94b8825c9407b65c67a4ae58f4a4f036aa83d0"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "113f3a3b010da9e1ca1ead58df1831d33ddd08852fe0e07b4104f162f415ecb0",
-      "after_sha256": "40177cf2436910998cf092ff5431313842320bd639dd9a6397cf0be896c2bd13",
+      "before_sha256": "40177cf2436910998cf092ff5431313842320bd639dd9a6397cf0be896c2bd13",
+      "after_sha256": "4e80e36d749034fc92c4a0bddee7a1875f9814b021c54bd6cd4b957e20ea750c",
       "owners": {
         "@document": {
-          "before": "113f3a3b010da9e1ca1ead58df1831d33ddd08852fe0e07b4104f162f415ecb0",
-          "after": "40177cf2436910998cf092ff5431313842320bd639dd9a6397cf0be896c2bd13"
+          "before": "40177cf2436910998cf092ff5431313842320bd639dd9a6397cf0be896c2bd13",
+          "after": "4e80e36d749034fc92c4a0bddee7a1875f9814b021c54bd6cd4b957e20ea750c"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "164354c0c019ea3758724d4c5ea56e11d4741c1ec811f45fa54571201f9da291",
-      "after_sha256": "f2ee450542ec97d11f8e6263bc2a89f15fd1c3ca0cb764ca6c5f7f7804fa33c8",
+      "before_sha256": "f2ee450542ec97d11f8e6263bc2a89f15fd1c3ca0cb764ca6c5f7f7804fa33c8",
+      "after_sha256": "1b91dfcd0d3e70ef4ef645e69fa410863b5573c0fc6b390e0c8e5ea77d33e30e",
       "owners": {
         "@document": {
-          "before": "164354c0c019ea3758724d4c5ea56e11d4741c1ec811f45fa54571201f9da291",
-          "after": "f2ee450542ec97d11f8e6263bc2a89f15fd1c3ca0cb764ca6c5f7f7804fa33c8"
+          "before": "f2ee450542ec97d11f8e6263bc2a89f15fd1c3ca0cb764ca6c5f7f7804fa33c8",
+          "after": "1b91dfcd0d3e70ef4ef645e69fa410863b5573c0fc6b390e0c8e5ea77d33e30e"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "42f9a7ac7d5b8998621ef37b847b8b2276ab081bd4ffdfa2f37a73974e174df6",
-      "after_sha256": "3b10b05316199dd2c42129f20032056a35f05875339e21a97ccea047c72d346b",
+      "before_sha256": "3b10b05316199dd2c42129f20032056a35f05875339e21a97ccea047c72d346b",
+      "after_sha256": "bd1544bce5132811229f730e8143892cb3cbef673cd192ce7dc9c9a071db7f58",
       "owners": {
         "@document": {
-          "before": "42f9a7ac7d5b8998621ef37b847b8b2276ab081bd4ffdfa2f37a73974e174df6",
-          "after": "3b10b05316199dd2c42129f20032056a35f05875339e21a97ccea047c72d346b"
+          "before": "3b10b05316199dd2c42129f20032056a35f05875339e21a97ccea047c72d346b",
+          "after": "bd1544bce5132811229f730e8143892cb3cbef673cd192ce7dc9c9a071db7f58"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "44f36b08e5f706d939f9683babb5eae16fc6453706fc56e47574258bfb82f1c6",
-      "after_sha256": "f602ca161709c83d476799f7be1584d81011754f422ec042837e6fa7793ee4f9",
+      "before_sha256": "f602ca161709c83d476799f7be1584d81011754f422ec042837e6fa7793ee4f9",
+      "after_sha256": "266ae5f5e0d34e7f733868ae501dd814f73a0dffdaf49fb43604f063bde1d66c",
       "owners": {
         "@document": {
-          "before": "44f36b08e5f706d939f9683babb5eae16fc6453706fc56e47574258bfb82f1c6",
-          "after": "f602ca161709c83d476799f7be1584d81011754f422ec042837e6fa7793ee4f9"
+          "before": "f602ca161709c83d476799f7be1584d81011754f422ec042837e6fa7793ee4f9",
+          "after": "266ae5f5e0d34e7f733868ae501dd814f73a0dffdaf49fb43604f063bde1d66c"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "612a008471581cdcbaf05aae2c4dbfd545089b9a79ebd82339c8e7a9870ad0e4",
-      "after_sha256": "21d3e2289479b9fdc869091455a5f963f34cbe0e451387e686023ab5a0898b22",
+      "before_sha256": "21d3e2289479b9fdc869091455a5f963f34cbe0e451387e686023ab5a0898b22",
+      "after_sha256": "947916c1cacbfca911e40203def1e945ee70b2a0d44e8fc1d6bc8f6ef6e217b5",
       "owners": {
         "@document": {
-          "before": "612a008471581cdcbaf05aae2c4dbfd545089b9a79ebd82339c8e7a9870ad0e4",
-          "after": "21d3e2289479b9fdc869091455a5f963f34cbe0e451387e686023ab5a0898b22"
+          "before": "21d3e2289479b9fdc869091455a5f963f34cbe0e451387e686023ab5a0898b22",
+          "after": "947916c1cacbfca911e40203def1e945ee70b2a0d44e8fc1d6bc8f6ef6e217b5"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "f5354ae67d4753e402f725c313dd8bdb92edcc4e58e28ad6140bfc0ad3a16e88",
-      "after_sha256": "3fdcc2b0c45ec81cc827b23d5246ef79b7dbb8116ebee34836c31a7bda6cc09e",
+      "before_sha256": "3fdcc2b0c45ec81cc827b23d5246ef79b7dbb8116ebee34836c31a7bda6cc09e",
+      "after_sha256": "b76b5add8b3bcdecfb4e315d82130257d2dc9f40380a7f6797de98a3fac6dbb5",
       "owners": {
         "@document": {
-          "before": "f5354ae67d4753e402f725c313dd8bdb92edcc4e58e28ad6140bfc0ad3a16e88",
-          "after": "3fdcc2b0c45ec81cc827b23d5246ef79b7dbb8116ebee34836c31a7bda6cc09e"
+          "before": "3fdcc2b0c45ec81cc827b23d5246ef79b7dbb8116ebee34836c31a7bda6cc09e",
+          "after": "b76b5add8b3bcdecfb4e315d82130257d2dc9f40380a7f6797de98a3fac6dbb5"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "3d8ab7ebecad1a4920afcdc43eb073914fabbb22c754210380145c08083cfb58",
-      "after_sha256": "46085d874848b3606fb1a9d44f2e95abf4eae898a183ea0ec9a43efec289eb0a",
+      "before_sha256": "46085d874848b3606fb1a9d44f2e95abf4eae898a183ea0ec9a43efec289eb0a",
+      "after_sha256": "fcfcdbef823c578fabe2a27fa636e91f8eceffa05c70d0453667b08d4d9ae442",
       "owners": {
         "@document": {
-          "before": "3d8ab7ebecad1a4920afcdc43eb073914fabbb22c754210380145c08083cfb58",
-          "after": "46085d874848b3606fb1a9d44f2e95abf4eae898a183ea0ec9a43efec289eb0a"
+          "before": "46085d874848b3606fb1a9d44f2e95abf4eae898a183ea0ec9a43efec289eb0a",
+          "after": "fcfcdbef823c578fabe2a27fa636e91f8eceffa05c70d0453667b08d4d9ae442"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/app-updates-index-context.json": {
+      "before_sha256": null,
+      "after_sha256": "c25f5f48eca2a1271c5c36d6a75d994ac9387c0607a50c0d833cb99fbe5d47e5",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c25f5f48eca2a1271c5c36d6a75d994ac9387c0607a50c0d833cb99fbe5d47e5"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/app-updates-index-context.txt": {
+      "before_sha256": null,
+      "after_sha256": "ec5a824fb4ce242fa2ecbeb1261ea7f8030e70f8f9194525773c6e409919f19d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ec5a824fb4ce242fa2ecbeb1261ea7f8030e70f8f9194525773c6e409919f19d"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/audit-report.txt": {
+      "before_sha256": null,
+      "after_sha256": "e32264cafeb872cb75b47f028833e1465f3330347dcf137899697bd5c8b284ed",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e32264cafeb872cb75b47f028833e1465f3330347dcf137899697bd5c8b284ed"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/audit-summary.json": {
+      "before_sha256": null,
+      "after_sha256": "2aaf4fb1dc005f1e7081eabda19ae6785549c0c6ff8aeb7379806878f74da2da",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2aaf4fb1dc005f1e7081eabda19ae6785549c0c6ff8aeb7379806878f74da2da"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/catalog-delta.json": {
+      "before_sha256": null,
+      "after_sha256": "81c435520a18a37bbf97b9b66e6120f6798234754b3bf23da24898ba25acf639",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "81c435520a18a37bbf97b9b66e6120f6798234754b3bf23da24898ba25acf639"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/component-residual-disposition.csv": {
+      "before_sha256": null,
+      "after_sha256": "2922d3ac9fc262af6780912e1412ec65a2ab2ef3f637720b13f89c5681eb9af4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2922d3ac9fc262af6780912e1412ec65a2ab2ef3f637720b13f89c5681eb9af4"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.08.json": {
+      "before_sha256": null,
+      "after_sha256": "5fa150602dc1b491cc0b1bb7046edabea684d775f25740b560c1aff16d4d8a53",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5fa150602dc1b491cc0b1bb7046edabea684d775f25740b560c1aff16d4d8a53"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.08.txt": {
+      "before_sha256": null,
+      "after_sha256": "d50b4cd39d3057254cfce4617a50b1da14b9087a76003db2e73ce8f738833dc8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d50b4cd39d3057254cfce4617a50b1da14b9087a76003db2e73ce8f738833dc8"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.09.json": {
+      "before_sha256": null,
+      "after_sha256": "5b346e992e825447faa8aa685bb44c5cdb7aaaf29c24d3daf5c26b61c39de65c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5b346e992e825447faa8aa685bb44c5cdb7aaaf29c24d3daf5c26b61c39de65c"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.09.txt": {
+      "before_sha256": null,
+      "after_sha256": "1f5324cfe63123aaba50fd0d48cc4b179767cefc3fdc3d366172b2bd199e737b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1f5324cfe63123aaba50fd0d48cc4b179767cefc3fdc3d366172b2bd199e737b"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.11.json": {
+      "before_sha256": null,
+      "after_sha256": "fe0e22ffa0069b623f5b605be44706c426c38c814df44943e2388f49d43bd6f0",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fe0e22ffa0069b623f5b605be44706c426c38c814df44943e2388f49d43bd6f0"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.11.txt": {
+      "before_sha256": null,
+      "after_sha256": "f930a668b906976ab3777e4d24c4e7146946143e15666f88cb61c3386dbcdcf7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f930a668b906976ab3777e4d24c4e7146946143e15666f88cb61c3386dbcdcf7"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.12.json": {
+      "before_sha256": null,
+      "after_sha256": "f2054bac85ad7a32f5495f39ede0dded6a44384c6557c20e92d15dc7a81820c0",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f2054bac85ad7a32f5495f39ede0dded6a44384c6557c20e92d15dc7a81820c0"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.12.txt": {
+      "before_sha256": null,
+      "after_sha256": "a1b22d5ccde9a11ab50ca34bd06c16d884465419442dcdab0cfca28a14db2cd8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a1b22d5ccde9a11ab50ca34bd06c16d884465419442dcdab0cfca28a14db2cd8"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.15.json": {
+      "before_sha256": null,
+      "after_sha256": "0593be2bd15ad3f9e9fcb826b48797ac628478e49760c14eee4f212c54ee0872",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0593be2bd15ad3f9e9fcb826b48797ac628478e49760c14eee4f212c54ee0872"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.15.txt": {
+      "before_sha256": null,
+      "after_sha256": "cb4939c51b4a8fd7b85384e48fec82b5cca856c8d69ef5fe6c9c367f865dd6c4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "cb4939c51b4a8fd7b85384e48fec82b5cca856c8d69ef5fe6c9c367f865dd6c4"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.18.json": {
+      "before_sha256": null,
+      "after_sha256": "338f0d4139c7129ff883176112b7b54ddd24eb2a5a1d90b1ec3292704a74b639",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "338f0d4139c7129ff883176112b7b54ddd24eb2a5a1d90b1ec3292704a74b639"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.18.txt": {
+      "before_sha256": null,
+      "after_sha256": "5c62983b09f40a9f7a2e9f82b6775d9811e2c7f1c205e6c1bca25346f3249f6a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5c62983b09f40a9f7a2e9f82b6775d9811e2c7f1c205e6c1bca25346f3249f6a"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.23.json": {
+      "before_sha256": null,
+      "after_sha256": "5da965e960d61ad54c3e6c2e8a742c02a751314335832bd5731aec9678b75241",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5da965e960d61ad54c3e6c2e8a742c02a751314335832bd5731aec9678b75241"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.23.txt": {
+      "before_sha256": null,
+      "after_sha256": "b0386b21ac05e72d3b0967bb240aba2d5b71cea51d5b6590b86b7079586d9cd0",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b0386b21ac05e72d3b0967bb240aba2d5b71cea51d5b6590b86b7079586d9cd0"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.29.json": {
+      "before_sha256": null,
+      "after_sha256": "6d2e4e0b367c5b180bb2dd83a9ce18886c8b6f02df91b33183ee32dce8ed8d75",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6d2e4e0b367c5b180bb2dd83a9ce18886c8b6f02df91b33183ee32dce8ed8d75"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.29.txt": {
+      "before_sha256": null,
+      "after_sha256": "c041f6dbe64222d39d050ef7116cd95e3f06b77ff46a392f6b980f8fea46a762",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c041f6dbe64222d39d050ef7116cd95e3f06b77ff46a392f6b980f8fea46a762"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.36.json": {
+      "before_sha256": null,
+      "after_sha256": "988048fa638c4f9979f56b50fe8f59af1035751b3f72aa5e0a9d0d95848ba1d0",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "988048fa638c4f9979f56b50fe8f59af1035751b3f72aa5e0a9d0d95848ba1d0"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.36.txt": {
+      "before_sha256": null,
+      "after_sha256": "5eaafd474994d8ea5a45003b3e70363fe0c37eea719b17d115392f6757246a16",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5eaafd474994d8ea5a45003b3e70363fe0c37eea719b17d115392f6757246a16"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.37.json": {
+      "before_sha256": null,
+      "after_sha256": "55dccef996ebdcbf3ccb0d5de47779fa0f808004e4bca2aa7952fca0fe9ae6bd",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "55dccef996ebdcbf3ccb0d5de47779fa0f808004e4bca2aa7952fca0fe9ae6bd"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.37.txt": {
+      "before_sha256": null,
+      "after_sha256": "f988078fcef8914b2fc71ec65992ecda9cae772d3a166d09eec208f7a858f2cf",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f988078fcef8914b2fc71ec65992ecda9cae772d3a166d09eec208f7a858f2cf"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.39.json": {
+      "before_sha256": null,
+      "after_sha256": "73e7fa607f99fec9daec272bf743d923a24b279b2bbfce8bfef0482541da9def",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "73e7fa607f99fec9daec272bf743d923a24b279b2bbfce8bfef0482541da9def"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.39.txt": {
+      "before_sha256": null,
+      "after_sha256": "0135f79ca30f4f3174d38671fd6814c99c3e9ee1dedc204bf9f2606cd80cf432",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0135f79ca30f4f3174d38671fd6814c99c3e9ee1dedc204bf9f2606cd80cf432"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/correction-plan.txt": {
+      "before_sha256": null,
+      "after_sha256": "37996a0063afe3d094681bad238064a15db43db237035d66e2b2930c42c4d4fe",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "37996a0063afe3d094681bad238064a15db43db237035d66e2b2930c42c4d4fe"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/daemons-army-rules-current.json": {
+      "before_sha256": null,
+      "after_sha256": "9723c5aed6d35b0ba72d97c04a5336d9b10e506ccbdc59ce8b02defc4b3d6a7c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9723c5aed6d35b0ba72d97c04a5336d9b10e506ccbdc59ce8b02defc4b3d6a7c"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/daemons-army-rules-current.txt": {
+      "before_sha256": null,
+      "after_sha256": "70d084d16ba36e406284650c2cda447e77c458f60f7a40aebacbd28ca9e030f2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "70d084d16ba36e406284650c2cda447e77c458f60f7a40aebacbd28ca9e030f2"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/daemons-update-963.json": {
+      "before_sha256": null,
+      "after_sha256": "26edadc32af868bf1c6e526f9cecf6d1656a8689ed3bb97eb7c734da1e6cbe34",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "26edadc32af868bf1c6e526f9cecf6d1656a8689ed3bb97eb7c734da1e6cbe34"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/daemons-update-963.txt": {
+      "before_sha256": null,
+      "after_sha256": "88845d30c06b6a17f872c7968044aaa08deb339f909fec7c78fcb2686c9ca04e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "88845d30c06b6a17f872c7968044aaa08deb339f909fec7c78fcb2686c9ca04e"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/flesh-hounds-current.json": {
+      "before_sha256": null,
+      "after_sha256": "a30753244cfc65604b9afea08e6607c5c86dd37c6a7fd6d144a288668a0894ff",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a30753244cfc65604b9afea08e6607c5c86dd37c6a7fd6d144a288668a0894ff"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/flesh-hounds-current.txt": {
+      "before_sha256": null,
+      "after_sha256": "7df98c8e13367816bb3604dca482294d464dae85b25351bc6475aaf3e43baa02",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "7df98c8e13367816bb3604dca482294d464dae85b25351bc6475aaf3e43baa02"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/flesh-hounds-history.json": {
+      "before_sha256": null,
+      "after_sha256": "752b9eaeb774754fdce2cd44084140d2d8ea4ba2d73553248c8cbe9028da1b2a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "752b9eaeb774754fdce2cd44084140d2d8ea4ba2d73553248c8cbe9028da1b2a"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/flesh-hounds-history.txt": {
+      "before_sha256": null,
+      "after_sha256": "fefaf3409e144e21c499255cb601bc7650f679f34d2a5876776967249d8b8fa2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fefaf3409e144e21c499255cb601bc7650f679f34d2a5876776967249d8b8fa2"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/later-ir-residual-disposition.csv": {
+      "before_sha256": null,
+      "after_sha256": "46f7ba6dba493de983e210d2fe602860b621a85e1e3dbd36991e1afb4d49c043",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "46f7ba6dba493de983e210d2fe602860b621a85e1e3dbd36991e1afb4d49c043"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/lord-of-change-current.json": {
+      "before_sha256": null,
+      "after_sha256": "0194bc5ec602c9d8f7db0d7b0569fafb5c49ff88e5ac96f081914912790c1204",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0194bc5ec602c9d8f7db0d7b0569fafb5c49ff88e5ac96f081914912790c1204"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/lord-of-change-current.txt": {
+      "before_sha256": null,
+      "after_sha256": "d72e1d5e553ab5108d6f7535abe79e57895e2dcb898a2cd6293ec66775a61e7a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d72e1d5e553ab5108d6f7535abe79e57895e2dcb898a2cd6293ec66775a61e7a"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/lord-of-change-history.json": {
+      "before_sha256": null,
+      "after_sha256": "0677130afee83e20621069e935cec88a7806464cc48817230daadc1f7286e6ab",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0677130afee83e20621069e935cec88a7806464cc48817230daadc1f7286e6ab"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/lord-of-change-history.txt": {
+      "before_sha256": null,
+      "after_sha256": "1c741dab073fe4088b5d4e4db46ff513868b9608d2b5ecd1fb8acac91168501b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1c741dab073fe4088b5d4e4db46ff513868b9608d2b5ecd1fb8acac91168501b"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/plaguebearers-current.json": {
+      "before_sha256": null,
+      "after_sha256": "991fa0912ba9fc6ea7ff648316af6170685d8fdb92d3bbf4ab5af15ec29c46cd",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "991fa0912ba9fc6ea7ff648316af6170685d8fdb92d3bbf4ab5af15ec29c46cd"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/plaguebearers-current.txt": {
+      "before_sha256": null,
+      "after_sha256": "f8a923578105c347d9e25b52b6cee70797b70480ee42ff5e85b5705889cd8c18",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f8a923578105c347d9e25b52b6cee70797b70480ee42ff5e85b5705889cd8c18"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/plaguebearers-history.json": {
+      "before_sha256": null,
+      "after_sha256": "836dcde8d9654bebc421866bede83b9bcf18acfab67eeb27344b91588d1f3fcd",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "836dcde8d9654bebc421866bede83b9bcf18acfab67eeb27344b91588d1f3fcd"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/plaguebearers-history.txt": {
+      "before_sha256": null,
+      "after_sha256": "badfc228c670c5ab7a54b58b3edb488d180c08a6ded527efd3c22d2009d2b9ac",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "badfc228c670c5ab7a54b58b3edb488d180c08a6ded527efd3c22d2009d2b9ac"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/registry-delta.json": {
+      "before_sha256": null,
+      "after_sha256": "3aaf5d22177ddc40129a7febc275e5c58be8b71da871be9c0fb33b78036eeaac",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "3aaf5d22177ddc40129a7febc275e5c58be8b71da871be9c0fb33b78036eeaac"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/reviewed-observation.json": {
+      "before_sha256": null,
+      "after_sha256": "e550211684cf4104f39dacecffd11ec5b3a9a691894eee49ecaab2972f213a2c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e550211684cf4104f39dacecffd11ec5b3a9a691894eee49ecaab2972f213a2c"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/shadow-legion-current.json": {
+      "before_sha256": null,
+      "after_sha256": "e9bc7dbb69a7dd19cda731ff5d28c5c17ce48e79ee1bb34f728d88945ef39a97",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e9bc7dbb69a7dd19cda731ff5d28c5c17ce48e79ee1bb34f728d88945ef39a97"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/shadow-legion-current.txt": {
+      "before_sha256": null,
+      "after_sha256": "ea876304ab89342cf2f30e80245d8b40152924365b0d406a0e8ab6e33122d05a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ea876304ab89342cf2f30e80245d8b40152924365b0d406a0e8ab6e33122d05a"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/source-capture-receipts.json": {
+      "before_sha256": null,
+      "after_sha256": "cc67ebf416a0bf463c812c51a6c83d3784fa68e2bcfdbb874e9cd34b66d7478c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "cc67ebf416a0bf463c812c51a6c83d3784fa68e2bcfdbb874e9cd34b66d7478c"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/source-native-matrix.csv": {
+      "before_sha256": null,
+      "after_sha256": "0dcadf3f67cdfa0e68561e572d4d137a59d2db28671bad0196ddef733c668fea",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0dcadf3f67cdfa0e68561e572d4d137a59d2db28671bad0196ddef733c668fea"
+        }
+      }
+    },
+    "data/source_audits/daemons_next_three_2026_11/source-native-matrix.json": {
+      "before_sha256": null,
+      "after_sha256": "19317fe207ae5effff3b293c56872e4127eb5b1c9574333e11fafa67b7dc1700",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "19317fe207ae5effff3b293c56872e4127eb5b1c9574333e11fafa67b7dc1700"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "bea38b67b25ae4d6a83846009934da26832063c5587d58e9d0283ce5a1fe3925",
-      "after_sha256": "8121625c1c8a9b97575895c7dfd1b465d3511a9fc594b22e1bf05203ef4b8052",
+      "before_sha256": "8121625c1c8a9b97575895c7dfd1b465d3511a9fc594b22e1bf05203ef4b8052",
+      "after_sha256": "9c6d1401f9c63b37620cee168af416d4ee0b37fdfe6acb5b00c65341266c1bed",
       "owners": {
         "@document": {
-          "before": "bea38b67b25ae4d6a83846009934da26832063c5587d58e9d0283ce5a1fe3925",
-          "after": "8121625c1c8a9b97575895c7dfd1b465d3511a9fc594b22e1bf05203ef4b8052"
+          "before": "8121625c1c8a9b97575895c7dfd1b465d3511a9fc594b22e1bf05203ef4b8052",
+          "after": "9c6d1401f9c63b37620cee168af416d4ee0b37fdfe6acb5b00c65341266c1bed"
         }
       }
     },
-    "docs/SAVE7_ALLOCATION_SCOPE.md": {
+    "docs/DAEMONS_NEXT_THREE_SOURCE_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "0f852a23bda3d64a9e485e701f4fcef526aa3eec70c0cd0a2b0c3337800d58c2",
+      "after_sha256": "0ef5be38632626ec95ed4fb47c6a37fc645e322006e79b0121e3d0c545ef4319",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0f852a23bda3d64a9e485e701f4fcef526aa3eec70c0cd0a2b0c3337800d58c2"
+          "after": "0ef5be38632626ec95ed4fb47c6a37fc645e322006e79b0121e3d0c545ef4319"
+        }
+      }
+    },
+    "docs/performance/policy-v3/daemons-next-three-smoke-scope.json": {
+      "before_sha256": null,
+      "after_sha256": "a17d2ed59851af47aab96f14703dfea4b4b0d50765c916aca3babfd34901e4c7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a17d2ed59851af47aab96f14703dfea4b4b0d50765c916aca3babfd34901e4c7"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "2cef3975330b551245f1550add35b02f261ec9017a4e9a30527fe50e5c266109",
-      "after_sha256": "2afaefc7b7fc2415b7cceb0821804989e1fddbe56260be2182c65fb011ae38a9",
+      "before_sha256": "2afaefc7b7fc2415b7cceb0821804989e1fddbe56260be2182c65fb011ae38a9",
+      "after_sha256": "8528d20964c6e73bde6b21ebe57d8050fc3f6e2a73d1912308b134b918d3e29b",
       "owners": {
         "@document": {
-          "before": "2cef3975330b551245f1550add35b02f261ec9017a4e9a30527fe50e5c266109",
-          "after": "2afaefc7b7fc2415b7cceb0821804989e1fddbe56260be2182c65fb011ae38a9"
+          "before": "2afaefc7b7fc2415b7cceb0821804989e1fddbe56260be2182c65fb011ae38a9",
+          "after": "8528d20964c6e73bde6b21ebe57d8050fc3f6e2a73d1912308b134b918d3e29b"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "1787d6ffee2d381bb69728278de4064762a32dba0c725eb5816a81b112915037",
-      "after_sha256": "865ec77f6b47e19fa641cd3cc9d35bd8e8d1c10431286a772f9b02741ffeeb0d",
+      "before_sha256": "865ec77f6b47e19fa641cd3cc9d35bd8e8d1c10431286a772f9b02741ffeeb0d",
+      "after_sha256": "da6a6cb0e0f107f1135945b252293f9da342e35b7e5d2038900e7b6e773055d1",
       "owners": {
         "@document": {
-          "before": "1787d6ffee2d381bb69728278de4064762a32dba0c725eb5816a81b112915037",
-          "after": "865ec77f6b47e19fa641cd3cc9d35bd8e8d1c10431286a772f9b02741ffeeb0d"
+          "before": "865ec77f6b47e19fa641cd3cc9d35bd8e8d1c10431286a772f9b02741ffeeb0d",
+          "after": "da6a6cb0e0f107f1135945b252293f9da342e35b7e5d2038900e7b6e773055d1"
         }
       }
     },
-    "src/warhammer40k_core/engine/damage_allocation.py": {
-      "before_sha256": "ad90f81c802eb7571865a3a11a50ad95c811f1965a8aba8b13ea1ddab649250a",
-      "after_sha256": "524a0aa87e0f7dac45d6e603caadff8259ceb86904d609b7f9864767784c5d14",
+    "src/warhammer40k_core/rules/faction_source_governance.py": {
+      "before_sha256": "7f2376fb30ead71e8504eabbc3014d87b14d733c03c4671718f7a43fe3af96bb",
+      "after_sha256": "e88e91fa8fbb66d3c4c0f245a2600a1374d4aba968a23355ad1455ecbc48743e",
+      "owners": {
+        "authorize_faction_observation": {
+          "before": "bfadd35f0773439021171c42b975e086f8eb3466cc33bc24ad27dc6434ad5e3f",
+          "after": "a2c1800f429b821fec58c8d66b22594ff728abb6422f6a70bde3f993a08478a9"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_authority_registry.json": {
+      "before_sha256": "fbcacca48101aab5a41f182ed70b1aa23c039e1434d36ef3868f9059ed3e0170",
+      "after_sha256": "3d044c396d4c000e77a3ff9f6a34780ecb0075ac2f87d510014e5290b88c3894",
+      "owners": {
+        "@document": {
+          "before": "fbcacca48101aab5a41f182ed70b1aa23c039e1434d36ef3868f9059ed3e0170",
+          "after": "3d044c396d4c000e77a3ff9f6a34780ecb0075ac2f87d510014e5290b88c3894"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_authority_registry.py": {
+      "before_sha256": "70e010deb06a7cade86a1175827cd9a6176d0f18009f87862e628fd66e817680",
+      "after_sha256": "989128bc5bf753b07c0b40694925f60ccd7e0ea389143458e6da811c5fed549c",
       "owners": {
         "@module": {
-          "before": "6c0d32201ca14cc4c72528ef940718e5c389da26c645db2c414d9a1cadeb92e0",
-          "after": "0714592218f0fb9877833471e1d7b7347b4ed4c33243768af5104c73baf312f8"
-        },
-        "AllocationGroup.__post_init__": {
-          "before": "21992b40e340ebb322c627873b4a1f083266ee37eb74634d14f7c22413ede012",
-          "after": "a70c55a45b1d2ff7ef687e26665601483092b3acb031e6be2a1de599c6989810"
+          "before": "efa81c2a99322ecefd7b8fd6aa782163cf62a842146ba1ca1d5ea95bc30aa2f2",
+          "after": "889ece45a5b67818f43d022615328678176d476d65136d46ec48163cfc51106a"
         }
       }
     },
-    "src/warhammer40k_core/engine/damage_allocation_validation.py": {
-      "before_sha256": "6419181f155228c6ccf9576a829eb23f405f9dfca9397dd0ca1c91b7d3f325ac",
-      "after_sha256": "0d63378acc5bb04f9e8b07ac8790f42cb0a3bd602541eb433ccfcd3de65d12f8",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.py": {
+      "before_sha256": "14ef59fe400314080351f559d12a614b92d712cc6c33e6a96b8761adfbafadff",
+      "after_sha256": "547fa487bf2c0e84ca45fa0c7f7be1a20c836b1a994f8908e0b6276fa4190a42",
       "owners": {
         "@module": {
-          "before": "6066ffa20157422e7d6d36d544f61f17b0594bd91ca76e1f41655ff8ea335e46",
-          "after": "4089fe12cef3dfdefdaf627ae40cec15dcea75d2903572edc5354ab635388258"
+          "before": "6385c4d232c8e57995b9286b927db9bb2f09d9cedea3a0e0aae203af23f57828",
+          "after": "6867d176b48ffef959f808aecf3bbfc51cc6c686abdcb0b8a8699ffe6b114afe"
         },
-        "validate_optional_effective_save_characteristic": {
-          "before": null,
-          "after": "2f75dd6a0235e929d31e83b69692f0e45e88b3886a743b29200da52589026cbd"
-        },
-        "validate_optional_save": {
-          "before": "75e0f0765f67bcc0ba8335a90711f3c6f15441ea3396c35a0fa3027cfb7f7c40",
-          "after": null
+        "apply_current_daemons": {
+          "before": "341bae7888d506f946ba488e0d560f533d332103361592f0b4130518c1727cb5",
+          "after": "e288b3fd49fef0b2abcbe195cce1a649998e04c769b80f62a3026cfd0e3a28e8"
         }
       }
     },
-    "tests/rules/section04/test_completion_boundaries.py": {
-      "before_sha256": "d4a653d9d7ead869a30e599dbf984234655ed9c634e3854cab267e8c9cd9de0f",
-      "after_sha256": "4600589661f5647fb82e1a19fb47b43e616200f37dd6aa26c90dbeb315a6a7a2",
-      "owners": {
-        "test_effective_save7_engine_checkpoint_restores_forks_and_replays": {
-          "before": null,
-          "after": "6469a4a8617b92b9846f3d8522eb873f608a443106ededdf17ffa80e2432dd82"
-        }
-      }
-    },
-    "tests/rules/section05/test_allocation_choices.py": {
-      "before_sha256": "a9faa7653aef99dd2d32b6f7ca42d74aef3837745ddf8d145750a4775939b6a0",
-      "after_sha256": "70ac36cba184c58160afaa7022a827aedbd3babd3e03499e9c69ac4af057a08c",
-      "owners": {
-        "@module": {
-          "before": "1c9bf76d2c7c6842da10be61b8af9845770123b9ae50b7a0b8a3c967cccb1ca5",
-          "after": "78c6acde6c5ea44e3a67ffb86235bb257e746dd377ce15eaaf2915d7c853f34d"
-        },
-        "test_effective_save7_character_and_mixed_group_choices": {
-          "before": null,
-          "after": "262633796834a8af9d50d27f8516f6ff7fde3584d9be6fc38ece5e5fa2c72d77"
-        },
-        "test_effective_save_characteristic_constructor_and_decoder": {
-          "before": null,
-          "after": "816b528e089affcdfebeb67aaa9d315e21837ee1dc252b1f1879c1b0f80fb31a"
-        },
-        "test_effective_save_characteristic_rejects_malformed_values": {
-          "before": null,
-          "after": "324981ba7ccedbac206f73d6dc32c826d5c8e6fd37bbf3d2a8226ab68f3c4e99"
-        },
-        "test_effective_save_widening_keeps_d6_and_fnp_bounds": {
-          "before": null,
-          "after": "c36a9b7b57cf104189605471484626e5d3a11be659589a6f041adedba4b47dfc"
-        },
-        "test_native_bloodletters_unit_and_allocation_roundtrip": {
-          "before": null,
-          "after": "a11027dad6326760f3adee309fe834f773525c419a6d2afd7aca3e1d56aaff90"
-        },
-        "test_native_save7_facade_completes_attack": {
-          "before": null,
-          "after": "9e4b5dc90484752e12147c9fe3f54c2d4445b99ca6634972db090af3f56eb674"
-        }
-      }
-    },
-    "tests/rules/section05/test_saves.py": {
-      "before_sha256": "4d36c413523e8fe26860160887ee876333ee495d0cf006fc983e20ed032656d7",
-      "after_sha256": "480c808fffe7bf12ec4937d27f301650407a9e7faf7d5a89f6a3891a2b2c3f09",
-      "owners": {
-        "@module": {
-          "before": "a5b89755b2369bfe16713f4fe93dba409896d6ba3a87bc4424ab3f9af2c00fe7",
-          "after": "3dcd90a7248dbf2dfa165c9e6c1dcd12fac9f58c2fbf7b8009d263d4d972088e"
-        },
-        "test_effective_save7_current_cover_penalizes_bs_only": {
-          "before": null,
-          "after": "19ae524206f1652d1c713d696cb606a97a9de0879ed304eb3636e38f95e572d3"
-        },
-        "test_effective_save7_improvement_worsening_and_current_cover": {
-          "before": null,
-          "after": "cc28d7102d8653c4671872bf416d96589e7ad0574c4db1ecf85d9da1e3816469"
-        },
-        "test_effective_save7_is_real_save_except_devastating_wounds": {
-          "before": null,
-          "after": "678f0995ed827ae405e21784a405058c609f700b3874c0cd848d27cdb403c318"
-        },
-        "test_effective_save_widening_keeps_invulnerable_grant_bounds": {
-          "before": null,
-          "after": "4f284725748271f435bcb833b5db2dfae7737a52e03f376da8190d5d5a92217f"
-        },
-        "test_native_save7_faces_keep_armour_and_invulnerable": {
-          "before": null,
-          "after": "06e9cd36462072e8d87fff22c0f46799f2bea4ed8e297cbbe835071b33ef22e9"
-        }
-      }
-    },
-    "tests/save7_allocation_helpers.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_next_three_2026_11.audit.json": {
       "before_sha256": null,
-      "after_sha256": "c6e91a1acecb3eafc61a72859bf95e45b2566f14e9818793c9e1253fbedbfee5",
+      "after_sha256": "ef49da41af68b0e862ca9b88cc4f08259ec124638ac69cf64283ea186012a6bd",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ef49da41af68b0e862ca9b88cc4f08259ec124638ac69cf64283ea186012a6bd"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_next_three_2026_11.py": {
+      "before_sha256": null,
+      "after_sha256": "742e91c905e3f44a47f3aa7e25b725798192360c3dfd9bfe47553e81633e0fa7",
       "owners": {
         "@module": {
           "before": null,
-          "after": "5276ee509005618ca95c41e65e581b00dd4f5e89262d0951fbcffd38189947a2"
+          "after": "7ef4dbf0e0ca545100c679ee28e50551e876510a08760d8bf28705362391a224"
         },
-        "allocation_group": {
+        "source_audit": {
           "before": null,
-          "after": "97b2fbf6d9027431d72da8d99dd497e66df211f6545431102c8869b315988278"
+          "after": "637cbbdcf5f710faba63ab4424cbc5dc450ffba464da022fce731799dcbdcdf7"
         },
-        "effective_save_session": {
+        "source_audit_from_json_bytes": {
           "before": null,
-          "after": "4b1ee58abe3e092201867e81a1f69baec16f8c1a7d28ad4273a7aa87989b3651"
+          "after": "ccc261ef05db15aedf6c3afc37c52e5c447b01b4b41439a8287c6e22f0f3d97c"
         },
-        "effective_value": {
+        "source_package": {
           "before": null,
-          "after": "d98f79e30738d5893f527e21d958a6b793a8aac63a864dd1d13a9602cbeba035"
+          "after": "6778785f86e94ceaffc290146df37bc7fff18cd5c64239694cde6aa6cbb6428f"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/wahapedia_bridge_defaults.py": {
+      "before_sha256": "33c3724554be31d166f0702b3346528ea4d703c4435393c1f42434a22cf70152",
+      "after_sha256": "a3849127fb4d5dc5097a163fc76f8c19163c909d92da482af5021446f8b04b14",
+      "owners": {
+        "@module": {
+          "before": "aeedaa7a5994aac6e44ec866cf1146f94cddd1bfdba87edd2aef01a5d67f33d7",
+          "after": "68afacf3f23b78a0286b342a0d244567ce727d8ad93cc63d9ac93172c07c157b"
+        }
+      }
+    },
+    "tests/code_quality/test_starfang_source_policy.py": {
+      "before_sha256": "ef4369cac7a6251014afe2fa71df6a2758e943443431793f36ec07af94150cfb",
+      "after_sha256": "83da7a11edf59ace1c2dbab78b593c0c80c95b487c1d5c85144ce06688d9ee16",
+      "owners": {
+        "test_daemons_native_performance_scope_is_exact_and_preserves_policy_chain": {
+          "before": "e21c4f203f65f17fbe63f4c3c6446b0f36e96cb64372648d9bad823dc832e3bc",
+          "after": "131ce42af61db2cc2ea075cd03c6fda1262d722b9574b333a43056f0be9e0ffd"
         },
-        "modified_model": {
+        "test_daemons_next_three_performance_scope_is_exact_and_preserves_policy_chain": {
           "before": null,
-          "after": "dfa66fc52f1b66377dc83bea6a039022ed893134ed1fddcb616248d55bb7254e"
+          "after": "8452d0859a0600c9e79223399902c29f982a9063b8df4991d02d5878ff6aabc1"
         },
-        "native_attack_session": {
+        "test_daemons_next_three_retained_capture_bytes_match_receipts": {
           "before": null,
-          "after": "dff25c71e062c2493a15f4e063c51ffaa97d55912f399a33b2256dd26150b627"
+          "after": "6b90cb6e0c6dabdfc450a6b942d4f865a10b193b2940b8613ecf8f3d3a7408d3"
         },
-        "native_target": {
+        "test_wave_frame_performance_scope_is_exact_and_preserves_policy_chain": {
+          "before": "69e11d1e0f16ee668d840cd453d10d88b975a3c584b2d5a0f0de512b8a9b6ee1",
+          "after": "83419a4e13b2b40f8ac28e423d454636b09945d7910eee1b6cb8b798299046db"
+        }
+      }
+    },
+    "tests/daemons_native_source_preservation.py": {
+      "before_sha256": "9c83174de700933418e4932616de0404cf4b20ac4a67c3c55e3a06a942b0d138",
+      "after_sha256": "d55003ffb9e9dec21e9e911f36303f951766bd34c69b06c6e48ce4429edb6fa4",
+      "owners": {
+        "before_daemons_native": {
+          "before": "00cc530413a79a598ca1af3b9e1428a96b0d3a969a01a70439d866b543e4fde4",
+          "after": "0b1dd9354ab69d1fb25e5ffcdad8d21324fa3e5a8efe55d41677e2cd14d94de2"
+        },
+        "before_daemons_registry": {
+          "before": "e7977b24b771747dbfd035614bc58cbf9f5d0ce9bb6f03a7c22d216383d1b9ba",
+          "after": "6aad2243f43aa359a98759646332d210c72de44a78989ca6e947a3a3e07db1c4"
+        }
+      }
+    },
+    "tests/daemons_next_three_preservation.py": {
+      "before_sha256": null,
+      "after_sha256": "0ac5274975e4365e397ed3d4c8b0df21bdaa6e4a6150d2d8873677b5264ec151",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "ecb4631f52239d1baff8743101c1097077489820142e65f1fe3db4de36f1e613"
+          "after": "a36510aff22911c6669e7cce932c525c937c602fc6e316a283ba5460ffc66934"
+        },
+        "_hash": {
+          "before": null,
+          "after": "fb2b021357e260297deb6a527d2ec19d496183efcd93b1d083e30265bb21f848"
+        },
+        "before_daemons_next_three": {
+          "before": null,
+          "after": "0c6eaf5322ead318f82c53079acd564f286165d0efdbcf5216a8199d2a8807b7"
+        },
+        "before_next_three_registry": {
+          "before": null,
+          "after": "43e57d212254b271f60e3039c83af0afd15051d31906b22bffd61db1d99b5e80"
+        },
+        "daemons_audit": {
+          "before": null,
+          "after": "ef5ac6eeeabcef2d39ea70c3a383565156f43a89aef0e2198963ee80e4e07828"
+        }
+      }
+    },
+    "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
+      "before_sha256": "27ba97bbe47ec4a173d63acadedd9c84d64e13bf171e593a409244e66d9e7f6a",
+      "after_sha256": "7bdc960d8cfa360b1c29d1c8e8d7ab297fe2399d882e2239a63319c4becde85a",
+      "owners": {
+        "@module": {
+          "before": "ff23533810d1ad9675659e4fb22cae76c3a11de851099162a4dc415b4faed491",
+          "after": "d6a54e5608ef9318ec4473b9055690ebf58abbcf952912622a96f0fa5388d51a"
+        },
+        "before_daemons_source_artifacts": {
+          "before": null,
+          "after": "4c5034add8137554c049abc6f6575659925a0e8c6e5f70fad2a6238bf0cb6d91"
+        },
+        "test_daemons_current_keyword_boundary_requires_exact_preimage": {
+          "before": "a9cd6b704f300b754da6b94ebd881309025eeb3646848735a88c4baf99991475",
+          "after": "53ab060cffd8818b472d640ea9b46f2a0e4d575f06fbd6b72d5b6bd52b01401d"
+        },
+        "test_daemons_damaged_source_exact_fields_and_other_artifacts_unchanged": {
+          "before": "e32f966ead59f2ec0ad89634ee7f36ccf9301d1e3c0b3a5077fa26235b275ee1",
+          "after": "c08d3b3dd1dcd5c9526ddddef71ef667b73ae277c13eba801dca2fbd1b8e9257"
+        },
+        "test_daemons_native_full_sixty_exact_delta_and_counterparts": {
+          "before": "9a1d7653915e0d9c12142479dbb45b598c2b122dcf331f2e76277097625f12c8",
+          "after": "0a5a5fb992fa80d43b708d43ab6f07386e9891ca0f7ae10f7b8a77f144b18965"
+        },
+        "test_daemons_next_three_all_nine_native_construction_variants": {
+          "before": null,
+          "after": "ada87cd91fc35c8ff524599a1bbcb1e56cd694ab3b562235b244380be7f88c4e"
+        },
+        "test_daemons_next_three_exact_keyword_guard": {
+          "before": null,
+          "after": "83b0b2b7143b4aa25c05ace801362974b38ecdf8ef38dc70fbbda6cfaf17c361"
+        },
+        "test_daemons_next_three_full_catalog_delta_and_pinned_source": {
+          "before": null,
+          "after": "24c4a66562723cb58657ff73dd3d5127e17e88454519dd32f75c5b79e38f0783"
+        },
+        "test_daemons_next_three_native_keyword_grant_roundtrip": {
+          "before": null,
+          "after": "45e5a7592ddccdf59aeaceaee3c6b58091c4d80b32c0a580bde3e33b5ce28cce"
+        },
+        "test_daemons_next_three_requires_one_keyword_table": {
+          "before": null,
+          "after": "897c60d497d73421bab231fc49372567c9576a31a3e620d92b2207f00f01b40a"
+        }
+      }
+    },
+    "tools/ability_support_sources.py": {
+      "before_sha256": "421d6c695e6710e0c0594a3b89e17529831033b73d36d6dea3ef016563160a0d",
+      "after_sha256": "cd108fd9df9ee6357d9b0478884cf483b4586eb5ee9cc1c41bc22fac4256f5b1",
+      "owners": {
+        "ability_support_index_inputs": {
+          "before": "f5d8bae32c825cbe72086b1206181f39e5c150bb73f18442b868895b59829364",
+          "after": "10687843f5c3f25e9af7b4b4c659c8d499ee3f09b2e2ab888202d80df0ef46f7"
+        }
+      }
+    },
+    "tools/build_daemons_next_three_source.py": {
+      "before_sha256": null,
+      "after_sha256": "b7957b8bd42eb756f0a304edaff85a4f29c6bd888dd0599318af4416e4c6d32f",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "9320dc43bce9bbbf5ec8f7c7ad369271f324e72f9a3b8e6dd8e699c918b27f52"
+        },
+        "build": {
+          "before": null,
+          "after": "2194aa4b6eda695351a494e073739f2e0bae1854a69b753cef6ee84705cad3ce"
+        },
+        "main": {
+          "before": null,
+          "after": "3f5b1c20c76d6a89bfdc5d4e03886fb8fc2696d8fb4e6673b100860a3e0845a2"
+        },
+        "raw": {
+          "before": null,
+          "after": "e24b16d9bcdc5deaa9d8c5088a8414a39f3aa07007e4995a9babd1eb77ecf616"
+        },
+        "sha": {
+          "before": null,
+          "after": "d4d016c668b1333bda640a36afd294708b7ddc65fe3c2595f3273a1ecfb917af"
+        }
+      }
+    },
+    "tools/performance_daemons_next.py": {
+      "before_sha256": null,
+      "after_sha256": "f707cadf9d16a335225f274530e285ab6338b7a2dd62f56aa07dc3b511c0d5cd",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "ba2553acedcd1d3f157202651c6a48ff4d99e664b88d26a654d089c4c0bf2f1b"
+        },
+        "_hash": {
+          "before": null,
+          "after": "adda31e2a9b809da9ab435026408682e9f1732d2ee623b5cc58b0c125482ade7"
+        },
+        "_scope": {
+          "before": null,
+          "after": "e99c7561e9a73fd6cfd66a63b779f60426048d7b368f3dec05d5f7b8c22263b6"
+        },
+        "daemons_next_policy_predecessor": {
+          "before": null,
+          "after": "3a7ec7c5a6fa825b28d542dc1431cc25bef325c528a1214be29d64ba095ef401"
+        },
+        "daemons_next_smoke_operations": {
+          "before": null,
+          "after": "84c4e3f05aef84de83325c83d7e14376ee2786064c300c1f9bea73deffcd0592"
+        }
+      }
+    },
+    "tools/performance_policy.py": {
+      "before_sha256": "8cd7b97a934f6fb6c71270f0004850f7203a12ed3d19548f005b2156a3b8900c",
+      "after_sha256": "e4b05916324de6b7194627ec48e93da6c2b1ff1bec7d75378f399541f4104507",
+      "owners": {
+        "starfang_deep_strike_policy_predecessor": {
+          "before": "bb13829b5371072214090370f5bfaaf1f70be487671250d9ee2ffd302b08644f",
+          "after": "09f3dcec85cd631f7eccfcce470e6ce32d209c064a304cedf911c9e5849b2f6f"
+        },
+        "validate_assessment": {
+          "before": "657624fda5dd3b3fc448cd28fea06484060d17b2f0799a39f1a62477a1d1f782",
+          "after": "245d08ee1d67dbfb879dbd9764a9310b4150a15ad237069f36c45a32851bc59c"
         }
       }
     }
   },
   "rows": {
+    ".gitattributes": {
+      "category": "rule_semantics",
+      "operations": [
+        "d09-authenticated-source-bytes"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -292,9 +1018,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -302,9 +1028,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -312,9 +1038,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -322,9 +1048,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -332,9 +1058,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -342,9 +1068,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -352,9 +1078,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -362,33 +1088,571 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/app-updates-index-context.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/app-updates-index-context.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/audit-report.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/audit-summary.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/catalog-delta.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/component-residual-disposition.csv": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.08.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.08.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.09.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.09.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.11.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.12.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.15.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.15.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.18.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.18.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.23.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.23.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.29.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.29.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.36.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.36.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.37.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.37.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.39.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/core-24.39.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/correction-plan.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/daemons-army-rules-current.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/daemons-army-rules-current.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/daemons-update-963.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/daemons-update-963.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/flesh-hounds-current.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/flesh-hounds-current.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/flesh-hounds-history.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/flesh-hounds-history.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/later-ir-residual-disposition.csv": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/lord-of-change-current.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/lord-of-change-current.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/lord-of-change-history.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/lord-of-change-history.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/plaguebearers-current.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/plaguebearers-current.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/plaguebearers-history.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/plaguebearers-history.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/registry-delta.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/reviewed-observation.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/shadow-legion-current.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/shadow-legion-current.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/source-capture-receipts.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/source-native-matrix.csv": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "data/source_audits/daemons_next_three_2026_11/source-native-matrix.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-audit-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
-    "docs/SAVE7_ALLOCATION_SCOPE.md": {
+    "docs/DAEMONS_NEXT_THREE_SOURCE_SCOPE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "docs/performance/policy-v3/daemons-next-three-smoke-scope.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -396,72 +1660,160 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
-    "src/warhammer40k_core/engine/damage_allocation.py": {
+    "src/warhammer40k_core/rules/faction_source_governance.py": {
       "category": "rule_semantics",
       "operations": [
-        "order118-attack-source-lifetime",
-        "save7-exact-d8df651625f769c6"
+        "aeldari-current-exact-09"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
-    "src/warhammer40k_core/engine/damage_allocation_validation.py": {
+    "src/warhammer40k_core/rules/source_authority_registry.json": {
       "category": "rule_semantics",
       "operations": [
-        "save7-exact-a3adc1968be49c48"
+        "source-authority-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
-    "tests/rules/section04/test_completion_boundaries.py": {
+    "src/warhammer40k_core/rules/source_authority_registry.py": {
       "category": "rule_semantics",
       "operations": [
-        "save7-exact-547642cb6d038744"
+        "source-authority-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
-    "tests/rules/section05/test_allocation_choices.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-14272f7eb5f29567",
-        "save7-exact-14272f7eb5f29567"
+        "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
-    "tests/rules/section05/test_saves.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_next_three_2026_11.audit.json": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-50d0064f13e1390f",
-        "save7-exact-50d0064f13e1390f"
+        "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     },
-    "tests/save7_allocation_helpers.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_next_three_2026_11.py": {
       "category": "rule_semantics",
       "operations": [
-        "save7-exact-7a6825eace60cd05"
+        "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
-      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
-      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "src/warhammer40k_core/rules/wahapedia_bridge_defaults.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-20"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "tests/code_quality/test_starfang_source_policy.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "tests/daemons_native_source_preservation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-native-exact-fac356e49e4b8510"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "tests/daemons_next_three_preservation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-d193661d3e5faf4a"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "starfang-deep-strike-exact-8a566d77a945247d",
+        "daemons-native-exact-8a566d77a945247d",
+        "daemons-next-exact-8a566d77a945247d"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "tools/ability_support_sources.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b0712fa66a9cc38e",
+        "supported-vyper-source-title-binding"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "tools/build_daemons_next_three_source.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-next-exact-49197f6c2a84a0ad"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "tools/performance_daemons_next.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
+    },
+    "tools/performance_policy.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci64-provenance-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
+        "ci67-transaction-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
+        "starfang-deep-strike-exact-1504c891c8d333f3"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded three ordinary Daemons keyword corrections through the existing source boundary, their exact source authority and tests, immutable historical projections and derived identity publication; no gameplay algorithm changes.",
+      "source_obligation": "Complete observed Flesh Hounds, Lord of Change and Plaguebearers ordinary keyword lists exclude SHADOW LEGION; the existing conditional Shadow Legion mustering grant remains the sole source of that keyword. Preserve exact preimages, faction keywords, counterpart bytes and documented descriptor/geometry debt.",
+      "unchanged_work": "Source index input enumeration gains one pinned audit JSON resource. Existing file hashing, source loading, row scans, catalog construction and cache validation algorithms are unchanged. No hot gameplay, geometry, serialization, replay or deliberate performance change; serial current-runtime smoke and all live semantic/work/cache checks remain required."
     }
   },
   "milestone": "ordinary",

@@ -1,0 +1,4 @@
+24.12
+FEEL NO PAIN
+
+This ability always takes the form Feel No Pain X+. Each time a model with this ability would lose a wound, roll one D6: on an X+, that wound is not lost.

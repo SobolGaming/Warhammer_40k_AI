@@ -33192,6 +33192,63 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "daemons-next-exact-audit-evidence": {
+      "paths": [
+        "data/source_audits/daemons_next_three_2026_11/*"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-next-exact-d193661d3e5faf4a": {
+      "paths": [
+        "tests/daemons_next_three_preservation.py"
+      ],
+      "owners": [
+        "@module",
+        "_hash",
+        "before_daemons_next_three",
+        "before_next_three_registry",
+        "daemons_audit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-next-exact-8a566d77a945247d": {
+      "paths": [
+        "tests/infrastructure/source/unit/test_starfang_deep_strike.py"
+      ],
+      "owners": [
+        "before_daemons_source_artifacts",
+        "test_daemons_next_three_all_nine_native_construction_variants",
+        "test_daemons_next_three_exact_keyword_guard",
+        "test_daemons_next_three_full_catalog_delta_and_pinned_source",
+        "test_daemons_next_three_native_keyword_grant_roundtrip",
+        "test_daemons_next_three_requires_one_keyword_table"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-next-exact-49197f6c2a84a0ad": {
+      "paths": [
+        "tools/build_daemons_next_three_source.py"
+      ],
+      "owners": [
+        "@module",
+        "build",
+        "main",
+        "raw",
+        "sha"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

@@ -1,0 +1,17 @@
+40K.APP
+FACTIONS
+CHAOS DAEMONS
+Flesh Hounds
+DATASHEET
+UPDATES
+VERSION 963
+Released 2026-09-30
+Points changes
+5 models
+75 pts → 80 pts
+VERSION 867
+Released 2026-06-19
+Added to the faction
+Added
+Points cost
+75 pts
