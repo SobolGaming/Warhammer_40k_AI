@@ -20,6 +20,8 @@ from tests.core_description_helpers import (
     before_mandiblasters_correction,
     core_description_audit,
 )
+from tests.current_description_preimages import current_core_description_preimage
+from tests.source_history import historical_packages
 from tests.starfang_deep_strike_helpers import (
     before_starfang_deep_strike,
     before_starfang_source_registry,
@@ -80,7 +82,14 @@ def test_all_39_occurrences_close_35_replacements_and_four_preserved_stealth() -
     changed = preserved = total = 0
     owners: set[str] = set()
     for package, surface in zip(_packages(), audit["surfaces"], strict=True):
-        before = before_core_description_correction(package)
+        historical = next(
+            p
+            for p in historical_packages()
+            if p.army_catalog.catalog_id == package.army_catalog.catalog_id
+        )
+        before = before_core_description_correction(historical)
+        if surface["occurrences"]:
+            current_core_description_preimage(package)
         for occurrence in surface["occurrences"]:
             owner = occurrence["datasheet_id"]
             owners.add(owner)
@@ -97,7 +106,7 @@ def test_all_39_occurrences_close_35_replacements_and_four_preserved_stealth() -
         assert CanonicalCatalogPackage.from_payload(package.to_payload()) == package
     assert (total, changed, preserved, len(owners)) == (39, 35, 4, 18)
     assert (
-        before_starfang_deep_strike(_packages()[2]).package_hash()
+        before_starfang_deep_strike(historical_packages()[2]).package_hash()
         == "b63c0805b6878daf2eef2d4145e407361f7848bde3095074022f1b850db183ab"
     )
 
@@ -162,7 +171,7 @@ def _mutate(package: CanonicalCatalogPackage, mutation: str) -> CanonicalCatalog
     "mutation", ["text", "identity", "id", "kind", "parameter", "missing", "duplicate"]
 )
 def test_adapter_rejects_wrong_reviewed_input(mutation: str) -> None:
-    historical = before_core_description_correction(_packages()[0])
+    historical = before_core_description_correction(historical_packages()[0])
     with pytest.raises(ValueError, match="Core description"):
         with_current_core_descriptions(_mutate(historical, mutation))
 
@@ -189,13 +198,28 @@ def test_adapter_rejects_wrong_reviewed_input(mutation: str) -> None:
 )
 def test_historical_projection_authenticates_all_payload_fields(mutation: str) -> None:
     with pytest.raises((AssertionError, KeyError)):
-        before_core_description_correction(_mutate(_packages()[0], mutation))
+        before_core_description_correction(_mutate(historical_packages()[0], mutation))
 
 
 def test_adapter_once_only_deterministic_absent_noop_and_wrong_owner() -> None:
     current = _packages()[0]
-    before = before_core_description_correction(current)
-    assert with_current_core_descriptions(before) == before_mandiblasters_correction(current)
+    historical = historical_packages()[0]
+    before = before_core_description_correction(historical)
+    assert with_current_core_descriptions(before) == before_mandiblasters_correction(historical)
+    live_before = current_core_description_preimage(current)
+    assert with_current_core_descriptions(live_before) == current
+    other = current.army_catalog.datasheets[0]
+    unrelated = replace(
+        current,
+        army_catalog=replace(
+            current.army_catalog,
+            datasheets=(
+                replace(other, name=other.name + " unrelated"),
+                *current.army_catalog.datasheets[1:],
+            ),
+        ),
+    )
+    assert with_current_core_descriptions(current_core_description_preimage(unrelated)) == unrelated
     assert with_current_core_descriptions(before) == with_current_core_descriptions(before)
     with pytest.raises(ValueError, match="already applied"):
         with_current_core_descriptions(current)
@@ -214,14 +238,14 @@ def test_adapter_once_only_deterministic_absent_noop_and_wrong_owner() -> None:
 
 @pytest.mark.parametrize("module", [source, core_stealth_2026_09, core_fights_first_2026_09])
 def test_adapter_rejects_wrong_source_pin(module: Any, monkeypatch: pytest.MonkeyPatch) -> None:
-    historical = before_core_description_correction(_packages()[0])
+    historical = before_core_description_correction(historical_packages()[0])
     monkeypatch.setattr(module, "EXPECTED_ARTIFACT_SHA256", "0" * 64)
     with pytest.raises(ValueError, match="source pin"):
         with_current_core_descriptions(historical)
 
 
 def test_adapter_rejects_current_source_text_drift(monkeypatch: pytest.MonkeyPatch) -> None:
-    historical = before_core_description_correction(_packages()[0])
+    historical = before_core_description_correction(historical_packages()[0])
     rules = source.source_rules()
     monkeypatch.setattr(
         source,
@@ -331,7 +355,8 @@ def test_scouts_parameters_and_native_factory_persistence_are_preserved(
 ) -> None:
     current = _packages()[0]
     results: list[tuple[tuple[str, tuple[str, ...]], ...]] = []
-    for package in (before_core_description_correction(current), current):
+    historical = historical_packages()[0]
+    for package in (before_core_description_correction(historical), historical, current):
         datasheet = package.army_catalog.datasheet_by_id(identity)
         unit = UnitFactory(
             catalog=package.army_catalog, model_geometries=package.model_geometries
@@ -357,7 +382,7 @@ def test_scouts_parameters_and_native_factory_persistence_are_preserved(
             distance,
         )
         results.append(tuple((row.source_id, row.parameter_tokens) for row in descriptors))
-    assert results[0] == results[1]
+    assert results[0] == results[1] == results[2]
 
 
 @pytest.mark.parametrize("identity", ["000000592", "000000594", "000002538"])
@@ -369,7 +394,8 @@ def test_other_core_recognition_and_lone_operative_identity_are_preserved(identi
             dict[str, tuple[str, ...]],
         ]
     ] = []
-    for package in (before_core_description_correction(current), current):
+    historical = historical_packages()[0]
+    for package in (before_core_description_correction(historical), historical, current):
         datasheet = package.army_catalog.datasheet_by_id(identity)
         unit = UnitFactory(
             catalog=package.army_catalog, model_geometries=package.model_geometries
@@ -406,11 +432,11 @@ def test_other_core_recognition_and_lone_operative_identity_are_preserved(identi
             assert rules_unit_has_native_stealth(view)
             assert all(native.values())
         results.append((result, native))
-    assert results[0] == results[1]
+    assert results[0] == results[1] == results[2]
 
 
 def test_adapter_rejects_unreviewed_owner_occurrence() -> None:
-    before = before_core_description_correction(_packages()[0])
+    before = before_core_description_correction(historical_packages()[0])
     ability = next(
         row
         for row in before.army_catalog.datasheet_by_id("000000595").abilities
@@ -500,7 +526,7 @@ def test_source_registry_keeps_every_historical_registration_and_source_byte() -
 def test_mandiblasters_successor_projection_rejects_unreviewed_bytes(mutation: str) -> None:
     from copy import deepcopy
 
-    package = _packages()[0]
+    package = historical_packages()[0]
     owner = package.army_catalog.datasheet_by_id("000000595")
     ability = next(a for a in owner.abilities if a.ability_id == "000000595:mandiblasters")
     changed = ability
@@ -569,7 +595,7 @@ def test_lhykhis_historical_projection_rejects_unreviewed_bytes(
 ) -> None:
     from tests.core_description_helpers import before_lhykhis_correction
 
-    current = _packages()[surface]
+    current = historical_packages()[surface]
     owner = current.army_catalog.datasheet_by_id("000003909")
     ability = next(a for a in owner.abilities if a.ability_id == "000003909:whispering-web")
     changed = ability
@@ -611,7 +637,7 @@ def test_lhykhis_historical_projection_rejects_unreviewed_bytes(
 def test_lhykhis_projection_rejects_current_artifact_without_its_source() -> None:
     from tests.core_description_helpers import before_lhykhis_correction
 
-    current = _packages()[0]
+    current = historical_packages()[0]
     without = replace(
         current,
         army_catalog=replace(
@@ -629,7 +655,9 @@ def test_lhykhis_projection_rejects_current_artifact_without_its_source() -> Non
     )
     with pytest.raises(AssertionError):
         before_lhykhis_correction(without)
-    assert before_lhykhis_correction(_packages()[2]) == before_starfang_deep_strike(_packages()[2])
+    assert before_lhykhis_correction(historical_packages()[2]) == before_starfang_deep_strike(
+        historical_packages()[2]
+    )
 
 
 def test_current_model_hit_successor_is_bound_by_source_index_provenance() -> None:

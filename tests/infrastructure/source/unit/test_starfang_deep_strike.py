@@ -6,7 +6,7 @@ import json
 from dataclasses import replace
 from functools import cache
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import pytest
 from tools.ability_support_sources import ability_support_index_inputs, load_ability_support_sources
@@ -16,7 +16,9 @@ from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 
+from tests.current_description_preimages import current_deep_strike_preimage
 from tests.icon_provenance_helpers import before_icon_catalog
+from tests.source_history import historical_icon_component, historical_packages
 from warhammer40k_core.engine.abilities import KeywordGate
 from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
@@ -255,7 +257,7 @@ def test_keyword_overlay_explicit_identity_lineage_and_index_inputs() -> None:
 def test_exact_three_surface_delta_reconstructs_all_original_payload_hashes() -> None:
     from tests.starfang_deep_strike_helpers import before_starfang_deep_strike, correction_audit
 
-    for package, surface in zip(packages(), correction_audit()["surfaces"], strict=True):
+    for package, surface in zip(historical_packages(), correction_audit()["surfaces"], strict=True):
         assert before_starfang_deep_strike(package).package_hash() == surface["prior_package_hash"]
 
 
@@ -286,10 +288,8 @@ def test_selected_source_index_preserves_corrected_keyword_identity(tmp_path: Pa
 
 
 def test_deep_strike_forward_is_exact_deterministic_and_once_only() -> None:
-    from tests.starfang_deep_strike_helpers import before_starfang_deep_strike
-
     current = packages()[2]
-    prior = before_starfang_deep_strike(current)
+    prior = current_deep_strike_preimage(current)
     assert with_current_deep_strike(prior) == current
     assert with_current_deep_strike(prior) == with_current_deep_strike(prior)
     with pytest.raises(ValueError, match="already applied"):
@@ -303,9 +303,7 @@ def test_deep_strike_forward_is_exact_deterministic_and_once_only() -> None:
 
 @pytest.mark.parametrize("mutation", ["text", "parameters", "source", "missing"])
 def test_forward_deep_strike_boundary_rejects_unreviewed_inputs(mutation: str) -> None:
-    from tests.starfang_deep_strike_helpers import before_starfang_deep_strike
-
-    prior = before_starfang_deep_strike(packages()[2])
+    prior = current_deep_strike_preimage(packages()[2])
     owner = prior.army_catalog.datasheets[0]
     ability = next(a for a in owner.abilities if a.ability_id == ABILITY_ID)
     changed = ability
@@ -530,7 +528,7 @@ def test_wave_serpent_frame_exact_native_delta_and_unchanged_counterparts() -> N
     from tests.wave_serpent_frame_helpers import before_wave_frame, frame_audit
 
     audit = frame_audit("catalog-delta")
-    native, paired_catalog, daemons_catalog = packages()
+    native, paired_catalog, daemons_catalog = historical_packages()
     assert before_wave_frame(native).package_hash() == audit["prior_package_hash"]
     assert before_wave_frame(paired_catalog) == before_icon_catalog(paired_catalog)
     assert before_wave_frame(daemons_catalog) is daemons_catalog
@@ -731,7 +729,7 @@ def test_daemons_native_base_keywords_and_real_conditional_grant_kernel(
 def test_daemons_native_full_sixty_exact_delta_and_counterparts() -> None:
     from tests.daemons_native_source_preservation import before_daemons_native, daemons_audit
 
-    native, paired_catalog, standalone = packages()
+    native, paired_catalog, standalone = historical_packages()
     audit = daemons_audit("catalog-delta")
     assert len(native.army_catalog.datasheets) == 60
     prior = before_daemons_native(native)
@@ -873,7 +871,7 @@ def test_daemons_next_three_full_catalog_delta_and_pinned_source() -> None:
         daemons_next_three_2026_11 as current,
     )
 
-    native, paired_catalog, standalone = packages()
+    native, paired_catalog, standalone = historical_packages()
     native = before_daemons_final_four(native)
     audit = daemons_audit("catalog-delta")
     before = before_daemons_next_three(native)
@@ -975,7 +973,7 @@ def test_daemons_final_four_full_catalog_delta_and_pinned_source() -> None:
         daemons_final_four_2026_11 as current,
     )
 
-    native, paired_catalog, standalone = packages()
+    native, paired_catalog, standalone = historical_packages()
     native = before_icon_catalog(native)
     audit = daemons_audit("catalog-delta")
     before = before_daemons_final_four(native)
@@ -1032,10 +1030,15 @@ def test_daemons_final_four_all_native_variants(datasheet_id: str, expected: int
     from warhammer40k_core.engine.wargear_selections import WargearSelection
 
     package = packages()[0]
-    prior = before_daemons_final_four(package)
+    historical = historical_packages()[0]
+    prior = before_daemons_final_four(historical)
     sheet = package.army_catalog.datasheet_by_id(datasheet_id)
+    historical_sheet = historical.army_catalog.datasheet_by_id(datasheet_id)
     old_sheet = prior.army_catalog.datasheet_by_id(datasheet_id)
     factory = UnitFactory(catalog=package.army_catalog, model_geometries=package.model_geometries)
+    historical_factory = UnitFactory(
+        catalog=historical.army_catalog, model_geometries=historical.model_geometries
+    )
     old_factory = UnitFactory(catalog=prior.army_catalog, model_geometries=prior.model_geometries)
     allegiances: list[tuple[MusteringOptionSelection, ...]] = [
         (MusteringOptionSelection(o.option_id),) for o in sheet.mustering_options
@@ -1046,8 +1049,8 @@ def test_daemons_final_four_all_native_variants(datasheet_id: str, expected: int
         for o in sheet.wargear_options
         if o.min_selections == 0
     )
-    removed_sources = set(old_sheet.source_ids) - set(sheet.source_ids)
-    added_sources = set(sheet.source_ids) - set(old_sheet.source_ids)
+    removed_sources = set(old_sheet.source_ids) - set(historical_sheet.source_ids)
+    added_sources = set(historical_sheet.source_ids) - set(old_sheet.source_ids)
     from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
         daemons_final_four_2026_11 as current,
     )
@@ -1090,7 +1093,9 @@ def test_daemons_final_four_all_native_variants(datasheet_id: str, expected: int
             # Catalog proof binds the exact correction record and new reviewed source ID.
             # Unit/model provenance carries that same delta; all other payload fields agree.
             old_payload = previous.to_payload()
-            new_payload = unit.to_payload()
+            new_payload = historical_factory.instantiate_unit(
+                army_id="final-four", datasheet=historical_sheet, selection=selection
+            ).to_payload()
             old_payload["keywords"].remove("SHADOW LEGION")
             assert_source_delta(
                 old_payload["datasheet_source_ids"], new_payload["datasheet_source_ids"]
@@ -1175,7 +1180,7 @@ def test_icon_successor_preserves_complete_historical_catalogs_and_rejects_drift
     from tests.icon_provenance_helpers import icon_successor_audit
 
     audit = icon_successor_audit()
-    for package in packages():
+    for package in historical_packages():
         previous = before_icon_catalog(package)
         assert before_icon_catalog(previous) is previous
         surface = next(
@@ -1217,14 +1222,9 @@ def test_icon_successor_preserves_complete_historical_catalogs_and_rejects_drift
 def test_icon_component_successor_keeps_sticky_exact_and_rejects_partial_or_source_drift() -> None:
     from copy import deepcopy
 
-    from tests.icon_provenance_helpers import before_icon_component, icon_successor_audit
-    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
+    from tests.icon_provenance_helpers import before_icon_component
 
-    audit = icon_successor_audit()["ir_component"]
-    current = cast(
-        dict[str, Any],
-        faction_pack_rule_ir.source_package_artifact(audit["source_package_id"]).payload(),
-    )
+    current = historical_icon_component()
     previous = before_icon_component(current)
     assert previous["records"]["000004079:3"] == current["records"]["000004079:3"]
     for path in (

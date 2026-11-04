@@ -11,7 +11,6 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
-from tests.icon_provenance_helpers import before_icon_component
 from tests.support.section02_fixtures import Section02Definitions
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
@@ -20,6 +19,8 @@ PATH = "data/source_audits/section08_native_mission_2026_10_22/observation.json"
 SHA256 = "dc4d92037d661208270d1c178625de3aa85b984b6f06b7f21dc1f313e4ce1f10"
 PACKAGE = "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08"
 SOURCE_ID = PACKAGE + ":datasheet:000004079:3"
+BINDING_PATH = "tests/fixtures/source_history/section08-sticky-binding-v1.json"
+BINDING_SHA256 = "54ce787e43c852f3acc8d1fe9cdc98bf971868db11241d8ebc382c8b87e2f9b1"
 PREDECESSOR = "ea77045ee0940a8d12e330080f69790c64839932109a190b19195426f3320cce"
 
 
@@ -27,6 +28,28 @@ def _digest(value: object) -> str:
     return hashlib.sha256(
         json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
+
+
+def validate_sticky_binding(component: dict[str, Any], observation: dict[str, Any]) -> None:
+    """Check this fixture dependency; callers must separately authenticate component admission."""
+    raw = (Path(__file__).resolve().parents[2] / BINDING_PATH).read_bytes()
+    if hashlib.sha256(raw).hexdigest() != BINDING_SHA256:
+        raise ValueError("Native Command Sticky binding bytes changed.")
+    binding = json.loads(raw)
+    if (
+        binding["schema"] != "section08-native-sticky-binding-v1"
+        or component.get("source_package_id") != binding["source_package_id"]
+        or component.get("artifact_schema") != binding["artifact_schema"]
+        or not isinstance(component.get("datasheets"), dict)
+        or component["datasheets"].get(binding["datasheet_id"]) != binding["datasheet_name"]
+        or not isinstance(component.get("records"), dict)
+        or component["records"].get(binding["source_row_id"]) != binding["record"]
+        or any(component.get(key) != value for key, value in binding["source_identity"].items())
+        or observation["observation_sha256"] != binding["observation_sha256"]
+    ):
+        raise ValueError(
+            "Native Command complete Sticky record, ownership or source binding changed."
+        )
 
 
 def validate_observation(raw: bytes) -> dict[str, Any]:
@@ -50,14 +73,13 @@ def validate_observation(raw: bytes) -> dict[str, Any]:
     crosswalk = row["identity_crosswalk"]
     artifact = faction_pack_rule_ir.source_package_artifact(PACKAGE)
     component = artifact.payload()
-    previous_component = before_icon_component(component)
+    validate_sticky_binding(component, row)
     payload = artifact.datasheet_rule_ir_payload_by_source_row_id("000004079:3")
     if (
         payload is None
         or crosswalk["admitted_package_id"] != PACKAGE
         or crosswalk["page_source_id"] != "faction-app:emperors-children:datasheet:tormentors"
         or artifact.package_hash != component["package_hash"]
-        or previous_component["package_hash"] != crosswalk["admitted_package_hash"]
         or payload["source_id"] != SOURCE_ID
         or crosswalk["runtime_source_id"] != SOURCE_ID
         or crosswalk["runtime_rule_id"] != payload["rule_id"]

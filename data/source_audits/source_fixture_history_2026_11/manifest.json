@@ -1,0 +1,302 @@
+{
+  "schema": "source-history-roots-v1",
+  "base_commit": "23929a36f04f3d9cf1c7fee7b70f38fc0f588d83",
+  "base_tree": "02ea54feae8e0c5c55ea0f33bcdd13a8a9927918",
+  "capture_status": "Exact merged base; full local and main macOS qualification pending at capture.",
+  "members": {
+    "native.json": {
+      "raw_sha256": "3b751a9d7d0960bc28d92e860121b85fb8966fa37aeed91a625ddd8d3833be37",
+      "canonical_sha256": "12fb462fc4c171511d7eb35bb8c6f85e61bbf3588469aeec51ef9624d95a032b",
+      "schema": "canonical-catalog-v2-construction",
+      "owner": "chaos-daemons-bridge-catalog",
+      "package_hash": "2e2a87bc28b59ed4461a2cd790946cea3c7478bd3c324bcd42544ac847468c47",
+      "bytes": 1841108
+    },
+    "paired.json": {
+      "raw_sha256": "856bc7e4787ad204075f89976c26a1c1929798cd1acd28a02d8bf21227658823",
+      "canonical_sha256": "d5826dc5998918c2f96e9c13a0b4b4fcea635c2dabd744a7c1788953b47a2c80",
+      "schema": "canonical-catalog-v2-construction",
+      "owner": "core-v2:court-of-slaughter-anvanth:2026-08",
+      "package_hash": "f6e17fd128479e1692c227261bd978f4939ff1a0d9ee015d5f832f7756f39136",
+      "bytes": 869008
+    },
+    "standalone.json": {
+      "raw_sha256": "c8fd8112b9ea75fdc6b4025292c7956efc7c076cde8dfacd2916ec679dd37f57",
+      "canonical_sha256": "a4e6feda2e1d63de52ba253d1cc59b7b4cef1c90e4ff83cca3e99c80704a2fcb",
+      "schema": "canonical-catalog-v2-construction",
+      "owner": "core-v2:chaos-daemons-roster:2026-07",
+      "package_hash": "f910aa113e8da197636e8868b41e58b394961d234dee0e77c04aba31c6e6468f",
+      "bytes": 158482
+    },
+    "icon-component.json": {
+      "raw_sha256": "1c3bf9bcdadf270665e7fa6aa11968e7a6e3f8a0371028be35d9f480a5f06cb8",
+      "canonical_sha256": "4c802d19d8d58e3f1a8329e71390390f2f70808a98851982fb0459320a8bd87b",
+      "schema": "core-v2-emperors-children-infractors-tormentors-rule-ir-v1",
+      "owner": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08",
+      "package_hash": "cc0549e37898f5935e2ee263c75a42643813d81e7ba6a0e2eeb6aeaf958275ab",
+      "bytes": 13667
+    }
+  },
+  "audit_links": {
+    "data/source_audits/later_ir_icon_2026_11/accepted-scope-review.json": "d77b04c370d8bba1689d37d210488c41f25b4fa5809d999b43e1410384cdc375",
+    "data/source_audits/later_ir_icon_2026_11/app-updates-context.json": "a7a71ae5a317d862b1184aa184cb48f0e9e2db55663524c49ee0f18904f508c7",
+    "data/source_audits/later_ir_icon_2026_11/base-later-ir-records.json": "0d2477782e1f13c4046abc65c151f26471660a8ec6d0c7bbbecc04d744c1b6be",
+    "data/source_audits/later_ir_icon_2026_11/cd-blue-current.json": "68168dccb3b3d8c26e28d32732b3f314a7a987815e25f2a3b18727b0da579a12",
+    "data/source_audits/later_ir_icon_2026_11/cd-blue-history.json": "67287096ef917a5053d6f130cf80158087e6ecb846dfb3ad8c8564799d67ae94",
+    "data/source_audits/later_ir_icon_2026_11/cd-pink-current.json": "3d9d12e2fc6b570ef993f813f6dbb5eb3e1038e56f05bb442d0677b5c960a7a0",
+    "data/source_audits/later_ir_icon_2026_11/cd-pink-history.json": "b0050dbf95a32e32ba0b5870a8b005c130510750189723d362a472557da917bd",
+    "data/source_audits/later_ir_icon_2026_11/ec-infractors-current.json": "9cec65a9114bb37e0c7b04bae165f314159a76eadea853ba9002b3195794d8f2",
+    "data/source_audits/later_ir_icon_2026_11/ec-infractors-history.json": "570540cc99d8dbac273aedd7a6a76718d3db996f5b79a6dcbd3ea143d48f1e3b",
+    "data/source_audits/later_ir_icon_2026_11/ec-lord-current.json": "63f908898821a9d61b436d9303315a761a3e3d55a530af7f9460b15bc61181a5",
+    "data/source_audits/later_ir_icon_2026_11/ec-lord-history.json": "629137b884b3020e1ebf215fff8af6603ba0b8c2e93c9c2fab0e636b66c2f6dc",
+    "data/source_audits/later_ir_icon_2026_11/ec-tormentors-current.json": "9e52ee7e66e3d14dd0fbfeff81bd3d101f4c81308947c4bfde89ad5cfb4fe59f",
+    "data/source_audits/later_ir_icon_2026_11/ec-tormentors-history.json": "35965a54d840aa776881a7787f31acbc6de135d58d8509c5b3f464032f5ae6e2",
+    "data/source_audits/later_ir_icon_2026_11/inventory-owner-clarification.json": "93ad49977c7d038c7c8a1ecf0bfbe633c91792b94702a362bc527450e828876d",
+    "data/source_audits/later_ir_icon_2026_11/provenance-successor.json": "e15437f43367d05e48bce8ebafb5379155033df4c5af9bb4ca50d2fb4023197e",
+    "data/source_audits/later_ir_icon_2026_11/scint-blue-current.json": "79cc3c151b5ba66cce4f4ac5c7ea189325dd1608f66d900671dc316d9d572fd1",
+    "data/source_audits/later_ir_icon_2026_11/scint-blue-history.json": "410f4deaca25efbd1f4d7aa6238d1522b441d1db180c1097f2b578305078f293",
+    "data/source_audits/later_ir_icon_2026_11/scint-index-current.json": "5e9953b90317986d7db12e64a3b967987a4c6c36cbfeaf040c4f33636a9ab4b3",
+    "data/source_audits/later_ir_icon_2026_11/scint-pink-current.json": "68b46ecad2ef5d0ee6aa8994876a7836b3a60d27fc16097ea0d2fee663f38c61",
+    "data/source_audits/later_ir_icon_2026_11/scint-pink-history.json": "81646006e4bd66f9b3edf74bd7252a72c8605538df4b0c9af52f127bc58b58df",
+    "data/source_audits/later_ir_icon_2026_11/selected-source-observations.json": "55bfe98a65f011344f77442815d936a85d7fb8e97be09cd39fb6f8ef43dcd748",
+    "data/source_audits/later_ir_icon_2026_11/source-capture-receipts.json": "f580c96dc44f7875db1168271a696d4db932a31ce39cf74244b646438b3e49bc",
+    "data/source_audits/later_ir_icon_2026_11/source-only-audit.json": "35e3d423a09052e217b52095c67e4d10a514c958891b700c344f4a94a4eed94c",
+    "data/source_audits/later_ir_icon_2026_11/ts-index-current.json": "ffb8f55df63e12d276c006cb361580f83c21698e57522cfddbdcf12dccc1b960",
+    "data/source_audits/later_ir_icon_2026_11/ts-pink-current.json": "0f8d84c64add21034b69d3c11408238230fc6e20ea614768b9f845fe0ec54cac",
+    "data/source_audits/later_ir_icon_2026_11/ts-updates-current.json": "99699b49c860c0fbf35abb81dccf05064f49f9d153499fa36f17f252746f963f",
+    "data/source_audits/later_ir_icon_2026_11/twelve-clause-source-matrix.json": "20ed298cca7348d031388a28e7b5f14c4908dee08d89b1cb3f6e38d4f5606b1d",
+    "data/source_audits/daemons_final_four_2026_11/accepted-scope-review.json": "35c294f6eeb6b69580de67fe6cd53ae4d1369106686bc7b6590c37b9f2df0de4",
+    "data/source_audits/daemons_final_four_2026_11/app-updates-index-context.json": "338e3150b9c8d9f5d72f5b7299428196bf5f44faaae107e8a2b1ffa879c4a638",
+    "data/source_audits/daemons_final_four_2026_11/audit-summary.json": "973a220e595195f95b1799ae34cc1eec561c99512f38a79c6c4f7b47d7bbec1e",
+    "data/source_audits/daemons_final_four_2026_11/bloodthirster-current.json": "2df40b00fa335e19b962e5db043d945eaf6fbceb7e2736a2d9b63dcf2b00ed40",
+    "data/source_audits/daemons_final_four_2026_11/bloodthirster-history.json": "5e103e51e064bd330dbda624373ca0affbd67c5b70be8a8a065540382fac439f",
+    "data/source_audits/daemons_final_four_2026_11/catalog-delta.json": "33a2989420ac205ca66443ae349516fb3f891a9a33f4ad35cccdf3763a6c74ec",
+    "data/source_audits/daemons_final_four_2026_11/core-24.05.json": "3e04bb5a634c0e492f30a521312da1523bb0a27bc9c43a1daf22906a8b58043a",
+    "data/source_audits/daemons_final_four_2026_11/core-24.08.json": "3c3e1d7ad36e4fed10b2774b0a3f5648b01d65132cd5752153636a496987b3d3",
+    "data/source_audits/daemons_final_four_2026_11/core-24.09.json": "26d33ef101378a11160d24feabbd05bde71da3c1f3a018c9737a2a00392bac4f",
+    "data/source_audits/daemons_final_four_2026_11/core-24.10.json": "d5204646b2cf06618edda816d6a73ecd57ed8cdccba0c4cac913a532dad23f85",
+    "data/source_audits/daemons_final_four_2026_11/core-24.11.json": "cd1603eba870c855313801b59babf7dd293d7662cf85c624108e4a343c5dc872",
+    "data/source_audits/daemons_final_four_2026_11/core-24.18.json": "c9b43352f3198850656c7082ebd3e188d75c5e60197ad65007e4c2f17d1b503a",
+    "data/source_audits/daemons_final_four_2026_11/core-24.19.json": "e91fe9a2fd3db896cd360fc1180c8cf6babf74a155ca4c77a0155ab1139b3225",
+    "data/source_audits/daemons_final_four_2026_11/core-24.23.json": "f4adcd73ceaf0cf4779f7fc994bf829edcdb0a39ed8f6a2eaf16f48325ee50b1",
+    "data/source_audits/daemons_final_four_2026_11/core-24.24.json": "427def94cd9e2b812596818a12daf6a563fdf616b492d5f7bdd06ba377bd4c75",
+    "data/source_audits/daemons_final_four_2026_11/core-24.28.json": "2aba486039e3a89da5313a1523ecf20b155b8f1f5ac20427a9bc1552bfb8436e",
+    "data/source_audits/daemons_final_four_2026_11/core-24.33.json": "c8ccaee5be81271fcb6bcad2507b784b848d326956eec37c4cbd64b065ce8a54",
+    "data/source_audits/daemons_final_four_2026_11/core-24.36.json": "1d1a729089441e3f6f96aa030293ef0772c27889120b7a5db307fcbf87a09bfc",
+    "data/source_audits/daemons_final_four_2026_11/core-24.37.json": "d0d4d1cac140221e2850efe4c23166136bdd39c0e641fb8f8fbe4db4037dee74",
+    "data/source_audits/daemons_final_four_2026_11/core-24.39.json": "f43a4d4fa007f5b7a1a968559eb7c5b56ef72f3693ad9e8c4ab72b9208daffbd",
+    "data/source_audits/daemons_final_four_2026_11/daemon-prince-current.json": "eeee7120d270844bf6d9a6088a3bc49d6d30b223ce5308c9907473a29604d0ba",
+    "data/source_audits/daemons_final_four_2026_11/daemon-prince-history.json": "6ce130b6e255df6ba6cc5803bf9f1c200948398fecffca67391167490a1e86d4",
+    "data/source_audits/daemons_final_four_2026_11/daemon-prince-wings-current.json": "4c498689cdfc9469534991e771da03b9285edfb0f021d47d99aa886f2fd30ecd",
+    "data/source_audits/daemons_final_four_2026_11/daemon-prince-wings-history.json": "4d9a668d33715724b5a70a0b8760bb131ec48cc8a3bbddf97a1e82872c7bc086",
+    "data/source_audits/daemons_final_four_2026_11/daemons-army-rules-current.json": "6d97fce6dc7f31cd109eb53fc1843e1a117b89fb72c06e75600145bdfee0ad31",
+    "data/source_audits/daemons_final_four_2026_11/later-ir-source-joins.json": "d940263c034e8eda7d40444bc422fe8fa42c8a4ebe3c74aaa4b8199bcfd5316d",
+    "data/source_audits/daemons_final_four_2026_11/registry-delta.json": "88e4f5e72fd1773767715e8758a8a8dbf4d0dd5aae7feccd1b1f0c0ad36fcdd7",
+    "data/source_audits/daemons_final_four_2026_11/reviewed-observation.json": "b51592b0b9ecf1af2290ec87499534e55b92859e560635d675ed28fc84c004d6",
+    "data/source_audits/daemons_final_four_2026_11/shadow-legion-current.json": "1e2e4de54ca2c556a6d145fb14fbb3e5f3c588ea53f570169d448c326976d9f5",
+    "data/source_audits/daemons_final_four_2026_11/soul-grinder-current.json": "e24e8539d9b533504ed1dadf0687f2e69f805ab8779086704282dcfa59911358",
+    "data/source_audits/daemons_final_four_2026_11/soul-grinder-history.json": "afd8d7d5e5704cf8dbe9306fdf35efdc9bc6b7aeb32d493dd358e6ae2566269b",
+    "data/source_audits/daemons_final_four_2026_11/source-capture-receipts.json": "3da81bad73e6e8ef6655cff3f8961480a3980ae64d28b1d11fc983bb26e02536",
+    "data/source_audits/daemons_final_four_2026_11/source-native-matrix.json": "f5f82f561b9c3044fa41c6172934817e9d623902b2c330ade6edaf74736fabe4",
+    "data/source_audits/daemons_next_three_2026_11/app-updates-index-context.json": "c25f5f48eca2a1271c5c36d6a75d994ac9387c0607a50c0d833cb99fbe5d47e5",
+    "data/source_audits/daemons_next_three_2026_11/audit-summary.json": "2aaf4fb1dc005f1e7081eabda19ae6785549c0c6ff8aeb7379806878f74da2da",
+    "data/source_audits/daemons_next_three_2026_11/catalog-delta.json": "81c435520a18a37bbf97b9b66e6120f6798234754b3bf23da24898ba25acf639",
+    "data/source_audits/daemons_next_three_2026_11/core-24.08.json": "5fa150602dc1b491cc0b1bb7046edabea684d775f25740b560c1aff16d4d8a53",
+    "data/source_audits/daemons_next_three_2026_11/core-24.09.json": "5b346e992e825447faa8aa685bb44c5cdb7aaaf29c24d3daf5c26b61c39de65c",
+    "data/source_audits/daemons_next_three_2026_11/core-24.11.json": "fe0e22ffa0069b623f5b605be44706c426c38c814df44943e2388f49d43bd6f0",
+    "data/source_audits/daemons_next_three_2026_11/core-24.12.json": "f2054bac85ad7a32f5495f39ede0dded6a44384c6557c20e92d15dc7a81820c0",
+    "data/source_audits/daemons_next_three_2026_11/core-24.15.json": "0593be2bd15ad3f9e9fcb826b48797ac628478e49760c14eee4f212c54ee0872",
+    "data/source_audits/daemons_next_three_2026_11/core-24.18.json": "338f0d4139c7129ff883176112b7b54ddd24eb2a5a1d90b1ec3292704a74b639",
+    "data/source_audits/daemons_next_three_2026_11/core-24.23.json": "5da965e960d61ad54c3e6c2e8a742c02a751314335832bd5731aec9678b75241",
+    "data/source_audits/daemons_next_three_2026_11/core-24.29.json": "6d2e4e0b367c5b180bb2dd83a9ce18886c8b6f02df91b33183ee32dce8ed8d75",
+    "data/source_audits/daemons_next_three_2026_11/core-24.36.json": "988048fa638c4f9979f56b50fe8f59af1035751b3f72aa5e0a9d0d95848ba1d0",
+    "data/source_audits/daemons_next_three_2026_11/core-24.37.json": "55dccef996ebdcbf3ccb0d5de47779fa0f808004e4bca2aa7952fca0fe9ae6bd",
+    "data/source_audits/daemons_next_three_2026_11/core-24.39.json": "73e7fa607f99fec9daec272bf743d923a24b279b2bbfce8bfef0482541da9def",
+    "data/source_audits/daemons_next_three_2026_11/daemons-army-rules-current.json": "9723c5aed6d35b0ba72d97c04a5336d9b10e506ccbdc59ce8b02defc4b3d6a7c",
+    "data/source_audits/daemons_next_three_2026_11/daemons-update-963.json": "26edadc32af868bf1c6e526f9cecf6d1656a8689ed3bb97eb7c734da1e6cbe34",
+    "data/source_audits/daemons_next_three_2026_11/flesh-hounds-current.json": "a30753244cfc65604b9afea08e6607c5c86dd37c6a7fd6d144a288668a0894ff",
+    "data/source_audits/daemons_next_three_2026_11/flesh-hounds-history.json": "752b9eaeb774754fdce2cd44084140d2d8ea4ba2d73553248c8cbe9028da1b2a",
+    "data/source_audits/daemons_next_three_2026_11/lord-of-change-current.json": "0194bc5ec602c9d8f7db0d7b0569fafb5c49ff88e5ac96f081914912790c1204",
+    "data/source_audits/daemons_next_three_2026_11/lord-of-change-history.json": "0677130afee83e20621069e935cec88a7806464cc48817230daadc1f7286e6ab",
+    "data/source_audits/daemons_next_three_2026_11/plaguebearers-current.json": "991fa0912ba9fc6ea7ff648316af6170685d8fdb92d3bbf4ab5af15ec29c46cd",
+    "data/source_audits/daemons_next_three_2026_11/plaguebearers-history.json": "836dcde8d9654bebc421866bede83b9bcf18acfab67eeb27344b91588d1f3fcd",
+    "data/source_audits/daemons_next_three_2026_11/registry-delta.json": "3aaf5d22177ddc40129a7febc275e5c58be8b71da871be9c0fb33b78036eeaac",
+    "data/source_audits/daemons_next_three_2026_11/reviewed-observation.json": "e550211684cf4104f39dacecffd11ec5b3a9a691894eee49ecaab2972f213a2c",
+    "data/source_audits/daemons_next_three_2026_11/shadow-legion-current.json": "e9bc7dbb69a7dd19cda731ff5d28c5c17ce48e79ee1bb34f728d88945ef39a97",
+    "data/source_audits/daemons_next_three_2026_11/source-capture-receipts.json": "cc67ebf416a0bf463c812c51a6c83d3784fa68e2bcfdbb874e9cd34b66d7478c",
+    "data/source_audits/daemons_next_three_2026_11/source-native-matrix.json": "19317fe207ae5effff3b293c56872e4127eb5b1c9574333e11fafa67b7dc1700",
+    "data/source_audits/daemons_native_2026_11/catalog-delta.json": "3aa53fb015caa2ffe854362fe511bef561814630927d6ad33b525096fe39c1e1",
+    "data/source_audits/daemons_native_2026_11/provenance-delta.json": "34adae1ed1516e98f4f39235f55e6c30e5b566eb4342a528be71f814c549e20f",
+    "data/source_audits/daemons_native_2026_11/registry-delta.json": "7bb6e2a0a7fb3e6845188b18e5e572b21daf1f04b694e39708069a9c8d2dd2c4",
+    "data/source_audits/daemons_native_2026_11/reviewed-observation.json": "185e1eef3f58b8e7f7357a93e2f6cb694614c2339893a8a8cb70d2c9bb022d13",
+    "data/source_audits/wave_serpent_frame_2026_11/catalog-delta.json": "b77117fad5482b034ecbfdac25d89bce69c280d00373c43451190be5ac6eb108",
+    "data/source_audits/wave_serpent_frame_2026_11/provenance-delta.json": "b95b7166fc1f32fd7f984605f82a7dc26723108003b0ffa7bae97c4f26c1d51f",
+    "data/source_audits/wave_serpent_frame_2026_11/registry-delta.json": "0ac7269a4625c19bad692fc6ec6023a454d507f4c62244cf1fd6295648dad0b8",
+    "data/source_audits/wave_serpent_frame_2026_11/reviewed-observation.json": "ffdf2378872f9c4bf75bee0fb91e11bf4cee0f10835480a4d53e316fb28374a3",
+    "data/source_audits/starfang_deep_strike_2026_11/catalog-delta.json": "4e2e01ce60c830d68060c878cf1db0d6e9602483a8af47bf513dd447ecb2343a",
+    "data/source_audits/starfang_deep_strike_2026_11/reviewed-observations.json": "048e21d8284625e4ddb89111a06fdb064e499e80530428f2db6ed978c05798e1",
+    "data/source_audits/starfang_deep_strike_2026_11/source-admission.audit.json": "0c368e435dde85259e39022629741a9d462001f70d735f03aae4d665e590e495",
+    "data/source_audits/core_descriptions_2026_11/catalog-description-delta.json": "124158a48519894f7deffcdd6ac45c500f994f67ecd099dd45edc1005cd524d5",
+    "data/source_audits/core_descriptions_2026_11/reviewed-observations.json": "2cc9783d22512e9135b450d44a12e694ab742edd8475f83ed55bbd63a6daf3e3",
+    "data/source_audits/core_descriptions_2026_11/source-admission.audit.json": "4a77ee6301c154d1e07577f21d9cb1315248aaab472d03a39101025153d0298e",
+    "data/source_audits/deadly_demise_2026_11/catalog-description-delta.json": "40aa60c665b221e0fb0d57879efe602dd43499812b73ef261074d689c74b32b4"
+  },
+  "closure": [
+    {
+      "member": "native.json",
+      "stage": "before_icon_catalog",
+      "package_hash": "0f724df814b8ad794444672e83cd467dcfac2f453eb8da1ba3dd0a2a81c2d2e9"
+    },
+    {
+      "member": "native.json",
+      "stage": "before_daemons_final_four",
+      "package_hash": "abf01ed3f175985d3f5ac37ed2eead4cd5a6b5e542dc8baf6bdba699a09703bf"
+    },
+    {
+      "member": "native.json",
+      "stage": "before_daemons_next_three",
+      "package_hash": "bc7a64c56e5d01984d3094436ee2886270bb13ea03889cbca71619fc41d917a5"
+    },
+    {
+      "member": "native.json",
+      "stage": "before_daemons_native",
+      "package_hash": "13d36e768b1f3fbb27fe54ea64c31bd0287397dba5db2522bd54daaa43ea5284"
+    },
+    {
+      "member": "native.json",
+      "stage": "before_wave_frame",
+      "package_hash": "1bd55cc47038b8d7fbe9ff39efc380a3c25c77bd68b92fd71797448dd5eefe53"
+    },
+    {
+      "member": "native.json",
+      "stage": "before_starfang_deep_strike",
+      "package_hash": "3da400cd47a608ae88738cc48969d55a01fc77d9252b892337c010324345c7e0"
+    },
+    {
+      "member": "native.json",
+      "stage": "before_lhykhis_correction",
+      "package_hash": "09354e531fd40076f05440a029dacf6de245e2744cd94cb929cb0da615745553"
+    },
+    {
+      "member": "native.json",
+      "stage": "before_mandiblasters_correction",
+      "package_hash": "dbbcf79c2642a87c4cdf91ea79fd680544c72cf86b3e04b6e9f3c0785d4c6171"
+    },
+    {
+      "member": "native.json",
+      "stage": "before_core_description_correction",
+      "package_hash": "e5b665508ef58cb239d3505efce80935d030e41ccda6b5ec01a566c71d2f9a8c"
+    },
+    {
+      "member": "native.json",
+      "stage": "before_deadly_demise",
+      "package_hash": "ca1adf0b5d4e467ebbb1572215811feada1db3b8b48caba55e39c8b9f33d1c3b"
+    },
+    {
+      "member": "paired.json",
+      "stage": "before_icon_catalog",
+      "package_hash": "5c8550d3c5965a6eaee6aea3a890371cb9e522f74f164e9b673c76eb03155bf0"
+    },
+    {
+      "member": "paired.json",
+      "stage": "before_daemons_final_four",
+      "package_hash": "5c8550d3c5965a6eaee6aea3a890371cb9e522f74f164e9b673c76eb03155bf0"
+    },
+    {
+      "member": "paired.json",
+      "stage": "before_daemons_next_three",
+      "package_hash": "5c8550d3c5965a6eaee6aea3a890371cb9e522f74f164e9b673c76eb03155bf0"
+    },
+    {
+      "member": "paired.json",
+      "stage": "before_daemons_native",
+      "package_hash": "5c8550d3c5965a6eaee6aea3a890371cb9e522f74f164e9b673c76eb03155bf0"
+    },
+    {
+      "member": "paired.json",
+      "stage": "before_wave_frame",
+      "package_hash": "5c8550d3c5965a6eaee6aea3a890371cb9e522f74f164e9b673c76eb03155bf0"
+    },
+    {
+      "member": "paired.json",
+      "stage": "before_starfang_deep_strike",
+      "package_hash": "b1a1a67580cdb5f5942864e54baa174d0a71d32633517d02c37468a8cb514b1e"
+    },
+    {
+      "member": "paired.json",
+      "stage": "before_lhykhis_correction",
+      "package_hash": "13ab3a03bf10193cd089412c9858baff0925e77bc5dfe24f33b1c2ba911cf55d"
+    },
+    {
+      "member": "paired.json",
+      "stage": "before_mandiblasters_correction",
+      "package_hash": "13ab3a03bf10193cd089412c9858baff0925e77bc5dfe24f33b1c2ba911cf55d"
+    },
+    {
+      "member": "paired.json",
+      "stage": "before_core_description_correction",
+      "package_hash": "085f2414c725f9d6681cdd4c7ef57fc4d0e9efdb665adbaeb95975de1d882439"
+    },
+    {
+      "member": "paired.json",
+      "stage": "before_deadly_demise",
+      "package_hash": "cfab073089ed11bcecd9476b92cd261154c9a23936612bc8767976aff74134d2"
+    },
+    {
+      "member": "standalone.json",
+      "stage": "before_icon_catalog",
+      "package_hash": "f910aa113e8da197636e8868b41e58b394961d234dee0e77c04aba31c6e6468f"
+    },
+    {
+      "member": "standalone.json",
+      "stage": "before_daemons_final_four",
+      "package_hash": "f910aa113e8da197636e8868b41e58b394961d234dee0e77c04aba31c6e6468f"
+    },
+    {
+      "member": "standalone.json",
+      "stage": "before_daemons_next_three",
+      "package_hash": "f910aa113e8da197636e8868b41e58b394961d234dee0e77c04aba31c6e6468f"
+    },
+    {
+      "member": "standalone.json",
+      "stage": "before_daemons_native",
+      "package_hash": "f910aa113e8da197636e8868b41e58b394961d234dee0e77c04aba31c6e6468f"
+    },
+    {
+      "member": "standalone.json",
+      "stage": "before_wave_frame",
+      "package_hash": "f910aa113e8da197636e8868b41e58b394961d234dee0e77c04aba31c6e6468f"
+    },
+    {
+      "member": "standalone.json",
+      "stage": "before_starfang_deep_strike",
+      "package_hash": "b63c0805b6878daf2eef2d4145e407361f7848bde3095074022f1b850db183ab"
+    },
+    {
+      "member": "standalone.json",
+      "stage": "before_lhykhis_correction",
+      "package_hash": "b63c0805b6878daf2eef2d4145e407361f7848bde3095074022f1b850db183ab"
+    },
+    {
+      "member": "standalone.json",
+      "stage": "before_mandiblasters_correction",
+      "package_hash": "b63c0805b6878daf2eef2d4145e407361f7848bde3095074022f1b850db183ab"
+    },
+    {
+      "member": "standalone.json",
+      "stage": "before_core_description_correction",
+      "package_hash": "b63c0805b6878daf2eef2d4145e407361f7848bde3095074022f1b850db183ab"
+    },
+    {
+      "member": "standalone.json",
+      "stage": "before_deadly_demise",
+      "package_hash": "f7ca34e55127c98cb625ebffbf5becc9a4f53a7f9ece06776667df70e6eab73e"
+    },
+    {
+      "member": "icon-component.json",
+      "stage": "before_icon_component",
+      "canonical_sha256": "9163cee3877f67d2d2a364e95126fec14fcb65247a27dbfdbfb84b7e20c39bc7",
+      "package_hash": "076824923ec39f2ce539c6e2dbd1c763143797c688fb36abebfd4104d8f38059"
+    }
+  ]
+}

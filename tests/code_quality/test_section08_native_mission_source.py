@@ -116,3 +116,148 @@ def test_native_mission_factory_rejects_wrong_predecessor_identity(
     definitions = replace(faction_definitions, package=replace(package, army_catalog=catalog))
     with pytest.raises(ValueError, match="predecessor identity or semantics changed"):
         source.source_backed_command_definitions(definitions)
+
+
+def test_sticky_binding_accepts_authenticated_icon_predecessor_and_current() -> None:
+    from tests.icon_provenance_helpers import before_icon_component
+    from tests.source_history import historical_icon_component
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
+
+    row = source.validate_observation((ROOT / source.PATH).read_bytes())
+    current = historical_icon_component()
+    previous = before_icon_component(current)
+    source.validate_sticky_binding(previous, row)
+    source.validate_sticky_binding(current, row)
+    approved = faction_pack_rule_ir.source_package_artifact(source.PACKAGE)
+    approved.validate_generated_artifact_bytes(json.dumps(approved.payload()).encode())
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError, match="registry pin"):
+        approved.validate_generated_artifact_bytes(json.dumps(previous).encode())
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "package",
+        "schema",
+        "owner",
+        "missing",
+        "name",
+        "text_hash",
+        "source",
+        "rule",
+        "ir",
+        "dependency",
+        "document",
+        "malformed",
+    ],
+)
+def test_sticky_binding_rejects_selected_dependency_or_identity_drift(mutation: str) -> None:
+    from tests.source_history import historical_icon_component
+
+    component = historical_icon_component()
+    row = json.loads((ROOT / source.PATH).read_bytes())
+    record = component["records"]["000004079:3"]
+    if mutation == "package":
+        component["source_package_id"] += ":drift"
+    elif mutation == "schema":
+        component["artifact_schema"] += ":drift"
+    elif mutation == "owner":
+        component["datasheets"]["000004079"] = "Infractors"
+    elif mutation == "missing":
+        del component["records"]["000004079:3"]
+    elif mutation == "name":
+        record["ability_name"] += " drift"
+    elif mutation == "text_hash":
+        record["normalized_text_sha256"] = "0" * 64
+    elif mutation == "source":
+        record["rule_ir"]["source_id"] += ":drift"
+    elif mutation == "rule":
+        record["rule_ir"]["rule_id"] += ":drift"
+    elif mutation == "ir":
+        record["rule_ir"]["clauses"][0]["effects"][0]["parameters"][0]["value"] = "drift"
+    elif mutation == "dependency":
+        record["rule_ir"]["dependency_source_ids"] = ["unreviewed"]
+    elif mutation == "document":
+        component["official_document_sha256"] = "0" * 64
+    else:
+        component["records"] = []
+    with pytest.raises(ValueError, match="complete Sticky record, ownership or source binding"):
+        source.validate_sticky_binding(component, row)
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_pack_rule_ir._artifacts import (  # noqa: E501
+        canonical_package_hash,
+    )
+
+    approved = faction_pack_rule_ir.source_package_artifact(source.PACKAGE)
+    component["package_hash"] = canonical_package_hash(component)
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError):
+        approved.validate_generated_artifact_bytes(json.dumps(component).encode())
+
+
+@pytest.mark.parametrize(
+    "field", ["source_snapshot_sha256", "source_artifact_hash", "overlay_package_hash"]
+)
+def test_current_component_loader_retains_broad_source_authentication(field: str) -> None:
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_pack_rule_ir._artifacts import (  # noqa: E501
+        canonical_package_hash,
+    )
+
+    approved = faction_pack_rule_ir.source_package_artifact(source.PACKAGE)
+    component = approved.payload()
+    component[field] = "0" * 64
+    component["package_hash"] = canonical_package_hash(component)
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError, match="registry pin"):
+        approved.validate_generated_artifact_bytes(json.dumps(component).encode())
+
+
+@pytest.mark.parametrize("mutation", ["payload", "manifest", "extra", "missing"])
+def test_fixed_source_history_rejects_corruption_before_closure(
+    tmp_path: Path, mutation: str
+) -> None:
+    import shutil
+
+    from tests.source_history import HISTORY, validate_source_history
+
+    target = tmp_path / "history"
+    shutil.copytree(HISTORY, target)
+    if mutation == "payload":
+        path = target / "native.json"
+        path.write_bytes(path.read_bytes() + b" ")
+    elif mutation == "manifest":
+        path = target / "manifest.json"
+        path.write_bytes(path.read_bytes() + b" ")
+    elif mutation == "extra":
+        (target / "unlisted.json").write_text("{}")
+    else:
+        (target / "paired.json").unlink()
+    with pytest.raises(ValueError, match="Historical source roots"):
+        validate_source_history(target)
+
+
+def test_source_history_guard_precedes_index_and_covered_pytest() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text()
+    step = workflow.split("- name: Run behavioral coverage shard", 1)[1].split(
+        "- name: Upload shard test report", 1
+    )[0]
+    assert (
+        step.index("scripts.validate_source_history")
+        < step.index("tools.ability_support_sources")
+        < step.index("--cov=warhammer40k_core")
+    )
+    assert "timeout-minutes: 12" in step
+
+
+def test_source_history_rejects_optimized_interpreter() -> None:
+    import subprocess
+    import sys
+
+    result = subprocess.run(
+        [sys.executable, "-O", "-m", "scripts.validate_source_history"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode != 0
+    assert "optimized Python is unsupported" in result.stderr

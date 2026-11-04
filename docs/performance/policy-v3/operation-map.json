@@ -33389,6 +33389,128 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-e1f4a1e16daabf6b": {
+      "paths": [
+        "data/source_audits/source_fixture_history_2026_11/icon-component.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-646e930764b734f2": {
+      "paths": [
+        "data/source_audits/source_fixture_history_2026_11/manifest.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-7fab3e1a1fd643c9": {
+      "paths": [
+        "data/source_audits/source_fixture_history_2026_11/native.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-63ed9f6e9e7f4c33": {
+      "paths": [
+        "data/source_audits/source_fixture_history_2026_11/paired.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-a89e63191ccf2789": {
+      "paths": [
+        "data/source_audits/source_fixture_history_2026_11/standalone.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-d093da7d00abc532": {
+      "paths": [
+        "scripts/validate_source_history.py"
+      ],
+      "owners": [
+        "@module",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-29c3dfc9354d3ad5": {
+      "paths": [
+        "tests/current_description_preimages.py"
+      ],
+      "owners": [
+        "@module",
+        "current_core_description_preimage",
+        "current_deep_strike_preimage"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-ba7743f81070fa6b": {
+      "paths": [
+        "tests/fixtures/source_history/section08-sticky-binding-v1.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-8ab3e822fb8605cf": {
+      "paths": [
+        "tests/source_history.py"
+      ],
+      "owners": [
+        "@module",
+        "_contained",
+        "_digest",
+        "_package",
+        "_require",
+        "before_historical_deadly_demise",
+        "historical_icon_component",
+        "historical_packages",
+        "read_manifest",
+        "validate_source_history"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-5efa41c290f18238": {
+      "paths": [
+        "tests/support/section08_native_mission_source.py"
+      ],
+      "owners": [
+        "validate_sticky_binding"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
