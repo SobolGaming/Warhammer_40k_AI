@@ -652,3 +652,25 @@ def test_daemons_next_three_performance_scope_is_exact_and_preserves_policy_chai
     assert policy.starfang_deep_strike_policy_predecessor(current) == subprocess.check_output(
         ["git", "show", BASE + ":tools/performance_policy.py"], cwd=ROOT
     )
+
+
+def test_daemons_next_three_retained_capture_bytes_match_receipts() -> None:
+    import hashlib
+    import json
+
+    directory = ROOT / "data/source_audits/daemons_next_three_2026_11"
+    raw = (directory / "source-capture-receipts.json").read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == (
+        "cc67ebf416a0bf463c812c51a6c83d3784fa68e2bcfdbb874e9cd34b66d7478c"
+    )
+    receipts = json.loads(raw)
+    assert len(receipts) == 21
+    assert len({row["file"] for row in receipts}) == 21
+    for row in receipts:
+        text_path = directory / row["file"]
+        assert text_path.name == row["file"]
+        text_bytes = text_path.read_bytes()
+        capture = text_path.with_suffix(".json").read_bytes()
+        assert hashlib.sha256(text_bytes).hexdigest() == row["sha256_utf8"]
+        assert hashlib.sha256(capture).hexdigest() == row["json_sha256"]
+        assert json.loads(capture)["text"].encode("utf-8") == text_bytes
