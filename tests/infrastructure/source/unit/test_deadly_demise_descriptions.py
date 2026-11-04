@@ -19,6 +19,7 @@ from tools.generate_ability_support_matrix import (
 )
 
 from tests.core_description_helpers import before_core_description_correction
+from tests.source_history import historical_packages
 from tests.starfang_deep_strike_helpers import before_starfang_deep_strike
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
 from warhammer40k_core.engine.core_ability_materialization import _deadly_demise_source_for_model
@@ -132,7 +133,13 @@ def test_deadly_demise_all_thirty_current_descriptions_preserve_entire_baseline_
         # Includes every unrelated field, ability, geometry, source identity and support flag.
         assert (
             _historical_deadly_demise_package(
-                before_core_description_correction(package)
+                before_core_description_correction(
+                    next(
+                        p
+                        for p in historical_packages()
+                        if p.army_catalog.catalog_id == package.army_catalog.catalog_id
+                    )
+                )
             ).package_hash()
             == surface["package_hash"]
         )
@@ -151,7 +158,7 @@ def test_deadly_demise_preserves_historical_artifact_bytes_and_original_validato
     reconciliation = daemons_roster.reconciliation_manifest()
     daemons_roster.validate_catalog_against_reconciliation(
         catalog=_historical_deadly_demise_package(
-            before_starfang_deep_strike(current)
+            before_starfang_deep_strike(historical_packages()[2])
         ).army_catalog,
         reconciliation=reconciliation,
     )

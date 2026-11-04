@@ -448,6 +448,7 @@ jobs:
         run: |
           mkdir -p reports
           mapfile -t shard_paths < "$SHARD_MANIFEST"
+          uv run --no-sync python -B -m scripts.validate_source_history
           uv run --no-sync python -B -m tools.ability_support_sources \
             data/source_snapshots/wahapedia/10th-edition/2026-06-14/json \
             "$SELECTED_ARMY_SOURCE_INDEX"

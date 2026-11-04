@@ -258,6 +258,10 @@ Architecture and source-shape audits run independently without behavioral covera
 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 ```
 
+Before coverage, validate the fixed historical roots and the current approved Sticky
+fixture dependency with `uv run --no-sync python -B -m scripts.validate_source_history`.
+See [source/fixture hash boundaries](docs/SOURCE_FIXTURE_HASH_BOUNDARIES.md).
+
 For final validation, run the behavioral suite once with coverage and the code-quality
 suite above once without coverage. A second no-coverage behavioral run is unnecessary.
 Focused subsets and `--lf` are for iteration, never replacements for this final gate:
