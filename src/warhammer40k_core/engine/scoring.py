@@ -8,6 +8,10 @@ from warhammer40k_core.core.mission_scoring_resolution import (
     MissionScoringResolutionMode,
     validate_mission_scoring_resolution_groups,
 )
+from warhammer40k_core.core.secondary_vp_cap_scope import (
+    SecondaryVictoryPointCapScope,
+    secondary_vp_cap_scope_from_token,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import primary_scoring_state_evidence as _state
 from warhammer40k_core.engine.destruction_provenance import (
@@ -161,6 +165,7 @@ class MissionScoringPolicyPayload(TypedDict):
     battle_ready_vp: int
     total_vp_cap: int
     secondary_max_vp_per_turn: int
+    secondary_vp_cap_scope: str
     end_of_round_scoring_windows: list[str]
     end_of_game_scoring_windows: list[str]
     source_id: str
@@ -1916,12 +1921,21 @@ class MissionScoringPolicy:
     secondary_vp_cap: int
     battle_ready_vp: int
     total_vp_cap: int
+    # Historical amount field; the explicit scope defines its scoring period.
     secondary_max_vp_per_turn: int
+    secondary_vp_cap_scope: SecondaryVictoryPointCapScope
     end_of_round_scoring_windows: tuple[str, ...]
     end_of_game_scoring_windows: tuple[str, ...]
     source_id: str
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "secondary_vp_cap_scope",
+            secondary_vp_cap_scope_from_token(
+                self.secondary_vp_cap_scope, error_type=GameLifecycleError
+            ),
+        )
         object.__setattr__(
             self,
             "player_id",
@@ -2866,6 +2880,7 @@ class MissionScoringPolicy:
             "battle_ready_vp": self.battle_ready_vp,
             "total_vp_cap": self.total_vp_cap,
             "secondary_max_vp_per_turn": self.secondary_max_vp_per_turn,
+            "secondary_vp_cap_scope": self.secondary_vp_cap_scope.value,
             "end_of_round_scoring_windows": list(self.end_of_round_scoring_windows),
             "end_of_game_scoring_windows": list(self.end_of_game_scoring_windows),
             "source_id": self.source_id,
@@ -2901,6 +2916,7 @@ class MissionScoringPolicy:
             "battle_ready_vp",
             "total_vp_cap",
             "secondary_max_vp_per_turn",
+            "secondary_vp_cap_scope",
             "end_of_round_scoring_windows",
             "end_of_game_scoring_windows",
             "source_id",
@@ -2949,6 +2965,9 @@ class MissionScoringPolicy:
             battle_ready_vp=payload["battle_ready_vp"],
             total_vp_cap=payload["total_vp_cap"],
             secondary_max_vp_per_turn=payload["secondary_max_vp_per_turn"],
+            secondary_vp_cap_scope=secondary_vp_cap_scope_from_token(
+                payload["secondary_vp_cap_scope"], error_type=GameLifecycleError
+            ),
             end_of_round_scoring_windows=tuple(payload["end_of_round_scoring_windows"]),
             end_of_game_scoring_windows=tuple(payload["end_of_game_scoring_windows"]),
             source_id=payload["source_id"],

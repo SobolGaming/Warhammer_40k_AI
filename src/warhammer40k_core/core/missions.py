@@ -58,6 +58,10 @@ from warhammer40k_core.core.objective_terrain_area_references import (
     validate_objective_terrain_area_references,
 )
 from warhammer40k_core.core.objectives import Objective, ObjectiveMarker
+from warhammer40k_core.core.secondary_vp_cap_scope import (
+    SecondaryVictoryPointCapScope,
+    secondary_vp_cap_scope_from_token,
+)
 from warhammer40k_core.core.terrain_areas import (
     PlacedTerrainArea,
     PlacedTerrainAreaPayload,
@@ -264,6 +268,7 @@ class MissionPackScoringDefinitionPayload(TypedDict):
     secondary_vp_cap: int
     total_vp_cap: int
     secondary_max_vp_per_turn: int
+    secondary_vp_cap_scope: str
     end_of_round_scoring_windows: list[str]
     end_of_game_scoring_windows: list[str]
     reserve_destruction_timing: str
@@ -1684,7 +1689,9 @@ class MissionPackScoringDefinition:
     primary_vp_cap: int
     secondary_vp_cap: int
     total_vp_cap: int
+    # Historical amount field; the explicit scope defines its scoring period.
     secondary_max_vp_per_turn: int
+    secondary_vp_cap_scope: SecondaryVictoryPointCapScope
     end_of_round_scoring_windows: tuple[str, ...]
     end_of_game_scoring_windows: tuple[str, ...]
     reserve_destruction_timing: str
@@ -1694,6 +1701,13 @@ class MissionPackScoringDefinition:
     source_id: str
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "secondary_vp_cap_scope",
+            secondary_vp_cap_scope_from_token(
+                self.secondary_vp_cap_scope, error_type=MissionPackError
+            ),
+        )
         object.__setattr__(
             self,
             "game_length_battle_rounds",
@@ -1836,6 +1850,7 @@ class MissionPackScoringDefinition:
             "secondary_vp_cap": self.secondary_vp_cap,
             "total_vp_cap": self.total_vp_cap,
             "secondary_max_vp_per_turn": self.secondary_max_vp_per_turn,
+            "secondary_vp_cap_scope": self.secondary_vp_cap_scope.value,
             "end_of_round_scoring_windows": list(self.end_of_round_scoring_windows),
             "end_of_game_scoring_windows": list(self.end_of_game_scoring_windows),
             "reserve_destruction_timing": self.reserve_destruction_timing,
@@ -1851,6 +1866,8 @@ class MissionPackScoringDefinition:
 
     @classmethod
     def from_payload(cls, payload: MissionPackScoringDefinitionPayload) -> Self:
+        if "secondary_vp_cap_scope" not in payload:
+            raise MissionPackError("Mission scoring payload requires secondary_vp_cap_scope.")
         return cls(
             game_length_battle_rounds=payload["game_length_battle_rounds"],
             primary_scoring_phase=payload["primary_scoring_phase"],
@@ -1861,6 +1878,9 @@ class MissionPackScoringDefinition:
             secondary_vp_cap=payload["secondary_vp_cap"],
             total_vp_cap=payload["total_vp_cap"],
             secondary_max_vp_per_turn=payload["secondary_max_vp_per_turn"],
+            secondary_vp_cap_scope=secondary_vp_cap_scope_from_token(
+                payload["secondary_vp_cap_scope"], error_type=MissionPackError
+            ),
             end_of_round_scoring_windows=tuple(payload["end_of_round_scoring_windows"]),
             end_of_game_scoring_windows=tuple(payload["end_of_game_scoring_windows"]),
             reserve_destruction_timing=payload["reserve_destruction_timing"],

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import cast
 
+from tests.event_secondary_round_cap_helpers import assert_native_secondary_round_cap
 from tests.shared.category_migration.phase11f_game_end_scoring import (
     PHASE16A_MISSION_POOL_ENTRY_ID,
     ArmyCatalog,
@@ -55,6 +56,9 @@ from tests.shared.category_migration.phase11f_game_end_scoring import (
     resolve_primary_scoring_boundary_lifecycle,
     warhammer_event_companion_2026_07_mission_pack,
 )
+from tests.support.faction_batch01 import faction_definitions as faction_definitions
+from tests.support.section02_fixtures import Section02Definitions
+from warhammer40k_core.core.secondary_vp_cap_scope import SecondaryVictoryPointCapScope
 
 
 def test_phase11f_final_scoring_requires_the_owning_player_policy() -> None:
@@ -129,6 +133,39 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
                 amount=15,
             )
         )
+        # Explicit period-valid ledger premises for this aggregate-cap kernel.
+        # Native award admission is covered by the separate facade regressions.
+        for player_id in ("player-a", "player-b"):
+            ledger = state.victory_point_ledger_for_player(player_id)
+            award = VictoryPointAward(
+                player_id=player_id,
+                battle_round=battle_round,
+                phase=BattlePhase.COMMAND.value,
+                amount=14 if player_id == "player-a" and battle_round == 3 else 15,
+                source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+                source_id="assassination",
+                scoring_timing="secondary_mission_score",
+                metadata={
+                    "scoring_turn_active_player_id": player_id,
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.LEGACY_PHASE11F.value
+                    ),
+                    "scoring_rule_id": "aggregate-cap-ledger-premise",
+                },
+            )
+            amount, metadata = policies.capped_award_for_ledger(
+                ledger=ledger,
+                award=award,
+                objective_control_records=(),
+                primary_scoring_state_evidence_records=(),
+                turn_order=state.turn_order,
+                current_active_player_id=state.active_player_id,
+            )
+            updated, _ = ledger.award(award, applied_amount=amount, metadata=metadata)
+            state.victory_point_ledgers = [
+                updated if stored.player_id == player_id else stored
+                for stored in state.victory_point_ledgers
+            ]
     state.battle_round = 4
     primary_cap_transaction = state.award_victory_points(
         policies.mission_action_award(
@@ -196,7 +233,7 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
     player_b_score = next(score for score in player_scores if score["player_id"] == "player-b")
 
     assert primary_cap_transaction.amount == 0
-    assert secondary_transaction.amount == 45
+    assert secondary_transaction.amount == 1
     assert battle_ready_transaction.amount == 10
     assert state.victory_point_total("player-a") == 100
     assert state.victory_point_total("player-b") == 45
@@ -209,8 +246,12 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
     assert player_a_score["raw_victory_points"] == 100
     assert player_a_score["cap_adjustment"] == 0
     assert player_b_score["raw_secondary_vp"] == 45
-    assert _cap_reasons(primary_cap_transaction) == ["primary_vp_cap"]
-    assert _cap_reasons(secondary_transaction) == ["secondary_vp_cap"]
+    assert _cap_reasons(primary_cap_transaction) == ["primary_vp_cap", "total_vp_cap"]
+    assert _cap_reasons(secondary_transaction) == [
+        "secondary_vp_cap",
+        "secondary_battle_round_vp_cap",
+        "total_vp_cap",
+    ]
     assert _cap_reasons(battle_ready_transaction) == ["battle_ready_vp_cap", "total_vp_cap"]
 
 
@@ -221,6 +262,7 @@ def test_phase11f_vp_cap_audit_metadata_shapes_and_validation_are_explicit() -> 
         requested_amount: int = 5,
         applied_amount: int = 3,
         capped_reasons: tuple[str, ...] = ("primary_battle_round_vp_cap",),
+        scope: object = SecondaryVictoryPointCapScope.PLAYER_TURN,
     ) -> object:
         return metadata_with_vp_cap_audit(
             cast(JsonValue, metadata),
@@ -233,8 +275,11 @@ def test_phase11f_vp_cap_audit_metadata_shapes_and_validation_are_explicit() -> 
             total_points_before=20,
             total_points_after=23,
             capped_reasons=capped_reasons,
+            secondary_vp_cap_scope=cast(SecondaryVictoryPointCapScope, scope),
         )
 
+    with pytest.raises(GameLifecycleError, match="typed Secondary cap scope"):
+        audit(None, scope="invalid")
     empty_metadata = audit(None)
     scalar_metadata = cast(dict[str, object], audit("source-audit"))
 
@@ -451,3 +496,116 @@ __all__ += ["chapter_approved_2026_27_mission_pack", "create_deterministic_battl
 __all__ += ["enter_battle_for_fixture", "muster_army", "record_primary_scoring_state_evidence"]
 __all__ += ["record_primary_turn_start_evidence"]
 __all__ += ["warhammer_event_companion_2026_07_mission_pack"]
+
+
+@pytest.mark.parametrize("scoring", ("owner", "opponent"))
+@pytest.mark.parametrize("first_count", (3, 4))
+def test_event_secondary_round_cap_native_facade_and_replay(
+    faction_definitions: Section02Definitions, scoring: str, first_count: int
+) -> None:
+    assert_native_secondary_round_cap(faction_definitions, scoring=scoring, first_count=first_count)
+
+
+@pytest.mark.parametrize("event", (False, True))
+def test_secondary_cap_source_scope_and_strict_round_trip(event: bool) -> None:
+    from typing import Any
+
+    from warhammer40k_core.core.missions import MissionPackError, MissionPackScoringDefinition
+    from warhammer40k_core.engine.scoring import MissionScoringPolicy
+
+    pack = (
+        warhammer_event_companion_2026_07_mission_pack()
+        if event
+        else chapter_approved_2026_27_mission_pack()
+    )
+    assert pack.scoring.secondary_vp_cap_scope is (
+        SecondaryVictoryPointCapScope.BATTLE_ROUND
+        if event
+        else SecondaryVictoryPointCapScope.PLAYER_TURN
+    )
+    payload = pack.scoring.to_payload()
+    assert MissionPackScoringDefinition.from_payload(payload) == pack.scoring
+    for value in (None, "unknown", 1):
+        invalid = dict(payload, secondary_vp_cap_scope=value)
+        with pytest.raises(MissionPackError, match="cap scope"):
+            MissionPackScoringDefinition.from_payload(cast(Any, invalid))
+    missing = dict(payload)
+    del missing["secondary_vp_cap_scope"]
+    with pytest.raises(MissionPackError, match="requires secondary_vp_cap_scope"):
+        MissionPackScoringDefinition.from_payload(cast(Any, missing))
+    setup = _event_death_trap_setup() if event else _config().mission_setup
+    assert setup is not None
+    policies = mission_scoring_policies_from_setup(setup)
+    policy = policies.player_policies[0]
+    encoded = policy.to_payload()
+    assert MissionScoringPolicy.from_payload(encoded) == policy
+    for value in (None, "unknown", 1):
+        invalid_policy = dict(encoded, secondary_vp_cap_scope=value)
+        with pytest.raises(GameLifecycleError, match="cap scope"):
+            MissionScoringPolicy.from_payload(cast(Any, invalid_policy))
+    missing_policy = dict(encoded)
+    del missing_policy["secondary_vp_cap_scope"]
+    with pytest.raises(GameLifecycleError, match="payload fields"):
+        MissionScoringPolicy.from_payload(cast(Any, missing_policy))
+    with pytest.raises(GameLifecycleError, match="shared field drifted: secondary_vp_cap_scope"):
+        replace(
+            policies,
+            player_policies=(
+                policy,
+                replace(
+                    policies.player_policies[1],
+                    secondary_vp_cap_scope=(
+                        SecondaryVictoryPointCapScope.PLAYER_TURN
+                        if event
+                        else SecondaryVictoryPointCapScope.BATTLE_ROUND
+                    ),
+                ),
+            ),
+        )
+
+
+@pytest.mark.parametrize("event", (False, True))
+def test_secondary_cap_period_reset_and_source_totals(event: bool) -> None:
+    """Pure cap owner control; native gameplay is covered separately."""
+    from warhammer40k_core.engine.scoring import VictoryPointLedger
+    from warhammer40k_core.engine.victory_point_cap_resolution import resolve_victory_point_cap
+
+    setup = _event_death_trap_setup() if event else _config().mission_setup
+    assert setup is not None
+    policy = mission_scoring_policies_from_setup(setup).player_policies[0]
+    award = VictoryPointAward(
+        player_id=policy.player_id,
+        battle_round=2,
+        phase="fight",
+        amount=15,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+        source_id="assassination",
+        scoring_timing="turn_end",
+        hidden=False,
+        metadata={"scoring_turn_active_player_id": "player-a"},
+    )
+    ledger, _ = VictoryPointLedger.initial(player_id=policy.player_id).award(award)
+    opposite = replace(award, amount=4, metadata={"scoring_turn_active_player_id": "player-b"})
+
+    def resolve(candidate: VictoryPointAward) -> int:
+        return resolve_victory_point_cap(
+            policy=policy,
+            ledger=ledger,
+            award=candidate,
+            end_of_battle_transaction_ids=frozenset(),
+            end_of_battle_exempt=False,
+        ).applied_amount
+
+    assert resolve(opposite) == (0 if event else 4)
+    assert resolve(replace(opposite, battle_round=3)) == 4
+    # Fixed20 remains tighter than the fresh15 round allowance.
+    assert resolve(replace(opposite, battle_round=3, amount=10)) == 5
+    assert (policy.secondary_vp_cap, policy.total_vp_cap) == (45, 100)
+
+
+def test_event_secondary_round_cap_two_card_tactical_preview(
+    faction_definitions: Section02Definitions,
+) -> None:
+    from tests.event_secondary_round_cap_helpers import assert_native_two_card_tactical_capacity
+
+    assert_native_two_card_tactical_capacity(faction_definitions)

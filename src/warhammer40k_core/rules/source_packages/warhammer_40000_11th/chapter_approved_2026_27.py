@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from warhammer40k_core.core.deployment_zones import DeploymentZoneShape
 from warhammer40k_core.core.missions import MissionPackError, MissionSourcePackageDefinition
+from warhammer40k_core.core.secondary_vp_cap_scope import SecondaryVictoryPointCapScope
 
 from .chapter_approved_battlefield_rows_2026_27 import (
     SourceBattlefieldTerrainFeatureRow as SourceBattlefieldTerrainFeatureRow,
@@ -156,6 +157,7 @@ class SourceMissionPackScoringRow:
     secondary_vp_cap: int
     total_vp_cap: int
     secondary_max_vp_per_turn: int
+    secondary_vp_cap_scope: SecondaryVictoryPointCapScope
     end_of_round_scoring_windows: tuple[str, ...]
     end_of_game_scoring_windows: tuple[str, ...]
     reserve_destruction_timing: str
@@ -174,6 +176,7 @@ class SourceMissionPackScoringRow:
             "secondary_vp_cap": self.secondary_vp_cap,
             "total_vp_cap": self.total_vp_cap,
             "secondary_max_vp_per_turn": self.secondary_max_vp_per_turn,
+            "secondary_vp_cap_scope": self.secondary_vp_cap_scope.value,
             "end_of_round_scoring_windows": list(self.end_of_round_scoring_windows),
             "end_of_game_scoring_windows": list(self.end_of_game_scoring_windows),
             "reserve_destruction_timing": self.reserve_destruction_timing,
@@ -952,6 +955,7 @@ def mission_pack_scoring_row() -> SourceMissionPackScoringRow:
         secondary_vp_cap=45,
         total_vp_cap=100,
         secondary_max_vp_per_turn=15,
+        secondary_vp_cap_scope=SecondaryVictoryPointCapScope.PLAYER_TURN,
         end_of_round_scoring_windows=("battle_round_end",),
         end_of_game_scoring_windows=("turn_end_round_five_going_second", "end_of_battle"),
         reserve_destruction_timing="end_of_battle_round_n",

@@ -8044,3 +8044,27 @@ the revision with a fresh request. Unsupported-with-reason and no-detail branche
 have pure typed response-assembly coverage; the public setup scenario has no
 deterministic native uncommitted unsupported route, so no such live certification
 is claimed.
+
+
+## Secondary victory-point cap period
+
+Mission scoring source/core/policy payloads require `secondary_vp_cap_scope`,
+exactly `player_turn` or `battle_round`. Missing and unknown values fail closed;
+there is no old-payload default. The existing numeric
+`secondary_max_vp_per_turn` field is historical naming: its amount applies to the
+explicit scope. Event Companion selects `battle_round`; ordinary Chapter Approved
+retains `player_turn`. Both player policies must agree on the shared scope.
+
+`scoring_turn_active_player_id` remains genuine boundary provenance. It does not
+partition Event Companion round capacity. Event cap metadata uses the reason
+`secondary_battle_round_vp_cap` and audit fields `secondary_battle_round_vp_cap`,
+`secondary_battle_round_points_before`, `secondary_battle_round_points_after`, and
+`secondary_battle_round_remaining_capacity`. The existing `secondary_turn_*`
+keys remain only for policies actually scoped to a player turn. Finite tactical
+score/retain options and stale-cap validation use the same shared cap resolver as
+awards and restored ledgers; no new decision type or submission family is added.
+The internal payload addition and regenerated runtime build identity require
+current-runtime persistence/replay artifacts; no compatibility shim is provided.
+The current Secondary source rules do not expose end-of-battle scoring. The final
+ordinary turn remains capped, and authenticated Primary end-of-battle treatment
+is unchanged.

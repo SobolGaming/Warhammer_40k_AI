@@ -485,9 +485,9 @@ def test_positive_partial_tactical_award_scores_and_discards_the_card() -> None:
     assert isinstance(audit, dict)
     assert audit["requested_amount"] == 5
     assert audit["applied_amount"] == 2
-    assert audit["secondary_turn_points_before"] == 13
-    assert audit["secondary_turn_points_after"] == 15
-    assert audit["secondary_turn_remaining_capacity"] == 0
+    assert audit["secondary_battle_round_points_before"] == 13
+    assert audit["secondary_battle_round_points_after"] == 15
+    assert audit["secondary_battle_round_remaining_capacity"] == 0
     GameState.from_payload(state.to_payload())
 
 

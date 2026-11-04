@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.secondary_vp_cap_scope import SecondaryVictoryPointCapScope
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -17,6 +18,7 @@ def metadata_with_vp_cap_audit(
     total_points_before: int,
     total_points_after: int,
     capped_reasons: tuple[str, ...],
+    secondary_vp_cap_scope: SecondaryVictoryPointCapScope,
     fixed_secondary_mission_cap: int | None = None,
     fixed_secondary_mission_points_before: int = 0,
     fixed_secondary_mission_points_after: int = 0,
@@ -28,6 +30,8 @@ def metadata_with_vp_cap_audit(
     secondary_turn_points_after: int = 0,
     secondary_turn_remaining_capacity: int | None = None,
 ) -> JsonValue:
+    if type(secondary_vp_cap_scope) is not SecondaryVictoryPointCapScope:
+        raise GameLifecycleError("VP cap audit requires a typed Secondary cap scope.")
     audit = {
         "requested_amount": _positive_int("requested_amount", requested_amount),
         "applied_amount": _non_negative_int("applied_amount", applied_amount),
@@ -66,24 +70,29 @@ def metadata_with_vp_cap_audit(
             primary_battle_round_points_after,
         )
     if secondary_turn_vp_cap is not None:
+        period = (
+            "secondary_battle_round"
+            if secondary_vp_cap_scope is SecondaryVictoryPointCapScope.BATTLE_ROUND
+            else "secondary_turn"
+        )
         remaining = (
             secondary_turn_remaining_capacity
             if secondary_turn_remaining_capacity is not None
             else max(secondary_turn_vp_cap - secondary_turn_points_after, 0)
         )
-        audit["secondary_turn_vp_cap"] = _positive_int(
+        audit[f"{period}_vp_cap"] = _positive_int(
             "secondary_turn_vp_cap",
             secondary_turn_vp_cap,
         )
-        audit["secondary_turn_points_before"] = _non_negative_int(
+        audit[f"{period}_points_before"] = _non_negative_int(
             "secondary_turn_points_before",
             secondary_turn_points_before,
         )
-        audit["secondary_turn_points_after"] = _non_negative_int(
+        audit[f"{period}_points_after"] = _non_negative_int(
             "secondary_turn_points_after",
             secondary_turn_points_after,
         )
-        audit["secondary_turn_remaining_capacity"] = _non_negative_int(
+        audit[f"{period}_remaining_capacity"] = _non_negative_int(
             "secondary_turn_remaining_capacity",
             remaining,
         )
