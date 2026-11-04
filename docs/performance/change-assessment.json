@@ -256,11 +256,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "21b9cdaaf38af78a41ddab3de39b3c71fcfaca5e3c4af474e427629c8d2621da",
-      "after_sha256": "5f1d19f59f347af1e2eae7fa653b6215bac9b02511b24bea89fe6d576a68e631",
+      "after_sha256": "707c722b57a42dcbe775745c9d2540cc3b813523f86175320d00e59fa2d653fc",
       "owners": {
         "@document": {
           "before": "21b9cdaaf38af78a41ddab3de39b3c71fcfaca5e3c4af474e427629c8d2621da",
-          "after": "5f1d19f59f347af1e2eae7fa653b6215bac9b02511b24bea89fe6d576a68e631"
+          "after": "707c722b57a42dcbe775745c9d2540cc3b813523f86175320d00e59fa2d653fc"
         }
       }
     },
@@ -912,11 +912,11 @@
     },
     "tests/rules/section08/test_command_flow.py": {
       "before_sha256": "a67327723cad6a50818c23cdd6b5ee68dd1bf8bdf03ff659e8f0663bee09e46d",
-      "after_sha256": "de9b610e87229eea7cc43531263dd267851f17c7c3c00aa2d19323f0d84fdc09",
+      "after_sha256": "a3289a2fad02ed06dc0cfaed565bbd6213bc0d4293ff297fdf351d836c027032",
       "owners": {
         "test_shared_cp_trigger_owner_validation_fails_closed": {
           "before": null,
-          "after": "24df8d9490556fa5cb44289dda6607490089cba63a2b4a295a43434870de9c95"
+          "after": "f653b407b74aac55fd060054ddff7633efa2141207db8c5685df438f16210310"
         }
       }
     },

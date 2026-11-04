@@ -217,7 +217,10 @@ def test_shared_cp_trigger_owner_validation_fails_closed(
     clause = rule.clauses[0]
     assert clause.trigger is not None
     assert clause_is_supported_phase_command_point_gain(clause)
-    parameters = (RuleParameter("edge", edge), RuleParameter("phase", "command"))
+    parameters: tuple[RuleParameter, ...] = (
+        RuleParameter("edge", edge),
+        RuleParameter("phase", "command"),
+    )
     if owner is not None:
         parameters += (RuleParameter("owner", owner),)
     candidate = replace(clause, trigger=replace(clause.trigger, parameters=parameters))
