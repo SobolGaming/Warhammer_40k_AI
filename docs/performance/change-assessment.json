@@ -14,16 +14,6 @@
         }
       }
     },
-    "README.md": {
-      "before_sha256": "d0950aff1592421b310fe06d4ff455900374fadad7021e0bba06e3db5860ff96",
-      "after_sha256": "0de75923d5d3d16ca403528d03221d80cd84d9e830fc47809b9a226027f1d59d",
-      "owners": {
-        "@document": {
-          "before": "d0950aff1592421b310fe06d4ff455900374fadad7021e0bba06e3db5860ff96",
-          "after": "0de75923d5d3d16ca403528d03221d80cd84d9e830fc47809b9a226027f1d59d"
-        }
-      }
-    },
     "ci/quality_shards/all.txt": {
       "before_sha256": "3f16277fe84b04b55bb8a2119a18f17cd4d817cc6698aa99b34ea5fad55a9a10",
       "after_sha256": "4aa209b3aaaa50b36ca2d4d6497cfecbeb5c67e8b7f04e4582924c69418f77e0",
@@ -66,11 +56,11 @@
     },
     "docs/SOURCE_FIXTURE_HASH_BOUNDARIES.md": {
       "before_sha256": null,
-      "after_sha256": "2edf45c2754604741e89c8b8a150081d9efc76951f7a4079ef19b243e52d6114",
+      "after_sha256": "c7ca20aeda05155934b44810491fd61441a4d5b932d38cee94a602b67159e51f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2edf45c2754604741e89c8b8a150081d9efc76951f7a4079ef19b243e52d6114"
+          "after": "c7ca20aeda05155934b44810491fd61441a4d5b932d38cee94a602b67159e51f"
         }
       }
     },
@@ -399,14 +389,6 @@
   },
   "rows": {
     ".github/workflows/ci.yml": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",
-      "source_obligation": "Retain approved source loading, full selected Sticky record and dependency identities, current adapters and native semantics, exact original historical evidence and all required test selections.",
-      "unchanged_work": "No packaged runtime, source-authority, contract, dependency, engine algorithm, cache or serializer change. Fixture history validation stays test-only. Serial current-runtime smoke and live semantic/index/cache gates remain required; no speedup or full-game claim."
-    },
-    "README.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],

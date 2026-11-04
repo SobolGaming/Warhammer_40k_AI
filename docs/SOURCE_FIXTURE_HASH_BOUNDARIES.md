@@ -36,6 +36,10 @@ complete current package. Deadly Demise retains its existing scoped current path
 These tests preserve unrelated current fields without prepending inverses of
 unrelated successors. Existing current source-registry, source-scope provenance
 and Acts checks deliberately retain their broader governance dependencies.
+Section 07 also authenticates the complete current README as a governance input.
+That residual dependency is outside the package-hash-name inventory; this change
+preserves its existing README bytes and both current/historical pins. The guide
+here and the roadmap link carry the new local guard instructions.
 
 Run `python -B -m scripts.validate_source_history` before local coverage. The same
 guard is the first validation command in the existing behavioral CI step, before
