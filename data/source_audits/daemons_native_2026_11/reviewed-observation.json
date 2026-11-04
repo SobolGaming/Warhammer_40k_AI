@@ -1,0 +1,124 @@
+{
+  "base": "2a40dfc44954ed1758876dfe8502a23db9da1fb8",
+  "author_selection": "Accepted explicit gpt-6-astra/high; no inaccessible resolved runtime or speed controls attested",
+  "authority_limit": "Maintained unofficial App rendered text, not official primary/network bytes or App-build attestation. Version995 is global index context, not a per-unit change date. Only two complete unit pages admitted; complete mustering/Keywords section is supporting authority, not a complete detachment page. Historical geometry is unchanged and not newly measured.",
+  "captures": [
+    {
+      "file": "belakor-current.txt",
+      "url": "https://www.40k.app/factions/chaos-daemons/units/belakor",
+      "method": "complete main.innerText via supported read-only browser DOM; all Previous disclosures expanded on history pages",
+      "authenticated_utc": "2026-11-04T01:36:43.558435+00:00",
+      "utf16_length": 2502,
+      "fnv1a_utf16": "d8562c4a",
+      "bytes": 2526,
+      "sha256": "4383c601750e3ac6b4cf730552fdf593b6ef119000aa4ddbeb084422b4c8a85e",
+      "observed_utc": "2026-11-04T01:36:43.558435+00:00",
+      "captured_text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nBe’lakor\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nBe’lakor 100mm\n\nInvulnerable save: 4+\n\n12\"\n11\n3+\n20\n6+\n5\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\n➤ Betraying Shades (witchfire)\nDEVASTATING WOUNDS\nIGNORES COVER\nPSYCHIC\n18\"\n9\n2+\n5\n-2\n1\n➤ Betraying Shades (focused witchfire)\nDEVASTATING WOUNDS\nHAZARDOUS\nIGNORES COVER\nPSYCHIC\n18\"\n12\n2+\n6\n-3\n1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\n➤ The Blade of Shadows (strike)\nDEVASTATING WOUNDS\n7\n2+\n14\n-4\nD6+1\n➤ The Blade of Shadows (sweep)\nSUSTAINED HITS 1\n14\n2+\n8\n-3\n1\nKEYWORDS\nBE’LAKOR\nCHAOS\nCHARACTER\nDAEMON\nEPIC HERO\nFLY\nMONSTER\nPSYKER\nCOSTS\n1 model\n390 pts\nUNIT COMPOSITION\n1 Be’lakor – EPIC HERO\n\nThis model is equipped with: Betraying Shades; the Blade of Shadows.\n\nBecome a supporter and remove ads\nCORE ABILITIES\nDEADLY DEMISE D6\nDEEP STRIKE\nSTEALTH\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nThe Dark Master\n\nThe area of the battlefield within 6\" of this model is within your army’s Shadow of Chaos.\n\nShadow Form Abilities\n\nAt the start of the battle round, select one Shadow Form ability. Until the end of the battle round, this model has that ability.\n\nWreathed in Shadows (Aura, Psychic)\n\nWhile a friendly LEGIONES DAEMONICA unit or SHADOW LEGION unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\".\n\nPall of Despair (Aura, Psychic)\n\nIn the Battle-shock step of your opponent’s Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9” of this model, this model regains up to D3 lost wounds.\n\nShadow Lord (Aura, Psychic)\n\nWhile a friendly LEGIONES DAEMONICA or SHADOW LEGION unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1.\n\nSUPREME COMMANDER\n\nIf this model is in your army, it must be your WARLORD.\n\nDAMAGED: 1-7 WOUNDS REMAINING\n\nWhile this model has 1-7 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n30%\nof Chaos Daemons lists\n#2\nmost-taken in faction\n26%\nfrom 35% since last update\nIN ARMY LISTS\nPopular detachments\nSHADOW LEGION\nDAEMONIC INCURSION\nWARPTIDE\nOften taken with\nBLOODCRUSHERS\nNURGLINGS\nBLOODTHIRSTER\nLORD OF CHANGE\nFLESH HOUNDS"
+    },
+    {
+      "file": "bloodletters-current.txt",
+      "url": "https://www.40k.app/factions/chaos-daemons/units/bloodletters",
+      "method": "complete main.innerText via supported read-only browser DOM; all Previous disclosures expanded on history pages",
+      "authenticated_utc": "2026-11-04T01:36:43.580137+00:00",
+      "utf16_length": 1580,
+      "fnv1a_utf16": "a8cc3cc7",
+      "bytes": 1586,
+      "sha256": "443433147237985f14cf1ddd7662a15def1ec8d5970f905ad79e0143ba1c994e",
+      "observed_utc": "2026-11-04T01:36:43.580137+00:00",
+      "captured_text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nBloodletters\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nBloodreaper 32mm\n\nInvulnerable save: 5+\n\n8\"\n4\n7+\n1\n7+\n2\nBloodletter 32mm\n\nInvulnerable save: 5+\n\n8\"\n4\n7+\n1\n7+\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nHellblade\n2\n3+\n5\n-2\n2\nKEYWORDS\nBATTLELINE\nBLOODLETTERS\nCHAOS\nDAEMON\nINFANTRY\nKHORNE\nCOSTS\n10 models\n110 pts\nUNIT COMPOSITION\n1 Bloodreaper\n9 Bloodletters\n\nEvery model is equipped with: hellblade.\n\nLed by\nSKULLTAKER\nBLOODMASTER\nBecome a supporter and remove ads\nWARGEAR OPTIONS\n1 Bloodletter that is not equipped with a daemonic icon can be equipped with 1 instrument of Chaos.\n1 Bloodletter that is not equipped with an instrument of Chaos can be equipped with 1 daemonic icon.\nWARGEAR\nDaemonic Icon\n\nModels in the bearer’s unit have a Leadership characteristic of 6+.\n\nInstrument of Chaos\n\nAdd 1 to Charge rolls made for the bearer’s unit.\n\nCORE ABILITIES\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nBane of Cowards\n\nEach time an enemy unit (excluding MONSTERS and VEHICLES) within Engagement Range of one or more units from your army with this ability Falls Back, models in that enemy unit must take Desperate Escape tests. When doing so, if that enemy unit is also Battle‑shocked, subtract 1 from each of those Desperate Escape tests.\n\nSTATS\n31%\nof Chaos Daemons lists, 2.1 per list\n#1\nmost-taken in faction\n37%\nfrom 33% since last update\nIN ARMY LISTS\nPopular detachments\nBLOOD LEGION\nWARPTIDE\nCAVALCADE OF CHAOS\nMost often led by\nBLOODMASTER\nSKULLTAKER\nOften taken with\nBLOODMASTER\nBLOODCRUSHERS\nBLOODTHIRSTER\nFLESH HOUNDS\nSKARBRAND"
+    },
+    {
+      "file": "linked-shadow-legion-keyword-grants.txt",
+      "url": "https://www.40k.app/factions/chaos-daemons/detachments/shadow-legion",
+      "method": "bounded main.innerText prefix through full mustering and Keywords section; following detachment rule, Enhancements and Stratagems excluded",
+      "authenticated_utc": "2026-11-04T01:36:43.611531+00:00",
+      "utf16_length": 913,
+      "fnv1a_utf16": "f35315e6",
+      "bytes": 918,
+      "sha256": "0488cd50d47f33e989601d56ac7cb4a97c64e6ae0b466f1256bb5e01ef305054",
+      "observed_utc": "2026-11-04T01:36:43.611531+00:00",
+      "captured_text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nDETACHMENTS\nShadow Legion\n2DP · Purge the Foe\nDETACHMENT\nUNITS\nUPDATES\nCREATE LIST\nTHRALLS OF THE FIRST PRINCE\n\nWhen mustering your army, you cannot include any DAEMON PRINCE, DAEMON PRINCE WITH WINGS or EPIC HERO units (excluding BE’LAKOR), but you can include the following HERETIC ASTARTES units:\n\nCHAOS LORD\nCHAOS LORD IN TERMINATOR ARMOUR\nCHAOS LORD WITH JUMP PACK\nCHAOS TERMINATOR SQUAD\nCHOSEN\nDAMNED units\nDARK APOSTLE\nHAVOCS\nLEGIONARIES\nMASTER OF POSSESSION\nPOSSESSED\nRAPTORS\nSORCERER\nSORCERER IN TERMINATOR ARMOUR\nWARP TALONS\n\nThe combined points value of such units depends on your battle size, as shown below.\n\nIncursion: Up to 500 pts\nStrike Force: Up to 1000 pts\nOnslaught: Up to 1500 pts\nKEYWORDS\n\nBE’LAKOR and HERETIC ASTARTES units from your army gain the SHADOW LEGION and UNDIVIDED keywords.\n\nLEGIONES DAEMONICA units from your army gain the SHADOW LEGION keyword."
+    },
+    {
+      "file": "app-updates-index-context.txt",
+      "url": "https://www.40k.app/factions/updates",
+      "method": "complete first four release section.innerText joined with two linefeeds: 995,981,972,963; update context only, no ingestion or audit claim for other factions",
+      "authenticated_utc": "2026-11-04T01:36:43.547107+00:00",
+      "utf16_length": 2571,
+      "fnv1a_utf16": "3b840580",
+      "bytes": 2607,
+      "sha256": "cdd2e41d1879f93f67522aab717d7d327fc01e7d010497a893dc9c733f84828f",
+      "observed_utc": "2026-11-04T01:36:43.547107+00:00",
+      "captured_text": "VERSION 995\nReleased 2026-10-16.\n1 faction changed.\nGenestealer Cults\n1 unit\n1 change\n\nVERSION 981\nReleased 2026-10-14.\n11 factions changed.\nIMPERIUM\nAdepta Sororitas\n11 units\n11 changes\nAdeptus Custodes\n42 units · 18 detachments\n60 changes\nAnathema Psykana\n5 units\n5 changes\nAstra Militarum\n1 detachment\n1 change\nImperial Agents\n1 unit · 2 detachments\n3 changes\nSPACE MARINES\nDark Angels\n1 unit · 1 detachment\n2 changes\nDeathwatch\n1 detachment\n1 change\nRaven Guard\n1 unit\n1 change\nSpace Marines\n2 units · 5 detachments\n7 changes\nUltramarines\n1 detachment\n1 change\nCHAOS\nEmperor’s Children\n2 units\n2 changes\n\nVERSION 972\nReleased 2026-10-02.\n7 factions changed.\nAstra Militarum\n1 detachment\n1 change\nDeathwatch\n1 detachment\n1 change\nEmperor’s Children\n1 unit\n1 change\nImperial Agents\n1 detachment\n1 change\nSpace Marines\n42 units · 5 detachments\n47 changes\nSpace Wolves\n1 unit\n1 change\nUltramarines\n1 detachment\n1 change\n\nVERSION 963\nReleased 2026-09-30.\n37 factions changed.\nIMPERIUM\nAdepta Sororitas\n6 units\n6 changes\nAdeptus Custodes\n7 units\n7 changes\nAdeptus Mechanicus\n13 units · 3 detachments\n16 changes\nAstra Militarum\n9 units\n9 changes\nImperial Agents\n6 units · 1 detachment\n7 changes\nImperial Knights\n4 units\n4 changes\nSPACE MARINES\nBlack Templars\n18 units · 7 detachments\n25 changes\nBlood Angels\n15 units · 7 detachments\n22 changes\nDark Angels\n16 units · 8 detachments\n24 changes\nDeathwatch\n10 units · 1 detachment\n11 changes\nGrey Knights\n16 units\n16 changes\nImperial Fists\n3 units · 2 detachments\n5 changes\nIron Hands\n2 units · 2 detachments\n4 changes\nRaven Guard\n2 units · 1 detachment\n3 changes\nSalamanders\n2 units · 1 detachment\n3 changes\nSpace Marines\n103 units · 29 detachments\n132 changes\nSpace Wolves\n21 units · 7 detachments\n28 changes\nUltramarines\n10 units · 2 detachments\n12 changes\nWhite Scars\n2 units · 1 detachment\n3 changes\nCHAOS\nChaos Daemons\n4 units · 2 detachments\n6 changes\nChaos Knights\n5 units\n5 changes\nChaos Space Marines\n39 units\n39 changes\nDeath Guard\n18 units\n18 changes\nEmperor’s Children\n10 units · 1 detachment\n11 changes\nLegions of Excess\n1 detachment\n1 change\nThousand Sons\n8 units · 1 detachment\n9 changes\nWorld Eaters\n11 units · 1 detachment\n12 changes\nXENOS\nAeldari\n11 units · 3 detachments\n14 changes\nDrukhari\n2 units\n2 changes\nGenestealer Cults\n5 units\n5 changes\nHarlequins\n3 units\n3 changes\nLeagues of Votann\n5 units · 2 detachments\n7 changes\nNecrons\n10 units · 1 detachment\n11 changes\nOrks\n37 units · 3 detachments\n40 changes\nT’au Empire\n2 units\n2 changes\nTyranids\n10 units · 1 detachment\n11 changes\nYnnari\n2 units\n2 changes"
+    }
+  ],
+  "predecessor": {
+    "head": "2a40dfc44954ed1758876dfe8502a23db9da1fb8",
+    "package_hash": "13d36e768b1f3fbb27fe54ea64c31bd0287397dba5db2522bd54daaa43ea5284",
+    "rows": [
+      {
+        "table": "Datasheets",
+        "row_id": "000001148",
+        "preimage_hash": "20b54ffece9d7080f458d62b1f3af07d0675c168d1f7fc99bc2361651a821570",
+        "fields": {
+          "damaged_description": "While this model has 1-6 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.",
+          "damaged_w": "1-6",
+          "faction_id": "CD",
+          "id": "000001148",
+          "leader_footer": "",
+          "leader_head": "",
+          "legend": "Few warp entities are as mighty or as insidious as Be'lakor. Wreathed in shadow and dancing witchlight, the Dark Master spreads terror and torment to all who behold him. Every blow of his Blade of Shadows leaves the hollow husks of slain enemies sprawled in its wake - just more victims lost to the encroaching darkness.",
+          "link": "https://wahapedia.ru/wh40k10ed/factions/chaos-daemons/Be-lakor",
+          "loadout": "This model is equipped with: Betraying Shades; the Blade of Shadows.",
+          "name": "Be'lakor",
+          "role": "Characters",
+          "source_id": "000000025",
+          "transport": "",
+          "virtual": "false"
+        },
+        "predecessor_tuple_index": 690
+      },
+      {
+        "table": "Datasheets_keywords",
+        "row_id": "000001114:Shadow Legion:global:false:4385",
+        "preimage_hash": "d5ef3a4d71b38faa159d103681fd81e9b05294c7194d50f624b3ee3a70ab76ee",
+        "fields": {
+          "datasheet_id": "000001114",
+          "is_faction_keyword": "false",
+          "keyword": "Shadow Legion",
+          "model": ""
+        },
+        "predecessor_tuple_index": 4388
+      },
+      {
+        "table": "Datasheets_keywords",
+        "row_id": "000001148:Shadow Legion:global:false:4614",
+        "preimage_hash": "5e71e35ddf0f2e3dd1dd74755db37fc27597c992bdd8609b9720ec7f89662afc",
+        "fields": {
+          "datasheet_id": "000001148",
+          "is_faction_keyword": "false",
+          "keyword": "Shadow Legion",
+          "model": ""
+        },
+        "predecessor_tuple_index": 4619
+      }
+    ],
+    "counterparts": {
+      "core-v2:chaos-daemons-roster:2026-07": "f910aa113e8da197636e8868b41e58b394961d234dee0e77c04aba31c6e6468f",
+      "core-v2:court-of-slaughter-anvanth:2026-08": "5c8550d3c5965a6eaee6aea3a890371cb9e522f74f164e9b673c76eb03155bf0"
+    }
+  },
+  "historical_primary": {
+    "source_id": "gw-11e-chaos-daemons-faction-pack-2026-07",
+    "provider_name": "Games Workshop",
+    "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+    "source_date": "2026-07-22",
+    "artifact_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+    "sha256": "818f7ef144691b9eef6b3c5b5d0a39793690af5a958037b7055215e6675e6a2c",
+    "relationship": "historical_primary_not_current_corroboration"
+  },
+  "accepted_audit": {
+    "durable_directory": "/mnt/c/Users/nostr/Documents/Codex/ProjectEvidence/Warhammer_40k_AI/SourceAudit_DaemonsFirstThree_20261104",
+    "independent_disposition_sha256": "90d2dba1628fb3eb43bbe1266c5759052b9c94a661d574e460e5ff6aa1a97cfa"
+  }
+}

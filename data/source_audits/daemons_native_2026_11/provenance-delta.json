@@ -1,0 +1,6 @@
+{
+  "prior_sha256": "03ba930bd1b77644853b875ee7d6f86620e730690cff8b5d1cd12e42c47814ba",
+  "current_sha256": "95244250ad88ac287f6bcef1c89eea29fe4f70318d9383e9a92b7c103240670d",
+  "block": "\n\nDAEMONS_NATIVE_OVERLAY = (\n    \"src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/\"\n    \"daemons_native_2026_11.overlay-pack.json\"\n)\nDAEMONS_NATIVE_OVERLAY_SHA256 = \"b0ccc944e022622bbeded025608a5b2d7ddd224c0f4cae9cca30b59f7adaf4aa\"\n",
+  "entry": "        root / DAEMONS_NATIVE_OVERLAY: DAEMONS_NATIVE_OVERLAY_SHA256,\n"
+}

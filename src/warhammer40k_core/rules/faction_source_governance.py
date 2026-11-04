@@ -243,6 +243,12 @@ def authorize_faction_observation(
         )
 
         audit = wave_serpent_frame_2026_11.source_audit()
+    elif audit_id == "daemons-native-app-mirror-2026-11-04":
+        from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+            daemons_native_2026_11,
+        )
+
+        audit = daemons_native_2026_11.source_audit()
     else:
         audit = faction_source_audit()
     if audit.audit_id != audit_id:

@@ -32970,6 +32970,145 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "daemons-native-exact-ac90283f1af38590": {
+      "paths": [
+        "data/source_audits/daemons_native_2026_11/catalog-delta.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-native-exact-9dbe815103b0311e": {
+      "paths": [
+        "data/source_audits/daemons_native_2026_11/provenance-delta.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-native-exact-8f46c586d2338683": {
+      "paths": [
+        "data/source_audits/daemons_native_2026_11/registry-delta.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-native-exact-cb467eba357cf40e": {
+      "paths": [
+        "data/source_audits/daemons_native_2026_11/reviewed-observation.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-native-exact-fa0f55425cfc3000": {
+      "paths": [
+        "tests/daemons_native_source_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "attack_component",
+        "damaged_state",
+        "native_definitions",
+        "resolve_native_attack"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-native-exact-fac356e49e4b8510": {
+      "paths": [
+        "tests/daemons_native_source_preservation.py"
+      ],
+      "owners": [
+        "@module",
+        "_hash",
+        "before_daemons_native",
+        "before_daemons_provenance",
+        "before_daemons_registry",
+        "daemons_audit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-native-exact-8a566d77a945247d": {
+      "paths": [
+        "tests/infrastructure/source/unit/test_starfang_deep_strike.py"
+      ],
+      "owners": [
+        "test_daemons_current_keyword_boundary_requires_exact_preimage",
+        "test_daemons_current_two_complete_pages_and_partial_support_scope",
+        "test_daemons_damaged_source_exact_fields_and_other_artifacts_unchanged",
+        "test_daemons_native_base_keywords_and_real_conditional_grant_kernel",
+        "test_daemons_native_full_sixty_exact_delta_and_counterparts"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-native-exact-2b69c86b0ccce84e": {
+      "paths": [
+        "tests/rules/section24/test_damaged.py"
+      ],
+      "owners": [
+        "test_native_belakor_actual_attack_damaged_psychic_choice_component_restore",
+        "test_native_belakor_damage_generated_threshold_and_restoration"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-native-exact-b0712fa66a9cc38e": {
+      "paths": [
+        "tools/ability_support_sources.py"
+      ],
+      "owners": [
+        "load_before_daemons_native_sources"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-native-exact-e6650756a1c5d131": {
+      "paths": [
+        "tools/build_daemons_native_source.py"
+      ],
+      "owners": [
+        "@module",
+        "_bytes",
+        "build_payloads",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-native-exact-ded6452f144f095b": {
+      "paths": [
+        "tools/generate_ability_support_matrix.py"
+      ],
+      "owners": [
+        "_chaos_daemons_khorne_review_rows",
+        "_chaos_daemons_undivided_review_rows"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

@@ -29,6 +29,9 @@ def _hash(value: object) -> str:
 
 
 def before_wave_frame(package: CanonicalCatalogPackage) -> CanonicalCatalogPackage:
+    from tests.daemons_native_source_preservation import before_daemons_native
+
+    package = before_daemons_native(package)
     audit = frame_audit("catalog-delta")
     if package.army_catalog.catalog_id != "chaos-daemons-bridge-catalog":
         assert package.package_hash() in audit["unchanged_counterparts"].values()
@@ -61,6 +64,9 @@ def before_wave_frame(package: CanonicalCatalogPackage) -> CanonicalCatalogPacka
 
 
 def before_wave_registry(value: dict[str, Any]) -> dict[str, Any]:
+    from tests.daemons_native_source_preservation import before_daemons_registry
+
+    value = before_daemons_registry(value)
     audit = frame_audit("registry-delta")
     if _hash(value) == audit["prior_sha256"]:
         return value
@@ -73,6 +79,9 @@ def before_wave_registry(value: dict[str, Any]) -> dict[str, Any]:
 
 
 def before_wave_provenance(raw: bytes) -> bytes:
+    from tests.daemons_native_source_preservation import before_daemons_provenance
+
+    raw = before_daemons_provenance(raw)
     audit = frame_audit("provenance-delta")
     observed = sha256(raw).hexdigest()
     # Earlier callers authenticate their own older predecessor after this boundary.

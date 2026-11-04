@@ -4399,15 +4399,27 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
         DatasheetGroupReviewRow(
             datasheet="Bloodletters",
             datasheet_id="000001114",
-            source_basis="PDF pages 28-29; supersedes Wahapedia.",
+            source_basis=(
+                "Historical PDF pages 28-29; complete maintained App page observed "
+                "2026-11-04. Native base SHADOW LEGION is removed at the typed source "
+                "boundary; the existing conditional detachment grant is preserved."
+            ),
             ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, The Shadow of Chaos, Daemonic Icon Leadership, and "
                 "Instrument of Chaos charge modifier, plus Bane of Cowards Desperate "
                 "Escape test and Battle-shocked roll modifier semantics, are consumed."
             ),
-            semantics_needed="None.",
-            catalog_blockers="No known catalog blocker.",
+            semantics_needed=(
+                "Native gameplay remains blocked: shared attack allocation rejects the "
+                "source-correct Sv7/InSv5 profile before hits. The generic effective-save "
+                "validator correction is separately queued; this source update does not fix it."
+            ),
+            catalog_blockers=(
+                "Base keyword correction is source-qualified only. The native component "
+                "catalog has no admitted detachment; full army muster and native lifecycle "
+                "save/load/replay are not certified."
+            ),
         ),
         DatasheetGroupReviewRow(
             datasheet="Bloodmaster",
@@ -5075,8 +5087,10 @@ def _chaos_daemons_undivided_review_rows() -> tuple[DatasheetGroupReviewRow, ...
             datasheet="Be'lakor",
             datasheet_id="000001148",
             source_basis=(
-                "Exact-five reconciliation: official PDF pages 112-113; generator inputs "
-                "pinned by hash."
+                "Historical exact-five PDF reconciliation pages 112-113; complete "
+                "maintained App page observed 2026-11-04 now also corrects native "
+                "DAMAGED 1-7 and removes unconditional SHADOW LEGION. Native attack "
+                "regressions retain the legal Psychic modifier-ignore decision."
             ),
             ir_coverage="All consumed",
             supported_semantics=(
@@ -5088,9 +5102,11 @@ def _chaos_daemons_undivided_review_rows() -> tuple[DatasheetGroupReviewRow, ...
             ),
             semantics_needed="None.",
             catalog_blockers=(
-                "Official DAMAGED 1-7 is enforced; the base datasheet excludes the "
+                "Current-source DAMAGED 1-7 is enforced; the base datasheet excludes the "
                 "detachment-granted SHADOW LEGION keyword. Reviewed representative height "
-                "is included in the July roster catalog; no known catalog blocker."
+                "is included in the July roster catalog. Native selected-pool attacks and "
+                "component JSON restoration do not certify full native army muster, ability "
+                "lifecycles or facade replay: the native catalog has no admitted detachment."
             ),
         ),
         DatasheetGroupReviewRow(

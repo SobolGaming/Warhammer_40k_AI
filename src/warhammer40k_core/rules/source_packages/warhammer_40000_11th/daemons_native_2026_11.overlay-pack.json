@@ -1,0 +1,38 @@
+{
+  "package_id": {
+    "namespace": "40k-app",
+    "package_name": "daemons-native",
+    "version": "reviewed-2026-11-04"
+  },
+  "catalog_version": {
+    "version_id": "warhammer-40000-11th-daemons-native-2026-11",
+    "source_date": "2026-11-04"
+  },
+  "base_source_package_id": {
+    "namespace": "wahapedia",
+    "package_name": "source-mirror",
+    "version": "10th-edition-2026-06-14"
+  },
+  "target_edition": "warhammer-40000-11th",
+  "effective_date": "2026-11-04",
+  "operations": [
+    {
+      "op_id": "belakor-current-damaged-one-to-seven",
+      "order_index": 0,
+      "operation_kind": "update_row",
+      "target_edition": "warhammer-40000-11th",
+      "source_table": "Datasheets",
+      "source_row_id": "000001148",
+      "source_reference": "https://www.40k.app/factions/chaos-daemons/units/belakor",
+      "effective_date": "2026-11-04",
+      "reason": "Current complete App datasheet requires DAMAGED 1-7; update only threshold and corresponding prose.",
+      "expected_preimage_hash": "20b54ffece9d7080f458d62b1f3af07d0675c168d1f7fc99bc2361651a821570",
+      "fields": {
+        "damaged_w": "1-7",
+        "damaged_description": "While this model has 1-7 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll."
+      }
+    }
+  ],
+  "schema_version": "phase17-source-overlay-v1",
+  "package_hash": "1ff78d7896efeb36d54723df4684207846dee29f15237ee15efec9d0fc783b46"
+}

@@ -1,0 +1,60 @@
+{
+  "base": "2a40dfc44954ed1758876dfe8502a23db9da1fb8",
+  "changes": {
+    "tools/ability_support_sources.py": {
+      "before_sha256": "a77a2eefceb165576b6c28ebf8ea97e18dcfeb7094a77dccbc8f6b8bb017abcf",
+      "after_sha256": "421d6c695e6710e0c0594a3b89e17529831033b73d36d6dea3ef016563160a0d",
+      "owners": {
+        "@module": {
+          "before": "8705fbf50d90aff4ffaed70a3bc38c0bf6c9610d3181ac73d2cc2db0bb51909b",
+          "after": "af64734884857792a2bbc3b131a9a2f1fbfccaf7962ee9e9e237e9ef9cfce5f6"
+        },
+        "ability_support_index_inputs": {
+          "before": "7c63b99d26804229e7cd4c3de696a7233392599edeaf99b1c49d23a41d269910",
+          "after": "f5d8bae32c825cbe72086b1206181f39e5c150bb73f18442b868895b59829364"
+        },
+        "load_ability_support_sources": {
+          "before": "26f3ce58df69672727c21de7d7c8727f0194e3fa003af913ad9010f1dab87a5c",
+          "after": "a411c3c3dcedaeae4b4ec98426f34fbe1987c8f4791c4c6735743699bc2d92c7"
+        },
+        "load_before_daemons_native_sources": {
+          "before": null,
+          "after": "d7254f4ebbfd7d0cfd995a5fa9a2eb5e63f805054c351bf1c94cfa6b335354a0"
+        }
+      }
+    },
+    "tools/source_scope_provenance.py": {
+      "before_sha256": "03ba930bd1b77644853b875ee7d6f86620e730690cff8b5d1cd12e42c47814ba",
+      "after_sha256": "95244250ad88ac287f6bcef1c89eea29fe4f70318d9383e9a92b7c103240670d",
+      "owners": {
+        "@module": {
+          "before": "ad108e622449b489a8f07842482786c085c2c22a023c257e58d8eac57a2e60d2",
+          "after": "382c7a4a9feeceaac5f30ea19b9f55448cfd1deff824eefbae62e767474e6371"
+        },
+        "current_ec_overlay_provenance": {
+          "before": "40ddc135890f5dc3e2766ace0c67a61f195eb6131d685441221a21429adf9066",
+          "after": "43b3bdb3678dd90e2c6aca2b63ce4b01606ed668a7fa130c582096f577122970"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tools/ability_support_sources.py": [
+      "qualification40-exact-b0712fa66a9cc38e"
+    ],
+    "tools/source_scope_provenance.py": [
+      "registered-source-provenance-projection"
+    ]
+  },
+  "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+  "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required.",
+  "policy_successor": {
+    "before_sha256": "879f0ca4328865a8f24c515abaa894dc8628a49865dcdb817902b94dc7e02a4a",
+    "after_sha256": "8cd7b97a934f6fb6c71270f0004850f7203a12ed3d19548f005b2156a3b8900c",
+    "import_sha256": "0ce0c3849ea57add436fa1471e7743a07841ffe7cf4d443edcf99a1a9dacd3d8",
+    "call_sha256": "bc75492f8b54618d82048c998ec81c932e7edb0199a15f7327fe17093313509c",
+    "predecessor_sha256": "17763b0551e1e00f6315a661ebdbd68e5902e0638a5c33940520120fef3ee792",
+    "smoke_import_sha256": "5934ce7581ffd0a462d114d043f8db184e9b1e69433371db2b605a42bf2aea31"
+  },
+  "module_sha256": "e0a4b649d740e79d93e671e3c03bab695c950319cff7a4136618f63908ba7739"
+}
