@@ -76,3 +76,6 @@ tests/core_description_helpers.py text eol=lf
 
 # Preserve authenticated three-Daemons browser captures and audit receipt bytes.
 data/source_audits/daemons_next_three_2026_11/* -text whitespace=cr-at-eol
+
+# Preserve authenticated four-Daemons source capture and receipt bytes.
+data/source_audits/daemons_final_four_2026_11/* -text whitespace=cr-at-eol

@@ -22,6 +22,9 @@ from warhammer40k_core.rules.source_overlay import (
     apply_source_release_overlays,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    daemons_final_four_2026_11 as final_four,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     daemons_next_three_2026_11 as next_three,
 )
 from warhammer40k_core.rules.source_patch import source_row_hash
@@ -105,7 +108,12 @@ def apply_current_daemons(
     if len(tables) != 1:
         raise SourceOverlayError("Daemons native correction requires one keyword table.")
     next_three.source_package()
-    for datasheet_id, row_id, preimage in (*KEYWORD_PREIMAGES, *next_three.KEYWORD_PREIMAGES):
+    final_four.source_package()
+    for datasheet_id, row_id, preimage in (
+        *KEYWORD_PREIMAGES,
+        *next_three.KEYWORD_PREIMAGES,
+        *final_four.KEYWORD_PREIMAGES,
+    ):
         matches = tuple(
             row
             for row in tables[0].rows

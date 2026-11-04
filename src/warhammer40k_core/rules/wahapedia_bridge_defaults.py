@@ -9,6 +9,9 @@ from warhammer40k_core.core.model_geometry_catalog import (
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    daemons_final_four_2026_11 as final_four_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     daemons_native_2026_11 as daemons_native_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -1073,6 +1076,7 @@ CHAOS_DAEMONS_CURRENT_KEYWORD_CORRECTIONS = tuple(
     for datasheet_id, source_id in (
         *daemons_native_source.KEYWORD_SOURCE_IDS,
         *next_three_source.KEYWORD_SOURCE_IDS,
+        *final_four_source.KEYWORD_SOURCE_IDS,
     )
 )
 

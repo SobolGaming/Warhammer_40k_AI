@@ -33249,6 +33249,61 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "daemons-final-exact-audit-evidence": {
+      "paths": [
+        "data/source_audits/daemons_final_four_2026_11/*"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-final-exact-cc855fadf3540655": {
+      "paths": [
+        "tests/daemons_final_four_preservation.py"
+      ],
+      "owners": [
+        "@module",
+        "_hash",
+        "before_daemons_final_four",
+        "before_final_four_registry",
+        "daemons_audit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-final-exact-8a566d77a945247d": {
+      "paths": [
+        "tests/infrastructure/source/unit/test_starfang_deep_strike.py"
+      ],
+      "owners": [
+        "test_daemons_current_exact_keyword_guard",
+        "test_daemons_final_four_all_native_variants",
+        "test_daemons_final_four_allegiance_remains_mandatory",
+        "test_daemons_final_four_full_catalog_delta_and_pinned_source"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "daemons-final-exact-1c5ffb6a0262be44": {
+      "paths": [
+        "tools/build_daemons_final_four_source.py"
+      ],
+      "owners": [
+        "@module",
+        "build",
+        "main",
+        "raw",
+        "sha"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

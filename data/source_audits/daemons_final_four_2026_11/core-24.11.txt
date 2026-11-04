@@ -1,0 +1,9 @@
+24.11
+[EXTRA ATTACKS]
+
+Each time a unit containing one or more models with an [EXTRA ATTACKS] weapon fights, those models will make attacks with those weapons in addition to any others. In the Select Weapons step (04.01), for each of those models, you must select:
+
+All of that model’s [EXTRA ATTACKS] weapons.
+One of that model’s other melee weapons, if possible.
+24.11.01
+Only [EXTRA ATTACKS] weapons

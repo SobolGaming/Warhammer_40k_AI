@@ -420,10 +420,12 @@ def starfang_deep_strike_policy_predecessor(raw: bytes) -> bytes:
     before = "faa07162fff82c6d960d0f8288f8438f8d1bf8b726a502207b941c228eb8002c"
     if digest(raw) == before:
         return raw
+    from tools.performance_daemons_final import daemons_final_policy_predecessor
     from tools.performance_daemons_native import daemons_native_policy_predecessor
     from tools.performance_daemons_next import daemons_next_policy_predecessor
     from tools.performance_wave_frame import wave_frame_policy_predecessor
 
+    raw = daemons_final_policy_predecessor(raw)
     raw = daemons_next_policy_predecessor(raw)
     raw = daemons_native_policy_predecessor(raw)
     raw = wave_frame_policy_predecessor(raw)
@@ -1109,6 +1111,7 @@ def validate_assessment(
         }
         if not chosen_families <= candidates or not chosen_families <= families.keys():
             raise ValueError(f"Unmapped detailed family: {path}")
+        from tools.performance_daemons_final import daemons_final_smoke_operations
         from tools.performance_daemons_native import daemons_native_smoke_operations
         from tools.performance_daemons_next import daemons_next_smoke_operations
         from tools.performance_wave_frame import wave_frame_smoke_operations
@@ -1143,6 +1146,9 @@ def validate_assessment(
                 base=base, path=path, category=category, change=changes[path]
             )
             | aeldari_current_source_rule_semantics_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | daemons_final_smoke_operations(
                 base=base, path=path, category=category, change=changes[path]
             )
             | daemons_next_smoke_operations(

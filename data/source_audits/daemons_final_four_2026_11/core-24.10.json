@@ -1,0 +1,7 @@
+{
+  "fnv1a_utf16": "2c5249fc",
+  "length_utf16": 806,
+  "observed_utc": "2026-11-04T10:03:48.402Z",
+  "text": "24.10\n[DEVASTATING WOUNDS]\n\nEach time an attack made with a [DEVASTATING WOUNDS] weapon results in a critical wound, the attack sequence for that attack ends and the target unit suffers a number of mortal wounds equal to the D characteristic of that weapon. These are inflicted after resolving any normal damage inflicted by those attacks.\n\nMortal wounds inflicted by [DEVASTATING WOUNDS] weapons can damage a maximum of one model for each critical wound; any remaining mortal wounds inflicted by that attack are lost.\n\nExample: An attack made with a [DEVASTATING WOUNDS] weapon with a D characteristic of 3 results in a critical wound against an Intercessor Squad, so inflicts 3 mortal wounds. The first 2 mortal wounds are sufficient to destroy 1 Intercessor model, so the remaining mortal wound is lost.",
+  "url": "https://www.40k.app/rules/24-core-abilities#24.10"
+}

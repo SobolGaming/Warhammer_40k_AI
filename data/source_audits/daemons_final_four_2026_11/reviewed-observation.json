@@ -1,0 +1,181 @@
+{
+  "base": "912507cd2e6b705b054b55cf7c9c1a85e7d6dfe9",
+  "captures": {
+    "app-updates-index-context": {
+      "fnv1a_utf16": "f8b30c84",
+      "length_utf16": 246,
+      "observed_utc": "2026-11-04T10:03:35.946Z",
+      "text": "40K.APP\nFACTIONS\nFactions\n\nExplore the factions of Warhammer 40,000, from humanity’s indomitable armies to the galaxy’s most ruthless predators.\n\nARMIES\nUPDATES\nVERSION 995\nReleased 2026-10-16.\n1 faction changed.\nGenestealer Cults\n1 unit\n1 change",
+      "url": "https://www.40k.app/factions/updates"
+    },
+    "bloodthirster-current": {
+      "fnv1a_utf16": "d9afb402",
+      "length_utf16": 1927,
+      "observed_utc": "2026-11-04T09:58:26.276Z",
+      "text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nBloodthirster\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nBloodthirster 120 x 92mm Oval Base\n\nInvulnerable save: 4+\n\n12\"\n11\n3+\n18\n6+\n5\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nBloodflail\nDEVASTATING WOUNDS\n12\"\n1\n2+\n16\n-3\nD6+1\nHellfire breath\nIGNORES COVER\nTORRENT\n12\"\nD6\n-\n5\n-1\n1\nLash of Khorne\n12\"\n6\n2+\n8\n-1\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\n➤ Axe of Khorne (strike)\n8\n2+\n14\n-4\nD3+1\n➤ Axe of Khorne (sweep)\n16\n2+\n8\n-2\n1\n➤ Great axe of Khorne (strike)\n7\n2+\n16\n-4\nD6+2\n➤ Great axe of Khorne (sweep)\n14\n2+\n10\n-2\n2\nKEYWORDS\nBLOODTHIRSTER\nCHAOS\nCHARACTER\nDAEMON\nFLY\nKHORNE\nMONSTER\nCOSTS\n1 model\n320 pts\n3rd+ in your army\n+15 pts\nUNIT COMPOSITION\n1 Bloodthirster\n\nThis model is equipped with: hellfire breath; great axe of Khorne\n\nBecome a supporter and remove ads\nWARGEAR OPTIONS\nThis model’s great axe of Khorne can be replaced with 1 axe of Khorne and one of the following: ◦ 1 bloodflail ◦ 1 lash of Khorne\nCORE ABILITIES\nDEADLY DEMISE D6\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nDaemon Lord of Khorne\n\nWhile a friendly KHORNE LEGIONES DAEMONICA unit is within 6\" of this model, each time a model in that unit makes a melee attack, add 1 to the Hit roll.\n\nGreater Daemon of Khorne\n\nWhile a friendly KHORNE LEGIONES DAEMONICA unit is within 6\" of this model, that unit is within your army’s Shadow of Chaos.\n\nRelentless Carnage\n\nAt the end of the Fight phase, you can select one enemy unit within Engagement Range of this model and roll eight D6: for each 4+, that enemy unit suffers 1 mortal wound.\n\nDAMAGED: 1-6 WOUNDS REMAINING\n\nWhile this model has 1-6 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n24%\nof Chaos Daemons lists, 1.4 per list\n#8\nmost-taken in faction\n24%\nfrom 28% since last update\nIN ARMY LISTS\nPopular detachments\nBLOOD LEGION\nWARPTIDE\nSHADOW LEGION\nOften taken with\nBLOODLETTERS\nBLOODCRUSHERS\nFLESH HOUNDS\nBE’LAKOR\nSKULLMASTER",
+      "url": "https://www.40k.app/factions/chaos-daemons/units/bloodthirster"
+    },
+    "bloodthirster-history": {
+      "fnv1a_utf16": "17d2e764",
+      "length_utf16": 615,
+      "observed_utc": "2026-11-04T09:59:03.774Z",
+      "text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nBloodthirster\nDATASHEET\nUPDATES\nVERSION 931\nReleased 2026-08-26\nDeadly Demise D6\nAbility Updated\n\nThis ability always takes the form Deadly Demise X. Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6\" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6\").\n\nPrevious\nVERSION 867\nReleased 2026-06-19\nAdded to the faction\nAdded\nPoints cost\n320 pts",
+      "url": "https://www.40k.app/factions/chaos-daemons/units/bloodthirster/updates"
+    },
+    "core-24.05": {
+      "fnv1a_utf16": "6581ed4a",
+      "length_utf16": 622,
+      "observed_utc": "2026-11-04T10:03:48.401Z",
+      "text": "24.05\n[BLAST]\n\nEach time you gather attack dice for a [BLAST] weapon, add one additional attack dice for every five models that were in the target unit in the Select Targets step (rounding down).\n\nIf this ability takes the form [BLAST X], each time you gather attack dice for such a weapon, add X additional attack dice for every five models that were in the target unit in the Select Targets step (rounding down) instead.\n\nExample: If a [BLAST 2] weapon with an A characteristic of 3 targets a unit containing 12 models, you would gather four additional attack dice for that weapon (for a total of seven for that weapon).",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.05"
+    },
+    "core-24.08": {
+      "fnv1a_utf16": "4265cc66",
+      "length_utf16": 418,
+      "observed_utc": "2026-11-04T10:03:48.401Z",
+      "text": "24.08\nDEADLY DEMISE\n\nThis ability always takes the form Deadly Demise X. Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6\" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6\").",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.08"
+    },
+    "core-24.09": {
+      "fnv1a_utf16": "bd1d5d31",
+      "length_utf16": 272,
+      "observed_utc": "2026-11-04T10:03:48.401Z",
+      "text": "24.09\nDEEP STRIKE\n\nEach time this unit makes an ingress move (20.04), if every model in this unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from all enemy units, even if that is within your opponent’s deployment zone.",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.09"
+    },
+    "core-24.10": {
+      "fnv1a_utf16": "2c5249fc",
+      "length_utf16": 806,
+      "observed_utc": "2026-11-04T10:03:48.402Z",
+      "text": "24.10\n[DEVASTATING WOUNDS]\n\nEach time an attack made with a [DEVASTATING WOUNDS] weapon results in a critical wound, the attack sequence for that attack ends and the target unit suffers a number of mortal wounds equal to the D characteristic of that weapon. These are inflicted after resolving any normal damage inflicted by those attacks.\n\nMortal wounds inflicted by [DEVASTATING WOUNDS] weapons can damage a maximum of one model for each critical wound; any remaining mortal wounds inflicted by that attack are lost.\n\nExample: An attack made with a [DEVASTATING WOUNDS] weapon with a D characteristic of 3 results in a critical wound against an Intercessor Squad, so inflicts 3 mortal wounds. The first 2 mortal wounds are sufficient to destroy 1 Intercessor model, so the remaining mortal wound is lost.",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.10"
+    },
+    "core-24.11": {
+      "fnv1a_utf16": "f72ac2eb",
+      "length_utf16": 402,
+      "observed_utc": "2026-11-04T10:03:48.402Z",
+      "text": "24.11\n[EXTRA ATTACKS]\n\nEach time a unit containing one or more models with an [EXTRA ATTACKS] weapon fights, those models will make attacks with those weapons in addition to any others. In the Select Weapons step (04.01), for each of those models, you must select:\n\nAll of that model’s [EXTRA ATTACKS] weapons.\nOne of that model’s other melee weapons, if possible.\n24.11.01\nOnly [EXTRA ATTACKS] weapons",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.11"
+    },
+    "core-24.18": {
+      "fnv1a_utf16": "5982b788",
+      "length_utf16": 239,
+      "observed_utc": "2026-11-04T10:03:48.402Z",
+      "text": "24.18\n[IGNORES COVER]\n\nEach time an attack is made with an [IGNORES COVER] weapon, the target cannot have the benefit of cover against that attack (13.08), including from rules that give a model or unit the benefit of cover (e.g. Stealth).",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.18"
+    },
+    "core-24.19": {
+      "fnv1a_utf16": "efb80714",
+      "length_utf16": 132,
+      "observed_utc": "2026-11-04T10:03:48.402Z",
+      "text": "24.19\n[INDIRECT FIRE]\n\nUnits containing one or more models with an [INDIRECT FIRE] weapon can shoot using indirect shooting (10.07).",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.19"
+    },
+    "core-24.23": {
+      "fnv1a_utf16": "cc75fe9",
+      "length_utf16": 432,
+      "observed_utc": "2026-11-04T10:03:48.402Z",
+      "text": "24.23\n[LETHAL HITS]\n\nEach time an attack made with a [LETHAL HITS] weapon results in a critical hit, you can choose for that attack to automatically wound the target.\n\nDesigner’s Note: Choosing to automatically wound the target means that no wound roll is made for that attack. You may decide against this, as it means that attack cannot result in a critical wound and so cannot trigger other abilities such as [DEVASTATING WOUNDS].",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.23"
+    },
+    "core-24.24": {
+      "fnv1a_utf16": "c99f2491",
+      "length_utf16": 560,
+      "observed_utc": "2026-11-04T10:03:48.403Z",
+      "text": "24.24\nLONE OPERATIVE\n\nUnless part of an attached unit, this unit is not visible to enemy models unless they are within 12\" of this unit, and it cannot be targeted by [INDIRECT FIRE] weapons unless the attacking model is within 12\" of this unit.\n\nIf this ability takes the form Lone Operative X\", unless part of an attached unit, this unit is not visible to enemy models unless they are within X\" of this unit, and it cannot be targeted by [INDIRECT FIRE] weapons unless the attacking model is within X\" of this unit.\n\n24.24.01\nAttached units and Lone Operative",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.24"
+    },
+    "core-24.28": {
+      "fnv1a_utf16": "9ec78f5b",
+      "length_utf16": 557,
+      "observed_utc": "2026-11-04T10:03:48.403Z",
+      "text": "24.28\n[PRECISION]\n\nWhile resolving attacks made with one or more [PRECISION] weapons, at the start of the Allocation Order step (05.03), if the target unit contains one or more CHARACTER models visible to one or more of the attacking models, the active player can select one allocation group that contains one of those visible CHARACTER models. If they do, until those attacks are resolved, or until that CHARACTER group is destroyed (whichever happens first), that CHARACTER group is the current allocation group.\n\n24.28.01\nPrecision and Devastating Wounds",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.28"
+    },
+    "core-24.33": {
+      "fnv1a_utf16": "56771b38",
+      "length_utf16": 166,
+      "observed_utc": "2026-11-04T10:03:48.403Z",
+      "text": "24.33\nSTEALTH\n\nIf every model in a unit has this ability, each time a ranged attack targets that unit, that unit has the benefit of cover against that attack (13.08).",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.33"
+    },
+    "core-24.36": {
+      "fnv1a_utf16": "7c5e0496",
+      "length_utf16": 460,
+      "observed_utc": "2026-11-04T10:03:48.403Z",
+      "text": "24.36\n[SUSTAINED HITS]\n\nThis ability always takes the form [SUSTAINED HITS X]. Each time an attack made with a [SUSTAINED HITS] weapon results in a critical hit, that attack results in a number of additional hits on the target as denoted by X.\n\nExample: An attack made with a [SUSTAINED HITS 2] weapon results in a critical hit. That attack therefore hits the target three times (once from the critical hit, and twice more from the [SUSTAINED HITS 2] ability).",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.36"
+    },
+    "core-24.37": {
+      "fnv1a_utf16": "4eeef923",
+      "length_utf16": 122,
+      "observed_utc": "2026-11-04T10:03:48.403Z",
+      "text": "24.37\n[TORRENT]\n\nEach time an attack is made with a [TORRENT] weapon, that attack automatically hits the target.\n\n24.37.01",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.37"
+    },
+    "core-24.39": {
+      "fnv1a_utf16": "937a1544",
+      "length_utf16": 215,
+      "observed_utc": "2026-11-04T10:03:48.403Z",
+      "text": "24.39\nDAMAGED\n\nThis ability always takes the form Damaged X. While a model’s remaining wounds are equal to or less than X, that model is damaged:\n\nWhile a model is damaged, that model's attacks have -1 to hit rolls.",
+      "url": "https://www.40k.app/rules/24-core-abilities#24.39"
+    },
+    "daemon-prince-current": {
+      "fnv1a_utf16": "1bc03c4",
+      "length_utf16": 2104,
+      "observed_utc": "2026-11-04T09:59:41.782Z",
+      "text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nDaemon Prince of Chaos\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nDaemon Prince of Chaos 60mm\n\nInvulnerable save: 4+\n\n8\"\n10\n2+\n10\n6+\n3\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nInfernal cannon\n24\"\n3\n2+\n5\n-1\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\n➤ Hellforged weapons (strike)\n6\n2+\n8\n-2\n3\n➤ Hellforged weapons (sweep)\n14\n2+\n6\n0\n1\nKEYWORDS\nCHAOS\nCHARACTER\nDAEMON\nDAEMON PRINCE OF CHAOS\nMONSTER\nCOSTS\n1 model\n165 pts\nUNIT COMPOSITION\n1 Daemon Prince of Chaos\n\nThis model is equipped with: infernal cannon; hellforged weapons.\n\nCORE ABILITIES\nDEADLY DEMISE D3\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nDaemonic Lord\n\nWhile this model is within 3\" of one or more friendly LEGIONES DAEMONICA INFANTRY units, this model has the Lone Operative ability.\n\nPrince of Darkness\n\nWhile a friendly LEGIONES DAEMONICA unit is within 6\" of this model, models in that unit have the Stealth ability.\n\nUnholy Vigour\n\nOnce per battle, at the start of any phase, this model can use this ability. If it does, until the end of the phase, this model has a 3+ invulnerable save.\n\nDAEMONIC ALLEGIANCE\n\nWhen you select this model to include in your army, you must select one of the following keywords for it to gain:\n\nKHORNE\nTZEENTCH\nNURGLE\nSLAANESH\n\nThe keyword you select will also affect some of this model’s characteristics.\n\nDaemon Prince of Khorne: If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model’s hellforged weapons.\n\nDaemon Prince of Tzeentch: If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model’s infernal cannon.\n\nDaemon Prince of Nurgle: If this model has the NURGLE keyword, add 1 to this model’s Toughness characteristic.\n\nDaemon Prince of Slaanesh: If this model has the SLAANESH keyword, add 2\" to this model’s Move characteristic.\n\nSTATS\n7%\nof Chaos Daemons lists, 1.6 per list\n#37\nmost-taken in faction\n10%\nfrom 8% since last update\nIN ARMY LISTS\nPopular detachments\nWARPTIDE\nBLOOD LEGION\nDAEMONIC INCURSION\nOften taken with\nBLOODMASTER\nBLOODLETTERS\nNURGLINGS\nFLESH HOUNDS\nDAEMON PRINCE OF CHAOS WITH WINGS",
+      "url": "https://www.40k.app/factions/chaos-daemons/units/daemon-prince-of-chaos"
+    },
+    "daemon-prince-history": {
+      "fnv1a_utf16": "5c1f9ff",
+      "length_utf16": 624,
+      "observed_utc": "2026-11-04T09:59:53.686Z",
+      "text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nDaemon Prince of Chaos\nDATASHEET\nUPDATES\nVERSION 931\nReleased 2026-08-26\nDeadly Demise D3\nAbility Updated\n\nThis ability always takes the form Deadly Demise X. Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6\" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6\").\n\nPrevious\nVERSION 867\nReleased 2026-06-19\nAdded to the faction\nAdded\nPoints cost\n165 pts",
+      "url": "https://www.40k.app/factions/chaos-daemons/units/daemon-prince-of-chaos/updates"
+    },
+    "daemon-prince-wings-current": {
+      "fnv1a_utf16": "9ef3f21",
+      "length_utf16": 2120,
+      "observed_utc": "2026-11-04T09:59:54.219Z",
+      "text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nDaemon Prince of Chaos with Wings\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nDaemon Prince of Chaos with Wings 60mm\n\nInvulnerable save: 4+\n\n12\"\n9\n2+\n10\n6+\n3\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nInfernal cannon\n24\"\n3\n2+\n5\n-1\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\n➤ Hellforged weapons (strike)\n6\n2+\n8\n-2\n3\n➤ Hellforged weapons (sweep)\n14\n2+\n6\n0\n1\nKEYWORDS\nCHAOS\nCHARACTER\nDAEMON\nDAEMON PRINCE OF CHAOS WITH WINGS\nFLY\nMONSTER\nCOSTS\n1 model\n190 pts\nUNIT COMPOSITION\n1 Daemon Prince of Chaos with Wings\n\nThis model is equipped with: infernal cannon; hellforged weapons.\n\nCORE ABILITIES\nDEADLY DEMISE D3\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nMalefic Destruction\n\nOnce per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model’s hellforged weapons.\n\nHarbinger of Death\n\nEach time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model’s hellforged weapons have that ability:\n\n[LETHAL HITS]\n[PRECISION]\n[SUSTAINED HITS 1]\nDAEMONIC ALLEGIANCE\n\nWhen you select this model to include in your army, you must select one of the following keywords for it to gain:\n\nKHORNE\nTZEENTCH\nNURGLE\nSLAANESH\n\nThe keyword you select will also affect some of this model’s characteristics.\n\nDaemon Prince of Khorne: If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model’s hellforged weapons.\n\nDaemon Prince of Tzeentch: If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model’s infernal cannon.\n\nDaemon Prince of Nurgle: If this model has the NURGLE keyword, add 1 to this model’s Toughness characteristic.\n\nDaemon Prince of Slaanesh: If this model has the SLAANESH keyword, add 2\" to this model’s Move characteristic.\n\nSTATS\n16%\nof Chaos Daemons lists, 1.4 per list\n#17\nmost-taken in faction\n23%\nfrom 9% since last update\nIN ARMY LISTS\nPopular detachments\nDAEMONIC INCURSION\nWARPTIDE\nBLOOD LEGION\nOften taken with\nBLOODLETTERS\nNURGLINGS\nSCREAMERS\nLORD OF CHANGE\nPINK HORRORS",
+      "url": "https://www.40k.app/factions/chaos-daemons/units/daemon-prince-of-chaos-with-wings"
+    },
+    "daemon-prince-wings-history": {
+      "fnv1a_utf16": "a20a9e59",
+      "length_utf16": 635,
+      "observed_utc": "2026-11-04T10:01:40.168Z",
+      "text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nDaemon Prince of Chaos with Wings\nDATASHEET\nUPDATES\nVERSION 931\nReleased 2026-08-26\nDeadly Demise D3\nAbility Updated\n\nThis ability always takes the form Deadly Demise X. Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6\" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6\").\n\nPrevious\nVERSION 867\nReleased 2026-06-19\nAdded to the faction\nAdded\nPoints cost\n190 pts",
+      "url": "https://www.40k.app/factions/chaos-daemons/units/daemon-prince-of-chaos-with-wings/updates"
+    },
+    "daemons-army-rules-current": {
+      "fnv1a_utf16": "129e9d3a",
+      "length_utf16": 2319,
+      "observed_utc": "2026-11-04T10:01:56.468Z",
+      "text": "40K.APP\nFACTIONS\nChaos Daemons\nDATASHEETS\nARMY RULES\nDETACHMENTS\nUPDATES\nCREATE LIST\nTHE SHADOW OF CHAOS\n\nIf your Army Faction is LEGIONES DAEMONICA, certain areas of the battlefield are considered to be within your army’s Shadow of Chaos, as follows:\n\nYour deployment zone is always within your army’s Shadow of Chaos.\nAt the start of any phase, if you control at least half of the objective markers within No Man’s Land, until the end of that phase, No Man’s Land is within your army’s Shadow of Chaos.\nAt the start of any phase, if you control at least half of the objective markers within your opponent’s deployment zone, until the end of that phase, your opponent’s deployment zone is within your army’s Shadow of Chaos.\nDAEMONIC MANIFESTATION\n\nWhile a friendly LEGIONES DAEMONICA unit is within your army’s Shadow of Chaos, each time that unit makes a battle-shock roll, that unit has +1 to that battle-shock roll and, if that roll is successful, one model in that unit heals D3 wounds (if that unit is a BATTLELINE unit and that roll is successful, up to D3 destroyed models (excluding CHARACTER models) can be returned to that unit instead).\n\nDAEMONIC TERROR\n\nWhile an enemy unit is within your army’s Shadow of Chaos and/or it is within 6\" of one or more BLOODTHIRSTER, GREAT UNCLEAN ONE, KAIROS FATEWEAVER, KEEPER OF SECRETS, LORD OF CHANGE, ROTIGUS, SHALAXI HELBANE or SKARBRAND units from your army, each time that unit takes a Battle-shock test, subtract 1 from that test and, if that test is failed, that enemy unit suffers D3 mortal wounds.\n\nDAEMONIC PACT\n\nIf every model from your army has the CHAOS KNIGHTS or HERETIC ASTARTES keyword, you can include LEGIONES DAEMONICA units in your army, even if they do not have the Faction keyword you selected in the Select Army Faction step. The combined points cost of such units you can include depends on your battle size, as shown below.\n\nIncursion - Up to 250 pts\nStrike Force - Up to 500 pts\nOnslaught - Up to 750 pts\n\nNone of these models can be your WARLORD, and they cannot be given Enhancements.\n\nIn addition, for each of the following keywords, the number of non-BATTLELINE units with that keyword you include in this way cannot be greater than the number of BATTLELINE units with that keyword you include in this way:\n\nKHORNE\nTZEENTCH\nNURGLE\nSLAANESH",
+      "url": "https://www.40k.app/factions/chaos-daemons/army-rules"
+    },
+    "shadow-legion-current": {
+      "fnv1a_utf16": "d823eaf9",
+      "length_utf16": 6359,
+      "observed_utc": "2026-11-04T10:03:09.931Z",
+      "text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nDETACHMENTS\nShadow Legion\n2DP · Purge the Foe\nDETACHMENT\nUNITS\nUPDATES\nCREATE LIST\nTHRALLS OF THE FIRST PRINCE\n\nWhen mustering your army, you cannot include any DAEMON PRINCE, DAEMON PRINCE WITH WINGS or EPIC HERO units (excluding BE’LAKOR), but you can include the following HERETIC ASTARTES units:\n\nCHAOS LORD\nCHAOS LORD IN TERMINATOR ARMOUR\nCHAOS LORD WITH JUMP PACK\nCHAOS TERMINATOR SQUAD\nCHOSEN\nDAMNED units\nDARK APOSTLE\nHAVOCS\nLEGIONARIES\nMASTER OF POSSESSION\nPOSSESSED\nRAPTORS\nSORCERER\nSORCERER IN TERMINATOR ARMOUR\nWARP TALONS\n\nThe combined points value of such units depends on your battle size, as shown below.\n\nIncursion: Up to 500 pts\nStrike Force: Up to 1000 pts\nOnslaught: Up to 1500 pts\nKEYWORDS\n\nBE’LAKOR and HERETIC ASTARTES units from your army gain the SHADOW LEGION and UNDIVIDED keywords.\n\nLEGIONES DAEMONICA units from your army gain the SHADOW LEGION keyword.\n\nFIRST PRINCE OF CHAOS\n\nIf your Army Faction is LEGIONES DAEMONICA, you can use this Shadow Legion Detachment rule.\n\nFIRST PRINCE OF CHAOS\n\nUnits from your army have the relevant abilities presented below.\n\nMurderer’s Cowl\n\nThe most murderous seek not to hide in the Dark Master’s pall. The shadows extend before them, offering a rapid route to slaughter.\n\nSHADOW LEGION KHORNE units only. This unit is eligible to shoot and declare a charge in a turn in which it Advanced.\n\nPenumbral Puppetry\n\nMutative agents of change, touched by the Dark Master’s umbral aura, summon llusory magicks to confound and confuse their desperate foes.\n\nSHADOW LEGION TZEENTCH units only. This unit has Stealth. Each time a melee attack targets this unit, subtract 1 from the Hit roll.\n\nGloam Rot\n\nBorne upon the gloaming wisp of Be’lakor’s shadow, this debilitating curse atrophies muscle and withers flesh, greatly weakening its victims.\n\nSHADOW LEGION NURGLE units only. Each time an attack targets this unit, if the Strength characteristic of that attack is greater than this unit’s Toughness characteristic, subtract 1 from the Wound roll.\n\nShadow’s Caress\n\nThe Dark Master’s shadow falls across his thralls, masking their approach.\n\nSHADOW LEGION SLAANESH units only. Enemy units cannot target this unit with snap shooting attacks.\n\nDisciples of Be’lakor\n\nBe’lakor’s immortal ego draws into his orbit those as yet unclaimed by any one Chaos God. Their hate‐filled pacts are made to the entire fell pantheon, and the dangerous boons they receive see them plunged along paths of perpetual night straight into the enemy’s midst.\n\nSHADOW LEGION UNDIVIDED units only.\n\nThis unit has the Dark Pacts army rule, and can use it as described in Codex: Chaos Space Marines, even though your Army Faction is not HERETIC ASTARTES. If this unit is BE’LAKOR, it automatically passes the Leadership test required for Dark Pacts.\nSHADOW LEGION HERETIC ASTARTES models in this unit have the Deep Strike ability.\nENHANCEMENTS\nFADE TO DARKNESS\n30 pts\n\nSHADOW LEGION model only. At the end of the Fight phase, if the bearer’s unit destroyed one or more enemy units this phase and is not within Engagement Range of one or more enemy units, you can remove the bearer’s unit from the battlefield and place it into Strategic Reserves.\n\nLEAPING SHADOWS\n25 pts\n\nSHADOW LEGION model only. Models in the bearer’s unit have the Scouts 9” ability.\n\nMALICE MADE MANIFEST\n25 pts\n\nSHADOW LEGION model only. At the start of the Fight phase, select one enemy unit within Engagement Range of the bearer’s unit and roll one D6: on a 2‐5, that enemy unit suffers D3 mortal wounds; on a 6, that enemy unit suffers 3 mortal wounds.\n\nMANTLE OF GLOOM (AURA)\n20 pts\n\nSHADOW LEGION model only. While an enemy unit is within Engagement Range of the bearer’s unit, subtract 1 from the Objective Control characteristic of models in that enemy unit.\n\nSTRATAGEMS\nSPITEFUL DEMISE\nANY PHASE - STRATEGIC PLOY\nTARGET\n\nThat SHADOW LEGION unit. You can use this Stratagem on that unit even though it was just destroyed.\n\nWHEN\n\nAny phase, just after a SHADOW LEGION unit from your army is destroyed, before removing the last model in that unit from the battlefield and before rolling any dice for the Deadly Demise ability.\n\nEFFECT\n\nRoll one D6 for each enemy unit that is within Engagement Range of the last model in your unit, adding 2 to the result if your unit has the SLAANESH keyword: on a 4-5, that enemy unit suffers D3 mortal wounds; on a 6+, that enemy unit suffers 3 mortal wounds.\n\n1\nCHANNELLED WRATH\nFIGHT PHASE - STRATEGIC PLOY\nTARGET\n\nOne SHADOW LEGION unit from your army that has not been selected to fight this phase.\n\nWHEN\n\nFight phase.\n\nEFFECT\n\nUntil the end of the phase, melee weapons equipped by models in your unit have the [LANCE] ability. If your unit has the KHORNE keyword, until the end of the phase, improve the Armour Penetration characteristic of those weapons by 1 as well.\n\n1\nDEATH DENIED\nCOMMAND PHASE - BATTLE TACTIC\nTARGET\n\nOne SHADOW LEGION unit from your army.\n\nWHEN\n\nYour Command phase.\n\nEFFECT\n\nOne model in your unit regains up to 3 lost wounds. In addition, If your unit has the TZEENTCH keyword, return up to one destroyed model (excluding CHARACTER models) to your unit with its full wounds remaining.\n\n1\nENCROACHING DARKNESS\nSHOOTING PHASE - BATTLE TACTIC\nTARGET\n\nUp to one SHADOW LEGION HERETIC ASTARTES unit from your army and up to one SHADOW LEGION LEGIONES DAEMONICA unit from your army. You can only select units that arrived from Reserves this turn.\n\nWHEN\n\nYour Shooting phase.\n\nEFFECT\n\nUntil the end of the phase, weapons equipped by models in your selected units have the [IGNORES COVER] ability.\n\n1\nSHADE PATH\nCHARGE PHASE - BATTLE TACTIC\nTARGET\n\nOne friendly SHADOW LEGION unit.\n\nWHEN\n\nStart of your opponent's Charge phase.\n\nEFFECT\n\nSelect one visible enemy unit within 12\" of your unit. When that enemy unit declares a charge, that enemy unit has -1 to charge rolls. If your unit has Nurgle, that enemy unit must make a battle-shock roll.\n\n2\nBINDING SHADOW\nFIGHT PHASE - STRATEGIC PLOY\nTARGET\n\nUp to one SHADOW LEGION HERETIC ASTARTES unit from your army and up to one SHADOW LEGION LEGIONES DAEMONICA unit from your army. You can only select units that are not within Engagement Range of one or more enemy units.\n\nWHEN\n\nEnd of your opponent’s Fight phase.\n\nEFFECT\n\nRemove those selected units from the battlefield and place them into Strategic Reserves.\n\n1",
+      "url": "https://www.40k.app/factions/chaos-daemons/detachments/shadow-legion"
+    },
+    "soul-grinder-current": {
+      "fnv1a_utf16": "39a02f65",
+      "length_utf16": 2054,
+      "observed_utc": "2026-11-04T10:01:40.759Z",
+      "text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nSoul Grinder\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nSoul Grinder 160mm\n\nInvulnerable save: 4+\n\n8\"\n11\n3+\n14\n7+\n5\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nHarvester cannon\n36\"\n3\n3+\n10\n-1\n3\nPhlegm bombardment\nBLAST\nINDIRECT FIRE\nLETHAL HITS\n36\"\nD6+1\n3+\n7\n-1\n2\nScream of despair\nDEVASTATING WOUNDS\nSUSTAINED HITS 1\n24\"\n6\n3+\n9\n-2\n2\nTorrent of burning blood\nIGNORES COVER\nTORRENT\n12\"\n2D6\n-\n5\n-1\n1\nWarp gaze\nBLAST\n48\"\nD3\n3+\n12\n-2\nD6+2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nIron claw\n5\n3+\n16\n-3\nD6+2\nWarpclaw\nEXTRA ATTACKS\n6\n3+\n8\n-1\n2\nWarpsword\nEXTRA ATTACKS\n3\n3+\n8\n-2\nD6\nKEYWORDS\nCHAOS\nDAEMON\nSOUL GRINDER\nVEHICLE\nWALKER\nCOSTS\n1 model\n180 pts\n3rd+ in your army\n+15 pts\nUNIT COMPOSITION\n1 Soul Grinder\n\nThis model is equipped with: harvester cannon; iron claw; warpsword.\n\nWARGEAR OPTIONS\nThis model’s warpsword can be replaced with 1 warpclaw.\nCORE ABILITIES\nDEADLY DEMISE D3\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nScuttling Walker\n\nEach time this model makes a Normal or Advance move, it can move over friendly MONSTER and VEHICLE models and terrain features that are 4\" or less in height as if they were not there.\n\nDAEMONIC ALLEGIANCE\n\nWhen you select this model to include in your army, you must select one of the keywords below. Until the end of the battle, this model has that keyword and the additional wargear stated for that keyword below.\n\nKHORNE - This model is additionally equipped with: torrent of burning blood\n\nTZEENTCH - This model is additionally equipped with: warp gaze\n\nNURGLE - This model is additionally equipped with: phlegm bombardment\n\nSLAANESH - This model is additionally equipped with: scream of despair\n\nDAMAGED: 1-5 WOUNDS REMAINING\n\nWhile this model has 1-5 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n11%\nof Chaos Daemons lists\n#27\nmost-taken in faction\n11%\nfrom 5% since last update\nIN ARMY LISTS\nPopular detachments\nWARPTIDE\nPLAGUE LEGION\nSCINTILLATING LEGION\nOften taken with\nPINK HORRORS\nNURGLINGS\nBEASTS OF NURGLE\nLORD OF CHANGE\nSCREAMERS",
+      "url": "https://www.40k.app/factions/chaos-daemons/units/soul-grinder"
+    },
+    "soul-grinder-history": {
+      "fnv1a_utf16": "a3c673a6",
+      "length_utf16": 614,
+      "observed_utc": "2026-11-04T10:01:55.964Z",
+      "text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nSoul Grinder\nDATASHEET\nUPDATES\nVERSION 931\nReleased 2026-08-26\nDeadly Demise D3\nAbility Updated\n\nThis ability always takes the form Deadly Demise X. Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6\" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6\").\n\nPrevious\nVERSION 867\nReleased 2026-06-19\nAdded to the faction\nAdded\nPoints cost\n180 pts",
+      "url": "https://www.40k.app/factions/chaos-daemons/units/soul-grinder/updates"
+    }
+  },
+  "authority_limit": "Four complete maintained unofficial App unit pages authorize only four ordinary SHADOW LEGION removals. Global 995 is context, not per-unit update date or official corroboration. Conditional Shadow Legion grant and both Prince prohibitions remain. Bloodthirster height/Relentless Carnage diagnostic and native admission remain Blocked; other heights are retained manual records, not newly measured. Core parent sections exclude closed child/FAQ bodies. No full-unit, physical admission, lifecycle or game certification."
+}

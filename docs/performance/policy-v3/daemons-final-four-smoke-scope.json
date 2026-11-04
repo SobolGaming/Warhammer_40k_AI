@@ -1,0 +1,31 @@
+{
+  "base": "912507cd2e6b705b054b55cf7c9c1a85e7d6dfe9",
+  "changes": {
+    "tools/ability_support_sources.py": {
+      "before_sha256": "cd108fd9df9ee6357d9b0478884cf483b4586eb5ee9cc1c41bc22fac4256f5b1",
+      "after_sha256": "d031622521417ef0d5ba4b014b308c35b3de0f6fa923b5bbc0bcf3df38dcd2c2",
+      "owners": {
+        "ability_support_index_inputs": {
+          "before": "10687843f5c3f25e9af7b4b4c659c8d499ee3f09b2e2ab888202d80df0ef46f7",
+          "after": "763cd3a865797d2088ac4752ad65a7e94203ff5ef9422ca23a5e0bbaafc735aa"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tools/ability_support_sources.py": [
+      "qualification40-exact-b0712fa66a9cc38e"
+    ]
+  },
+  "source_obligation": "Four complete current own keyword blocks omit SHADOW LEGION. Remove only these four ordinary source rows with exact preimages; retain existing conditional grants, Prince prohibitions, historical counterpart bytes and support limits.",
+  "unchanged_work": "Source-index input enumeration gains one fixed pinned audit resource. Existing hashing, row scans, catalog construction and invalidation algorithms are unchanged. No gameplay, search, cache-policy, serialization or deliberate performance change; serial current-runtime smoke and live semantic/work/cache checks remain mandatory.",
+  "policy_successor": {
+    "before_sha256": "e4b05916324de6b7194627ec48e93da6c2b1ff1bec7d75378f399541f4104507",
+    "after_sha256": "cc2c9c9925ed6bb6487990c026a459181894e81d30989861bad498b3694fdb9a",
+    "import_sha256": "3f0d8bb614411f43c7ce1973932be0398e35d740e09cbff7e487d3309169d4b0",
+    "call_sha256": "2a2aa978654030aed46d0a4a2087f1103cc9fed6e31274b66af36440d76e478b",
+    "predecessor_sha256": "ad21e5cccffa7ee04fc8ba643244b8d917bbf5842199efd73a18c0036d7cc333",
+    "smoke_import_sha256": "60066789ced570d91b90fa8043afb60ff446e694309f38b3495024d7169ae004"
+  },
+  "module_sha256": "4dfa35b70548f65fc78f60874bfa7fa2e648efad7b3c2fcb5fb44e6d227c4b70"
+}

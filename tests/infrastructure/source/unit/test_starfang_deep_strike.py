@@ -762,11 +762,14 @@ def test_daemons_native_full_sixty_exact_delta_and_counterparts() -> None:
         before_daemons_native(drift)
 
 
-@pytest.mark.parametrize("datasheet_id", ["000001112", "000001120", "000001132"])
+@pytest.mark.parametrize(
+    "datasheet_id",
+    ["000001112", "000001120", "000001132", "000002582", "000001149", "000002758", "000001151"],
+)
 @pytest.mark.parametrize(
     "mutation", ["missing", "duplicate", "alias", "identity", "faction", "model"]
 )
-def test_daemons_next_three_exact_keyword_guard(datasheet_id: str, mutation: str) -> None:
+def test_daemons_current_exact_keyword_guard(datasheet_id: str, mutation: str) -> None:
 
     from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
         daemons_native_2026_11 as current,
@@ -863,12 +866,14 @@ def test_daemons_next_three_native_keyword_grant_roundtrip(
 
 
 def test_daemons_next_three_full_catalog_delta_and_pinned_source() -> None:
+    from tests.daemons_final_four_preservation import before_daemons_final_four
     from tests.daemons_next_three_preservation import before_daemons_next_three, daemons_audit
     from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
         daemons_next_three_2026_11 as current,
     )
 
     native, paired_catalog, standalone = packages()
+    native = before_daemons_final_four(native)
     audit = daemons_audit("catalog-delta")
     before = before_daemons_next_three(native)
     assert len(native.army_catalog.datasheets) == 60
@@ -961,3 +966,204 @@ def test_daemons_next_three_all_nine_native_construction_variants() -> None:
                 assert UnitInstance.from_payload(json.loads(json.dumps(unit.to_payload()))) == unit
                 count += 1
     assert count == 9
+
+
+def test_daemons_final_four_full_catalog_delta_and_pinned_source() -> None:
+    from tests.daemons_final_four_preservation import before_daemons_final_four, daemons_audit
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        daemons_final_four_2026_11 as current,
+    )
+
+    native, paired_catalog, standalone = packages()
+    audit = daemons_audit("catalog-delta")
+    before = before_daemons_final_four(native)
+    assert len(native.army_catalog.datasheets) == 60
+    assert before.package_hash() == audit["prior_package_hash"]
+    assert before_daemons_final_four(paired_catalog) is paired_catalog
+    assert before_daemons_final_four(standalone) is standalone
+    changed = {"000002582", "000001149", "000002758", "000001151"}
+    for old, new in zip(
+        before.army_catalog.datasheets, native.army_catalog.datasheets, strict=True
+    ):
+        if old.datasheet_id not in changed:
+            assert old == new
+        else:
+            assert (
+                tuple(k for k in old.keywords.keywords if k != "SHADOW LEGION")
+                == new.keywords.keywords
+            )
+            assert old.keywords.faction_keywords == new.keywords.faction_keywords
+    source = current.source_audit()
+    assert len(source.observations) == 4
+    assert set(source.selected_source_ids) == {s for _, s in current.KEYWORD_SOURCE_IDS}
+    for row in source.observations:
+        assert row.completeness == "complete_page"
+        assert (
+            current.source_package().source_catalog.source_text_by_id(row.source_id).raw_text
+            == row.operative_text
+        )
+    raw = Path(current.__file__).with_name(current.AUDIT_ARTIFACT_NAME).read_bytes()
+    with pytest.raises(FactionSourceError, match="reviewed pin"):
+        current.source_audit_from_json_bytes(raw + b" ")
+    assert Path(current.__file__).with_name(
+        current.AUDIT_ARTIFACT_NAME
+    ) in ability_support_index_inputs(DEFAULT_SOURCE_JSON_DIR)
+
+
+@pytest.mark.parametrize(
+    ("datasheet_id", "expected"),
+    [("000002582", 3), ("000001149", 4), ("000002758", 4), ("000001151", 8)],
+)
+def test_daemons_final_four_all_native_variants(datasheet_id: str, expected: int) -> None:
+    from tests.daemons_final_four_preservation import before_daemons_final_four
+    from warhammer40k_core.engine.army_mustering import (
+        ArmyMusterRequest,
+        RosterLegalityViolation,
+        _append_shadow_legion_forbidden_unit_violations,  # pyright: ignore[reportPrivateUsage]
+        _apply_shadow_legion_keyword_grants,  # pyright: ignore[reportPrivateUsage]
+    )
+    from warhammer40k_core.engine.list_validation import (
+        DetachmentSelection,
+        MusteringOptionSelection,
+    )
+    from warhammer40k_core.engine.unit_keyword_queries import unit_has_roster_keyword
+    from warhammer40k_core.engine.wargear_selections import WargearSelection
+
+    package = packages()[0]
+    prior = before_daemons_final_four(package)
+    sheet = package.army_catalog.datasheet_by_id(datasheet_id)
+    old_sheet = prior.army_catalog.datasheet_by_id(datasheet_id)
+    factory = UnitFactory(catalog=package.army_catalog, model_geometries=package.model_geometries)
+    old_factory = UnitFactory(catalog=prior.army_catalog, model_geometries=prior.model_geometries)
+    allegiances: list[tuple[MusteringOptionSelection, ...]] = [
+        (MusteringOptionSelection(o.option_id),) for o in sheet.mustering_options
+    ] or [()]
+    gears: list[tuple[WargearSelection, ...]] = [()]
+    gears.extend(
+        (WargearSelection(o.option_id, o.model_profile_id, o.allowed_wargear_ids),)
+        for o in sheet.wargear_options
+        if o.min_selections == 0
+    )
+    removed_sources = set(old_sheet.source_ids) - set(sheet.source_ids)
+    added_sources = set(sheet.source_ids) - set(old_sheet.source_ids)
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        daemons_final_four_2026_11 as current,
+    )
+
+    assert not removed_sources  # Historical row ancestry remains retained.
+    assert added_sources == {
+        "data-package:pdf:source-corrections:reviewed-2026-11-04:PdfCorrections:"
+        + datasheet_id
+        + ":keyword-correction",
+        dict(current.KEYWORD_SOURCE_IDS)[datasheet_id],
+    }
+
+    def assert_source_delta(old: list[str], new: list[str]) -> None:
+        assert set(old) - set(new) <= removed_sources
+        assert set(new) - set(old) <= added_sources
+
+    count = 0
+    for allegiance in allegiances:
+        for gear in gears:
+            selection = UnitMusterSelection(
+                unit_selection_id=datasheet_id,
+                datasheet_id=datasheet_id,
+                model_profile_selections=tuple(
+                    ModelProfileSelection(c.model_profile_id, c.min_models)
+                    for c in sheet.composition
+                ),
+                mustering_option_selections=allegiance,
+                wargear_selections=gear,
+            )
+            unit = factory.instantiate_unit(
+                army_id="final-four", datasheet=sheet, selection=selection
+            )
+            previous = old_factory.instantiate_unit(
+                army_id="final-four", datasheet=old_sheet, selection=selection
+            )
+            assert not unit_has_roster_keyword(unit, "SHADOW LEGION")
+            assert all("SHADOW LEGION" not in m.keywords for m in unit.own_models)
+            assert unit.faction_keywords == ("LEGIONES DAEMONICA",)
+            assert UnitInstance.from_payload(json.loads(json.dumps(unit.to_payload()))) == unit
+            # Catalog proof binds the exact correction record and new reviewed source ID.
+            # Unit/model provenance carries that same delta; all other payload fields agree.
+            old_payload = previous.to_payload()
+            new_payload = unit.to_payload()
+            old_payload["keywords"].remove("SHADOW LEGION")
+            assert_source_delta(
+                old_payload["datasheet_source_ids"], new_payload["datasheet_source_ids"]
+            )
+            old_payload["datasheet_source_ids"] = new_payload["datasheet_source_ids"]
+            for old_model, new_model in zip(
+                old_payload["own_models"], new_payload["own_models"], strict=True
+            ):
+                old_model["keyword_assignment"]["keywords"].remove("SHADOW LEGION")
+                assert_source_delta(
+                    old_model["keyword_assignment"]["source_ids"],
+                    new_model["keyword_assignment"]["source_ids"],
+                )
+                old_model["keyword_assignment"]["source_ids"] = new_model["keyword_assignment"][
+                    "source_ids"
+                ]
+                assert_source_delta(old_model["source_ids"], new_model["source_ids"])
+                old_model["source_ids"] = new_model["source_ids"]
+            assert old_payload == new_payload
+            # Native package has no admitted detachments. These are real factory and existing
+            # grant/prohibition-owner controls, not a fabricated full army/session certification.
+            for faction, detachment in (
+                ("chaos-daemons", "daemonic-incursion"),
+                ("aeldari", "shadow-legion"),
+                ("chaos-daemons", "shadow-legion"),
+            ):
+                request = ArmyMusterRequest(
+                    army_id="final-four",
+                    player_id="owner",
+                    catalog_id=package.army_catalog.catalog_id,
+                    source_package_id=package.army_catalog.source_package_id,
+                    ruleset_id=package.army_catalog.ruleset_id,
+                    detachment_selection=DetachmentSelection(faction, (detachment,)),
+                    force_disposition_id="constructed-source-grant",
+                    unit_selections=(selection,),
+                )
+                is_shadow = faction == "chaos-daemons" and detachment == "shadow-legion"
+                if is_shadow and datasheet_id in {"000001149", "000002758"}:
+                    violations: list[RosterLegalityViolation] = []
+                    _append_shadow_legion_forbidden_unit_violations(
+                        datasheets_by_selection_id={datasheet_id: sheet}, violations=violations
+                    )
+                    assert len(violations) == 1
+                    assert (
+                        violations[0].violation_code
+                        == "shadow_legion_forbidden_daemon_prince_or_epic_hero"
+                    )
+                    continue
+                (result,) = _apply_shadow_legion_keyword_grants(request=request, units=(unit,))
+                assert unit_has_roster_keyword(result, "SHADOW LEGION") is is_shadow
+                assert all(("SHADOW LEGION" in m.keywords) is is_shadow for m in result.own_models)
+                assert not unit_has_roster_keyword(result, "UNDIVIDED")
+                assert (
+                    UnitInstance.from_payload(json.loads(json.dumps(result.to_payload()))) == result
+                )
+                if not is_shadow:
+                    assert result == unit
+            count += 1
+    assert count == expected
+
+
+@pytest.mark.parametrize("datasheet_id", ["000001149", "000002758", "000001151"])
+def test_daemons_final_four_allegiance_remains_mandatory(datasheet_id: str) -> None:
+    from warhammer40k_core.engine.unit_factory import UnitFactoryError
+
+    package = packages()[0]
+    sheet = package.army_catalog.datasheet_by_id(datasheet_id)
+    selection = UnitMusterSelection(
+        unit_selection_id=datasheet_id,
+        datasheet_id=datasheet_id,
+        model_profile_selections=tuple(
+            ModelProfileSelection(c.model_profile_id, c.min_models) for c in sheet.composition
+        ),
+    )
+    with pytest.raises(UnitFactoryError):
+        UnitFactory(
+            catalog=package.army_catalog, model_geometries=package.model_geometries
+        ).instantiate_unit(army_id="final-four", datasheet=sheet, selection=selection)

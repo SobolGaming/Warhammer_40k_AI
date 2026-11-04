@@ -1,0 +1,7 @@
+{
+  "fnv1a_utf16": "6581ed4a",
+  "length_utf16": 622,
+  "observed_utc": "2026-11-04T10:03:48.401Z",
+  "text": "24.05\n[BLAST]\n\nEach time you gather attack dice for a [BLAST] weapon, add one additional attack dice for every five models that were in the target unit in the Select Targets step (rounding down).\n\nIf this ability takes the form [BLAST X], each time you gather attack dice for such a weapon, add X additional attack dice for every five models that were in the target unit in the Select Targets step (rounding down) instead.\n\nExample: If a [BLAST 2] weapon with an A characteristic of 3 targets a unit containing 12 models, you would gather four additional attack dice for that weapon (for a total of seven for that weapon).",
+  "url": "https://www.40k.app/rules/24-core-abilities#24.05"
+}

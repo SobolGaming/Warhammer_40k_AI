@@ -1,0 +1,7 @@
+{
+  "fnv1a_utf16": "f72ac2eb",
+  "length_utf16": 402,
+  "observed_utc": "2026-11-04T10:03:48.402Z",
+  "text": "24.11\n[EXTRA ATTACKS]\n\nEach time a unit containing one or more models with an [EXTRA ATTACKS] weapon fights, those models will make attacks with those weapons in addition to any others. In the Select Weapons step (04.01), for each of those models, you must select:\n\nAll of that model’s [EXTRA ATTACKS] weapons.\nOne of that model’s other melee weapons, if possible.\n24.11.01\nOnly [EXTRA ATTACKS] weapons",
+  "url": "https://www.40k.app/rules/24-core-abilities#24.11"
+}

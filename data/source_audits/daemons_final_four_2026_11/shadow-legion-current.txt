@@ -1,0 +1,193 @@
+40K.APP
+FACTIONS
+CHAOS DAEMONS
+DETACHMENTS
+Shadow Legion
+2DP · Purge the Foe
+DETACHMENT
+UNITS
+UPDATES
+CREATE LIST
+THRALLS OF THE FIRST PRINCE
+
+When mustering your army, you cannot include any DAEMON PRINCE, DAEMON PRINCE WITH WINGS or EPIC HERO units (excluding BE’LAKOR), but you can include the following HERETIC ASTARTES units:
+
+CHAOS LORD
+CHAOS LORD IN TERMINATOR ARMOUR
+CHAOS LORD WITH JUMP PACK
+CHAOS TERMINATOR SQUAD
+CHOSEN
+DAMNED units
+DARK APOSTLE
+HAVOCS
+LEGIONARIES
+MASTER OF POSSESSION
+POSSESSED
+RAPTORS
+SORCERER
+SORCERER IN TERMINATOR ARMOUR
+WARP TALONS
+
+The combined points value of such units depends on your battle size, as shown below.
+
+Incursion: Up to 500 pts
+Strike Force: Up to 1000 pts
+Onslaught: Up to 1500 pts
+KEYWORDS
+
+BE’LAKOR and HERETIC ASTARTES units from your army gain the SHADOW LEGION and UNDIVIDED keywords.
+
+LEGIONES DAEMONICA units from your army gain the SHADOW LEGION keyword.
+
+FIRST PRINCE OF CHAOS
+
+If your Army Faction is LEGIONES DAEMONICA, you can use this Shadow Legion Detachment rule.
+
+FIRST PRINCE OF CHAOS
+
+Units from your army have the relevant abilities presented below.
+
+Murderer’s Cowl
+
+The most murderous seek not to hide in the Dark Master’s pall. The shadows extend before them, offering a rapid route to slaughter.
+
+SHADOW LEGION KHORNE units only. This unit is eligible to shoot and declare a charge in a turn in which it Advanced.
+
+Penumbral Puppetry
+
+Mutative agents of change, touched by the Dark Master’s umbral aura, summon llusory magicks to confound and confuse their desperate foes.
+
+SHADOW LEGION TZEENTCH units only. This unit has Stealth. Each time a melee attack targets this unit, subtract 1 from the Hit roll.
+
+Gloam Rot
+
+Borne upon the gloaming wisp of Be’lakor’s shadow, this debilitating curse atrophies muscle and withers flesh, greatly weakening its victims.
+
+SHADOW LEGION NURGLE units only. Each time an attack targets this unit, if the Strength characteristic of that attack is greater than this unit’s Toughness characteristic, subtract 1 from the Wound roll.
+
+Shadow’s Caress
+
+The Dark Master’s shadow falls across his thralls, masking their approach.
+
+SHADOW LEGION SLAANESH units only. Enemy units cannot target this unit with snap shooting attacks.
+
+Disciples of Be’lakor
+
+Be’lakor’s immortal ego draws into his orbit those as yet unclaimed by any one Chaos God. Their hate‐filled pacts are made to the entire fell pantheon, and the dangerous boons they receive see them plunged along paths of perpetual night straight into the enemy’s midst.
+
+SHADOW LEGION UNDIVIDED units only.
+
+This unit has the Dark Pacts army rule, and can use it as described in Codex: Chaos Space Marines, even though your Army Faction is not HERETIC ASTARTES. If this unit is BE’LAKOR, it automatically passes the Leadership test required for Dark Pacts.
+SHADOW LEGION HERETIC ASTARTES models in this unit have the Deep Strike ability.
+ENHANCEMENTS
+FADE TO DARKNESS
+30 pts
+
+SHADOW LEGION model only. At the end of the Fight phase, if the bearer’s unit destroyed one or more enemy units this phase and is not within Engagement Range of one or more enemy units, you can remove the bearer’s unit from the battlefield and place it into Strategic Reserves.
+
+LEAPING SHADOWS
+25 pts
+
+SHADOW LEGION model only. Models in the bearer’s unit have the Scouts 9” ability.
+
+MALICE MADE MANIFEST
+25 pts
+
+SHADOW LEGION model only. At the start of the Fight phase, select one enemy unit within Engagement Range of the bearer’s unit and roll one D6: on a 2‐5, that enemy unit suffers D3 mortal wounds; on a 6, that enemy unit suffers 3 mortal wounds.
+
+MANTLE OF GLOOM (AURA)
+20 pts
+
+SHADOW LEGION model only. While an enemy unit is within Engagement Range of the bearer’s unit, subtract 1 from the Objective Control characteristic of models in that enemy unit.
+
+STRATAGEMS
+SPITEFUL DEMISE
+ANY PHASE - STRATEGIC PLOY
+TARGET
+
+That SHADOW LEGION unit. You can use this Stratagem on that unit even though it was just destroyed.
+
+WHEN
+
+Any phase, just after a SHADOW LEGION unit from your army is destroyed, before removing the last model in that unit from the battlefield and before rolling any dice for the Deadly Demise ability.
+
+EFFECT
+
+Roll one D6 for each enemy unit that is within Engagement Range of the last model in your unit, adding 2 to the result if your unit has the SLAANESH keyword: on a 4-5, that enemy unit suffers D3 mortal wounds; on a 6+, that enemy unit suffers 3 mortal wounds.
+
+1
+CHANNELLED WRATH
+FIGHT PHASE - STRATEGIC PLOY
+TARGET
+
+One SHADOW LEGION unit from your army that has not been selected to fight this phase.
+
+WHEN
+
+Fight phase.
+
+EFFECT
+
+Until the end of the phase, melee weapons equipped by models in your unit have the [LANCE] ability. If your unit has the KHORNE keyword, until the end of the phase, improve the Armour Penetration characteristic of those weapons by 1 as well.
+
+1
+DEATH DENIED
+COMMAND PHASE - BATTLE TACTIC
+TARGET
+
+One SHADOW LEGION unit from your army.
+
+WHEN
+
+Your Command phase.
+
+EFFECT
+
+One model in your unit regains up to 3 lost wounds. In addition, If your unit has the TZEENTCH keyword, return up to one destroyed model (excluding CHARACTER models) to your unit with its full wounds remaining.
+
+1
+ENCROACHING DARKNESS
+SHOOTING PHASE - BATTLE TACTIC
+TARGET
+
+Up to one SHADOW LEGION HERETIC ASTARTES unit from your army and up to one SHADOW LEGION LEGIONES DAEMONICA unit from your army. You can only select units that arrived from Reserves this turn.
+
+WHEN
+
+Your Shooting phase.
+
+EFFECT
+
+Until the end of the phase, weapons equipped by models in your selected units have the [IGNORES COVER] ability.
+
+1
+SHADE PATH
+CHARGE PHASE - BATTLE TACTIC
+TARGET
+
+One friendly SHADOW LEGION unit.
+
+WHEN
+
+Start of your opponent's Charge phase.
+
+EFFECT
+
+Select one visible enemy unit within 12" of your unit. When that enemy unit declares a charge, that enemy unit has -1 to charge rolls. If your unit has Nurgle, that enemy unit must make a battle-shock roll.
+
+2
+BINDING SHADOW
+FIGHT PHASE - STRATEGIC PLOY
+TARGET
+
+Up to one SHADOW LEGION HERETIC ASTARTES unit from your army and up to one SHADOW LEGION LEGIONES DAEMONICA unit from your army. You can only select units that are not within Engagement Range of one or more enemy units.
+
+WHEN
+
+End of your opponent’s Fight phase.
+
+EFFECT
+
+Remove those selected units from the battlefield and place them into Strategic Reserves.
+
+1
