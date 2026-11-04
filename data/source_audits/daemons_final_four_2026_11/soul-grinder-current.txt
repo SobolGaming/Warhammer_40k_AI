@@ -1,0 +1,161 @@
+40K.APP
+FACTIONS
+CHAOS DAEMONS
+Soul Grinder
+DATASHEET
+UPDATES
+MODELS
+M
+T
+SV
+W
+LD
+OC
+Soul Grinder 160mm
+
+Invulnerable save: 4+
+
+8"
+11
+3+
+14
+7+
+5
+RANGED WEAPONS
+RNG
+A
+BS
+S
+AP
+D
+Harvester cannon
+36"
+3
+3+
+10
+-1
+3
+Phlegm bombardment
+BLAST
+INDIRECT FIRE
+LETHAL HITS
+36"
+D6+1
+3+
+7
+-1
+2
+Scream of despair
+DEVASTATING WOUNDS
+SUSTAINED HITS 1
+24"
+6
+3+
+9
+-2
+2
+Torrent of burning blood
+IGNORES COVER
+TORRENT
+12"
+2D6
+-
+5
+-1
+1
+Warp gaze
+BLAST
+48"
+D3
+3+
+12
+-2
+D6+2
+MELEE WEAPONS
+A
+WS
+S
+AP
+D
+Iron claw
+5
+3+
+16
+-3
+D6+2
+Warpclaw
+EXTRA ATTACKS
+6
+3+
+8
+-1
+2
+Warpsword
+EXTRA ATTACKS
+3
+3+
+8
+-2
+D6
+KEYWORDS
+CHAOS
+DAEMON
+SOUL GRINDER
+VEHICLE
+WALKER
+COSTS
+1 model
+180 pts
+3rd+ in your army
++15 pts
+UNIT COMPOSITION
+1 Soul Grinder
+
+This model is equipped with: harvester cannon; iron claw; warpsword.
+
+WARGEAR OPTIONS
+This model’s warpsword can be replaced with 1 warpclaw.
+CORE ABILITIES
+DEADLY DEMISE D3
+DEEP STRIKE
+FACTION ABILITIES
+THE SHADOW OF CHAOS
+UNIT ABILITIES
+Scuttling Walker
+
+Each time this model makes a Normal or Advance move, it can move over friendly MONSTER and VEHICLE models and terrain features that are 4" or less in height as if they were not there.
+
+DAEMONIC ALLEGIANCE
+
+When you select this model to include in your army, you must select one of the keywords below. Until the end of the battle, this model has that keyword and the additional wargear stated for that keyword below.
+
+KHORNE - This model is additionally equipped with: torrent of burning blood
+
+TZEENTCH - This model is additionally equipped with: warp gaze
+
+NURGLE - This model is additionally equipped with: phlegm bombardment
+
+SLAANESH - This model is additionally equipped with: scream of despair
+
+DAMAGED: 1-5 WOUNDS REMAINING
+
+While this model has 1-5 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.
+
+STATS
+11%
+of Chaos Daemons lists
+#27
+most-taken in faction
+11%
+from 5% since last update
+IN ARMY LISTS
+Popular detachments
+WARPTIDE
+PLAGUE LEGION
+SCINTILLATING LEGION
+Often taken with
+PINK HORRORS
+NURGLINGS
+BEASTS OF NURGLE
+LORD OF CHANGE
+SCREAMERS

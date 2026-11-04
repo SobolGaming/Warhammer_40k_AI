@@ -1,0 +1,146 @@
+[
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000001149:10",
+    "ir_hash": "f9e97fcb2bc40f1671bf6fb4d1d66f0ba15e940abda0312013451a4f3b8ca682",
+    "descriptor_id": "000001149:daemon-prince-of-nurgle",
+    "source_capture": "daemon-prince-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000001149:11",
+    "ir_hash": "392b72eace4bb9fc20d0a3e2ccf578364f40582d8aec8d36b804e12af7c857e5",
+    "descriptor_id": "000001149:daemon-prince-of-slaanesh",
+    "source_capture": "daemon-prince-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000001149:4",
+    "ir_hash": "3b92769ecb49dd744a5f08a2a7c46b1c6009697de4fe414ae958c1aaa1534bc3",
+    "descriptor_id": "000001149:daemonic-lord",
+    "source_capture": "daemon-prince-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000001149:5",
+    "ir_hash": "35768215da461730791e690952d8e98d3bbf4d019241a496459d93226b57e1aa",
+    "descriptor_id": "000001149:prince-of-darkness-aura",
+    "source_capture": "daemon-prince-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000001149:6",
+    "ir_hash": "9bff52ed4cd605b512f5a90a8eb15115686e6ea2c539eb8797a8af04278fb68a",
+    "descriptor_id": "000001149:unholy-vigour",
+    "source_capture": "daemon-prince-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000001149:7",
+    "ir_hash": "d47c7db2c1babd058b2f269081faebfe4be9e5ce918f3b60520b280926611eb7",
+    "descriptor_id": "000001149:daemonic-allegiance",
+    "source_capture": "daemon-prince-current.txt",
+    "comparison": "agrees_semantics_presentation_diff",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000001149:8",
+    "ir_hash": "b6f5bdbef18795a5a0d5b4585cce26cfb9393812125b8b41488d29f6bb904cae",
+    "descriptor_id": "000001149:daemon-prince-of-khorne",
+    "source_capture": "daemon-prince-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000001149:9",
+    "ir_hash": "6ebe09ba85c3e5f92a655261252aa9588ec502c560d026b7b768a3dd4585a695",
+    "descriptor_id": "000001149:daemon-prince-of-tzeentch",
+    "source_capture": "daemon-prince-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000001151:5",
+    "ir_hash": "35dcc98c090a4de96734da8aaf0c79c49781b57c50822f0b0dd0e6eecef6a186",
+    "descriptor_id": "000001151:daemonic-allegiance",
+    "source_capture": "soul-grinder-current.txt",
+    "comparison": "agrees_semantics_presentation_diff",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000002758:10",
+    "ir_hash": "9d68929f2c422dcc3413b31afb5012a0d6984cfcbf76d0b8ae87db068b64b5e9",
+    "descriptor_id": "000002758:daemon-prince-of-slaanesh",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000002758:4",
+    "ir_hash": "a1a9daffef8ffc38e175afbc7f87d826d4263ef10db109d46e4f21e13ec6ae80",
+    "descriptor_id": "000002758:malefic-destruction",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000002758:5",
+    "ir_hash": "023a1cf08045b164689dce20f0131524ea0cc0b1dc41cb0a76c3bb552bcb1001",
+    "descriptor_id": "000002758:harbinger-of-death",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000002758:6",
+    "ir_hash": "e778bba78c1a68759aa6e3cce3e330b851220ffb87fe9f092b0c28a810db9600",
+    "descriptor_id": "000002758:daemonic-allegiance",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "comparison": "agrees_semantics_presentation_diff",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000002758:7",
+    "ir_hash": "2a7abab11c41688c38bb82e0ba82e755d472aa14b40dd81a02053a610b1d272f",
+    "descriptor_id": "000002758:daemon-prince-of-khorne",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000002758:8",
+    "ir_hash": "d75fdd0d0740dc52b36abe5851af3f7575889dc3a804a385ebe281b9ddc9dfcd",
+    "descriptor_id": "000002758:daemon-prince-of-tzeentch",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  },
+  {
+    "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "source_row_id": "000002758:9",
+    "ir_hash": "a7700783e970818f99ac9e13efd99d465bc5eabfdac512265d3dfef39decc8c6",
+    "descriptor_id": "000002758:daemon-prince-of-nurgle",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "comparison": "agrees_normalized",
+    "execution_qualification": "source_text_join_only_full_lifecycle_not_run"
+  }
+]

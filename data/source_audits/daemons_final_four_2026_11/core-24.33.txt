@@ -1,0 +1,4 @@
+24.33
+STEALTH
+
+If every model in a unit has this ability, each time a ranged attack targets that unit, that unit has the benefit of cover against that attack (13.08).

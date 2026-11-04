@@ -1,0 +1,6 @@
+24.37
+[TORRENT]
+
+Each time an attack is made with a [TORRENT] weapon, that attack automatically hits the target.
+
+24.37.01

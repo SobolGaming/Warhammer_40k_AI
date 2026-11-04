@@ -1,0 +1,2657 @@
+[
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-chaos",
+    "field": "movement",
+    "current_source": 8,
+    "native": 8,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-chaos",
+    "field": "toughness",
+    "current_source": 10,
+    "native": 10,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-chaos",
+    "field": "save",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-chaos",
+    "field": "wounds",
+    "current_source": 10,
+    "native": 10,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-chaos",
+    "field": "leadership",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-chaos",
+    "field": "objective_control",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-chaos",
+    "field": "invulnerable_save",
+    "current_source": 4,
+    "native": 4,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-chaos",
+    "field": "base_mm",
+    "current_source": [
+      60
+    ],
+    "native": [
+      60.0
+    ],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-chaos",
+    "field": "height_evidence",
+    "current_source": "not measured in this audit",
+    "native": {
+      "canonical_units": "inches",
+      "coordinate_frame": "model_centered_z_up",
+      "evidence_id": "000001149:daemon-prince-of-chaos:height",
+      "height_inches": 4.75,
+      "origin": "footprint_center_table_surface",
+      "source_units": "inches"
+    },
+    "disposition": "retained_geometry_not_newly_certified",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Preserve existing geometry caveats; no official measured-height claim."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-chaos",
+    "field": "composition_min_max",
+    "current_source": [
+      1,
+      1
+    ],
+    "native": [
+      1,
+      1
+    ],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149",
+    "field": "ordinary_keywords",
+    "current_source": [
+      "CHAOS",
+      "CHARACTER",
+      "DAEMON",
+      "DAEMON PRINCE OF CHAOS",
+      "MONSTER"
+    ],
+    "native": [
+      "CHAOS",
+      "CHARACTER",
+      "DAEMON",
+      "DAEMON PRINCE OF CHAOS",
+      "MONSTER",
+      "SHADOW LEGION"
+    ],
+    "disposition": "confirmed_keyword_drift",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "SHADOW LEGION is conditional detachment ownership, absent from current ordinary keyword block. No off-detachment benefit demonstrated."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149",
+    "field": "faction_keywords",
+    "current_source": [
+      "LEGIONES DAEMONICA"
+    ],
+    "native": [
+      "LEGIONES DAEMONICA"
+    ],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Faction identity retained; current owning army provides context."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149",
+    "field": "attachment_eligibilities",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149",
+    "field": "transport_ability_present",
+    "current_source": false,
+    "native": false,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149",
+    "field": "default_wargear",
+    "current_source": [
+      "000001149:hellforged-weapons",
+      "000001149:infernal-cannon"
+    ],
+    "native": [
+      "000001149:hellforged-weapons",
+      "000001149:infernal-cannon"
+    ],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:soul-grinder",
+    "field": "movement",
+    "current_source": 8,
+    "native": 8,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:soul-grinder",
+    "field": "toughness",
+    "current_source": 11,
+    "native": 11,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:soul-grinder",
+    "field": "save",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:soul-grinder",
+    "field": "wounds",
+    "current_source": 14,
+    "native": 14,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:soul-grinder",
+    "field": "leadership",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:soul-grinder",
+    "field": "objective_control",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:soul-grinder",
+    "field": "invulnerable_save",
+    "current_source": 4,
+    "native": 4,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:soul-grinder",
+    "field": "base_mm",
+    "current_source": [
+      160
+    ],
+    "native": [
+      160.0
+    ],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:soul-grinder",
+    "field": "height_evidence",
+    "current_source": "not measured in this audit",
+    "native": {
+      "canonical_units": "inches",
+      "coordinate_frame": "model_centered_z_up",
+      "evidence_id": "000001151:soul-grinder:height",
+      "height_inches": 6.5,
+      "origin": "footprint_center_table_surface",
+      "source_units": "inches"
+    },
+    "disposition": "retained_geometry_not_newly_certified",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Preserve existing geometry caveats; no official measured-height claim."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:soul-grinder",
+    "field": "composition_min_max",
+    "current_source": [
+      1,
+      1
+    ],
+    "native": [
+      1,
+      1
+    ],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151",
+    "field": "ordinary_keywords",
+    "current_source": [
+      "CHAOS",
+      "DAEMON",
+      "SOUL GRINDER",
+      "VEHICLE",
+      "WALKER"
+    ],
+    "native": [
+      "CHAOS",
+      "DAEMON",
+      "SHADOW LEGION",
+      "SOUL GRINDER",
+      "VEHICLE",
+      "WALKER"
+    ],
+    "disposition": "confirmed_keyword_drift",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "SHADOW LEGION is conditional detachment ownership, absent from current ordinary keyword block. No off-detachment benefit demonstrated."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151",
+    "field": "faction_keywords",
+    "current_source": [
+      "LEGIONES DAEMONICA"
+    ],
+    "native": [
+      "LEGIONES DAEMONICA"
+    ],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Faction identity retained; current owning army provides context."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151",
+    "field": "attachment_eligibilities",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151",
+    "field": "transport_ability_present",
+    "current_source": false,
+    "native": false,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151",
+    "field": "default_wargear",
+    "current_source": [
+      "000001151:harvester-cannon",
+      "000001151:iron-claw",
+      "000001151:warpsword"
+    ],
+    "native": [
+      "000001151:harvester-cannon",
+      "000001151:iron-claw",
+      "000001151:warpsword"
+    ],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodthirster",
+    "field": "movement",
+    "current_source": 12,
+    "native": 12,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodthirster",
+    "field": "toughness",
+    "current_source": 11,
+    "native": 11,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodthirster",
+    "field": "save",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodthirster",
+    "field": "wounds",
+    "current_source": 18,
+    "native": 18,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodthirster",
+    "field": "leadership",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodthirster",
+    "field": "objective_control",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodthirster",
+    "field": "invulnerable_save",
+    "current_source": 4,
+    "native": 4,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodthirster",
+    "field": "base_mm",
+    "current_source": [
+      120,
+      92
+    ],
+    "native": [
+      120.0,
+      92.0
+    ],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodthirster",
+    "field": "height_evidence",
+    "current_source": "not measured in this audit",
+    "native": null,
+    "disposition": "geometry_record_absent",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Preserve existing geometry caveats; no official measured-height claim."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodthirster",
+    "field": "composition_min_max",
+    "current_source": [
+      1,
+      1
+    ],
+    "native": [
+      1,
+      1
+    ],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582",
+    "field": "ordinary_keywords",
+    "current_source": [
+      "BLOODTHIRSTER",
+      "CHAOS",
+      "CHARACTER",
+      "DAEMON",
+      "FLY",
+      "KHORNE",
+      "MONSTER"
+    ],
+    "native": [
+      "BLOODTHIRSTER",
+      "CHAOS",
+      "CHARACTER",
+      "DAEMON",
+      "FLY",
+      "KHORNE",
+      "MONSTER",
+      "SHADOW LEGION"
+    ],
+    "disposition": "confirmed_keyword_drift",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "SHADOW LEGION is conditional detachment ownership, absent from current ordinary keyword block. No off-detachment benefit demonstrated."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582",
+    "field": "faction_keywords",
+    "current_source": [
+      "LEGIONES DAEMONICA"
+    ],
+    "native": [
+      "LEGIONES DAEMONICA"
+    ],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Faction identity retained; current owning army provides context."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582",
+    "field": "attachment_eligibilities",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582",
+    "field": "transport_ability_present",
+    "current_source": false,
+    "native": false,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582",
+    "field": "default_wargear",
+    "current_source": [
+      "000002582:great-axe-of-khorne",
+      "000002582:hellfire-breath"
+    ],
+    "native": [
+      "000002582:great-axe-of-khorne",
+      "000002582:hellfire-breath"
+    ],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-chaos-with-wings",
+    "field": "movement",
+    "current_source": 12,
+    "native": 12,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-chaos-with-wings",
+    "field": "toughness",
+    "current_source": 9,
+    "native": 9,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-chaos-with-wings",
+    "field": "save",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-chaos-with-wings",
+    "field": "wounds",
+    "current_source": 10,
+    "native": 10,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-chaos-with-wings",
+    "field": "leadership",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-chaos-with-wings",
+    "field": "objective_control",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-chaos-with-wings",
+    "field": "invulnerable_save",
+    "current_source": 4,
+    "native": 4,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-chaos-with-wings",
+    "field": "base_mm",
+    "current_source": [
+      60
+    ],
+    "native": [
+      60.0
+    ],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-chaos-with-wings",
+    "field": "height_evidence",
+    "current_source": "not measured in this audit",
+    "native": {
+      "canonical_units": "inches",
+      "coordinate_frame": "model_centered_z_up",
+      "evidence_id": "000002758:daemon-prince-of-chaos-with-wings:height",
+      "height_inches": 5.5,
+      "origin": "footprint_center_table_surface",
+      "source_units": "inches"
+    },
+    "disposition": "retained_geometry_not_newly_certified",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Preserve existing geometry caveats; no official measured-height claim."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-chaos-with-wings",
+    "field": "composition_min_max",
+    "current_source": [
+      1,
+      1
+    ],
+    "native": [
+      1,
+      1
+    ],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758",
+    "field": "ordinary_keywords",
+    "current_source": [
+      "CHAOS",
+      "CHARACTER",
+      "DAEMON",
+      "DAEMON PRINCE OF CHAOS WITH WINGS",
+      "FLY",
+      "MONSTER"
+    ],
+    "native": [
+      "CHAOS",
+      "CHARACTER",
+      "DAEMON",
+      "DAEMON PRINCE OF CHAOS WITH WINGS",
+      "FLY",
+      "MONSTER",
+      "SHADOW LEGION"
+    ],
+    "disposition": "confirmed_keyword_drift",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "SHADOW LEGION is conditional detachment ownership, absent from current ordinary keyword block. No off-detachment benefit demonstrated."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758",
+    "field": "faction_keywords",
+    "current_source": [
+      "LEGIONES DAEMONICA"
+    ],
+    "native": [
+      "LEGIONES DAEMONICA"
+    ],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Faction identity retained; current owning army provides context."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758",
+    "field": "attachment_eligibilities",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758",
+    "field": "transport_ability_present",
+    "current_source": false,
+    "native": false,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758",
+    "field": "default_wargear",
+    "current_source": [
+      "000002758:hellforged-weapons",
+      "000002758:infernal-cannon"
+    ],
+    "native": [
+      "000002758:hellforged-weapons",
+      "000002758:infernal-cannon"
+    ],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:strike",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:strike",
+    "field": "attacks",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:strike",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:strike",
+    "field": "strength",
+    "current_source": 8,
+    "native": 8,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:strike",
+    "field": "AP",
+    "current_source": -2,
+    "native": -2,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:strike",
+    "field": "damage",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:strike",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:sweep",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:sweep",
+    "field": "attacks",
+    "current_source": 14,
+    "native": 14,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:sweep",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:sweep",
+    "field": "strength",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:sweep",
+    "field": "AP",
+    "current_source": 0,
+    "native": 0,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:sweep",
+    "field": "damage",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:hellforged-weapons:sweep",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:infernal-cannon:standard",
+    "field": "range",
+    "current_source": 24,
+    "native": 24,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:infernal-cannon:standard",
+    "field": "attacks",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:infernal-cannon:standard",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:infernal-cannon:standard",
+    "field": "strength",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:infernal-cannon:standard",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:infernal-cannon:standard",
+    "field": "damage",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:infernal-cannon:standard",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:harvester-cannon:standard",
+    "field": "range",
+    "current_source": 36,
+    "native": 36,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:harvester-cannon:standard",
+    "field": "attacks",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:harvester-cannon:standard",
+    "field": "skill",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:harvester-cannon:standard",
+    "field": "strength",
+    "current_source": 10,
+    "native": 10,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:harvester-cannon:standard",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:harvester-cannon:standard",
+    "field": "damage",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:harvester-cannon:standard",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:iron-claw:standard",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:iron-claw:standard",
+    "field": "attacks",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:iron-claw:standard",
+    "field": "skill",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:iron-claw:standard",
+    "field": "strength",
+    "current_source": 16,
+    "native": 16,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:iron-claw:standard",
+    "field": "AP",
+    "current_source": -3,
+    "native": -3,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:iron-claw:standard",
+    "field": "damage",
+    "current_source": "D6+2",
+    "native": "D6+2",
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:iron-claw:standard",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:phlegm-bombardment:standard",
+    "field": "range",
+    "current_source": 36,
+    "native": 36,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:phlegm-bombardment:standard",
+    "field": "attacks",
+    "current_source": "D6+1",
+    "native": "D6+1",
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:phlegm-bombardment:standard",
+    "field": "skill",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:phlegm-bombardment:standard",
+    "field": "strength",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:phlegm-bombardment:standard",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:phlegm-bombardment:standard",
+    "field": "damage",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:phlegm-bombardment:standard",
+    "field": "keywords",
+    "current_source": [
+      "Blast",
+      "Indirect Fire",
+      "Lethal Hits"
+    ],
+    "native": [
+      "Blast",
+      "Indirect Fire",
+      "Lethal Hits"
+    ],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:scream-of-despair:standard",
+    "field": "range",
+    "current_source": 24,
+    "native": 24,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:scream-of-despair:standard",
+    "field": "attacks",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:scream-of-despair:standard",
+    "field": "skill",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:scream-of-despair:standard",
+    "field": "strength",
+    "current_source": 9,
+    "native": 9,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:scream-of-despair:standard",
+    "field": "AP",
+    "current_source": -2,
+    "native": -2,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:scream-of-despair:standard",
+    "field": "damage",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:scream-of-despair:standard",
+    "field": "keywords",
+    "current_source": [
+      "Devastating Wounds",
+      "Sustained Hits"
+    ],
+    "native": [
+      "Devastating Wounds",
+      "Sustained Hits"
+    ],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:scream-of-despair:standard",
+    "field": "sustained_hits_parameters",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:torrent-of-burning-blood:standard",
+    "field": "range",
+    "current_source": 12,
+    "native": 12,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:torrent-of-burning-blood:standard",
+    "field": "attacks",
+    "current_source": "2D6",
+    "native": "2D6",
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:torrent-of-burning-blood:standard",
+    "field": "skill",
+    "current_source": 0,
+    "native": 0,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:torrent-of-burning-blood:standard",
+    "field": "strength",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:torrent-of-burning-blood:standard",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:torrent-of-burning-blood:standard",
+    "field": "damage",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:torrent-of-burning-blood:standard",
+    "field": "keywords",
+    "current_source": [
+      "Ignores Cover",
+      "Torrent"
+    ],
+    "native": [
+      "Ignores Cover",
+      "Torrent"
+    ],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:torrent-of-burning-blood:standard",
+    "field": "dash_skill_kind",
+    "current_source": "source_dash",
+    "native": "source_dash",
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warp-gaze:standard",
+    "field": "range",
+    "current_source": 48,
+    "native": 48,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warp-gaze:standard",
+    "field": "attacks",
+    "current_source": "D3",
+    "native": "D3",
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warp-gaze:standard",
+    "field": "skill",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warp-gaze:standard",
+    "field": "strength",
+    "current_source": 12,
+    "native": 12,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warp-gaze:standard",
+    "field": "AP",
+    "current_source": -2,
+    "native": -2,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warp-gaze:standard",
+    "field": "damage",
+    "current_source": "D6+2",
+    "native": "D6+2",
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warp-gaze:standard",
+    "field": "keywords",
+    "current_source": [
+      "Blast"
+    ],
+    "native": [
+      "Blast"
+    ],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpclaw:standard",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpclaw:standard",
+    "field": "attacks",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpclaw:standard",
+    "field": "skill",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpclaw:standard",
+    "field": "strength",
+    "current_source": 8,
+    "native": 8,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpclaw:standard",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpclaw:standard",
+    "field": "damage",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpclaw:standard",
+    "field": "keywords",
+    "current_source": [
+      "Extra Attacks"
+    ],
+    "native": [
+      "Extra Attacks"
+    ],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpsword:standard",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpsword:standard",
+    "field": "attacks",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpsword:standard",
+    "field": "skill",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpsword:standard",
+    "field": "strength",
+    "current_source": 8,
+    "native": 8,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpsword:standard",
+    "field": "AP",
+    "current_source": -2,
+    "native": -2,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpsword:standard",
+    "field": "damage",
+    "current_source": "D6",
+    "native": "D6",
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:warpsword:standard",
+    "field": "keywords",
+    "current_source": [
+      "Extra Attacks"
+    ],
+    "native": [
+      "Extra Attacks"
+    ],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:strike",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:strike",
+    "field": "attacks",
+    "current_source": 8,
+    "native": 8,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:strike",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:strike",
+    "field": "strength",
+    "current_source": 14,
+    "native": 14,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:strike",
+    "field": "AP",
+    "current_source": -4,
+    "native": -4,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:strike",
+    "field": "damage",
+    "current_source": "D3+1",
+    "native": "D3+1",
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:strike",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:sweep",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:sweep",
+    "field": "attacks",
+    "current_source": 16,
+    "native": 16,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:sweep",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:sweep",
+    "field": "strength",
+    "current_source": 8,
+    "native": 8,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:sweep",
+    "field": "AP",
+    "current_source": -2,
+    "native": -2,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:sweep",
+    "field": "damage",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:axe-of-khorne:sweep",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodflail:standard",
+    "field": "range",
+    "current_source": 12,
+    "native": 12,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodflail:standard",
+    "field": "attacks",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodflail:standard",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodflail:standard",
+    "field": "strength",
+    "current_source": 16,
+    "native": 16,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodflail:standard",
+    "field": "AP",
+    "current_source": -3,
+    "native": -3,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodflail:standard",
+    "field": "damage",
+    "current_source": "D6+1",
+    "native": "D6+1",
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:bloodflail:standard",
+    "field": "keywords",
+    "current_source": [
+      "Devastating Wounds"
+    ],
+    "native": [
+      "Devastating Wounds"
+    ],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:strike",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:strike",
+    "field": "attacks",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:strike",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:strike",
+    "field": "strength",
+    "current_source": 16,
+    "native": 16,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:strike",
+    "field": "AP",
+    "current_source": -4,
+    "native": -4,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:strike",
+    "field": "damage",
+    "current_source": "D6+2",
+    "native": "D6+2",
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:strike",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:sweep",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:sweep",
+    "field": "attacks",
+    "current_source": 14,
+    "native": 14,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:sweep",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:sweep",
+    "field": "strength",
+    "current_source": 10,
+    "native": 10,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:sweep",
+    "field": "AP",
+    "current_source": -2,
+    "native": -2,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:sweep",
+    "field": "damage",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:great-axe-of-khorne:sweep",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:hellfire-breath:standard",
+    "field": "range",
+    "current_source": 12,
+    "native": 12,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:hellfire-breath:standard",
+    "field": "attacks",
+    "current_source": "D6",
+    "native": "D6",
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:hellfire-breath:standard",
+    "field": "skill",
+    "current_source": 0,
+    "native": 0,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:hellfire-breath:standard",
+    "field": "strength",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:hellfire-breath:standard",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:hellfire-breath:standard",
+    "field": "damage",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:hellfire-breath:standard",
+    "field": "keywords",
+    "current_source": [
+      "Ignores Cover",
+      "Torrent"
+    ],
+    "native": [
+      "Ignores Cover",
+      "Torrent"
+    ],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:hellfire-breath:standard",
+    "field": "dash_skill_kind",
+    "current_source": "source_dash",
+    "native": "source_dash",
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:lash-of-khorne:standard",
+    "field": "range",
+    "current_source": 12,
+    "native": 12,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:lash-of-khorne:standard",
+    "field": "attacks",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:lash-of-khorne:standard",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:lash-of-khorne:standard",
+    "field": "strength",
+    "current_source": 8,
+    "native": 8,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:lash-of-khorne:standard",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:lash-of-khorne:standard",
+    "field": "damage",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:lash-of-khorne:standard",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:strike",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:strike",
+    "field": "attacks",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:strike",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:strike",
+    "field": "strength",
+    "current_source": 8,
+    "native": 8,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:strike",
+    "field": "AP",
+    "current_source": -2,
+    "native": -2,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:strike",
+    "field": "damage",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:strike",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:sweep",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:sweep",
+    "field": "attacks",
+    "current_source": 14,
+    "native": 14,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:sweep",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:sweep",
+    "field": "strength",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:sweep",
+    "field": "AP",
+    "current_source": 0,
+    "native": 0,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:sweep",
+    "field": "damage",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:hellforged-weapons:sweep",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:infernal-cannon:standard",
+    "field": "range",
+    "current_source": 24,
+    "native": 24,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:infernal-cannon:standard",
+    "field": "attacks",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:infernal-cannon:standard",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:infernal-cannon:standard",
+    "field": "strength",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:infernal-cannon:standard",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:infernal-cannon:standard",
+    "field": "damage",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:infernal-cannon:standard",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-khorne",
+    "field": "operative_ability_text",
+    "current_source": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model’s hellforged weapons.",
+    "native": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons.",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-nurgle",
+    "field": "operative_ability_text",
+    "current_source": "If this model has the NURGLE keyword, add 1 to this model’s Toughness characteristic.",
+    "native": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic.",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-slaanesh",
+    "field": "operative_ability_text",
+    "current_source": "If this model has the SLAANESH keyword, add 2\" to this model’s Move characteristic.",
+    "native": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic.",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemon-prince-of-tzeentch",
+    "field": "operative_ability_text",
+    "current_source": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model’s infernal cannon.",
+    "native": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon.",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemonic-allegiance",
+    "field": "allegiance_options",
+    "current_source": [
+      "KHORNE",
+      "TZEENTCH",
+      "NURGLE",
+      "SLAANESH"
+    ],
+    "native": [
+      "KHORNE",
+      "TZEENTCH",
+      "NURGLE",
+      "SLAANESH"
+    ],
+    "disposition": "agrees_semantics_presentation_diff",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Native Prince text includes overleaf reference; bullets and case differ; mandatory choice exercised by independent19-variant probe."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:daemonic-lord",
+    "field": "operative_ability_text",
+    "current_source": "While this model is within 3\" of one or more friendly LEGIONES DAEMONICA INFANTRY units, this model has the Lone Operative ability.",
+    "native": "While this model is within 3\" of one or more friendly Legiones Daemonica Infantry units, this model has the Lone Operative ability.",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:prince-of-darkness-aura",
+    "field": "operative_ability_text",
+    "current_source": "While a friendly LEGIONES DAEMONICA unit is within 6\" of this model, models in that unit have the Stealth ability.",
+    "native": "While a friendly Legiones Daemonica unit is within 6\" of this model, models in that unit have the Stealth ability.",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149:unholy-vigour",
+    "field": "operative_ability_text",
+    "current_source": "Once per battle, at the start of any phase, this model can use this ability. If it does, until the end of the phase, this model has a 3+ invulnerable save.",
+    "native": "Once per battle, at the start of any phase, this model can use this ability. If it does, until the end of the phase, this model has a 3+ invulnerable save.",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001149",
+    "owner": "000001149",
+    "field": "points_current_mfm",
+    "current_source": [
+      165
+    ],
+    "native": [
+      165
+    ],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-current.txt",
+    "limit": "Fresh App base+surcharge compared with separately sourced MFM metadata; no new MFM source pin."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:daemonic-allegiance",
+    "field": "allegiance_options",
+    "current_source": [
+      "KHORNE",
+      "TZEENTCH",
+      "NURGLE",
+      "SLAANESH"
+    ],
+    "native": [
+      "KHORNE",
+      "TZEENTCH",
+      "NURGLE",
+      "SLAANESH"
+    ],
+    "disposition": "agrees_semantics_presentation_diff",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Native Prince text includes overleaf reference; bullets and case differ; mandatory choice exercised by independent19-variant probe."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:scuttling-walker",
+    "field": "operative_ability_text",
+    "current_source": "Each time this model makes a Normal or Advance move, it can move over friendly MONSTER and VEHICLE models and terrain features that are 4\" or less in height as if they were not there.",
+    "native": "Each time this model makes a Normal or Advance move, it can move over friendly Monster and Vehicle models and terrain features that are 4\" or less in height as if they were not there.",
+    "disposition": "agrees_normalized",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:damaged:001",
+    "field": "wounds_min",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:damaged:001",
+    "field": "wounds_max",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151:damaged:001",
+    "field": "modifier",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000001151",
+    "owner": "000001151",
+    "field": "points_current_mfm",
+    "current_source": [
+      180,
+      195
+    ],
+    "native": [
+      180,
+      195
+    ],
+    "disposition": "agrees",
+    "source_capture": "soul-grinder-current.txt",
+    "limit": "Fresh App base+surcharge compared with separately sourced MFM metadata; no new MFM source pin."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:daemon-lord-of-khorne-aura",
+    "field": "operative_ability_text",
+    "current_source": "While a friendly KHORNE LEGIONES DAEMONICA unit is within 6\" of this model, each time a model in that unit makes a melee attack, add 1 to the Hit roll.",
+    "native": "While a friendly Khorne Legiones Daemonica unit is within 6\" of this model, each time a model in that unit makes a melee attack, add 1 to the Hit roll.",
+    "disposition": "agrees_normalized",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:greater-daemon-of-khorne-aura",
+    "field": "operative_ability_text",
+    "current_source": "While a friendly KHORNE LEGIONES DAEMONICA unit is within 6\" of this model, that unit is within your army’s Shadow of Chaos.",
+    "native": "While a friendly Khorne Legiones Daemonica unit is within 6\" of this model, that unit is within your army's Shadow of Chaos.",
+    "disposition": "agrees_normalized",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:relentless-carnage",
+    "field": "operative_ability_text",
+    "current_source": "At the end of the Fight phase, you can select one enemy unit within Engagement Range of this model and roll eight D6: for each 4+, that enemy unit suffers 1 mortal wound.",
+    "native": "At the end of the Fight phase, you can select one enemy unit within Engagement Range of this model and roll eight D6: for each 4+, that enemy unit suffers 1 mortal wound.",
+    "disposition": "agrees_normalized",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:damaged:001",
+    "field": "wounds_min",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:damaged:001",
+    "field": "wounds_max",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582:damaged:001",
+    "field": "modifier",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002582",
+    "owner": "000002582",
+    "field": "points_current_mfm",
+    "current_source": [
+      320,
+      335
+    ],
+    "native": [
+      320,
+      335
+    ],
+    "disposition": "agrees",
+    "source_capture": "bloodthirster-current.txt",
+    "limit": "Fresh App base+surcharge compared with separately sourced MFM metadata; no new MFM source pin."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-khorne",
+    "field": "operative_ability_text",
+    "current_source": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model’s hellforged weapons.",
+    "native": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons.",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-nurgle",
+    "field": "operative_ability_text",
+    "current_source": "If this model has the NURGLE keyword, add 1 to this model’s Toughness characteristic.",
+    "native": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic.",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-slaanesh",
+    "field": "operative_ability_text",
+    "current_source": "If this model has the SLAANESH keyword, add 2\" to this model’s Move characteristic.",
+    "native": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic.",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemon-prince-of-tzeentch",
+    "field": "operative_ability_text",
+    "current_source": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model’s infernal cannon.",
+    "native": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon.",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:daemonic-allegiance",
+    "field": "allegiance_options",
+    "current_source": [
+      "KHORNE",
+      "TZEENTCH",
+      "NURGLE",
+      "SLAANESH"
+    ],
+    "native": [
+      "KHORNE",
+      "TZEENTCH",
+      "NURGLE",
+      "SLAANESH"
+    ],
+    "disposition": "agrees_semantics_presentation_diff",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Native Prince text includes overleaf reference; bullets and case differ; mandatory choice exercised by independent19-variant probe."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:harbinger-of-death",
+    "field": "operative_ability_text",
+    "current_source": "Each time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model’s hellforged weapons have that ability:\n\n[LETHAL HITS]\n[PRECISION]\n[SUSTAINED HITS 1]",
+    "native": "Each time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model's hellforged weapons have that ability:\n- [LETHAL HITS]\n- [PRECISION]\n- [SUSTAINED HITS 1]",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758:malefic-destruction",
+    "field": "operative_ability_text",
+    "current_source": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model’s hellforged weapons.",
+    "native": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model's hellforged weapons.",
+    "disposition": "agrees_normalized",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Bounded source/native comparison, not full gameplay qualification."
+  },
+  {
+    "datasheet_id": "000002758",
+    "owner": "000002758",
+    "field": "points_current_mfm",
+    "current_source": [
+      190
+    ],
+    "native": [
+      190
+    ],
+    "disposition": "agrees",
+    "source_capture": "daemon-prince-wings-current.txt",
+    "limit": "Fresh App base+surcharge compared with separately sourced MFM metadata; no new MFM source pin."
+  }
+]

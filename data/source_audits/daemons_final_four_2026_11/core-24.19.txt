@@ -1,0 +1,4 @@
+24.19
+[INDIRECT FIRE]
+
+Units containing one or more models with an [INDIRECT FIRE] weapon can shoot using indirect shooting (10.07).

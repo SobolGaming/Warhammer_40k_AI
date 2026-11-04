@@ -1,0 +1,124 @@
+40K.APP
+FACTIONS
+CHAOS DAEMONS
+Daemon Prince of Chaos with Wings
+DATASHEET
+UPDATES
+MODELS
+M
+T
+SV
+W
+LD
+OC
+Daemon Prince of Chaos with Wings 60mm
+
+Invulnerable save: 4+
+
+12"
+9
+2+
+10
+6+
+3
+RANGED WEAPONS
+RNG
+A
+BS
+S
+AP
+D
+Infernal cannon
+24"
+3
+2+
+5
+-1
+2
+MELEE WEAPONS
+A
+WS
+S
+AP
+D
+➤ Hellforged weapons (strike)
+6
+2+
+8
+-2
+3
+➤ Hellforged weapons (sweep)
+14
+2+
+6
+0
+1
+KEYWORDS
+CHAOS
+CHARACTER
+DAEMON
+DAEMON PRINCE OF CHAOS WITH WINGS
+FLY
+MONSTER
+COSTS
+1 model
+190 pts
+UNIT COMPOSITION
+1 Daemon Prince of Chaos with Wings
+
+This model is equipped with: infernal cannon; hellforged weapons.
+
+CORE ABILITIES
+DEADLY DEMISE D3
+DEEP STRIKE
+FACTION ABILITIES
+THE SHADOW OF CHAOS
+UNIT ABILITIES
+Malefic Destruction
+
+Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model’s hellforged weapons.
+
+Harbinger of Death
+
+Each time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model’s hellforged weapons have that ability:
+
+[LETHAL HITS]
+[PRECISION]
+[SUSTAINED HITS 1]
+DAEMONIC ALLEGIANCE
+
+When you select this model to include in your army, you must select one of the following keywords for it to gain:
+
+KHORNE
+TZEENTCH
+NURGLE
+SLAANESH
+
+The keyword you select will also affect some of this model’s characteristics.
+
+Daemon Prince of Khorne: If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model’s hellforged weapons.
+
+Daemon Prince of Tzeentch: If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model’s infernal cannon.
+
+Daemon Prince of Nurgle: If this model has the NURGLE keyword, add 1 to this model’s Toughness characteristic.
+
+Daemon Prince of Slaanesh: If this model has the SLAANESH keyword, add 2" to this model’s Move characteristic.
+
+STATS
+16%
+of Chaos Daemons lists, 1.4 per list
+#17
+most-taken in faction
+23%
+from 9% since last update
+IN ARMY LISTS
+Popular detachments
+DAEMONIC INCURSION
+WARPTIDE
+BLOOD LEGION
+Often taken with
+BLOODLETTERS
+NURGLINGS
+SCREAMERS
+LORD OF CHANGE
+PINK HORRORS

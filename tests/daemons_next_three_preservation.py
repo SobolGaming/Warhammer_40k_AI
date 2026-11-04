@@ -30,6 +30,9 @@ def _hash(value: object) -> str:
 
 
 def before_daemons_next_three(package: CanonicalCatalogPackage) -> CanonicalCatalogPackage:
+    from tests.daemons_final_four_preservation import before_daemons_final_four
+
+    package = before_daemons_final_four(package)
     audit = daemons_audit("catalog-delta")
     if package.army_catalog.catalog_id != "chaos-daemons-bridge-catalog":
         assert package.package_hash() in audit["unchanged_counterparts"].values()
@@ -69,6 +72,9 @@ def before_daemons_next_three(package: CanonicalCatalogPackage) -> CanonicalCata
 
 
 def before_next_three_registry(value: dict[str, Any]) -> dict[str, Any]:
+    from tests.daemons_final_four_preservation import before_final_four_registry
+
+    value = before_final_four_registry(value)
     audit = daemons_audit("registry-delta")
     if _hash(value) == audit["prior_sha256"]:
         return value

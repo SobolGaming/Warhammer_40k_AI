@@ -215,6 +215,9 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
     require regeneration after moving a checkout.
     """
     from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        daemons_final_four_2026_11 as final_four,
+    )
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
         daemons_next_three_2026_11 as next_three,
     )
 
@@ -250,6 +253,7 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
                 Path(daemons_native.__file__).with_name(daemons_native.ARTIFACT_NAME),
                 Path(daemons_native.__file__).with_name(daemons_native.AUDIT_ARTIFACT_NAME),
                 Path(next_three.__file__).with_name(next_three.AUDIT_ARTIFACT_NAME),
+                Path(final_four.__file__).with_name(final_four.AUDIT_ARTIFACT_NAME),
                 rules / "source_authority_registry.json",
                 rules
                 / "source_packages"

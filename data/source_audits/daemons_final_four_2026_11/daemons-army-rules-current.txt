@@ -1,0 +1,39 @@
+40K.APP
+FACTIONS
+Chaos Daemons
+DATASHEETS
+ARMY RULES
+DETACHMENTS
+UPDATES
+CREATE LIST
+THE SHADOW OF CHAOS
+
+If your Army Faction is LEGIONES DAEMONICA, certain areas of the battlefield are considered to be within your army’s Shadow of Chaos, as follows:
+
+Your deployment zone is always within your army’s Shadow of Chaos.
+At the start of any phase, if you control at least half of the objective markers within No Man’s Land, until the end of that phase, No Man’s Land is within your army’s Shadow of Chaos.
+At the start of any phase, if you control at least half of the objective markers within your opponent’s deployment zone, until the end of that phase, your opponent’s deployment zone is within your army’s Shadow of Chaos.
+DAEMONIC MANIFESTATION
+
+While a friendly LEGIONES DAEMONICA unit is within your army’s Shadow of Chaos, each time that unit makes a battle-shock roll, that unit has +1 to that battle-shock roll and, if that roll is successful, one model in that unit heals D3 wounds (if that unit is a BATTLELINE unit and that roll is successful, up to D3 destroyed models (excluding CHARACTER models) can be returned to that unit instead).
+
+DAEMONIC TERROR
+
+While an enemy unit is within your army’s Shadow of Chaos and/or it is within 6" of one or more BLOODTHIRSTER, GREAT UNCLEAN ONE, KAIROS FATEWEAVER, KEEPER OF SECRETS, LORD OF CHANGE, ROTIGUS, SHALAXI HELBANE or SKARBRAND units from your army, each time that unit takes a Battle-shock test, subtract 1 from that test and, if that test is failed, that enemy unit suffers D3 mortal wounds.
+
+DAEMONIC PACT
+
+If every model from your army has the CHAOS KNIGHTS or HERETIC ASTARTES keyword, you can include LEGIONES DAEMONICA units in your army, even if they do not have the Faction keyword you selected in the Select Army Faction step. The combined points cost of such units you can include depends on your battle size, as shown below.
+
+Incursion - Up to 250 pts
+Strike Force - Up to 500 pts
+Onslaught - Up to 750 pts
+
+None of these models can be your WARLORD, and they cannot be given Enhancements.
+
+In addition, for each of the following keywords, the number of non-BATTLELINE units with that keyword you include in this way cannot be greater than the number of BATTLELINE units with that keyword you include in this way:
+
+KHORNE
+TZEENTCH
+NURGLE
+SLAANESH

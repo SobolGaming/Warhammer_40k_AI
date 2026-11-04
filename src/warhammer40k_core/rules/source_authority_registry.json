@@ -2187,6 +2187,46 @@
           "source_observation_sha256": "8981b3d2a29a0a29dcce2ca724c598dea9a04d80aebff134a6ad8e45f9f91e16",
           "identity_kind": "versioned_observation",
           "identity_value": "995@2026-11-04T07:13:59.087Z"
+        },
+        {
+          "audit_id": "daemons-final-four-app-mirror-2026-11-04",
+          "row_id": "daemons-final-four-2026-11-04:datasheet:bloodthirster",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/chaos-daemons/units/bloodthirster",
+          "source_observation_sha256": "417edfd9328259092d4e1a86aed4723d686eaefc76ae4a35d4864e46d52d95f1",
+          "identity_kind": "versioned_observation",
+          "identity_value": "995@2026-11-04T09:58:26.276Z"
+        },
+        {
+          "audit_id": "daemons-final-four-app-mirror-2026-11-04",
+          "row_id": "daemons-final-four-2026-11-04:datasheet:daemon-prince",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/chaos-daemons/units/daemon-prince-of-chaos",
+          "source_observation_sha256": "ad7bee3e555c993bf1d884ebd1d83e5203789fab357d81ce43742f11f5cadab8",
+          "identity_kind": "versioned_observation",
+          "identity_value": "995@2026-11-04T09:59:41.782Z"
+        },
+        {
+          "audit_id": "daemons-final-four-app-mirror-2026-11-04",
+          "row_id": "daemons-final-four-2026-11-04:datasheet:daemon-prince-wings",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/chaos-daemons/units/daemon-prince-of-chaos-with-wings",
+          "source_observation_sha256": "1a0b829089803cfd9338950253b3f10657d555d00b4fc036724b6128814b61a0",
+          "identity_kind": "versioned_observation",
+          "identity_value": "995@2026-11-04T09:59:54.219Z"
+        },
+        {
+          "audit_id": "daemons-final-four-app-mirror-2026-11-04",
+          "row_id": "daemons-final-four-2026-11-04:datasheet:soul-grinder",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/chaos-daemons/units/soul-grinder",
+          "source_observation_sha256": "dac21c5f1e477287e2710b12ad9efea6b5d263d1e545c9ac3b3355ed1e1f94ad",
+          "identity_kind": "versioned_observation",
+          "identity_value": "995@2026-11-04T10:01:40.759Z"
         }
       ],
       "legacy_observations": [],
@@ -2271,6 +2311,18 @@
             "faction-app:chaos-daemons:datasheet:plaguebearers"
           ],
           "catalog_sha256": "0c8d4e86183db267535505d978c8e71f17fab78c9a477128ad4a244b5a72378d"
+        },
+        {
+          "namespace": "core-v2-reviewed-app-mirror",
+          "package_name": "reviewed-daemons-final-four-observations-2026-11",
+          "version": "app-data-995-observed-2026-11-04",
+          "allowed_rule_source_ids": [
+            "faction-app:chaos-daemons:datasheet:bloodthirster",
+            "faction-app:chaos-daemons:datasheet:daemon-prince-of-chaos",
+            "faction-app:chaos-daemons:datasheet:daemon-prince-of-chaos-with-wings",
+            "faction-app:chaos-daemons:datasheet:soul-grinder"
+          ],
+          "catalog_sha256": "40b558ff79e238e144cc64436e1ce9fe74a90200c757c6d80b00832f93cdbadb"
         }
       ],
       "source_package_extensions": []

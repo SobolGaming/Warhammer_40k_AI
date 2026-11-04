@@ -1,0 +1,7 @@
+{
+  "fnv1a_utf16": "cc75fe9",
+  "length_utf16": 432,
+  "observed_utc": "2026-11-04T10:03:48.402Z",
+  "text": "24.23\n[LETHAL HITS]\n\nEach time an attack made with a [LETHAL HITS] weapon results in a critical hit, you can choose for that attack to automatically wound the target.\n\nDesigner’s Note: Choosing to automatically wound the target means that no wound roll is made for that attack. You may decide against this, as it means that attack cannot result in a critical wound and so cannot trigger other abilities such as [DEVASTATING WOUNDS].",
+  "url": "https://www.40k.app/rules/24-core-abilities#24.23"
+}

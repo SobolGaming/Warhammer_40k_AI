@@ -1,0 +1,69 @@
+{
+  "verdict": "ACCEPTED_BOUNDED_AUDIT_AND_CORRECTION_PLAN",
+  "reviewed_head": "912507cd2e6b705b054b55cf7c9c1a85e7d6dfe9",
+  "reviewed_tree": "00d7ab49a9e57e1032c2da70c9aa728c0b604166",
+  "clean_detached_checkout_verified": true,
+  "packet_manifest_sha256": "80c6136f8462bd8ef95aec0d5a50ba98c81b73daa81918c542aaa8bc5b1daaaa",
+  "packet_members": 64,
+  "packet_member_bytes": 600666,
+  "source_observations": 25,
+  "comparison_rows": 240,
+  "accepted_scope": "Exactly four ordinary SHADOW LEGION keyword removals through existing typed source correction; preserve conditional grant, Prince exclusion, other semantics, historical packages and geometry.",
+  "selected_ids": [
+    "000002582",
+    "000001149",
+    "000002758",
+    "000001151"
+  ],
+  "audit_blockers": [],
+  "confirmed_source_defect": {
+    "entry_path": "load_ability_support_sources -> current corrections -> _ability_support_catalog_package -> UnitFactory.instantiate_unit -> UnitInstance JSON -> real off-detachment grant kernel",
+    "impact": "All four canonical ordinary keyword lists and resulting native component payloads incorrectly contain SHADOW LEGION absent from current own-page KEYWORDS blocks.",
+    "normal_reachability": "Reproduced from freshly constructed canonical package and nineteen legal UnitMusterSelection loadout/allegiance variants, without modified historical state. Full native army admission and downstream combat consequence not established.",
+    "violated_acceptance": "Canonical native ordinary keywords must match complete current own source; conditional keywords belong to their existing supported detachment grant owner."
+  },
+  "independent_evidence": {
+    "native_package_sha256": "97081890392f560d7837bb42ccbfaf05787f2ba4fef1e1f97d2182ae05722fa5",
+    "parent_native_bytes_identical": true,
+    "variants": 19,
+    "bloodthirster": 3,
+    "prince": 4,
+    "winged_prince": 4,
+    "soul_grinder": 8,
+    "factory_and_json_roundtrips_pass": true,
+    "off_detachment_existing_keyword_reproduced": true,
+    "prince_exclusion_predicate_pass": true,
+    "source_receipts_verified": 25,
+    "ir_exact_native_payload_and_hash_joins": 16,
+    "ir_normalized_current_clause_matches": 13,
+    "ir_reviewed_presentation_only_allegiance_clauses": 3
+  },
+  "ledger": {
+    "component_rows": 60,
+    "component_own_page_unobserved": 0,
+    "component_unselected_unchanged": 56,
+    "component_declaration_certification_flags_unchanged": true,
+    "later_ir_rows": 93,
+    "later_ir_unselected_unchanged": 77,
+    "later_ir_remaining_unverified": 12,
+    "all_ir_hashes_unchanged": true,
+    "selected_execution_labels": "16 labels clarified from not_run to source_text_join_only_full_lifecycle_not_run; no execution certification promoted"
+  },
+  "limitations": [
+    "This verdict accepts source audit and correction scope only; it is not implementation, PR, CI, merge, performance or full-game certification.",
+    "Bloodthirster geometry remains blocked for unreviewed height; its Relentless Carnage parser/support diagnostic remains declared.",
+    "Existing accepted manual height records for the other three were not freshly measured or independently established as official.",
+    "Native package has no admitted detachments. Both Princes remain prohibited in Shadow Legion; direct grant-kernel calls do not establish legal muster.",
+    "Fourteen Core captures are parent sections; closed child/FAQ bodies are not complete dependency observations. Histories are observed collapsed rendering; global995 is not per-unit update date.",
+    "Shared Shadow of Chaos CHARACTER-exclusion prose debt and prior Plague Infected Outbreak prose debt remain separately queued."
+  ],
+  "required_implementation_evidence": [
+    "Exact four preimage removals and whole60 delta; standalone/paired package byte preservation.",
+    "All19 construction/JSON variants, off-detachment absence, conditional grant positive controls, Prince prohibition, prior keyword controls, invalid-preimage/duplicate/alias guards.",
+    "Frozen scope then complete applicable local/remote exact-head gates,65%full-package branch coverage, unchanged260deferrals, both types, quality/lint/contracts/index/package/source gates, serial smoke.",
+    "Independent coding review and distinct fresh parent audit on final implementation head; no silent scope expansion."
+  ],
+  "review_runtime_attestation": "Explicit gpt-6-astra/high selection coordinator-attested; resolved backend/effort not independently attested, unavailable1.5x not claimed.",
+  "operations": "Read-only repository review; evidence only in task workspace. No repository mutation, branch, PR or cleanup.",
+  "supersedes": "Provisional scope-review.txt statements about pending packet and unchanged93/28 ledger are superseded by this final exact16 source-only reconciliation."
+}

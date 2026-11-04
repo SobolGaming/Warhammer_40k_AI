@@ -453,10 +453,13 @@ def test_wave_frame_performance_scope_is_exact_and_preserves_policy_chain(
     # Authenticate this historical policy view before testing its unchanged pins.
     policy_path = ROOT / "tools/performance_policy.py"
     original_read_bytes = Path.read_bytes
+    from tools.performance_daemons_final import daemons_final_policy_predecessor
     from tools.performance_daemons_next import daemons_next_policy_predecessor
 
     predecessor = daemons_native_policy_predecessor(
-        daemons_next_policy_predecessor(original_read_bytes(policy_path))
+        daemons_next_policy_predecessor(
+            daemons_final_policy_predecessor(original_read_bytes(policy_path))
+        )
     )
 
     def historical_policy_bytes(path: Path) -> bytes:
@@ -543,6 +546,7 @@ def test_wave_frame_source_provenance_admission_is_exact() -> None:
 def test_daemons_native_performance_scope_is_exact_and_preserves_policy_chain(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from tools.performance_daemons_final import daemons_final_policy_predecessor
     from tools.performance_daemons_native import BASE as DAEMONS_BASE
     from tools.performance_daemons_native import (
         OPERATIONS,
@@ -554,7 +558,9 @@ def test_daemons_native_performance_scope_is_exact_and_preserves_policy_chain(
 
     policy_path = ROOT / "tools/performance_policy.py"
     original_read_bytes = Path.read_bytes
-    predecessor = daemons_next_policy_predecessor(original_read_bytes(policy_path))
+    predecessor = daemons_next_policy_predecessor(
+        daemons_final_policy_predecessor(original_read_bytes(policy_path))
+    )
 
     def historical_policy_bytes(path: Path) -> bytes:
         return predecessor if path == policy_path else original_read_bytes(path)
@@ -603,7 +609,10 @@ def test_daemons_native_performance_scope_is_exact_and_preserves_policy_chain(
     )
 
 
-def test_daemons_next_three_performance_scope_is_exact_and_preserves_policy_chain() -> None:
+def test_daemons_next_three_performance_scope_is_exact_and_preserves_policy_chain(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools.performance_daemons_final import daemons_final_policy_predecessor
     from tools.performance_daemons_next import BASE as NEXT_BASE
     from tools.performance_daemons_next import (
         OPERATIONS,
@@ -611,6 +620,15 @@ def test_daemons_next_three_performance_scope_is_exact_and_preserves_policy_chai
         daemons_next_smoke_operations,
     )
     from tools.performance_daemons_next import SCOPE as NEXT_SCOPE
+
+    policy_path = ROOT / "tools/performance_policy.py"
+    original_read_bytes = Path.read_bytes
+    predecessor = daemons_final_policy_predecessor(original_read_bytes(policy_path))
+
+    def historical_policy_bytes(path: Path) -> bytes:
+        return predecessor if path == policy_path else original_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", historical_policy_bytes)
 
     scope = read_object(ROOT / NEXT_SCOPE)
     for path, change in object_value(scope["changes"]).items():
@@ -666,6 +684,79 @@ def test_daemons_next_three_retained_capture_bytes_match_receipts() -> None:
     receipts = json.loads(raw)
     assert len(receipts) == 21
     assert len({row["file"] for row in receipts}) == 21
+    for row in receipts:
+        text_path = directory / row["file"]
+        assert text_path.name == row["file"]
+        text_bytes = text_path.read_bytes()
+        capture = text_path.with_suffix(".json").read_bytes()
+        assert hashlib.sha256(text_bytes).hexdigest() == row["sha256_utf8"]
+        assert hashlib.sha256(capture).hexdigest() == row["json_sha256"]
+        assert json.loads(capture)["text"].encode("utf-8") == text_bytes
+
+
+def test_daemons_final_four_performance_scope_is_exact_and_preserves_policy_chain() -> None:
+    from tools.performance_daemons_final import BASE as FINAL_BASE
+    from tools.performance_daemons_final import (
+        OPERATIONS,
+        daemons_final_policy_predecessor,
+        daemons_final_smoke_operations,
+    )
+    from tools.performance_daemons_final import SCOPE as FINAL_SCOPE
+
+    scope = read_object(ROOT / FINAL_SCOPE)
+    for path, change in object_value(scope["changes"]).items():
+        assert daemons_final_smoke_operations(
+            base=FINAL_BASE, path=path, category="rule_semantics", change=change
+        ) == frozenset({OPERATIONS[path]})
+        for base, selected, category in (
+            ("0" * 40, path, "rule_semantics"),
+            (FINAL_BASE, "tools/unreviewed.py", "rule_semantics"),
+            (FINAL_BASE, path, "algorithm_or_search"),
+            (FINAL_BASE, path, "cache_policy"),
+            (FINAL_BASE, path, "serialization_or_replay_work"),
+        ):
+            assert not daemons_final_smoke_operations(
+                base=base, path=selected, category=category, change=change
+            )
+        drift = copy.deepcopy(object_value(change))
+        drift["after_sha256"] = "0" * 64
+        assert not daemons_final_smoke_operations(
+            base=FINAL_BASE, path=path, category="rule_semantics", change=drift
+        )
+        drift = copy.deepcopy(object_value(change))
+        object_value(next(iter(object_value(drift["owners"]).values())))["after"] = "0" * 64
+        assert not daemons_final_smoke_operations(
+            base=FINAL_BASE, path=path, category="rule_semantics", change=drift
+        )
+    current = (ROOT / "tools/performance_policy.py").read_bytes()
+    before = subprocess.check_output(
+        ["git", "show", FINAL_BASE + ":tools/performance_policy.py"], cwd=ROOT
+    )
+    assert daemons_final_policy_predecessor(current) == before
+    assert daemons_final_policy_predecessor(before) == before
+    for policy_drift in (
+        current + b"\n",
+        current.replace(b"daemons_final_smoke_operations", b"other_operation"),
+    ):
+        with pytest.raises(ValueError, match="Daemons final-four"):
+            daemons_final_policy_predecessor(policy_drift)
+    assert policy.starfang_deep_strike_policy_predecessor(current) == subprocess.check_output(
+        ["git", "show", BASE + ":tools/performance_policy.py"], cwd=ROOT
+    )
+
+
+def test_daemons_final_four_retained_capture_bytes_match_receipts() -> None:
+    import hashlib
+    import json
+
+    directory = ROOT / "data/source_audits/daemons_final_four_2026_11"
+    raw = (directory / "source-capture-receipts.json").read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == (
+        "3da81bad73e6e8ef6655cff3f8961480a3980ae64d28b1d11fc983bb26e02536"
+    )
+    receipts = json.loads(raw)
+    assert len(receipts) == 25
+    assert len({row["file"] for row in receipts}) == 25
     for row in receipts:
         text_path = directory / row["file"]
         assert text_path.name == row["file"]

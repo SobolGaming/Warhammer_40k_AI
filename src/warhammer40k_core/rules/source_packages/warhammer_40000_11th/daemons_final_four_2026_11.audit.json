@@ -1,0 +1,191 @@
+{
+  "app_version": "995",
+  "audit_id": "daemons-final-four-app-mirror-2026-11-04",
+  "audit_schema": "core-v2-faction-source-audit-v2",
+  "edition": "warhammer_40000_11th",
+  "geometry_authority": {
+    "base_authority": "explicit_maintained_app_or_official_model_evidence",
+    "missing_data": "blocks_fieldability",
+    "variants": "exact_model_profile_and_variant_required",
+    "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+  },
+  "locale": "en",
+  "observations": [
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "2c1996c69e33ab79383eb927dd3264c970ba3b08e87ffe270faf03cbf1098af3",
+      "captured_text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nBloodthirster\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nBloodthirster 120 x 92mm Oval Base\n\nInvulnerable save: 4+\n\n12\"\n11\n3+\n18\n6+\n5\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nBloodflail\nDEVASTATING WOUNDS\n12\"\n1\n2+\n16\n-3\nD6+1\nHellfire breath\nIGNORES COVER\nTORRENT\n12\"\nD6\n-\n5\n-1\n1\nLash of Khorne\n12\"\n6\n2+\n8\n-1\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\n➤ Axe of Khorne (strike)\n8\n2+\n14\n-4\nD3+1\n➤ Axe of Khorne (sweep)\n16\n2+\n8\n-2\n1\n➤ Great axe of Khorne (strike)\n7\n2+\n16\n-4\nD6+2\n➤ Great axe of Khorne (sweep)\n14\n2+\n10\n-2\n2\nKEYWORDS\nBLOODTHIRSTER\nCHAOS\nCHARACTER\nDAEMON\nFLY\nKHORNE\nMONSTER\nCOSTS\n1 model\n320 pts\n3rd+ in your army\n+15 pts\nUNIT COMPOSITION\n1 Bloodthirster\n\nThis model is equipped with: hellfire breath; great axe of Khorne\n\nBecome a supporter and remove ads\nWARGEAR OPTIONS\nThis model’s great axe of Khorne can be replaced with 1 axe of Khorne and one of the following: ◦ 1 bloodflail ◦ 1 lash of Khorne\nCORE ABILITIES\nDEADLY DEMISE D6\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nDaemon Lord of Khorne\n\nWhile a friendly KHORNE LEGIONES DAEMONICA unit is within 6\" of this model, each time a model in that unit makes a melee attack, add 1 to the Hit roll.\n\nGreater Daemon of Khorne\n\nWhile a friendly KHORNE LEGIONES DAEMONICA unit is within 6\" of this model, that unit is within your army’s Shadow of Chaos.\n\nRelentless Carnage\n\nAt the end of the Fight phase, you can select one enemy unit within Engagement Range of this model and roll eight D6: for each 4+, that enemy unit suffers 1 mortal wound.\n\nDAMAGED: 1-6 WOUNDS REMAINING\n\nWhile this model has 1-6 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n24%\nof Chaos Daemons lists, 1.4 per list\n#8\nmost-taken in faction\n24%\nfrom 28% since last update\nIN ARMY LISTS\nPopular detachments\nBLOOD LEGION\nWARPTIDE\nSHADOW LEGION\nOften taken with\nBLOODLETTERS\nBLOODCRUSHERS\nFLESH HOUNDS\nBE’LAKOR\nSKULLMASTER",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "model_role": "Bloodthirster",
+          "base_statement": "Bloodthirster 120 x 92mm Oval Base",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "daemons-final-four-2026-11-04:datasheet:bloodthirster",
+      "observed_at": "2026-11-04T09:58:26.276Z",
+      "official_source_ids": [
+        "gw-11e-chaos-daemons-faction-pack-2026-07"
+      ],
+      "operative_start": "Bloodthirster\nDATASHEET",
+      "operative_text": "Bloodthirster\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nBloodthirster 120 x 92mm Oval Base\n\nInvulnerable save: 4+\n\n12\"\n11\n3+\n18\n6+\n5\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nBloodflail\nDEVASTATING WOUNDS\n12\"\n1\n2+\n16\n-3\nD6+1\nHellfire breath\nIGNORES COVER\nTORRENT\n12\"\nD6\n-\n5\n-1\n1\nLash of Khorne\n12\"\n6\n2+\n8\n-1\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\n➤ Axe of Khorne (strike)\n8\n2+\n14\n-4\nD3+1\n➤ Axe of Khorne (sweep)\n16\n2+\n8\n-2\n1\n➤ Great axe of Khorne (strike)\n7\n2+\n16\n-4\nD6+2\n➤ Great axe of Khorne (sweep)\n14\n2+\n10\n-2\n2\nKEYWORDS\nBLOODTHIRSTER\nCHAOS\nCHARACTER\nDAEMON\nFLY\nKHORNE\nMONSTER\nCOSTS\n1 model\n320 pts\n3rd+ in your army\n+15 pts\nUNIT COMPOSITION\n1 Bloodthirster\n\nThis model is equipped with: hellfire breath; great axe of Khorne\n\nBecome a supporter and remove ads\nWARGEAR OPTIONS\nThis model’s great axe of Khorne can be replaced with 1 axe of Khorne and one of the following: ◦ 1 bloodflail ◦ 1 lash of Khorne\nCORE ABILITIES\nDEADLY DEMISE D6\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nDaemon Lord of Khorne\n\nWhile a friendly KHORNE LEGIONES DAEMONICA unit is within 6\" of this model, each time a model in that unit makes a melee attack, add 1 to the Hit roll.\n\nGreater Daemon of Khorne\n\nWhile a friendly KHORNE LEGIONES DAEMONICA unit is within 6\" of this model, that unit is within your army’s Shadow of Chaos.\n\nRelentless Carnage\n\nAt the end of the Fight phase, you can select one enemy unit within Engagement Range of this model and roll eight D6: for each 4+, that enemy unit suffers 1 mortal wound.\n\nDAMAGED: 1-6 WOUNDS REMAINING\n\nWhile this model has 1-6 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n24%\nof Chaos Daemons lists, 1.4 per list\n#8\nmost-taken in faction\n24%\nfrom 28% since last update\nIN ARMY LISTS\nPopular detachments\nBLOOD LEGION\nWARPTIDE\nSHADOW LEGION\nOften taken with\nBLOODLETTERS\nBLOODCRUSHERS\nFLESH HOUNDS\nBE’LAKOR\nSKULLMASTER",
+      "owning_faction_source_id": "faction-app:chaos-daemons",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Four complete maintained unofficial App unit pages authorize only four ordinary SHADOW LEGION removals. Global 995 is context, not per-unit update date or official corroboration. Conditional Shadow Legion grant and both Prince prohibitions remain. Bloodthirster height/Relentless Carnage diagnostic and native admission remain Blocked; other heights are retained manual records, not newly measured. Core parent sections exclude closed child/FAQ bodies. No full-unit, physical admission, lifecycle or game certification.",
+      "source_id": "faction-app:chaos-daemons:datasheet:bloodthirster",
+      "source_observation_sha256": "417edfd9328259092d4e1a86aed4723d686eaefc76ae4a35d4864e46d52d95f1",
+      "source_title": "Bloodthirster",
+      "source_url": "https://www.40k.app/factions/chaos-daemons/units/bloodthirster",
+      "transcription_sha256": "25e234ad652f6bc593f5490ceffb6b14bd85170c8fe1703a0775137b38ac033c"
+    },
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "22de71460db6ee14d1cb8dad945e4f16809be8b683ac1e051599bf9d84916ab7",
+      "captured_text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nDaemon Prince of Chaos\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nDaemon Prince of Chaos 60mm\n\nInvulnerable save: 4+\n\n8\"\n10\n2+\n10\n6+\n3\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nInfernal cannon\n24\"\n3\n2+\n5\n-1\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\n➤ Hellforged weapons (strike)\n6\n2+\n8\n-2\n3\n➤ Hellforged weapons (sweep)\n14\n2+\n6\n0\n1\nKEYWORDS\nCHAOS\nCHARACTER\nDAEMON\nDAEMON PRINCE OF CHAOS\nMONSTER\nCOSTS\n1 model\n165 pts\nUNIT COMPOSITION\n1 Daemon Prince of Chaos\n\nThis model is equipped with: infernal cannon; hellforged weapons.\n\nCORE ABILITIES\nDEADLY DEMISE D3\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nDaemonic Lord\n\nWhile this model is within 3\" of one or more friendly LEGIONES DAEMONICA INFANTRY units, this model has the Lone Operative ability.\n\nPrince of Darkness\n\nWhile a friendly LEGIONES DAEMONICA unit is within 6\" of this model, models in that unit have the Stealth ability.\n\nUnholy Vigour\n\nOnce per battle, at the start of any phase, this model can use this ability. If it does, until the end of the phase, this model has a 3+ invulnerable save.\n\nDAEMONIC ALLEGIANCE\n\nWhen you select this model to include in your army, you must select one of the following keywords for it to gain:\n\nKHORNE\nTZEENTCH\nNURGLE\nSLAANESH\n\nThe keyword you select will also affect some of this model’s characteristics.\n\nDaemon Prince of Khorne: If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model’s hellforged weapons.\n\nDaemon Prince of Tzeentch: If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model’s infernal cannon.\n\nDaemon Prince of Nurgle: If this model has the NURGLE keyword, add 1 to this model’s Toughness characteristic.\n\nDaemon Prince of Slaanesh: If this model has the SLAANESH keyword, add 2\" to this model’s Move characteristic.\n\nSTATS\n7%\nof Chaos Daemons lists, 1.6 per list\n#37\nmost-taken in faction\n10%\nfrom 8% since last update\nIN ARMY LISTS\nPopular detachments\nWARPTIDE\nBLOOD LEGION\nDAEMONIC INCURSION\nOften taken with\nBLOODMASTER\nBLOODLETTERS\nNURGLINGS\nFLESH HOUNDS\nDAEMON PRINCE OF CHAOS WITH WINGS",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "model_role": "Daemon Prince of Chaos",
+          "base_statement": "Daemon Prince of Chaos 60mm",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "daemons-final-four-2026-11-04:datasheet:daemon-prince",
+      "observed_at": "2026-11-04T09:59:41.782Z",
+      "official_source_ids": [
+        "gw-11e-chaos-daemons-faction-pack-2026-07"
+      ],
+      "operative_start": "Daemon Prince of Chaos\nDATASHEET",
+      "operative_text": "Daemon Prince of Chaos\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nDaemon Prince of Chaos 60mm\n\nInvulnerable save: 4+\n\n8\"\n10\n2+\n10\n6+\n3\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nInfernal cannon\n24\"\n3\n2+\n5\n-1\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\n➤ Hellforged weapons (strike)\n6\n2+\n8\n-2\n3\n➤ Hellforged weapons (sweep)\n14\n2+\n6\n0\n1\nKEYWORDS\nCHAOS\nCHARACTER\nDAEMON\nDAEMON PRINCE OF CHAOS\nMONSTER\nCOSTS\n1 model\n165 pts\nUNIT COMPOSITION\n1 Daemon Prince of Chaos\n\nThis model is equipped with: infernal cannon; hellforged weapons.\n\nCORE ABILITIES\nDEADLY DEMISE D3\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nDaemonic Lord\n\nWhile this model is within 3\" of one or more friendly LEGIONES DAEMONICA INFANTRY units, this model has the Lone Operative ability.\n\nPrince of Darkness\n\nWhile a friendly LEGIONES DAEMONICA unit is within 6\" of this model, models in that unit have the Stealth ability.\n\nUnholy Vigour\n\nOnce per battle, at the start of any phase, this model can use this ability. If it does, until the end of the phase, this model has a 3+ invulnerable save.\n\nDAEMONIC ALLEGIANCE\n\nWhen you select this model to include in your army, you must select one of the following keywords for it to gain:\n\nKHORNE\nTZEENTCH\nNURGLE\nSLAANESH\n\nThe keyword you select will also affect some of this model’s characteristics.\n\nDaemon Prince of Khorne: If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model’s hellforged weapons.\n\nDaemon Prince of Tzeentch: If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model’s infernal cannon.\n\nDaemon Prince of Nurgle: If this model has the NURGLE keyword, add 1 to this model’s Toughness characteristic.\n\nDaemon Prince of Slaanesh: If this model has the SLAANESH keyword, add 2\" to this model’s Move characteristic.\n\nSTATS\n7%\nof Chaos Daemons lists, 1.6 per list\n#37\nmost-taken in faction\n10%\nfrom 8% since last update\nIN ARMY LISTS\nPopular detachments\nWARPTIDE\nBLOOD LEGION\nDAEMONIC INCURSION\nOften taken with\nBLOODMASTER\nBLOODLETTERS\nNURGLINGS\nFLESH HOUNDS\nDAEMON PRINCE OF CHAOS WITH WINGS",
+      "owning_faction_source_id": "faction-app:chaos-daemons",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Four complete maintained unofficial App unit pages authorize only four ordinary SHADOW LEGION removals. Global 995 is context, not per-unit update date or official corroboration. Conditional Shadow Legion grant and both Prince prohibitions remain. Bloodthirster height/Relentless Carnage diagnostic and native admission remain Blocked; other heights are retained manual records, not newly measured. Core parent sections exclude closed child/FAQ bodies. No full-unit, physical admission, lifecycle or game certification.",
+      "source_id": "faction-app:chaos-daemons:datasheet:daemon-prince-of-chaos",
+      "source_observation_sha256": "ad7bee3e555c993bf1d884ebd1d83e5203789fab357d81ce43742f11f5cadab8",
+      "source_title": "Daemon Prince of Chaos",
+      "source_url": "https://www.40k.app/factions/chaos-daemons/units/daemon-prince-of-chaos",
+      "transcription_sha256": "b02e02bbb7a5da7fe19f0ad1fb7c6f4b749876b9d4bcdc2b6bf008f4e85a5f21"
+    },
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "0e7e0bc6a3d8d2832b2d72395b12bbc7d163a4cdba843db0cf9c2245f289ea22",
+      "captured_text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nDaemon Prince of Chaos with Wings\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nDaemon Prince of Chaos with Wings 60mm\n\nInvulnerable save: 4+\n\n12\"\n9\n2+\n10\n6+\n3\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nInfernal cannon\n24\"\n3\n2+\n5\n-1\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\n➤ Hellforged weapons (strike)\n6\n2+\n8\n-2\n3\n➤ Hellforged weapons (sweep)\n14\n2+\n6\n0\n1\nKEYWORDS\nCHAOS\nCHARACTER\nDAEMON\nDAEMON PRINCE OF CHAOS WITH WINGS\nFLY\nMONSTER\nCOSTS\n1 model\n190 pts\nUNIT COMPOSITION\n1 Daemon Prince of Chaos with Wings\n\nThis model is equipped with: infernal cannon; hellforged weapons.\n\nCORE ABILITIES\nDEADLY DEMISE D3\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nMalefic Destruction\n\nOnce per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model’s hellforged weapons.\n\nHarbinger of Death\n\nEach time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model’s hellforged weapons have that ability:\n\n[LETHAL HITS]\n[PRECISION]\n[SUSTAINED HITS 1]\nDAEMONIC ALLEGIANCE\n\nWhen you select this model to include in your army, you must select one of the following keywords for it to gain:\n\nKHORNE\nTZEENTCH\nNURGLE\nSLAANESH\n\nThe keyword you select will also affect some of this model’s characteristics.\n\nDaemon Prince of Khorne: If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model’s hellforged weapons.\n\nDaemon Prince of Tzeentch: If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model’s infernal cannon.\n\nDaemon Prince of Nurgle: If this model has the NURGLE keyword, add 1 to this model’s Toughness characteristic.\n\nDaemon Prince of Slaanesh: If this model has the SLAANESH keyword, add 2\" to this model’s Move characteristic.\n\nSTATS\n16%\nof Chaos Daemons lists, 1.4 per list\n#17\nmost-taken in faction\n23%\nfrom 9% since last update\nIN ARMY LISTS\nPopular detachments\nDAEMONIC INCURSION\nWARPTIDE\nBLOOD LEGION\nOften taken with\nBLOODLETTERS\nNURGLINGS\nSCREAMERS\nLORD OF CHANGE\nPINK HORRORS",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "model_role": "Daemon Prince of Chaos with Wings",
+          "base_statement": "Daemon Prince of Chaos with Wings 60mm",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "daemons-final-four-2026-11-04:datasheet:daemon-prince-wings",
+      "observed_at": "2026-11-04T09:59:54.219Z",
+      "official_source_ids": [
+        "gw-11e-chaos-daemons-faction-pack-2026-07"
+      ],
+      "operative_start": "Daemon Prince of Chaos with Wings\nDATASHEET",
+      "operative_text": "Daemon Prince of Chaos with Wings\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nDaemon Prince of Chaos with Wings 60mm\n\nInvulnerable save: 4+\n\n12\"\n9\n2+\n10\n6+\n3\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nInfernal cannon\n24\"\n3\n2+\n5\n-1\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\n➤ Hellforged weapons (strike)\n6\n2+\n8\n-2\n3\n➤ Hellforged weapons (sweep)\n14\n2+\n6\n0\n1\nKEYWORDS\nCHAOS\nCHARACTER\nDAEMON\nDAEMON PRINCE OF CHAOS WITH WINGS\nFLY\nMONSTER\nCOSTS\n1 model\n190 pts\nUNIT COMPOSITION\n1 Daemon Prince of Chaos with Wings\n\nThis model is equipped with: infernal cannon; hellforged weapons.\n\nCORE ABILITIES\nDEADLY DEMISE D3\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nMalefic Destruction\n\nOnce per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model’s hellforged weapons.\n\nHarbinger of Death\n\nEach time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model’s hellforged weapons have that ability:\n\n[LETHAL HITS]\n[PRECISION]\n[SUSTAINED HITS 1]\nDAEMONIC ALLEGIANCE\n\nWhen you select this model to include in your army, you must select one of the following keywords for it to gain:\n\nKHORNE\nTZEENTCH\nNURGLE\nSLAANESH\n\nThe keyword you select will also affect some of this model’s characteristics.\n\nDaemon Prince of Khorne: If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model’s hellforged weapons.\n\nDaemon Prince of Tzeentch: If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model’s infernal cannon.\n\nDaemon Prince of Nurgle: If this model has the NURGLE keyword, add 1 to this model’s Toughness characteristic.\n\nDaemon Prince of Slaanesh: If this model has the SLAANESH keyword, add 2\" to this model’s Move characteristic.\n\nSTATS\n16%\nof Chaos Daemons lists, 1.4 per list\n#17\nmost-taken in faction\n23%\nfrom 9% since last update\nIN ARMY LISTS\nPopular detachments\nDAEMONIC INCURSION\nWARPTIDE\nBLOOD LEGION\nOften taken with\nBLOODLETTERS\nNURGLINGS\nSCREAMERS\nLORD OF CHANGE\nPINK HORRORS",
+      "owning_faction_source_id": "faction-app:chaos-daemons",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Four complete maintained unofficial App unit pages authorize only four ordinary SHADOW LEGION removals. Global 995 is context, not per-unit update date or official corroboration. Conditional Shadow Legion grant and both Prince prohibitions remain. Bloodthirster height/Relentless Carnage diagnostic and native admission remain Blocked; other heights are retained manual records, not newly measured. Core parent sections exclude closed child/FAQ bodies. No full-unit, physical admission, lifecycle or game certification.",
+      "source_id": "faction-app:chaos-daemons:datasheet:daemon-prince-of-chaos-with-wings",
+      "source_observation_sha256": "1a0b829089803cfd9338950253b3f10657d555d00b4fc036724b6128814b61a0",
+      "source_title": "Daemon Prince of Chaos with Wings",
+      "source_url": "https://www.40k.app/factions/chaos-daemons/units/daemon-prince-of-chaos-with-wings",
+      "transcription_sha256": "7f9fab26c689ab5f82da4ab5994894c362ce34736629bd1954cfe613e14b4515"
+    },
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "4c06623c00b6b6e955925bfd56ecabf59bf5de0cc636ea35c25f24f969d236fe",
+      "captured_text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nSoul Grinder\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nSoul Grinder 160mm\n\nInvulnerable save: 4+\n\n8\"\n11\n3+\n14\n7+\n5\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nHarvester cannon\n36\"\n3\n3+\n10\n-1\n3\nPhlegm bombardment\nBLAST\nINDIRECT FIRE\nLETHAL HITS\n36\"\nD6+1\n3+\n7\n-1\n2\nScream of despair\nDEVASTATING WOUNDS\nSUSTAINED HITS 1\n24\"\n6\n3+\n9\n-2\n2\nTorrent of burning blood\nIGNORES COVER\nTORRENT\n12\"\n2D6\n-\n5\n-1\n1\nWarp gaze\nBLAST\n48\"\nD3\n3+\n12\n-2\nD6+2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nIron claw\n5\n3+\n16\n-3\nD6+2\nWarpclaw\nEXTRA ATTACKS\n6\n3+\n8\n-1\n2\nWarpsword\nEXTRA ATTACKS\n3\n3+\n8\n-2\nD6\nKEYWORDS\nCHAOS\nDAEMON\nSOUL GRINDER\nVEHICLE\nWALKER\nCOSTS\n1 model\n180 pts\n3rd+ in your army\n+15 pts\nUNIT COMPOSITION\n1 Soul Grinder\n\nThis model is equipped with: harvester cannon; iron claw; warpsword.\n\nWARGEAR OPTIONS\nThis model’s warpsword can be replaced with 1 warpclaw.\nCORE ABILITIES\nDEADLY DEMISE D3\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nScuttling Walker\n\nEach time this model makes a Normal or Advance move, it can move over friendly MONSTER and VEHICLE models and terrain features that are 4\" or less in height as if they were not there.\n\nDAEMONIC ALLEGIANCE\n\nWhen you select this model to include in your army, you must select one of the keywords below. Until the end of the battle, this model has that keyword and the additional wargear stated for that keyword below.\n\nKHORNE - This model is additionally equipped with: torrent of burning blood\n\nTZEENTCH - This model is additionally equipped with: warp gaze\n\nNURGLE - This model is additionally equipped with: phlegm bombardment\n\nSLAANESH - This model is additionally equipped with: scream of despair\n\nDAMAGED: 1-5 WOUNDS REMAINING\n\nWhile this model has 1-5 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n11%\nof Chaos Daemons lists\n#27\nmost-taken in faction\n11%\nfrom 5% since last update\nIN ARMY LISTS\nPopular detachments\nWARPTIDE\nPLAGUE LEGION\nSCINTILLATING LEGION\nOften taken with\nPINK HORRORS\nNURGLINGS\nBEASTS OF NURGLE\nLORD OF CHANGE\nSCREAMERS",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "model_role": "Soul Grinder",
+          "base_statement": "Soul Grinder 160mm",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "daemons-final-four-2026-11-04:datasheet:soul-grinder",
+      "observed_at": "2026-11-04T10:01:40.759Z",
+      "official_source_ids": [
+        "gw-11e-chaos-daemons-faction-pack-2026-07"
+      ],
+      "operative_start": "Soul Grinder\nDATASHEET",
+      "operative_text": "Soul Grinder\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nSoul Grinder 160mm\n\nInvulnerable save: 4+\n\n8\"\n11\n3+\n14\n7+\n5\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nHarvester cannon\n36\"\n3\n3+\n10\n-1\n3\nPhlegm bombardment\nBLAST\nINDIRECT FIRE\nLETHAL HITS\n36\"\nD6+1\n3+\n7\n-1\n2\nScream of despair\nDEVASTATING WOUNDS\nSUSTAINED HITS 1\n24\"\n6\n3+\n9\n-2\n2\nTorrent of burning blood\nIGNORES COVER\nTORRENT\n12\"\n2D6\n-\n5\n-1\n1\nWarp gaze\nBLAST\n48\"\nD3\n3+\n12\n-2\nD6+2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nIron claw\n5\n3+\n16\n-3\nD6+2\nWarpclaw\nEXTRA ATTACKS\n6\n3+\n8\n-1\n2\nWarpsword\nEXTRA ATTACKS\n3\n3+\n8\n-2\nD6\nKEYWORDS\nCHAOS\nDAEMON\nSOUL GRINDER\nVEHICLE\nWALKER\nCOSTS\n1 model\n180 pts\n3rd+ in your army\n+15 pts\nUNIT COMPOSITION\n1 Soul Grinder\n\nThis model is equipped with: harvester cannon; iron claw; warpsword.\n\nWARGEAR OPTIONS\nThis model’s warpsword can be replaced with 1 warpclaw.\nCORE ABILITIES\nDEADLY DEMISE D3\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nScuttling Walker\n\nEach time this model makes a Normal or Advance move, it can move over friendly MONSTER and VEHICLE models and terrain features that are 4\" or less in height as if they were not there.\n\nDAEMONIC ALLEGIANCE\n\nWhen you select this model to include in your army, you must select one of the keywords below. Until the end of the battle, this model has that keyword and the additional wargear stated for that keyword below.\n\nKHORNE - This model is additionally equipped with: torrent of burning blood\n\nTZEENTCH - This model is additionally equipped with: warp gaze\n\nNURGLE - This model is additionally equipped with: phlegm bombardment\n\nSLAANESH - This model is additionally equipped with: scream of despair\n\nDAMAGED: 1-5 WOUNDS REMAINING\n\nWhile this model has 1-5 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n11%\nof Chaos Daemons lists\n#27\nmost-taken in faction\n11%\nfrom 5% since last update\nIN ARMY LISTS\nPopular detachments\nWARPTIDE\nPLAGUE LEGION\nSCINTILLATING LEGION\nOften taken with\nPINK HORRORS\nNURGLINGS\nBEASTS OF NURGLE\nLORD OF CHANGE\nSCREAMERS",
+      "owning_faction_source_id": "faction-app:chaos-daemons",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Four complete maintained unofficial App unit pages authorize only four ordinary SHADOW LEGION removals. Global 995 is context, not per-unit update date or official corroboration. Conditional Shadow Legion grant and both Prince prohibitions remain. Bloodthirster height/Relentless Carnage diagnostic and native admission remain Blocked; other heights are retained manual records, not newly measured. Core parent sections exclude closed child/FAQ bodies. No full-unit, physical admission, lifecycle or game certification.",
+      "source_id": "faction-app:chaos-daemons:datasheet:soul-grinder",
+      "source_observation_sha256": "dac21c5f1e477287e2710b12ad9efea6b5d263d1e545c9ac3b3355ed1e1f94ad",
+      "source_title": "Soul Grinder",
+      "source_url": "https://www.40k.app/factions/chaos-daemons/units/soul-grinder",
+      "transcription_sha256": "a2bf8e5667ca0414b96fcaba61c0e38a2eb3240c09ceb7d9cf2b30e102e610b9"
+    }
+  ],
+  "official_sources": [
+    {
+      "source_id": "gw-11e-chaos-daemons-faction-pack-2026-07",
+      "provider_name": "Games Workshop",
+      "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+      "source_date": "2026-07-22",
+      "artifact_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+      "sha256": "818f7ef144691b9eef6b3c5b5d0a39793690af5a958037b7055215e6675e6a2c",
+      "relationship": "historical_primary_not_current_corroboration"
+    }
+  ],
+  "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+  "selected_source_ids": [
+    "faction-app:chaos-daemons:datasheet:bloodthirster",
+    "faction-app:chaos-daemons:datasheet:daemon-prince-of-chaos",
+    "faction-app:chaos-daemons:datasheet:daemon-prince-of-chaos-with-wings",
+    "faction-app:chaos-daemons:datasheet:soul-grinder"
+  ],
+  "version_evidence": {
+    "source_url": "https://www.40k.app/factions/updates",
+    "observed_at": "2026-11-04T10:03:35.946Z",
+    "statement": "Version 995\nReleased 2026-10-16.",
+    "transcription_sha256": "e6efd2e9a45a208c455693a1855a929e4da0696bc206eaec403958bb45017b54"
+  }
+}

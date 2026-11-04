@@ -1,0 +1,20 @@
+40K.APP
+FACTIONS
+CHAOS DAEMONS
+Daemon Prince of Chaos with Wings
+DATASHEET
+UPDATES
+VERSION 931
+Released 2026-08-26
+Deadly Demise D3
+Ability Updated
+
+This ability always takes the form Deadly Demise X. Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6").
+
+Previous
+VERSION 867
+Released 2026-06-19
+Added to the faction
+Added
+Points cost
+190 pts
