@@ -13,7 +13,7 @@ def test_later_ir_twelve_complete_source_observations_are_pinned() -> None:
     raw = (AUDIT / "source-only-audit.json").read_bytes()
     assert (
         hashlib.sha256(raw).hexdigest()
-        == "083f2a0bcaa69383bcd8652672d0dae3cd6dd426b78e4a03391c82d95c276842"
+        == "7c5e971b0eca74f8dc39b871aaa543ad29ee8128fa9a579b985f95e878ec4a92"
     )
     audit = json.loads(raw)
     for name, expected in audit["files"].items():
@@ -49,7 +49,7 @@ def test_later_ir_only_two_icon_fight_owners_change() -> None:
         for row_id, record in package["records"].items()
     }
     assert set(preimages) <= records.keys()
-    changed = set()
+    changed: set[str] = set()
     for key, prior in preimages.items():
         current = records[key]
         if prior == current:

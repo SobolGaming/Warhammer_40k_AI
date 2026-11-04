@@ -24,6 +24,16 @@
         }
       }
     },
+    "ci/quality_shards/shard-4-modules.txt": {
+      "before_sha256": "a477aa442acd0d90fb90e4ef8b380a2b38ea84fc0c5c663d315c7c717361a6d3",
+      "after_sha256": "7cf1017f20b086efdf1aa59545405a1ee9d1070aade88f1d5d1808f0b6739a60",
+      "owners": {
+        "@document": {
+          "before": "a477aa442acd0d90fb90e4ef8b380a2b38ea84fc0c5c663d315c7c717361a6d3",
+          "after": "7cf1017f20b086efdf1aa59545405a1ee9d1070aade88f1d5d1808f0b6739a60"
+        }
+      }
+    },
     "ci/quality_shards/shard-4.txt": {
       "before_sha256": "e3ad703d79cc8dd615db953dd5158baf5f55ba845067f84b98debf250f7c50c3",
       "after_sha256": "ddc0b6891f407dfa3bf019809b7bf8103939e93a9c1385da7bf6421c4724c134",
@@ -524,6 +534,16 @@
         }
       }
     },
+    "data/source_audits/later_ir_icon_2026_11/inventory-owner-clarification.json": {
+      "before_sha256": null,
+      "after_sha256": "93ad49977c7d038c7c8a1ecf0bfbe633c91792b94702a362bc527450e828876d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "93ad49977c7d038c7c8a1ecf0bfbe633c91792b94702a362bc527450e828876d"
+        }
+      }
+    },
     "data/source_audits/later_ir_icon_2026_11/later-ir-residual-disposition.csv": {
       "before_sha256": null,
       "after_sha256": "e6d504e80d9eb5feb7930853e0cf761e96e3d501c227f69799c660b17616401e",
@@ -656,11 +676,11 @@
     },
     "data/source_audits/later_ir_icon_2026_11/source-only-audit.json": {
       "before_sha256": null,
-      "after_sha256": "083f2a0bcaa69383bcd8652672d0dae3cd6dd426b78e4a03391c82d95c276842",
+      "after_sha256": "7c5e971b0eca74f8dc39b871aaa543ad29ee8128fa9a579b985f95e878ec4a92",
       "owners": {
         "@document": {
           "before": null,
-          "after": "083f2a0bcaa69383bcd8652672d0dae3cd6dd426b78e4a03391c82d95c276842"
+          "after": "7c5e971b0eca74f8dc39b871aaa543ad29ee8128fa9a579b985f95e878ec4a92"
         }
       }
     },
@@ -736,11 +756,11 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "99f224a7d47611b671acc9d5f268e7a946f43a257676d513f918fc6d4cff5e53",
-      "after_sha256": "0ccc5c00b3d82a3176b4546c62ddbeb0ae9af9f3504cd1ca02f2c918b953eb15",
+      "after_sha256": "379a4e05f02efa7b939d6ce0405349eeb195ec517ea6e4ecf20ccb30f11e51a1",
       "owners": {
         "@document": {
           "before": "99f224a7d47611b671acc9d5f268e7a946f43a257676d513f918fc6d4cff5e53",
-          "after": "0ccc5c00b3d82a3176b4546c62ddbeb0ae9af9f3504cd1ca02f2c918b953eb15"
+          "after": "379a4e05f02efa7b939d6ce0405349eeb195ec517ea6e4ecf20ccb30f11e51a1"
         }
       }
     },
@@ -756,11 +776,11 @@
     },
     "docs/LATER_IR_ICON_PHASE_OWNER_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "b599ca0a22e702eb871d7b5e378290214ce5317cb16a44a3cfb1fd67697447e1",
+      "after_sha256": "f45a571f8a77277f88526eb5010900e16ce84483c305ebb8b99ba5226bcdef9e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b599ca0a22e702eb871d7b5e378290214ce5317cb16a44a3cfb1fd67697447e1"
+          "after": "f45a571f8a77277f88526eb5010900e16ce84483c305ebb8b99ba5226bcdef9e"
         }
       }
     },
@@ -876,7 +896,7 @@
     },
     "tests/code_quality/test_later_ir_icon_source.py": {
       "before_sha256": null,
-      "after_sha256": "13fc08ce082213f5ac8feac46733aea1dbf13c0f53de71049a6b730e9a587635",
+      "after_sha256": "e00de03ffa432d33ffbdc15d954062fc6b4c52d930c2fd3fc16f6e8049c79f99",
       "owners": {
         "@module": {
           "before": null,
@@ -884,11 +904,11 @@
         },
         "test_later_ir_only_two_icon_fight_owners_change": {
           "before": null,
-          "after": "bde254eca40dee7f6ac0d97be44dad62eb22813dae48dfcafaff15ba32709b7b"
+          "after": "c41989f09288e3e60fe85339631ae75555e99b5ef32b3fa463be2146201eb3a5"
         },
         "test_later_ir_twelve_complete_source_observations_are_pinned": {
           "before": null,
-          "after": "5ab71442c90d38edf84b3f0ee80fc560eb7c55f5f90081de98acd9c89afaf6b2"
+          "after": "e5781870d084614a2330d3ae0050ab6da492bb4a42d3d7d8bc8880d1edd48c59"
         },
         "test_later_ir_versioned_ledger_preserves_all_unselected_rows": {
           "before": null,
@@ -957,6 +977,14 @@
       "unchanged_work": "No algorithm, cache policy, serializer, event lookup or traversal change. Existing loops, native casualty attribution, Leadership and CP mutation/once owners remain. Serial current-runtime smoke and live semantic/index/cache gates are required; no detailed performance or full-game claim."
     },
     "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded twelve source-only observations and two IconFight owner corrections through existing shared CP validation/evaluation; derived identities and focused regressions.",
+      "source_obligation": "Your Shooting phase or the Fight phase: ownShooting remains active_player; both IconFight clauses use either_player, preserving recipient and physical/source destruction gates.",
+      "unchanged_work": "No algorithm, cache policy, serializer, event lookup or traversal change. Existing loops, native casualty attribution, Leadership and CP mutation/once owners remain. Serial current-runtime smoke and live semantic/index/cache gates are required; no detailed performance or full-game claim."
+    },
+    "ci/quality_shards/shard-4-modules.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -1453,6 +1481,16 @@
       "unchanged_work": "No algorithm, cache policy, serializer, event lookup or traversal change. Existing loops, native casualty attribution, Leadership and CP mutation/once owners remain. Serial current-runtime smoke and live semantic/index/cache gates are required; no detailed performance or full-game claim."
     },
     "data/source_audits/later_ir_icon_2026_11/horror-audit-report.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "later-ir-icon-exact-source-observations"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded twelve source-only observations and two IconFight owner corrections through existing shared CP validation/evaluation; derived identities and focused regressions.",
+      "source_obligation": "Your Shooting phase or the Fight phase: ownShooting remains active_player; both IconFight clauses use either_player, preserving recipient and physical/source destruction gates.",
+      "unchanged_work": "No algorithm, cache policy, serializer, event lookup or traversal change. Existing loops, native casualty attribution, Leadership and CP mutation/once owners remain. Serial current-runtime smoke and live semantic/index/cache gates are required; no detailed performance or full-game claim."
+    },
+    "data/source_audits/later_ir_icon_2026_11/inventory-owner-clarification.json": {
       "category": "rule_semantics",
       "operations": [
         "later-ir-icon-exact-source-observations"

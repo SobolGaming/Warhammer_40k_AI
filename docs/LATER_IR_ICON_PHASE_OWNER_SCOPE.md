@@ -5,7 +5,12 @@ The accepted bounded review and complete offline captures are retained in
 `data/source_audits/later_ir_icon_2026_11/`. The new source-only ledger observes
 exactly twelve previously unverified clauses: six exact and six presentation-only
 matches. All81 unselected rows and prior immutable ledgers remain unchanged.
-The27 source packages,60 native datasheets and93 later-IR records are preserved.
+The 22 component IR source packages, 93 later-IR records, 27 paired Court
+datasheet IDs and 60 native datasheets are preserved. The later
+[inventory clarification](../data/source_audits/later_ir_icon_2026_11/inventory-owner-clarification.json)
+corrects the frozen plan's inherited "27 source packages" label using each
+canonical owner. The original plan and accepted review remain unchanged; this
+clarification changes no rule, source admission or implementation scope.
 These observations do not promote any load, execution or certification flag.
 
 Emperor's Children Lord4078:4/:5, Tormentors4079:3/:4 and Infractors4080:3/:4

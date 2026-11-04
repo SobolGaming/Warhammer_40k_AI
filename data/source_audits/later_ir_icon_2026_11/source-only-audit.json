@@ -106,6 +106,10 @@
       "bytes": 4832,
       "sha256": "4e8e82551242eba2d4990aa3dfa64396787eab0f743ab1f9f5416297ca2f7240"
     },
+    "inventory-owner-clarification.json": {
+      "bytes": 4184,
+      "sha256": "93ad49977c7d038c7c8a1ecf0bfbe633c91792b94702a362bc527450e828876d"
+    },
     "later-ir-residual-disposition.csv": {
       "bytes": 47238,
       "sha256": "e6d504e80d9eb5feb7930853e0cf761e96e3d501c227f69799c660b17616401e"
@@ -188,13 +192,15 @@
     }
   },
   "inventories": {
+    "later_ir_component_source_packages": 22,
     "later_ir_rows": 93,
     "native_datasheets": 60,
+    "paired_court_datasheet_ids": 27,
     "selected": 12,
     "selected_unobserved": 0,
-    "source_packages": 27,
     "unselected_unchanged": 81
   },
+  "inventory_clarification": "The later addendum corrects an inherited label: 27 paired Court datasheet IDs, 22 component IR source packages/93 records, 60 native datasheets. Frozen plan and accepted review bytes remain historical and unchanged; no admission expands.",
   "limitations": [
     "No new load/execution/certification flag, Horror native admission, geometry or complete profile qualification.",
     "Chaos2583/2584 and ThousandSons4127/4128 are distinct variants; Scintillating Legions own pages resolved from retained Thousand Sons navigation.",
