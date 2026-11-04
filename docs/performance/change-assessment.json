@@ -106,11 +106,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "d0d29b0c89cb7ecff76b2826b5d67e0dfd0a1103849150135bd7392a1c398d0b",
-      "after_sha256": "f627a7dfcf8e2d31c9dd8a210f1afa58ea016ae15147eb357920fb680243b0ff",
+      "after_sha256": "0cff6d0945906f0dc14f53a486e3a3ca17738365a813e2774aa349bbbfa16e02",
       "owners": {
         "@document": {
           "before": "d0d29b0c89cb7ecff76b2826b5d67e0dfd0a1103849150135bd7392a1c398d0b",
-          "after": "f627a7dfcf8e2d31c9dd8a210f1afa58ea016ae15147eb357920fb680243b0ff"
+          "after": "0cff6d0945906f0dc14f53a486e3a3ca17738365a813e2774aa349bbbfa16e02"
         }
       }
     },
@@ -156,21 +156,21 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "778a216c785976ba7934cf2281adba301ee11192932e300fa17757a285cc87bb",
-      "after_sha256": "bc1b4cad3e8f5f5d0088b4bd892c02182fffe45c0626617ba17fbbad150eb86f",
+      "after_sha256": "77aa25a3dddfc5d8fe6449e6abed4dfb868d4d52b31c20540ec00eb2b8587224",
       "owners": {
         "@document": {
           "before": "778a216c785976ba7934cf2281adba301ee11192932e300fa17757a285cc87bb",
-          "after": "bc1b4cad3e8f5f5d0088b4bd892c02182fffe45c0626617ba17fbbad150eb86f"
+          "after": "77aa25a3dddfc5d8fe6449e6abed4dfb868d4d52b31c20540ec00eb2b8587224"
         }
       }
     },
     "docs/WAVE_SERPENT_FRAME_SOURCE_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "418a9309b5da937fddfc8f027a8a49ee4ad146401863c65d0b72e4b003b64ef4",
+      "after_sha256": "f36793db56495e077d592436bc15090ac24c4d98437eabc46de94bd573a586df",
       "owners": {
         "@document": {
           "before": null,
-          "after": "418a9309b5da937fddfc8f027a8a49ee4ad146401863c65d0b72e4b003b64ef4"
+          "after": "f36793db56495e077d592436bc15090ac24c4d98437eabc46de94bd573a586df"
         }
       }
     },
@@ -186,11 +186,11 @@
     },
     "docs/performance/policy-v3/wave-serpent-frame-smoke-scope.json": {
       "before_sha256": null,
-      "after_sha256": "7ef236eba98fbe91e01d7aa0c87e8dc363700bed651d911d1ba1b0a65bb25611",
+      "after_sha256": "23d493d3030edd4684340f077b9dcb9a97d86fc90b2744e1a85267986b6e1b5e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "7ef236eba98fbe91e01d7aa0c87e8dc363700bed651d911d1ba1b0a65bb25611"
+          "after": "23d493d3030edd4684340f077b9dcb9a97d86fc90b2744e1a85267986b6e1b5e"
         }
       }
     },
@@ -333,6 +333,40 @@
         "test_wave_serpent_frame_source_guards_and_exact_addition": {
           "before": null,
           "after": "f52861b341189704a2f84643b8a44be43dede905e37d1c442759b23ad87ff7c6"
+        }
+      }
+    },
+    "tests/rules/section18/coverage.json": {
+      "before_sha256": "7756037ea607e0d6d4d049d71dc3e5810bd91560e17be43c7284bc29641431cc",
+      "after_sha256": "cde59b060f81707da01097628c950c300ac0df0854a2f69159c8cb378eef9397",
+      "owners": {
+        "@document": {
+          "before": "7756037ea607e0d6d4d049d71dc3e5810bd91560e17be43c7284bc29641431cc",
+          "after": "cde59b060f81707da01097628c950c300ac0df0854a2f69159c8cb378eef9397"
+        }
+      }
+    },
+    "tests/rules/section18/test_embark.py": {
+      "before_sha256": "d148bcd98b7ee35af091d65ce1d4b1da49c7ede1aab56c0611923e4ab6a75cd2",
+      "after_sha256": "52a6932ef18fe93ae8fbba796aa9d0af79842884ed3cfd5c337aa13a15949261",
+      "owners": {
+        "test_embark_each_model_uses_actual_three_dimensional_three_inch_distance": {
+          "before": "3f73b23a57fa4c8955898e0b1cc1c5cc072030fd5dcb3b9f28707260b5dc29ab",
+          "after": "d4a715ba8bae730a7632c8fdae6ec34f1d29e966e990fe4df788ad00910fc037"
+        }
+      }
+    },
+    "tests/rules/section18/test_emergency_status.py": {
+      "before_sha256": "fd3db12da38f514cbbb9e4f100b104c149ccd053dfb7d57fab6d56021a7c65e2",
+      "after_sha256": "33d138d7535a91165197a066e0b9f6bac5ee757453175f57e7539a218ba80d1e",
+      "owners": {
+        "@module": {
+          "before": "7f3ef00ebe6c3030e0ad3547a1ca3c62a1cd31c5f35c6e6c2a8be69870e00ac4",
+          "after": "55698302febf5daceabf41b9eaa31989cede65ed4730c932d9c32bbab6f5ce16"
+        },
+        "test_native_emergency_survivors_become_actually_battle_shocked": {
+          "before": "ae286d1b724886d50e72584c4916cac8f3f6d7c1a08ac51457ded479e712219b",
+          "after": "4fbcb74c432a5f7641a4e6e7c3ec9704054d7c8787298ce09f976a295a01185a"
         }
       }
     },
@@ -500,7 +534,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "ci/quality_shards/shard-4.txt": {
       "category": "governance",
@@ -508,7 +542,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -518,7 +552,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -528,7 +562,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -538,7 +572,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -548,7 +582,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -558,7 +592,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -568,7 +602,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -578,7 +612,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -588,7 +622,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -598,7 +632,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "data/source_audits/wave_serpent_frame_2026_11/catalog-delta.json": {
       "category": "rule_semantics",
@@ -608,7 +642,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "data/source_audits/wave_serpent_frame_2026_11/provenance-delta.json": {
       "category": "rule_semantics",
@@ -618,7 +652,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "data/source_audits/wave_serpent_frame_2026_11/registry-delta.json": {
       "category": "rule_semantics",
@@ -628,7 +662,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "data/source_audits/wave_serpent_frame_2026_11/reviewed-observation.json": {
       "category": "rule_semantics",
@@ -638,7 +672,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
@@ -646,7 +680,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "docs/WAVE_SERPENT_FRAME_SOURCE_SCOPE.md": {
       "category": "governance",
@@ -654,7 +688,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
@@ -662,7 +696,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "docs/performance/policy-v3/wave-serpent-frame-smoke-scope.json": {
       "category": "governance",
@@ -670,7 +704,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -680,7 +714,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "src/warhammer40k_core/rules/faction_source_governance.py": {
       "category": "rule_semantics",
@@ -690,7 +724,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "src/warhammer40k_core/rules/source_authority_registry.json": {
       "category": "rule_semantics",
@@ -700,7 +734,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "src/warhammer40k_core/rules/source_authority_registry.py": {
       "category": "rule_semantics",
@@ -710,7 +744,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/wave_serpent_frame_2026_11.audit.json": {
       "category": "rule_semantics",
@@ -720,7 +754,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/wave_serpent_frame_2026_11.overlay-pack.json": {
       "category": "rule_semantics",
@@ -730,7 +764,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/wave_serpent_frame_2026_11.py": {
       "category": "rule_semantics",
@@ -740,7 +774,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "tests/code_quality/test_starfang_source_policy.py": {
       "category": "governance",
@@ -748,7 +782,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
       "category": "rule_semantics",
@@ -759,7 +793,39 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+    },
+    "tests/rules/section18/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-472204d42ddab990",
+        "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+    },
+    "tests/rules/section18/test_embark.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-09f8363b82bd0a28"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+    },
+    "tests/rules/section18/test_emergency_status.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-97ba81bb1395873b",
+        "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "tests/starfang_deep_strike_helpers.py": {
       "category": "rule_semantics",
@@ -769,7 +835,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "tests/support/acts_preservation.py": {
       "category": "rule_semantics",
@@ -780,7 +846,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "tests/wave_serpent_frame_helpers.py": {
       "category": "rule_semantics",
@@ -790,7 +856,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "tools/ability_support_sources.py": {
       "category": "rule_semantics",
@@ -802,7 +868,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "tools/build_wave_serpent_frame_source.py": {
       "category": "rule_semantics",
@@ -812,7 +878,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "tools/performance_policy.py": {
       "category": "rule_semantics",
@@ -824,7 +890,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "tools/performance_wave_frame.py": {
       "category": "governance",
@@ -832,7 +898,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     },
     "tools/source_scope_provenance.py": {
       "category": "rule_semantics",
@@ -843,7 +909,7 @@
       "selected_families": [],
       "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
       "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required."
+      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
     }
   },
   "milestone": "ordinary",

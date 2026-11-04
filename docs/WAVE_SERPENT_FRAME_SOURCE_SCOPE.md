@@ -37,6 +37,20 @@ FRAME controls retain synthetic identical-body forward/reverse evidence. Current
 native60mm and provisional2.75inch support geometry remain unchanged; the App's
 Large Flying Base is nonnumeric and real hull distances remain uncertified.
 
+The complete covered run at `908e8b64f9b2e2e70f0b17cfe0176a5d1fa2df15`
+exposed three stale fixture assumptions. Two embark negatives measured vertically
+from the ordinary base plane; their recorded FRAME-body distances are legal.
+The updated eight-case matrix retains those body-proximity positives and ground
+horizontal controls, plus exact vertical inclusion/outside and diagonal
+inside/outside above the existing recorded body. Ordinary-base epsilon controls
+remain unchanged. The native emergency fixture's original seed now fails its
+wound roll because FRAME changes the LOS context fingerprint in deterministic
+history. A verified current-source seed and explicit native hit/wound/save/hazard
+assertions restore the real destruction-to-placement-to-Battle-shock positive
+path, retaining all original aftermath assertions. Engine, RNG, geometry and
+transport mechanics are unchanged; existing persistence/replay controls remain.
+The failed aggregate remains failed pending fresh complete qualification.
+
 Malevolent Souls prose, native transport provider/weighted occupancy/eligibility,
 attachments and historical Bonesinger remain outside this correction. The broader
 transport gap blocks complete playability certification, not this bounded source
