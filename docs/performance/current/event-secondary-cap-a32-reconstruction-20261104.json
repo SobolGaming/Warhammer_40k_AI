@@ -1,0 +1,156 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "reconstruction",
+  "workload_id": "loaded-ingress-reconstruction-v1",
+  "base_revision": "16542feb7ab48cff852cc3dbe17aa76b292eb09f",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4ad18b22d2abe4a917318b04e200d577265d8b89568625f69bbe6a83093b5053",
+  "head_input_digest": "66facf636c3c407cccbb6ea608ef2754d2349ed9b56249ddc7c639a005a569bf",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f4d4a6c0e68be824d716e93d05bbfd2ff36340a3bcd11e174ca2649c23e41be8",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359395840,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "5e0787cba828b3717ddd07bb16b0c68926d77b9416eaac062e1199408f1beebf",
+    "fixture_sha256": "cd9ac6ba8ea4c79e2510c7f5c951066eec0fde8f115b854df3d918dac86da9bc",
+    "samples": {
+      "ingress/restore": [
+        1.0714826699999946,
+        1.1349230139999946,
+        1.0476323769999993,
+        1.1551291100000043,
+        1.0525815670000043,
+        1.1430266650000078,
+        1.0482526600000028
+      ],
+      "ingress/fork": [
+        1.1709838290000079,
+        1.0660088289999976,
+        1.171246447999991,
+        1.0823644200000047,
+        1.1664245629999925,
+        1.1635887449999984,
+        1.0776541600000087
+      ],
+      "rapid_disembark/restore": [
+        1.1820756340000003,
+        1.0908722960000148,
+        1.1898041190000015,
+        1.0991320210000026,
+        1.189045598000007,
+        1.0949498349999942,
+        1.093577348999986
+      ],
+      "rapid_disembark/fork": [
+        1.1236762390000195,
+        1.2106294570000102,
+        1.203517058999978,
+        1.1140359739999894,
+        1.2062985099999821,
+        1.1528008139999883,
+        1.162302896
+      ],
+      "later_decision/restore": [
+        1.244096844000012,
+        1.1542169569999885,
+        1.2450696150000056,
+        1.1464008219999755,
+        1.2771701069999892,
+        1.1386983000000157,
+        1.1406529690000013
+      ],
+      "later_decision/fork": [
+        1.1677718920000189,
+        1.2751486239999963,
+        1.2769784429999902,
+        1.176896269000025,
+        1.2890312010000002,
+        1.1939163009999731,
+        1.1708868629999927
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4ad18b22d2abe4a917318b04e200d577265d8b89568625f69bbe6a83093b5053",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359395840,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "5e0787cba828b3717ddd07bb16b0c68926d77b9416eaac062e1199408f1beebf",
+    "fixture_sha256": "cd9ac6ba8ea4c79e2510c7f5c951066eec0fde8f115b854df3d918dac86da9bc",
+    "samples": {
+      "ingress/restore": [
+        1.1391186910000215,
+        1.2014455599999962,
+        1.1107666149999886,
+        1.198930267999998,
+        1.0973834309999972,
+        1.1933527999999853,
+        1.1020420739999963
+      ],
+      "ingress/fork": [
+        1.1884906120000096,
+        1.0862132629999905,
+        1.1811397150000005,
+        1.0854114500000094,
+        1.170231742999988,
+        1.1721293150000065,
+        1.0730773550000094
+      ],
+      "rapid_disembark/restore": [
+        1.184963759999988,
+        1.0953722389999996,
+        1.186743746000019,
+        1.0978728169999954,
+        1.182920426999999,
+        1.0906397930000082,
+        1.0928537590000076
+      ],
+      "rapid_disembark/fork": [
+        1.1343800489999865,
+        1.2167899460000058,
+        1.2320288359999836,
+        1.1306679999999858,
+        1.2131710939999891,
+        1.1264676750000149,
+        1.110890291000004
+      ],
+      "later_decision/restore": [
+        1.1992151500000148,
+        1.1104410340000186,
+        1.2039622079999788,
+        1.1135551090000035,
+        1.1954073299999664,
+        1.0966199380000035,
+        1.10512060100001
+      ],
+      "later_decision/fork": [
+        1.1285486809999838,
+        1.2123609100000294,
+        1.228120937999961,
+        1.1207259759999602,
+        1.216930364999996,
+        1.1204678409999929,
+        1.1221327520000273
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": []
+}
