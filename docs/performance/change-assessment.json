@@ -146,11 +146,11 @@
     },
     "docs/performance/current/event-secondary-cap-a32-reconstruction-20261104.json": {
       "before_sha256": null,
-      "after_sha256": "8e5fac683ffd36115b7ba5b0817ccc61c8077606a8a64c0f8f5fc44c7a8def0c",
+      "after_sha256": "26c370198f2a3834aff41da6c04a49b90494fc9ecde589879b3772d1129310e1",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8e5fac683ffd36115b7ba5b0817ccc61c8077606a8a64c0f8f5fc44c7a8def0c"
+          "after": "26c370198f2a3834aff41da6c04a49b90494fc9ecde589879b3772d1129310e1"
         }
       }
     },
