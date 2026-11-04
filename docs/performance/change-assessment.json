@@ -458,6 +458,16 @@
         }
       }
     },
+    "tests/rules/section18/coverage.json": {
+      "before_sha256": "cde59b060f81707da01097628c950c300ac0df0854a2f69159c8cb378eef9397",
+      "after_sha256": "7802d76e1cc8da4dd5dfb2304155ebb16606e70da5b7fa343e4bd9c276b57e4c",
+      "owners": {
+        "@document": {
+          "before": "cde59b060f81707da01097628c950c300ac0df0854a2f69159c8cb378eef9397",
+          "after": "7802d76e1cc8da4dd5dfb2304155ebb16606e70da5b7fa343e4bd9c276b57e4c"
+        }
+      }
+    },
     "tests/rules/section18/test_facade.py": {
       "before_sha256": "2465f2e916ccbf7ea4e433bd6820874287e8dec38a226efb5ecb46f1cede64e3",
       "after_sha256": "043a4266f6e7cb557f8345724e6bedb8dcd85fb76fae7d1b1d92fbfa0b0f8bee",
@@ -1081,6 +1091,17 @@
       "category": "rule_semantics",
       "operations": [
         "ci-restructure-tests-infrastructure-missions-unit-test_step6g_secondary_certification.py"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "tests/rules/section18/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-472204d42ddab990",
+        "supported-ec-source-fixture-controls"
       ],
       "selected_families": [],
       "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
