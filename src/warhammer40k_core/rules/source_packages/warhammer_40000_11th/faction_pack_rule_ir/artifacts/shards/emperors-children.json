@@ -17,7 +17,7 @@
     "source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32"
   },
   "edition": 11,
-  "package_hash": "66fb9184b769035ff1afe283cd960f71d731c859c64a84e1fbd6392e5bf5280e",
+  "package_hash": "c9482ddac7bf053b5e65dd3dc6ffe47387550cfbdd0b508b134ca8cb6b8416f4",
   "shard_id": "emperors-children",
   "source_packages": {
     "40k-app-11e-emperors-children-sorcerer-2026-11-01": {
@@ -1360,7 +1360,7 @@
       ],
       "official_document_sha256": "1808fabb911f7a3e917ae5f2f12a6a7436ed97e1e5382238566dfd5e4540aa3c",
       "overlay_package_hash": "c8a36f8301ace9121e92418f48d47818c8bc9b64ede895a0b84556bfba5824bb",
-      "package_hash": "076824923ec39f2ce539c6e2dbd1c763143797c688fb36abebfd4104d8f38059",
+      "package_hash": "cc0549e37898f5935e2ee263c75a42643813d81e7ba6a0e2eeb6aeaf958275ab",
       "records": {
         "000004079:3": {
           "ability_name": "Objective Defiled",
@@ -1714,7 +1714,7 @@
                     },
                     {
                       "key": "owner",
-                      "value": "active_player"
+                      "value": "either_player"
                     },
                     {
                       "key": "phase",
@@ -1735,7 +1735,7 @@
               }
             ],
             "diagnostics": [],
-            "ir_hash": "c0353aae99491963228d2feb844cdecf080074eab588b8a1fbf565edbab07653",
+            "ir_hash": "6e412a43272b85baa6b769f9a0225442a978d7cd43ac0adeb5bddfbcd1706c9f",
             "normalized_text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP.",
             "parser_version": "manual-source-backed-rule-ir:v1",
             "rule_id": "phase17n:emperors-children:battleline:datasheet:000004079:4",
@@ -2055,7 +2055,7 @@
                     },
                     {
                       "key": "owner",
-                      "value": "active_player"
+                      "value": "either_player"
                     },
                     {
                       "key": "phase",
@@ -2076,7 +2076,7 @@
               }
             ],
             "diagnostics": [],
-            "ir_hash": "65227dbab2d999a1ad7c4b7b2b2bb4eedfa3a52d8f45f3a3cb891995fd7b5ef5",
+            "ir_hash": "deceaf1b6b786ba5d4f57e5dd871f5940f967496f760cb42dfa71fe12ad02869",
             "normalized_text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP.",
             "parser_version": "manual-source-backed-rule-ir:v1",
             "rule_id": "phase17n:emperors-children:battleline:datasheet:000004080:4",

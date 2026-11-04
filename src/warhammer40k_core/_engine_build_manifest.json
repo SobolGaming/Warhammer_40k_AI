@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:23cca6cf8cc3c4551bbe07b8056b899103a9f0194fbd2071a27293cab1579e26",
-  "fingerprint": "23cca6cf8cc3c4551bbe07b8056b899103a9f0194fbd2071a27293cab1579e26",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f4d4a6c0e68be824d716e93d05bbfd2ff36340a3bcd11e174ca2649c23e41be8",
+  "fingerprint": "f4d4a6c0e68be824d716e93d05bbfd2ff36340a3bcd11e174ca2649c23e41be8",
   "resource_count": 3210,
   "resources": [
     {
@@ -1290,14 +1290,14 @@
       "sha256": "86a27a646a44f44d4a2119d67641d0fc2c3b32fba157d64dd91d9e4457cbe75c"
     },
     {
-      "byte_length": 57527,
+      "byte_length": 57790,
       "path": "warhammer40k_core/engine/catalog_command_point_runtime.py",
-      "sha256": "2d26178a4ebde6509943a1c0e9e0468189f64109a177569c874fc39f4d916a56"
+      "sha256": "ba869a3b9daf4363a55603ceb45f617e539dddb9760f4aef981cbc53b9588dea"
     },
     {
-      "byte_length": 12526,
+      "byte_length": 12549,
       "path": "warhammer40k_core/engine/catalog_command_point_support.py",
-      "sha256": "73fd78aa4dac280ab97cb442d6fcac49d006498ae877d2cd20fe31b0b908b1da"
+      "sha256": "4ea5f08a7a9101f1a61ebfd71c735e79935d032ab3487e0601b83212f667926f"
     },
     {
       "byte_length": 10448,
@@ -14927,12 +14927,12 @@
     {
       "byte_length": 6911,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/__init__.py",
-      "sha256": "594e47de9e82bb047a432d8fadea4704b65476bbfa995ffabf6ed4d06b1960a9"
+      "sha256": "806ab7a6e9003a358377463fdf7f17e0a53c5b1d1c5ed03bb57e41ec9c1a059d"
     },
     {
       "byte_length": 869007,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/artifacts/catalog.json",
-      "sha256": "38f0f170e822d4a87b14aa026a3c5b85b816ae8ff1942a4ed9838717c6f7288a"
+      "sha256": "d5826dc5998918c2f96e9c13a0b4b4fcea635c2dabd744a7c1788953b47a2c80"
     },
     {
       "byte_length": 28113,
@@ -15167,17 +15167,17 @@
     {
       "byte_length": 14480,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/__init__.py",
-      "sha256": "41a559aa7081407f6752a9c2cc1afa372eb5e66e6c684702427e346a941e050e"
+      "sha256": "e0e0385b6f6d7d0ff550741b0e8f58548ba87478f5fd9e0af256e4aca22201ca"
     },
     {
       "byte_length": 45243,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/_artifacts.py",
-      "sha256": "2533d6497fef6cef30fe6e601ad694656efb86dba17d44ced01febbb9cc3b34a"
+      "sha256": "d8713371d7aa67bd1ca55290caf8e9741e94b7c3f5259c30b1ee1ac8cba83195"
     },
     {
       "byte_length": 6450,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/package.json",
-      "sha256": "40c54893dc57657104c74237f4cf877080b57ca367d9e08709d747362eabc0d9"
+      "sha256": "11cd609fb635d4b4cece6707f9bf6360cb4d5d8d4162b0e8f8125a02c6b5ee75"
     },
     {
       "byte_length": 254050,
@@ -15197,7 +15197,7 @@
     {
       "byte_length": 122881,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/emperors-children.json",
-      "sha256": "920fffd77f9209aad4b9c7024321d694ee1b1a15987a18f9e970b4a064d88e89"
+      "sha256": "e1e2359863fb66206a9b81a058ef972975a721c9a102277619277ee3d348eb5a"
     },
     {
       "byte_length": 19062,

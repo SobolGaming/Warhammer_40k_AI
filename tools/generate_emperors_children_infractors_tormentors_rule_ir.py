@@ -232,7 +232,7 @@ def _icon_of_excess_clause(
             source_span=_span(text, "At the end of your Shooting phase or the Fight phase"),
             parameters=_parameters(
                 ("edge", "end"),
-                ("owner", "active_player"),
+                ("owner", "either_player" if phase == "fight" else "active_player"),
                 ("phase", phase),
                 ("subject", "this_unit"),
             ),

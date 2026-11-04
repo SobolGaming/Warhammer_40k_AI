@@ -1,0 +1,165 @@
+40K.APP
+FACTIONS
+EMPEROR’S CHILDREN
+Lord Exultant
+DATASHEET
+UPDATES
+MODELS
+M
+T
+SV
+W
+LD
+OC
+Lord Exultant 40mm
+
+Invulnerable save: 4+
+
+7"
+5
+3+
+5
+6+
+1
+RANGED WEAPONS
+RNG
+A
+BS
+S
+AP
+D
+Bolt Pistol
+PISTOL
+12"
+1
+2+
+5
+-1
+1
+➤ Plasma pistol (standard)
+PISTOL
+12"
+1
+2+
+7
+-2
+1
+➤ Plasma pistol (supercharge)
+HAZARDOUS
+PISTOL
+12"
+1
+2+
+8
+-3
+2
+Screamer pistol
+IGNORES COVER
+PISTOL
+12"
+3
+2+
+5
+-1
+2
+MELEE WEAPONS
+A
+WS
+S
+AP
+D
+Close combat weapon
+6
+2+
+5
+0
+1
+Master-crafted power sword
+PRECISION
+5
+2+
+5
+-2
+2
+Phoenix power spear
+LANCE
+5
+2+
+7
+-2
+2
+Power fist
+5
+2+
+8
+-2
+2
+Rapture lash
+EXTRA ATTACKS
+4
+2+
+4
+-1
+1
+KEYWORDS
+CHAOS
+CHARACTER
+GRENADES
+INFANTRY
+LORD EXULTANT
+SLAANESH
+COSTS
+1 model
+95 pts
+3rd+ in your army
++10 pts
+UNIT COMPOSITION
+1 Lord Exultant
+
+This model is equipped with: bolt pistol; plasma pistol; Phoenix power spear; close combat weapon.
+
+Leads
+INFRACTORS
+TORMENTORS
+WARGEAR OPTIONS
+This model’s plasma pistol can be replaced with one of the following: ◦ 1 power fist ◦ 1 rapture lash
+This model’s Phoenix power spear can be replaced with one of the following: ◦ 1 master‑crafted power sword ◦ 1 screamer pistol
+CORE ABILITIES
+LEADER
+FACTION ABILITIES
+THRILL SEEKERS
+UNIT ABILITIES
+Perfectionists
+
+While this model is leading a unit, weapons equipped by models in that unit have the [LETHAL HITS] ability.
+
+Euphoric Strikes
+
+Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of melee weapons equipped by this model and improve the Armour Penetration characteristic of those weapons by 1.
+
+LORD OF THE HOST
+
+If this model is attached to an EMPEROR’S CHILDREN BATTLELINE unit during the Declare Battle Formations step, this model has the Infiltrators and Scouts 6" abilities.
+
+STATS
+70%
+of Emperor’s Children lists, 1.6 per list
+#2
+most-taken in faction
+76%
+from 62% since last update
+IN ARMY LISTS
+Popular detachments
+COURT OF THE PHOENICIAN
+SPECTACLE OF SLAUGHTER
+FRENZIED HOST
+Most often leads
+INFRACTORS
+TORMENTORS
+FLAWLESS BLADES
+Often taken with
+INFRACTORS
+FLAWLESS BLADES
+TORMENTORS
+NOISE MARINES
+LUCIUS THE ETERNAL

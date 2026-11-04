@@ -1531,3 +1531,273 @@ def test_sorcerer_original_rear_blocker_scene_completes_shooting_and_exact_repla
         session.replay_artifact(artifact_id="sorcerer-original-rear-blocker-scene")
     ).run()
     assert result.status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.parametrize("sheet", [INFRACTORS, TORMENTORS])
+@pytest.mark.parametrize("active", ["owner", "opponent"])
+def test_icon_native_either_players_fight_restores_real_destruction_boundary(
+    faction_definitions: Section02Definitions, sheet: str, active: str, tmp_path: Path
+) -> None:
+    from tests.support.faction_batch01 import Scene
+    from tests.support.faction_batch01_fight import fight_to_end
+    from warhammer40k_core.engine.command_points import CommandPointSourceKind
+    from warhammer40k_core.engine.decision_request import DecisionRequest
+
+    d = faction_definitions
+    s = scene(
+        d,
+        (selection(d, sheet, "infractors", equipment=("icon-of-excess",), full=True),),
+        (selection(d, RANGERS, "target"),),
+        phase=BattlePhase.FIGHT,
+        active=active,
+        seed=(
+            "faction-batch01-ec-fight-3"
+            if sheet == INFRACTORS and active == "opponent"
+            else "faction-batch01-ec-fight-2"
+        ),
+    )
+    unit, target = s.units["own:infractors"], s.units["foe:target"]
+    assert s.state.mission_setup is not None
+    marker = s.state.mission_setup.objective_markers[0]
+    locate(
+        s,
+        unit.unit_instance_id,
+        tuple(
+            Pose.at(
+                marker.x_inches - (3.2 if i % 2 == 0 else 1.8),
+                marker.y_inches - 2.8 + (i // 2) * 1.4,
+            )
+            for i in range(len(unit.own_models))
+        ),
+    )
+    locate(
+        s,
+        target.unit_instance_id,
+        tuple(Pose.at(marker.x_inches, marker.y_inches - 2.8 + i * 1.4) for i in range(5)),
+    )
+    anchor(s)
+    restored_boundaries: list[str] = []
+
+    def checkpoint(current: Scene, pending: DecisionRequest) -> None:
+        deaths = [
+            e
+            for e in events(current.session, "model_destroyed")
+            if e["target_unit_instance_id"] == target.unit_instance_id
+        ]
+        if len(deaths) != 5 or restored_boundaries:
+            return
+        # Real post-destruction pending combat choice, before the automatic test.
+        assert not events(current.session, "catalog_ir_command_point_leadership_test_resolved")
+        saved = json.loads(json.dumps(current.session.to_persistence_payload()))
+        restored = LocalGameSession.from_persistence_payload(saved)
+        assert restored.to_persistence_payload() == saved
+        assert restored.lifecycle.pending_decision_request() == pending
+        (tmp_path / "before-icon-phase-end.json").write_text(json.dumps(saved), encoding="utf-8")
+        assert (
+            ReplayRunner.from_payload(restored.replay_artifact(artifact_id="icon-before-end"))
+            .run()
+            .reproduced_exactly
+        )
+        current.session = restored
+        assert restored.lifecycle.state is not None
+        current.state = restored.lifecycle.state
+        restored_boundaries.append(pending.decision_type)
+
+    fight_to_end(s, checkpoint=checkpoint)
+    deaths = [
+        e
+        for e in events(s.session, "model_destroyed")
+        if e["target_unit_instance_id"] == target.unit_instance_id
+    ]
+    assert len(deaths) == 5
+    assert restored_boundaries
+    leadership = events(s.session, "catalog_ir_command_point_leadership_test_resolved")
+    assert len(leadership) == 1
+    result = leadership[0]
+    bearer = next(m for m in unit.own_models if f"{sheet}:icon-of-excess" in m.wargear_ids)
+    assert result["source_unit_instance_id"] == unit.unit_instance_id
+    assert result["source_model_instance_id"] == bearer.model_instance_id
+    assert f"{sheet}:4" in str(result["source_rule_id"])
+    assert result["leadership_target"] == 6
+    rolled = cast(dict[str, Any], result["leadership_roll"])
+    assert rolled["original_result"]["source"] == "rng"
+    assert result["passed"] is (rolled["current_total"] >= 6)
+    assert result["passed"] is True
+    transactions = s.state.command_point_ledger_for_player("owner").transactions
+    assert sum(
+        t.amount for t in transactions if t.source_kind is CommandPointSourceKind.OTHER
+    ) == int(bool(result["passed"]))
+    assert not [
+        t
+        for t in s.state.command_point_ledger_for_player("opponent").transactions
+        if t.source_kind is CommandPointSourceKind.OTHER
+    ]
+    saved = json.loads(json.dumps(s.session.to_persistence_payload()))
+    assert LocalGameSession.from_persistence_payload(saved).to_persistence_payload() == saved
+    assert (
+        ReplayRunner.from_payload(s.session.replay_artifact(artifact_id="icon-after-end"))
+        .run()
+        .reproduced_exactly
+    )
+    (tmp_path / "icon-result.json").write_text(json.dumps(result), encoding="utf-8")
+
+
+@pytest.mark.parametrize("sheet", [INFRACTORS, TORMENTORS])
+@pytest.mark.parametrize(
+    ("phase", "active", "gate", "expected"),
+    [
+        (BattlePhase.SHOOTING, "owner", "eligible", 1),
+        (BattlePhase.SHOOTING, "opponent", "eligible", 0),
+        (BattlePhase.FIGHT, "owner", "eligible", 1),
+        (BattlePhase.FIGHT, "opponent", "eligible", 1),
+        (BattlePhase.FIGHT, "opponent", "no_icon", 0),
+        (BattlePhase.FIGHT, "opponent", "dead_icon", 0),
+        (BattlePhase.FIGHT, "opponent", "partial_unit", 0),
+        (BattlePhase.FIGHT, "opponent", "wrong_unit", 0),
+        (BattlePhase.FIGHT, "opponent", "friendly_target", 0),
+        (BattlePhase.FIGHT, "opponent", "stale_phase", 0),
+        (BattlePhase.FIGHT, "opponent", "attached", 1),
+    ],
+)
+def test_icon_shared_phase_boundary_preserves_physical_and_destruction_gates(
+    faction_definitions: Section02Definitions,
+    sheet: str,
+    phase: BattlePhase,
+    active: str,
+    gate: str,
+    expected: int,
+) -> None:
+    from tests.support.faction_batch01 import casualty_checkpoint
+    from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+    from warhammer40k_core.engine.rule_model_destruction import destroy_model_with_rule_reactions
+    from warhammer40k_core.engine.rules_units import rules_unit_id_for_unit_id
+    from warhammer40k_core.engine.stratagems import stratagem_decline_payload
+
+    d = faction_definitions
+    s = scene(
+        d,
+        (
+            selection(d, sheet, "icon", equipment=() if gate == "no_icon" else ("icon-of-excess",)),
+            selection(d, sheet, "other"),
+            selection(d, LORD, "leader"),
+        ),
+        (selection(d, RANGERS, "target"),),
+        phase=BattlePhase.SHOOTING if gate == "stale_phase" else phase,
+        active=active,
+        attachments=(AttachmentDeclaration("leader", "icon"),) if gate == "attached" else (),
+        seed=f"icon-boundary:{sheet}:{phase.value}:{active}:{gate}",
+    )
+    icon = s.units["own:icon"]
+    if gate == "attached":
+        locate(s, "own:leader", (Pose.at(12.5, 15),))
+    anchor(s)
+    if gate == "dead_icon":
+        bearer = next(m for m in icon.own_models if f"{sheet}:icon-of-excess" in m.wargear_ids)
+        casualty_checkpoint(s, (bearer.model_instance_id,))
+    target = s.units["own:other" if gate == "friendly_target" else "foe:target"]
+    source_unit = s.units["own:other" if gate == "wrong_unit" else "own:icon"]
+    source_group = rules_unit_id_for_unit_id(
+        armies=tuple(s.state.army_definitions), unit_instance_id=source_unit.unit_instance_id
+    )
+    # Explicit shared rule-effect boundary, not a fabricated native Shooting
+    # ability or attack history. The destruction engine owns every casualty,
+    # provenance event and unit completion; native Fight attacks are tested above.
+    source_phase = s.state.current_battle_phase
+    assert source_phase is not None
+    for i, model in enumerate(
+        target.own_models[:1] if gate == "partial_unit" else target.own_models
+    ):
+        effect_id = f"constructed:icon-boundary:liability:{i}"
+        s.state.record_persisting_effect(
+            PersistingEffect(
+                effect_id=effect_id,
+                source_rule_id="constructed:icon-boundary",
+                owner_player_id="owner",
+                target_unit_instance_ids=(target.unit_instance_id,),
+                started_battle_round=s.state.battle_round,
+                started_phase=source_phase,
+                expiration=EffectExpiration.end_phase(
+                    battle_round=s.state.battle_round, phase=source_phase, player_id=active
+                ),
+                effect_payload={"effect_kind": "test_rule_destruction_liability"},
+            )
+        )
+        result = destroy_model_with_rule_reactions(
+            state=s.state,
+            decisions=s.session.lifecycle.decision_controller,
+            model_instance_id=model.model_instance_id,
+            rules_unit_instance_id=target.unit_instance_id,
+            destroying_player_id="owner",
+            source_rule_id="constructed:icon-boundary",
+            source_effect_ids=(effect_id,),
+            source_phase=source_phase,
+            source_step="icon_gate_control",
+            source_result_id=f"constructed:icon-boundary:{i}",
+            source_rules_unit_instance_id=source_group,
+            completion_event_type="icon_gate_control_completed",
+            completion_event_payload={"destroyed_model_instance_id": model.model_instance_id},
+        )
+        assert result.status is None
+    assert len(events(s.session, "model_destroyed")) == (
+        1 if gate == "partial_unit" else len(target.own_models)
+    )
+    # The stale-phase case traverses real Shooting/Charge completion before
+    # Fight; pending destruction may never be carried across a hand-edited phase.
+    traversed = (
+        (BattlePhase.SHOOTING, BattlePhase.CHARGE, BattlePhase.FIGHT)
+        if gate == "stale_phase"
+        else (phase,)
+    )
+    for i in range(16):
+        status = s.session.advance_until_decision_or_terminal()
+        assert status.status_kind not in {
+            LifecycleStatusKind.INVALID,
+            LifecycleStatusKind.UNSUPPORTED,
+        }
+        if s.state.current_battle_phase not in traversed:
+            break
+        r = request(status)
+        if r.decision_type == "select_coherency_casualty":
+            s.session.submit_option(
+                request_id=r.request_id,
+                option_id=r.options[0].option_id,
+                result_id=f"icon-boundary:coherency:{i}",
+            )
+        elif r.decision_type == "select_charging_unit":
+            s.session.submit_option(
+                request_id=r.request_id,
+                option_id="complete_charge_phase",
+                result_id=f"icon-boundary:charge:{i}",
+            )
+        elif r.decision_type == "submit_stratagem_target_proposal":
+            s.session.submit_parameterized_payload(
+                request_id=r.request_id,
+                result_id=f"icon-boundary:decline:{i}",
+                payload=stratagem_decline_payload(),
+            )
+        elif r.decision_type == "select_faction_rule_fight_phase_start_option":
+            choice = next(
+                o for o in r.options if cast(dict[str, Any], o.payload)["activate"] is False
+            )
+            s.session.submit_option(
+                request_id=r.request_id,
+                option_id=choice.option_id,
+                result_id=f"icon-boundary:lord:{i}",
+            )
+        else:
+            assert r.decision_type == "select_shooting_unit"
+            s.session.submit_option(
+                request_id=r.request_id,
+                option_id="complete_shooting_phase",
+                result_id=f"icon-boundary:end:{i}",
+            )
+    else:
+        pytest.fail("Bounded phase did not complete")
+    tests = events(s.session, "catalog_ir_command_point_leadership_test_resolved")
+    assert len(tests) == expected
+    if tests:
+        assert tests[0]["source_unit_instance_id"] == source_group
+        assert str(tests[0]["source_model_instance_id"]).startswith("own:icon:")
+    before = len(tests)
+    s.session.advance_until_decision_or_terminal()
+    assert len(events(s.session, "catalog_ir_command_point_leadership_test_resolved")) == before

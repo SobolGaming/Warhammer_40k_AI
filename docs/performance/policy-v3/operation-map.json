@@ -33304,6 +33304,63 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "later-ir-icon-exact-source-observations": {
+      "paths": [
+        "data/source_audits/later_ir_icon_2026_11/*"
+      ],
+      "owners": [
+        "@document",
+        "@text"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "later-ir-icon-exact-5833c81805361595": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_command_point_runtime.py"
+      ],
+      "owners": [
+        "CatalogCommandPointRuntime._phase_gain_targets"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "later-ir-icon-exact-43d80a5328081a25": {
+      "paths": [
+        "tests/factions/emperors_children/test_selected_consumers.py"
+      ],
+      "owners": [
+        "test_icon_native_either_players_fight_restores_real_destruction_boundary",
+        "test_icon_shared_phase_boundary_preserves_physical_and_destruction_gates"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "later-ir-icon-exact-f5a7877c6bc147f1": {
+      "paths": [
+        "tests/rules/section08/test_command_flow.py"
+      ],
+      "owners": [
+        "test_shared_cp_trigger_owner_validation_fails_closed"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "later-ir-icon-exact-b3ebf7e1db793ff0": {
+      "paths": [
+        "tools/generate_emperors_children_infractors_tormentors_rule_ir.py"
+      ],
+      "owners": [
+        "_icon_of_excess_clause"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

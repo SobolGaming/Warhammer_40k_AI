@@ -1,0 +1,12 @@
+40K.APP
+FACTIONS
+CHAOS DAEMONS
+Pink Horrors
+DATASHEET
+UPDATES
+VERSION 867
+Released 2026-06-19
+Added to the faction
+Added
+Points cost
+150 pts

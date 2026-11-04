@@ -1,0 +1,38 @@
+40K.APP
+FACTIONS
+EMPEROR’S CHILDREN
+Lord Exultant
+DATASHEET
+UPDATES
+VERSION 981
+Released 2026-10-14
+Lord Exultant
+Stats Changed
+STAT	WAS	NOW
+Toughness	4	5
+VERSION 963
+Released 2026-09-30
+Points changes
+1 model
+90 pts → 95 pts
+VERSION 931
+Released 2026-08-26
+Points changes
+1 model
+80 pts → 90 pts
+VERSION 875
+Released 2026-06-19
+Leader
+Rule Updated
+
+This model can be attached to the following units:
+
+INFRACTORS
+TORMENTORS
+Previous
+VERSION 867
+Released 2026-06-19
+Added to the faction
+Added
+Points cost
+80 pts

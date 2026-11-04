@@ -1954,27 +1954,6 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "46e313b74ae2d115b59a3cc9c825a04c4fd301d8c9e8974005a6e8bdc82c73e1",
-      "execution_statuses": [
-        "engine_consumed"
-      ],
-      "faction_ids": [
-        "emperors-children"
-      ],
-      "group_id": "semantic-equivalence:46e313b74ae2d115b59a3cc9c825a04c4fd301d8c9e8974005a6e8bdc82c73e1",
-      "member_ids": [
-        "datasheet-ability:000004079:4",
-        "datasheet-ability:000004080:4"
-      ],
-      "rules_surface": "wargear",
-      "runtime_consumer_ids": [
-        "catalog-ir:command-point-gain"
-      ],
-      "support_transfer": "content_neutral_generic_ir"
-    },
-    {
-      "content_kind": "datasheet_ability",
       "equivalence_basis": "exact_normalized_text",
       "equivalence_hash": "46e5c013eae1a3c77f7616b4629ad535ecfd79a1961e75636ea5c43cf21520b4",
       "execution_statuses": [
@@ -2546,6 +2525,27 @@
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [],
       "support_transfer": "none"
+    },
+    {
+      "content_kind": "datasheet_ability",
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "58a2f45212c697f8c3e8e524cc80dc9b1b62469fd92d28d80136f4e07e39c724",
+      "execution_statuses": [
+        "engine_consumed"
+      ],
+      "faction_ids": [
+        "emperors-children"
+      ],
+      "group_id": "semantic-equivalence:58a2f45212c697f8c3e8e524cc80dc9b1b62469fd92d28d80136f4e07e39c724",
+      "member_ids": [
+        "datasheet-ability:000004079:4",
+        "datasheet-ability:000004080:4"
+      ],
+      "rules_surface": "wargear",
+      "runtime_consumer_ids": [
+        "catalog-ir:command-point-gain"
+      ],
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -56933,7 +56933,7 @@
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "46e313b74ae2d115b59a3cc9c825a04c4fd301d8c9e8974005a6e8bdc82c73e1",
+      "equivalence_hash": "58a2f45212c697f8c3e8e524cc80dc9b1b62469fd92d28d80136f4e07e39c724",
       "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
@@ -56948,7 +56948,7 @@
         "catalog-ir:command-point-gain"
       ],
       "semantic_context_hash": "7b3b9ac81e8844a8727c61ffe130fcb9e838c7367d49dc67c37e64c90299f83f",
-      "semantic_hash": "ab0440bfca3149a7e7814afaf67d02dba987eed108eaa5fe9057167aaf859e34",
+      "semantic_hash": "424ae94db88e30a7776f52b40b87f6b3b54ad4e0869549f67131b047c03c02b7",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004079:4"
       ],
@@ -56989,7 +56989,7 @@
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "46e313b74ae2d115b59a3cc9c825a04c4fd301d8c9e8974005a6e8bdc82c73e1",
+      "equivalence_hash": "58a2f45212c697f8c3e8e524cc80dc9b1b62469fd92d28d80136f4e07e39c724",
       "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
@@ -57004,7 +57004,7 @@
         "catalog-ir:command-point-gain"
       ],
       "semantic_context_hash": "7b3b9ac81e8844a8727c61ffe130fcb9e838c7367d49dc67c37e64c90299f83f",
-      "semantic_hash": "ab0440bfca3149a7e7814afaf67d02dba987eed108eaa5fe9057167aaf859e34",
+      "semantic_hash": "424ae94db88e30a7776f52b40b87f6b3b54ad4e0869549f67131b047c03c02b7",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004080:4"
       ],
@@ -121989,7 +121989,7 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "af145c00446eba18cb6daff98fb69f41a94a7db124682215c9ce4bf50ee50788",
+  "source_payload_checksum_sha256": "ff26dbec8d5808a9c676d65c9a8e9de68027e8fb3fb83543076895994045d025",
   "source_text_unavailable_member_count": 111,
   "structured_member_count": 808,
   "upstream_execution_checksum_sha256": "6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c"

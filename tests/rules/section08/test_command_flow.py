@@ -185,3 +185,41 @@ def test_command_body_guard_rejects_early_or_wrong_phase_then_valid_boundary_wor
     )
     window = command_abilities_window(state)
     assert window.descriptor.source_rule_id == "rule:08:08.04:1"
+
+
+@pytest.mark.parametrize("edge", ["start", "end", "during"])
+@pytest.mark.parametrize(
+    "owner",
+    ["active_player", "either_player", "opponent", "unknown", None, True, ("active_player",)],
+)
+def test_shared_cp_trigger_owner_validation_fails_closed(
+    edge: str, owner: str | bool | tuple[str, ...] | None
+) -> None:
+    from warhammer40k_core.engine.catalog_command_point_support import (
+        clause_is_supported_phase_command_point_gain,
+    )
+    from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+    from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+    from warhammer40k_core.rules.rule_ir import RuleParameter
+    from warhammer40k_core.rules.source_data import RuleSourceText
+
+    rule = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="constructed:cp-owner-validation",
+            raw_text=(
+                "At the start of your Command phase, "
+                "if this model is on the battlefield, you gain 1CP."
+            ),
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
+        ),
+        source_keyword_sequence_parts=("CHARACTER", "INFANTRY"),
+    ).rule_ir
+    clause = rule.clauses[0]
+    assert clause.trigger is not None
+    assert clause_is_supported_phase_command_point_gain(clause)
+    parameters = (RuleParameter("edge", edge), RuleParameter("phase", "command"))
+    if owner is not None:
+        parameters += (RuleParameter("owner", owner),)
+    candidate = replace(clause, trigger=replace(clause.trigger, parameters=parameters))
+    expected = owner == "active_player" or (owner == "either_player" and edge != "during")
+    assert clause_is_supported_phase_command_point_gain(candidate) is expected

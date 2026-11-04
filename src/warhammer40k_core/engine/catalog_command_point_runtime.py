@@ -504,8 +504,12 @@ class CatalogCommandPointRuntime:
     ) -> tuple[tuple[UnitInstance, str], ...]:
         if type(context) is not RuntimeContentEventContext:
             raise GameLifecycleError("Catalog CP phase runtime requires context.")
-        if context.event.active_player_id != source.owner_player_id:
-            return ()
+        owner = parameter_payload(_required_trigger(source.clause).parameters).get("owner")
+        if owner == "active_player":
+            if context.event.active_player_id != source.owner_player_id:
+                return ()
+        elif owner != "either_player":
+            raise GameLifecycleError("Catalog CP phase trigger owner is unsupported.")
         targets: list[tuple[UnitInstance, str]] = []
         army = _army_for_player(self.armies, player_id=source.owner_player_id)
         for unit in army.units:
