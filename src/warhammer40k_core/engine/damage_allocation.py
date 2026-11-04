@@ -51,10 +51,10 @@ from warhammer40k_core.engine.damage_allocation_validation import (
     validate_non_negative_int as _validate_non_negative_int,
 )
 from warhammer40k_core.engine.damage_allocation_validation import (
-    validate_optional_identifier as _validate_optional_identifier,
+    validate_optional_effective_save_characteristic as _validate_effective_save_characteristic,
 )
 from warhammer40k_core.engine.damage_allocation_validation import (
-    validate_optional_save as _validate_optional_save,
+    validate_optional_identifier as _validate_optional_identifier,
 )
 from warhammer40k_core.engine.damage_allocation_validation import (
     validate_ordered_identifier_tuple as _validate_ordered_identifier_tuple,
@@ -632,12 +632,12 @@ class AllocationGroup:
         object.__setattr__(
             self,
             "save",
-            _validate_optional_save("AllocationGroup save", self.save),
+            _validate_effective_save_characteristic("AllocationGroup save", self.save),
         )
         object.__setattr__(
             self,
             "invulnerable_save",
-            _validate_optional_save(
+            _validate_effective_save_characteristic(
                 "AllocationGroup invulnerable_save",
                 self.invulnerable_save,
             ),

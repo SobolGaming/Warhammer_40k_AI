@@ -1,592 +1,290 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "2a40dfc44954ed1758876dfe8502a23db9da1fb8",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1bd54c19c4853b282c77ffedac213cd3783587f95d5618b1795b5c9824f589d5",
-  "operation_map_sha256": "8f08360f54f84474aba369b1ad753da7488e306b6f92e0a07af149df506af0b8",
+  "base": "b01e038f048be87df0c91640f249c800a63104aa",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9c67490093af232f0cbee6df778c3435068478d531d2bb512cc7a5081397092e",
+  "operation_map_sha256": "57134b8bcad14acfe0271368848b4a9d806a1c336b0842346ca23027c6cf8199",
   "changes": {
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "d114dfda8655926b5f138434ea8fc6d4e40ad7870df721797d22fdb5fee06d6a",
-      "after_sha256": "da447700a6385e2eceee9ab0bbf090941e51361c4e3817d5369c56e4310bba6c",
-      "owners": {
-        "@document": {
-          "before": "d114dfda8655926b5f138434ea8fc6d4e40ad7870df721797d22fdb5fee06d6a",
-          "after": "da447700a6385e2eceee9ab0bbf090941e51361c4e3817d5369c56e4310bba6c"
-        }
-      }
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "324285418096f206e8371efcf79dd6685e3729b5f8007e7ebef266ecdc871443",
-      "after_sha256": "44a34596e268f6d2ff09b58926385c82fb6661fe805597b74d3352efcf850dbd",
-      "owners": {
-        "@document": {
-          "before": "324285418096f206e8371efcf79dd6685e3729b5f8007e7ebef266ecdc871443",
-          "after": "44a34596e268f6d2ff09b58926385c82fb6661fe805597b74d3352efcf850dbd"
-        }
-      }
-    },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "29f827ea592f22644c62d8dbd6098e8ed1da8227cce07722c35d99b3d97f9aef",
-      "after_sha256": "bdf38a566cef29ce0d0e6dab002e8fddc6ef503fb497233b3576ff1069cd3ac9",
+      "before_sha256": "bdf38a566cef29ce0d0e6dab002e8fddc6ef503fb497233b3576ff1069cd3ac9",
+      "after_sha256": "cc50d735821b85668cf1d38135ac52417fa949576d746ebeb9efa6582019a1f5",
       "owners": {
         "@document": {
-          "before": "29f827ea592f22644c62d8dbd6098e8ed1da8227cce07722c35d99b3d97f9aef",
-          "after": "bdf38a566cef29ce0d0e6dab002e8fddc6ef503fb497233b3576ff1069cd3ac9"
+          "before": "bdf38a566cef29ce0d0e6dab002e8fddc6ef503fb497233b3576ff1069cd3ac9",
+          "after": "cc50d735821b85668cf1d38135ac52417fa949576d746ebeb9efa6582019a1f5"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "39f6c02f05f718806e2ff89d629978825f3b644df2d778d564c14a94420d3c06",
-      "after_sha256": "4d24948b2f834f23e96da26ffda203fec93b4ad198d6dcfb571c78629ac35933",
+      "before_sha256": "4d24948b2f834f23e96da26ffda203fec93b4ad198d6dcfb571c78629ac35933",
+      "after_sha256": "35cfe0555549faa404e57ce207d9c2c9c97dfab811c0fb88c9c6ce035cab03e9",
       "owners": {
         "@document": {
-          "before": "39f6c02f05f718806e2ff89d629978825f3b644df2d778d564c14a94420d3c06",
-          "after": "4d24948b2f834f23e96da26ffda203fec93b4ad198d6dcfb571c78629ac35933"
+          "before": "4d24948b2f834f23e96da26ffda203fec93b4ad198d6dcfb571c78629ac35933",
+          "after": "35cfe0555549faa404e57ce207d9c2c9c97dfab811c0fb88c9c6ce035cab03e9"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "73be697f0e7472207ad764fde74ead3eab282e76967ba3628a313121f12ede90",
-      "after_sha256": "113f3a3b010da9e1ca1ead58df1831d33ddd08852fe0e07b4104f162f415ecb0",
+      "before_sha256": "113f3a3b010da9e1ca1ead58df1831d33ddd08852fe0e07b4104f162f415ecb0",
+      "after_sha256": "40177cf2436910998cf092ff5431313842320bd639dd9a6397cf0be896c2bd13",
       "owners": {
         "@document": {
-          "before": "73be697f0e7472207ad764fde74ead3eab282e76967ba3628a313121f12ede90",
-          "after": "113f3a3b010da9e1ca1ead58df1831d33ddd08852fe0e07b4104f162f415ecb0"
+          "before": "113f3a3b010da9e1ca1ead58df1831d33ddd08852fe0e07b4104f162f415ecb0",
+          "after": "40177cf2436910998cf092ff5431313842320bd639dd9a6397cf0be896c2bd13"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "49bce3a4de78d674902fe8ba8e15fc6324ddb3f24bbd2b9820a75ac41f9ccda5",
-      "after_sha256": "164354c0c019ea3758724d4c5ea56e11d4741c1ec811f45fa54571201f9da291",
+      "before_sha256": "164354c0c019ea3758724d4c5ea56e11d4741c1ec811f45fa54571201f9da291",
+      "after_sha256": "f2ee450542ec97d11f8e6263bc2a89f15fd1c3ca0cb764ca6c5f7f7804fa33c8",
       "owners": {
         "@document": {
-          "before": "49bce3a4de78d674902fe8ba8e15fc6324ddb3f24bbd2b9820a75ac41f9ccda5",
-          "after": "164354c0c019ea3758724d4c5ea56e11d4741c1ec811f45fa54571201f9da291"
+          "before": "164354c0c019ea3758724d4c5ea56e11d4741c1ec811f45fa54571201f9da291",
+          "after": "f2ee450542ec97d11f8e6263bc2a89f15fd1c3ca0cb764ca6c5f7f7804fa33c8"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "c56b4afed6bf2d8611aa9ad3b0f81aed36a405793bb1f556db85d8e45b774874",
-      "after_sha256": "42f9a7ac7d5b8998621ef37b847b8b2276ab081bd4ffdfa2f37a73974e174df6",
+      "before_sha256": "42f9a7ac7d5b8998621ef37b847b8b2276ab081bd4ffdfa2f37a73974e174df6",
+      "after_sha256": "3b10b05316199dd2c42129f20032056a35f05875339e21a97ccea047c72d346b",
       "owners": {
         "@document": {
-          "before": "c56b4afed6bf2d8611aa9ad3b0f81aed36a405793bb1f556db85d8e45b774874",
-          "after": "42f9a7ac7d5b8998621ef37b847b8b2276ab081bd4ffdfa2f37a73974e174df6"
+          "before": "42f9a7ac7d5b8998621ef37b847b8b2276ab081bd4ffdfa2f37a73974e174df6",
+          "after": "3b10b05316199dd2c42129f20032056a35f05875339e21a97ccea047c72d346b"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "d9a6783eaa8dac9e146b2015cbd6a25c6a46b48bb9f0ba130aee792d31458a56",
-      "after_sha256": "44f36b08e5f706d939f9683babb5eae16fc6453706fc56e47574258bfb82f1c6",
+      "before_sha256": "44f36b08e5f706d939f9683babb5eae16fc6453706fc56e47574258bfb82f1c6",
+      "after_sha256": "f602ca161709c83d476799f7be1584d81011754f422ec042837e6fa7793ee4f9",
       "owners": {
         "@document": {
-          "before": "d9a6783eaa8dac9e146b2015cbd6a25c6a46b48bb9f0ba130aee792d31458a56",
-          "after": "44f36b08e5f706d939f9683babb5eae16fc6453706fc56e47574258bfb82f1c6"
+          "before": "44f36b08e5f706d939f9683babb5eae16fc6453706fc56e47574258bfb82f1c6",
+          "after": "f602ca161709c83d476799f7be1584d81011754f422ec042837e6fa7793ee4f9"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "073b3ba7196e29ed43622f5954a817a61517b27e31487e41e73fc2b84741fb9d",
-      "after_sha256": "612a008471581cdcbaf05aae2c4dbfd545089b9a79ebd82339c8e7a9870ad0e4",
+      "before_sha256": "612a008471581cdcbaf05aae2c4dbfd545089b9a79ebd82339c8e7a9870ad0e4",
+      "after_sha256": "21d3e2289479b9fdc869091455a5f963f34cbe0e451387e686023ab5a0898b22",
       "owners": {
         "@document": {
-          "before": "073b3ba7196e29ed43622f5954a817a61517b27e31487e41e73fc2b84741fb9d",
-          "after": "612a008471581cdcbaf05aae2c4dbfd545089b9a79ebd82339c8e7a9870ad0e4"
+          "before": "612a008471581cdcbaf05aae2c4dbfd545089b9a79ebd82339c8e7a9870ad0e4",
+          "after": "21d3e2289479b9fdc869091455a5f963f34cbe0e451387e686023ab5a0898b22"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "aec54e3eaf6feff9854a50a3b122688cf3cbfb24b7850a01ab51a5c9f047e5f5",
-      "after_sha256": "f5354ae67d4753e402f725c313dd8bdb92edcc4e58e28ad6140bfc0ad3a16e88",
+      "before_sha256": "f5354ae67d4753e402f725c313dd8bdb92edcc4e58e28ad6140bfc0ad3a16e88",
+      "after_sha256": "3fdcc2b0c45ec81cc827b23d5246ef79b7dbb8116ebee34836c31a7bda6cc09e",
       "owners": {
         "@document": {
-          "before": "aec54e3eaf6feff9854a50a3b122688cf3cbfb24b7850a01ab51a5c9f047e5f5",
-          "after": "f5354ae67d4753e402f725c313dd8bdb92edcc4e58e28ad6140bfc0ad3a16e88"
+          "before": "f5354ae67d4753e402f725c313dd8bdb92edcc4e58e28ad6140bfc0ad3a16e88",
+          "after": "3fdcc2b0c45ec81cc827b23d5246ef79b7dbb8116ebee34836c31a7bda6cc09e"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "0cff6d0945906f0dc14f53a486e3a3ca17738365a813e2774aa349bbbfa16e02",
-      "after_sha256": "3d8ab7ebecad1a4920afcdc43eb073914fabbb22c754210380145c08083cfb58",
+      "before_sha256": "3d8ab7ebecad1a4920afcdc43eb073914fabbb22c754210380145c08083cfb58",
+      "after_sha256": "46085d874848b3606fb1a9d44f2e95abf4eae898a183ea0ec9a43efec289eb0a",
       "owners": {
         "@document": {
-          "before": "0cff6d0945906f0dc14f53a486e3a3ca17738365a813e2774aa349bbbfa16e02",
-          "after": "3d8ab7ebecad1a4920afcdc43eb073914fabbb22c754210380145c08083cfb58"
-        }
-      }
-    },
-    "data/source_audits/daemons_native_2026_11/catalog-delta.json": {
-      "before_sha256": null,
-      "after_sha256": "3aa53fb015caa2ffe854362fe511bef561814630927d6ad33b525096fe39c1e1",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "3aa53fb015caa2ffe854362fe511bef561814630927d6ad33b525096fe39c1e1"
-        }
-      }
-    },
-    "data/source_audits/daemons_native_2026_11/provenance-delta.json": {
-      "before_sha256": null,
-      "after_sha256": "34adae1ed1516e98f4f39235f55e6c30e5b566eb4342a528be71f814c549e20f",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "34adae1ed1516e98f4f39235f55e6c30e5b566eb4342a528be71f814c549e20f"
-        }
-      }
-    },
-    "data/source_audits/daemons_native_2026_11/registry-delta.json": {
-      "before_sha256": null,
-      "after_sha256": "7bb6e2a0a7fb3e6845188b18e5e572b21daf1f04b694e39708069a9c8d2dd2c4",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "7bb6e2a0a7fb3e6845188b18e5e572b21daf1f04b694e39708069a9c8d2dd2c4"
-        }
-      }
-    },
-    "data/source_audits/daemons_native_2026_11/reviewed-observation.json": {
-      "before_sha256": null,
-      "after_sha256": "185e1eef3f58b8e7f7357a93e2f6cb694614c2339893a8a8cb70d2c9bb022d13",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "185e1eef3f58b8e7f7357a93e2f6cb694614c2339893a8a8cb70d2c9bb022d13"
+          "before": "3d8ab7ebecad1a4920afcdc43eb073914fabbb22c754210380145c08083cfb58",
+          "after": "46085d874848b3606fb1a9d44f2e95abf4eae898a183ea0ec9a43efec289eb0a"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "77aa25a3dddfc5d8fe6449e6abed4dfb868d4d52b31c20540ec00eb2b8587224",
-      "after_sha256": "bea38b67b25ae4d6a83846009934da26832063c5587d58e9d0283ce5a1fe3925",
+      "before_sha256": "bea38b67b25ae4d6a83846009934da26832063c5587d58e9d0283ce5a1fe3925",
+      "after_sha256": "8121625c1c8a9b97575895c7dfd1b465d3511a9fc594b22e1bf05203ef4b8052",
       "owners": {
         "@document": {
-          "before": "77aa25a3dddfc5d8fe6449e6abed4dfb868d4d52b31c20540ec00eb2b8587224",
-          "after": "bea38b67b25ae4d6a83846009934da26832063c5587d58e9d0283ce5a1fe3925"
+          "before": "bea38b67b25ae4d6a83846009934da26832063c5587d58e9d0283ce5a1fe3925",
+          "after": "8121625c1c8a9b97575895c7dfd1b465d3511a9fc594b22e1bf05203ef4b8052"
         }
       }
     },
-    "docs/DAEMONS_NATIVE_SOURCE_SCOPE.md": {
+    "docs/SAVE7_ALLOCATION_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "ae5d353aadd9dc3afdc61bb5c8ca253348ae4ddcc063defd0d854eee274ad654",
+      "after_sha256": "0f852a23bda3d64a9e485e701f4fcef526aa3eec70c0cd0a2b0c3337800d58c2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ae5d353aadd9dc3afdc61bb5c8ca253348ae4ddcc063defd0d854eee274ad654"
-        }
-      }
-    },
-    "docs/factions/chaos-daemons.md": {
-      "before_sha256": "f7eb08288c5dd53f6665263b5c90cd21695b507ecf3cbda705d620196239e9a4",
-      "after_sha256": "4fa1d97f4ae51df9003cf0ee7a19c05c512229ab4952d2a3f3f51468d8c04a51",
-      "owners": {
-        "@document": {
-          "before": "f7eb08288c5dd53f6665263b5c90cd21695b507ecf3cbda705d620196239e9a4",
-          "after": "4fa1d97f4ae51df9003cf0ee7a19c05c512229ab4952d2a3f3f51468d8c04a51"
-        }
-      }
-    },
-    "docs/performance/policy-v3/daemons-native-smoke-scope.json": {
-      "before_sha256": null,
-      "after_sha256": "dda4c81e65d5244a57006ad25a42e7846b5c75278d57ce016e1abc32f2cfa100",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "dda4c81e65d5244a57006ad25a42e7846b5c75278d57ce016e1abc32f2cfa100"
+          "after": "0f852a23bda3d64a9e485e701f4fcef526aa3eec70c0cd0a2b0c3337800d58c2"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "c0ab62c073554ec1acb852e2bde71f490be38f669182f3d57da0903a09160e1e",
-      "after_sha256": "2cef3975330b551245f1550add35b02f261ec9017a4e9a30527fe50e5c266109",
+      "before_sha256": "2cef3975330b551245f1550add35b02f261ec9017a4e9a30527fe50e5c266109",
+      "after_sha256": "2afaefc7b7fc2415b7cceb0821804989e1fddbe56260be2182c65fb011ae38a9",
       "owners": {
         "@document": {
-          "before": "c0ab62c073554ec1acb852e2bde71f490be38f669182f3d57da0903a09160e1e",
-          "after": "2cef3975330b551245f1550add35b02f261ec9017a4e9a30527fe50e5c266109"
+          "before": "2cef3975330b551245f1550add35b02f261ec9017a4e9a30527fe50e5c266109",
+          "after": "2afaefc7b7fc2415b7cceb0821804989e1fddbe56260be2182c65fb011ae38a9"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "d1b13872358df5e0cacc400f89999046d8cb915e39676548cb61c22daa860dda",
-      "after_sha256": "1787d6ffee2d381bb69728278de4064762a32dba0c725eb5816a81b112915037",
+      "before_sha256": "1787d6ffee2d381bb69728278de4064762a32dba0c725eb5816a81b112915037",
+      "after_sha256": "865ec77f6b47e19fa641cd3cc9d35bd8e8d1c10431286a772f9b02741ffeeb0d",
       "owners": {
         "@document": {
-          "before": "d1b13872358df5e0cacc400f89999046d8cb915e39676548cb61c22daa860dda",
-          "after": "1787d6ffee2d381bb69728278de4064762a32dba0c725eb5816a81b112915037"
+          "before": "1787d6ffee2d381bb69728278de4064762a32dba0c725eb5816a81b112915037",
+          "after": "865ec77f6b47e19fa641cd3cc9d35bd8e8d1c10431286a772f9b02741ffeeb0d"
         }
       }
     },
-    "src/warhammer40k_core/rules/faction_source_governance.py": {
-      "before_sha256": "04331fded4911da69d3cbedeb9c628a40a82bc27be39fdbefefcf111300f990b",
-      "after_sha256": "7f2376fb30ead71e8504eabbc3014d87b14d733c03c4671718f7a43fe3af96bb",
-      "owners": {
-        "authorize_faction_observation": {
-          "before": "122f76a4da17a07c797614efb476515da9ddd47aff653da8fb8f74b5c32826ea",
-          "after": "bfadd35f0773439021171c42b975e086f8eb3466cc33bc24ad27dc6434ad5e3f"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_authority_registry.json": {
-      "before_sha256": "c29fa3e58d51ead99e3f8ce1108d79f8090b6883af4f1ce3ce0f10d4df5cd98c",
-      "after_sha256": "fbcacca48101aab5a41f182ed70b1aa23c039e1434d36ef3868f9059ed3e0170",
-      "owners": {
-        "@document": {
-          "before": "c29fa3e58d51ead99e3f8ce1108d79f8090b6883af4f1ce3ce0f10d4df5cd98c",
-          "after": "fbcacca48101aab5a41f182ed70b1aa23c039e1434d36ef3868f9059ed3e0170"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_authority_registry.py": {
-      "before_sha256": "9385cb8f03cc86d35d42af9aca18d391f6f962c2ea1c369d23feb4c9596fe5c0",
-      "after_sha256": "70e010deb06a7cade86a1175827cd9a6176d0f18009f87862e628fd66e817680",
+    "src/warhammer40k_core/engine/damage_allocation.py": {
+      "before_sha256": "ad90f81c802eb7571865a3a11a50ad95c811f1965a8aba8b13ea1ddab649250a",
+      "after_sha256": "524a0aa87e0f7dac45d6e603caadff8259ceb86904d609b7f9864767784c5d14",
       "owners": {
         "@module": {
-          "before": "b4dcccf31577ad90a232595644e230001b31a839c701853f98dd2554ae297536",
-          "after": "efa81c2a99322ecefd7b8fd6aa782163cf62a842146ba1ca1d5ea95bc30aa2f2"
+          "before": "6c0d32201ca14cc4c72528ef940718e5c389da26c645db2c414d9a1cadeb92e0",
+          "after": "0714592218f0fb9877833471e1d7b7347b4ed4c33243768af5104c73baf312f8"
+        },
+        "AllocationGroup.__post_init__": {
+          "before": "21992b40e340ebb322c627873b4a1f083266ee37eb74634d14f7c22413ede012",
+          "after": "a70c55a45b1d2ff7ef687e26665601483092b3acb031e6be2a1de599c6989810"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.audit.json": {
+    "src/warhammer40k_core/engine/damage_allocation_validation.py": {
+      "before_sha256": "6419181f155228c6ccf9576a829eb23f405f9dfca9397dd0ca1c91b7d3f325ac",
+      "after_sha256": "0d63378acc5bb04f9e8b07ac8790f42cb0a3bd602541eb433ccfcd3de65d12f8",
+      "owners": {
+        "@module": {
+          "before": "6066ffa20157422e7d6d36d544f61f17b0594bd91ca76e1f41655ff8ea335e46",
+          "after": "4089fe12cef3dfdefdaf627ae40cec15dcea75d2903572edc5354ab635388258"
+        },
+        "validate_optional_effective_save_characteristic": {
+          "before": null,
+          "after": "2f75dd6a0235e929d31e83b69692f0e45e88b3886a743b29200da52589026cbd"
+        },
+        "validate_optional_save": {
+          "before": "75e0f0765f67bcc0ba8335a90711f3c6f15441ea3396c35a0fa3027cfb7f7c40",
+          "after": null
+        }
+      }
+    },
+    "tests/rules/section04/test_completion_boundaries.py": {
+      "before_sha256": "d4a653d9d7ead869a30e599dbf984234655ed9c634e3854cab267e8c9cd9de0f",
+      "after_sha256": "4600589661f5647fb82e1a19fb47b43e616200f37dd6aa26c90dbeb315a6a7a2",
+      "owners": {
+        "test_effective_save7_engine_checkpoint_restores_forks_and_replays": {
+          "before": null,
+          "after": "6469a4a8617b92b9846f3d8522eb873f608a443106ededdf17ffa80e2432dd82"
+        }
+      }
+    },
+    "tests/rules/section05/test_allocation_choices.py": {
+      "before_sha256": "a9faa7653aef99dd2d32b6f7ca42d74aef3837745ddf8d145750a4775939b6a0",
+      "after_sha256": "70ac36cba184c58160afaa7022a827aedbd3babd3e03499e9c69ac4af057a08c",
+      "owners": {
+        "@module": {
+          "before": "1c9bf76d2c7c6842da10be61b8af9845770123b9ae50b7a0b8a3c967cccb1ca5",
+          "after": "78c6acde6c5ea44e3a67ffb86235bb257e746dd377ce15eaaf2915d7c853f34d"
+        },
+        "test_effective_save7_character_and_mixed_group_choices": {
+          "before": null,
+          "after": "262633796834a8af9d50d27f8516f6ff7fde3584d9be6fc38ece5e5fa2c72d77"
+        },
+        "test_effective_save_characteristic_constructor_and_decoder": {
+          "before": null,
+          "after": "816b528e089affcdfebeb67aaa9d315e21837ee1dc252b1f1879c1b0f80fb31a"
+        },
+        "test_effective_save_characteristic_rejects_malformed_values": {
+          "before": null,
+          "after": "324981ba7ccedbac206f73d6dc32c826d5c8e6fd37bbf3d2a8226ab68f3c4e99"
+        },
+        "test_effective_save_widening_keeps_d6_and_fnp_bounds": {
+          "before": null,
+          "after": "c36a9b7b57cf104189605471484626e5d3a11be659589a6f041adedba4b47dfc"
+        },
+        "test_native_bloodletters_unit_and_allocation_roundtrip": {
+          "before": null,
+          "after": "a11027dad6326760f3adee309fe834f773525c419a6d2afd7aca3e1d56aaff90"
+        },
+        "test_native_save7_facade_completes_attack": {
+          "before": null,
+          "after": "9e4b5dc90484752e12147c9fe3f54c2d4445b99ca6634972db090af3f56eb674"
+        }
+      }
+    },
+    "tests/rules/section05/test_saves.py": {
+      "before_sha256": "4d36c413523e8fe26860160887ee876333ee495d0cf006fc983e20ed032656d7",
+      "after_sha256": "480c808fffe7bf12ec4937d27f301650407a9e7faf7d5a89f6a3891a2b2c3f09",
+      "owners": {
+        "@module": {
+          "before": "a5b89755b2369bfe16713f4fe93dba409896d6ba3a87bc4424ab3f9af2c00fe7",
+          "after": "3dcd90a7248dbf2dfa165c9e6c1dcd12fac9f58c2fbf7b8009d263d4d972088e"
+        },
+        "test_effective_save7_current_cover_penalizes_bs_only": {
+          "before": null,
+          "after": "19ae524206f1652d1c713d696cb606a97a9de0879ed304eb3636e38f95e572d3"
+        },
+        "test_effective_save7_improvement_worsening_and_current_cover": {
+          "before": null,
+          "after": "cc28d7102d8653c4671872bf416d96589e7ad0574c4db1ecf85d9da1e3816469"
+        },
+        "test_effective_save7_is_real_save_except_devastating_wounds": {
+          "before": null,
+          "after": "678f0995ed827ae405e21784a405058c609f700b3874c0cd848d27cdb403c318"
+        },
+        "test_effective_save_widening_keeps_invulnerable_grant_bounds": {
+          "before": null,
+          "after": "4f284725748271f435bcb833b5db2dfae7737a52e03f376da8190d5d5a92217f"
+        },
+        "test_native_save7_faces_keep_armour_and_invulnerable": {
+          "before": null,
+          "after": "06e9cd36462072e8d87fff22c0f46799f2bea4ed8e297cbbe835071b33ef22e9"
+        }
+      }
+    },
+    "tests/save7_allocation_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "c5520d359da6f3732765803fea9258fb50d3726cce49392b9f85411aa0e18940",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "c5520d359da6f3732765803fea9258fb50d3726cce49392b9f85411aa0e18940"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.overlay-pack.json": {
-      "before_sha256": null,
-      "after_sha256": "b0ccc944e022622bbeded025608a5b2d7ddd224c0f4cae9cca30b59f7adaf4aa",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "b0ccc944e022622bbeded025608a5b2d7ddd224c0f4cae9cca30b59f7adaf4aa"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.py": {
-      "before_sha256": null,
-      "after_sha256": "14ef59fe400314080351f559d12a614b92d712cc6c33e6a96b8761adfbafadff",
+      "after_sha256": "c6e91a1acecb3eafc61a72859bf95e45b2566f14e9818793c9e1253fbedbfee5",
       "owners": {
         "@module": {
           "before": null,
-          "after": "6385c4d232c8e57995b9286b927db9bb2f09d9cedea3a0e0aae203af23f57828"
+          "after": "5276ee509005618ca95c41e65e581b00dd4f5e89262d0951fbcffd38189947a2"
         },
-        "apply_current_daemons": {
+        "allocation_group": {
           "before": null,
-          "after": "341bae7888d506f946ba488e0d560f533d332103361592f0b4130518c1727cb5"
+          "after": "97b2fbf6d9027431d72da8d99dd497e66df211f6545431102c8869b315988278"
         },
-        "overlay_pack": {
+        "effective_save_session": {
           "before": null,
-          "after": "e28f6c3716d0416d22abcef5c2039daf4e58eef75b0b0206f97892d9fe9324a4"
+          "after": "4b1ee58abe3e092201867e81a1f69baec16f8c1a7d28ad4273a7aa87989b3651"
         },
-        "overlay_pack_from_json_bytes": {
+        "effective_value": {
           "before": null,
-          "after": "6d0a83258d401bb6278107561adeb222a9033c774ed097582363b7e03e6269e7"
+          "after": "d98f79e30738d5893f527e21d958a6b793a8aac63a864dd1d13a9602cbeba035"
         },
-        "source_audit": {
+        "modified_model": {
           "before": null,
-          "after": "637cbbdcf5f710faba63ab4424cbc5dc450ffba464da022fce731799dcbdcdf7"
+          "after": "dfa66fc52f1b66377dc83bea6a039022ed893134ed1fddcb616248d55bb7254e"
         },
-        "source_audit_from_json_bytes": {
+        "native_attack_session": {
           "before": null,
-          "after": "7e613ef04148b00aadf5ee89b012ed309ccdb0e26d8c6101f395957e9f6af004"
+          "after": "dff25c71e062c2493a15f4e063c51ffaa97d55912f399a33b2256dd26150b627"
         },
-        "source_package": {
+        "native_target": {
           "before": null,
-          "after": "6778785f86e94ceaffc290146df37bc7fff18cd5c64239694cde6aa6cbb6428f"
-        },
-        "source_release_manifest": {
-          "before": null,
-          "after": "cc7390c1d71dbd79e2776f46b24f58c3fbbe0ef4b4493c64d2ce354276e27271"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/wahapedia_bridge_defaults.py": {
-      "before_sha256": "4a62b9c447771b218ab6c285cba87718708a9d746761e9d0604889c3f5207401",
-      "after_sha256": "33c3724554be31d166f0702b3346528ea4d703c4435393c1f42434a22cf70152",
-      "owners": {
-        "@module": {
-          "before": "1578d62954da09b6403c99f981891afad8ba88233a244af069389dac0577bb18",
-          "after": "aeedaa7a5994aac6e44ec866cf1146f94cddd1bfdba87edd2aef01a5d67f33d7"
-        }
-      }
-    },
-    "tests/code_quality/test_starfang_source_policy.py": {
-      "before_sha256": "5607e70538462825153076462ccf5096de516cf74fb60315d56280cd2bc8a007",
-      "after_sha256": "ef4369cac7a6251014afe2fa71df6a2758e943443431793f36ec07af94150cfb",
-      "owners": {
-        "test_daemons_native_performance_scope_is_exact_and_preserves_policy_chain": {
-          "before": null,
-          "after": "e21c4f203f65f17fbe63f4c3c6446b0f36e96cb64372648d9bad823dc832e3bc"
-        },
-        "test_wave_frame_performance_scope_is_exact_and_preserves_policy_chain": {
-          "before": "3e2e8c0c2b5e4ca6622ba713007e66ffa783fb5a981dffe911a2b3d021ffb278",
-          "after": "69e11d1e0f16ee668d840cd453d10d88b975a3c584b2d5a0f0de512b8a9b6ee1"
-        }
-      }
-    },
-    "tests/daemons_native_source_helpers.py": {
-      "before_sha256": null,
-      "after_sha256": "2ed44baf0feb4be360165e65d531b578887fae3c407045b67606cd0d853ddaa8",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "f8f92ac5a740def5aae457706b5928e2cde31b0a96f878dae5057cf88be0a02a"
-        },
-        "attack_component": {
-          "before": null,
-          "after": "c88aaf8633aa787d6e838f26d5e58c222c8e6f4bbb6f93435d168d13ead6f30e"
-        },
-        "damaged_state": {
-          "before": null,
-          "after": "927d0e1096b21011b9aefbc28a0cdd2f7d46eb462ac42bb4492e6f458b7b5e85"
-        },
-        "native_definitions": {
-          "before": null,
-          "after": "b1942a3b79ae3b366e7a50c60dd537be51ed7b386059234a9762132a2a1dde95"
-        },
-        "resolve_native_attack": {
-          "before": null,
-          "after": "77a3f077548247ea390f352e7713ccc55ad545c552655a74ef0ef5dc740ce5f0"
-        }
-      }
-    },
-    "tests/daemons_native_source_preservation.py": {
-      "before_sha256": null,
-      "after_sha256": "9c83174de700933418e4932616de0404cf4b20ac4a67c3c55e3a06a942b0d138",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "a36510aff22911c6669e7cce932c525c937c602fc6e316a283ba5460ffc66934"
-        },
-        "_hash": {
-          "before": null,
-          "after": "fb2b021357e260297deb6a527d2ec19d496183efcd93b1d083e30265bb21f848"
-        },
-        "before_daemons_native": {
-          "before": null,
-          "after": "00cc530413a79a598ca1af3b9e1428a96b0d3a969a01a70439d866b543e4fde4"
-        },
-        "before_daemons_provenance": {
-          "before": null,
-          "after": "940e433d7825b75b5df41429bb75ceba1e4de475472f8efcf73d9c23dc7c5a5a"
-        },
-        "before_daemons_registry": {
-          "before": null,
-          "after": "e7977b24b771747dbfd035614bc58cbf9f5d0ce9bb6f03a7c22d216383d1b9ba"
-        },
-        "daemons_audit": {
-          "before": null,
-          "after": "d0b944bc067510e5127670f39776aaf55e540038e7e5d6afeaeffa11858fc20d"
-        }
-      }
-    },
-    "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
-      "before_sha256": "aade31614c623ca2df9a5199c8afa3fcdb6a86bf63511dc996239ec1e4bf02a9",
-      "after_sha256": "27ba97bbe47ec4a173d63acadedd9c84d64e13bf171e593a409244e66d9e7f6a",
-      "owners": {
-        "test_daemons_current_keyword_boundary_requires_exact_preimage": {
-          "before": null,
-          "after": "a9cd6b704f300b754da6b94ebd881309025eeb3646848735a88c4baf99991475"
-        },
-        "test_daemons_current_two_complete_pages_and_partial_support_scope": {
-          "before": null,
-          "after": "06e7e79f1798912ac8f23774742f9ef917fc7164d1b7d509a52490d3eddc9e92"
-        },
-        "test_daemons_damaged_source_exact_fields_and_other_artifacts_unchanged": {
-          "before": null,
-          "after": "e32f966ead59f2ec0ad89634ee7f36ccf9301d1e3c0b3a5077fa26235b275ee1"
-        },
-        "test_daemons_native_base_keywords_and_real_conditional_grant_kernel": {
-          "before": null,
-          "after": "1ea820386b500230e9c2cc1f742acb2f97051f5a2e5c6178ec5d805a08ff9ca0"
-        },
-        "test_daemons_native_full_sixty_exact_delta_and_counterparts": {
-          "before": null,
-          "after": "9a1d7653915e0d9c12142479dbb45b598c2b122dcf331f2e76277097625f12c8"
-        },
-        "test_selected_source_index_preserves_corrected_keyword_identity": {
-          "before": "3397db0154c0f3a6e38d8eea59ab9938baff366cec96e31de198d9aa4d3638fa",
-          "after": "b7a8826d30db2ae31998814e3854e1ba6296ef1f38c1561fe836d08793c3593e"
-        }
-      }
-    },
-    "tests/rules/section24/test_damaged.py": {
-      "before_sha256": "0129c193a194c6ac943699970de0ca07d06660afab28f26dfc383d5a73f874bc",
-      "after_sha256": "569874d0c7ed1d0105308a4ef570db2580673443df8a5070e7e7153ecec304b3",
-      "owners": {
-        "@module": {
-          "before": "907415b00346cb56225b83d024d02522bcfbf9b5ed0e65c701763388084097a6",
-          "after": "d67e0b2c8aee5cc4898de3b1ef449fee40f67eca13f54ebba3b674fdd5f7bbe2"
-        },
-        "test_native_belakor_actual_attack_damaged_psychic_choice_component_restore": {
-          "before": null,
-          "after": "7aa01c767e1c13f2dee9c204b8116eed0ef476caca62b39da4b727720c61495a"
-        },
-        "test_native_belakor_damage_generated_threshold_and_restoration": {
-          "before": null,
-          "after": "aa183eb7e404a78cf7fde6e7701d0aa321b0d5777ca249d997b04a21abb1277a"
-        }
-      }
-    },
-    "tests/wave_serpent_frame_helpers.py": {
-      "before_sha256": "e7076f6ebb5dc94ccb192e605f6d6ac62ee822a6d7fd0d1806b3f333d2e01dc0",
-      "after_sha256": "f1c8181127f6767e2c5f3d8a3985b64c1216139f63c397b65c023cde997ef899",
-      "owners": {
-        "before_wave_frame": {
-          "before": "f0bd537dc7e906573890d012bf4dbd4da2ab1fe905ed40175864f6d03f471cc8",
-          "after": "88db518c7fbd73cc838c6195d7fc8db8f7e41fb4b180e2032b628046471543ac"
-        },
-        "before_wave_provenance": {
-          "before": "2caf2e0206d19c5037c258b3b86fa408250201940361742d5dab97686b4f5a30",
-          "after": "fc3b9c852b6ae72a2acedb34928a05a763e7ea95f8bab54f7eb60c942f522cba"
-        },
-        "before_wave_registry": {
-          "before": "367cbfe5445306d62340fa2ca51dcc77f8bbe128a9390a31cde90605fa02b548",
-          "after": "bcd68b7862abf2f518d9de97191b9b874e0bab47efebcad0c841f08b15c50bc9"
-        }
-      }
-    },
-    "tools/ability_support_sources.py": {
-      "before_sha256": "a77a2eefceb165576b6c28ebf8ea97e18dcfeb7094a77dccbc8f6b8bb017abcf",
-      "after_sha256": "421d6c695e6710e0c0594a3b89e17529831033b73d36d6dea3ef016563160a0d",
-      "owners": {
-        "@module": {
-          "before": "8705fbf50d90aff4ffaed70a3bc38c0bf6c9610d3181ac73d2cc2db0bb51909b",
-          "after": "af64734884857792a2bbc3b131a9a2f1fbfccaf7962ee9e9e237e9ef9cfce5f6"
-        },
-        "ability_support_index_inputs": {
-          "before": "7c63b99d26804229e7cd4c3de696a7233392599edeaf99b1c49d23a41d269910",
-          "after": "f5d8bae32c825cbe72086b1206181f39e5c150bb73f18442b868895b59829364"
-        },
-        "load_ability_support_sources": {
-          "before": "26f3ce58df69672727c21de7d7c8727f0194e3fa003af913ad9010f1dab87a5c",
-          "after": "a411c3c3dcedaeae4b4ec98426f34fbe1987c8f4791c4c6735743699bc2d92c7"
-        },
-        "load_before_daemons_native_sources": {
-          "before": null,
-          "after": "d7254f4ebbfd7d0cfd995a5fa9a2eb5e63f805054c351bf1c94cfa6b335354a0"
-        }
-      }
-    },
-    "tools/build_daemons_native_source.py": {
-      "before_sha256": null,
-      "after_sha256": "c56072ef52bcb94932bc5b509b89fa35ef05187a55a68c7b20e197b3f4c5adb8",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "45ee3b92dc5552725fcdda2e6d831ca3b7279c5945bac08846a95bc2d8ff677a"
-        },
-        "_bytes": {
-          "before": null,
-          "after": "bbf21c80abc1ddc6134b26d3d070e19f4b9b06e07caf9a436af3b1109433cacc"
-        },
-        "build_payloads": {
-          "before": null,
-          "after": "893ed56457532805625189cd11f475ad132b9e4eed2b73492af8f8218d8ae99a"
-        },
-        "main": {
-          "before": null,
-          "after": "2f99cd1efddba7f6c09ee9a153e79d4e275b74e814d37a053e76898198b43a2e"
-        }
-      }
-    },
-    "tools/generate_ability_support_matrix.py": {
-      "before_sha256": "e2806e7406310c1a8b09af6344ce93bfac2f112f2d05f4f22fff00158d28228f",
-      "after_sha256": "83212c06e46ee50419d5f33386a8dc11875d1c9365be94a8031593b120b7ac69",
-      "owners": {
-        "_chaos_daemons_khorne_review_rows": {
-          "before": "82510dad34596367420f2871ef8e4c571dfa3c894764945d114aa42cc2d2f783",
-          "after": "370bd69dcfa851c5a5fc9baaea058b5829a110df9f07be68143fbaaaa31e7b67"
-        },
-        "_chaos_daemons_undivided_review_rows": {
-          "before": "68d1cb6a95371c62ed4d940ddd4a2a72a293eda30087bc05c6c8ffd7cf7049a0",
-          "after": "2e96e7439a3a76a73d6707300017da051fa9ca1fb0baec76a14738f5bb50f8d2"
-        }
-      }
-    },
-    "tools/performance_daemons_native.py": {
-      "before_sha256": null,
-      "after_sha256": "e0a4b649d740e79d93e671e3c03bab695c950319cff7a4136618f63908ba7739",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "afdd9e5b6b6e9ec327a41428139f6e35227268006cedc6409f58de1b65b642ef"
-        },
-        "_hash": {
-          "before": null,
-          "after": "adda31e2a9b809da9ab435026408682e9f1732d2ee623b5cc58b0c125482ade7"
-        },
-        "_scope": {
-          "before": null,
-          "after": "9714b7abe9cf0f1d950e15334e0580c61f9dfe8c38ecaa1d223194292614f6e1"
-        },
-        "daemons_native_policy_predecessor": {
-          "before": null,
-          "after": "a10e38bcd248326a6686bf6758c9c943270c8e7dd79922f19461da1eeb808ee8"
-        },
-        "daemons_native_smoke_operations": {
-          "before": null,
-          "after": "a2fcd55ea31582fa934df84fbb69316ed22413cac11a98d07925a7fe53b7db11"
-        }
-      }
-    },
-    "tools/performance_policy.py": {
-      "before_sha256": "879f0ca4328865a8f24c515abaa894dc8628a49865dcdb817902b94dc7e02a4a",
-      "after_sha256": "8cd7b97a934f6fb6c71270f0004850f7203a12ed3d19548f005b2156a3b8900c",
-      "owners": {
-        "starfang_deep_strike_policy_predecessor": {
-          "before": "f7e553b9c992ed875c7f2ae1b0a425bfa4a4d48fa0c23f54d3d498fa8dc0a4f6",
-          "after": "bb13829b5371072214090370f5bfaaf1f70be487671250d9ee2ffd302b08644f"
-        },
-        "validate_assessment": {
-          "before": "23eb4eda808e3a56dedc0658a07962f685b89d472c4b58d4e354d2dd6d835ed5",
-          "after": "657624fda5dd3b3fc448cd28fea06484060d17b2f0799a39f1a62477a1d1f782"
-        }
-      }
-    },
-    "tools/source_scope_provenance.py": {
-      "before_sha256": "03ba930bd1b77644853b875ee7d6f86620e730690cff8b5d1cd12e42c47814ba",
-      "after_sha256": "95244250ad88ac287f6bcef1c89eea29fe4f70318d9383e9a92b7c103240670d",
-      "owners": {
-        "@module": {
-          "before": "ad108e622449b489a8f07842482786c085c2c22a023c257e58d8eac57a2e60d2",
-          "after": "382c7a4a9feeceaac5f30ea19b9f55448cfd1deff824eefbae62e767474e6371"
-        },
-        "current_ec_overlay_provenance": {
-          "before": "40ddc135890f5dc3e2766ace0c67a61f195eb6131d685441221a21429adf9066",
-          "after": "43b3bdb3678dd90e2c6aca2b63ce4b01606ed668a7fa130c582096f577122970"
+          "after": "ecb4631f52239d1baff8743101c1097077489820142e65f1fe3db4de36f1e613"
         }
       }
     }
   },
   "rows": {
-    "ci/quality_shards/all.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -594,9 +292,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -604,9 +302,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -614,9 +312,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -624,9 +322,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -634,9 +332,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -644,9 +342,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -654,9 +352,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -664,89 +362,33 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "data/source_audits/daemons_native_2026_11/catalog-delta.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "daemons-native-exact-ac90283f1af38590"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "data/source_audits/daemons_native_2026_11/provenance-delta.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "daemons-native-exact-9dbe815103b0311e"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "data/source_audits/daemons_native_2026_11/registry-delta.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "daemons-native-exact-8f46c586d2338683"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "data/source_audits/daemons_native_2026_11/reviewed-observation.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "daemons-native-exact-cb467eba357cf40e"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
-    "docs/DAEMONS_NATIVE_SOURCE_SCOPE.md": {
+    "docs/SAVE7_ALLOCATION_SCOPE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "docs/factions/chaos-daemons.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "docs/performance/policy-v3/daemons-native-smoke-scope.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -754,202 +396,72 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
-    "src/warhammer40k_core/rules/faction_source_governance.py": {
+    "src/warhammer40k_core/engine/damage_allocation.py": {
       "category": "rule_semantics",
       "operations": [
-        "aeldari-current-exact-09"
+        "order118-attack-source-lifetime",
+        "save7-exact-d8df651625f769c6"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
-    "src/warhammer40k_core/rules/source_authority_registry.json": {
+    "src/warhammer40k_core/engine/damage_allocation_validation.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-authority-publication"
+        "save7-exact-a3adc1968be49c48"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
-    "src/warhammer40k_core/rules/source_authority_registry.py": {
+    "tests/rules/section04/test_completion_boundaries.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-authority-publication"
+        "save7-exact-547642cb6d038744"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.audit.json": {
+    "tests/rules/section05/test_allocation_choices.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "qualification40-exact-14272f7eb5f29567",
+        "save7-exact-14272f7eb5f29567"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.overlay-pack.json": {
+    "tests/rules/section05/test_saves.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "qualification40-exact-50d0064f13e1390f",
+        "save7-exact-50d0064f13e1390f"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.py": {
+    "tests/save7_allocation_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "save7-exact-7a6825eace60cd05"
       ],
       "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "src/warhammer40k_core/rules/wahapedia_bridge_defaults.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "sorcerer-admission-exact-20"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "tests/code_quality/test_starfang_source_policy.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "tests/daemons_native_source_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "daemons-native-exact-fa0f55425cfc3000"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "tests/daemons_native_source_preservation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "daemons-native-exact-fac356e49e4b8510"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "starfang-deep-strike-exact-8a566d77a945247d",
-        "daemons-native-exact-8a566d77a945247d"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "tests/rules/section24/test_damaged.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-2b69c86b0ccce84e",
-        "daemons-native-exact-2b69c86b0ccce84e"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "tests/wave_serpent_frame_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "wave-frame-exact-663326d24d56e47b"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "tools/ability_support_sources.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-b0712fa66a9cc38e",
-        "supported-vyper-source-title-binding",
-        "daemons-native-exact-b0712fa66a9cc38e"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "tools/build_daemons_native_source.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "daemons-native-exact-e6650756a1c5d131"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "tools/generate_ability_support_matrix.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "daemons-native-exact-ded6452f144f095b"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "tools/performance_daemons_native.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "tools/performance_policy.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "ci64-provenance-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
-        "ci67-transaction-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
-        "starfang-deep-strike-exact-1504c891c8d333f3"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
-    },
-    "tools/source_scope_provenance.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "registered-source-provenance-projection",
-        "ec-current-source-exact-10"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
-      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+      "rationale": "Bounded effective Sv/InSv domain correction at shared AllocationGroup construction/decoding, its focused real consumer regressions, active test identities and generated runtime contract publication; no unrelated engine algorithm changes.",
+      "source_obligation": "Retained governed Core02.02.01 and05.03 require numeric effective Sv/InSv integers>=2 without upper cap; native Bloodletters Sv7/InSv5 must reach allocation and ordinary save/damage. Core13.08 remains ranged-BS Cover. See docs/SAVE7_ALLOCATION_SCOPE.md for exact source identities and limits.",
+      "unchanged_work": "The validator remains constant-time exact-type/lower-bound checking; only the erroneous upper bound is removed for effective characteristics. Group enumeration/order, dice/RNG, save arithmetic, geometry, caches, wire shapes and persistence/replay algorithms remain unchanged. Current serial smoke and live semantic gates still apply; no benchmark or full-game certification is claimed."
     }
   },
   "milestone": "ordinary",

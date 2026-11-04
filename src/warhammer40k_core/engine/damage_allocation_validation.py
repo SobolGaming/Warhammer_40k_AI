@@ -103,10 +103,18 @@ def validate_d6_target(field_name: str, value: object) -> int:
     return value
 
 
-def validate_optional_save(field_name: str, value: object | None) -> int | None:
+def validate_optional_effective_save_characteristic(
+    field_name: str, value: object | None
+) -> int | None:
     if value is None:
         return None
-    return validate_d6_target(field_name, value)
+    # Effective Sv/InSv characteristics have a minimum of 2, not a D6-face cap.
+    # Keep numeric impossible saves: modifiers and AP still consume their value.
+    if type(value) is not int:
+        raise GameLifecycleError(f"{field_name} must be an int.")
+    if value < 2:
+        raise GameLifecycleError(f"{field_name} must be at least 2.")
+    return value
 
 
 def validate_model_identifier_subset(
@@ -157,8 +165,8 @@ __all__ = (
     "validate_identifier_tuple",
     "validate_model_identifier_subset",
     "validate_non_negative_int",
+    "validate_optional_effective_save_characteristic",
     "validate_optional_identifier",
-    "validate_optional_save",
     "validate_ordered_identifier_tuple",
     "validate_positive_int",
     "validate_unique_sorted_exact_type_tuple",
