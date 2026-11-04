@@ -32870,6 +32870,106 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "wave-frame-exact-84fbc60811c1a1ed": {
+      "paths": [
+        "data/source_audits/wave_serpent_frame_2026_11/catalog-delta.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "wave-frame-exact-4ab201ea3db36bcf": {
+      "paths": [
+        "data/source_audits/wave_serpent_frame_2026_11/provenance-delta.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "wave-frame-exact-c76d2b32c396241c": {
+      "paths": [
+        "data/source_audits/wave_serpent_frame_2026_11/registry-delta.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "wave-frame-exact-7e30360eba3e41a0": {
+      "paths": [
+        "data/source_audits/wave_serpent_frame_2026_11/reviewed-observation.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "wave-frame-exact-8a566d77a945247d": {
+      "paths": [
+        "tests/infrastructure/source/unit/test_starfang_deep_strike.py"
+      ],
+      "owners": [
+        "test_wave_serpent_frame_admission_bytes_are_pinned",
+        "test_wave_serpent_frame_exact_native_delta_and_unchanged_counterparts",
+        "test_wave_serpent_frame_native_factory_roundtrip_and_measurement_selector",
+        "test_wave_serpent_frame_source_admission_and_index_inputs",
+        "test_wave_serpent_frame_source_guards_and_exact_addition"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "wave-frame-exact-663326d24d56e47b": {
+      "paths": [
+        "tests/wave_serpent_frame_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "_hash",
+        "before_wave_frame",
+        "before_wave_provenance",
+        "before_wave_registry",
+        "frame_audit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "wave-frame-exact-b0712fa66a9cc38e": {
+      "paths": [
+        "tools/ability_support_sources.py"
+      ],
+      "owners": [
+        "load_before_wave_frame_sources"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "wave-frame-exact-62d2c44256aceddc": {
+      "paths": [
+        "tools/build_wave_serpent_frame_source.py"
+      ],
+      "owners": [
+        "@module",
+        "_bytes",
+        "build_payloads",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

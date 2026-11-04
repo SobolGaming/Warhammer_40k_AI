@@ -237,6 +237,12 @@ def authorize_faction_observation(
         )
 
         audit = starfang_keyword_2026_11.source_audit()
+    elif audit_id == "wave-serpent-frame-app-mirror-2026-11-03":
+        from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+            wave_serpent_frame_2026_11,
+        )
+
+        audit = wave_serpent_frame_2026_11.source_audit()
     else:
         audit = faction_source_audit()
     if audit.audit_id != audit_id:

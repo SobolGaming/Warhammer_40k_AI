@@ -71,6 +71,13 @@ AELDARI_OVERLAY = (
 AELDARI_OVERLAY_SHA256 = "e51d507c9852821b12e6a250d413dbf3c1c13fed27325a8506acaf3cd26605d5"
 
 
+WAVE_FRAME_OVERLAY = (
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+    "wave_serpent_frame_2026_11.overlay-pack.json"
+)
+WAVE_FRAME_OVERLAY_SHA256 = "0e1eefbb84497d8204f91e9add31c3e9ece010f6783000c30f6c26a0eaf2b66a"
+
+
 STARFANG_OVERLAY = (
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
     "starfang_keyword_2026_11.overlay-pack.json"
@@ -90,6 +97,7 @@ def current_ec_overlay_provenance(root: Path, path: Path, raw: bytes) -> str | N
         root / CURRENT_EC_OVERLAY: CURRENT_EC_OVERLAY_SHA256,
         root / SORCERER_OVERLAY: SORCERER_OVERLAY_SHA256,
         root / AELDARI_OVERLAY: AELDARI_OVERLAY_SHA256,
+        root / WAVE_FRAME_OVERLAY: WAVE_FRAME_OVERLAY_SHA256,
         root / STARFANG_OVERLAY: STARFANG_OVERLAY_SHA256,
         root / BANSHEE_ELDRAD_OVERLAY: BANSHEE_ELDRAD_OVERLAY_SHA256,
     }.get(path)

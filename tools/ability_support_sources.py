@@ -51,6 +51,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     thousand_sons_defiler_datasheet_overlay_2026_07 as chaos_defiler_overlay,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    wave_serpent_frame_2026_11 as wave_frame,
+)
 from warhammer40k_core.rules.wahapedia_bridge_rows import BridgeSourceArtifact
 from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaJsonArtifact,
@@ -87,7 +90,7 @@ def load_source_artifacts(source_json_dir: Path) -> tuple[WahapediaJsonArtifact,
     return tuple(artifacts)
 
 
-def load_ability_support_sources(source_json_dir: Path) -> tuple[BridgeSourceArtifact, ...]:
+def load_before_wave_frame_sources(source_json_dir: Path) -> tuple[BridgeSourceArtifact, ...]:
     artifacts = load_source_artifacts(source_json_dir)
     chaos_overlaid_artifacts = apply_source_release_overlays(
         source_artifacts=artifacts,
@@ -193,6 +196,10 @@ def load_ability_support_sources(source_json_dir: Path) -> tuple[BridgeSourceArt
     )
 
 
+def load_ability_support_sources(source_json_dir: Path) -> tuple[BridgeSourceArtifact, ...]:
+    return wave_frame.apply_current_frame(load_before_wave_frame_sources(source_json_dir))
+
+
 def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
     """Bind all source-processing code and authoritative bytes, including overlays.
 
@@ -227,6 +234,8 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
                 Path(aeldari_current.__file__).with_name(aeldari_current.AUDIT_ARTIFACT_NAME),
                 Path(starfang_keyword.__file__).with_name(starfang_keyword.ARTIFACT_NAME),
                 Path(starfang_keyword.__file__).with_name(starfang_keyword.AUDIT_ARTIFACT_NAME),
+                Path(wave_frame.__file__).with_name(wave_frame.ARTIFACT_NAME),
+                Path(wave_frame.__file__).with_name(wave_frame.AUDIT_ARTIFACT_NAME),
                 rules / "source_authority_registry.json",
                 rules
                 / "source_packages"

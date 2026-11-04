@@ -74,10 +74,15 @@ def test_each_permitted_move_can_embark_whole_unit_and_remove_its_placement(
     [
         (4.96, 0, True),
         (4.97, 0, False),
-        (1, 3, True),
-        (1, 3.001, False),
-        (4.36, 1.8, True),
-        (4.37, 1.8, False),
+        # Current native FRAME measures the existing provisional 2.75-inch body.
+        # Keep exact vertical inclusion and genuine 3D outside controls above it.
+        (1, 5.75, True),
+        (1, 5.751, False),
+        (4.36, 4.55, True),
+        (4.37, 4.55, False),
+        # These former base-plane negatives are close to the recorded FRAME body.
+        (1, 3.001, True),
+        (4.37, 1.8, True),
     ],
 )
 def test_embark_each_model_uses_actual_three_dimensional_three_inch_distance(

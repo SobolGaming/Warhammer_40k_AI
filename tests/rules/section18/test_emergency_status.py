@@ -1,6 +1,7 @@
 """18.05 after-moving status must reach the actual shared Battle-shock state."""
 
 from dataclasses import replace
+from typing import cast
 
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section03_fixtures import native_state
@@ -8,6 +9,7 @@ from tests.support.section04_fixtures import choose, pending, weapon_rows
 from tests.support.section09_fixtures import movement_mission
 from tests.support.section10_fixtures import declaration_request, shooting_session, submit
 from tests.support.section18_fixtures import AVENGERS, LORD, WAVE
+from warhammer40k_core.core.dice import DiceRollResult, DiceRollResultPayload
 from warhammer40k_core.engine.battle_shock import (
     StratagemTargetPermissionStatus,
     friendly_stratagem_target_permission,
@@ -17,6 +19,7 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
     UnitPlacement,
 )
+from warhammer40k_core.engine.damage_allocation import unit_by_id
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
@@ -48,8 +51,9 @@ def test_native_emergency_survivors_become_actually_battle_shocked(
     state = native_state(
         d, shooter, (Pose.at(10, 10),), enemy=carrier, enemy_poses=(Pose.at(18, 10),)
     )
-    # Current native profile: observed hit/wound/failed save reaches Emergency placement.
-    state.game_id = "section18:emergency:seed-1"
+    # FRAME changes the native LOS fingerprint in deterministic dice history.
+    # Current source: hit 5, wound 5, failed save 1, then five surviving passengers.
+    state.game_id = "section18:emergency:seed-4"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     state.army_definitions[:] = [
         replace(a, units=(*a.units, passenger)) if a.player_id == "opponent" else a
@@ -97,6 +101,27 @@ def test_native_emergency_survivors_become_actually_battle_shocked(
         choose(session, request, option)
     else:
         raise AssertionError("Native Emergency placement was not reached")
+    rolls = tuple(
+        DiceRollResult.from_payload(cast(DiceRollResultPayload, event.payload))
+        for event in session.lifecycle.decision_controller.event_log.records
+        if event.event_type == "dice_rolled"
+    )
+    assert all(roll.source == "rng" for roll in rolls)
+    assert [(roll.spec.roll_type, roll.values) for roll in rolls] == [
+        ("attack_sequence.hit", (5,)),
+        ("attack_sequence.wound", (5,)),
+        ("attack_sequence.save.invulnerable", (1,)),
+        ("destroyed_transport_disembark", (6,)),
+        ("destroyed_transport_disembark", (3,)),
+        ("destroyed_transport_disembark", (4,)),
+        ("destroyed_transport_disembark", (6,)),
+        ("destroyed_transport_disembark", (3,)),
+    ]
+    assert (
+        not unit_by_id(state=state, unit_instance_id=carrier.unit_instance_id)
+        .own_models[0]
+        .is_alive
+    )
     proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
     assert proposal.context is not None
     assert proposal.context["destruction_timing"] == "destroyed_transport"

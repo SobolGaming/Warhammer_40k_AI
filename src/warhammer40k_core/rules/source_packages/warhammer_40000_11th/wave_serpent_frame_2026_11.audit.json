@@ -1,0 +1,74 @@
+{
+  "app_version": "995",
+  "audit_id": "wave-serpent-frame-app-mirror-2026-11-03",
+  "audit_schema": "core-v2-faction-source-audit-v2",
+  "edition": "warhammer_40000_11th",
+  "geometry_authority": {
+    "base_authority": "explicit_maintained_app_or_official_model_evidence",
+    "missing_data": "blocks_fieldability",
+    "variants": "exact_model_profile_and_variant_required",
+    "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+  },
+  "locale": "en",
+  "observations": [
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "b88315367a07df9efecc3bf0f01e433f9716ecc7023c27927f117cbf72fc91c1",
+      "captured_text": "40K.APP\nFACTIONS\nAELDARI\nWave Serpent\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nWave Serpent Large Flying Base\n\nInvulnerable save: 5+\n\n14\"\n9\n3+\n13\n7+\n2\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nShuriken cannon\nLETHAL HITS\n24\"\n3\n3+\n6\n-1\n2\nTwin bright lance\nTWIN-LINKED\n36\"\n1\n3+\n12\n-3\nD6+2\n➤ Twin missile launcher (starshot)\nTWIN-LINKED\n48\"\n1\n3+\n10\n-2\nD6\n➤ Twin missile launcher (sunburst)\nBLAST\nTWIN-LINKED\n48\"\nD6\n3+\n4\n-1\n1\nTwin scatter laser\nTWIN-LINKED\nSUSTAINED HITS 1\n36\"\n6\n3+\n5\n0\n1\nTwin shuriken cannon\nLETHAL HITS\nTWIN-LINKED\n24\"\n3\n3+\n6\n-1\n2\nTwin shuriken catapult\nASSAULT\nTWIN-LINKED\n18\"\n2\n3+\n4\n-1\n1\nTwin starcannon\nTWIN-LINKED\n36\"\n2\n3+\n8\n-3\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nWraithbone hull\n3\n4+\n6\n0\n1\nKEYWORDS\nAELDARI\nDEDICATED TRANSPORT\nFLY\nFRAME\nTRANSPORT\nVEHICLE\nWAVE SERPENT\nCOSTS\n1 model\n115 pts\n4th+ in your army\n+10 pts\nUNIT COMPOSITION\n1 Wave Serpent\n\nThis model is equipped with: twin shuriken cannon; twin shuriken catapult; wraithbone hull.\n\nBecome a supporter and remove ads\nWARGEAR OPTIONS\nThis model’s twin shuriken cannon can be replaced with one of the following: ◦ 1 twin missile launcher ◦ 1 twin bright lance ◦ 1 twin scatter laser ◦ 1 twin starcannon\nThis model’s twin shuriken catapult can be replaced with 1 shuriken cannon.\nCORE ABILITIES\nDEADLY DEMISE D3\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nWave Serpent Shield\n\nEach time a ranged attack targets this model, if the Strength characteristic of that attack is greater than the Toughness characteristic of this model, subtract 1 from the Wound roll.\n\nTRANSPORT\n\nThis model has a transport capacity of 12 ASURYANI INFANTRY models. Each WRAITH CONSTRUCT model takes the space of 2 models. It cannot transport JUMP PACK models or YNNARI models (excluding ASURYANI, YVRAINE and THE VISARCH models).\n\nDAMAGED: 1-4 WOUNDS REMAINING\n\nWhile this model has 1-4 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n23%\nof Aeldari lists, 1.3 per list\n#13\nmost-taken in faction\n29%\nfrom 23% since last update\nIN ARMY LISTS\nPopular detachments\nARMOURED WARHOST\nASPECT HOST\nSPIRIT CONCLAVE\nOften taken with\nFIRE DRAGONS\nWARP SPIDERS\nHOWLING BANSHEES\nWRAITHLORD\nSPIRITSEER",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "model_role": "Wave Serpent",
+          "base_statement": "Wave Serpent Large Flying Base",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "wave-serpent-frame-2026-11-03:datasheet:wave-serpent",
+      "observed_at": "2026-11-03T21:50:41.562Z",
+      "official_source_ids": [
+        "gw-11e-aeldari-faction-pack-2026-07"
+      ],
+      "operative_start": "Wave Serpent\nDATASHEET",
+      "operative_text": "Wave Serpent\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nWave Serpent Large Flying Base\n\nInvulnerable save: 5+\n\n14\"\n9\n3+\n13\n7+\n2\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nShuriken cannon\nLETHAL HITS\n24\"\n3\n3+\n6\n-1\n2\nTwin bright lance\nTWIN-LINKED\n36\"\n1\n3+\n12\n-3\nD6+2\n➤ Twin missile launcher (starshot)\nTWIN-LINKED\n48\"\n1\n3+\n10\n-2\nD6\n➤ Twin missile launcher (sunburst)\nBLAST\nTWIN-LINKED\n48\"\nD6\n3+\n4\n-1\n1\nTwin scatter laser\nTWIN-LINKED\nSUSTAINED HITS 1\n36\"\n6\n3+\n5\n0\n1\nTwin shuriken cannon\nLETHAL HITS\nTWIN-LINKED\n24\"\n3\n3+\n6\n-1\n2\nTwin shuriken catapult\nASSAULT\nTWIN-LINKED\n18\"\n2\n3+\n4\n-1\n1\nTwin starcannon\nTWIN-LINKED\n36\"\n2\n3+\n8\n-3\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nWraithbone hull\n3\n4+\n6\n0\n1\nKEYWORDS\nAELDARI\nDEDICATED TRANSPORT\nFLY\nFRAME\nTRANSPORT\nVEHICLE\nWAVE SERPENT\nCOSTS\n1 model\n115 pts\n4th+ in your army\n+10 pts\nUNIT COMPOSITION\n1 Wave Serpent\n\nThis model is equipped with: twin shuriken cannon; twin shuriken catapult; wraithbone hull.\n\nBecome a supporter and remove ads\nWARGEAR OPTIONS\nThis model’s twin shuriken cannon can be replaced with one of the following: ◦ 1 twin missile launcher ◦ 1 twin bright lance ◦ 1 twin scatter laser ◦ 1 twin starcannon\nThis model’s twin shuriken catapult can be replaced with 1 shuriken cannon.\nCORE ABILITIES\nDEADLY DEMISE D3\nFACTION ABILITIES\nBATTLE FOCUS\nUNIT ABILITIES\nWave Serpent Shield\n\nEach time a ranged attack targets this model, if the Strength characteristic of that attack is greater than the Toughness characteristic of this model, subtract 1 from the Wound roll.\n\nTRANSPORT\n\nThis model has a transport capacity of 12 ASURYANI INFANTRY models. Each WRAITH CONSTRUCT model takes the space of 2 models. It cannot transport JUMP PACK models or YNNARI models (excluding ASURYANI, YVRAINE and THE VISARCH models).\n\nDAMAGED: 1-4 WOUNDS REMAINING\n\nWhile this model has 1-4 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n23%\nof Aeldari lists, 1.3 per list\n#13\nmost-taken in faction\n29%\nfrom 23% since last update\nIN ARMY LISTS\nPopular detachments\nARMOURED WARHOST\nASPECT HOST\nSPIRIT CONCLAVE\nOften taken with\nFIRE DRAGONS\nWARP SPIDERS\nHOWLING BANSHEES\nWRAITHLORD\nSPIRITSEER",
+      "owning_faction_source_id": "faction-app:aeldari",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Complete rendered DOM observation from maintained unofficial App mirror; not official primary/network bytes or App-build attestation. Existing Core17.02 unchanged. Large Flying Base is nonnumeric; historical60mm and provisional2.75inch retained, no hull certification. Only ordinary/global FRAME is added; version995 is global update context, not keyword change date.",
+      "source_id": "faction-app:aeldari:datasheet:wave-serpent",
+      "source_observation_sha256": "c3c236e1ad687e38734615b6e35d327f49c26695a2fa38bb3105b83aa22dd48b",
+      "source_title": "Wave Serpent",
+      "source_url": "https://www.40k.app/factions/aeldari/units/wave-serpent",
+      "transcription_sha256": "196949c80917403cceb667adfbcc69dbd50e16ea896e80cb7547aa54024f45fe"
+    }
+  ],
+  "official_sources": [
+    {
+      "artifact_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_aeldari-qe1ykopo7h-blfkukhecc.pdf",
+      "provider_name": "Games Workshop",
+      "relationship": "historical_primary_not_current_corroboration",
+      "sha256": "2a1954801042948256c002095937be88c9d334994f0b01d7a63510c94d39fe1d",
+      "source_date": "2026-07-22",
+      "source_id": "gw-11e-aeldari-faction-pack-2026-07",
+      "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_faction_pack_aeldari-qe1ykopo7h-blfkukhecc.pdf"
+    }
+  ],
+  "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+  "selected_source_ids": [
+    "faction-app:aeldari:datasheet:wave-serpent"
+  ],
+  "version_evidence": {
+    "source_url": "https://www.40k.app/factions/updates",
+    "observed_at": "2026-11-03T21:48:13.587Z",
+    "statement": "Version 995\nReleased 2026-10-16.",
+    "transcription_sha256": "e6efd2e9a45a208c455693a1855a929e4da0696bc206eaec403958bb45017b54"
+  }
+}

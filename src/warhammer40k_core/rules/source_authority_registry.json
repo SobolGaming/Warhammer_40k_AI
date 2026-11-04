@@ -2127,6 +2127,16 @@
           "row_id": "starfang-keyword-2026-11-03:datasheet:starfangs",
           "source_observation_sha256": "8c6e977af2b801324ce6f52258a5f758be61a7b06bd6fc130dc5223245e177ab",
           "source_url": "https://www.40k.app/factions/aeldari/units/starfangs"
+        },
+        {
+          "audit_id": "wave-serpent-frame-app-mirror-2026-11-03",
+          "row_id": "wave-serpent-frame-2026-11-03:datasheet:wave-serpent",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/aeldari/units/wave-serpent",
+          "source_observation_sha256": "c3c236e1ad687e38734615b6e35d327f49c26695a2fa38bb3105b83aa22dd48b",
+          "identity_kind": "versioned_observation",
+          "identity_value": "995@2026-11-03T21:50:41.562Z"
         }
       ],
       "legacy_observations": [],
@@ -2181,6 +2191,15 @@
           "namespace": "core-v2-reviewed-app-mirror",
           "package_name": "reviewed-starfang-keyword-observations-2026-11",
           "version": "app-data-995-observed-2026-11-03"
+        },
+        {
+          "namespace": "core-v2-reviewed-app-mirror",
+          "package_name": "reviewed-wave-serpent-frame-observations-2026-11",
+          "version": "app-data-995-observed-2026-11-03",
+          "allowed_rule_source_ids": [
+            "faction-app:aeldari:datasheet:wave-serpent"
+          ],
+          "catalog_sha256": "547444841dee2fbca79882a1aa7ba0452b4ad00a2797c1974693b864397fffdb"
         }
       ],
       "source_package_extensions": []

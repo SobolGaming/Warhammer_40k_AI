@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7d35ef726363448ab0722ed1318fa2e6d2c0ba7d4a4f67a228a46c527a769724",
-  "fingerprint": "7d35ef726363448ab0722ed1318fa2e6d2c0ba7d4a4f67a228a46c527a769724",
-  "resource_count": 3200,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:023e6ea45a9c467fbce4d888824856cf4d00900f57a4b0d01f4b88d4459a748c",
+  "fingerprint": "023e6ea45a9c467fbce4d888824856cf4d00900f57a4b0d01f4b88d4459a748c",
+  "resource_count": 3203,
   "resources": [
     {
       "byte_length": 113,
@@ -13950,9 +13950,9 @@
       "sha256": "b4877c969da278cfbd8f11903dcd14aa6ee49acb867454c818efd7c82d96245d"
     },
     {
-      "byte_length": 16705,
+      "byte_length": 16962,
       "path": "warhammer40k_core/rules/faction_source_governance.py",
-      "sha256": "d0ecf6873207bdcc7e84036d74122a08f83eb655940d133a9ec775834b791f50"
+      "sha256": "04331fded4911da69d3cbedeb9c628a40a82bc27be39fdbefefcf111300f990b"
     },
     {
       "byte_length": 15466,
@@ -14150,14 +14150,14 @@
       "sha256": "78cb8b0a5fa15dcbfe5b30b36ae1d7fb06fc7d7a2a0b0b75db2761363f765d3f"
     },
     {
-      "byte_length": 113678,
+      "byte_length": 114687,
       "path": "warhammer40k_core/rules/source_authority_registry.json",
-      "sha256": "561f84d8c548725db2a01ef3fc0dc9903a719dedf47c19e766b87113ee3ed0eb"
+      "sha256": "c29fa3e58d51ead99e3f8ce1108d79f8090b6883af4f1ce3ce0f10d4df5cd98c"
     },
     {
       "byte_length": 26543,
       "path": "warhammer40k_core/rules/source_authority_registry.py",
-      "sha256": "2bd1e14419f8d5f4e7e640cbc9b6d9c3c6300f962cd1be4537bb022d41c9bdb4"
+      "sha256": "9385cb8f03cc86d35d42af9aca18d391f6f962c2ea1c369d23feb4c9596fe5c0"
     },
     {
       "byte_length": 19955,
@@ -15823,6 +15823,21 @@
       "byte_length": 3234,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/thousand_sons_defiler_datasheet_overlay_2026_07.py",
       "sha256": "c3cf36d76112cb8688fc943e4f085073bb5691f2faf30a31b6202576ab1f9241"
+    },
+    {
+      "byte_length": 8215,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/wave_serpent_frame_2026_11.audit.json",
+      "sha256": "b4c1acebb902bac7811df028b8f107ed47e531ba8bf0e3e69fbb8b1e9f518e7d"
+    },
+    {
+      "byte_length": 1425,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/wave_serpent_frame_2026_11.overlay-pack.json",
+      "sha256": "0e1eefbb84497d8204f91e9add31c3e9ece010f6783000c30f6c26a0eaf2b66a"
+    },
+    {
+      "byte_length": 4030,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/wave_serpent_frame_2026_11.py",
+      "sha256": "411624bffae2d73b2599510f9183ad72d8d0de65445d71b741b0736b0ccd02a5"
     },
     {
       "byte_length": 50668,

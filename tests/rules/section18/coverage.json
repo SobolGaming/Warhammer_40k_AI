@@ -453,7 +453,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section18/test_embark.py::test_embark_each_model_uses_actual_three_dimensional_three_inch_distance",
-              "function_ast_sha256": "3f73b23a57fa4c8955898e0b1cc1c5cc072030fd5dcb3b9f28707260b5dc29ab",
+              "function_ast_sha256": "d4a715ba8bae730a7632c8fdae6ec34f1d29e966e990fe4df788ad00910fc037",
               "assertions": [
                 "assert result.is_valid is valid, result.violations",
                 "assert {v.violation_code.value for v in result.violations} == (set() if valid else {'embark_distance'})",
@@ -2281,10 +2281,13 @@
             },
             {
               "node": "tests/rules/section18/test_emergency_status.py::test_native_emergency_survivors_become_actually_battle_shocked",
-              "function_ast_sha256": "ae286d1b724886d50e72584c4916cac8f3f6d7c1a08ac51457ded479e712219b",
+              "function_ast_sha256": "4fbcb74c432a5f7641a4e6e7c3ec9704054d7c8787298ce09f976a295a01185a",
               "assertions": [
                 "assert len(rows) == 1",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert all((roll.source == 'rng' for roll in rolls))",
+                "assert [(roll.spec.roll_type, roll.values) for roll in rolls] == [('attack_sequence.hit', (5,)), ('attack_sequence.wound', (5,)), ('attack_sequence.save.invulnerable', (1,)), ('destroyed_transport_disembark', (6,)), ('destroyed_transport_disembark', (3,)), ('destroyed_transport_disembark', (4,)), ('destroyed_transport_disembark', (6,)), ('destroyed_transport_disembark', (3,))]",
+                "assert not unit_by_id(state=state, unit_instance_id=carrier.unit_instance_id).own_models[0].is_alive",
                 "assert proposal.context is not None",
                 "assert proposal.context['destruction_timing'] == 'destroyed_transport'",
                 "assert not rules_unit_is_battle_shocked(state=state, unit_instance_id=passenger.unit_instance_id)",
@@ -3870,9 +3873,9 @@
     "tests/rules/section18/test_attached.py": "d23660806374db51e9911b02a755d3b3730d39a5e42a3a9c582df32598b23b5c",
     "tests/rules/section18/test_combat.py": "cd52e0d1b51def7655f99cf189396af2a5f7eedb8d2b4a53e3319bc7a6a311af",
     "tests/rules/section18/test_disembark.py": "4ca60395ad8dd62064b49e77c0c48660a89abf901ab4da711c0f8ef8f80c5cf8",
-    "tests/rules/section18/test_embark.py": "d148bcd98b7ee35af091d65ce1d4b1da49c7ede1aab56c0611923e4ab6a75cd2",
+    "tests/rules/section18/test_embark.py": "52a6932ef18fe93ae8fbba796aa9d0af79842884ed3cfd5c337aa13a15949261",
     "tests/rules/section18/test_emergency.py": "dd10071fe5d07adf4d5960320ce0dba5bda9f58187e5d52df08f1ef2e0871416",
-    "tests/rules/section18/test_emergency_status.py": "fd3db12da38f514cbbb9e4f100b104c149ccd053dfb7d57fab6d56021a7c65e2",
+    "tests/rules/section18/test_emergency_status.py": "33d138d7535a91165197a066e0b9f6bac5ee757453175f57e7539a218ba80d1e",
     "tests/rules/section18/test_facade.py": "2465f2e916ccbf7ea4e433bd6820874287e8dec38a226efb5ecb46f1cede64e3",
     "tests/rules/section18/test_faqs.py": "8897688f2eaaeb5a19c1e90f0f52994b276ded51ee36b67aa1031c0c70673178",
     "tests/rules/section18/test_formations.py": "1e64f5f3a7bd354f572af4d5796ecac0b85c5e48390acc7be94bbd368ee374ad",
