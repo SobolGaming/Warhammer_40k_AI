@@ -120,6 +120,7 @@ def mission_scoring_policies_from_setup(mission_setup: MissionSetup) -> MissionS
                 battle_ready_vp=caps.battle_ready_vp,
                 total_vp_cap=scoring.total_vp_cap,
                 secondary_max_vp_per_turn=scoring.secondary_max_vp_per_turn,
+                secondary_vp_cap_scope=scoring.secondary_vp_cap_scope,
                 end_of_round_scoring_windows=scoring.end_of_round_scoring_windows,
                 end_of_game_scoring_windows=scoring.end_of_game_scoring_windows,
                 source_id=(

@@ -24,6 +24,7 @@ from warhammer40k_core.core.missions import (
     ObjectiveTerrainAreaDefinition,
     objective_marker_role_from_token,
 )
+from warhammer40k_core.core.secondary_vp_cap_scope import SecondaryVictoryPointCapScope
 from warhammer40k_core.core.terrain_areas import (
     PlacedTerrainArea,
     SymmetryAxis,
@@ -71,7 +72,7 @@ DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-EXPECTED_SOURCE_IMPORT_HASH = "9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5"
+EXPECTED_SOURCE_IMPORT_HASH = "0b52df4d766aaba3820b7d8bb2e2325da02ba4f51f9fd65ab5fb2f84ea224a97"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -1005,6 +1006,7 @@ def mission_pack_scoring_row() -> chapter_approved.SourceMissionPackScoringRow:
         secondary_vp_cap=45,
         total_vp_cap=100,
         secondary_max_vp_per_turn=chapter_approved_scoring.secondary_max_vp_per_turn,
+        secondary_vp_cap_scope=SecondaryVictoryPointCapScope.BATTLE_ROUND,
         end_of_round_scoring_windows=chapter_approved_scoring.end_of_round_scoring_windows,
         end_of_game_scoring_windows=chapter_approved_scoring.end_of_game_scoring_windows,
         reserve_destruction_timing=chapter_approved_scoring.reserve_destruction_timing,

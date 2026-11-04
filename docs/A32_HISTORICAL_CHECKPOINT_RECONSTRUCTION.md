@@ -25,14 +25,32 @@ Recovery verifies the original closed envelope and every hash, exact initial
 anchor, decision inventory and event prefix/tail. It replays those decisions through
 the engine without injecting dice or editing live state. It then requires all 137
 old events to match exactly after a recorded one-to-one ordinal event-ID mapping.
-Gameplay state, choices, complete RNG state and source identity must remain exact.
+Gameplay state, choices and complete RNG state remain exact. All nine other
+source-identity fields remain exact; the one finite Chapter import-hash mapping
+below is explicit.
 Only the generated completion event and its event-ID references are added. Derived
 runtime-content audits are refreshed at the two declared current/history anchors;
 ordinary strict loading recomputes and authenticates them. Missing records, changed
 outcomes, unexplained events/state, unknown profile/source and drifted provenance
 fail closed. Supporting another source requires a separately reviewed recipe.
 
-The new offline package is `local-checkpoint-reconstruction-v1`: a separate strict
+The required explicit Chapter `secondary_vp_cap_scope=player_turn` field changes
+its derived import hash from
+`009a47e19b7e619f6a9bcd75a5294497ac1becb2aee4c320ffcd0a393c57399d` to
+`8f76fcf275397bd2ffabf16d3e127f059fb476e0144654bd54e550f5dd16faa1`.
+For this same authenticated source/profile only, reconstruction prepares an
+in-memory replay-artifact copy with that exact `mission_source_package_hash`
+transition and sends the copy through the unchanged strict replay loader. The
+current target and `PLAYER_TURN` scope are pinned; removing only the added field
+must recover the authenticated original scoring-row hash
+`b408ac7e759b3000d2c1a611624e28ba4ddb8e8f80c2a85589f89cd79927fedf`.
+Both original initial/final VP ledgers are empty and remain so under exact
+gameplay-state comparison. This converts no Event scoring history. The output
+records the exact path, old/new values, reason and
+`recorded-decision-reconstruction-v2-mission-scope` recipe revision. Unknown
+pack/hash changes and older reconstruction output schemas fail closed.
+
+The new offline package is `local-checkpoint-reconstruction-v2-mission-scope`: a separate strict
 local checkpoint plus deterministic provenance and a canonical package hash. It
 records source/destination runtime identities, original input digest, every event
 mapping, regenerated evidence and derived audit hashes. Its verification path

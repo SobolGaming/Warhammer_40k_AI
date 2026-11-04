@@ -134,6 +134,48 @@ Secondary status:
   (`A Grievous Blow`, `Assassination`, `Bring It Down`,
   `Engage on All Fronts`).
 
+## Event Companion Secondary cap correction
+
+The retained July v1.1 Companion, printed page 2, limits Secondary VP to 15 per
+battle round. The official October v1.3 Companion (14 October download,
+SHA-256 `187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2`)
+retains that limit. Structured scoring now carries the required
+`secondary_vp_cap_scope`: Event Companion uses `battle_round`, while the ordinary
+Chapter Approved pack retains its existing `player_turn` policy pending its own
+source review. The historical numeric field `secondary_max_vp_per_turn` specifies
+the amount for that explicit period. Shared award, capacity-preview and restored
+ledger validation aggregate both Fixed and Tactical Secondary transactions across
+the two turns for the Event policy. Independent player ledgers, 20 VP per Fixed
+card, 45 total Secondary VP and 100 total VP retain their existing meanings.
+
+The native regression uses unchanged W5 Lord Exultant definitions, a non-strict
+roster and authored destruction effects. It drives actual facade scoring and turn
+progression, validates saved state, and replays from the checkpoint after the last
+authored destruction premise. It establishes these bounded consumers, not natural
+combat, legal full-army admission or a complete game. The Tactical control uses
+at most two active cards, held from round 2 into round 3, and explicit subsequent
+turn/card checkpoints. State-backed scoring reaches 15 across the two turns;
+capacity preview permits only retain, rejects score without mutation, and restores
+the pending decision. It does not certify the natural draw chain. The legacy
+final-score aggregate test uses explicitly prepared period-valid cap/ledger
+premises for 45/100 arithmetic; those premises are not producer or restore evidence.
+
+The derived Chapter source import hash changes because the explicit existing
+player-turn scope is now serialized. The already supported one-artifact offline
+[A32 reconstruction](A32_HISTORICAL_CHECKPOINT_RECONSTRUCTION.md) records a finite,
+pinned hash transition; its original empty VP ledgers and all other gameplay,
+identity and event obligations remain exact. Ordinary loaders receive no fallback.
+
+This correction does not upgrade the complete package to October v1.3. Layouts,
+mission-card transcriptions and base-guide provenance remain July-bound. Current
+October diagrams differ on 30 rendered layout pages, including changed footprint
+geometry and an extra objective on each Reconnaissance versus Reconnaissance
+A/B/C layout. The independently checked source objective count is 249 versus 246
+in the retained runtime package; count evidence does not certify coordinates or
+bindings. Complete 45-layout extraction, review, generation and gameplay/replay
+requalification remain pending as a separate migration. The new Plunder/Beacon
+FAQ source admission and the changed Wazbom Blastajet base row are separate.
+
 ## Battlefield Coverage
 
 - Phase 17N has source-hashed executable battlefield packages for all 45 Event
@@ -261,7 +303,7 @@ Secondary status:
   timing string is insufficient. The same validator runs for live awards and
   restored ledgers, including ordinary per-round Primary-total validation. The
   derived Event Companion source identity is
-  `9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5`.
+  `0b52df4d766aaba3820b7d8bb2e2325da02ba4f51f9fd65ab5fb2f84ea224a97`.
 - Verify that the committed battlefield artifact still matches its reviewed
   inputs without writing files with
   `uv run python tools/build_event_companion_battlefields.py --check`.
@@ -470,7 +512,7 @@ five-battle-round game, as configured by the current Event Companion package.
   reciprocal shuffle and Defend Stronghold's mandatory first-round shuffle,
   Beacon/Tempting Target/Burden of Trust selections, scoring, retain/discard,
   Fixed card states that remain active after scoring, the 20 VP per Fixed
-  Mission card cap, the 15 VP Secondary cap per player turn, frozen
+  Mission card cap, the 15 VP Secondary cap per battle round, frozen
   `SecondaryScoringStateEvidence` restore authentication, and state-backed
   awards for all 18 cards. Engage presence-definition rows remain source-only
   procedure/definition text. Step 6G certifies every card/mode through both

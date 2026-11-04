@@ -489,6 +489,7 @@ def _validate_common_policy_fields(policies: tuple[MissionScoringPolicy, ...]) -
         "battle_ready_vp",
         "total_vp_cap",
         "secondary_max_vp_per_turn",
+        "secondary_vp_cap_scope",
         "end_of_round_scoring_windows",
         "end_of_game_scoring_windows",
     )

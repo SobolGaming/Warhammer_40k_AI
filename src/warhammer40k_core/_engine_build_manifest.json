@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f4d4a6c0e68be824d716e93d05bbfd2ff36340a3bcd11e174ca2649c23e41be8",
-  "fingerprint": "f4d4a6c0e68be824d716e93d05bbfd2ff36340a3bcd11e174ca2649c23e41be8",
-  "resource_count": 3210,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4ad18b22d2abe4a917318b04e200d577265d8b89568625f69bbe6a83093b5053",
+  "fingerprint": "4ad18b22d2abe4a917318b04e200d577265d8b89568625f69bbe6a83093b5053",
+  "resource_count": 3212,
   "resources": [
     {
       "byte_length": 113,
@@ -40,9 +40,9 @@
       "sha256": "e764aa73b4aec8b3b23d092a3f313b25b497c1384605b0ad4e6e9992de81b87f"
     },
     {
-      "byte_length": 13857,
+      "byte_length": 16253,
       "path": "warhammer40k_core/adapters/checkpoint_reconstruction.py",
-      "sha256": "f3eefd48ef0cf21bb429e22c8f6751f9dc056b5d7d3903c788f4b4f8daeddf3a"
+      "sha256": "796fefbff999b2c807ad212e1bbb2e3db7c3b99feb76811e596c7a4f69bf61ef"
     },
     {
       "byte_length": 13475,
@@ -510,14 +510,19 @@
       "sha256": "ef74027878a00ceeca09112a4b38908224c8b9a0db90d9da87475fd2e9cacb2f"
     },
     {
+      "byte_length": 741,
+      "path": "warhammer40k_core/core/mission_scoring_payload.py",
+      "sha256": "260df947586ea4afc6e2095db3406a1a10b2b5ef98ada80d5c807a9fbcc9d1be"
+    },
+    {
       "byte_length": 2965,
       "path": "warhammer40k_core/core/mission_scoring_resolution.py",
       "sha256": "2397c20a55ad0be5e2b357c958853a08e2a607e0572c4d8f56ca6749d8f0aa01"
     },
     {
-      "byte_length": 138592,
+      "byte_length": 138976,
       "path": "warhammer40k_core/core/missions.py",
-      "sha256": "5be4dc888e1f0f9445c127037e6bfd9576180117b5a705aa7e1ccb03cb8f4e78"
+      "sha256": "fc0c87a7236ea21fbc31ca9b186d6caada8b12f12eb2c7aba359a7070c489d29"
     },
     {
       "byte_length": 48472,
@@ -578,6 +583,11 @@
       "byte_length": 118753,
       "path": "warhammer40k_core/core/ruleset_descriptor.py",
       "sha256": "d4d30951aa60f5c7ef10941f609ee76abb3400945cba928a69f5321a14cbb7b8"
+    },
+    {
+      "byte_length": 609,
+      "path": "warhammer40k_core/core/secondary_vp_cap_scope.py",
+      "sha256": "2c0ca59f19e461cb6eb5c7fe11ac28b57ff2a3111f97b354d0f6815ba15916c2"
     },
     {
       "byte_length": 34052,
@@ -10860,9 +10870,9 @@
       "sha256": "4126dbe23caad063b9a30e33927792b87a13e9a843e918fa4dabd5d883b49e78"
     },
     {
-      "byte_length": 23220,
+      "byte_length": 23254,
       "path": "warhammer40k_core/engine/mission_scoring_policies.py",
-      "sha256": "5fcf648464838a0fce4e9ebc7a32cd3c809813d52c98213d3780047a9bcd78b8"
+      "sha256": "2df8a6ffa1fc61530f45020d5a521b29ff768410cb84212e5feb09f6c544256b"
     },
     {
       "byte_length": 16286,
@@ -10895,9 +10905,9 @@
       "sha256": "efa4010cc1cf2d32a9f962b78f3546215d9e9e7e3f721bc8d2bd45518bfd3f0b"
     },
     {
-      "byte_length": 28486,
+      "byte_length": 28557,
       "path": "warhammer40k_core/engine/missions.py",
-      "sha256": "3137321dafc27e63c28ba9c535c41b98ee1006df50e25b0b0cc75ccd50f47c8f"
+      "sha256": "7d1211180b4c9b0c5e1325f5b5dba8927d00beb4bd675c671ee95a15b927ce93"
     },
     {
       "byte_length": 2162,
@@ -12640,14 +12650,14 @@
       "sha256": "f70aee2c798d6253bfeeea2f17be5e3f77cec901aba5e47d6e937158a5a6a1f9"
     },
     {
-      "byte_length": 152869,
+      "byte_length": 153681,
       "path": "warhammer40k_core/engine/scoring.py",
-      "sha256": "81c529cbe79e9979f1f8f7ebd84c012850de1638ecfe3c32edc4929d11448386"
+      "sha256": "cca2294fe71a42585e4e64ff73f76a4d4049c85dc36d06d5b304e215c5642f90"
     },
     {
-      "byte_length": 5386,
+      "byte_length": 5858,
       "path": "warhammer40k_core/engine/scoring_cap_audit.py",
-      "sha256": "4e63172b6c6451b2728a8e9c41452115ec6aff3d77ed1f4aa08109ba3e830aae"
+      "sha256": "aadb7cda932a22ad191fecfe82c5f5b1bfc5b1b6995cfc912f4af39b830416a0"
     },
     {
       "byte_length": 5014,
@@ -13505,9 +13515,9 @@
       "sha256": "fe7bc1a3226d1bd26455a6c09bd18ff362112f21b95bf484b58f387107df0c75"
     },
     {
-      "byte_length": 9698,
+      "byte_length": 10200,
       "path": "warhammer40k_core/engine/victory_point_cap_resolution.py",
-      "sha256": "f8475aea2c4d57efb48873ae02120660c5d51796381923789e3b797ab3b415a7"
+      "sha256": "c954a52ad4fb683c5fcf8298dc6d9d3683b979358cf8a185bbfa973eca545cf8"
     },
     {
       "byte_length": 3546,
@@ -14005,9 +14015,9 @@
       "sha256": "8f51e15346f62b5bd7a19956707b45f930cf916fac890e9d85421d36e6edf683"
     },
     {
-      "byte_length": 30193,
+      "byte_length": 30327,
       "path": "warhammer40k_core/rules/mission_pack_import.py",
-      "sha256": "dddc3c9a83da8ece844093c12152cbc160c18e0633ca67edef41a1d16a7db77f"
+      "sha256": "c80c97dfbb57bed42960ae6ca6f9683ebf7b468ced6f939fe841a7308b00c86a"
     },
     {
       "byte_length": 1862,
@@ -14300,9 +14310,9 @@
       "sha256": "d309ff368e0df8c0f5606267da221aad011f1e42b4ff544dee76d187492441cf"
     },
     {
-      "byte_length": 54073,
+      "byte_length": 54366,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chapter_approved_2026_27.py",
-      "sha256": "a6954a460e96bb209447be2dc2a75c74aaa8eff2890cd69bc98ccc1b1acf3ee2"
+      "sha256": "473580fc5d1d0a55aef1a20194877623828873fcbee1ac9c0dd084e1585a9e3f"
     },
     {
       "byte_length": 1248,
@@ -15010,9 +15020,9 @@
       "sha256": "5582567775ffa248c99b71232a757e004f96206fe7ae0c4464d438228937eb50"
     },
     {
-      "byte_length": 86897,
+      "byte_length": 87060,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py",
-      "sha256": "fd7d0c7a7a21f9decaa482e7c201c9e4617acd2c3633d53f18ad1a308f00d5f5"
+      "sha256": "ddecfba92afba56a2477b981aaa12472895a8e19cde8a8c8a2b3da6bb20bde0c"
     },
     {
       "byte_length": 76485,

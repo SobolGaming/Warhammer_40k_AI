@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.secondary_vp_cap_scope import SecondaryVictoryPointCapScope
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.scoring_cap_audit import metadata_with_vp_cap_audit
@@ -113,13 +114,12 @@ def resolve_victory_point_cap(
     secondary_turn_points_before = 0
     secondary_turn_remaining = award.amount
     turn_active_player_id = _optional_scoring_turn_active_player_id(award.metadata)
-    if (
-        award.source_kind
-        in {
-            VictoryPointSourceKind.FIXED_SECONDARY,
-            VictoryPointSourceKind.TACTICAL_SECONDARY,
-        }
-        and turn_active_player_id is not None
+    if award.source_kind in {
+        VictoryPointSourceKind.FIXED_SECONDARY,
+        VictoryPointSourceKind.TACTICAL_SECONDARY,
+    } and (
+        policy.secondary_vp_cap_scope is SecondaryVictoryPointCapScope.BATTLE_ROUND
+        or turn_active_player_id is not None
     ):
         secondary_turn_cap = policy.secondary_max_vp_per_turn
         secondary_turn_points_before = sum(
@@ -131,7 +131,10 @@ def resolve_victory_point_cap(
                 VictoryPointSourceKind.TACTICAL_SECONDARY,
             }
             and transaction.battle_round == award.battle_round
-            and _transaction_scoring_turn_active_player_id(transaction) == turn_active_player_id
+            and (
+                policy.secondary_vp_cap_scope is SecondaryVictoryPointCapScope.BATTLE_ROUND
+                or _transaction_scoring_turn_active_player_id(transaction) == turn_active_player_id
+            )
         )
         secondary_turn_remaining = max(secondary_turn_cap - secondary_turn_points_before, 0)
 
@@ -158,7 +161,11 @@ def resolve_victory_point_cap(
     if primary_battle_round_remaining < award.amount:
         capped_reasons.append("primary_battle_round_vp_cap")
     if secondary_turn_remaining < award.amount:
-        capped_reasons.append("secondary_turn_vp_cap")
+        capped_reasons.append(
+            "secondary_battle_round_vp_cap"
+            if policy.secondary_vp_cap_scope is SecondaryVictoryPointCapScope.BATTLE_ROUND
+            else "secondary_turn_vp_cap"
+        )
     if total_remaining < award.amount:
         capped_reasons.append("total_vp_cap")
     return VictoryPointCapResolution(
@@ -180,6 +187,7 @@ def resolve_victory_point_cap(
             primary_battle_round_cap=primary_battle_round_cap,
             primary_battle_round_points_before=primary_battle_round_points_before,
             primary_battle_round_points_after=(primary_battle_round_points_before + applied_amount),
+            secondary_vp_cap_scope=policy.secondary_vp_cap_scope,
             secondary_turn_vp_cap=secondary_turn_cap,
             secondary_turn_points_before=secondary_turn_points_before,
             secondary_turn_points_after=secondary_turn_points_before + applied_amount,

@@ -265,10 +265,10 @@
       "sha256": "3d439c333754f8f99031fcf3489a0799a8e6dd4ecd64b2f6b5ff76bfa26b26ae"
     },
     "tests/infrastructure/missions/unit/test_event_companion.py": {
-      "blob_sha1": "0d7c3e650e3edbee98319ade403d1bf42633cce9",
+      "blob_sha1": "b007888a27bc240641bb56ab9f03c0865af66f51",
       "bytes": 59287,
       "mode": "100644",
-      "sha256": "ae6351e3f40fb9b9680770e513bcf301a80dd884b51b4a64c33b3d9d690fc563"
+      "sha256": "48641abc04fa4c5b6f595c070c2a8283a8aee8645398c7ee185a3d4a66a9c317"
     },
     "tests/infrastructure/missions/unit/test_event_companion_part2.py": {
       "blob_sha1": "15c2c82e445afe3ea456a4b3beb2112632f93ff1",
@@ -277,10 +277,10 @@
       "sha256": "baf996721695969307039d0a87089b8404cd199d60341afe461bbcf85e469b33"
     },
     "tests/infrastructure/missions/unit/test_game_end_scoring.py": {
-      "blob_sha1": "8edabfc6d0eded569a0ee1d52bd48a7922e0720f",
-      "bytes": 18613,
+      "blob_sha1": "d05354290dca05fecdd35496a649d0ca29a00a04",
+      "bytes": 26028,
       "mode": "100644",
-      "sha256": "e8a9d70b39beb869b59e8e549ce09ccafbeaa4af0046d1530c38607a6ef681f8"
+      "sha256": "b31fceb663ce6b50ea14f1d399b92e206b1464d8ec03c52fca867f4dc5fcaf9c"
     },
     "tests/infrastructure/missions/unit/test_lifecycle.py": {
       "blob_sha1": "e726f43a2865a93ee314dacd5ff5bc3d4e0d4025",
@@ -367,10 +367,10 @@
       "sha256": "ce3584778553eb5b0f563f8ff698126ae6aa8d1ecf26d496c3384836c16a7cf4"
     },
     "tests/infrastructure/missions/unit/test_step6g_secondary_certification.py": {
-      "blob_sha1": "e22d529c6e0d6fd585fca83a343193dd96a0cea8",
-      "bytes": 32500,
+      "blob_sha1": "a1c182ca081978aed1f8371bbeff9dd92fdf5ad4",
+      "bytes": 32524,
       "mode": "100644",
-      "sha256": "188ffe6cc56843bb5951da5d1e002eaf2ed0ebc1cfbda03ce8fddefc8b6597bd"
+      "sha256": "b58b7f6733ce28e6c16e752a578e47549e201a84ff256c5f4ec62d7e0ac550dc"
     },
     "tests/infrastructure/missions/unit/test_step6g_secondary_certification_a_grievous_through_beacon.py": {
       "blob_sha1": "b8202e2a29b950dcc95ee451d1c45e3d05dc0844",
@@ -1957,10 +1957,10 @@
       "sha256": "33d138d7535a91165197a066e0b9f6bac5ee757453175f57e7539a218ba80d1e"
     },
     "tests/rules/section18/test_facade.py": {
-      "blob_sha1": "6f25b3bafe844411830f8f7307982b9cb86ec46e",
-      "bytes": 26719,
+      "blob_sha1": "6468fee39bdf39ec36312db94d14259b40626c81",
+      "bytes": 28617,
       "mode": "100644",
-      "sha256": "2465f2e916ccbf7ea4e433bd6820874287e8dec38a226efb5ecb46f1cede64e3"
+      "sha256": "043a4266f6e7cb557f8345724e6bedb8dcd85fb76fae7d1b1d92fbfa0b0f8bee"
     },
     "tests/rules/section18/test_faqs.py": {
       "blob_sha1": "7ca728af1f8756f940a33b51b135a48833c41666",

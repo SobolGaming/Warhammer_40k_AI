@@ -22,6 +22,7 @@ from warhammer40k_core.core.missions import (
     PrimaryMissionDefinition,
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.secondary_vp_cap_scope import SecondaryVictoryPointCapScope
 from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState, ModelPlacement
 from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
@@ -481,6 +482,7 @@ def _runtime_policy(
         battle_ready_vp=10,
         total_vp_cap=100,
         secondary_max_vp_per_turn=15,
+        secondary_vp_cap_scope=SecondaryVictoryPointCapScope.BATTLE_ROUND,
         end_of_round_scoring_windows=("end-of-round",),
         end_of_game_scoring_windows=("end-of-game",),
         source_id="source:mission-policy",

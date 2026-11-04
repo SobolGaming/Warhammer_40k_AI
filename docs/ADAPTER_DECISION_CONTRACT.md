@@ -8018,12 +8018,17 @@ No player choice, proposal envelope, option family or visibility policy changes.
 The separately authorized offline profile documented in
 [A32 historical checkpoint reconstruction](A32_HISTORICAL_CHECKPOINT_RECONSTRUCTION.md)
 admits exactly one retained source digest. Its new
-`local-checkpoint-reconstruction-v1` package is tooling provenance plus an ordinary
+`local-checkpoint-reconstruction-v2-mission-scope` package is tooling provenance plus an ordinary
 strict local checkpoint, not a replacement server/session persistence envelope.
 The operator explicitly selects the recipe and preserves the original. Regenerated
 completion evidence is identified as new; every original event, choice, RNG state
 and gameplay field is matched under the declared event-ID mapping. Verification
 uses ordinary strict restore and exact replay of the reconstructed representation.
+The required explicit Chapter player-turn scope has one registered old/new import
+hash mapping for that same original digest/profile. Deterministic versioned
+provenance identifies it; the other nine identity fields remain exact. Ordinary
+loaders continue to reject the original bytes, and older output schemas receive
+no fallback.
 No automatic fallback, original-byte cross-version replay claim, player-visible
 payload, public operation or released contract family change is introduced.
 
@@ -8044,3 +8049,27 @@ the revision with a fresh request. Unsupported-with-reason and no-detail branche
 have pure typed response-assembly coverage; the public setup scenario has no
 deterministic native uncommitted unsupported route, so no such live certification
 is claimed.
+
+
+## Secondary victory-point cap period
+
+Mission scoring source/core/policy payloads require `secondary_vp_cap_scope`,
+exactly `player_turn` or `battle_round`. Missing and unknown values fail closed;
+there is no old-payload default. The existing numeric
+`secondary_max_vp_per_turn` field is historical naming: its amount applies to the
+explicit scope. Event Companion selects `battle_round`; ordinary Chapter Approved
+retains `player_turn`. Both player policies must agree on the shared scope.
+
+`scoring_turn_active_player_id` remains genuine boundary provenance. It does not
+partition Event Companion round capacity. Event cap metadata uses the reason
+`secondary_battle_round_vp_cap` and audit fields `secondary_battle_round_vp_cap`,
+`secondary_battle_round_points_before`, `secondary_battle_round_points_after`, and
+`secondary_battle_round_remaining_capacity`. The existing `secondary_turn_*`
+keys remain only for policies actually scoped to a player turn. Finite tactical
+score/retain options and stale-cap validation use the same shared cap resolver as
+awards and restored ledgers; no new decision type or submission family is added.
+The internal payload addition and regenerated runtime build identity require
+current-runtime persistence/replay artifacts; no compatibility shim is provided.
+The current Secondary source rules do not expose end-of-battle scoring. The final
+ordinary turn remains capped, and authenticated Primary end-of-battle treatment
+is unchanged.

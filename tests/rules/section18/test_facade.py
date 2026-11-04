@@ -471,13 +471,27 @@ def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes()
     assert isinstance(checkpoint, dict)
     original = json.loads(raw)
     assert checkpoint["rng_state"] == original["rng_state"]
-    assert checkpoint["source_identity"] == original["source_identity"]
+    assert checkpoint["source_identity"] == {
+        **original["source_identity"],
+        "mission_source_package_hash": (
+            "8f76fcf275397bd2ffabf16d3e127f059fb476e0144654bd54e550f5dd16faa1"
+        ),
+    }
     provenance = second["provenance"]
     assert isinstance(provenance, dict)
     assert provenance["original_event_count"] == 137
     assert provenance["reconstructed_event_count"] == 138
     assert provenance["decision_count"] == 18
     assert provenance["original_byte_replay_claimed"] is False
+    assert provenance["recipe_version"] == "recorded-decision-reconstruction-v2-mission-scope"
+    mapping = provenance["mission_source_identity_mapping"]
+    assert isinstance(mapping, dict)
+    assert mapping["original"] == original["source_identity"]["mission_source_package_hash"]
+    reconstructed_identity = checkpoint["source_identity"]
+    assert isinstance(reconstructed_identity, dict)
+    assert mapping["reconstructed"] == reconstructed_identity["mission_source_package_hash"]
+    assert mapping["added_scoring_value"] == "player_turn"
+    assert second["schema_version"] == "local-checkpoint-reconstruction-v2-mission-scope"
 
 
 @pytest.mark.parametrize(
@@ -490,6 +504,11 @@ def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes()
         "unknown_field",
         "missing_checkpoint_field",
         "json_type_alias",
+        "changed_mission_pack",
+        "changed_mission_hash",
+        "changed_other_source_identity",
+        "changed_identity_mapping",
+        "old_reconstruction_schema",
     ],
 )
 def test_a32_oct14_recovery_rejects_inconsistent_reconstructions(change: str) -> None:
@@ -533,6 +552,27 @@ def test_a32_oct14_recovery_rejects_inconsistent_reconstructions(change: str) ->
         state = lifecycle["state"]
         assert isinstance(state, dict)
         state["battle_round"] = True
+    elif change in {
+        "changed_mission_pack",
+        "changed_mission_hash",
+        "changed_other_source_identity",
+    }:
+        identity = checkpoint["source_identity"]
+        assert isinstance(identity, dict)
+        field = {
+            "changed_mission_pack": "mission_pack_id",
+            "changed_mission_hash": "mission_source_package_hash",
+            "changed_other_source_identity": "catalog_hash",
+        }[change]
+        identity[field] = "unregistered" if field == "mission_pack_id" else "0" * 64
+    elif change == "old_reconstruction_schema":
+        package["schema_version"] = "local-checkpoint-reconstruction-v1"
+    elif change == "changed_identity_mapping":
+        provenance = package["provenance"]
+        assert isinstance(provenance, dict)
+        mapping = provenance["mission_source_identity_mapping"]
+        assert isinstance(mapping, dict)
+        mapping["reconstructed"] = "0" * 64
     elif change == "changed_provenance":
         provenance = package["provenance"]
         assert isinstance(provenance, dict)

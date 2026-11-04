@@ -33511,6 +33511,161 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "event-secondary-round-cap-core-missions": {
+      "paths": [
+        "src/warhammer40k_core/core/missions.py"
+      ],
+      "owners": [
+        "@module",
+        "MissionPackScoringDefinition",
+        "MissionPackScoringDefinition.__post_init__",
+        "MissionPackScoringDefinition.from_payload",
+        "MissionPackScoringDefinition.to_payload",
+        "MissionPackScoringDefinitionPayload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "event-secondary-round-cap-core-secondary_vp_cap_scope": {
+      "paths": [
+        "src/warhammer40k_core/core/secondary_vp_cap_scope.py"
+      ],
+      "owners": [
+        "@module",
+        "SecondaryVictoryPointCapScope",
+        "secondary_vp_cap_scope_from_token"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "event-secondary-round-cap-engine-mission_scoring_policies": {
+      "paths": [
+        "src/warhammer40k_core/engine/mission_scoring_policies.py"
+      ],
+      "owners": [
+        "_validate_common_policy_fields"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "event-secondary-round-cap-engine-missions": {
+      "paths": [
+        "src/warhammer40k_core/engine/missions.py"
+      ],
+      "owners": [
+        "mission_scoring_policies_from_setup"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "event-secondary-round-cap-engine-scoring": {
+      "paths": [
+        "src/warhammer40k_core/engine/scoring.py"
+      ],
+      "owners": [
+        "@module",
+        "MissionScoringPolicy",
+        "MissionScoringPolicy.__post_init__",
+        "MissionScoringPolicy.from_payload",
+        "MissionScoringPolicy.to_payload",
+        "MissionScoringPolicyPayload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "event-secondary-round-cap-engine-scoring_cap_audit": {
+      "paths": [
+        "src/warhammer40k_core/engine/scoring_cap_audit.py"
+      ],
+      "owners": [
+        "@module",
+        "metadata_with_vp_cap_audit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "event-secondary-round-cap-engine-victory_point_cap_resolution": {
+      "paths": [
+        "src/warhammer40k_core/engine/victory_point_cap_resolution.py"
+      ],
+      "owners": [
+        "@module",
+        "resolve_victory_point_cap"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "event-secondary-round-cap-rules-mission_pack_import": {
+      "paths": [
+        "src/warhammer40k_core/rules/mission_pack_import.py"
+      ],
+      "owners": [
+        "chapter_approved_2026_27_mission_pack",
+        "warhammer_event_companion_2026_07_mission_pack"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "event-secondary-round-cap-event_secondary_round_cap_helpers": {
+      "paths": [
+        "tests/event_secondary_round_cap_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "assert_native_secondary_round_cap",
+        "assert_native_two_card_tactical_capacity"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "event-secondary-round-cap-infrastructure-missions-unit-test_game_end_scoring": {
+      "paths": [
+        "tests/infrastructure/missions/unit/test_game_end_scoring.py"
+      ],
+      "owners": [
+        "test_event_secondary_round_cap_native_facade_and_replay",
+        "test_event_secondary_round_cap_two_card_tactical_preview",
+        "test_secondary_cap_period_reset_and_source_totals",
+        "test_secondary_cap_source_scope_and_strict_round_trip"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "event-secondary-round-cap-core-mission_scoring_payload": {
+      "paths": [
+        "src/warhammer40k_core/core/mission_scoring_payload.py"
+      ],
+      "owners": [
+        "@module",
+        "MissionPackScoringDefinitionPayload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "event-secondary-round-cap-finite-a32-source-identity": {
+      "paths": [
+        "src/warhammer40k_core/adapters/checkpoint_reconstruction.py"
+      ],
+      "owners": [
+        "_mapped_mission_source_identity"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
