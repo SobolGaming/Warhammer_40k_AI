@@ -258,7 +258,16 @@ def test_selected_source_index_preserves_corrected_keyword_identity(tmp_path: Pa
         input_files=ability_support_index_inputs(DEFAULT_SOURCE_JSON_DIR),
         load_sources=lambda: load_ability_support_sources(DEFAULT_SOURCE_JSON_DIR),
     )
-    selected = ("000004195", "000000600", "000000599", "000000598", "000000613")
+    selected = (
+        "000004195",
+        "000000600",
+        "000000599",
+        "000000598",
+        "000000613",
+        "000001148",
+        "000001114",
+        "000001115",
+    )
     ordinary = _ability_support_catalog_package(datasheet_ids=selected)
     indexed = _ability_support_catalog_package(datasheet_ids=selected, source_index_dir=directory)
     assert indexed.to_payload() == ordinary.to_payload()
@@ -528,3 +537,216 @@ def test_wave_serpent_frame_exact_native_delta_and_unchanged_counterparts() -> N
     )
     with pytest.raises(AssertionError):
         before_wave_frame(drift)
+
+
+@pytest.mark.parametrize("mutation", ["missing", "duplicate", "preimage", "faction", "model"])
+@pytest.mark.parametrize("datasheet_id", ["000001148", "000001114"])
+def test_daemons_current_keyword_boundary_requires_exact_preimage(
+    mutation: str, datasheet_id: str
+) -> None:
+    from tools.ability_support_sources import load_before_daemons_native_sources
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        daemons_native_2026_11 as current,
+    )
+
+    artifacts = load_before_daemons_native_sources(DEFAULT_SOURCE_JSON_DIR)
+    table = next(a for a in artifacts if a.source_table == "Datasheets_keywords")
+    row = next(
+        r
+        for r in table.rows
+        if r.source_row_id == next(x[1] for x in current.KEYWORD_PREIMAGES if x[0] == datasheet_id)
+    )
+    if mutation == "missing":
+        rows = tuple(r for r in table.rows if r is not row)
+    elif mutation == "duplicate":
+        rows = (
+            *table.rows,
+            replace(row, source_row_id=row.source_row_id + ":duplicate", source_row_number=20000),
+        )
+    else:
+        field, value = {
+            "preimage": ("keyword", "SHADOW LEGION"),
+            "faction": ("is_faction_keyword", "true"),
+            "model": ("model", "unreviewed"),
+        }[mutation]
+        changed = replace(row, fields=tuple((k, value if k == field else v) for k, v in row.fields))
+        rows = tuple(changed if r is row else r for r in table.rows)
+    changed_table = replace(table, rows=rows)
+    with pytest.raises(SourceOverlayError, match="keyword preimage"):
+        current.apply_current_daemons(tuple(changed_table if a is table else a for a in artifacts))
+
+
+def test_daemons_damaged_source_exact_fields_and_other_artifacts_unchanged() -> None:
+    from tools.ability_support_sources import load_before_daemons_native_sources
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        daemons_native_2026_11 as current,
+    )
+
+    before = load_before_daemons_native_sources(DEFAULT_SOURCE_JSON_DIR)
+    after = current.apply_current_daemons(before)
+    old = next(a for a in before if a.source_table == "Datasheets")
+    new = next(a for a in after if a.source_table == "Datasheets")
+    original = next(r for r in old.rows if r.source_row_id == "000001148")
+    changed = next(r for r in new.rows if r.source_row_id == "000001148")
+    expected = original.runtime_fields_payload()
+    expected.update(
+        damaged_w="1-7", damaged_description=expected["damaged_description"].replace("1-6", "1-7")
+    )
+    assert changed.runtime_fields_payload() == expected
+    assert tuple(r for r in old.rows if r is not original) == tuple(
+        r for r in new.rows if r is not changed
+    )
+    assert tuple(a for a in after if a is not new) == tuple(a for a in before if a is not old)
+    (operation,) = current.overlay_pack().operations
+    assert operation.source_row_id == "000001148"
+    assert (
+        operation.expected_preimage_hash
+        == "20b54ffece9d7080f458d62b1f3af07d0675c168d1f7fc99bc2361651a821570"
+    )
+    assert {k for k, _v in operation.fields} == {"damaged_w", "damaged_description"}
+    with pytest.raises(SourceOverlayError, match="target_drift"):
+        current.apply_current_daemons(after)
+    for mutation in ("missing", "preimage"):
+        rows = (
+            tuple(r for r in old.rows if r is not original)
+            if mutation == "missing"
+            else tuple(
+                replace(r, fields=tuple((k, "1-5" if k == "damaged_w" else v) for k, v in r.fields))
+                if r is original
+                else r
+                for r in old.rows
+            )
+        )
+        mutated = replace(old, rows=rows)
+        with pytest.raises(SourceOverlayError):
+            current.apply_current_daemons(tuple(mutated if a is old else a for a in before))
+
+
+def test_daemons_current_two_complete_pages_and_partial_support_scope() -> None:
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        daemons_native_2026_11 as current,
+    )
+
+    audit = current.source_audit()
+    assert len(audit.observations) == 2
+    assert {o.source_id for o in audit.observations} == {
+        source for _, source in current.KEYWORD_SOURCE_IDS
+    }
+    for row in audit.observations:
+        assert row.content_kind == "datasheet"
+        assert row.completeness == "complete_page"
+        assert (
+            current.source_package().source_catalog.source_text_by_id(row.source_id).raw_text
+            == row.operative_text
+        )
+    assert all("detachment" not in source for source in audit.selected_source_ids)
+    inputs = ability_support_index_inputs(DEFAULT_SOURCE_JSON_DIR)
+    for filename in (current.ARTIFACT_NAME, current.AUDIT_ARTIFACT_NAME):
+        assert Path(current.__file__).with_name(filename) in inputs
+    for filename, loader, error in (
+        (current.ARTIFACT_NAME, current.overlay_pack_from_json_bytes, SourceOverlayError),
+        (current.AUDIT_ARTIFACT_NAME, current.source_audit_from_json_bytes, FactionSourceError),
+    ):
+        with pytest.raises(error, match="reviewed pin"):
+            loader(Path(current.__file__).with_name(filename).read_bytes() + b" ")
+
+
+@pytest.mark.parametrize(
+    ("faction", "detachment", "grants"),
+    [
+        ("chaos-daemons", "shadow-legion", True),
+        ("chaos-daemons", "daemonic-incursion", False),
+        ("emperors-children", "shadow-legion", False),
+    ],
+)
+def test_daemons_native_base_keywords_and_real_conditional_grant_kernel(
+    faction: str, detachment: str, grants: bool, selected_army_source_index: Path | None
+) -> None:
+    from tests.daemons_native_source_helpers import native_definitions
+    from warhammer40k_core.engine.army_mustering import (
+        ArmyMusterRequest,
+        _apply_shadow_legion_keyword_grants,  # pyright: ignore[reportPrivateUsage]
+    )
+    from warhammer40k_core.engine.list_validation import DetachmentSelection
+    from warhammer40k_core.engine.unit_keyword_queries import unit_has_roster_keyword
+
+    package = native_definitions(selected_army_source_index).package
+    factory = UnitFactory(catalog=package.army_catalog, model_geometries=package.model_geometries)
+    selections: list[UnitMusterSelection] = []
+    units: list[UnitInstance] = []
+    for uid in ("000001148", "000001114", "000001115"):
+        sheet = package.army_catalog.datasheet_by_id(uid)
+        assert "SHADOW LEGION" not in sheet.keywords.keywords
+        assert sheet.keywords.faction_keywords == ("LEGIONES DAEMONICA",)
+        selection = UnitMusterSelection(
+            unit_selection_id=uid,
+            datasheet_id=uid,
+            model_profile_selections=tuple(
+                ModelProfileSelection(c.model_profile_id, c.min_models) for c in sheet.composition
+            ),
+        )
+        unit = factory.instantiate_unit(
+            army_id="source-grants", selection=selection, datasheet=sheet
+        )
+        assert not unit_has_roster_keyword(unit, "SHADOW LEGION")
+        assert UnitInstance.from_payload(json.loads(json.dumps(unit.to_payload()))) == unit
+        selections.append(selection)
+        units.append(unit)
+    # Exact production grant kernel with explicitly constructed request metadata;
+    # this does not assert full native provider/list-mustering admission.
+    request = ArmyMusterRequest(
+        army_id="source-grants",
+        player_id="owner",
+        catalog_id=package.army_catalog.catalog_id,
+        source_package_id=package.army_catalog.source_package_id,
+        ruleset_id=package.army_catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(faction, (detachment,)),
+        force_disposition_id="constructed-source-grant",
+        unit_selections=tuple(selections),
+    )
+    result = _apply_shadow_legion_keyword_grants(request=request, units=tuple(units))
+    if not grants:
+        assert result == tuple(units)
+    for unit in result:
+        assert unit_has_roster_keyword(unit, "SHADOW LEGION") is grants
+        assert unit_has_roster_keyword(unit, "UNDIVIDED") is (
+            grants and unit.datasheet_id == "000001148"
+        )
+        assert unit.faction_keywords == ("LEGIONES DAEMONICA",)
+        assert all(model.faction_keywords == ("LEGIONES DAEMONICA",) for model in unit.own_models)
+        assert not unit_has_roster_keyword(unit, "LEGIONES DAEMONICA")
+        assert UnitInstance.from_payload(json.loads(json.dumps(unit.to_payload()))) == unit
+
+
+def test_daemons_native_full_sixty_exact_delta_and_counterparts() -> None:
+    from tests.daemons_native_source_preservation import before_daemons_native, daemons_audit
+
+    native, paired_catalog, standalone = packages()
+    audit = daemons_audit("catalog-delta")
+    assert len(native.army_catalog.datasheets) == 60
+    prior = before_daemons_native(native)
+    assert prior.package_hash() == audit["prior_package_hash"]
+    assert before_daemons_native(paired_catalog) is paired_catalog
+    assert before_daemons_native(standalone) is standalone
+    for uid in audit["unchanged_queued_keywords"]:
+        row = native.army_catalog.datasheet_by_id(uid)
+        assert "SHADOW LEGION" in row.keywords.keywords
+        assert row == prior.army_catalog.datasheet_by_id(uid)
+    assert native.army_catalog.datasheet_by_id("000001115") == prior.army_catalog.datasheet_by_id(
+        "000001115"
+    )
+    belakor = native.army_catalog.datasheet_by_id("000001148")
+    drift = replace(
+        native,
+        army_catalog=replace(
+            native.army_catalog,
+            datasheets=tuple(
+                replace(row, name=row.name + " drift") if row is belakor else row
+                for row in native.army_catalog.datasheets
+            ),
+        ),
+    )
+    with pytest.raises(AssertionError):
+        before_daemons_native(drift)

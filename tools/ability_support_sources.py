@@ -34,6 +34,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_space_marines_defiler_datasheet_overlay_2026_07 as csm_defiler_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    daemons_native_2026_11 as daemons_native,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     emperors_children_current_2026_11 as ec_current,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -196,8 +199,12 @@ def load_before_wave_frame_sources(source_json_dir: Path) -> tuple[BridgeSourceA
     )
 
 
-def load_ability_support_sources(source_json_dir: Path) -> tuple[BridgeSourceArtifact, ...]:
+def load_before_daemons_native_sources(source_json_dir: Path) -> tuple[BridgeSourceArtifact, ...]:
     return wave_frame.apply_current_frame(load_before_wave_frame_sources(source_json_dir))
+
+
+def load_ability_support_sources(source_json_dir: Path) -> tuple[BridgeSourceArtifact, ...]:
+    return daemons_native.apply_current_daemons(load_before_daemons_native_sources(source_json_dir))
 
 
 def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
@@ -236,6 +243,8 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
                 Path(starfang_keyword.__file__).with_name(starfang_keyword.AUDIT_ARTIFACT_NAME),
                 Path(wave_frame.__file__).with_name(wave_frame.ARTIFACT_NAME),
                 Path(wave_frame.__file__).with_name(wave_frame.AUDIT_ARTIFACT_NAME),
+                Path(daemons_native.__file__).with_name(daemons_native.ARTIFACT_NAME),
+                Path(daemons_native.__file__).with_name(daemons_native.AUDIT_ARTIFACT_NAME),
                 rules / "source_authority_registry.json",
                 rules
                 / "source_packages"

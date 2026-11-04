@@ -1,0 +1,121 @@
+{
+  "app_version": "995",
+  "audit_id": "daemons-native-app-mirror-2026-11-04",
+  "audit_schema": "core-v2-faction-source-audit-v2",
+  "edition": "warhammer_40000_11th",
+  "geometry_authority": {
+    "base_authority": "explicit_maintained_app_or_official_model_evidence",
+    "missing_data": "blocks_fieldability",
+    "variants": "exact_model_profile_and_variant_required",
+    "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+  },
+  "locale": "en",
+  "observations": [
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "4383c601750e3ac6b4cf730552fdf593b6ef119000aa4ddbeb084422b4c8a85e",
+      "captured_text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nBe’lakor\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nBe’lakor 100mm\n\nInvulnerable save: 4+\n\n12\"\n11\n3+\n20\n6+\n5\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\n➤ Betraying Shades (witchfire)\nDEVASTATING WOUNDS\nIGNORES COVER\nPSYCHIC\n18\"\n9\n2+\n5\n-2\n1\n➤ Betraying Shades (focused witchfire)\nDEVASTATING WOUNDS\nHAZARDOUS\nIGNORES COVER\nPSYCHIC\n18\"\n12\n2+\n6\n-3\n1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\n➤ The Blade of Shadows (strike)\nDEVASTATING WOUNDS\n7\n2+\n14\n-4\nD6+1\n➤ The Blade of Shadows (sweep)\nSUSTAINED HITS 1\n14\n2+\n8\n-3\n1\nKEYWORDS\nBE’LAKOR\nCHAOS\nCHARACTER\nDAEMON\nEPIC HERO\nFLY\nMONSTER\nPSYKER\nCOSTS\n1 model\n390 pts\nUNIT COMPOSITION\n1 Be’lakor – EPIC HERO\n\nThis model is equipped with: Betraying Shades; the Blade of Shadows.\n\nBecome a supporter and remove ads\nCORE ABILITIES\nDEADLY DEMISE D6\nDEEP STRIKE\nSTEALTH\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nThe Dark Master\n\nThe area of the battlefield within 6\" of this model is within your army’s Shadow of Chaos.\n\nShadow Form Abilities\n\nAt the start of the battle round, select one Shadow Form ability. Until the end of the battle round, this model has that ability.\n\nWreathed in Shadows (Aura, Psychic)\n\nWhile a friendly LEGIONES DAEMONICA unit or SHADOW LEGION unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\".\n\nPall of Despair (Aura, Psychic)\n\nIn the Battle-shock step of your opponent’s Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9” of this model, this model regains up to D3 lost wounds.\n\nShadow Lord (Aura, Psychic)\n\nWhile a friendly LEGIONES DAEMONICA or SHADOW LEGION unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1.\n\nSUPREME COMMANDER\n\nIf this model is in your army, it must be your WARLORD.\n\nDAMAGED: 1-7 WOUNDS REMAINING\n\nWhile this model has 1-7 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n30%\nof Chaos Daemons lists\n#2\nmost-taken in faction\n26%\nfrom 35% since last update\nIN ARMY LISTS\nPopular detachments\nSHADOW LEGION\nDAEMONIC INCURSION\nWARPTIDE\nOften taken with\nBLOODCRUSHERS\nNURGLINGS\nBLOODTHIRSTER\nLORD OF CHANGE\nFLESH HOUNDS",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "model_role": "Be’lakor",
+          "base_statement": "Be’lakor 100mm",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "daemons-native-2026-11-04:datasheet:belakor",
+      "observed_at": "2026-11-04T01:36:43.558435+00:00",
+      "official_source_ids": [
+        "gw-11e-chaos-daemons-faction-pack-2026-07"
+      ],
+      "operative_start": "Be’lakor\nDATASHEET",
+      "operative_text": "Be’lakor\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nBe’lakor 100mm\n\nInvulnerable save: 4+\n\n12\"\n11\n3+\n20\n6+\n5\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\n➤ Betraying Shades (witchfire)\nDEVASTATING WOUNDS\nIGNORES COVER\nPSYCHIC\n18\"\n9\n2+\n5\n-2\n1\n➤ Betraying Shades (focused witchfire)\nDEVASTATING WOUNDS\nHAZARDOUS\nIGNORES COVER\nPSYCHIC\n18\"\n12\n2+\n6\n-3\n1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\n➤ The Blade of Shadows (strike)\nDEVASTATING WOUNDS\n7\n2+\n14\n-4\nD6+1\n➤ The Blade of Shadows (sweep)\nSUSTAINED HITS 1\n14\n2+\n8\n-3\n1\nKEYWORDS\nBE’LAKOR\nCHAOS\nCHARACTER\nDAEMON\nEPIC HERO\nFLY\nMONSTER\nPSYKER\nCOSTS\n1 model\n390 pts\nUNIT COMPOSITION\n1 Be’lakor – EPIC HERO\n\nThis model is equipped with: Betraying Shades; the Blade of Shadows.\n\nBecome a supporter and remove ads\nCORE ABILITIES\nDEADLY DEMISE D6\nDEEP STRIKE\nSTEALTH\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nThe Dark Master\n\nThe area of the battlefield within 6\" of this model is within your army’s Shadow of Chaos.\n\nShadow Form Abilities\n\nAt the start of the battle round, select one Shadow Form ability. Until the end of the battle round, this model has that ability.\n\nWreathed in Shadows (Aura, Psychic)\n\nWhile a friendly LEGIONES DAEMONICA unit or SHADOW LEGION unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\".\n\nPall of Despair (Aura, Psychic)\n\nIn the Battle-shock step of your opponent’s Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9” of this model, this model regains up to D3 lost wounds.\n\nShadow Lord (Aura, Psychic)\n\nWhile a friendly LEGIONES DAEMONICA or SHADOW LEGION unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1.\n\nSUPREME COMMANDER\n\nIf this model is in your army, it must be your WARLORD.\n\nDAMAGED: 1-7 WOUNDS REMAINING\n\nWhile this model has 1-7 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n30%\nof Chaos Daemons lists\n#2\nmost-taken in faction\n26%\nfrom 35% since last update\nIN ARMY LISTS\nPopular detachments\nSHADOW LEGION\nDAEMONIC INCURSION\nWARPTIDE\nOften taken with\nBLOODCRUSHERS\nNURGLINGS\nBLOODTHIRSTER\nLORD OF CHANGE\nFLESH HOUNDS",
+      "owning_faction_source_id": "faction-app:chaos-daemons",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Maintained unofficial App rendered text, not official primary/network bytes or App-build attestation. Version995 is global index context, not a per-unit change date. Only two complete unit pages admitted; complete mustering/Keywords section is supporting authority, not a complete detachment page. Historical geometry is unchanged and not newly measured.",
+      "source_id": "faction-app:chaos-daemons:datasheet:belakor",
+      "source_observation_sha256": "6dac6dc1387222f8f4eea9f27b0597f6f0caf841f95f2c7a11b8fcd6d2013a2b",
+      "source_title": "Be’lakor",
+      "source_url": "https://www.40k.app/factions/chaos-daemons/units/belakor",
+      "transcription_sha256": "ddfba12ddb1759abdbe862614cbc32cc9e397affa353417226805d32022b5619"
+    },
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "443433147237985f14cf1ddd7662a15def1ec8d5970f905ad79e0143ba1c994e",
+      "captured_text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nBloodletters\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nBloodreaper 32mm\n\nInvulnerable save: 5+\n\n8\"\n4\n7+\n1\n7+\n2\nBloodletter 32mm\n\nInvulnerable save: 5+\n\n8\"\n4\n7+\n1\n7+\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nHellblade\n2\n3+\n5\n-2\n2\nKEYWORDS\nBATTLELINE\nBLOODLETTERS\nCHAOS\nDAEMON\nINFANTRY\nKHORNE\nCOSTS\n10 models\n110 pts\nUNIT COMPOSITION\n1 Bloodreaper\n9 Bloodletters\n\nEvery model is equipped with: hellblade.\n\nLed by\nSKULLTAKER\nBLOODMASTER\nBecome a supporter and remove ads\nWARGEAR OPTIONS\n1 Bloodletter that is not equipped with a daemonic icon can be equipped with 1 instrument of Chaos.\n1 Bloodletter that is not equipped with an instrument of Chaos can be equipped with 1 daemonic icon.\nWARGEAR\nDaemonic Icon\n\nModels in the bearer’s unit have a Leadership characteristic of 6+.\n\nInstrument of Chaos\n\nAdd 1 to Charge rolls made for the bearer’s unit.\n\nCORE ABILITIES\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nBane of Cowards\n\nEach time an enemy unit (excluding MONSTERS and VEHICLES) within Engagement Range of one or more units from your army with this ability Falls Back, models in that enemy unit must take Desperate Escape tests. When doing so, if that enemy unit is also Battle‑shocked, subtract 1 from each of those Desperate Escape tests.\n\nSTATS\n31%\nof Chaos Daemons lists, 2.1 per list\n#1\nmost-taken in faction\n37%\nfrom 33% since last update\nIN ARMY LISTS\nPopular detachments\nBLOOD LEGION\nWARPTIDE\nCAVALCADE OF CHAOS\nMost often led by\nBLOODMASTER\nSKULLTAKER\nOften taken with\nBLOODMASTER\nBLOODCRUSHERS\nBLOODTHIRSTER\nFLESH HOUNDS\nSKARBRAND",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "model_role": "Bloodreaper",
+          "base_statement": "Bloodreaper 32mm",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        },
+        {
+          "model_role": "Bloodletter",
+          "base_statement": "Bloodletter 32mm",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "daemons-native-2026-11-04:datasheet:bloodletters",
+      "observed_at": "2026-11-04T01:36:43.580137+00:00",
+      "official_source_ids": [
+        "gw-11e-chaos-daemons-faction-pack-2026-07"
+      ],
+      "operative_start": "Bloodletters\nDATASHEET",
+      "operative_text": "Bloodletters\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nBloodreaper 32mm\n\nInvulnerable save: 5+\n\n8\"\n4\n7+\n1\n7+\n2\nBloodletter 32mm\n\nInvulnerable save: 5+\n\n8\"\n4\n7+\n1\n7+\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nHellblade\n2\n3+\n5\n-2\n2\nKEYWORDS\nBATTLELINE\nBLOODLETTERS\nCHAOS\nDAEMON\nINFANTRY\nKHORNE\nCOSTS\n10 models\n110 pts\nUNIT COMPOSITION\n1 Bloodreaper\n9 Bloodletters\n\nEvery model is equipped with: hellblade.\n\nLed by\nSKULLTAKER\nBLOODMASTER\nBecome a supporter and remove ads\nWARGEAR OPTIONS\n1 Bloodletter that is not equipped with a daemonic icon can be equipped with 1 instrument of Chaos.\n1 Bloodletter that is not equipped with an instrument of Chaos can be equipped with 1 daemonic icon.\nWARGEAR\nDaemonic Icon\n\nModels in the bearer’s unit have a Leadership characteristic of 6+.\n\nInstrument of Chaos\n\nAdd 1 to Charge rolls made for the bearer’s unit.\n\nCORE ABILITIES\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nBane of Cowards\n\nEach time an enemy unit (excluding MONSTERS and VEHICLES) within Engagement Range of one or more units from your army with this ability Falls Back, models in that enemy unit must take Desperate Escape tests. When doing so, if that enemy unit is also Battle‑shocked, subtract 1 from each of those Desperate Escape tests.\n\nSTATS\n31%\nof Chaos Daemons lists, 2.1 per list\n#1\nmost-taken in faction\n37%\nfrom 33% since last update\nIN ARMY LISTS\nPopular detachments\nBLOOD LEGION\nWARPTIDE\nCAVALCADE OF CHAOS\nMost often led by\nBLOODMASTER\nSKULLTAKER\nOften taken with\nBLOODMASTER\nBLOODCRUSHERS\nBLOODTHIRSTER\nFLESH HOUNDS\nSKARBRAND",
+      "owning_faction_source_id": "faction-app:chaos-daemons",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Maintained unofficial App rendered text, not official primary/network bytes or App-build attestation. Version995 is global index context, not a per-unit change date. Only two complete unit pages admitted; complete mustering/Keywords section is supporting authority, not a complete detachment page. Historical geometry is unchanged and not newly measured.",
+      "source_id": "faction-app:chaos-daemons:datasheet:bloodletters",
+      "source_observation_sha256": "732ea9a9fec7d87b678542e2cd625efc36f8d69f89e19e324129e26193662423",
+      "source_title": "Bloodletters",
+      "source_url": "https://www.40k.app/factions/chaos-daemons/units/bloodletters",
+      "transcription_sha256": "e9d22a402f26246856f797be68a1d62fa295e295660df9e2d364abe22646fe91"
+    }
+  ],
+  "official_sources": [
+    {
+      "source_id": "gw-11e-chaos-daemons-faction-pack-2026-07",
+      "provider_name": "Games Workshop",
+      "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+      "source_date": "2026-07-22",
+      "artifact_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+      "sha256": "818f7ef144691b9eef6b3c5b5d0a39793690af5a958037b7055215e6675e6a2c",
+      "relationship": "historical_primary_not_current_corroboration"
+    }
+  ],
+  "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+  "selected_source_ids": [
+    "faction-app:chaos-daemons:datasheet:belakor",
+    "faction-app:chaos-daemons:datasheet:bloodletters"
+  ],
+  "version_evidence": {
+    "source_url": "https://www.40k.app/factions/updates",
+    "observed_at": "2026-11-04T01:36:43.547107+00:00",
+    "statement": "Version 995\nReleased 2026-10-16.",
+    "transcription_sha256": "e6efd2e9a45a208c455693a1855a929e4da0696bc206eaec403958bb45017b54"
+  }
+}

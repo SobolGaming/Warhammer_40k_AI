@@ -2137,6 +2137,26 @@
           "source_observation_sha256": "c3c236e1ad687e38734615b6e35d327f49c26695a2fa38bb3105b83aa22dd48b",
           "identity_kind": "versioned_observation",
           "identity_value": "995@2026-11-03T21:50:41.562Z"
+        },
+        {
+          "audit_id": "daemons-native-app-mirror-2026-11-04",
+          "row_id": "daemons-native-2026-11-04:datasheet:belakor",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/chaos-daemons/units/belakor",
+          "source_observation_sha256": "6dac6dc1387222f8f4eea9f27b0597f6f0caf841f95f2c7a11b8fcd6d2013a2b",
+          "identity_kind": "versioned_observation",
+          "identity_value": "995@2026-11-04T01:36:43.558435+00:00"
+        },
+        {
+          "audit_id": "daemons-native-app-mirror-2026-11-04",
+          "row_id": "daemons-native-2026-11-04:datasheet:bloodletters",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/chaos-daemons/units/bloodletters",
+          "source_observation_sha256": "732ea9a9fec7d87b678542e2cd625efc36f8d69f89e19e324129e26193662423",
+          "identity_kind": "versioned_observation",
+          "identity_value": "995@2026-11-04T01:36:43.580137+00:00"
         }
       ],
       "legacy_observations": [],
@@ -2200,6 +2220,16 @@
             "faction-app:aeldari:datasheet:wave-serpent"
           ],
           "catalog_sha256": "547444841dee2fbca79882a1aa7ba0452b4ad00a2797c1974693b864397fffdb"
+        },
+        {
+          "namespace": "core-v2-reviewed-app-mirror",
+          "package_name": "reviewed-daemons-native-observations-2026-11",
+          "version": "app-data-995-observed-2026-11-04",
+          "allowed_rule_source_ids": [
+            "faction-app:chaos-daemons:datasheet:belakor",
+            "faction-app:chaos-daemons:datasheet:bloodletters"
+          ],
+          "catalog_sha256": "484e131dafa5a30f77243e26c8b7138563b46118806f12da8f4f061472646ddf"
         }
       ],
       "source_package_extensions": []

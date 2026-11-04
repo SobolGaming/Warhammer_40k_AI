@@ -438,7 +438,10 @@ def test_starfang_helper_move_rejects_changed_helper_bytes(monkeypatch: pytest.M
         )
 
 
-def test_wave_frame_performance_scope_is_exact_and_preserves_policy_chain() -> None:
+def test_wave_frame_performance_scope_is_exact_and_preserves_policy_chain(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools.performance_daemons_native import daemons_native_policy_predecessor
     from tools.performance_wave_frame import BASE as FRAME_BASE
     from tools.performance_wave_frame import (
         OPERATIONS,
@@ -447,6 +450,15 @@ def test_wave_frame_performance_scope_is_exact_and_preserves_policy_chain() -> N
     )
     from tools.performance_wave_frame import SCOPE as FRAME_SCOPE
 
+    # Authenticate this historical policy view before testing its unchanged pins.
+    policy_path = ROOT / "tools/performance_policy.py"
+    original_read_bytes = Path.read_bytes
+    predecessor = daemons_native_policy_predecessor(original_read_bytes(policy_path))
+
+    def historical_policy_bytes(path: Path) -> bytes:
+        return predecessor if path == policy_path else original_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", historical_policy_bytes)
     scope = read_object(ROOT / FRAME_SCOPE)
     for path, change in object_value(scope["changes"]).items():
         assert wave_frame_smoke_operations(
@@ -522,3 +534,54 @@ def test_wave_frame_source_provenance_admission_is_exact() -> None:
     ):
         with pytest.raises(ValueError, match="registered edition provenance inputs changed"):
             before_wave_provenance(drift)
+
+
+def test_daemons_native_performance_scope_is_exact_and_preserves_policy_chain() -> None:
+    from tools.performance_daemons_native import BASE as DAEMONS_BASE
+    from tools.performance_daemons_native import (
+        OPERATIONS,
+        daemons_native_policy_predecessor,
+        daemons_native_smoke_operations,
+    )
+    from tools.performance_daemons_native import SCOPE as DAEMONS_SCOPE
+
+    scope = read_object(ROOT / DAEMONS_SCOPE)
+    for path, change in object_value(scope["changes"]).items():
+        assert daemons_native_smoke_operations(
+            base=DAEMONS_BASE, path=path, category="rule_semantics", change=change
+        ) == frozenset({OPERATIONS[path]})
+        for base, selected, category in (
+            ("0" * 40, path, "rule_semantics"),
+            (DAEMONS_BASE, "tools/unreviewed.py", "rule_semantics"),
+            (DAEMONS_BASE, path, "algorithm_or_search"),
+            (DAEMONS_BASE, path, "cache_policy"),
+            (DAEMONS_BASE, path, "serialization_or_replay_work"),
+        ):
+            assert not daemons_native_smoke_operations(
+                base=base, path=selected, category=category, change=change
+            )
+        drift = copy.deepcopy(object_value(change))
+        drift["after_sha256"] = "0" * 64
+        assert not daemons_native_smoke_operations(
+            base=DAEMONS_BASE, path=path, category="rule_semantics", change=drift
+        )
+        drift = copy.deepcopy(object_value(change))
+        object_value(next(iter(object_value(drift["owners"]).values())))["after"] = "0" * 64
+        assert not daemons_native_smoke_operations(
+            base=DAEMONS_BASE, path=path, category="rule_semantics", change=drift
+        )
+    current = (ROOT / "tools/performance_policy.py").read_bytes()
+    before = subprocess.check_output(
+        ["git", "show", DAEMONS_BASE + ":tools/performance_policy.py"], cwd=ROOT
+    )
+    assert daemons_native_policy_predecessor(current) == before
+    assert daemons_native_policy_predecessor(before) == before
+    for policy_drift in (
+        current + b"\n",
+        current.replace(b"daemons_native_smoke_operations", b"other_operation"),
+    ):
+        with pytest.raises(ValueError, match="Daemons native"):
+            daemons_native_policy_predecessor(policy_drift)
+    assert policy.starfang_deep_strike_policy_predecessor(current) == subprocess.check_output(
+        ["git", "show", BASE + ":tools/performance_policy.py"], cwd=ROOT
+    )

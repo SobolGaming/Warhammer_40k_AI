@@ -1,270 +1,280 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "6ca0ee47d44b227d805b15b5c1de8ca321003da8",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:023e6ea45a9c467fbce4d888824856cf4d00900f57a4b0d01f4b88d4459a748c",
-  "operation_map_sha256": "46669f6948c7cc9ed7efce410adf384a7117b985e85b0f064a0e83f34d6c6b40",
+  "base": "2a40dfc44954ed1758876dfe8502a23db9da1fb8",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1bd54c19c4853b282c77ffedac213cd3783587f95d5618b1795b5c9824f589d5",
+  "operation_map_sha256": "8f08360f54f84474aba369b1ad753da7488e306b6f92e0a07af149df506af0b8",
   "changes": {
     "ci/quality_shards/all.txt": {
-      "before_sha256": "ffa76741a8c6c34a6987aae3cf91afa8962c1352928f9e0b7608b704fad3c355",
-      "after_sha256": "d114dfda8655926b5f138434ea8fc6d4e40ad7870df721797d22fdb5fee06d6a",
+      "before_sha256": "d114dfda8655926b5f138434ea8fc6d4e40ad7870df721797d22fdb5fee06d6a",
+      "after_sha256": "da447700a6385e2eceee9ab0bbf090941e51361c4e3817d5369c56e4310bba6c",
       "owners": {
         "@document": {
-          "before": "ffa76741a8c6c34a6987aae3cf91afa8962c1352928f9e0b7608b704fad3c355",
-          "after": "d114dfda8655926b5f138434ea8fc6d4e40ad7870df721797d22fdb5fee06d6a"
+          "before": "d114dfda8655926b5f138434ea8fc6d4e40ad7870df721797d22fdb5fee06d6a",
+          "after": "da447700a6385e2eceee9ab0bbf090941e51361c4e3817d5369c56e4310bba6c"
         }
       }
     },
     "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "dd38200236f66ac58f8a6bf10db00de9c6e02eda82923b57eeb8ada44edcccb0",
-      "after_sha256": "324285418096f206e8371efcf79dd6685e3729b5f8007e7ebef266ecdc871443",
+      "before_sha256": "324285418096f206e8371efcf79dd6685e3729b5f8007e7ebef266ecdc871443",
+      "after_sha256": "44a34596e268f6d2ff09b58926385c82fb6661fe805597b74d3352efcf850dbd",
       "owners": {
         "@document": {
-          "before": "dd38200236f66ac58f8a6bf10db00de9c6e02eda82923b57eeb8ada44edcccb0",
-          "after": "324285418096f206e8371efcf79dd6685e3729b5f8007e7ebef266ecdc871443"
+          "before": "324285418096f206e8371efcf79dd6685e3729b5f8007e7ebef266ecdc871443",
+          "after": "44a34596e268f6d2ff09b58926385c82fb6661fe805597b74d3352efcf850dbd"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "7d3e49faf98243a2f99f7b6ebf15d74b0db05c0e407e1cbc4eef75cbb7e47551",
-      "after_sha256": "29f827ea592f22644c62d8dbd6098e8ed1da8227cce07722c35d99b3d97f9aef",
+      "before_sha256": "29f827ea592f22644c62d8dbd6098e8ed1da8227cce07722c35d99b3d97f9aef",
+      "after_sha256": "bdf38a566cef29ce0d0e6dab002e8fddc6ef503fb497233b3576ff1069cd3ac9",
       "owners": {
         "@document": {
-          "before": "7d3e49faf98243a2f99f7b6ebf15d74b0db05c0e407e1cbc4eef75cbb7e47551",
-          "after": "29f827ea592f22644c62d8dbd6098e8ed1da8227cce07722c35d99b3d97f9aef"
+          "before": "29f827ea592f22644c62d8dbd6098e8ed1da8227cce07722c35d99b3d97f9aef",
+          "after": "bdf38a566cef29ce0d0e6dab002e8fddc6ef503fb497233b3576ff1069cd3ac9"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "175bfe78ba136a034e7a4033e861916309674a4ba6271cda8262c0daec0fcca3",
-      "after_sha256": "39f6c02f05f718806e2ff89d629978825f3b644df2d778d564c14a94420d3c06",
+      "before_sha256": "39f6c02f05f718806e2ff89d629978825f3b644df2d778d564c14a94420d3c06",
+      "after_sha256": "4d24948b2f834f23e96da26ffda203fec93b4ad198d6dcfb571c78629ac35933",
       "owners": {
         "@document": {
-          "before": "175bfe78ba136a034e7a4033e861916309674a4ba6271cda8262c0daec0fcca3",
-          "after": "39f6c02f05f718806e2ff89d629978825f3b644df2d778d564c14a94420d3c06"
+          "before": "39f6c02f05f718806e2ff89d629978825f3b644df2d778d564c14a94420d3c06",
+          "after": "4d24948b2f834f23e96da26ffda203fec93b4ad198d6dcfb571c78629ac35933"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "e71a8375b42caf8f1f8d640893a6bfc52e55cf2ec045dcfa4144e7ed7349e43b",
-      "after_sha256": "73be697f0e7472207ad764fde74ead3eab282e76967ba3628a313121f12ede90",
+      "before_sha256": "73be697f0e7472207ad764fde74ead3eab282e76967ba3628a313121f12ede90",
+      "after_sha256": "113f3a3b010da9e1ca1ead58df1831d33ddd08852fe0e07b4104f162f415ecb0",
       "owners": {
         "@document": {
-          "before": "e71a8375b42caf8f1f8d640893a6bfc52e55cf2ec045dcfa4144e7ed7349e43b",
-          "after": "73be697f0e7472207ad764fde74ead3eab282e76967ba3628a313121f12ede90"
+          "before": "73be697f0e7472207ad764fde74ead3eab282e76967ba3628a313121f12ede90",
+          "after": "113f3a3b010da9e1ca1ead58df1831d33ddd08852fe0e07b4104f162f415ecb0"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "c558a2c3602b706169bde713609d920fae3329210e6d641b8f99f18bf1bfbc52",
-      "after_sha256": "49bce3a4de78d674902fe8ba8e15fc6324ddb3f24bbd2b9820a75ac41f9ccda5",
+      "before_sha256": "49bce3a4de78d674902fe8ba8e15fc6324ddb3f24bbd2b9820a75ac41f9ccda5",
+      "after_sha256": "164354c0c019ea3758724d4c5ea56e11d4741c1ec811f45fa54571201f9da291",
       "owners": {
         "@document": {
-          "before": "c558a2c3602b706169bde713609d920fae3329210e6d641b8f99f18bf1bfbc52",
-          "after": "49bce3a4de78d674902fe8ba8e15fc6324ddb3f24bbd2b9820a75ac41f9ccda5"
+          "before": "49bce3a4de78d674902fe8ba8e15fc6324ddb3f24bbd2b9820a75ac41f9ccda5",
+          "after": "164354c0c019ea3758724d4c5ea56e11d4741c1ec811f45fa54571201f9da291"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "e1a1aa3e14644b8c494b50728c81d0670c67003ddb0efbb4860a6cdfeeda3be5",
-      "after_sha256": "c56b4afed6bf2d8611aa9ad3b0f81aed36a405793bb1f556db85d8e45b774874",
+      "before_sha256": "c56b4afed6bf2d8611aa9ad3b0f81aed36a405793bb1f556db85d8e45b774874",
+      "after_sha256": "42f9a7ac7d5b8998621ef37b847b8b2276ab081bd4ffdfa2f37a73974e174df6",
       "owners": {
         "@document": {
-          "before": "e1a1aa3e14644b8c494b50728c81d0670c67003ddb0efbb4860a6cdfeeda3be5",
-          "after": "c56b4afed6bf2d8611aa9ad3b0f81aed36a405793bb1f556db85d8e45b774874"
+          "before": "c56b4afed6bf2d8611aa9ad3b0f81aed36a405793bb1f556db85d8e45b774874",
+          "after": "42f9a7ac7d5b8998621ef37b847b8b2276ab081bd4ffdfa2f37a73974e174df6"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "fb6c3cb77b6c591bb3534036783b59b8b22f603f5a57fb7d15744a8394dafbd3",
-      "after_sha256": "d9a6783eaa8dac9e146b2015cbd6a25c6a46b48bb9f0ba130aee792d31458a56",
+      "before_sha256": "d9a6783eaa8dac9e146b2015cbd6a25c6a46b48bb9f0ba130aee792d31458a56",
+      "after_sha256": "44f36b08e5f706d939f9683babb5eae16fc6453706fc56e47574258bfb82f1c6",
       "owners": {
         "@document": {
-          "before": "fb6c3cb77b6c591bb3534036783b59b8b22f603f5a57fb7d15744a8394dafbd3",
-          "after": "d9a6783eaa8dac9e146b2015cbd6a25c6a46b48bb9f0ba130aee792d31458a56"
+          "before": "d9a6783eaa8dac9e146b2015cbd6a25c6a46b48bb9f0ba130aee792d31458a56",
+          "after": "44f36b08e5f706d939f9683babb5eae16fc6453706fc56e47574258bfb82f1c6"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "66dfaa24f69cdb35e718968ff23a265b75b6e91bc18b6a3afb7c54997375a6a9",
-      "after_sha256": "073b3ba7196e29ed43622f5954a817a61517b27e31487e41e73fc2b84741fb9d",
+      "before_sha256": "073b3ba7196e29ed43622f5954a817a61517b27e31487e41e73fc2b84741fb9d",
+      "after_sha256": "612a008471581cdcbaf05aae2c4dbfd545089b9a79ebd82339c8e7a9870ad0e4",
       "owners": {
         "@document": {
-          "before": "66dfaa24f69cdb35e718968ff23a265b75b6e91bc18b6a3afb7c54997375a6a9",
-          "after": "073b3ba7196e29ed43622f5954a817a61517b27e31487e41e73fc2b84741fb9d"
+          "before": "073b3ba7196e29ed43622f5954a817a61517b27e31487e41e73fc2b84741fb9d",
+          "after": "612a008471581cdcbaf05aae2c4dbfd545089b9a79ebd82339c8e7a9870ad0e4"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "1a155031b392efdd69970d87c180502e2537cec43f5efa5145ba8f027cba76ae",
-      "after_sha256": "aec54e3eaf6feff9854a50a3b122688cf3cbfb24b7850a01ab51a5c9f047e5f5",
+      "before_sha256": "aec54e3eaf6feff9854a50a3b122688cf3cbfb24b7850a01ab51a5c9f047e5f5",
+      "after_sha256": "f5354ae67d4753e402f725c313dd8bdb92edcc4e58e28ad6140bfc0ad3a16e88",
       "owners": {
         "@document": {
-          "before": "1a155031b392efdd69970d87c180502e2537cec43f5efa5145ba8f027cba76ae",
-          "after": "aec54e3eaf6feff9854a50a3b122688cf3cbfb24b7850a01ab51a5c9f047e5f5"
+          "before": "aec54e3eaf6feff9854a50a3b122688cf3cbfb24b7850a01ab51a5c9f047e5f5",
+          "after": "f5354ae67d4753e402f725c313dd8bdb92edcc4e58e28ad6140bfc0ad3a16e88"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "d0d29b0c89cb7ecff76b2826b5d67e0dfd0a1103849150135bd7392a1c398d0b",
-      "after_sha256": "0cff6d0945906f0dc14f53a486e3a3ca17738365a813e2774aa349bbbfa16e02",
+      "before_sha256": "0cff6d0945906f0dc14f53a486e3a3ca17738365a813e2774aa349bbbfa16e02",
+      "after_sha256": "3d8ab7ebecad1a4920afcdc43eb073914fabbb22c754210380145c08083cfb58",
       "owners": {
         "@document": {
-          "before": "d0d29b0c89cb7ecff76b2826b5d67e0dfd0a1103849150135bd7392a1c398d0b",
-          "after": "0cff6d0945906f0dc14f53a486e3a3ca17738365a813e2774aa349bbbfa16e02"
+          "before": "0cff6d0945906f0dc14f53a486e3a3ca17738365a813e2774aa349bbbfa16e02",
+          "after": "3d8ab7ebecad1a4920afcdc43eb073914fabbb22c754210380145c08083cfb58"
         }
       }
     },
-    "data/source_audits/wave_serpent_frame_2026_11/catalog-delta.json": {
+    "data/source_audits/daemons_native_2026_11/catalog-delta.json": {
       "before_sha256": null,
-      "after_sha256": "b77117fad5482b034ecbfdac25d89bce69c280d00373c43451190be5ac6eb108",
+      "after_sha256": "3aa53fb015caa2ffe854362fe511bef561814630927d6ad33b525096fe39c1e1",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b77117fad5482b034ecbfdac25d89bce69c280d00373c43451190be5ac6eb108"
+          "after": "3aa53fb015caa2ffe854362fe511bef561814630927d6ad33b525096fe39c1e1"
         }
       }
     },
-    "data/source_audits/wave_serpent_frame_2026_11/provenance-delta.json": {
+    "data/source_audits/daemons_native_2026_11/provenance-delta.json": {
       "before_sha256": null,
-      "after_sha256": "b95b7166fc1f32fd7f984605f82a7dc26723108003b0ffa7bae97c4f26c1d51f",
+      "after_sha256": "34adae1ed1516e98f4f39235f55e6c30e5b566eb4342a528be71f814c549e20f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b95b7166fc1f32fd7f984605f82a7dc26723108003b0ffa7bae97c4f26c1d51f"
+          "after": "34adae1ed1516e98f4f39235f55e6c30e5b566eb4342a528be71f814c549e20f"
         }
       }
     },
-    "data/source_audits/wave_serpent_frame_2026_11/registry-delta.json": {
+    "data/source_audits/daemons_native_2026_11/registry-delta.json": {
       "before_sha256": null,
-      "after_sha256": "0ac7269a4625c19bad692fc6ec6023a454d507f4c62244cf1fd6295648dad0b8",
+      "after_sha256": "7bb6e2a0a7fb3e6845188b18e5e572b21daf1f04b694e39708069a9c8d2dd2c4",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0ac7269a4625c19bad692fc6ec6023a454d507f4c62244cf1fd6295648dad0b8"
+          "after": "7bb6e2a0a7fb3e6845188b18e5e572b21daf1f04b694e39708069a9c8d2dd2c4"
         }
       }
     },
-    "data/source_audits/wave_serpent_frame_2026_11/reviewed-observation.json": {
+    "data/source_audits/daemons_native_2026_11/reviewed-observation.json": {
       "before_sha256": null,
-      "after_sha256": "ffdf2378872f9c4bf75bee0fb91e11bf4cee0f10835480a4d53e316fb28374a3",
+      "after_sha256": "185e1eef3f58b8e7f7357a93e2f6cb694614c2339893a8a8cb70d2c9bb022d13",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ffdf2378872f9c4bf75bee0fb91e11bf4cee0f10835480a4d53e316fb28374a3"
+          "after": "185e1eef3f58b8e7f7357a93e2f6cb694614c2339893a8a8cb70d2c9bb022d13"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "778a216c785976ba7934cf2281adba301ee11192932e300fa17757a285cc87bb",
-      "after_sha256": "77aa25a3dddfc5d8fe6449e6abed4dfb868d4d52b31c20540ec00eb2b8587224",
+      "before_sha256": "77aa25a3dddfc5d8fe6449e6abed4dfb868d4d52b31c20540ec00eb2b8587224",
+      "after_sha256": "bea38b67b25ae4d6a83846009934da26832063c5587d58e9d0283ce5a1fe3925",
       "owners": {
         "@document": {
-          "before": "778a216c785976ba7934cf2281adba301ee11192932e300fa17757a285cc87bb",
-          "after": "77aa25a3dddfc5d8fe6449e6abed4dfb868d4d52b31c20540ec00eb2b8587224"
+          "before": "77aa25a3dddfc5d8fe6449e6abed4dfb868d4d52b31c20540ec00eb2b8587224",
+          "after": "bea38b67b25ae4d6a83846009934da26832063c5587d58e9d0283ce5a1fe3925"
         }
       }
     },
-    "docs/WAVE_SERPENT_FRAME_SOURCE_SCOPE.md": {
+    "docs/DAEMONS_NATIVE_SOURCE_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "f36793db56495e077d592436bc15090ac24c4d98437eabc46de94bd573a586df",
+      "after_sha256": "ae5d353aadd9dc3afdc61bb5c8ca253348ae4ddcc063defd0d854eee274ad654",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f36793db56495e077d592436bc15090ac24c4d98437eabc46de94bd573a586df"
+          "after": "ae5d353aadd9dc3afdc61bb5c8ca253348ae4ddcc063defd0d854eee274ad654"
+        }
+      }
+    },
+    "docs/factions/chaos-daemons.md": {
+      "before_sha256": "f7eb08288c5dd53f6665263b5c90cd21695b507ecf3cbda705d620196239e9a4",
+      "after_sha256": "4fa1d97f4ae51df9003cf0ee7a19c05c512229ab4952d2a3f3f51468d8c04a51",
+      "owners": {
+        "@document": {
+          "before": "f7eb08288c5dd53f6665263b5c90cd21695b507ecf3cbda705d620196239e9a4",
+          "after": "4fa1d97f4ae51df9003cf0ee7a19c05c512229ab4952d2a3f3f51468d8c04a51"
+        }
+      }
+    },
+    "docs/performance/policy-v3/daemons-native-smoke-scope.json": {
+      "before_sha256": null,
+      "after_sha256": "dda4c81e65d5244a57006ad25a42e7846b5c75278d57ce016e1abc32f2cfa100",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "dda4c81e65d5244a57006ad25a42e7846b5c75278d57ce016e1abc32f2cfa100"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "97ac6416a61abdb1a140008c9addca4f69f650983f45760e634e2f7d1a87ae84",
-      "after_sha256": "c0ab62c073554ec1acb852e2bde71f490be38f669182f3d57da0903a09160e1e",
+      "before_sha256": "c0ab62c073554ec1acb852e2bde71f490be38f669182f3d57da0903a09160e1e",
+      "after_sha256": "2cef3975330b551245f1550add35b02f261ec9017a4e9a30527fe50e5c266109",
       "owners": {
         "@document": {
-          "before": "97ac6416a61abdb1a140008c9addca4f69f650983f45760e634e2f7d1a87ae84",
-          "after": "c0ab62c073554ec1acb852e2bde71f490be38f669182f3d57da0903a09160e1e"
-        }
-      }
-    },
-    "docs/performance/policy-v3/wave-serpent-frame-smoke-scope.json": {
-      "before_sha256": null,
-      "after_sha256": "23d493d3030edd4684340f077b9dcb9a97d86fc90b2744e1a85267986b6e1b5e",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "23d493d3030edd4684340f077b9dcb9a97d86fc90b2744e1a85267986b6e1b5e"
+          "before": "c0ab62c073554ec1acb852e2bde71f490be38f669182f3d57da0903a09160e1e",
+          "after": "2cef3975330b551245f1550add35b02f261ec9017a4e9a30527fe50e5c266109"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "927403a7a21215d47b4b6ba44825745d8616cbaeb91feb98402720f774e662ad",
-      "after_sha256": "d1b13872358df5e0cacc400f89999046d8cb915e39676548cb61c22daa860dda",
+      "before_sha256": "d1b13872358df5e0cacc400f89999046d8cb915e39676548cb61c22daa860dda",
+      "after_sha256": "1787d6ffee2d381bb69728278de4064762a32dba0c725eb5816a81b112915037",
       "owners": {
         "@document": {
-          "before": "927403a7a21215d47b4b6ba44825745d8616cbaeb91feb98402720f774e662ad",
-          "after": "d1b13872358df5e0cacc400f89999046d8cb915e39676548cb61c22daa860dda"
+          "before": "d1b13872358df5e0cacc400f89999046d8cb915e39676548cb61c22daa860dda",
+          "after": "1787d6ffee2d381bb69728278de4064762a32dba0c725eb5816a81b112915037"
         }
       }
     },
     "src/warhammer40k_core/rules/faction_source_governance.py": {
-      "before_sha256": "d0ecf6873207bdcc7e84036d74122a08f83eb655940d133a9ec775834b791f50",
-      "after_sha256": "04331fded4911da69d3cbedeb9c628a40a82bc27be39fdbefefcf111300f990b",
+      "before_sha256": "04331fded4911da69d3cbedeb9c628a40a82bc27be39fdbefefcf111300f990b",
+      "after_sha256": "7f2376fb30ead71e8504eabbc3014d87b14d733c03c4671718f7a43fe3af96bb",
       "owners": {
         "authorize_faction_observation": {
-          "before": "1bfbcc61f8a2a253f33128336547827c3765f278c42651dbee28e8afc4e8a74c",
-          "after": "122f76a4da17a07c797614efb476515da9ddd47aff653da8fb8f74b5c32826ea"
+          "before": "122f76a4da17a07c797614efb476515da9ddd47aff653da8fb8f74b5c32826ea",
+          "after": "bfadd35f0773439021171c42b975e086f8eb3466cc33bc24ad27dc6434ad5e3f"
         }
       }
     },
     "src/warhammer40k_core/rules/source_authority_registry.json": {
-      "before_sha256": "561f84d8c548725db2a01ef3fc0dc9903a719dedf47c19e766b87113ee3ed0eb",
-      "after_sha256": "c29fa3e58d51ead99e3f8ce1108d79f8090b6883af4f1ce3ce0f10d4df5cd98c",
+      "before_sha256": "c29fa3e58d51ead99e3f8ce1108d79f8090b6883af4f1ce3ce0f10d4df5cd98c",
+      "after_sha256": "fbcacca48101aab5a41f182ed70b1aa23c039e1434d36ef3868f9059ed3e0170",
       "owners": {
         "@document": {
-          "before": "561f84d8c548725db2a01ef3fc0dc9903a719dedf47c19e766b87113ee3ed0eb",
-          "after": "c29fa3e58d51ead99e3f8ce1108d79f8090b6883af4f1ce3ce0f10d4df5cd98c"
+          "before": "c29fa3e58d51ead99e3f8ce1108d79f8090b6883af4f1ce3ce0f10d4df5cd98c",
+          "after": "fbcacca48101aab5a41f182ed70b1aa23c039e1434d36ef3868f9059ed3e0170"
         }
       }
     },
     "src/warhammer40k_core/rules/source_authority_registry.py": {
-      "before_sha256": "2bd1e14419f8d5f4e7e640cbc9b6d9c3c6300f962cd1be4537bb022d41c9bdb4",
-      "after_sha256": "9385cb8f03cc86d35d42af9aca18d391f6f962c2ea1c369d23feb4c9596fe5c0",
+      "before_sha256": "9385cb8f03cc86d35d42af9aca18d391f6f962c2ea1c369d23feb4c9596fe5c0",
+      "after_sha256": "70e010deb06a7cade86a1175827cd9a6176d0f18009f87862e628fd66e817680",
       "owners": {
         "@module": {
-          "before": "431242cd13e2b9d0120030ea597de752ac08a5942afae71f222cd5784bcf59e8",
-          "after": "b4dcccf31577ad90a232595644e230001b31a839c701853f98dd2554ae297536"
+          "before": "b4dcccf31577ad90a232595644e230001b31a839c701853f98dd2554ae297536",
+          "after": "efa81c2a99322ecefd7b8fd6aa782163cf62a842146ba1ca1d5ea95bc30aa2f2"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/wave_serpent_frame_2026_11.audit.json": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.audit.json": {
       "before_sha256": null,
-      "after_sha256": "b4c1acebb902bac7811df028b8f107ed47e531ba8bf0e3e69fbb8b1e9f518e7d",
+      "after_sha256": "c5520d359da6f3732765803fea9258fb50d3726cce49392b9f85411aa0e18940",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b4c1acebb902bac7811df028b8f107ed47e531ba8bf0e3e69fbb8b1e9f518e7d"
+          "after": "c5520d359da6f3732765803fea9258fb50d3726cce49392b9f85411aa0e18940"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/wave_serpent_frame_2026_11.overlay-pack.json": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.overlay-pack.json": {
       "before_sha256": null,
-      "after_sha256": "0e1eefbb84497d8204f91e9add31c3e9ece010f6783000c30f6c26a0eaf2b66a",
+      "after_sha256": "b0ccc944e022622bbeded025608a5b2d7ddd224c0f4cae9cca30b59f7adaf4aa",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0e1eefbb84497d8204f91e9add31c3e9ece010f6783000c30f6c26a0eaf2b66a"
+          "after": "b0ccc944e022622bbeded025608a5b2d7ddd224c0f4cae9cca30b59f7adaf4aa"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/wave_serpent_frame_2026_11.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.py": {
       "before_sha256": null,
-      "after_sha256": "411624bffae2d73b2599510f9183ad72d8d0de65445d71b741b0736b0ccd02a5",
+      "after_sha256": "14ef59fe400314080351f559d12a614b92d712cc6c33e6a96b8761adfbafadff",
       "owners": {
         "@module": {
           "before": null,
-          "after": "0a6907eb07c89b06ac1cf6b2113b281cc88ddf1a7608084aa72de8e387d9f3fd"
+          "after": "6385c4d232c8e57995b9286b927db9bb2f09d9cedea3a0e0aae203af23f57828"
         },
-        "apply_current_frame": {
+        "apply_current_daemons": {
           "before": null,
-          "after": "a3a4609f1efd7d0e0b8f50258a0e137b48098c26f28a8e01da3532c84b4e051e"
+          "after": "341bae7888d506f946ba488e0d560f533d332103361592f0b4130518c1727cb5"
         },
         "overlay_pack": {
           "before": null,
@@ -272,7 +282,7 @@
         },
         "overlay_pack_from_json_bytes": {
           "before": null,
-          "after": "d836cfad31648adcf7ad47b5c4a866a647baeb5a591b7de978430218d5fa5bbe"
+          "after": "6d0a83258d401bb6278107561adeb222a9033c774ed097582363b7e03e6269e7"
         },
         "source_audit": {
           "before": null,
@@ -280,7 +290,7 @@
         },
         "source_audit_from_json_bytes": {
           "before": null,
-          "after": "8d4fd4f18fb90eacc6be0592ba1c2b7c5f919eaa3ffa0ace5a1208ecff8bbdc7"
+          "after": "7e613ef04148b00aadf5ee89b012ed309ccdb0e26d8c6101f395957e9f6af004"
         },
         "source_package": {
           "before": null,
@@ -288,175 +298,185 @@
         },
         "source_release_manifest": {
           "before": null,
-          "after": "0a1fe3833234a600b176d9fb0dfec65b0263148676c24d1a5f447e810692a06a"
+          "after": "cc7390c1d71dbd79e2776f46b24f58c3fbbe0ef4b4493c64d2ce354276e27271"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/wahapedia_bridge_defaults.py": {
+      "before_sha256": "4a62b9c447771b218ab6c285cba87718708a9d746761e9d0604889c3f5207401",
+      "after_sha256": "33c3724554be31d166f0702b3346528ea4d703c4435393c1f42434a22cf70152",
+      "owners": {
+        "@module": {
+          "before": "1578d62954da09b6403c99f981891afad8ba88233a244af069389dac0577bb18",
+          "after": "aeedaa7a5994aac6e44ec866cf1146f94cddd1bfdba87edd2aef01a5d67f33d7"
         }
       }
     },
     "tests/code_quality/test_starfang_source_policy.py": {
-      "before_sha256": "1631031ad69f68bba907d14378a93223dc9b81a44ab200bdf9d6435d44156022",
-      "after_sha256": "5607e70538462825153076462ccf5096de516cf74fb60315d56280cd2bc8a007",
+      "before_sha256": "5607e70538462825153076462ccf5096de516cf74fb60315d56280cd2bc8a007",
+      "after_sha256": "ef4369cac7a6251014afe2fa71df6a2758e943443431793f36ec07af94150cfb",
       "owners": {
+        "test_daemons_native_performance_scope_is_exact_and_preserves_policy_chain": {
+          "before": null,
+          "after": "e21c4f203f65f17fbe63f4c3c6446b0f36e96cb64372648d9bad823dc832e3bc"
+        },
         "test_wave_frame_performance_scope_is_exact_and_preserves_policy_chain": {
-          "before": null,
-          "after": "3e2e8c0c2b5e4ca6622ba713007e66ffa783fb5a981dffe911a2b3d021ffb278"
-        },
-        "test_wave_frame_source_provenance_admission_is_exact": {
-          "before": null,
-          "after": "33855f6e96b125780c7b7ef867661579234d3cce6ddecb4030b6bbb64fbc6012"
+          "before": "3e2e8c0c2b5e4ca6622ba713007e66ffa783fb5a981dffe911a2b3d021ffb278",
+          "after": "69e11d1e0f16ee668d840cd453d10d88b975a3c584b2d5a0f0de512b8a9b6ee1"
         }
       }
     },
-    "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
-      "before_sha256": "7800ccf354f37795e2dd5307785df3c62e8a8e736dfad26a1257483e76b81209",
-      "after_sha256": "aade31614c623ca2df9a5199c8afa3fcdb6a86bf63511dc996239ec1e4bf02a9",
-      "owners": {
-        "test_selected_source_index_preserves_corrected_keyword_identity": {
-          "before": "c55c7d1632897f62ce71886bebdf58d28eb7f56f95d8217bab9319f3399f6106",
-          "after": "3397db0154c0f3a6e38d8eea59ab9938baff366cec96e31de198d9aa4d3638fa"
-        },
-        "test_wave_serpent_frame_admission_bytes_are_pinned": {
-          "before": null,
-          "after": "f3b36c51d1a2f5f80635ec2c305f2221796d8b2e5bc06282e3686155d60ed8d6"
-        },
-        "test_wave_serpent_frame_exact_native_delta_and_unchanged_counterparts": {
-          "before": null,
-          "after": "c862509f96ce0da8b46afb0e7d947769e3f3db1de01485849d638ec46f6a2c83"
-        },
-        "test_wave_serpent_frame_native_factory_roundtrip_and_measurement_selector": {
-          "before": null,
-          "after": "9f30a58fb45f3b7d71019018d337a03d5e89fc6cf83b88a5cc50f5abec82b3d1"
-        },
-        "test_wave_serpent_frame_source_admission_and_index_inputs": {
-          "before": null,
-          "after": "38f164654c1cc24ce260e440afff5a79dcbd1117a255c5823266e47f8a734aa0"
-        },
-        "test_wave_serpent_frame_source_guards_and_exact_addition": {
-          "before": null,
-          "after": "f52861b341189704a2f84643b8a44be43dede905e37d1c442759b23ad87ff7c6"
-        }
-      }
-    },
-    "tests/rules/section18/coverage.json": {
-      "before_sha256": "7756037ea607e0d6d4d049d71dc3e5810bd91560e17be43c7284bc29641431cc",
-      "after_sha256": "cde59b060f81707da01097628c950c300ac0df0854a2f69159c8cb378eef9397",
-      "owners": {
-        "@document": {
-          "before": "7756037ea607e0d6d4d049d71dc3e5810bd91560e17be43c7284bc29641431cc",
-          "after": "cde59b060f81707da01097628c950c300ac0df0854a2f69159c8cb378eef9397"
-        }
-      }
-    },
-    "tests/rules/section18/test_embark.py": {
-      "before_sha256": "d148bcd98b7ee35af091d65ce1d4b1da49c7ede1aab56c0611923e4ab6a75cd2",
-      "after_sha256": "52a6932ef18fe93ae8fbba796aa9d0af79842884ed3cfd5c337aa13a15949261",
-      "owners": {
-        "test_embark_each_model_uses_actual_three_dimensional_three_inch_distance": {
-          "before": "3f73b23a57fa4c8955898e0b1cc1c5cc072030fd5dcb3b9f28707260b5dc29ab",
-          "after": "d4a715ba8bae730a7632c8fdae6ec34f1d29e966e990fe4df788ad00910fc037"
-        }
-      }
-    },
-    "tests/rules/section18/test_emergency_status.py": {
-      "before_sha256": "fd3db12da38f514cbbb9e4f100b104c149ccd053dfb7d57fab6d56021a7c65e2",
-      "after_sha256": "33d138d7535a91165197a066e0b9f6bac5ee757453175f57e7539a218ba80d1e",
-      "owners": {
-        "@module": {
-          "before": "7f3ef00ebe6c3030e0ad3547a1ca3c62a1cd31c5f35c6e6c2a8be69870e00ac4",
-          "after": "55698302febf5daceabf41b9eaa31989cede65ed4730c932d9c32bbab6f5ce16"
-        },
-        "test_native_emergency_survivors_become_actually_battle_shocked": {
-          "before": "ae286d1b724886d50e72584c4916cac8f3f6d7c1a08ac51457ded479e712219b",
-          "after": "4fbcb74c432a5f7641a4e6e7c3ec9704054d7c8787298ce09f976a295a01185a"
-        }
-      }
-    },
-    "tests/starfang_deep_strike_helpers.py": {
-      "before_sha256": "0c5aaa768b7eca775b4a2121c81eafe4cf0f467a58dffb6b45aa9443bf432f85",
-      "after_sha256": "6383e4da9f73c96c18582ac48d88d7ff5a1bddadf336a45e37361e0ecf999932",
-      "owners": {
-        "before_starfang_deep_strike": {
-          "before": "89223d526bd0e220486a6d9acddaa4399ba6e34fc85ff6c495b84b8b92a0250e",
-          "after": "7703fd48929f343f2916d1f776c07afb8bae7b824454d850ce12cbd22a021c37"
-        },
-        "before_starfang_source_registry": {
-          "before": "75953294359bc7531a205e71893f66bb65fb6d0a29db74e4f4d53f78069663ab",
-          "after": "7102b02d2a39061f298b296bab0b10d61b176daf342d1fb7718f16f1515af65d"
-        }
-      }
-    },
-    "tests/support/acts_preservation.py": {
-      "before_sha256": "b6b7c220057216790b5c0fff5f430bcc18cc36e7565d6b30333d089b1ef51949",
-      "after_sha256": "4a92f3556d7c1160bf8d107db83a49c3ed10eeef5a9230e17f97e1f06fc8311c",
-      "owners": {
-        "defiler_provenance_predecessor": {
-          "before": "7d040b52bcbe3ddf55f62dfb20adac97fb767649302375d6f378b7b9abb35a89",
-          "after": "653f81202100b63c431d0b653783aefa957d9fe68ff2dac90b9d675ea131f5a4"
-        },
-        "starfang_provenance_predecessor": {
-          "before": "ed3538ec79d9bae1e4241ef34f8e52632e98cecd70e877ff1b247cfa9e73a192",
-          "after": "394c93447cc18398c84e4f5093b1c90d7d1bf34f69be2f0bf5c7e1443c070aaf"
-        }
-      }
-    },
-    "tests/wave_serpent_frame_helpers.py": {
+    "tests/daemons_native_source_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "e7076f6ebb5dc94ccb192e605f6d6ac62ee822a6d7fd0d1806b3f333d2e01dc0",
+      "after_sha256": "2ed44baf0feb4be360165e65d531b578887fae3c407045b67606cd0d853ddaa8",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7d3124693780ba179cff4f5b3e2b808cecd02f741b064289b86fba674859fbcb"
+          "after": "f8f92ac5a740def5aae457706b5928e2cde31b0a96f878dae5057cf88be0a02a"
+        },
+        "attack_component": {
+          "before": null,
+          "after": "c88aaf8633aa787d6e838f26d5e58c222c8e6f4bbb6f93435d168d13ead6f30e"
+        },
+        "damaged_state": {
+          "before": null,
+          "after": "927d0e1096b21011b9aefbc28a0cdd2f7d46eb462ac42bb4492e6f458b7b5e85"
+        },
+        "native_definitions": {
+          "before": null,
+          "after": "b1942a3b79ae3b366e7a50c60dd537be51ed7b386059234a9762132a2a1dde95"
+        },
+        "resolve_native_attack": {
+          "before": null,
+          "after": "77a3f077548247ea390f352e7713ccc55ad545c552655a74ef0ef5dc740ce5f0"
+        }
+      }
+    },
+    "tests/daemons_native_source_preservation.py": {
+      "before_sha256": null,
+      "after_sha256": "9c83174de700933418e4932616de0404cf4b20ac4a67c3c55e3a06a942b0d138",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a36510aff22911c6669e7cce932c525c937c602fc6e316a283ba5460ffc66934"
         },
         "_hash": {
           "before": null,
           "after": "fb2b021357e260297deb6a527d2ec19d496183efcd93b1d083e30265bb21f848"
         },
-        "before_wave_frame": {
+        "before_daemons_native": {
           "before": null,
-          "after": "f0bd537dc7e906573890d012bf4dbd4da2ab1fe905ed40175864f6d03f471cc8"
+          "after": "00cc530413a79a598ca1af3b9e1428a96b0d3a969a01a70439d866b543e4fde4"
+        },
+        "before_daemons_provenance": {
+          "before": null,
+          "after": "940e433d7825b75b5df41429bb75ceba1e4de475472f8efcf73d9c23dc7c5a5a"
+        },
+        "before_daemons_registry": {
+          "before": null,
+          "after": "e7977b24b771747dbfd035614bc58cbf9f5d0ce9bb6f03a7c22d216383d1b9ba"
+        },
+        "daemons_audit": {
+          "before": null,
+          "after": "d0b944bc067510e5127670f39776aaf55e540038e7e5d6afeaeffa11858fc20d"
+        }
+      }
+    },
+    "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
+      "before_sha256": "aade31614c623ca2df9a5199c8afa3fcdb6a86bf63511dc996239ec1e4bf02a9",
+      "after_sha256": "27ba97bbe47ec4a173d63acadedd9c84d64e13bf171e593a409244e66d9e7f6a",
+      "owners": {
+        "test_daemons_current_keyword_boundary_requires_exact_preimage": {
+          "before": null,
+          "after": "a9cd6b704f300b754da6b94ebd881309025eeb3646848735a88c4baf99991475"
+        },
+        "test_daemons_current_two_complete_pages_and_partial_support_scope": {
+          "before": null,
+          "after": "06e7e79f1798912ac8f23774742f9ef917fc7164d1b7d509a52490d3eddc9e92"
+        },
+        "test_daemons_damaged_source_exact_fields_and_other_artifacts_unchanged": {
+          "before": null,
+          "after": "e32f966ead59f2ec0ad89634ee7f36ccf9301d1e3c0b3a5077fa26235b275ee1"
+        },
+        "test_daemons_native_base_keywords_and_real_conditional_grant_kernel": {
+          "before": null,
+          "after": "1ea820386b500230e9c2cc1f742acb2f97051f5a2e5c6178ec5d805a08ff9ca0"
+        },
+        "test_daemons_native_full_sixty_exact_delta_and_counterparts": {
+          "before": null,
+          "after": "9a1d7653915e0d9c12142479dbb45b598c2b122dcf331f2e76277097625f12c8"
+        },
+        "test_selected_source_index_preserves_corrected_keyword_identity": {
+          "before": "3397db0154c0f3a6e38d8eea59ab9938baff366cec96e31de198d9aa4d3638fa",
+          "after": "b7a8826d30db2ae31998814e3854e1ba6296ef1f38c1561fe836d08793c3593e"
+        }
+      }
+    },
+    "tests/rules/section24/test_damaged.py": {
+      "before_sha256": "0129c193a194c6ac943699970de0ca07d06660afab28f26dfc383d5a73f874bc",
+      "after_sha256": "569874d0c7ed1d0105308a4ef570db2580673443df8a5070e7e7153ecec304b3",
+      "owners": {
+        "@module": {
+          "before": "907415b00346cb56225b83d024d02522bcfbf9b5ed0e65c701763388084097a6",
+          "after": "d67e0b2c8aee5cc4898de3b1ef449fee40f67eca13f54ebba3b674fdd5f7bbe2"
+        },
+        "test_native_belakor_actual_attack_damaged_psychic_choice_component_restore": {
+          "before": null,
+          "after": "7aa01c767e1c13f2dee9c204b8116eed0ef476caca62b39da4b727720c61495a"
+        },
+        "test_native_belakor_damage_generated_threshold_and_restoration": {
+          "before": null,
+          "after": "aa183eb7e404a78cf7fde6e7701d0aa321b0d5777ca249d997b04a21abb1277a"
+        }
+      }
+    },
+    "tests/wave_serpent_frame_helpers.py": {
+      "before_sha256": "e7076f6ebb5dc94ccb192e605f6d6ac62ee822a6d7fd0d1806b3f333d2e01dc0",
+      "after_sha256": "f1c8181127f6767e2c5f3d8a3985b64c1216139f63c397b65c023cde997ef899",
+      "owners": {
+        "before_wave_frame": {
+          "before": "f0bd537dc7e906573890d012bf4dbd4da2ab1fe905ed40175864f6d03f471cc8",
+          "after": "88db518c7fbd73cc838c6195d7fc8db8f7e41fb4b180e2032b628046471543ac"
         },
         "before_wave_provenance": {
-          "before": null,
-          "after": "2caf2e0206d19c5037c258b3b86fa408250201940361742d5dab97686b4f5a30"
+          "before": "2caf2e0206d19c5037c258b3b86fa408250201940361742d5dab97686b4f5a30",
+          "after": "fc3b9c852b6ae72a2acedb34928a05a763e7ea95f8bab54f7eb60c942f522cba"
         },
         "before_wave_registry": {
-          "before": null,
-          "after": "367cbfe5445306d62340fa2ca51dcc77f8bbe128a9390a31cde90605fa02b548"
-        },
-        "frame_audit": {
-          "before": null,
-          "after": "071423620c4e965579dedc02fa5cd3b7b5de72e6b61378dc9450de151dd28858"
+          "before": "367cbfe5445306d62340fa2ca51dcc77f8bbe128a9390a31cde90605fa02b548",
+          "after": "bcd68b7862abf2f518d9de97191b9b874e0bab47efebcad0c841f08b15c50bc9"
         }
       }
     },
     "tools/ability_support_sources.py": {
-      "before_sha256": "19825e7ed02385118ff17fc49c6b3847512f783aaa98a0ac1a61f5105ab68e1a",
-      "after_sha256": "a77a2eefceb165576b6c28ebf8ea97e18dcfeb7094a77dccbc8f6b8bb017abcf",
+      "before_sha256": "a77a2eefceb165576b6c28ebf8ea97e18dcfeb7094a77dccbc8f6b8bb017abcf",
+      "after_sha256": "421d6c695e6710e0c0594a3b89e17529831033b73d36d6dea3ef016563160a0d",
       "owners": {
         "@module": {
-          "before": "2e02f88b88e7caf177bce7541bc01e0da88f250d7a7f0a193b14846cdd633090",
-          "after": "8705fbf50d90aff4ffaed70a3bc38c0bf6c9610d3181ac73d2cc2db0bb51909b"
+          "before": "8705fbf50d90aff4ffaed70a3bc38c0bf6c9610d3181ac73d2cc2db0bb51909b",
+          "after": "af64734884857792a2bbc3b131a9a2f1fbfccaf7962ee9e9e237e9ef9cfce5f6"
         },
         "ability_support_index_inputs": {
-          "before": "15862eedd8bc266af0d4f942d08f3697e19d13a10af758f85ae23cd5109e8c69",
-          "after": "7c63b99d26804229e7cd4c3de696a7233392599edeaf99b1c49d23a41d269910"
+          "before": "7c63b99d26804229e7cd4c3de696a7233392599edeaf99b1c49d23a41d269910",
+          "after": "f5d8bae32c825cbe72086b1206181f39e5c150bb73f18442b868895b59829364"
         },
         "load_ability_support_sources": {
-          "before": "a19f4a1098c9371ffa3578dc1584a0a9f7b249d89db67741c84a187448d04025",
-          "after": "26f3ce58df69672727c21de7d7c8727f0194e3fa003af913ad9010f1dab87a5c"
+          "before": "26f3ce58df69672727c21de7d7c8727f0194e3fa003af913ad9010f1dab87a5c",
+          "after": "a411c3c3dcedaeae4b4ec98426f34fbe1987c8f4791c4c6735743699bc2d92c7"
         },
-        "load_before_wave_frame_sources": {
+        "load_before_daemons_native_sources": {
           "before": null,
-          "after": "0c80afefb380a838214aa89879883e143edc13ae29b211269d556c5ad9e29304"
+          "after": "d7254f4ebbfd7d0cfd995a5fa9a2eb5e63f805054c351bf1c94cfa6b335354a0"
         }
       }
     },
-    "tools/build_wave_serpent_frame_source.py": {
+    "tools/build_daemons_native_source.py": {
       "before_sha256": null,
-      "after_sha256": "a32c88bbbfd90c11b1b76b88d32c932fe91c5f3378ce7d28956de21905376bcc",
+      "after_sha256": "c56072ef52bcb94932bc5b509b89fa35ef05187a55a68c7b20e197b3f4c5adb8",
       "owners": {
         "@module": {
           "before": null,
-          "after": "988970c269f657bbb2c7cd51c585d4bb183c8bc34afc5bd4ae0aced025b05c53"
+          "after": "45ee3b92dc5552725fcdda2e6d831ca3b7279c5945bac08846a95bc2d8ff677a"
         },
         "_bytes": {
           "before": null,
@@ -464,35 +484,35 @@
         },
         "build_payloads": {
           "before": null,
-          "after": "8324950c28df8de498096ac8ed854c5255a69c7d0d9d36941d3ca0895e576431"
+          "after": "893ed56457532805625189cd11f475ad132b9e4eed2b73492af8f8218d8ae99a"
         },
         "main": {
           "before": null,
-          "after": "88bc3426fd1f78daf22ef3759a19457cb42ec2dd68075d2456d8e6fcebc9bbc4"
+          "after": "2f99cd1efddba7f6c09ee9a153e79d4e275b74e814d37a053e76898198b43a2e"
         }
       }
     },
-    "tools/performance_policy.py": {
-      "before_sha256": "53855381390dae96880a448d0bf3729fa9099280441aad539e5db56124134526",
-      "after_sha256": "879f0ca4328865a8f24c515abaa894dc8628a49865dcdb817902b94dc7e02a4a",
+    "tools/generate_ability_support_matrix.py": {
+      "before_sha256": "e2806e7406310c1a8b09af6344ce93bfac2f112f2d05f4f22fff00158d28228f",
+      "after_sha256": "83212c06e46ee50419d5f33386a8dc11875d1c9365be94a8031593b120b7ac69",
       "owners": {
-        "starfang_deep_strike_policy_predecessor": {
-          "before": "ebd7f258598f1adf8b7012261b822722cc172bcdba2e3e1c83543abbdeb0c37e",
-          "after": "f7e553b9c992ed875c7f2ae1b0a425bfa4a4d48fa0c23f54d3d498fa8dc0a4f6"
+        "_chaos_daemons_khorne_review_rows": {
+          "before": "82510dad34596367420f2871ef8e4c571dfa3c894764945d114aa42cc2d2f783",
+          "after": "370bd69dcfa851c5a5fc9baaea058b5829a110df9f07be68143fbaaaa31e7b67"
         },
-        "validate_assessment": {
-          "before": "6cbb5609cae189214be6de80cc1a3d203ce130d4db10d7671166915ea5092aa7",
-          "after": "23eb4eda808e3a56dedc0658a07962f685b89d472c4b58d4e354d2dd6d835ed5"
+        "_chaos_daemons_undivided_review_rows": {
+          "before": "68d1cb6a95371c62ed4d940ddd4a2a72a293eda30087bc05c6c8ffd7cf7049a0",
+          "after": "2e96e7439a3a76a73d6707300017da051fa9ca1fb0baec76a14738f5bb50f8d2"
         }
       }
     },
-    "tools/performance_wave_frame.py": {
+    "tools/performance_daemons_native.py": {
       "before_sha256": null,
-      "after_sha256": "8e5c6daec312da5b8982e015df90a9785d3a54545355a629313d4d9e3ac0fd0c",
+      "after_sha256": "e0a4b649d740e79d93e671e3c03bab695c950319cff7a4136618f63908ba7739",
       "owners": {
         "@module": {
           "before": null,
-          "after": "601e7de491a2534d0f585b5f6196c948f1667f4ca37e49843be4470b3657bfa8"
+          "after": "afdd9e5b6b6e9ec327a41428139f6e35227268006cedc6409f58de1b65b642ef"
         },
         "_hash": {
           "before": null,
@@ -500,29 +520,43 @@
         },
         "_scope": {
           "before": null,
-          "after": "1007bd9014128ac646277a4d0698a43fc036af0c07fadc7337fa8a1dbc559439"
+          "after": "9714b7abe9cf0f1d950e15334e0580c61f9dfe8c38ecaa1d223194292614f6e1"
         },
-        "wave_frame_policy_predecessor": {
+        "daemons_native_policy_predecessor": {
           "before": null,
-          "after": "fb234a1b5d566554d088d16b44ad1986b24033df62f9fc2f6dd00107f396a7f9"
+          "after": "a10e38bcd248326a6686bf6758c9c943270c8e7dd79922f19461da1eeb808ee8"
         },
-        "wave_frame_smoke_operations": {
+        "daemons_native_smoke_operations": {
           "before": null,
-          "after": "4629b932ef18d5a56a66d7fc5cf6210c42b2786f79dd54fb677038adea7dc83c"
+          "after": "a2fcd55ea31582fa934df84fbb69316ed22413cac11a98d07925a7fe53b7db11"
+        }
+      }
+    },
+    "tools/performance_policy.py": {
+      "before_sha256": "879f0ca4328865a8f24c515abaa894dc8628a49865dcdb817902b94dc7e02a4a",
+      "after_sha256": "8cd7b97a934f6fb6c71270f0004850f7203a12ed3d19548f005b2156a3b8900c",
+      "owners": {
+        "starfang_deep_strike_policy_predecessor": {
+          "before": "f7e553b9c992ed875c7f2ae1b0a425bfa4a4d48fa0c23f54d3d498fa8dc0a4f6",
+          "after": "bb13829b5371072214090370f5bfaaf1f70be487671250d9ee2ffd302b08644f"
+        },
+        "validate_assessment": {
+          "before": "23eb4eda808e3a56dedc0658a07962f685b89d472c4b58d4e354d2dd6d835ed5",
+          "after": "657624fda5dd3b3fc448cd28fea06484060d17b2f0799a39f1a62477a1d1f782"
         }
       }
     },
     "tools/source_scope_provenance.py": {
-      "before_sha256": "5c41d1c6c8a0b6d186b60271758cab59d1a268d22d47214597dd60f991f90be6",
-      "after_sha256": "03ba930bd1b77644853b875ee7d6f86620e730690cff8b5d1cd12e42c47814ba",
+      "before_sha256": "03ba930bd1b77644853b875ee7d6f86620e730690cff8b5d1cd12e42c47814ba",
+      "after_sha256": "95244250ad88ac287f6bcef1c89eea29fe4f70318d9383e9a92b7c103240670d",
       "owners": {
         "@module": {
-          "before": "2b0b3678f2a7dc8901b3c76ee8d9fe9c7630328967961fe0fbe60f51c6490b56",
-          "after": "ad108e622449b489a8f07842482786c085c2c22a023c257e58d8eac57a2e60d2"
+          "before": "ad108e622449b489a8f07842482786c085c2c22a023c257e58d8eac57a2e60d2",
+          "after": "382c7a4a9feeceaac5f30ea19b9f55448cfd1deff824eefbae62e767474e6371"
         },
         "current_ec_overlay_provenance": {
-          "before": "efc89a02bfee3f2f36101b581a97ed77dc684fe7d24723eb43c99102c6ea093f",
-          "after": "40ddc135890f5dc3e2766ace0c67a61f195eb6131d685441221a21429adf9066"
+          "before": "40ddc135890f5dc3e2766ace0c67a61f195eb6131d685441221a21429adf9066",
+          "after": "43b3bdb3678dd90e2c6aca2b63ce4b01606ed668a7fa130c582096f577122970"
         }
       }
     }
@@ -532,17 +566,17 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "ci/quality_shards/shard-4.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -550,9 +584,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -560,9 +594,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -570,9 +604,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -580,9 +614,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -590,9 +624,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -600,9 +634,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -610,9 +644,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -620,9 +654,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -630,81 +664,89 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
-    "data/source_audits/wave_serpent_frame_2026_11/catalog-delta.json": {
+    "data/source_audits/daemons_native_2026_11/catalog-delta.json": {
       "category": "rule_semantics",
       "operations": [
-        "wave-frame-exact-84fbc60811c1a1ed"
+        "daemons-native-exact-ac90283f1af38590"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
-    "data/source_audits/wave_serpent_frame_2026_11/provenance-delta.json": {
+    "data/source_audits/daemons_native_2026_11/provenance-delta.json": {
       "category": "rule_semantics",
       "operations": [
-        "wave-frame-exact-4ab201ea3db36bcf"
+        "daemons-native-exact-9dbe815103b0311e"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
-    "data/source_audits/wave_serpent_frame_2026_11/registry-delta.json": {
+    "data/source_audits/daemons_native_2026_11/registry-delta.json": {
       "category": "rule_semantics",
       "operations": [
-        "wave-frame-exact-c76d2b32c396241c"
+        "daemons-native-exact-8f46c586d2338683"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
-    "data/source_audits/wave_serpent_frame_2026_11/reviewed-observation.json": {
+    "data/source_audits/daemons_native_2026_11/reviewed-observation.json": {
       "category": "rule_semantics",
       "operations": [
-        "wave-frame-exact-7e30360eba3e41a0"
+        "daemons-native-exact-cb467eba357cf40e"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
-    "docs/WAVE_SERPENT_FRAME_SOURCE_SCOPE.md": {
+    "docs/DAEMONS_NATIVE_SOURCE_SCOPE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+    },
+    "docs/factions/chaos-daemons.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+    },
+    "docs/performance/policy-v3/daemons-native-smoke-scope.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
-    },
-    "docs/performance/policy-v3/wave-serpent-frame-smoke-scope.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -712,9 +754,9 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "src/warhammer40k_core/rules/faction_source_governance.py": {
       "category": "rule_semantics",
@@ -722,9 +764,9 @@
         "aeldari-current-exact-09"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "src/warhammer40k_core/rules/source_authority_registry.json": {
       "category": "rule_semantics",
@@ -732,9 +774,9 @@
         "source-authority-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "src/warhammer40k_core/rules/source_authority_registry.py": {
       "category": "rule_semantics",
@@ -742,111 +784,99 @@
         "source-authority-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/wave_serpent_frame_2026_11.audit.json": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.audit.json": {
       "category": "rule_semantics",
       "operations": [
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/wave_serpent_frame_2026_11.overlay-pack.json": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.overlay-pack.json": {
       "category": "rule_semantics",
       "operations": [
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/wave_serpent_frame_2026_11.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/daemons_native_2026_11.py": {
       "category": "rule_semantics",
       "operations": [
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+    },
+    "src/warhammer40k_core/rules/wahapedia_bridge_defaults.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-20"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "tests/code_quality/test_starfang_source_policy.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+    },
+    "tests/daemons_native_source_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-native-exact-fa0f55425cfc3000"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+    },
+    "tests/daemons_native_source_preservation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-native-exact-fac356e49e4b8510"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
       "category": "rule_semantics",
       "operations": [
         "starfang-deep-strike-exact-8a566d77a945247d",
-        "wave-frame-exact-8a566d77a945247d"
+        "daemons-native-exact-8a566d77a945247d"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
-    "tests/rules/section18/coverage.json": {
+    "tests/rules/section24/test_damaged.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-472204d42ddab990",
-        "supported-ec-source-fixture-controls"
+        "qualification40-exact-2b69c86b0ccce84e",
+        "daemons-native-exact-2b69c86b0ccce84e"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
-    },
-    "tests/rules/section18/test_embark.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-09f8363b82bd0a28"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
-    },
-    "tests/rules/section18/test_emergency_status.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-97ba81bb1395873b",
-        "supported-ec-source-fixture-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
-    },
-    "tests/starfang_deep_strike_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "starfang-deep-strike-exact-ee515e310a1c048b"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
-    },
-    "tests/support/acts_preservation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-defiler-exact-predecessor-projection",
-        "starfang-deep-strike-exact-7ac0b8f112aa0e6f"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "tests/wave_serpent_frame_helpers.py": {
       "category": "rule_semantics",
@@ -854,31 +884,49 @@
         "wave-frame-exact-663326d24d56e47b"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "tools/ability_support_sources.py": {
       "category": "rule_semantics",
       "operations": [
         "qualification40-exact-b0712fa66a9cc38e",
         "supported-vyper-source-title-binding",
-        "wave-frame-exact-b0712fa66a9cc38e"
+        "daemons-native-exact-b0712fa66a9cc38e"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
-    "tools/build_wave_serpent_frame_source.py": {
+    "tools/build_daemons_native_source.py": {
       "category": "rule_semantics",
       "operations": [
-        "wave-frame-exact-62d2c44256aceddc"
+        "daemons-native-exact-e6650756a1c5d131"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+    },
+    "tools/generate_ability_support_matrix.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-native-exact-ded6452f144f095b"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+    },
+    "tools/performance_daemons_native.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "tools/performance_policy.py": {
       "category": "rule_semantics",
@@ -888,17 +936,9 @@
         "starfang-deep-strike-exact-1504c891c8d333f3"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
-    },
-    "tools/performance_wave_frame.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     },
     "tools/source_scope_provenance.py": {
       "category": "rule_semantics",
@@ -907,9 +947,9 @@
         "ec-current-source-exact-10"
       ],
       "selected_families": [],
-      "rationale": "Bounded Wave Serpent FRAME source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
-      "source_obligation": "Add only Wave Serpent599 ordinary/global FRAME via one predecessor-bound ADD_ROW; retain existing Core17.02 and native measurement selector. Preserve all prior source rows, catalog fields and paired/Daemons payloads.",
-      "unchanged_work": "One source-owned keyword-table preimage/absence check and the existing composer propagate FRAME; native geometry selects its already-existing every-part branch. Index/search/cache algorithms, geometry values, attack/transport/serializer code and dependencies are unchanged. This is ordinary source-rule semantics, not a deliberate performance change or measured-workload change. No identical-work or measured speed claim. Preserve every sensitive mapping/family/budget and live semantic/work/cache check; serial current-runtime smoke remains required. Current-source fixture adaptation changes only existing Section18 numeric boundary inputs and the explicit native deterministic scenario seed with stronger roll/destruction assertions; it does not alter any measured workload or runtime owner."
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
     }
   },
   "milestone": "ordinary",
