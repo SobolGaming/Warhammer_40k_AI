@@ -17,7 +17,7 @@ The binding does not require an unrelated Icon record's old component hash.
 capture/suffix, source fingerprint and exact predecessor remain unchanged.
 40k.app remains the approved non-affiliated project mirror, not official GW.
 
-`tests/fixtures/source_history/post_icon_2026_11/` contains three full canonical
+`data/source_audits/source_fixture_history_2026_11/` contains three full canonical
 catalogs and the Icon component captured at merged commit
 `23929a36f04f3d9cf1c7fee7b70f38fc0f588d83`, tree
 `02ea54feae8e0c5c55ea0f33bcdd13a8a9927918`. The manifest records capture status
@@ -57,3 +57,9 @@ branch denominator and temporary 65% floor, quality 600-second cutoff and serial
 demonstrated fixture coupling; it does not claim a CI speedup or full-game
 certification. Relevant rule/schema changes still require explicit migration
 while retaining the old bytes; snapshots contain data, never executable Python.
+
+The complete frozen catalogs live in the historical audit-evidence namespace,
+alongside other retained full catalog captures. They are not runtime admissions or
+active source files. The existing edition-identity scan and its frozen preservation
+proofs remain unchanged. The test loader alone opens these exact members and still
+enforces the original pinned manifest, full bytes, identities and finite closure.

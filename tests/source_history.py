@@ -27,7 +27,7 @@ from warhammer40k_core.rules.catalog_package import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-HISTORY = ROOT / "tests/fixtures/source_history/post_icon_2026_11"
+HISTORY = ROOT / "data/source_audits/source_fixture_history_2026_11"
 MANIFEST_SHA256 = "e2419f6728ee7df32910d3a8288f0d0ac26cd8a3c1ee5b6d8d606296c0715ed8"
 MEMBERS = ("native.json", "paired.json", "standalone.json", "icon-component.json")
 

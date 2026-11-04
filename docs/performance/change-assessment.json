@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "23929a36f04f3d9cf1c7fee7b70f38fc0f588d83",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f4d4a6c0e68be824d716e93d05bbfd2ff36340a3bcd11e174ca2649c23e41be8",
-  "operation_map_sha256": "5c356dd958895fb71678f098488326f3faf0774ae4a9acecd87b688b8773a3ad",
+  "operation_map_sha256": "fa628193a6eb777cad1074e354a53666a6d28f7d7d53821fc5292439b7841ad5",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "1a680bbd62e193731b7d49b160fbd86e7a06e225f7b8192d00b6564f1ed1ba83",
@@ -44,6 +44,56 @@
         }
       }
     },
+    "data/source_audits/source_fixture_history_2026_11/icon-component.json": {
+      "before_sha256": null,
+      "after_sha256": "1c3bf9bcdadf270665e7fa6aa11968e7a6e3f8a0371028be35d9f480a5f06cb8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1c3bf9bcdadf270665e7fa6aa11968e7a6e3f8a0371028be35d9f480a5f06cb8"
+        }
+      }
+    },
+    "data/source_audits/source_fixture_history_2026_11/manifest.json": {
+      "before_sha256": null,
+      "after_sha256": "e2419f6728ee7df32910d3a8288f0d0ac26cd8a3c1ee5b6d8d606296c0715ed8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e2419f6728ee7df32910d3a8288f0d0ac26cd8a3c1ee5b6d8d606296c0715ed8"
+        }
+      }
+    },
+    "data/source_audits/source_fixture_history_2026_11/native.json": {
+      "before_sha256": null,
+      "after_sha256": "3b751a9d7d0960bc28d92e860121b85fb8966fa37aeed91a625ddd8d3833be37",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "3b751a9d7d0960bc28d92e860121b85fb8966fa37aeed91a625ddd8d3833be37"
+        }
+      }
+    },
+    "data/source_audits/source_fixture_history_2026_11/paired.json": {
+      "before_sha256": null,
+      "after_sha256": "856bc7e4787ad204075f89976c26a1c1929798cd1acd28a02d8bf21227658823",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "856bc7e4787ad204075f89976c26a1c1929798cd1acd28a02d8bf21227658823"
+        }
+      }
+    },
+    "data/source_audits/source_fixture_history_2026_11/standalone.json": {
+      "before_sha256": null,
+      "after_sha256": "c8fd8112b9ea75fdc6b4025292c7956efc7c076cde8dfacd2916ec679dd37f57",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c8fd8112b9ea75fdc6b4025292c7956efc7c076cde8dfacd2916ec679dd37f57"
+        }
+      }
+    },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "3b3ce4093a9364ae74a272c7d86dde46f7d712217e035923d5db911a7a98ebae",
       "after_sha256": "e61b30811be6179a958d3491d47e0f012af4968c307b8ec55ea39e8725dc323b",
@@ -56,21 +106,21 @@
     },
     "docs/SOURCE_FIXTURE_HASH_BOUNDARIES.md": {
       "before_sha256": null,
-      "after_sha256": "c7ca20aeda05155934b44810491fd61441a4d5b932d38cee94a602b67159e51f",
+      "after_sha256": "962869a7a474e55fe248c5005d8d0933ddaaf55553b12538a49453797109a19d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c7ca20aeda05155934b44810491fd61441a4d5b932d38cee94a602b67159e51f"
+          "after": "962869a7a474e55fe248c5005d8d0933ddaaf55553b12538a49453797109a19d"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "b7b65fa26e56c86e4c158385074e0833b696676e74f56175b834ad95b6132eab",
-      "after_sha256": "4922892e98f539a4e1d90ba9839cc4685c59750fb0b36f018b6fcf7ccbd42f6c",
+      "after_sha256": "19cfa7026284dd7f6e660e5e249bc8c24c742256ead1aa4a749f6792da210f6c",
       "owners": {
         "@document": {
           "before": "b7b65fa26e56c86e4c158385074e0833b696676e74f56175b834ad95b6132eab",
-          "after": "4922892e98f539a4e1d90ba9839cc4685c59750fb0b36f018b6fcf7ccbd42f6c"
+          "after": "19cfa7026284dd7f6e660e5e249bc8c24c742256ead1aa4a749f6792da210f6c"
         }
       }
     },
@@ -138,53 +188,28 @@
     },
     "tests/fixtures/source_history/post_icon_2026_11/icon-component.json": {
       "before_sha256": null,
-      "after_sha256": "1c3bf9bcdadf270665e7fa6aa11968e7a6e3f8a0371028be35d9f480a5f06cb8",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "1c3bf9bcdadf270665e7fa6aa11968e7a6e3f8a0371028be35d9f480a5f06cb8"
-        }
-      }
+      "after_sha256": null,
+      "owners": {}
     },
     "tests/fixtures/source_history/post_icon_2026_11/manifest.json": {
       "before_sha256": null,
-      "after_sha256": "e2419f6728ee7df32910d3a8288f0d0ac26cd8a3c1ee5b6d8d606296c0715ed8",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e2419f6728ee7df32910d3a8288f0d0ac26cd8a3c1ee5b6d8d606296c0715ed8"
-        }
-      }
+      "after_sha256": null,
+      "owners": {}
     },
     "tests/fixtures/source_history/post_icon_2026_11/native.json": {
       "before_sha256": null,
-      "after_sha256": "3b751a9d7d0960bc28d92e860121b85fb8966fa37aeed91a625ddd8d3833be37",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "3b751a9d7d0960bc28d92e860121b85fb8966fa37aeed91a625ddd8d3833be37"
-        }
-      }
+      "after_sha256": null,
+      "owners": {}
     },
     "tests/fixtures/source_history/post_icon_2026_11/paired.json": {
       "before_sha256": null,
-      "after_sha256": "856bc7e4787ad204075f89976c26a1c1929798cd1acd28a02d8bf21227658823",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "856bc7e4787ad204075f89976c26a1c1929798cd1acd28a02d8bf21227658823"
-        }
-      }
+      "after_sha256": null,
+      "owners": {}
     },
     "tests/fixtures/source_history/post_icon_2026_11/standalone.json": {
       "before_sha256": null,
-      "after_sha256": "c8fd8112b9ea75fdc6b4025292c7956efc7c076cde8dfacd2916ec679dd37f57",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "c8fd8112b9ea75fdc6b4025292c7956efc7c076cde8dfacd2916ec679dd37f57"
-        }
-      }
+      "after_sha256": null,
+      "owners": {}
     },
     "tests/fixtures/source_history/section08-sticky-binding-v1.json": {
       "before_sha256": null,
@@ -324,11 +349,11 @@
     },
     "tests/source_history.py": {
       "before_sha256": null,
-      "after_sha256": "9f9d10b59b64c5404543acdadc99a9be8b048f15dba5e89d5dcd17cc34cf37ce",
+      "after_sha256": "d59f44034de7467bb938ec1c2190fffd2a1cc386f486b844a674229acdb4b47a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7fec003510f0048b8a6d18a2f52880a155a21f589b0a182ec241e88fc59a0463"
+          "after": "d71ec3f1fa14cd259fb802a59699a5e34e49df2d10e6f1ea27a611c3a4862841"
         },
         "_contained": {
           "before": null,
@@ -416,6 +441,56 @@
       "category": "rule_semantics",
       "operations": [
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",
+      "source_obligation": "Retain approved source loading, full selected Sticky record and dependency identities, current adapters and native semantics, exact original historical evidence and all required test selections.",
+      "unchanged_work": "No packaged runtime, source-authority, contract, dependency, engine algorithm, cache or serializer change. Fixture history validation stays test-only. Serial current-runtime smoke and live semantic/index/cache gates remain required; no speedup or full-game claim."
+    },
+    "data/source_audits/source_fixture_history_2026_11/icon-component.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "fixture-hash-boundaries-exact-e1f4a1e16daabf6b"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",
+      "source_obligation": "Retain approved source loading, full selected Sticky record and dependency identities, current adapters and native semantics, exact original historical evidence and all required test selections.",
+      "unchanged_work": "No packaged runtime, source-authority, contract, dependency, engine algorithm, cache or serializer change. Fixture history validation stays test-only. Serial current-runtime smoke and live semantic/index/cache gates remain required; no speedup or full-game claim."
+    },
+    "data/source_audits/source_fixture_history_2026_11/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "fixture-hash-boundaries-exact-646e930764b734f2"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",
+      "source_obligation": "Retain approved source loading, full selected Sticky record and dependency identities, current adapters and native semantics, exact original historical evidence and all required test selections.",
+      "unchanged_work": "No packaged runtime, source-authority, contract, dependency, engine algorithm, cache or serializer change. Fixture history validation stays test-only. Serial current-runtime smoke and live semantic/index/cache gates remain required; no speedup or full-game claim."
+    },
+    "data/source_audits/source_fixture_history_2026_11/native.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "fixture-hash-boundaries-exact-7fab3e1a1fd643c9"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",
+      "source_obligation": "Retain approved source loading, full selected Sticky record and dependency identities, current adapters and native semantics, exact original historical evidence and all required test selections.",
+      "unchanged_work": "No packaged runtime, source-authority, contract, dependency, engine algorithm, cache or serializer change. Fixture history validation stays test-only. Serial current-runtime smoke and live semantic/index/cache gates remain required; no speedup or full-game claim."
+    },
+    "data/source_audits/source_fixture_history_2026_11/paired.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "fixture-hash-boundaries-exact-63ed9f6e9e7f4c33"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",
+      "source_obligation": "Retain approved source loading, full selected Sticky record and dependency identities, current adapters and native semantics, exact original historical evidence and all required test selections.",
+      "unchanged_work": "No packaged runtime, source-authority, contract, dependency, engine algorithm, cache or serializer change. Fixture history validation stays test-only. Serial current-runtime smoke and live semantic/index/cache gates remain required; no speedup or full-game claim."
+    },
+    "data/source_audits/source_fixture_history_2026_11/standalone.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "fixture-hash-boundaries-exact-a89e63191ccf2789"
       ],
       "selected_families": [],
       "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",

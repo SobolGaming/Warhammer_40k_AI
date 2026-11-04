@@ -33390,6 +33390,61 @@
       "sensitive": false,
       "mandatory": false
     },
+    "fixture-hash-boundaries-exact-e1f4a1e16daabf6b": {
+      "paths": [
+        "data/source_audits/source_fixture_history_2026_11/icon-component.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-646e930764b734f2": {
+      "paths": [
+        "data/source_audits/source_fixture_history_2026_11/manifest.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-7fab3e1a1fd643c9": {
+      "paths": [
+        "data/source_audits/source_fixture_history_2026_11/native.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-63ed9f6e9e7f4c33": {
+      "paths": [
+        "data/source_audits/source_fixture_history_2026_11/paired.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fixture-hash-boundaries-exact-a89e63191ccf2789": {
+      "paths": [
+        "data/source_audits/source_fixture_history_2026_11/standalone.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
     "fixture-hash-boundaries-exact-d093da7d00abc532": {
       "paths": [
         "scripts/validate_source_history.py"
@@ -33420,7 +33475,7 @@
         "tests/fixtures/source_history/post_icon_2026_11/icon-component.json"
       ],
       "owners": [
-        "@document"
+        "@text"
       ],
       "families": [],
       "sensitive": false,
@@ -33431,7 +33486,7 @@
         "tests/fixtures/source_history/post_icon_2026_11/manifest.json"
       ],
       "owners": [
-        "@document"
+        "@text"
       ],
       "families": [],
       "sensitive": false,
@@ -33442,7 +33497,7 @@
         "tests/fixtures/source_history/post_icon_2026_11/native.json"
       ],
       "owners": [
-        "@document"
+        "@text"
       ],
       "families": [],
       "sensitive": false,
@@ -33453,7 +33508,7 @@
         "tests/fixtures/source_history/post_icon_2026_11/paired.json"
       ],
       "owners": [
-        "@document"
+        "@text"
       ],
       "families": [],
       "sensitive": false,
@@ -33464,7 +33519,7 @@
         "tests/fixtures/source_history/post_icon_2026_11/standalone.json"
       ],
       "owners": [
-        "@document"
+        "@text"
       ],
       "families": [],
       "sensitive": false,
