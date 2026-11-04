@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4ad18b22d2abe4a917318b04e200d577265d8b89568625f69bbe6a83093b5053",
   "operation_map_sha256": "af099a565c7dc9672471449a627b0d2834a1f330eb1a9acb7efca3acb73e09bf",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "58c42978557d30ca5082ce65962c58b2092820212a884e1deed54f2876f012c3",
+      "after_sha256": "65f0148d2a31290453ae8b763fb96a5effef973ed9dbc0f22e2fa5026f9c9e7e",
+      "owners": {
+        "@document": {
+          "before": "58c42978557d30ca5082ce65962c58b2092820212a884e1deed54f2876f012c3",
+          "after": "65f0148d2a31290453ae8b763fb96a5effef973ed9dbc0f22e2fa5026f9c9e7e"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "9ada1211658e9d59b5cc7fcf35b1e921bc9e27388f5f7732de84d7af961c49e9",
+      "after_sha256": "7cc3ba15bdd238c29815242a9b7e825fe15faaeb98a6b9b2470e70e81965eb02",
+      "owners": {
+        "@document": {
+          "before": "9ada1211658e9d59b5cc7fcf35b1e921bc9e27388f5f7732de84d7af961c49e9",
+          "after": "7cc3ba15bdd238c29815242a9b7e825fe15faaeb98a6b9b2470e70e81965eb02"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "c1ab3bfdfbd30116162b1d85b16e6b6b9b9fd016458f67df32d81efeb698e585",
+      "after_sha256": "ba40f14ae00db065baf166f6fe738d662b69ac5478f5ee0470eb0f3f4dfca49d",
+      "owners": {
+        "@document": {
+          "before": "c1ab3bfdfbd30116162b1d85b16e6b6b9b9fd016458f67df32d81efeb698e585",
+          "after": "ba40f14ae00db065baf166f6fe738d662b69ac5478f5ee0470eb0f3f4dfca49d"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "3fa657bcdece8289774ab07e6b2fe7bbc4e3ef5466c9dd69703698be15d3615c",
+      "after_sha256": "4fdc609e8d4e299ea4507fb669180fbedd1bcd231ac9316d17a5aa612d1a06ca",
+      "owners": {
+        "@document": {
+          "before": "3fa657bcdece8289774ab07e6b2fe7bbc4e3ef5466c9dd69703698be15d3615c",
+          "after": "4fdc609e8d4e299ea4507fb669180fbedd1bcd231ac9316d17a5aa612d1a06ca"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "54bba4974222321866201270e8b1f0236de6975ed302d68fb41d2d7897594613",
+      "after_sha256": "67ffa57dc599e9a83c21c39b6fafba3d1f3a959ee5f294d6003124f5c9ff1ad5",
+      "owners": {
+        "@document": {
+          "before": "54bba4974222321866201270e8b1f0236de6975ed302d68fb41d2d7897594613",
+          "after": "67ffa57dc599e9a83c21c39b6fafba3d1f3a959ee5f294d6003124f5c9ff1ad5"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "76684ea0d1e27ff7ee3dc8ed2f8b7ca2b871c28fcdca3e9fdc5872496adf777f",
+      "after_sha256": "36860366af5961a9472f7318bae6c78cd8c391e92621b405c0359245f1eaabc8",
+      "owners": {
+        "@document": {
+          "before": "76684ea0d1e27ff7ee3dc8ed2f8b7ca2b871c28fcdca3e9fdc5872496adf777f",
+          "after": "36860366af5961a9472f7318bae6c78cd8c391e92621b405c0359245f1eaabc8"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "f836f2da7150a025bed61d4dc45aeec025350ab2a5353bcd571a2043c82aa020",
+      "after_sha256": "568c78c0f07e778a530503bfd590751d3f5c72457ca03e9695a51d1943e92e07",
+      "owners": {
+        "@document": {
+          "before": "f836f2da7150a025bed61d4dc45aeec025350ab2a5353bcd571a2043c82aa020",
+          "after": "568c78c0f07e778a530503bfd590751d3f5c72457ca03e9695a51d1943e92e07"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "e3b0ea2a885fd4a2c611da21ca6c7ae60c21450348d2f4ef08f7617ace207445",
+      "after_sha256": "12d83a23712a14f0338d3cb9651681ce86a85d79afb349aa77f7f19aa003a36f",
+      "owners": {
+        "@document": {
+          "before": "e3b0ea2a885fd4a2c611da21ca6c7ae60c21450348d2f4ef08f7617ace207445",
+          "after": "12d83a23712a14f0338d3cb9651681ce86a85d79afb349aa77f7f19aa003a36f"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "2da5c6fdf6f19cf09eea62bc65fc8f4ec712a3b7b98dcf8c50625f1799399d85",
+      "after_sha256": "b984fd7310faa51d70a87c47298e8d877fbf02ab0aa525db52a593b5963be43b",
+      "owners": {
+        "@document": {
+          "before": "2da5c6fdf6f19cf09eea62bc65fc8f4ec712a3b7b98dcf8c50625f1799399d85",
+          "after": "b984fd7310faa51d70a87c47298e8d877fbf02ab0aa525db52a593b5963be43b"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "aff9b5373535eadd42a1fe079789f8b708a80e869e8bdf32f7585b819f5a66be",
+      "after_sha256": "586c445324844c83b9c36a1d6a57d2e9a88dde2702c6daeb82c944ac3503c45e",
+      "owners": {
+        "@document": {
+          "before": "aff9b5373535eadd42a1fe079789f8b708a80e869e8bdf32f7585b819f5a66be",
+          "after": "586c445324844c83b9c36a1d6a57d2e9a88dde2702c6daeb82c944ac3503c45e"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "790914c7db3c0e972a58782179be52a28ac09a73794c45308ccff3a86c7a38f8",
+      "after_sha256": "1617e4d7d6ab95e97c76888393ca5f7cca27987ea69034a1e060ed52baae0292",
+      "owners": {
+        "@document": {
+          "before": "790914c7db3c0e972a58782179be52a28ac09a73794c45308ccff3a86c7a38f8",
+          "after": "1617e4d7d6ab95e97c76888393ca5f7cca27987ea69034a1e060ed52baae0292"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "6dc20bb27bd2a6765ad7cfca2af6a9659f76f85e1a57bf2ffab509a4d3fcb41e",
+      "after_sha256": "3384a52c92315f0936bed9aa47cd33a900c79f26bb8a041ace2480cf621778f7",
+      "owners": {
+        "@document": {
+          "before": "6dc20bb27bd2a6765ad7cfca2af6a9659f76f85e1a57bf2ffab509a4d3fcb41e",
+          "after": "3384a52c92315f0936bed9aa47cd33a900c79f26bb8a041ace2480cf621778f7"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "a410a7c4fa2f54aa08e50e23bd05d7bf14348afb358025d5472609304ced74b0",
+      "after_sha256": "3007eb9877b0ee12c01ef2df448f41b75f41c41cdb519b1d1c93ee2cc20cb41a",
+      "owners": {
+        "@document": {
+          "before": "a410a7c4fa2f54aa08e50e23bd05d7bf14348afb358025d5472609304ced74b0",
+          "after": "3007eb9877b0ee12c01ef2df448f41b75f41c41cdb519b1d1c93ee2cc20cb41a"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "cc14ee40b73107d33dcf4e54c8caae8d9c289210fa0868841ac7a56ee282affd",
       "after_sha256": "d582cedaaeb0f89c48f892383828182d7ce06182fa34a0d4efb127659513950f",
@@ -498,6 +628,240 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
+      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
+      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
