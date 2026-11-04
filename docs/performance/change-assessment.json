@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "23929a36f04f3d9cf1c7fee7b70f38fc0f588d83",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f4d4a6c0e68be824d716e93d05bbfd2ff36340a3bcd11e174ca2649c23e41be8",
-  "operation_map_sha256": "fa628193a6eb777cad1074e354a53666a6d28f7d7d53821fc5292439b7841ad5",
+  "operation_map_sha256": "8d13340b7db425b03366c1493ef47a1762b73c339e96737cd80ffebba80d0219",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "1a680bbd62e193731b7d49b160fbd86e7a06e225f7b8192d00b6564f1ed1ba83",
@@ -116,11 +116,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "b7b65fa26e56c86e4c158385074e0833b696676e74f56175b834ad95b6132eab",
-      "after_sha256": "19cfa7026284dd7f6e660e5e249bc8c24c742256ead1aa4a749f6792da210f6c",
+      "after_sha256": "7878bc8ff4ecf6b2da3e183b71b82d5ff6437bd58066a2672d458789558e286a",
       "owners": {
         "@document": {
           "before": "b7b65fa26e56c86e4c158385074e0833b696676e74f56175b834ad95b6132eab",
-          "after": "19cfa7026284dd7f6e660e5e249bc8c24c742256ead1aa4a749f6792da210f6c"
+          "after": "7878bc8ff4ecf6b2da3e183b71b82d5ff6437bd58066a2672d458789558e286a"
         }
       }
     },
@@ -185,31 +185,6 @@
           "after": "0ff998d274e56a1fd43416f2ae58e1ef08d2064e4727116efa48c03cdaa01ab4"
         }
       }
-    },
-    "tests/fixtures/source_history/post_icon_2026_11/icon-component.json": {
-      "before_sha256": null,
-      "after_sha256": null,
-      "owners": {}
-    },
-    "tests/fixtures/source_history/post_icon_2026_11/manifest.json": {
-      "before_sha256": null,
-      "after_sha256": null,
-      "owners": {}
-    },
-    "tests/fixtures/source_history/post_icon_2026_11/native.json": {
-      "before_sha256": null,
-      "after_sha256": null,
-      "owners": {}
-    },
-    "tests/fixtures/source_history/post_icon_2026_11/paired.json": {
-      "before_sha256": null,
-      "after_sha256": null,
-      "owners": {}
-    },
-    "tests/fixtures/source_history/post_icon_2026_11/standalone.json": {
-      "before_sha256": null,
-      "after_sha256": null,
-      "owners": {}
     },
     "tests/fixtures/source_history/section08-sticky-binding-v1.json": {
       "before_sha256": null,
@@ -543,56 +518,6 @@
       "category": "rule_semantics",
       "operations": [
         "fixture-hash-boundaries-exact-29c3dfc9354d3ad5"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",
-      "source_obligation": "Retain approved source loading, full selected Sticky record and dependency identities, current adapters and native semantics, exact original historical evidence and all required test selections.",
-      "unchanged_work": "No packaged runtime, source-authority, contract, dependency, engine algorithm, cache or serializer change. Fixture history validation stays test-only. Serial current-runtime smoke and live semantic/index/cache gates remain required; no speedup or full-game claim."
-    },
-    "tests/fixtures/source_history/post_icon_2026_11/icon-component.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "fixture-hash-boundaries-exact-95503f78943a3497"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",
-      "source_obligation": "Retain approved source loading, full selected Sticky record and dependency identities, current adapters and native semantics, exact original historical evidence and all required test selections.",
-      "unchanged_work": "No packaged runtime, source-authority, contract, dependency, engine algorithm, cache or serializer change. Fixture history validation stays test-only. Serial current-runtime smoke and live semantic/index/cache gates remain required; no speedup or full-game claim."
-    },
-    "tests/fixtures/source_history/post_icon_2026_11/manifest.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "fixture-hash-boundaries-exact-7f0507bd23f7d5be"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",
-      "source_obligation": "Retain approved source loading, full selected Sticky record and dependency identities, current adapters and native semantics, exact original historical evidence and all required test selections.",
-      "unchanged_work": "No packaged runtime, source-authority, contract, dependency, engine algorithm, cache or serializer change. Fixture history validation stays test-only. Serial current-runtime smoke and live semantic/index/cache gates remain required; no speedup or full-game claim."
-    },
-    "tests/fixtures/source_history/post_icon_2026_11/native.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "fixture-hash-boundaries-exact-d221b8e59f4d0211"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",
-      "source_obligation": "Retain approved source loading, full selected Sticky record and dependency identities, current adapters and native semantics, exact original historical evidence and all required test selections.",
-      "unchanged_work": "No packaged runtime, source-authority, contract, dependency, engine algorithm, cache or serializer change. Fixture history validation stays test-only. Serial current-runtime smoke and live semantic/index/cache gates remain required; no speedup or full-game claim."
-    },
-    "tests/fixtures/source_history/post_icon_2026_11/paired.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "fixture-hash-boundaries-exact-f98bb538937a17b7"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",
-      "source_obligation": "Retain approved source loading, full selected Sticky record and dependency identities, current adapters and native semantics, exact original historical evidence and all required test selections.",
-      "unchanged_work": "No packaged runtime, source-authority, contract, dependency, engine algorithm, cache or serializer change. Fixture history validation stays test-only. Serial current-runtime smoke and live semantic/index/cache gates remain required; no speedup or full-game claim."
-    },
-    "tests/fixtures/source_history/post_icon_2026_11/standalone.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "fixture-hash-boundaries-exact-5bb25f412070aae8"
       ],
       "selected_families": [],
       "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",

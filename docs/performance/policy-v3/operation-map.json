@@ -33470,61 +33470,6 @@
       "sensitive": false,
       "mandatory": false
     },
-    "fixture-hash-boundaries-exact-95503f78943a3497": {
-      "paths": [
-        "tests/fixtures/source_history/post_icon_2026_11/icon-component.json"
-      ],
-      "owners": [
-        "@text"
-      ],
-      "families": [],
-      "sensitive": false,
-      "mandatory": false
-    },
-    "fixture-hash-boundaries-exact-7f0507bd23f7d5be": {
-      "paths": [
-        "tests/fixtures/source_history/post_icon_2026_11/manifest.json"
-      ],
-      "owners": [
-        "@text"
-      ],
-      "families": [],
-      "sensitive": false,
-      "mandatory": false
-    },
-    "fixture-hash-boundaries-exact-d221b8e59f4d0211": {
-      "paths": [
-        "tests/fixtures/source_history/post_icon_2026_11/native.json"
-      ],
-      "owners": [
-        "@text"
-      ],
-      "families": [],
-      "sensitive": false,
-      "mandatory": false
-    },
-    "fixture-hash-boundaries-exact-f98bb538937a17b7": {
-      "paths": [
-        "tests/fixtures/source_history/post_icon_2026_11/paired.json"
-      ],
-      "owners": [
-        "@text"
-      ],
-      "families": [],
-      "sensitive": false,
-      "mandatory": false
-    },
-    "fixture-hash-boundaries-exact-5bb25f412070aae8": {
-      "paths": [
-        "tests/fixtures/source_history/post_icon_2026_11/standalone.json"
-      ],
-      "owners": [
-        "@text"
-      ],
-      "families": [],
-      "sensitive": false,
-      "mandatory": false
-    },
     "fixture-hash-boundaries-exact-ba7743f81070fa6b": {
       "paths": [
         "tests/fixtures/source_history/section08-sticky-binding-v1.json"
