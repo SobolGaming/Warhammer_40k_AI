@@ -34,6 +34,136 @@
         }
       }
     },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "7781f3d2ce737af6be40ab3875ec46a547064de6a14d90a3f041ff7698d98ed0",
+      "after_sha256": "58c42978557d30ca5082ce65962c58b2092820212a884e1deed54f2876f012c3",
+      "owners": {
+        "@document": {
+          "before": "7781f3d2ce737af6be40ab3875ec46a547064de6a14d90a3f041ff7698d98ed0",
+          "after": "58c42978557d30ca5082ce65962c58b2092820212a884e1deed54f2876f012c3"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "7cc3ba15bdd238c29815242a9b7e825fe15faaeb98a6b9b2470e70e81965eb02",
+      "after_sha256": "9ada1211658e9d59b5cc7fcf35b1e921bc9e27388f5f7732de84d7af961c49e9",
+      "owners": {
+        "@document": {
+          "before": "7cc3ba15bdd238c29815242a9b7e825fe15faaeb98a6b9b2470e70e81965eb02",
+          "after": "9ada1211658e9d59b5cc7fcf35b1e921bc9e27388f5f7732de84d7af961c49e9"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "86b1eccfd2068a287ac1f1c3a520858693476fc3f93020161b9d76cc5a2088b8",
+      "after_sha256": "c1ab3bfdfbd30116162b1d85b16e6b6b9b9fd016458f67df32d81efeb698e585",
+      "owners": {
+        "@document": {
+          "before": "86b1eccfd2068a287ac1f1c3a520858693476fc3f93020161b9d76cc5a2088b8",
+          "after": "c1ab3bfdfbd30116162b1d85b16e6b6b9b9fd016458f67df32d81efeb698e585"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "0d81850ff5d92ca6f8f034fc426705cd79766ba05e63b327fc07f82845a48303",
+      "after_sha256": "3fa657bcdece8289774ab07e6b2fe7bbc4e3ef5466c9dd69703698be15d3615c",
+      "owners": {
+        "@document": {
+          "before": "0d81850ff5d92ca6f8f034fc426705cd79766ba05e63b327fc07f82845a48303",
+          "after": "3fa657bcdece8289774ab07e6b2fe7bbc4e3ef5466c9dd69703698be15d3615c"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "e5e10f55b916ecd79bd03269c56af32df53dd6804b441b00ec6067d60c1b8988",
+      "after_sha256": "54bba4974222321866201270e8b1f0236de6975ed302d68fb41d2d7897594613",
+      "owners": {
+        "@document": {
+          "before": "e5e10f55b916ecd79bd03269c56af32df53dd6804b441b00ec6067d60c1b8988",
+          "after": "54bba4974222321866201270e8b1f0236de6975ed302d68fb41d2d7897594613"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "48af2102236462a4ec3e4203ee0b571b2c5a990f11ebc8b58e54749acd33267e",
+      "after_sha256": "76684ea0d1e27ff7ee3dc8ed2f8b7ca2b871c28fcdca3e9fdc5872496adf777f",
+      "owners": {
+        "@document": {
+          "before": "48af2102236462a4ec3e4203ee0b571b2c5a990f11ebc8b58e54749acd33267e",
+          "after": "76684ea0d1e27ff7ee3dc8ed2f8b7ca2b871c28fcdca3e9fdc5872496adf777f"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "c4e05a39caea551a2a891f14177c0f68c64290daa39b24b2c80c57bdb6c9392d",
+      "after_sha256": "f836f2da7150a025bed61d4dc45aeec025350ab2a5353bcd571a2043c82aa020",
+      "owners": {
+        "@document": {
+          "before": "c4e05a39caea551a2a891f14177c0f68c64290daa39b24b2c80c57bdb6c9392d",
+          "after": "f836f2da7150a025bed61d4dc45aeec025350ab2a5353bcd571a2043c82aa020"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "c6caf78e94c36e216de56549bec804bee3cdbd158f89b7335c51e583fd02313c",
+      "after_sha256": "e3b0ea2a885fd4a2c611da21ca6c7ae60c21450348d2f4ef08f7617ace207445",
+      "owners": {
+        "@document": {
+          "before": "c6caf78e94c36e216de56549bec804bee3cdbd158f89b7335c51e583fd02313c",
+          "after": "e3b0ea2a885fd4a2c611da21ca6c7ae60c21450348d2f4ef08f7617ace207445"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "5cae73fb76921091c59ef963a46c4cfad17479553466592571eb198dd8f3d2d4",
+      "after_sha256": "2da5c6fdf6f19cf09eea62bc65fc8f4ec712a3b7b98dcf8c50625f1799399d85",
+      "owners": {
+        "@document": {
+          "before": "5cae73fb76921091c59ef963a46c4cfad17479553466592571eb198dd8f3d2d4",
+          "after": "2da5c6fdf6f19cf09eea62bc65fc8f4ec712a3b7b98dcf8c50625f1799399d85"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "f486855a4fc1ba7fa57756618f28ff035aac4996467e468286889dc1a6c4a183",
+      "after_sha256": "aff9b5373535eadd42a1fe079789f8b708a80e869e8bdf32f7585b819f5a66be",
+      "owners": {
+        "@document": {
+          "before": "f486855a4fc1ba7fa57756618f28ff035aac4996467e468286889dc1a6c4a183",
+          "after": "aff9b5373535eadd42a1fe079789f8b708a80e869e8bdf32f7585b819f5a66be"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "35605d86303cb2027331b877d3835fafafcab9776953f7b5d86060c047392a3e",
+      "after_sha256": "790914c7db3c0e972a58782179be52a28ac09a73794c45308ccff3a86c7a38f8",
+      "owners": {
+        "@document": {
+          "before": "35605d86303cb2027331b877d3835fafafcab9776953f7b5d86060c047392a3e",
+          "after": "790914c7db3c0e972a58782179be52a28ac09a73794c45308ccff3a86c7a38f8"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "7447fce527bb59f453b6b497101f34e2a6451c233de0da51c1fc46652fd9948a",
+      "after_sha256": "6dc20bb27bd2a6765ad7cfca2af6a9659f76f85e1a57bf2ffab509a4d3fcb41e",
+      "owners": {
+        "@document": {
+          "before": "7447fce527bb59f453b6b497101f34e2a6451c233de0da51c1fc46652fd9948a",
+          "after": "6dc20bb27bd2a6765ad7cfca2af6a9659f76f85e1a57bf2ffab509a4d3fcb41e"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "2ca92d1a0ea3b9627dfbe4c040f2b3350495bd40e413315fd38baa1168c5cf7f",
+      "after_sha256": "a410a7c4fa2f54aa08e50e23bd05d7bf14348afb358025d5472609304ced74b0",
+      "owners": {
+        "@document": {
+          "before": "2ca92d1a0ea3b9627dfbe4c040f2b3350495bd40e413315fd38baa1168c5cf7f",
+          "after": "a410a7c4fa2f54aa08e50e23bd05d7bf14348afb358025d5472609304ced74b0"
+        }
+      }
+    },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "84a09321d52d36a418efb25dcda8d2786294996271cf6885cb4a302f33ce9f34",
       "after_sha256": "956f59aab9367a8c4fb89fb78157f30f855613f6361f278a912b2067c7f2fd9a",
@@ -411,6 +541,136 @@
       "rationale": "Bounded test-only source fixture redesign: full fixed historical roots and selected Sticky binding, current semantic controls, early validation and exact regression inventories.",
       "source_obligation": "Retain approved source loading, full selected Sticky record and dependency identities, current adapters and native semantics, exact original historical evidence and all required test selections.",
       "unchanged_work": "No packaged runtime, source-authority, contract, dependency, engine algorithm, cache or serializer change. Fixture history validation stays test-only. Serial current-runtime smoke and live semantic/index/cache gates remain required; no speedup or full-game claim."
+    },
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Scheduling-only refresh from a complete successful hosted covered run: https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/41883242728/attempts/2; commit eca8f23be205384c9aea9e43967e3e9fc1d546b3; checkout dd11552a1d914e1a54c75dbdc5ba827f51a3903b; ubuntu-latest; 4 workers per shard; Python 3.14.5. Current 5,501 cases are unchanged; all twelve original JUnit reports and worker outcomes were validated.",
+      "source_obligation": "Preserve complete current behavioral selection, unchanged finite case partition, original report digests and honest hosted timing provenance. No local timing mixture or invented weight.",
+      "unchanged_work": "Only test scheduling weights and shard membership change; source, runtime, test bodies, budgets, coverage denominator/floor and exact 260 deferrals are unchanged. Final-head required hosted CI and current-runtime smoke remain required."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
