@@ -160,6 +160,12 @@ the pending decision. It does not certify the natural draw chain. The legacy
 final-score aggregate test uses explicitly prepared period-valid cap/ledger
 premises for 45/100 arithmetic; those premises are not producer or restore evidence.
 
+The derived Chapter source import hash changes because the explicit existing
+player-turn scope is now serialized. The already supported one-artifact offline
+[A32 reconstruction](A32_HISTORICAL_CHECKPOINT_RECONSTRUCTION.md) records a finite,
+pinned hash transition; its original empty VP ledgers and all other gameplay,
+identity and event obligations remain exact. Ordinary loaders receive no fallback.
+
 This correction does not upgrade the complete package to October v1.3. Layouts,
 mission-card transcriptions and base-guide provenance remain July-bound. Current
 October diagrams differ on 30 rendered layout pages, including changed footprint

@@ -14,6 +14,7 @@ from typing import cast
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.replay import submit_replay_record
 from warhammer40k_core.build_identity import current_engine_build_id
+from warhammer40k_core.core.secondary_vp_cap_scope import SecondaryVictoryPointCapScope
 from warhammer40k_core.engine.decision_request import DecisionError
 from warhammer40k_core.engine.event_log import (
     EventLogError,
@@ -31,9 +32,17 @@ from warhammer40k_core.engine.replay import (
     ReplayRunner,
     ReplayRunStatus,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chapter_approved_2026_27 as _chapter_source,
+)
 
 PROFILE_ID = "local-checkpoint:legacy-model-completion:2026-10-14"
-RECOVERY_SCHEMA = "local-checkpoint-reconstruction-v1"
+RECOVERY_SCHEMA = "local-checkpoint-reconstruction-v2-mission-scope"
+_RECIPE_VERSION = "recorded-decision-reconstruction-v2-mission-scope"
+_MISSION_PACK_ID = "11e-chapter-approved-2026-27"
+_OLD_MISSION_HASH = "009a47e19b7e619f6a9bcd75a5294497ac1becb2aee4c320ffcd0a393c57399d"
+_CURRENT_MISSION_HASH = "8f76fcf275397bd2ffabf16d3e127f059fb476e0144654bd54e550f5dd16faa1"
+_OLD_SCORING_ROW_HASH = "b408ac7e759b3000d2c1a611624e28ba4ddb8e8f80c2a85589f89cd79927fedf"
 SOURCE_SHA256 = "55f23684cedb354050605bb796928bea5971acb73d975ffe54ce230ae2db9370"
 _SOURCE_BUILD = (
     "warhammer40k-core-v2:runtime-tree-sha256-v1:"
@@ -60,7 +69,9 @@ def reconstruct_local_checkpoint(source_bytes: bytes, *, profile_id: str) -> dic
     if profile_id != PROFILE_ID:
         raise CheckpointReconstructionError("Unsupported checkpoint reconstruction profile.")
     original = _source_payload(source_bytes)
-    artifact = ReplayArtifact.from_payload(cast(ReplayArtifactPayload, original["replay_artifact"]))
+    replay_input = copy.deepcopy(_object(original["replay_artifact"]))
+    replay_input["source_identity"] = _mapped_mission_source_identity(original["source_identity"])
+    artifact = ReplayArtifact.from_payload(cast(ReplayArtifactPayload, replay_input))
     try:
         lifecycle = GameLifecycle.from_payload(artifact.initial_lifecycle_payload)
         session = LocalGameSession(lifecycle=lifecycle)
@@ -245,7 +256,8 @@ def _validate_mapping(
             "Checkpoint reconstruction changed original gameplay state."
         )
     if canonical_json(original["rng_state"]) != canonical_json(checkpoint["rng_state"]) or (
-        canonical_json(original["source_identity"]) != canonical_json(checkpoint["source_identity"])
+        canonical_json(_mapped_mission_source_identity(original["source_identity"]))
+        != canonical_json(checkpoint["source_identity"])
     ):
         raise CheckpointReconstructionError(
             "Checkpoint reconstruction changed original RNG/source."
@@ -257,7 +269,19 @@ def _validate_mapping(
     if canonical_json(mapped_initial) != canonical_json(new_initial):
         raise CheckpointReconstructionError("Checkpoint reconstruction initial anchor drifted.")
     return {
-        "recipe_version": "recorded-decision-reconstruction-v1",
+        "recipe_version": _RECIPE_VERSION,
+        "mission_source_identity_mapping": {
+            "path": "/source_identity/mission_source_package_hash",
+            "mission_pack_id": _MISSION_PACK_ID,
+            "original": _OLD_MISSION_HASH,
+            "reconstructed": _CURRENT_MISSION_HASH,
+            "reason": (
+                "Explicit player_turn scope; all other Chapter source scoring fields unchanged."
+            ),
+            "scoring_row_unchanged_remainder_sha256": _OLD_SCORING_ROW_HASH,
+            "added_scoring_field": "secondary_vp_cap_scope",
+            "added_scoring_value": SecondaryVictoryPointCapScope.PLAYER_TURN.value,
+        },
         "source_sha256": SOURCE_SHA256,
         "source_runtime_build_id": _SOURCE_BUILD,
         "source_git_revision": _SOURCE_COMMIT,
@@ -273,6 +297,24 @@ def _validate_mapping(
         "original_decisions_rng_and_gameplay_preserved": True,
         "original_byte_replay_claimed": False,
     }
+
+
+def _mapped_mission_source_identity(value: JsonValue) -> dict[str, JsonValue]:
+    """One authenticated original's finite, scoring-neutral Chapter identity transition."""
+    identity = _object(value)
+    row = _chapter_source.mission_pack_scoring_row()
+    current_hash = _chapter_source.source_package_definition().source_commit_or_import_hash
+    scoring = _object(validate_json_value(row.to_payload()))
+    if (
+        identity["mission_pack_id"] != _MISSION_PACK_ID
+        or identity["mission_source_package_hash"] != _OLD_MISSION_HASH
+        or current_hash != _CURRENT_MISSION_HASH
+        or row.secondary_vp_cap_scope is not SecondaryVictoryPointCapScope.PLAYER_TURN
+        or scoring.pop("secondary_vp_cap_scope") != "player_turn"
+        or _hash(scoring) != _OLD_SCORING_ROW_HASH
+    ):
+        raise CheckpointReconstructionError("Unregistered Chapter mission source transition.")
+    return {**identity, "mission_source_package_hash": _CURRENT_MISSION_HASH}
 
 
 def _rebind(value: JsonValue, bindings: dict[str, str]) -> JsonValue:

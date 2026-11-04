@@ -263,8 +263,8 @@ def assert_native_two_card_tactical_capacity(d: Section02Definitions) -> None:
     )
     assert s.session.lifecycle._config is not None  # pyright: ignore[reportPrivateUsage]
     config = replace(
-        s.session.lifecycle._config,
-        mission_setup=mission,  # pyright: ignore[reportPrivateUsage]
+        s.session.lifecycle._config,  # pyright: ignore[reportPrivateUsage]
+        mission_setup=mission,
         ruleset_descriptor=descriptor,
         turn_order=("opponent", "owner"),
     )

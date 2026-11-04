@@ -44,6 +44,9 @@ from warhammer40k_core.core.mission_pool import (
 from warhammer40k_core.core.mission_pool import (
     MissionPoolEntryPayload as MissionPoolEntryPayload,
 )
+from warhammer40k_core.core.mission_scoring_payload import (
+    MissionPackScoringDefinitionPayload as MissionPackScoringDefinitionPayload,
+)
 from warhammer40k_core.core.mission_scoring_resolution import (
     MissionScoringResolutionMode as MissionScoringResolutionMode,
 )
@@ -255,26 +258,6 @@ class TournamentScoringCapsPayload(TypedDict):
     secondary_vp_cap: int
     battle_ready_vp: int
     total_vp_cap: int
-    source_id: str
-
-
-class MissionPackScoringDefinitionPayload(TypedDict):
-    game_length_battle_rounds: int
-    primary_scoring_phase: str
-    primary_scoring_timing: str
-    secondary_vp_per_score: int
-    mission_action_vp: int
-    primary_vp_cap: int
-    secondary_vp_cap: int
-    total_vp_cap: int
-    secondary_max_vp_per_turn: int
-    secondary_vp_cap_scope: str
-    end_of_round_scoring_windows: list[str]
-    end_of_game_scoring_windows: list[str]
-    reserve_destruction_timing: str
-    reserve_destruction_battle_round: int | None
-    reserve_destruction_excludes_during_battle_strategic_reserves: bool
-    reserve_destruction_only_declare_battle_formations: bool
     source_id: str
 
 

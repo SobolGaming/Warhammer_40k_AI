@@ -8018,12 +8018,17 @@ No player choice, proposal envelope, option family or visibility policy changes.
 The separately authorized offline profile documented in
 [A32 historical checkpoint reconstruction](A32_HISTORICAL_CHECKPOINT_RECONSTRUCTION.md)
 admits exactly one retained source digest. Its new
-`local-checkpoint-reconstruction-v1` package is tooling provenance plus an ordinary
+`local-checkpoint-reconstruction-v2-mission-scope` package is tooling provenance plus an ordinary
 strict local checkpoint, not a replacement server/session persistence envelope.
 The operator explicitly selects the recipe and preserves the original. Regenerated
 completion evidence is identified as new; every original event, choice, RNG state
 and gameplay field is matched under the declared event-ID mapping. Verification
 uses ordinary strict restore and exact replay of the reconstructed representation.
+The required explicit Chapter player-turn scope has one registered old/new import
+hash mapping for that same original digest/profile. Deterministic versioned
+provenance identifies it; the other nine identity fields remain exact. Ordinary
+loaders continue to reject the original bytes, and older output schemas receive
+no fallback.
 No automatic fallback, original-byte cross-version replay claim, player-visible
 payload, public operation or released contract family change is introduced.
 

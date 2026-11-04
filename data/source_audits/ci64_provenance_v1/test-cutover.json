@@ -1957,10 +1957,10 @@
       "sha256": "33d138d7535a91165197a066e0b9f6bac5ee757453175f57e7539a218ba80d1e"
     },
     "tests/rules/section18/test_facade.py": {
-      "blob_sha1": "6f25b3bafe844411830f8f7307982b9cb86ec46e",
-      "bytes": 26719,
+      "blob_sha1": "6468fee39bdf39ec36312db94d14259b40626c81",
+      "bytes": 28617,
       "mode": "100644",
-      "sha256": "2465f2e916ccbf7ea4e433bd6820874287e8dec38a226efb5ecb46f1cede64e3"
+      "sha256": "043a4266f6e7cb557f8345724e6bedb8dcd85fb76fae7d1b1d92fbfa0b0f8bee"
     },
     "tests/rules/section18/test_faqs.py": {
       "blob_sha1": "7ca728af1f8756f940a33b51b135a48833c41666",
