@@ -1,0 +1,133 @@
+40K.APP
+FACTIONS
+CHAOS DAEMONS
+Blue Horrors
+DATASHEET
+UPDATES
+MODELS
+M
+T
+SV
+W
+LD
+OC
+Brimstone Horror 25mm
+
+Invulnerable save: 4+
+
+6"
+3
+7+
+1
+8+
+1
+Blue Horror 25mm
+
+Invulnerable save: 4+
+
+6"
+3
+7+
+1
+8+
+1
+RANGED WEAPONS
+RNG
+A
+BS
+S
+AP
+D
+Coruscating yellow flames
+PSYCHIC
+PISTOL
+18"
+2
+5+
+2
+-1
+1
+Coruscating blue flames
+PSYCHIC
+PISTOL
+18"
+2
+4+
+3
+-1
+1
+MELEE WEAPONS
+A
+WS
+S
+AP
+D
+Yellow claws
+2
+5+
+2
+0
+1
+Blue claws
+1
+5+
+3
+0
+1
+KEYWORDS
+BATTLELINE
+BLUE
+BRIMSTONE
+CHAOS
+DAEMON
+HORRORS
+INFANTRY
+TZEENTCH
+COSTS
+10 models
+125 pts
+UNIT COMPOSITION
+10 Blue Horrors
+
+Every Blue Horror is equipped with: Coruscating Blue Flames; blue claws. Every Brimstone Horror added to this unit using the Split ability is equipped with: Coruscating Yellow Flames; yellow claws.
+
+Led by
+FLUXMASTER
+CHANGECASTER
+Become a supporter and remove ads
+CORE ABILITIES
+DEEP STRIKE
+INFILTRATORS
+FACTION ABILITIES
+THE SHADOW OF CHAOS
+UNIT ABILITIES
+Split
+
+Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit.
+
+Sullen Malevolence
+
+While an enemy unit is within 6" of this unit, if this unit contains one or more BLUE HORROR models, worsen the Leadership characteristic of models in that enemy unit by 1.
+
+Exploding Horrors
+
+Each time this unit is selected to fight, you can select one enemy unit within Engagement Range of it, then select one or more BRIMSTONE HORROR models in this unit. For each BRIMSTONE HORROR model you select, roll one D6: on a 4+, that model is destroyed and that enemy unit suffers 1 mortal wound.
+
+STATS
+8%
+of Chaos Daemons lists, 1.3 per list
+#34
+most-taken in faction
+8%
+from 8% since last update
+IN ARMY LISTS
+Popular detachments
+DAEMONIC INCURSION
+SCINTILLATING LEGION
+WARPTIDE
+Often taken with
+PINK HORRORS
+DAEMON PRINCE OF CHAOS WITH WINGS
+SCREAMERS
+BE’LAKOR
+FLAMERS

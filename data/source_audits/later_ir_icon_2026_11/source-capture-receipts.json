@@ -1,0 +1,146 @@
+[
+  {
+    "key": "ec-lord-current",
+    "url": "https://www.40k.app/factions/emperors-children/units/lord-exultant",
+    "observed_utc": "2026-11-04T11:45:21.592Z",
+    "length_utf16": 2123,
+    "fnv1a_utf16": "dcc60d89",
+    "captured_text_sha256": "818037f2d6c51d49d3fa9c1f999ef3b93371376dd50bf1c92cbd1d2bf1819965"
+  },
+  {
+    "key": "ec-lord-history",
+    "url": "https://www.40k.app/factions/emperors-children/units/lord-exultant/updates",
+    "observed_utc": "2026-11-04T11:45:21.950Z",
+    "length_utf16": 510,
+    "fnv1a_utf16": "d8107cea",
+    "captured_text_sha256": "779d9e1f95fde2ca0e3921ca9e485c2bf324dc8c63095bc2244524f87ea08279"
+  },
+  {
+    "key": "ec-tormentors-current",
+    "url": "https://www.40k.app/factions/emperors-children/units/tormentors",
+    "observed_utc": "2026-11-04T11:45:31.312Z",
+    "length_utf16": 2299,
+    "fnv1a_utf16": "a6d70e2b",
+    "captured_text_sha256": "4e6cea797bd4658feeb99de5fa13a548cdc7a22f51df04d0924e7336c48a3fcb"
+  },
+  {
+    "key": "ec-tormentors-history",
+    "url": "https://www.40k.app/factions/emperors-children/units/tormentors/updates",
+    "observed_utc": "2026-11-04T11:45:31.793Z",
+    "length_utf16": 379,
+    "fnv1a_utf16": "91b14c68",
+    "captured_text_sha256": "8c4804d42ae73a59308319c6d765373f792d57d72ca22133ee5d0277d4787474"
+  },
+  {
+    "key": "ec-infractors-current",
+    "url": "https://www.40k.app/factions/emperors-children/units/infractors",
+    "observed_utc": "2026-11-04T11:45:32.606Z",
+    "length_utf16": 1825,
+    "fnv1a_utf16": "68d77f1a",
+    "captured_text_sha256": "122e59d55f54e60c3cfbcf2fd2a6ad635407f0c66d6d07cb274b90818017905d"
+  },
+  {
+    "key": "ec-infractors-history",
+    "url": "https://www.40k.app/factions/emperors-children/units/infractors/updates",
+    "observed_utc": "2026-11-04T11:45:33.706Z",
+    "length_utf16": 347,
+    "fnv1a_utf16": "8f130f76",
+    "captured_text_sha256": "21c3ba9c9e63b8671b8733bc752ac5f443c09f7cc387018ab6e4ba7cd357ae90"
+  },
+  {
+    "key": "cd-blue-current",
+    "url": "https://www.40k.app/factions/chaos-daemons/units/blue-horrors",
+    "observed_utc": "2026-11-04T11:42:51.294Z",
+    "length_utf16": 1928,
+    "fnv1a_utf16": "1924aa41",
+    "captured_text_sha256": "0c9045072419bf4d3114485421cb7dec8e90dc3fdcc2f0d4699171392134d9c6"
+  },
+  {
+    "key": "cd-blue-history",
+    "url": "https://www.40k.app/factions/chaos-daemons/units/blue-horrors/updates",
+    "observed_utc": "2026-11-04T11:43:07.993Z",
+    "length_utf16": 140,
+    "fnv1a_utf16": "833ba98c",
+    "captured_text_sha256": "3d326231f7619659ab4b919739e5b5a3919df3b59eafa9e3ed3177cfd51079f8"
+  },
+  {
+    "key": "cd-pink-current",
+    "url": "https://www.40k.app/factions/chaos-daemons/units/pink-horrors",
+    "observed_utc": "2026-11-04T11:43:47.155Z",
+    "length_utf16": 2550,
+    "fnv1a_utf16": "d480761d",
+    "captured_text_sha256": "618fe9c4db1d256083e17ae2e779d6a6bebc3d30683f6f1ba56178eeb7b4a00c"
+  },
+  {
+    "key": "cd-pink-history",
+    "url": "https://www.40k.app/factions/chaos-daemons/units/pink-horrors/updates",
+    "observed_utc": "2026-11-04T11:44:04.385Z",
+    "length_utf16": 140,
+    "fnv1a_utf16": "79929ff8",
+    "captured_text_sha256": "c1103e3232847b28bed8a6f2dc2829608069575bbedb093bc34988761f8248ba"
+  },
+  {
+    "key": "ts-pink-current",
+    "url": "https://www.40k.app/factions/thousand-sons/units/pink-horrors",
+    "observed_utc": "2026-11-04T11:44:05.063Z",
+    "length_utf16": 170,
+    "fnv1a_utf16": "9a117db9",
+    "captured_text_sha256": "47158a47873378af54ea1133d10d97038d6fb447f6e177383529659aa7617f52"
+  },
+  {
+    "key": "ts-index-current",
+    "url": "https://www.40k.app/factions/thousand-sons",
+    "observed_utc": "2026-11-04T11:44:20.153Z",
+    "length_utf16": 914,
+    "fnv1a_utf16": "a444a77",
+    "captured_text_sha256": "15a602505d208f28b14f51a8defe41c021df3abbc2910337e4d86cf65fd53691"
+  },
+  {
+    "key": "ts-updates-current",
+    "url": "https://www.40k.app/factions/thousand-sons/updates",
+    "observed_utc": "2026-11-04T11:44:20.664Z",
+    "length_utf16": 120,
+    "fnv1a_utf16": "da09f5a5",
+    "captured_text_sha256": "4b802af0ddbe738a3ba456de376ca4d1df081464294948306e6b763ae3906045"
+  },
+  {
+    "key": "scint-index-current",
+    "url": "https://www.40k.app/factions/scintillating-legions",
+    "observed_utc": "2026-11-04T11:44:36.022Z",
+    "length_utf16": 1013,
+    "fnv1a_utf16": "971eb95c",
+    "captured_text_sha256": "c9517a7b2c7a9b50bb6dfab8ac40da29f280be5b3fdaaf51fc39723eaac8bc1a"
+  },
+  {
+    "key": "scint-pink-current",
+    "url": "https://www.40k.app/factions/scintillating-legions/units/pink-horrors",
+    "observed_utc": "2026-11-04T11:44:36.858Z",
+    "length_utf16": 2223,
+    "fnv1a_utf16": "49855624",
+    "captured_text_sha256": "5539571438eb485d69f46babbe32ccbeec1ca5e2266239d65c59524b3be2bb05"
+  },
+  {
+    "key": "scint-pink-history",
+    "url": "https://www.40k.app/factions/scintillating-legions/units/pink-horrors/updates",
+    "observed_utc": "2026-11-04T11:44:37.784Z",
+    "length_utf16": 148,
+    "fnv1a_utf16": "a4dc149c",
+    "captured_text_sha256": "2e34f561063eb2c5bddd54d11a6c6afbf723b74d989955871be389557fb0629e"
+  },
+  {
+    "key": "scint-blue-current",
+    "url": "https://www.40k.app/factions/scintillating-legions/units/blue-horrors",
+    "observed_utc": "2026-11-04T11:45:20.182Z",
+    "length_utf16": 1599,
+    "fnv1a_utf16": "5437158f",
+    "captured_text_sha256": "bfc287f3f2c9b7428553d80dcb8e863534097ecf911ceede240297a56ec9f88c"
+  },
+  {
+    "key": "scint-blue-history",
+    "url": "https://www.40k.app/factions/scintillating-legions/units/blue-horrors/updates",
+    "observed_utc": "2026-11-04T11:45:21.152Z",
+    "length_utf16": 147,
+    "fnv1a_utf16": "8dbfe244",
+    "captured_text_sha256": "8697d556be5689bac1683adc0768784b78299439f8585f989bde85ac56895c05"
+  }
+]

@@ -385,7 +385,7 @@ _SOURCE_PACKAGE_DESCRIPTOR_BY_ID: Final = MappingProxyType(
         "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08": (
             _SourcePackageDescriptor(
                 artifact_schema=("core-v2-emperors-children-infractors-tormentors-rule-ir-v1"),
-                package_hash=("076824923ec39f2ce539c6e2dbd1c763143797c688fb36abebfd4104d8f38059"),
+                package_hash=("cc0549e37898f5935e2ee263c75a42643813d81e7ba6a0e2eeb6aeaf958275ab"),
                 wire_type=_OfficialSnapshotMultiDatasheetSourcePackageWire,
             )
         ),

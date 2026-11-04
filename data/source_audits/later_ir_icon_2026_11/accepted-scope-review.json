@@ -1,0 +1,89 @@
+{
+  "schema": "independent-later-ir-scope-review-v1",
+  "verdict": "ACCEPTED_SCOPE",
+  "reviewed_base": "e921b927e0de21070df8398c63494510c5461f45",
+  "reviewed_tree_equivalent_audit_head": "21dd70655bdbc96fc8d77944d7302eea62458ba5",
+  "scope_packet": {
+    "path": "scope-packet-manifest.json",
+    "sha256": "b30a9d6ead9ca0e4f29d265b8d6a946d8f2ad7a58c8d52a084816948fe1d9318",
+    "members": 67,
+    "bytes": 14709738,
+    "all_member_lengths_and_hashes_verified": true
+  },
+  "accepted_plan": {
+    "path": "audit-evidence/correction-plan.txt",
+    "sha256": "2b58eddcca1a863a3e6497edf9ec54a47a102a1b58c48ee613d2b43946103c55"
+  },
+  "ec_report": {
+    "path": "ec-audit/EC_AUDIT_REPORT.md",
+    "sha256": "a7f11f9da916ec53a0cea0c827354a7f534c26cbce71966c7bbc41d50c62a3ef"
+  },
+  "policy": "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md",
+  "accepted_work": [
+    "Add a new versioned source-only disposition for exactly the twelve selected later-IR source records, retaining complete own-page captures, histories/context, stable source joins, raw hashes and explicit mirror/fixture limitations.",
+    "Change only the Fight trigger owner of source records 000004079:4 and 000004080:4 to existing either_player vocabulary. Keep both Shooting triggers active_player and all operative source wording unchanged.",
+    "Repair the shared CP phase-owner validation and eligibility evaluation, preserving recipient-player event subscriptions, native destruction attribution, living physical bearer gates, shared Leadership/CP mutation, cap and sequencing ownership.",
+    "Add focused real native consumer regressions for both datasheets and retain positive/negative controls, generated identities, truthful documentation and every applicable exact-head gate."
+  ],
+  "rejected_expansions": [
+    "New Horror native admission, geometry correction, complete-profile or full-faction certification.",
+    "Changing source ownership based on duplicate Horror display names or treating a failed guessed URL as removal evidence.",
+    "New named handlers, faction/name-specific runtime gates, manual runtime injection or removal of the owner-recipient event filter.",
+    "Rewriting immutable historical observations, historical qualification outcomes, or the exact 260 deferred quality cases.",
+    "Unrelated CP families, new speculative trigger-owner semantics, or coordinated historical-state tamper hardening without a required supported-input boundary or normal-play reproduction."
+  ],
+  "source_assessment": {
+    "raw_capture_fingerprints_verified": 18,
+    "selected_source_records": 12,
+    "exact_text_matches": 6,
+    "presentation_only_matches": 6,
+    "historical_later_ir_records": 93,
+    "unselected_records_to_preserve_exactly": 81,
+    "native_component_inventory_to_preserve": 60,
+    "source_package_inventory_to_preserve": 27,
+    "horror_identity": "Chaos Daemons 2583/2584 and Thousand Sons/Scintillating Legions 4127/4128 are distinct source variants. All four remain outside native60. Canonical own pages, distinguishing properties and retained parent navigation support source-only joins, not new admission.",
+    "version_limit": "App-data 995 context is snapshot context, not each rule's last update date; visible update histories are not proof of expanded hidden history.",
+    "ledger_limit": "The frozen matrix imports historical current_operative_clause_unverified fields and basis. Preserve their historical meaning; the new versioned disposition must explicitly distinguish prior status from the new observation conclusion. No execution flag may be promoted by observation alone."
+  },
+  "confirmed_blocking_finding": {
+    "id": "EC-ICON-OPPONENT-FIGHT",
+    "category": "incorrect_rules_normal_combat_trigger",
+    "entry_path": "Native source-backed Infractors with physical Icon and five Rangers; tests.support.faction_batch01 scene and fight_to_end LocalGameSession finite/proposal submissions; seed faction-batch01-ec-fight-2; owner and opponent Fight variants.",
+    "reviewed_head": "e921b927e0de21070df8398c63494510c5461f45",
+    "result": "Both cases retain five distinct native target-model destruction events attributed to own:infractors and eight native reroll decisions. Owner Fight has one Leadership test and 1 OTHER CP; opponent Fight has neither.",
+    "impact": "An eligible Icon unit loses its required Leadership test and opportunity to gain 1 CP after destroying an enemy during the opponent's Fight phase.",
+    "normal_reachability": "Real engine-issued legal combat decisions and engine-generated casualties reach the omitted trigger. The starting phase/placements are constructed, non-strict component fixtures; prior public setup, legal full roster and complete game traversal are unproven and are not claimed.",
+    "violated_acceptance": "Execute the retained and current source timing: your Shooting phase or the Fight phase; Fight is either player's phase. Preserve shared authoritative decision/event/mutation and engine-generated-state persistence/replay.",
+    "owners": [
+      "tools/generate_emperors_children_infractors_tormentors_rule_ir.py:_icon_of_excess_clause",
+      "src/warhammer40k_core/engine/catalog_command_point_support.py:clause_is_supported_phase_command_point_gain",
+      "src/warhammer40k_core/engine/catalog_command_point_runtime.py:_phase_gain_targets"
+    ],
+    "status": "Unfixed at scope review; accepted bounded implementation target."
+  },
+  "implementation_acceptance": [
+    "Both Infractors and Tormentors exercise native owner/opponent Fight destruction with exact source/bearer ownership, one eligible Leadership test, success/failure/capped CP and no duplicate occurrence.",
+    "Preserve own-Shooting positive and opponent-Shooting negative behavior. Cover absent/dead Icon, no enemy unit completion, wrong destroying unit, friendly target and stale prior-phase attribution as supported by existing native/shared boundaries; retain attached rules-unit attribution.",
+    "Validate the recognized owner vocabulary and reject unknown/malformed/unsupported owners fail-closed. Retain during-Command and existing own-phase CP restrictions; do not infer opponent support from either-player support.",
+    "Use engine-generated state on the corrected route for restore before phase-end, at an engine-issued pending test/modifier/sequence boundary when that boundary exists, and after resolution, plus exact ReplayRunner reproduction. Do not fabricate a pending choice for an automatic Leadership roll.",
+    "Preserve Euphoric Strikes, Lord of the Host, Excessive Assault, Objective Defiled and existing Horror component controls. The failed exploratory Excessive Assault fixture is not a new proven behavior finding.",
+    "Prove the exact delta: only two Icon Fight semantic owner changes and derived authenticated artifacts; all other source clauses unchanged, all 81 unselected later-IR records unchanged, source text and historical audit bytes unchanged.",
+    "Update the new source-only ledger and this order's roadmap cell truthfully; preserve official historical references, mirror classification, geometry anomalies and unsupported scope. Explain the unchanged adapter contract if no payload/decision shape changes.",
+    "Run focused tests before scope/diff freeze; final full behavioral coverage once with full-package branches and 65% floor, active quality once with exact deferrals, both type checkers, lint/import/precommit/shard checks, applicable generated/contracts/base-ref/client/conformance/package gates and serial 180-second runtime smoke with exact-base assessment.",
+    "Retain separate explicit Astra/high implementation and coding review, fresh parent Astra audit, exact final head/tree identities, hosted CI and post-merge verification as required by the parent workflow. This scope verdict satisfies none of those later delivery gates."
+  ],
+  "queue": [],
+  "remaining_scope_blockers": [],
+  "limitations": [
+    "Independent code/evidence review and offline byte checks only; no direct browser surfaces and no fresh native combat run by this reviewer.",
+    "Parent's previous-PR remote gate release is supplied task context, not independently re-audited here.",
+    "No repository edits, production fix, source admission, final implementation review, passing aggregate gate or merge authorization is asserted."
+  ],
+  "action_status": {
+    "scope_review": "completed",
+    "repository_mutations": "none",
+    "review_outputs": "scope-review only",
+    "approval_denials": "none",
+    "uncertain_mutations": "none"
+  }
+}

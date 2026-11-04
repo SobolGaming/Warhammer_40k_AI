@@ -1,0 +1,146 @@
+40K.APP
+FACTIONS
+SCINTILLATING LEGIONS
+Pink Horrors
+DATASHEET
+UPDATES
+MODELS
+M
+T
+SV
+W
+LD
+OC
+Brimstone Horror 32mm
+
+Invulnerable save: 4+
+
+6"
+3
+7+
+1
+8+
+0
+Pink Horror 32mm
+
+Invulnerable save: 4+
+
+6"
+3
+7+
+1
+7+
+1
+Blue Horror 32mm
+
+Invulnerable save: 4+
+
+6"
+3
+7+
+1
+8+
+0
+RANGED WEAPONS
+RNG
+A
+BS
+S
+AP
+D
+Coruscating yellow flames
+PSYCHIC
+PISTOL
+18"
+2
+5+
+2
+-1
+1
+Coruscating pink flames (Coruscating Pink Flames)
+PSYCHIC
+PISTOL
+18"
+2
+3+
+4
+-1
+1
+Coruscating blue flames
+PSYCHIC
+PISTOL
+18"
+2
+4+
+3
+-1
+1
+MELEE WEAPONS
+A
+WS
+S
+AP
+D
+Yellow claws
+2
+5+
+2
+0
+1
+Pink claws
+1
+4+
+3
+0
+1
+Blue claws
+1
+5+
+3
+0
+1
+KEYWORDS
+BATTLELINE
+BLUE
+BRIMSTONE
+CHAOS
+DAEMON
+HORRORS
+INFANTRY
+PINK
+SUMMONED
+TZEENTCH
+COSTS
+10 models
+115 pts
+UNIT COMPOSITION
+10 Pink Horrors
+
+Every Pink Horror is equipped with: coruscating pink flames; pink claws. Every Blue Horror added to this unit using the Split ability is equipped with: coruscating blue flames; blue claws. Every Brimstone Horror added to this unit using the Split ability is equipped with: coruscating yellow flames; yellow claws.
+
+WARGEAR OPTIONS
+1 Pink Horror that is not equipped with a daemonic icon can be equipped with 1 instrument of Chaos.
+1 Pink Horror that is not equipped with an instrument of Chaos can be equipped with 1 daemonic icon.
+WARGEAR
+Daemonic Icon
+
+Models in the bearer’s unit have a Leadership characteristic of 6+.
+
+Instrument of Chaos
+
+Add 1 to Charge rolls made for the bearer’s unit.
+
+CORE ABILITIES
+DEEP STRIKE
+FACTION ABILITIES
+PACT OF SORCERY
+UNIT ABILITIES
+Split
+
+Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit.
+
+HORRORS ARE PINK. HORRORS ARE BLUE. WHERE ONCE THERE WAS ONE, NOW THERE ARE TWO.
+
+If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.
+
+Designer’s Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit.

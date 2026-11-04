@@ -1,0 +1,184 @@
+40K.APP
+FACTIONS
+EMPEROR’S CHILDREN
+Tormentors
+DATASHEET
+UPDATES
+MODELS
+M
+T
+SV
+W
+LD
+OC
+Obsessionist 32mm
+7"
+5
+3+
+2
+6+
+2
+Tormentor 32mm
+7"
+5
+3+
+2
+6+
+2
+RANGED WEAPONS
+RNG
+A
+BS
+S
+AP
+D
+Bolt pistol
+PISTOL
+PRECISION
+12"
+1
+3+
+5
+-1
+1
+➤ Plasma pistol (standard)
+PISTOL
+PRECISION
+12"
+1
+3+
+7
+-2
+1
+➤ Plasma pistol (supercharge)
+HAZARDOUS
+PISTOL
+PRECISION
+12"
+1
+3+
+8
+-3
+2
+Boltgun
+PRECISION
+24"
+2
+3+
+5
+-1
+1
+Meltagun
+MELTA 2
+PRECISION
+12"
+1
+3+
+9
+-4
+D6
+➤ Plasma gun (standard)
+PRECISION
+RAPID FIRE 1
+24"
+1
+3+
+7
+-2
+1
+➤ Plasma gun (supercharge)
+HAZARDOUS
+PRECISION
+RAPID FIRE 1
+24"
+1
+3+
+8
+-3
+2
+MELEE WEAPONS
+A
+WS
+S
+AP
+D
+Power sword
+4
+3+
+5
+-2
+1
+Rapture lash
+6
+3+
+4
+-1
+1
+Close Combat Weapon
+3
+3+
+5
+0
+1
+KEYWORDS
+BATTLELINE
+CHAOS
+GRENADES
+INFANTRY
+SLAANESH
+TORMENTORS
+COSTS
+5 models
+85 pts
+10 models
+170 pts
+UNIT COMPOSITION
+1 Obsessionist
+4‑9 Tormentors
+
+The Obsessionist is equipped with: bolt pistol; power sword. Every Tormentor is equipped with: boltgun; close combat weapon.
+
+Led by
+LORD EXULTANT
+SORCERER
+WARGEAR OPTIONS
+The Obsessionist’s bolt pistol can be replaced with 1 plasma pistol.
+The Obsessionist’s power sword can be replaced with 1 rapture lash.
+For every 5 models in this unit, 1 Tormentor’s boltgun can be replaced with 1 meltagun.
+For every 5 models in this unit, 1 Tormentor’s boltgun can be replaced with 1 plasma gun.
+1 Tormentor can be equipped with 1 icon of excess.
+WARGEAR
+Icon of Excess
+
+At the end of your Shooting phase or the Fight phase, if the bearer’s unit destroyed one or more enemy units that phase, the bearer’s unit takes a Leadership test. If that test is passed, you gain 1CP.
+
+CORE ABILITIES
+INFILTRATORS
+FACTION ABILITIES
+THRILL SEEKERS
+UNIT ABILITIES
+Objective Defiled
+
+At the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent’s Level of Control over that objective marker is greater than yours at the end of a phase.
+
+STATS
+64%
+of Emperor’s Children lists, 1.5 per list
+#4
+most-taken in faction
+68%
+from 60% since last update
+IN ARMY LISTS
+Popular detachments
+COURT OF THE PHOENICIAN
+SPECTACLE OF SLAUGHTER
+COTERIE OF THE CONCEITED
+Most often led by
+LORD EXULTANT
+SORCERER
+Often taken with
+INFRACTORS
+LORD EXULTANT
+FLAWLESS BLADES
+NOISE MARINES
+LUCIUS THE ETERNAL

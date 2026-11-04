@@ -1,0 +1,146 @@
+40K.APP
+FACTIONS
+EMPEROR’S CHILDREN
+Infractors
+DATASHEET
+UPDATES
+MODELS
+M
+T
+SV
+W
+LD
+OC
+Obsessionist 32mm
+7"
+5
+3+
+2
+6+
+2
+Infractor 32mm
+7"
+5
+3+
+2
+6+
+2
+RANGED WEAPONS
+RNG
+A
+BS
+S
+AP
+D
+Bolt pistol
+PISTOL
+12"
+1
+3+
+5
+-1
+1
+➤ Plasma pistol (standard)
+PISTOL
+12"
+1
+3+
+7
+-2
+1
+➤ Plasma pistol (supercharge)
+HAZARDOUS
+PISTOL
+12"
+1
+3+
+8
+-3
+2
+MELEE WEAPONS
+A
+WS
+S
+AP
+D
+Duelling sabre
+PRECISION
+4
+3+
+5
+-1
+1
+Power sword
+PRECISION
+4
+3+
+5
+-2
+1
+Rapture lash
+PRECISION
+6
+3+
+4
+-1
+1
+KEYWORDS
+BATTLELINE
+CHAOS
+GRENADES
+INFANTRY
+INFRACTORS
+SLAANESH
+COSTS
+5 models
+95 pts
+10 models
+175 pts
+UNIT COMPOSITION
+1 Obsessionist
+4‑9 Infractors
+
+The Obsessionist is equipped with: bolt pistol; power sword. Every Infractor is equipped with: bolt pistol; duelling sabre.
+
+Led by
+LORD EXULTANT
+SORCERER
+WARGEAR OPTIONS
+The Obsessionist’s bolt pistol can be replaced with 1 plasma pistol
+The Obsessionist’s power sword can be replaced with 1 rapture lash.
+1 Infractor can be equipped with 1 icon of excess.
+WARGEAR
+Icon of Excess
+
+At the end of your Shooting phase or the Fight phase, if the bearer’s unit destroyed one or more enemy units that phase, the bearer’s unit takes a Leadership test. If that test is passed, you gain 1CP.
+
+CORE ABILITIES
+SCOUTS 6"
+FACTION ABILITIES
+THRILL SEEKERS
+UNIT ABILITIES
+Excessive Assault
+
+Each time a model in this unit targets an enemy unit with a melee attack, re-roll a Wound roll of 1. If that enemy unit is within range of an objective marker, you can re-roll the Wound roll instead.
+
+STATS
+73%
+of Emperor’s Children lists, 1.7 per list
+#1
+most-taken in faction
+76%
+from 72% since last update
+IN ARMY LISTS
+Popular detachments
+COURT OF THE PHOENICIAN
+SPECTACLE OF SLAUGHTER
+FRENZIED HOST
+Most often led by
+LORD EXULTANT
+SORCERER
+Often taken with
+LORD EXULTANT
+FLAWLESS BLADES
+TORMENTORS
+NOISE MARINES
+LUCIUS THE ETERNAL

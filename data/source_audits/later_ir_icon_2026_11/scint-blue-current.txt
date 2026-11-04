@@ -1,0 +1,111 @@
+40K.APP
+FACTIONS
+SCINTILLATING LEGIONS
+Blue Horrors
+DATASHEET
+UPDATES
+MODELS
+M
+T
+SV
+W
+LD
+OC
+Blue Horror 25mm
+
+Invulnerable save: 4+
+
+6"
+3
+7+
+1
+8+
+0
+Brimstone Horror 25mm
+
+Invulnerable save: 4+
+
+6"
+3
+7+
+1
+8+
+0
+RANGED WEAPONS
+RNG
+A
+BS
+S
+AP
+D
+Coruscating blue flames
+PSYCHIC
+PISTOL
+18"
+2
+4+
+3
+-1
+1
+Coruscating yellow flames
+PSYCHIC
+PISTOL
+18"
+2
+5+
+2
+-1
+1
+MELEE WEAPONS
+A
+WS
+S
+AP
+D
+Blue claws
+1
+5+
+3
+0
+1
+Yellow claws
+2
+5+
+2
+0
+1
+KEYWORDS
+BATTLELINE
+BLUE
+BRIMSTONE
+CHAOS
+DAEMON
+HORRORS
+INFANTRY
+SUMMONED
+TZEENTCH
+COSTS
+10 models
+90 pts
+UNIT COMPOSITION
+10 Blue Horrors
+
+Every Blue Horror is equipped with: coruscating blue flames; blue claws. Every Brimstone Horror added to this unit using the Split ability is equipped with: coruscating yellow flames; yellow claws.
+
+CORE ABILITIES
+DEEP STRIKE
+INFILTRATORS
+FACTION ABILITIES
+PACT OF SORCERY
+UNIT ABILITIES
+Split
+
+Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit.
+
+Sullen Malevolence
+
+While an enemy unit is within 6" of this unit, if this unit contains one or more BLUE HORROR models, worsen the Leadership characteristic of models in that enemy unit by 1.
+
+Exploding Horrors
+
+Each time this unit is selected to fight, you can select one enemy unit within Engagement Range of it, then select one or more BRIMSTONE HORROR models in this unit. For each BRIMSTONE HORROR model you select, roll one D6: on a 4+, that model is destroyed and that enemy unit suffers 1 mortal wound.

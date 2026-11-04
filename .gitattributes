@@ -79,3 +79,9 @@ data/source_audits/daemons_next_three_2026_11/* -text whitespace=cr-at-eol
 
 # Preserve authenticated four-Daemons source capture and receipt bytes.
 data/source_audits/daemons_final_four_2026_11/* -text whitespace=cr-at-eol
+
+# Preserve exact bounded later-IR source observations.
+data/source_audits/later_ir_icon_2026_11/* -text whitespace=cr-at-eol
+
+# Preserve the existing Command test module CRLF convention.
+tests/rules/section08/test_command_flow.py -text whitespace=cr-at-eol

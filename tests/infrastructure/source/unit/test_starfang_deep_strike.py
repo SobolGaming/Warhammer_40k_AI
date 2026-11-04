@@ -6,7 +6,7 @@ import json
 from dataclasses import replace
 from functools import cache
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
 from tools.ability_support_sources import ability_support_index_inputs, load_ability_support_sources
@@ -16,6 +16,7 @@ from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 
+from tests.icon_provenance_helpers import before_icon_catalog
 from warhammer40k_core.engine.abilities import KeywordGate
 from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
@@ -531,7 +532,7 @@ def test_wave_serpent_frame_exact_native_delta_and_unchanged_counterparts() -> N
     audit = frame_audit("catalog-delta")
     native, paired_catalog, daemons_catalog = packages()
     assert before_wave_frame(native).package_hash() == audit["prior_package_hash"]
-    assert before_wave_frame(paired_catalog) is paired_catalog
+    assert before_wave_frame(paired_catalog) == before_icon_catalog(paired_catalog)
     assert before_wave_frame(daemons_catalog) is daemons_catalog
     wave = native.army_catalog.datasheet_by_id("000000599")
     changed = replace(wave, name=wave.name + " drift")
@@ -735,7 +736,7 @@ def test_daemons_native_full_sixty_exact_delta_and_counterparts() -> None:
     assert len(native.army_catalog.datasheets) == 60
     prior = before_daemons_native(native)
     assert prior.package_hash() == audit["prior_package_hash"]
-    assert before_daemons_native(paired_catalog) is paired_catalog
+    assert before_daemons_native(paired_catalog) == before_icon_catalog(paired_catalog)
     assert before_daemons_native(standalone) is standalone
     from tests.daemons_next_three_preservation import before_daemons_next_three
 
@@ -878,7 +879,7 @@ def test_daemons_next_three_full_catalog_delta_and_pinned_source() -> None:
     before = before_daemons_next_three(native)
     assert len(native.army_catalog.datasheets) == 60
     assert before.package_hash() == audit["prior_package_hash"]
-    assert before_daemons_next_three(paired_catalog) is paired_catalog
+    assert before_daemons_next_three(paired_catalog) == before_icon_catalog(paired_catalog)
     assert before_daemons_next_three(standalone) is standalone
     changed = {"000001112", "000001120", "000001132"}
     for old, new in zip(
@@ -975,11 +976,12 @@ def test_daemons_final_four_full_catalog_delta_and_pinned_source() -> None:
     )
 
     native, paired_catalog, standalone = packages()
+    native = before_icon_catalog(native)
     audit = daemons_audit("catalog-delta")
     before = before_daemons_final_four(native)
     assert len(native.army_catalog.datasheets) == 60
     assert before.package_hash() == audit["prior_package_hash"]
-    assert before_daemons_final_four(paired_catalog) is paired_catalog
+    assert before_daemons_final_four(paired_catalog) == before_icon_catalog(paired_catalog)
     assert before_daemons_final_four(standalone) is standalone
     changed = {"000002582", "000001149", "000002758", "000001151"}
     for old, new in zip(
@@ -1167,3 +1169,75 @@ def test_daemons_final_four_allegiance_remains_mandatory(datasheet_id: str) -> N
         UnitFactory(
             catalog=package.army_catalog, model_geometries=package.model_geometries
         ).instantiate_unit(army_id="final-four", datasheet=sheet, selection=selection)
+
+
+def test_icon_successor_preserves_complete_historical_catalogs_and_rejects_drift() -> None:
+    from tests.icon_provenance_helpers import icon_successor_audit
+
+    audit = icon_successor_audit()
+    for package in packages():
+        previous = before_icon_catalog(package)
+        assert before_icon_catalog(previous) is previous
+        surface = next(
+            (
+                s
+                for s in audit["catalog_surfaces"]
+                if s["catalog_id"] == package.army_catalog.catalog_id
+            ),
+            None,
+        )
+        if surface is None:
+            assert previous is package
+        else:
+            assert package.package_hash() == surface["current_hash"]
+            assert previous.package_hash() == surface["prior_hash"]
+            changed = [
+                current.datasheet_id
+                for current, old in zip(
+                    package.army_catalog.datasheets, previous.army_catalog.datasheets, strict=True
+                )
+                if current != old
+            ]
+            assert changed == ["000004079", "000004080"]
+        sheet = package.army_catalog.datasheets[0]
+        drift = replace(
+            package,
+            army_catalog=replace(
+                package.army_catalog,
+                datasheets=(
+                    replace(sheet, name=sheet.name + " drift"),
+                    *package.army_catalog.datasheets[1:],
+                ),
+            ),
+        )
+        with pytest.raises(AssertionError):
+            before_icon_catalog(drift)
+
+
+def test_icon_component_successor_keeps_sticky_exact_and_rejects_partial_or_source_drift() -> None:
+    from copy import deepcopy
+
+    from tests.icon_provenance_helpers import before_icon_component, icon_successor_audit
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
+
+    audit = icon_successor_audit()["ir_component"]
+    current = cast(
+        dict[str, Any],
+        faction_pack_rule_ir.source_package_artifact(audit["source_package_id"]).payload(),
+    )
+    previous = before_icon_component(current)
+    assert previous["records"]["000004079:3"] == current["records"]["000004079:3"]
+    for path in (
+        ("records", "000004079:3", "rule_ir", "normalized_text"),
+        ("records", "000004079:3", "rule_ir", "source_id"),
+        ("records", "000004079:4", "rule_ir", "clauses", 1, "trigger", "parameters", 1, "value"),
+    ):
+        changed = deepcopy(current)
+        cursor: Any = changed
+        for key in path[:-1]:
+            cursor = cursor[key]
+        cursor[path[-1]] = "unreviewed"
+        with pytest.raises(AssertionError):
+            before_icon_component(changed)
+    with pytest.raises(AssertionError):
+        before_icon_component(previous)

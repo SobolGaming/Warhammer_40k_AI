@@ -1,0 +1,91 @@
+{
+  "schema": "inventory-owner-clarification-v1",
+  "paired_catalog_datasheet_count": 27,
+  "paired_catalog_owner": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/court_of_slaughter_anvanth_2026_08/__init__.py:EXPECTED_DATASHEET_IDS",
+  "paired_catalog_package_id": "data-package:core-v2:court-of-slaughter-anvanth:2026-08",
+  "paired_datasheet_ids": [
+    "000000592",
+    "000000596",
+    "000000598",
+    "000000600",
+    "000000601",
+    "000000611",
+    "000000612",
+    "000000613",
+    "000002531",
+    "000002532",
+    "000002533",
+    "000002538",
+    "000002759",
+    "000003909",
+    "000004077",
+    "000004078",
+    "000004079",
+    "000004080",
+    "000004081",
+    "000004083",
+    "000004084",
+    "000004085",
+    "000004086",
+    "000004088",
+    "000004089",
+    "000004091",
+    "000004194"
+  ],
+  "later_ir_component_source_package_count": 22,
+  "later_ir_record_count": 93,
+  "later_ir_owner": "faction_pack_rule_ir/artifacts/shards/*.json:source_packages",
+  "later_ir_source_package_ids": [
+    "40k-app-11e-emperors-children-sorcerer-2026-11-01",
+    "gw-11e-aeldari-aspect-warriors-datasheets-2026-06-14",
+    "gw-11e-aeldari-autarchs-datasheets-2026-06-14",
+    "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14",
+    "gw-11e-aeldari-corsair-skyreavers-datasheet-2026-06-09",
+    "gw-11e-aeldari-corsair-void-units-datasheets-2026-06-14",
+    "gw-11e-aeldari-kharseth-datasheet-2026-06-09",
+    "gw-11e-aeldari-night-spinner-datasheet-2026-06-14",
+    "gw-11e-aeldari-shroud-runners-wraithblades-datasheets-2026-06-14",
+    "gw-11e-aeldari-solitaire-datasheet-2026-08",
+    "gw-11e-aeldari-war-walkers-wraithlord-datasheets-2026-06-14",
+    "gw-11e-aeldari-wave-serpent-shining-spears-eldrad-dire-avengers-datasheets-2026-06-14",
+    "gw-11e-aeldari-yriel-vypers-starfangs-datasheets-2026-06-09",
+    "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+    "gw-11e-chaos-space-marines-maulerfiend-datasheet-2026-07",
+    "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08",
+    "gw-11e-emperors-children-fulgrim-datasheet-2026-07",
+    "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08",
+    "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08",
+    "gw-11e-emperors-children-lucius-datasheet-2026-07",
+    "gw-11e-thousand-sons-maulerfiend-datasheet-2026-07",
+    "gw-11e-world-eaters-maulerfiend-datasheet-2026-07"
+  ],
+  "shard_input_hashes": [
+    {
+      "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/aeldari.json",
+      "sha256": "8268084a49d76572bc468a63a032a917eba95dc14fb3e6d8c5e303ed948b3a27"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/chaos-daemons.json",
+      "sha256": "0f42df67de162c702a1348ab0ece0867bd4d06d1581a940d42e95d789dbac607"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/chaos-space-marines.json",
+      "sha256": "b72dcc41332fa172f173a4f8cd05ab05947a6fb168054c144a073584a5c89485"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/emperors-children.json",
+      "sha256": "e1e2359863fb66206a9b81a058ef972975a721c9a102277619277ee3d348eb5a"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/thousand-sons.json",
+      "sha256": "c111851f71c0e52a45251b38efe3dec280e99a4256f1f6133e2fe54d0403c12a"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/world-eaters.json",
+      "sha256": "9c191219988c23db94ab6329127d7ff2d30b21a68c9796d4923dff84f094a5fc"
+    }
+  ],
+  "native_datasheet_count_from_existing_audit": 60,
+  "correction": "The frozen plan mistakenly called27 source packages;27 refers to paired Court datasheet IDs. Preserve historical bytes and use these separate canonical owners in current reports.",
+  "runtime_or_admission_change_authorized": false
+}

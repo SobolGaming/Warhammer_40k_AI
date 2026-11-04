@@ -1,0 +1,224 @@
+{
+  "authority": "project_authoritative_app_mirror",
+  "base": "e921b927e0de21070df8398c63494510c5461f45",
+  "files": {
+    "accepted-scope-review.json": {
+      "bytes": 8542,
+      "sha256": "d77b04c370d8bba1689d37d210488c41f25b4fa5809d999b43e1410384cdc375"
+    },
+    "app-updates-context.json": {
+      "bytes": 497,
+      "sha256": "a7a71ae5a317d862b1184aa184cb48f0e9e2db55663524c49ee0f18904f508c7"
+    },
+    "base-later-ir-records.json": {
+      "bytes": 491381,
+      "sha256": "0d2477782e1f13c4046abc65c151f26471660a8ec6d0c7bbbecc04d744c1b6be"
+    },
+    "cd-blue-current.json": {
+      "bytes": 2363,
+      "sha256": "68168dccb3b3d8c26e28d32732b3f314a7a987815e25f2a3b18727b0da579a12"
+    },
+    "cd-blue-current.txt": {
+      "bytes": 1930,
+      "sha256": "0c9045072419bf4d3114485421cb7dec8e90dc3fdcc2f0d4699171392134d9c6"
+    },
+    "cd-blue-history.json": {
+      "bytes": 454,
+      "sha256": "67287096ef917a5053d6f130cf80158087e6ecb846dfb3ad8c8564799d67ae94"
+    },
+    "cd-blue-history.txt": {
+      "bytes": 140,
+      "sha256": "3d326231f7619659ab4b919739e5b5a3919df3b59eafa9e3ed3177cfd51079f8"
+    },
+    "cd-pink-current.json": {
+      "bytes": 3027,
+      "sha256": "3d9d12e2fc6b570ef993f813f6dbb5eb3e1038e56f05bb442d0677b5c960a7a0"
+    },
+    "cd-pink-current.txt": {
+      "bytes": 2556,
+      "sha256": "618fe9c4db1d256083e17ae2e779d6a6bebc3d30683f6f1ba56178eeb7b4a00c"
+    },
+    "cd-pink-history.json": {
+      "bytes": 454,
+      "sha256": "b0050dbf95a32e32ba0b5870a8b005c130510750189723d362a472557da917bd"
+    },
+    "cd-pink-history.txt": {
+      "bytes": 140,
+      "sha256": "c1103e3232847b28bed8a6f2dc2829608069575bbedb093bc34988761f8248ba"
+    },
+    "correction-plan.txt": {
+      "bytes": 7403,
+      "sha256": "2b58eddcca1a863a3e6497edf9ec54a47a102a1b58c48ee613d2b43946103c55"
+    },
+    "ec-audit-report.md": {
+      "bytes": 12108,
+      "sha256": "a7f11f9da916ec53a0cea0c827354a7f534c26cbce71966c7bbc41d50c62a3ef"
+    },
+    "ec-infractors-current.json": {
+      "bytes": 2298,
+      "sha256": "9cec65a9114bb37e0c7b04bae165f314159a76eadea853ba9002b3195794d8f2"
+    },
+    "ec-infractors-current.txt": {
+      "bytes": 1843,
+      "sha256": "122e59d55f54e60c3cfbcf2fd2a6ad635407f0c66d6d07cb274b90818017905d"
+    },
+    "ec-infractors-history.json": {
+      "bytes": 698,
+      "sha256": "570540cc99d8dbac273aedd7a6a76718d3db996f5b79a6dcbd3ea143d48f1e3b"
+    },
+    "ec-infractors-history.txt": {
+      "bytes": 353,
+      "sha256": "21c3ba9c9e63b8671b8733bc752ac5f443c09f7cc387018ab6e4ba7cd357ae90"
+    },
+    "ec-lord-current.json": {
+      "bytes": 2618,
+      "sha256": "63f908898821a9d61b436d9303315a761a3e3d55a530af7f9460b15bc61181a5"
+    },
+    "ec-lord-current.txt": {
+      "bytes": 2147,
+      "sha256": "818037f2d6c51d49d3fa9c1f999ef3b93371376dd50bf1c92cbd1d2bf1819965"
+    },
+    "ec-lord-history.json": {
+      "bytes": 865,
+      "sha256": "629137b884b3020e1ebf215fff8af6603ba0b8c2e93c9c2fab0e636b66c2f6dc"
+    },
+    "ec-lord-history.txt": {
+      "bytes": 516,
+      "sha256": "779d9e1f95fde2ca0e3921ca9e485c2bf324dc8c63095bc2244524f87ea08279"
+    },
+    "ec-tormentors-current.json": {
+      "bytes": 2823,
+      "sha256": "9e52ee7e66e3d14dd0fbfeff81bd3d101f4c81308947c4bfde89ad5cfb4fe59f"
+    },
+    "ec-tormentors-current.txt": {
+      "bytes": 2327,
+      "sha256": "4e6cea797bd4658feeb99de5fa13a548cdc7a22f51df04d0924e7336c48a3fcb"
+    },
+    "ec-tormentors-history.json": {
+      "bytes": 732,
+      "sha256": "35965a54d840aa776881a7787f31acbc6de135d58d8509c5b3f464032f5ae6e2"
+    },
+    "ec-tormentors-history.txt": {
+      "bytes": 385,
+      "sha256": "8c4804d42ae73a59308319c6d765373f792d57d72ca22133ee5d0277d4787474"
+    },
+    "horror-audit-report.txt": {
+      "bytes": 4832,
+      "sha256": "4e8e82551242eba2d4990aa3dfa64396787eab0f743ab1f9f5416297ca2f7240"
+    },
+    "inventory-owner-clarification.json": {
+      "bytes": 4184,
+      "sha256": "93ad49977c7d038c7c8a1ecf0bfbe633c91792b94702a362bc527450e828876d"
+    },
+    "later-ir-residual-disposition.csv": {
+      "bytes": 47238,
+      "sha256": "e6d504e80d9eb5feb7930853e0cf761e96e3d501c227f69799c660b17616401e"
+    },
+    "provenance-successor.json": {
+      "bytes": 7295,
+      "sha256": "e15437f43367d05e48bce8ebafb5379155033df4c5af9bb4ca50d2fb4023197e"
+    },
+    "scint-blue-current.json": {
+      "bytes": 2021,
+      "sha256": "79cc3c151b5ba66cce4f4ac5c7ea189325dd1608f66d900671dc316d9d572fd1"
+    },
+    "scint-blue-current.txt": {
+      "bytes": 1599,
+      "sha256": "bfc287f3f2c9b7428553d80dcb8e863534097ecf911ceede240297a56ec9f88c"
+    },
+    "scint-blue-history.json": {
+      "bytes": 472,
+      "sha256": "410f4deaca25efbd1f4d7aa6238d1522b441d1db180c1097f2b578305078f293"
+    },
+    "scint-blue-history.txt": {
+      "bytes": 147,
+      "sha256": "8697d556be5689bac1683adc0768784b78299439f8585f989bde85ac56895c05"
+    },
+    "scint-index-current.json": {
+      "bytes": 1387,
+      "sha256": "5e9953b90317986d7db12e64a3b967987a4c6c36cbfeaf040c4f33636a9ab4b3"
+    },
+    "scint-index-current.txt": {
+      "bytes": 1013,
+      "sha256": "c9517a7b2c7a9b50bb6dfab8ac40da29f280be5b3fdaaf51fc39723eaac8bc1a"
+    },
+    "scint-pink-current.json": {
+      "bytes": 2687,
+      "sha256": "68b46ecad2ef5d0ee6aa8994876a7836b3a60d27fc16097ea0d2fee663f38c61"
+    },
+    "scint-pink-current.txt": {
+      "bytes": 2229,
+      "sha256": "5539571438eb485d69f46babbe32ccbeec1ca5e2266239d65c59524b3be2bb05"
+    },
+    "scint-pink-history.json": {
+      "bytes": 473,
+      "sha256": "81646006e4bd66f9b3edf74bd7252a72c8605538df4b0c9af52f127bc58b58df"
+    },
+    "scint-pink-history.txt": {
+      "bytes": 148,
+      "sha256": "2e34f561063eb2c5bddd54d11a6c6afbf723b74d989955871be389557fb0629e"
+    },
+    "selected-source-observations.json": {
+      "bytes": 29494,
+      "sha256": "55bfe98a65f011344f77442815d936a85d7fb8e97be09cd39fb6f8ef43dcd748"
+    },
+    "source-capture-receipts.json": {
+      "bytes": 5771,
+      "sha256": "f580c96dc44f7875db1168271a696d4db932a31ce39cf74244b646438b3e49bc"
+    },
+    "ts-index-current.json": {
+      "bytes": 1263,
+      "sha256": "ffb8f55df63e12d276c006cb361580f83c21698e57522cfddbdcf12dccc1b960"
+    },
+    "ts-index-current.txt": {
+      "bytes": 914,
+      "sha256": "15a602505d208f28b14f51a8defe41c021df3abbc2910337e4d86cf65fd53691"
+    },
+    "ts-pink-current.json": {
+      "bytes": 472,
+      "sha256": "0f8d84c64add21034b69d3c11408238230fc6e20ea614768b9f845fe0ec54cac"
+    },
+    "ts-pink-current.txt": {
+      "bytes": 170,
+      "sha256": "47158a47873378af54ea1133d10d97038d6fb447f6e177383529659aa7617f52"
+    },
+    "ts-updates-current.json": {
+      "bytes": 416,
+      "sha256": "99699b49c860c0fbf35abb81dccf05064f49f9d153499fa36f17f252746f963f"
+    },
+    "ts-updates-current.txt": {
+      "bytes": 120,
+      "sha256": "4b802af0ddbe738a3ba456de376ca4d1df081464294948306e6b763ae3906045"
+    },
+    "twelve-clause-source-matrix.json": {
+      "bytes": 20576,
+      "sha256": "20ed298cca7348d031388a28e7b5f14c4908dee08d89b1cb3f6e38d4f5606b1d"
+    }
+  },
+  "inventories": {
+    "later_ir_component_source_packages": 22,
+    "later_ir_rows": 93,
+    "native_datasheets": 60,
+    "paired_court_datasheet_ids": 27,
+    "selected": 12,
+    "selected_unobserved": 0,
+    "unselected_unchanged": 81
+  },
+  "inventory_clarification": "The later addendum corrects an inherited label: 27 paired Court datasheet IDs, 22 component IR source packages/93 records, 60 native datasheets. Frozen plan and accepted review bytes remain historical and unchanged; no admission expands.",
+  "limitations": [
+    "No new load/execution/certification flag, Horror native admission, geometry or complete profile qualification.",
+    "Chaos2583/2584 and ThousandSons4127/4128 are distinct variants; Scintillating Legions own pages resolved from retained Thousand Sons navigation.",
+    "Four Horror IDs remain outside native60. Display names and provider navigation do not transfer ownership.",
+    "Source wording and historical observations remain immutable. Historical unverified matrix fields describe the prior audit only.",
+    "Visible histories and context do not establish complete hidden history. Preserve anomalous spellings, geometry and official historical references.",
+    "Runtime consumes reviewed offline artifacts and never fetches live pages."
+  ],
+  "prior_ledger": {
+    "path": "data/source_audits/daemons_final_four_2026_11/later-ir-residual-disposition.csv",
+    "sha256": "3d50c56d5d0a765dd5187144750ef9d5ddea4991c5355b07acd810021f7fccfa"
+  },
+  "provider_affiliation": "not_affiliated_with_Games_Workshop",
+  "schema": "later-ir-source-only-observation-v1",
+  "scope": "Exactly twelve source observations; six exact and six presentation-only; two Icon Fight owner corrections separately tested",
+  "snapshot_context": "Global App-data995; not the last-update date of each selected rule"
+}

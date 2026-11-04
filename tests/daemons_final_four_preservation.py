@@ -10,6 +10,7 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any, cast
 
+from tests.icon_provenance_helpers import before_icon_catalog
 from warhammer40k_core.core.datasheet import DatasheetDefinition
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.source_catalog import SourceArtifactHash
@@ -31,6 +32,9 @@ def _hash(value: object) -> str:
 
 def before_daemons_final_four(package: CanonicalCatalogPackage) -> CanonicalCatalogPackage:
     audit = daemons_audit("catalog-delta")
+    if package.package_hash() == audit["prior_package_hash"]:
+        return package
+    package = before_icon_catalog(package)
     if package.army_catalog.catalog_id != "chaos-daemons-bridge-catalog":
         assert package.package_hash() in audit["unchanged_counterparts"].values()
         return package

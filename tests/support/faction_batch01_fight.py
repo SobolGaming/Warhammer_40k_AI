@@ -2,18 +2,22 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any, cast
 
 from tests.support.faction_batch01 import Scene, request
 from tests.support.section04_fixtures import weapon_rows
 from tests.support.section12_fixtures import melee_payload, move_payload
 
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
 from warhammer40k_core.engine.stratagems import stratagem_decline_payload
 
 
-def fight_to_end(s: Scene) -> list[dict[str, Any]]:
+def fight_to_end(
+    s: Scene, *, checkpoint: Callable[[Scene, DecisionRequest], None] | None = None
+) -> list[dict[str, Any]]:
     """Use each available fighter's real weapon and native allocation choices."""
     status = s.session.advance_until_decision_or_terminal()
     rerolls: list[dict[str, Any]] = []
@@ -25,6 +29,8 @@ def fight_to_end(s: Scene) -> list[dict[str, Any]]:
         if s.state.current_battle_phase is not BattlePhase.FIGHT:
             return rerolls
         r = request(status)
+        if checkpoint is not None:
+            checkpoint(s, r)
         result_id = f"batch01:fight:{i}"
         if r.decision_type == "submit_movement_proposal":
             # Native typed decline of optional Pile In/Consolidation; no endpoint shortcut.

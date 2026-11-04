@@ -115,10 +115,10 @@
       "sha256": "0edf3bc19424cf7882c9a24db3e877fd353696a3ed6718fb0d0ab4e9454ecc44"
     },
     "tests/factions/emperors_children/test_selected_consumers.py": {
-      "blob_sha1": "000ded52c0b21a2a589aa397ab89b3ddc2b30b3b",
-      "bytes": 65338,
+      "blob_sha1": "8e3808a987ecb619d64e20738e5f58035ebd25f5",
+      "bytes": 77301,
       "mode": "100644",
-      "sha256": "267dd235cbc553c6097dca6eb647719c323308e83874d28dfc8473afb988df17"
+      "sha256": "f9df29eca94b04eae476f28340b8cb5bbb439170cbd4f8b829b019ce51275619"
     },
     "tests/factions/emperors_children/test_shared_attack_consumers.py": {
       "blob_sha1": "4d6141e4a647edbcf7aaa841f7349262e66c08a9",
@@ -523,10 +523,10 @@
       "sha256": "e1a4a0883ab20effef0518e0e49ff34e5d107f46f1c0f9b1596e5e17e0701357"
     },
     "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
-      "blob_sha1": "ab2f82a6fd02ff5d79db102eda5e3caefb638313",
-      "bytes": 52515,
+      "blob_sha1": "a31343bc5d11033f250c894e3ac2b0c211b75e77",
+      "bytes": 55479,
       "mode": "100644",
-      "sha256": "a71037546ed06472b41d6d4d2ec8e9f5eb2bcfbff50ac16f97c50ae3dbaa62a1"
+      "sha256": "de16a72d596f87953471c33b9c9abaa6cf87cde8dee535c18816d3622ec22f81"
     },
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
       "blob_sha1": "df3410c8205c6381c11e823fffa94fce68ff9b91",
@@ -1369,10 +1369,10 @@
       "sha256": "2955b327e501b738dd07f8c4cdaaedadfd85d2e02dff3cc9eab7472528f2d2a2"
     },
     "tests/rules/section08/test_command_flow.py": {
-      "blob_sha1": "a55788b03d0beb8c69692a263aa359a74f243edf",
-      "bytes": 8862,
+      "blob_sha1": "675d5ab8010bb24c8f2021db6d9beff7e5ba33a0",
+      "bytes": 10692,
       "mode": "100644",
-      "sha256": "a67327723cad6a50818c23cdd6b5ee68dd1bf8bdf03ff659e8f0663bee09e46d"
+      "sha256": "a3289a2fad02ed06dc0cfaed565bbd6213bc0d4293ff297fdf351d836c027032"
     },
     "tests/rules/section08/test_coverage_map.py": {
       "blob_sha1": "2aa5fd4aa6c6af758fb77608c8a6be04ea29f95c",

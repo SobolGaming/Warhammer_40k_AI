@@ -1,0 +1,74 @@
+40K.APP
+FACTIONS
+Thousand Sons
+DATASHEETS
+ARMY RULES
+DETACHMENTS
+UPDATES
+CREATE LIST
+KEYWORDS
+Scintillating Legions
+EPIC HEROES
+Ahriman
+105
+Magnus the Red
+455
+LEADERS & CHARACTERS
+Daemon Prince of Tzeentch
+170
+Daemon Prince of Tzeentch with Wings
+170+
+Exalted Sorcerer
+100
+Exalted Sorcerer on Disc of Tzeentch
+95
+Infernal Master
+105
+Sorcerer
+100+
+Sorcerer in Terminator Armour
+110+
+Tzaangor Shaman
+65
+BATTLELINE
+Rubric Marines
+115+
+MOUNTED
+Tzaangor Enlightened
+50
+Tzaangor Enlightened with Fatecaster Greatbows
+55
+Become a supporter and remove ads
+INFANTRY, SWARMS, BEASTS
+Chaos Spawn
+65
+Scarab Occult Terminators
+200+
+Tzaangors
+75
+DEDICATED TRANSPORTS
+Chaos Rhino
+80+
+VEHICLES, MONSTERS
+Chaos Land Raider
+220+
+Chaos Predator Annihilator
+140+
+Chaos Predator Destructor
+140+
+Chaos Vindicator
+185+
+Defiler
+300+
+Forgefiend
+135+
+Helbrute
+110
+Heldrake
+175
+Maulerfiend
+120+
+Mutalith Vortex Beast
+170+
+Sekhetar Robots
+85+

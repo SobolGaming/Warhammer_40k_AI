@@ -1,7 +1,7 @@
 {
   "artifact_schema": "core-v2-faction-pack-rule-ir-package-v1",
   "edition": 11,
-  "package_hash": "f1dbc5894a26f2b6f5561910ea99d8ea66c79b67b054228cbe601ad2623e4ba8",
+  "package_hash": "845dea0116ba38b1a9e092f486c4442a42253749da4840a7485f06545ba65a23",
   "registry_id": "warhammer-40000-11th-faction-pack-rule-ir",
   "shard_artifacts": {
     "aeldari": {
@@ -167,7 +167,7 @@
         "000004091"
       ],
       "path": "shards/emperors-children.json",
-      "sha256": "920fffd77f9209aad4b9c7024321d694ee1b1a15987a18f9e970b4a064d88e89",
+      "sha256": "e1e2359863fb66206a9b81a058ef972975a721c9a102277619277ee3d348eb5a",
       "source_package_ids": [
         "40k-app-11e-emperors-children-sorcerer-2026-11-01",
         "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08",

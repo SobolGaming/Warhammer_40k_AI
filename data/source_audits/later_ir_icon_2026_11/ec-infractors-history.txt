@@ -1,0 +1,27 @@
+40K.APP
+FACTIONS
+EMPEROR’S CHILDREN
+Infractors
+DATASHEET
+UPDATES
+VERSION 963
+Released 2026-09-30
+Points changes
+5 models
+85 pts → 95 pts
+10 models
+160 pts → 175 pts
+Infractor
+Stats Changed
+STAT	WAS	NOW
+Toughness	4	5
+Obsessionist
+Stats Changed
+STAT	WAS	NOW
+Toughness	4	5
+VERSION 867
+Released 2026-06-19
+Added to the faction
+Added
+Points cost
+85 pts
