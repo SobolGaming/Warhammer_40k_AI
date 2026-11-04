@@ -4,6 +4,26 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1bd54c19c4853b282c77ffedac213cd3783587f95d5618b1795b5c9824f589d5",
   "operation_map_sha256": "8f08360f54f84474aba369b1ad753da7488e306b6f92e0a07af149df506af0b8",
   "changes": {
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "d114dfda8655926b5f138434ea8fc6d4e40ad7870df721797d22fdb5fee06d6a",
+      "after_sha256": "da447700a6385e2eceee9ab0bbf090941e51361c4e3817d5369c56e4310bba6c",
+      "owners": {
+        "@document": {
+          "before": "d114dfda8655926b5f138434ea8fc6d4e40ad7870df721797d22fdb5fee06d6a",
+          "after": "da447700a6385e2eceee9ab0bbf090941e51361c4e3817d5369c56e4310bba6c"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "before_sha256": "324285418096f206e8371efcf79dd6685e3729b5f8007e7ebef266ecdc871443",
+      "after_sha256": "44a34596e268f6d2ff09b58926385c82fb6661fe805597b74d3352efcf850dbd",
+      "owners": {
+        "@document": {
+          "before": "324285418096f206e8371efcf79dd6685e3729b5f8007e7ebef266ecdc871443",
+          "after": "44a34596e268f6d2ff09b58926385c82fb6661fe805597b74d3352efcf850dbd"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "29f827ea592f22644c62d8dbd6098e8ed1da8227cce07722c35d99b3d97f9aef",
       "after_sha256": "bdf38a566cef29ce0d0e6dab002e8fddc6ef503fb497233b3576ff1069cd3ac9",
@@ -542,6 +562,22 @@
     }
   },
   "rows": {
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Daemons native damaged threshold and conditional-keyword source admission, its real native/regression consumers, exact historical successor authentication or derived identity publication; no unrelated semantic or algorithm change.",
+      "source_obligation": "Update only Be000001148 damaged range/description 1-6 to1-7 and remove only unconditional ordinary SHADOW LEGION for Be and Bloodletters000001114 at the existing typed keyword-correction boundary. Preserve every other native semantic field, seven queued occurrences and all counterparts.",
+      "unchanged_work": "Existing source composer and PdfDatasheetCorrection boundary own three source corrections. Index/search/cache, engine damaged/Psychic/conditional-grant algorithms, geometry, serializers, dependencies, detailed families and budgets are unchanged. No measured speed or identical-work claim. Live current-runtime serial smoke remains required."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
