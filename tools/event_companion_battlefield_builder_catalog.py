@@ -10,16 +10,13 @@ from __future__ import annotations
 # area falls from 0.04625 to zero, sibling overlap remains zero, and the 1.825-inch
 # sibling gap is unchanged.
 REVIEWED_FIXED_COMPONENT_CENTERS = {
-    "disruption-vs-disruption-layout-3-terrain-area-02-component-01": (10.90, 53.45),
+    "disruption-vs-disruption-layout-3-terrain-area-02-component-01": (10.9, 53.45),
     "purge-the-foe-vs-disruption-layout-3-terrain-area-04-component-01": (37.85, 41.35),
     "purge-the-foe-vs-disruption-layout-3-terrain-area-07-component-01": (27.05, 27.55),
-    "purge-the-foe-vs-disruption-layout-3-terrain-area-13-component-01": (6.10, 18.50),
-    "take-and-hold-vs-priority-assets-layout-3-terrain-area-08-component-03": (35.40, 35.60),
-    "take-and-hold-vs-priority-assets-layout-3-terrain-area-09-component-02": (8.50, 24.30),
-    "reconnaissance-vs-reconnaissance-layout-1-terrain-area-02-component-01": (
-        10.90,
-        53.45,
-    ),
+    "purge-the-foe-vs-disruption-layout-3-terrain-area-13-component-01": (6.1, 18.5),
+    "take-and-hold-vs-priority-assets-layout-3-terrain-area-08-component-03": (35.4, 35.6),
+    "take-and-hold-vs-priority-assets-layout-3-terrain-area-09-component-02": (8.5, 24.3),
+    "reconnaissance-vs-reconnaissance-layout-1-terrain-area-02-component-01": (10.9, 53.45),
 }
 
 _LAYOUT_FAMILIES = (
@@ -190,7 +187,7 @@ ARCHETYPE_IDS = (
     "dense-long-pipes",
 )
 SOURCE_COORDINATE_FRAME = {
-    "pdf_background_image_xref": 5490,
+    "pdf_background_image_xref": 5664,
     "pdf_background_image_sha256": (
         "2eda9e45dadd328907dba59ca1f6630e816571e2bcfc20b1f5bf97f0c8b8772a"
     ),

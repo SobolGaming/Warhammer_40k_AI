@@ -68,11 +68,12 @@ MISSION_PACK_ID = "11e-warhammer-event-companion-2026-07"
 SOURCE_PACKAGE_ID = "gw-11e-warhammer-event-companion-v1-1-2026-07"
 SOURCE_TITLE = "Warhammer Event Companion v1.1"
 SOURCE_VERSION = "1.1"
+LAYOUT_SOURCE_PACKAGE_ID = event_layouts.battlefield_artifact().source_package_id
 DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-EXPECTED_SOURCE_IMPORT_HASH = "0b52df4d766aaba3820b7d8bb2e2325da02ba4f51f9fd65ab5fb2f84ea224a97"
+EXPECTED_SOURCE_IMPORT_HASH = "ce5795fa09755d9874f1df6e2625e7ffc53731d46bf4b7f2084ae6b8412e95ac"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -1134,7 +1135,7 @@ def layout_descriptor_rows() -> tuple[WarhammerEventLayoutDescriptor, ...]:
                     ),
                     geometry_extraction_status=_layout_geometry_status(layout_id),
                     source_page=_battlefield_layout_source_page(layout_id),
-                    source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_id}:descriptor",
+                    source_id=f"{LAYOUT_SOURCE_PACKAGE_ID}:battlefield-layout:{layout_id}:descriptor",
                 )
             )
     return tuple(descriptors)
@@ -1309,7 +1310,7 @@ def _battlefield_layout_definition(
             terrain_areas=terrain_areas,
         ),
         objective_role_counts=layout_source.objective_role_counts,
-        source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_source.source_layout_id}",
+        source_id=f"{LAYOUT_SOURCE_PACKAGE_ID}:battlefield-layout:{layout_source.source_layout_id}",
         objective_terrain_areas=_battlefield_objective_terrain_area_definitions(
             layout_id=layout_id,
             objective_markers=objective_markers,
@@ -1597,7 +1598,7 @@ def _battlefield_objective_definitions(
             x_inches=objective.x_inches,
             y_inches=objective.y_inches,
             source_id=(
-                f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_id}:"
+                f"{LAYOUT_SOURCE_PACKAGE_ID}:battlefield-layout:{layout_id}:"
                 f"objective:{objective.objective_marker_id}"
             ),
         )
@@ -1663,7 +1664,7 @@ def _battlefield_objective_terrain_area_definitions(
                 objective_role=marker.objective_role,
                 terrain_area_ids=terrain_area_ids,
                 source_id=(
-                    f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_source.source_layout_id}:"
+                    f"{LAYOUT_SOURCE_PACKAGE_ID}:battlefield-layout:{layout_source.source_layout_id}:"
                     f"objective-terrain-area:{objective_suffix}"
                 ),
             )
@@ -1685,7 +1686,7 @@ def _battlefield_regions(*, layout_id: str) -> tuple[BattlefieldRegion, ...]:
             owner_role="attacker",
             shape=attacker_zone.shape,
             derived_from=(attacker_zone.deployment_zone_id,),
-            source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:attacker-deployment",
+            source_id=f"{LAYOUT_SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:attacker-deployment",
         ),
         BattlefieldRegion(
             region_id=f"{layout_id}-defender-deployment-region",
@@ -1693,7 +1694,7 @@ def _battlefield_regions(*, layout_id: str) -> tuple[BattlefieldRegion, ...]:
             owner_role="defender",
             shape=defender_zone.shape,
             derived_from=(defender_zone.deployment_zone_id,),
-            source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:defender-deployment",
+            source_id=f"{LAYOUT_SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:defender-deployment",
         ),
         BattlefieldRegion(
             region_id=f"{layout_id}-no-mans-land",
@@ -1701,7 +1702,7 @@ def _battlefield_regions(*, layout_id: str) -> tuple[BattlefieldRegion, ...]:
             owner_role=None,
             shape=_battlefield_no_mans_land_shape(layout_id),
             derived_from=(attacker_zone.deployment_zone_id, defender_zone.deployment_zone_id),
-            source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:no-mans-land",
+            source_id=f"{LAYOUT_SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:no-mans-land",
         ),
         BattlefieldRegion(
             region_id=f"{layout_id}-attacker-territory",
@@ -1709,7 +1710,7 @@ def _battlefield_regions(*, layout_id: str) -> tuple[BattlefieldRegion, ...]:
             owner_role="attacker",
             shape=_shape_from_vertices(territories["attacker_territory"]),
             derived_from=(f"attacker_edge_{attacker_edge}",),
-            source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:attacker-territory",
+            source_id=f"{LAYOUT_SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:attacker-territory",
         ),
         BattlefieldRegion(
             region_id=f"{layout_id}-defender-territory",
@@ -1717,7 +1718,7 @@ def _battlefield_regions(*, layout_id: str) -> tuple[BattlefieldRegion, ...]:
             owner_role="defender",
             shape=_shape_from_vertices(territories["defender_territory"]),
             derived_from=(f"defender_edge_{defender_edge}",),
-            source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:defender-territory",
+            source_id=f"{LAYOUT_SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:defender-territory",
         ),
     )
 
@@ -1824,7 +1825,7 @@ def _placed_terrain_areas_from_specs(
             battlefield_depth_inches=BATTLEFIELD_DEPTH_INCHES,
             terrain_area_id=f"{layout_id}-{target_suffix}",
             source_id=(
-                f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:"
+                f"{LAYOUT_SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:"
                 f"terrain-area:{target_suffix}"
             ),
             symmetry_axis=SymmetryAxis.POINT_CENTER,
@@ -1883,7 +1884,7 @@ def _placed_terrain_area_from_anchor_spec(
         rotation_degrees=rotation_degrees,
         local_transform=local_transform,
         source_layout_id=source_layout_id,
-        source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:terrain-area:{area_id}",
+        source_id=f"{LAYOUT_SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:terrain-area:{area_id}",
         logical_terrain_area_id=f"{layout_id}-{logical_terrain_area_id}",
     )
 

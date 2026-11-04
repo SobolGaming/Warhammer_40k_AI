@@ -166,15 +166,14 @@ player-turn scope is now serialized. The already supported one-artifact offline
 pinned hash transition; its original empty VP ledgers and all other gameplay,
 identity and event obligations remain exact. Ordinary loaders receive no fallback.
 
-This correction does not upgrade the complete package to October v1.3. Layouts,
-mission-card transcriptions and base-guide provenance remain July-bound. Current
-October diagrams differ on 30 rendered layout pages, including changed footprint
-geometry and an extra objective on each Reconnaissance versus Reconnaissance
-A/B/C layout. The independently checked source objective count is 249 versus 246
-in the retained runtime package; count evidence does not certify coordinates or
-bindings. Complete 45-layout extraction, review, generation and gameplay/replay
-requalification remain pending as a separate migration. The new Plunder/Beacon
-FAQ source admission and the changed Wazbom Blastajet base row are separate.
+The layout owner now uses the official October v1.3 page 8 key and all 45
+pages 9–53 diagrams: 249 objectives, including two central objectives on each
+Reconnaissance mirror layout. July mission-card transcriptions, scoring and
+base-guide ownership remain explicit. The [current layout source review](../data/source_audits/event_companion_2026_10/README.md)
+records raw-source reproduction, stable/new IDs, geometry and modeling exceptions.
+Complete exact-head delivery gates are pending; this is not whole-package source
+or complete-game qualification. Plunder/Beacon FAQ admission and the changed
+Wazbom Blastajet base row remain separate.
 
 ## Battlefield Coverage
 
@@ -196,18 +195,18 @@ FAQ source admission and the changed Wazbom Blastajet base row are separate.
   falls back to legacy source-row rectangles or image-derived guesses.
 - The battlefield contact semantics come from the page-8 Layouts Key, and the
   45 layout diagrams and coordinates are extracted from pages 9-53 of
-  `eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf`, whose
+  `eng_14-10_wh40k_event_companion-rdwnqprl4c-nj8oqogadv.pdf`, whose
   SHA-256 is
-  `97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20`.
+  `187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2`.
   Territory boundaries are reviewed against the attacker/defender triangle
   glyphs on all 45 pages rather than inferred from the horizontal or vertical
   battlefield middle guides.
   The reviewed page-8 key plus pages-9-53 layout extraction SHA-256 is
-  `a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f`,
+  `94476b9c2b3756ac49e5045d31b4cfc577451ceeda87aee01df5431ae457f111`,
   the generated artifact SHA-256 is
-  `028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f`,
+  `577464ade3daf3a940257f8f385a09abff69e6de740198f157b91e1aed35dbec`,
   and its canonical package hash is
-  `44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972`.
+  `f917b72458420bec1616f3d13ac2b7fd68c795976f7212a70d947be76f57324c`.
   The generator separately pins the stable runtime identity map at
   `742ab841d1ec1e696f4a5c0e3f2e8c251203d510bf1da85fb30af88023cb64f3`.
   The generated `event-companion-battlefields.json` artifact records source
@@ -216,9 +215,9 @@ FAQ source admission and the changed Wazbom Blastajet base row are separate.
   contacts. Its strict loader pins source, extraction, package, and artifact
   hashes and rejects malformed, stale, or re-hashed coordinate drift.
 - The package contains 720 physical terrain-area footprint pieces representing
-  608 logical rules areas, plus 1,349 individually placed physical components.
-  Every layout has 16 footprint pieces. The page-8 key makes 112 two-piece pairs
-  into Single logical areas; the remaining 496 pieces are singletons. Page 9,
+  617 logical rules areas, plus 1,349 individually placed physical components.
+  Every layout has 16 footprint pieces. The page-8 key makes 103 two-piece pairs
+  into Single logical areas; the remaining 514 pieces are singletons. Page 9,
   Take and Hold versus Take and Hold Layout A, has the source-backed 29-component
   exception because one downed hovercraft has no tall-crate companion; every
   other layout has 30 components. Fourteen shared archetypes define recurring
@@ -231,50 +230,18 @@ FAQ source admission and the changed Wazbom Blastajet base row are separate.
   Objective centers retain the source vector extraction's finer 0.01-inch
   precision rather than discarding source accuracy at the terrain-placement
   boundary.
-  Every declared contact retains at most one 0.05-inch placement quantum of
-  source-fit gap and at most `0.000001` square inches of numerical overlap. Of
-  224 declared contacts, 43 have zero recorded gap and 181 retain a source-fit
-  open sliver no wider than 0.05 inches: 80 Single and 101 Separate. Of those
-  43 zero-gap contacts, 41 also have zero overlap. Two page-12 Single pairs
-  have `0.00000087` square inches of overlap after six-decimal geometry
-  quantization; every other pair has zero recorded overlap. Single
-  contacts share one logical rules identity; Separate contacts remain distinct.
-  Neither identity fills source-drawn open board between physical polygons. The
-  artifact records every measured runtime gap and overlap.
-- Page 29's two paired contacts are the only terrain-area pose witnesses that
-  require either adjustment axis to exceed the usual +/-0.20-inch
-  canonical-footprint bound. Exhaustive
-  evaluation of all four source-pose candidates on the 0.05-inch grid found no
-  non-overlapping contact solution through +/-0.30 inches; +/-0.35 inches is
-  the first feasible bound. The committed minimum-total corrections are area
-  02 `(+0.10, -0.35)`, area 04 `(-0.10, +0.30)`, area 13
-  `(+0.05, -0.35)`, and area 15 `(-0.05, +0.30)` inches. The loader permits
-  exactly those four reviewed witnesses and retains the 0.20-inch bound for
-  every other non-Meatgrinder area.
-- Seven component rasters land across their rules-area boundary after source
-  quantization. Exhaustive 0.05-inch-grid searches pin only the minimum
-  containment corrections: page 23 areas 08 component 03 `(0, -0.05)` and 09
-  component 02 `(0, +0.05)`; page 29 areas 04 component 01 `(-0.10, 0)`, 07
-  component 01 `(0, +0.05)`, and 13 component 01 `(+0.05, -0.05)`; page 38 area
-  02 component 01 `(0, -0.05)`; and page 45 area 02 component 01 `(0, -0.05)`
-  inches. Source centers and rotations remain separate provenance fields. All
-  84 non-Meatgrinder long-pipe rules proxies use the nearest feasible 0.05-inch
-  grid center of their parent footprint because the source raster intentionally
-  overhangs that rules area.
-- Pages 36 and 46 repeat one Single-area ruin join whose shared rules proxies
-  cannot close on the 0.05-inch grid. Exhaustive searches through +/-0.30
-  inches prove the minimum exact normal correction is
-  `(+0.005440361094, +0.010510105572)` inches, magnitude
-  `0.011834688335` inches, applied only to area 10 after its reviewed grid
-  placement. The source 0.05-inch anchors remain unchanged in provenance. Four
-  source-ID-bound area-pose witnesses form two paired joins: page 36
-  `disruption-vs-disruption-layout-1` areas 07 and 10, and page 46
-  `reconnaissance-vs-reconnaissance-layout-2` areas 07 and 10. Only the two
-  area-10 rows carry the sub-grid delta from `(-0.20, +0.10)`, so their effective
-  runtime anchors use 12-decimal precision. This closes both Single joins with
-  zero gap and zero overlap without weakening geometry tolerances.
-  Intentional clearance between physical terrain and terrain-area edges is
-  preserved, as required by the source, rather than treated as missing geometry.
+  Every declared contact retains at most 0.05 inch gap and 1e-6 square-inch
+  numerical overlap. 103 Single joins share logical identities; 116 Separate
+  contacts remain distinct. Source gaps and final runtime measurements remain
+  separately recorded; neither creates extra rules footprint between polygons.
+- All historical fixed-pose and component adjustments were reconsidered against
+  current source. Unchanged page 29 bounded exceptions and the page 36 exact seam
+  remain; changed page 46 and other changed-source fixed poses are retired.
+  Meatgrinder pages 24–26 now use independently registered current outlines and
+  component images instead of forced historical point symmetry. Every footprint
+  still passes board, overlap, objective, component containment and contact checks.
+  The complete row-by-row disposition and cropped-raster modeling convention are
+  recorded in [migration-review.json](../data/source_audits/event_companion_2026_10/migration-review.json).
 - All 25 Primary missions' source timing, VP values, structured condition
   tokens, current engine-support status, and the ten source-backed Primary Mission
   Action descriptors are committed in `primary-scoring.json`. Its package hash
@@ -291,7 +258,7 @@ FAQ source admission and the changed Wazbom Blastajet base row are separate.
   transcriptions, and the official card binaries are not committed. The
   GDMissions Meatgrinder transcription and image remain non-official secondary
   corroboration only.
-- The artifact also pins the committed official Event Companion v1.1 PDF hash
+- The scoring artifact also pins the committed official Event Companion v1.1 PDF hash
   `97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20`
   and exact scoring-limit pages. Printed page 2 applies a 15VP Primary limit per
   battle round to every Event Companion Primary mission; printed page 4 states

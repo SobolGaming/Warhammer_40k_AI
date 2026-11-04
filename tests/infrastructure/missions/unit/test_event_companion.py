@@ -100,7 +100,7 @@ def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> N
 
     assert mission_pack.mission_pack_id == "11e-warhammer-event-companion-2026-07"
     assert source_package.source_commit_or_import_hash == (
-        "0b52df4d766aaba3820b7d8bb2e2325da02ba4f51f9fd65ab5fb2f84ea224a97"
+        "ce5795fa09755d9874f1df6e2625e7ffc53731d46bf4b7f2084ae6b8412e95ac"
     )
     assert source_package.to_payload() == {
         "edition_id": "warhammer_40000_11th",
@@ -675,14 +675,14 @@ def test_phase17n_battlefield_artifact_is_source_hashed_and_strict() -> None:
     source_pdf_path = (
         repository_root
         / "docs/source_rules"
-        / "eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf"
+        / "eng_14-10_wh40k_event_companion-rdwnqprl4c-nj8oqogadv.pdf"
     )
     raw = artifact_path.read_bytes()
 
     assert artifact.source_pages == tuple(range(8, 54))
     assert len(artifact.source_extraction_payload_sha256) == 64
     assert artifact.source_pdf_sha256 == (
-        "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20"
+        "187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2"
     )
     assert hashlib.sha256(source_pdf_path.read_bytes()).hexdigest() == artifact.source_pdf_sha256
     assert artifact.source_pdf_sha256 == event_layouts.BATTLEFIELD_SOURCE_PDF_SHA256
@@ -748,6 +748,7 @@ def test_phase17n_battlefield_artifact_is_source_hashed_and_strict() -> None:
         )
     )
 
+    # Independently observed October registrations replace the old forced symmetry.
     meatgrinder_layouts = _meatgrinder_artifact_layouts()
     assert {
         area.area_id: (area.anchor_x_inches, area.anchor_y_inches)
@@ -755,30 +756,12 @@ def test_phase17n_battlefield_artifact_is_source_hashed_and_strict() -> None:
         for area in layout.terrain_areas
         if area.footprint_template_id == "FOOTPRINT_8X11_5_POLYGON"
     } == {
-        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-02": (
-            27.05,
-            50.2,
-        ),
-        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-15": (
-            16.95,
-            9.8,
-        ),
-        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-03": (
-            15.9,
-            44.1,
-        ),
-        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-14": (
-            28.1,
-            15.9,
-        ),
-        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-05": (
-            32.05,
-            43.0,
-        ),
-        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-12": (
-            11.95,
-            17.0,
-        ),
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-02": (27.0, 49.35),
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-15": (16.9, 10.75),
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-03": (15.9, 44.2),
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-14": (28.15, 15.7),
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-05": (32.05, 43.0),
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-12": (11.9, 16.9),
     }
     assert tuple(
         asset.source_pdf_image_xref
@@ -786,23 +769,23 @@ def test_phase17n_battlefield_artifact_is_source_hashed_and_strict() -> None:
         if archetype.archetype_id == "dense-tall-crates"
         for asset in archetype.source_assets
     ) == (
-        5486,
-        5675,
-        5519,
-        5558,
-        5678,
-        5680,
-        1014,
-        1556,
-        2073,
-        3151,
-        3153,
-        3415,
-        3417,
-        3835,
-        3968,
-        4648,
-        4900,
+        5660,
+        5818,
+        2902,
+        5721,
+        5821,
+        5823,
+        1019,
+        1561,
+        2087,
+        3164,
+        3166,
+        3435,
+        3437,
+        3916,
+        4797,
+        5049,
+        356,
     )
     event_layouts.validate_battlefield_artifact_bytes(raw)
 
@@ -1092,7 +1075,7 @@ def test_phase17n_battlefield_artifact_is_source_hashed_and_strict() -> None:
             separators=(",", ":"),
         ).encode()
     ).hexdigest()
-    with pytest.raises(ValueError, match="point symmetry"):
+    with pytest.raises(ValueError, match="independently observed component poses"):
         event_layouts.validate_battlefield_artifact_bytes(
             json.dumps(asymmetric_component_payload).encode()
         )
@@ -1155,8 +1138,8 @@ def test_phase17n_ruin_wall_joints_follow_source_image_registration() -> None:
     extraction_payload = json.loads(
         (
             repository_root
-            / "data/source_audits/event_companion_2026_06"
-            / "phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json"
+            / "data/source_audits/event_companion_2026_10"
+            / "event_companion_layouts_pages_8_53.json"
         ).read_text(encoding="utf-8")
     )
     artifact = event_layouts.battlefield_artifact()
@@ -1171,7 +1154,7 @@ def test_phase17n_ruin_wall_joints_follow_source_image_registration() -> None:
         for component in layout.terrain_components
     }
 
-    assert set(archetypes_by_xref) == {5470, 5472, 5474, 5476}
+    assert set(archetypes_by_xref) == {5644, 5646, 5648, 5650}
     for archetype in archetypes_by_xref.values():
         minimum_x = min(point.x_inches for point in archetype.rules_footprint_polygon)
         minimum_y = min(point.y_inches for point in archetype.rules_footprint_polygon)
@@ -1192,13 +1175,15 @@ def test_phase17n_ruin_wall_joints_follow_source_image_registration() -> None:
         )
 
     checked_component_ids: set[str] = set()
+    frame = extraction_payload["coordinate_frame"]["pdf_to_battlefield_affine"]
     for source_layout in extraction_payload["layouts"]:
+        if source_layout["source_pdf_page_number"] not in {24, 25, 26}:
+            continue
         for source_component in source_layout["terrain_components"]:
-            area_index = int(source_component["terrain_area_id"].rsplit("-", maxsplit=1)[-1])
+            area_index = int(source_component["parent_area_id"].rsplit("-", maxsplit=1)[-1])
             if area_index > 8:
                 continue
-            source_image = source_component["source_image"]
-            source_xref = source_image["xref"]
+            source_xref = source_component["source_xref"]
             source_archetype = archetypes_by_xref.get(source_xref)
             if source_archetype is None:
                 continue
@@ -1217,9 +1202,9 @@ def test_phase17n_ruin_wall_joints_follow_source_image_registration() -> None:
                 + (minimum_x * math.sin(radians))
                 + (minimum_y * math.cos(radians))
             )
-            source_joint_x, source_joint_y = source_image[
-                "battlefield_quad_inches_top_left_top_right_bottom_right_bottom_left"
-            ][3]
+            _a, _b, c, d, e, f = source_component["source_affine_normalized_image_to_points"]
+            source_joint_x = (c + e) * frame["x_inches"]["scale"] + frame["x_inches"]["offset"]
+            source_joint_y = (d + f) * frame["y_inches"]["scale"] + frame["y_inches"]["offset"]
             assert (
                 math.dist(
                     (modeled_joint_x, modeled_joint_y),
@@ -1281,8 +1266,13 @@ def test_phase17n_shared_non_ruin_archetypes_expand_to_legal_source_proportions_
         ) == expected_span
 
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
-    reviewed_multi_piece_xrefs = {5462, 5466, 5468, 5486, 5675}
-    primary_xrefs = {5462, 5466}
+    reviewed_multi_piece_archetypes = {
+        "dense-downed-hovercraft",
+        "dense-industrial-crates",
+        "light-end-barricade",
+        "dense-tall-crates",
+    }
+    primary_archetypes = {"dense-downed-hovercraft", "dense-industrial-crates"}
     checked_companion_count = 0
     for layout in meatgrinder_layouts:
         setup = MissionSetup.from_mission_pack(
@@ -1299,16 +1289,16 @@ def test_phase17n_shared_non_ruin_archetypes_expand_to_legal_source_proportions_
                 candidate
                 for candidate in layout.terrain_components
                 if candidate.terrain_area_id == component.terrain_area_id
-                and candidate.source_pdf_image_xref in reviewed_multi_piece_xrefs
+                and candidate.archetype_id in reviewed_multi_piece_archetypes
             )
             for component in layout.terrain_components
-            if component.source_pdf_image_xref in primary_xrefs
+            if component.archetype_id in primary_archetypes
         }
         for components in components_by_area.values():
             primary = next(
                 component
                 for component in components
-                if component.source_pdf_image_xref in primary_xrefs
+                if component.archetype_id in primary_archetypes
             )
             primary_feature = features_by_id[primary.component_id]
             primary_footprint = shapely_backend.footprint_for_polygon(

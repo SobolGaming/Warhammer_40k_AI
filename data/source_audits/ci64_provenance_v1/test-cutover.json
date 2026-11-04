@@ -265,16 +265,16 @@
       "sha256": "3d439c333754f8f99031fcf3489a0799a8e6dd4ecd64b2f6b5ff76bfa26b26ae"
     },
     "tests/infrastructure/missions/unit/test_event_companion.py": {
-      "blob_sha1": "b007888a27bc240641bb56ab9f03c0865af66f51",
-      "bytes": 59287,
+      "blob_sha1": "27b3a767ff975423a054d9de8976d0c95b41e8c7",
+      "bytes": 59537,
       "mode": "100644",
-      "sha256": "48641abc04fa4c5b6f595c070c2a8283a8aee8645398c7ee185a3d4a66a9c317"
+      "sha256": "a1005d25bb35eedad4257eca8fb95c677b1d2943e38cd8eee9042313a857702d"
     },
     "tests/infrastructure/missions/unit/test_event_companion_part2.py": {
-      "blob_sha1": "15c2c82e445afe3ea456a4b3beb2112632f93ff1",
-      "bytes": 57784,
+      "blob_sha1": "962dfb0f3e94c4c7625c9f4f95b3c8112a75719f",
+      "bytes": 63096,
       "mode": "100644",
-      "sha256": "baf996721695969307039d0a87089b8404cd199d60341afe461bbcf85e469b33"
+      "sha256": "dcc4dd8eca285b39b1c37eabddb89ff7c54853e195ac2ea7ee9ce105d4d077ec"
     },
     "tests/infrastructure/missions/unit/test_game_end_scoring.py": {
       "blob_sha1": "d05354290dca05fecdd35496a649d0ca29a00a04",

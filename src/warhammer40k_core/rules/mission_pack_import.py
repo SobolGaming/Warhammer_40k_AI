@@ -200,11 +200,11 @@ def warhammer_event_companion_2026_07_mission_pack() -> MissionPackDefinition:
 
     deployment_maps = _deployment_maps(
         rows=event_source_data.battlefield_layout_rows(),
-        source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
+        source_id=event_source_data.LAYOUT_SOURCE_PACKAGE_ID,
     )
     terrain_layouts = _terrain_layouts(
         rows=event_source_data.battlefield_layout_rows(),
-        source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
+        source_id=event_source_data.LAYOUT_SOURCE_PACKAGE_ID,
     )
     primary_missions = _primary_missions(
         rows=event_source_data.primary_mission_rows(),

@@ -49,66 +49,24 @@ _PIPE_CENTER_SEARCH_STEPS = 2
 _TERRAIN_GRID_INCHES = 0.05
 _SOURCE_AREA_ORIENTATION_BASIS = "source_area_affine_determinant"
 _SOURCE_COMPONENT_ORIENTATION_BASIS = "source_parent_relative_affine_determinant"
-_COMPONENT_ORIENTATION_OVERRIDES = {
-    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-05-component-01": (
-        "reviewed_shared_legal_pipe_solid_orientation"
-    ),
-    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-12-component-01": (
-        "reviewed_shared_legal_pipe_solid_orientation"
-    ),
-    "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-07-component-01": (
-        "reviewed_shared_legal_pipe_solid_orientation"
-    ),
-    "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-10-component-01": (
-        "reviewed_shared_legal_pipe_solid_orientation"
-    ),
-    "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-11-component-01": (
-        "reviewed_point_symmetry_inherits_primary_component_orientation"
-    ),
-    "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-11-component-02": (
-        "reviewed_point_symmetry_inherits_primary_component_orientation"
-    ),
-    "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-02-component-01": (
-        "reviewed_shared_legal_pipe_solid_orientation"
-    ),
-    "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-15-component-01": (
-        "reviewed_shared_legal_pipe_solid_orientation"
-    ),
-}
 _NEW_AREA_POSE_BASIS = "reviewed_source_pose_candidate_with_bounded_seam_adjustment"
 _NEW_COMPONENT_POSE_BASIS = "reviewed_source_quantized_pose"
 _EXACT_SEAM_AREA_POSE_BASIS = "reviewed_source_pose_with_exact_seam_closure"
 _PIPE_COMPONENT_POSE_BASIS = "reviewed_parent_footprint_centered_pipe_pose"
 _COMPONENT_CONTAINMENT_ADJUSTMENT_POSE_BASIS = "reviewed_source_quantization_containment_adjustment"
-_MEATGRINDER_SOURCE_POSE_BASIS = "accepted_meatgrinder_exemplar_source_pose"
-_MEATGRINDER_SYMMETRY_POSE_BASIS = "accepted_meatgrinder_exemplar_exact_point_symmetry"
 _CONTACT_CLOSURE_TOLERANCE_INCHES = 0.05
 _GEOMETRY_TOLERANCE = 1e-6
 _EXACT_WITNESS_TOLERANCE = 5e-13
 _REVIEWED_FIXED_AREA_POSE_WITNESSES = {
-    # Exact candidate identity and runtime anchor delta for every reviewed row
-    # in the generator's fixed area-pose table.
     "disruption-vs-disruption-layout-1-terrain-area-07": (2, 0.15, -0.1),
-    "disruption-vs-disruption-layout-1-terrain-area-10": (
-        2,
-        -0.194559638906,
-        0.110510105572,
-    ),
+    "disruption-vs-disruption-layout-1-terrain-area-10": (2, -0.194559638906, 0.110510105572),
     "purge-the-foe-vs-disruption-layout-3-terrain-area-02": (1, 0.1, -0.35),
     "purge-the-foe-vs-disruption-layout-3-terrain-area-04": (2, -0.1, 0.3),
     "purge-the-foe-vs-disruption-layout-3-terrain-area-13": (2, 0.05, -0.35),
     "purge-the-foe-vs-disruption-layout-3-terrain-area-15": (1, -0.05, 0.3),
     "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-13": (0, 0.0, 0.05),
-    "reconnaissance-vs-reconnaissance-layout-2-terrain-area-07": (2, 0.15, -0.1),
-    "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10": (
-        2,
-        -0.194559638906,
-        0.110510105572,
-    ),
     "disruption-vs-disruption-layout-2-terrain-area-06": (2, 0.0, 0.1),
     "disruption-vs-disruption-layout-2-terrain-area-11": (2, -0.2, 0.05),
-    "reconnaissance-vs-reconnaissance-layout-3-terrain-area-06": (2, 0.0, 0.1),
-    "reconnaissance-vs-reconnaissance-layout-3-terrain-area-11": (2, -0.2, 0.05),
     "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-02": (1, 0.2, -0.05),
     "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-04": (2, -0.2, 0.0),
     "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-13": (2, 0.2, -0.05),
@@ -121,14 +79,9 @@ _REVIEWED_EXACT_SEAM_AREA_IDS = frozenset(
     {
         "disruption-vs-disruption-layout-1-terrain-area-07",
         "disruption-vs-disruption-layout-1-terrain-area-10",
-        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-07",
-        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10",
     }
 )
 _REVIEWED_COMPONENT_CONTAINMENT_ADJUSTMENTS = {
-    # Minimum 0.05-inch-grid corrections from an exhaustive 17-by-17 search.
-    # These preserve source rotations and close numerical footprint slivers
-    # without changing sibling/contact semantics.
     "purge-the-foe-vs-disruption-layout-3-terrain-area-04-component-01": (-0.1, 0.0),
     "purge-the-foe-vs-disruption-layout-3-terrain-area-07-component-01": (0.0, 0.05),
     "purge-the-foe-vs-disruption-layout-3-terrain-area-13-component-01": (0.05, -0.05),
@@ -260,9 +213,8 @@ def validate_component_runtime_pose(
         < 0.0
         else "identity"
     )
-    override_basis = _COMPONENT_ORIENTATION_OVERRIDES.get(component.component_id)
-    expected_transform = "identity" if override_basis is not None else source_transform
-    expected_basis = override_basis or _SOURCE_COMPONENT_ORIENTATION_BASIS
+    expected_transform = source_transform
+    expected_basis = _SOURCE_COMPONENT_ORIENTATION_BASIS
     if (
         component.local_transform != expected_transform
         or component.local_transform_basis != expected_basis
@@ -320,9 +272,6 @@ def validate_component_runtime_pose(
 
 def validate_area_pose_witness(
     area: TerrainAreaArtifact,
-    *,
-    is_meatgrinder: bool,
-    source_area_index: int,
 ) -> None:
     reviewed_pose_witness = _REVIEWED_FIXED_AREA_POSE_WITNESSES.get(area.source_area_id)
     has_exact_seam = area.source_area_id in _REVIEWED_EXACT_SEAM_AREA_IDS
@@ -382,48 +331,41 @@ def validate_area_pose_witness(
             "Event Companion terrain-area pose witness is invalid."
         )
     expected_basis = _EXACT_SEAM_AREA_POSE_BASIS if has_exact_seam else _NEW_AREA_POSE_BASIS
-    if is_meatgrinder:
-        expected_basis = (
-            _MEATGRINDER_SOURCE_POSE_BASIS
-            if source_area_index <= 8
-            else _MEATGRINDER_SYMMETRY_POSE_BASIS
-        )
     if area.pose_basis != expected_basis:
         raise EventCompanionBattlefieldArtifactError(
             "Event Companion terrain-area pose basis drifted."
         )
-    if not is_meatgrinder:
-        adjustment_is_valid = (
-            (
-                abs(area.runtime_adjustment_x_inches) <= 0.2 + 1e-9
-                and abs(area.runtime_adjustment_y_inches) <= 0.2 + 1e-9
+    adjustment_is_valid = (
+        (
+            abs(area.runtime_adjustment_x_inches) <= 0.2 + 1e-9
+            and abs(area.runtime_adjustment_y_inches) <= 0.2 + 1e-9
+        )
+        if reviewed_pose_witness is None
+        else (
+            area.source_pose_candidate_index == reviewed_pose_witness[0]
+            and math.isclose(
+                area.runtime_adjustment_x_inches,
+                reviewed_pose_witness[1],
+                rel_tol=0.0,
+                abs_tol=_EXACT_WITNESS_TOLERANCE,
             )
-            if reviewed_pose_witness is None
-            else (
-                area.source_pose_candidate_index == reviewed_pose_witness[0]
-                and math.isclose(
-                    area.runtime_adjustment_x_inches,
-                    reviewed_pose_witness[1],
-                    rel_tol=0.0,
-                    abs_tol=_EXACT_WITNESS_TOLERANCE,
-                )
-                and math.isclose(
-                    area.runtime_adjustment_y_inches,
-                    reviewed_pose_witness[2],
-                    rel_tol=0.0,
-                    abs_tol=_EXACT_WITNESS_TOLERANCE,
-                )
+            and math.isclose(
+                area.runtime_adjustment_y_inches,
+                reviewed_pose_witness[2],
+                rel_tol=0.0,
+                abs_tol=_EXACT_WITNESS_TOLERANCE,
             )
         )
-        if not adjustment_is_valid or not math.isclose(
-            area.runtime_rotation_adjustment_degrees,
-            0.0,
-            rel_tol=0.0,
-            abs_tol=1e-9,
-        ):
-            raise EventCompanionBattlefieldArtifactError(
-                "Event Companion terrain-area source adjustment exceeds its reviewed bound."
-            )
+    )
+    if not adjustment_is_valid or not math.isclose(
+        area.runtime_rotation_adjustment_degrees,
+        0.0,
+        rel_tol=0.0,
+        abs_tol=1e-9,
+    ):
+        raise EventCompanionBattlefieldArtifactError(
+            "Event Companion terrain-area source adjustment exceeds its reviewed bound."
+        )
 
 
 def validate_component_pose_witness(
@@ -431,8 +373,6 @@ def validate_component_pose_witness(
     *,
     area: TerrainAreaArtifact,
     archetype: TerrainFeatureArchetypeArtifact,
-    is_meatgrinder: bool,
-    source_area_index: int,
 ) -> None:
     values = (
         component.source_battlefield_center_x_inches,
@@ -474,13 +414,7 @@ def validate_component_pose_witness(
     reviewed_adjustment = _REVIEWED_COMPONENT_CONTAINMENT_ADJUSTMENTS.get(
         component.source_component_id
     )
-    if is_meatgrinder:
-        expected_basis = (
-            _MEATGRINDER_SOURCE_POSE_BASIS
-            if source_area_index <= 8
-            else _MEATGRINDER_SYMMETRY_POSE_BASIS
-        )
-    elif reviewed_adjustment is not None:
+    if reviewed_adjustment is not None:
         expected_basis = _COMPONENT_CONTAINMENT_ADJUSTMENT_POSE_BASIS
     elif component.archetype_id == "dense-long-pipes":
         expected_basis = _PIPE_COMPONENT_POSE_BASIS
@@ -490,8 +424,6 @@ def validate_component_pose_witness(
         raise EventCompanionBattlefieldArtifactError(
             "Event Companion component pose basis drifted."
         )
-    if is_meatgrinder:
-        return
     if reviewed_adjustment is not None:
         if not (
             math.isclose(
@@ -772,7 +704,6 @@ def validate_component_mirror_links(
     components_by_id: dict[str, TerrainComponentPlacementArtifact],
     components_by_source_id: dict[str, TerrainComponentPlacementArtifact],
     areas_by_id: dict[str, TerrainAreaArtifact],
-    is_meatgrinder: bool,
 ) -> None:
     for component in components_by_id.values():
         if component.mirror_component_id is None:
@@ -796,27 +727,6 @@ def validate_component_mirror_links(
         ):
             raise EventCompanionBattlefieldArtifactError(
                 "Event Companion component mirror provenance is invalid."
-            )
-        if is_meatgrinder and not (
-            component.archetype_id == mirror.archetype_id
-            and component.local_transform == mirror.local_transform
-            and _is_exact_sum(
-                component.battlefield_center_x_inches,
-                mirror.battlefield_center_x_inches,
-                44.0,
-            )
-            and _is_exact_sum(
-                component.battlefield_center_y_inches,
-                mirror.battlefield_center_y_inches,
-                60.0,
-            )
-            and _is_half_turn(
-                component.battlefield_rotation_degrees,
-                mirror.battlefield_rotation_degrees,
-            )
-        ):
-            raise EventCompanionBattlefieldArtifactError(
-                "Meatgrinder component point symmetry drifted from the accepted exemplar."
             )
 
 
@@ -1027,19 +937,6 @@ def _quantize_terrain_coordinate(value: float) -> float:
 
 def _rotation_difference(value: float, source: float) -> float:
     return (value - source + 180.0) % 360.0 - 180.0
-
-
-def _is_exact_sum(first: float, second: float, expected: float) -> bool:
-    return math.isclose(first + second, expected, rel_tol=0.0, abs_tol=1e-9)
-
-
-def _is_half_turn(primary_degrees: float, mirror_degrees: float) -> bool:
-    return math.isclose(
-        (mirror_degrees - primary_degrees) % 360.0,
-        180.0,
-        rel_tol=0.0,
-        abs_tol=1e-9,
-    )
 
 
 __all__ = (

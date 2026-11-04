@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4ad18b22d2abe4a917318b04e200d577265d8b89568625f69bbe6a83093b5053",
-  "fingerprint": "4ad18b22d2abe4a917318b04e200d577265d8b89568625f69bbe6a83093b5053",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:56009daa17965657ab46aa0b839c49f01fdece4b90a322fcf6e7989f228f0caa",
+  "fingerprint": "56009daa17965657ab46aa0b839c49f01fdece4b90a322fcf6e7989f228f0caa",
   "resource_count": 3212,
   "resources": [
     {
@@ -14015,9 +14015,9 @@
       "sha256": "8f51e15346f62b5bd7a19956707b45f930cf916fac890e9d85421d36e6edf683"
     },
     {
-      "byte_length": 30327,
+      "byte_length": 30345,
       "path": "warhammer40k_core/rules/mission_pack_import.py",
-      "sha256": "c80c97dfbb57bed42960ae6ca6f9683ebf7b468ced6f939fe841a7308b00c86a"
+      "sha256": "1f3d3df6ccff744e8e98de13be243da1f85beff39242dfa2607f3956968904e1"
     },
     {
       "byte_length": 1862,
@@ -15020,9 +15020,9 @@
       "sha256": "5582567775ffa248c99b71232a757e004f96206fe7ae0c4464d438228937eb50"
     },
     {
-      "byte_length": 87060,
+      "byte_length": 87219,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py",
-      "sha256": "ddecfba92afba56a2477b981aaa12472895a8e19cde8a8c8a2b3da6bb20bde0c"
+      "sha256": "8920d679654d11c65eba8d243c1a1a8d06b8b7059246c1a51d55539b146744e9"
     },
     {
       "byte_length": 76485,
@@ -15050,9 +15050,9 @@
       "sha256": "19c51aa3f58e1ec40215b21141964896fca9c292f52970e3561827745ba3b83c"
     },
     {
-      "byte_length": 4500695,
+      "byte_length": 4555378,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-battlefields.json",
-      "sha256": "028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f"
+      "sha256": "577464ade3daf3a940257f8f385a09abff69e6de740198f157b91e1aed35dbec"
     },
     {
       "byte_length": 2471,
@@ -15070,9 +15070,9 @@
       "sha256": "17e34749a183211fc83f6a20f7a21fd713d8207e40eea2fb7e4c6da07a9e9e83"
     },
     {
-      "byte_length": 42519,
+      "byte_length": 38215,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_full_artifact_geometry_validation.py",
-      "sha256": "8847c9f9ab06f76333b29f3113cbfb598b22d5743a6387074bbaf1afb955c755"
+      "sha256": "9b63ec57ea12912360dbea31318995588a721db2a4ec70022722afb1e1e7c33e"
     },
     {
       "byte_length": 7191,
@@ -15080,9 +15080,9 @@
       "sha256": "7d640c6143e9d321186e8912ca1fbe7c658df7a6a6e51b956802941ecc580bf3"
     },
     {
-      "byte_length": 53491,
+      "byte_length": 52056,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_full_artifact_validation.py",
-      "sha256": "e886546c8b5645cdbd5b998a51a95e1eee9c513e6e88bf36c94d122b0a08e583"
+      "sha256": "4642b091cf0b84c1b44d9672ad554867252b3df90aa489257ec205af3148bb9f"
     },
     {
       "byte_length": 3270,

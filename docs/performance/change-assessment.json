@@ -1,910 +1,883 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "16542feb7ab48cff852cc3dbe17aa76b292eb09f",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4ad18b22d2abe4a917318b04e200d577265d8b89568625f69bbe6a83093b5053",
-  "operation_map_sha256": "af099a565c7dc9672471449a627b0d2834a1f330eb1a9acb7efca3acb73e09bf",
+  "base": "75765b6abc1f7205527b4e9c7414ed2fd694021a",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:56009daa17965657ab46aa0b839c49f01fdece4b90a322fcf6e7989f228f0caa",
+  "operation_map_sha256": "b20a061c5b54b0c175377e6cd3005107b13ac189f169cd5214bfd4938e71f7ac",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "58c42978557d30ca5082ce65962c58b2092820212a884e1deed54f2876f012c3",
-      "after_sha256": "65f0148d2a31290453ae8b763fb96a5effef973ed9dbc0f22e2fa5026f9c9e7e",
+    "README.md": {
+      "before_sha256": "d0950aff1592421b310fe06d4ff455900374fadad7021e0bba06e3db5860ff96",
+      "after_sha256": "4c366aea6416f218f7d9cbbf5b34a65c194e0f17f29d29450455944fc0be14db",
       "owners": {
         "@document": {
-          "before": "58c42978557d30ca5082ce65962c58b2092820212a884e1deed54f2876f012c3",
-          "after": "65f0148d2a31290453ae8b763fb96a5effef973ed9dbc0f22e2fa5026f9c9e7e"
+          "before": "d0950aff1592421b310fe06d4ff455900374fadad7021e0bba06e3db5860ff96",
+          "after": "4c366aea6416f218f7d9cbbf5b34a65c194e0f17f29d29450455944fc0be14db"
         }
       }
     },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "9ada1211658e9d59b5cc7fcf35b1e921bc9e27388f5f7732de84d7af961c49e9",
-      "after_sha256": "7cc3ba15bdd238c29815242a9b7e825fe15faaeb98a6b9b2470e70e81965eb02",
+    "contracts/examples/decisions/families/submit_movement_proposal.json": {
+      "before_sha256": "3d59999d54dbba2e660da76329782f513872be5703192fd72d4dfa71752cb62a",
+      "after_sha256": "fd2690850dce3c12dac213b54e0a9b6c9fedaffb74ac449e372503c34e9784bb",
       "owners": {
         "@document": {
-          "before": "9ada1211658e9d59b5cc7fcf35b1e921bc9e27388f5f7732de84d7af961c49e9",
-          "after": "7cc3ba15bdd238c29815242a9b7e825fe15faaeb98a6b9b2470e70e81965eb02"
+          "before": "3d59999d54dbba2e660da76329782f513872be5703192fd72d4dfa71752cb62a",
+          "after": "fd2690850dce3c12dac213b54e0a9b6c9fedaffb74ac449e372503c34e9784bb"
         }
       }
     },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "c1ab3bfdfbd30116162b1d85b16e6b6b9b9fd016458f67df32d81efeb698e585",
-      "after_sha256": "ba40f14ae00db065baf166f6fe738d662b69ac5478f5ee0470eb0f3f4dfca49d",
+    "contracts/examples/events/initial-player-a.json": {
+      "before_sha256": "4d65546e701e0e39db97c8a08433265dd77b767cc5c856674acaf6da111407fe",
+      "after_sha256": "c64113a479f801075d517d77e0ada3024e19a7154dbf5525926b6fd96c94a270",
       "owners": {
         "@document": {
-          "before": "c1ab3bfdfbd30116162b1d85b16e6b6b9b9fd016458f67df32d81efeb698e585",
-          "after": "ba40f14ae00db065baf166f6fe738d662b69ac5478f5ee0470eb0f3f4dfca49d"
+          "before": "4d65546e701e0e39db97c8a08433265dd77b767cc5c856674acaf6da111407fe",
+          "after": "c64113a479f801075d517d77e0ada3024e19a7154dbf5525926b6fd96c94a270"
         }
       }
     },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "3fa657bcdece8289774ab07e6b2fe7bbc4e3ef5466c9dd69703698be15d3615c",
-      "after_sha256": "4fdc609e8d4e299ea4507fb669180fbedd1bcd231ac9316d17a5aa612d1a06ca",
+    "contracts/examples/events/initial-player-b.json": {
+      "before_sha256": "5539a69ab2cce62d5b36564898c65013586d8f896627d247d2a005aafe39cabb",
+      "after_sha256": "5d005b2caf289207ef19ad60518be81a9a5edfb2c591cd839bf505bc6abbe003",
       "owners": {
         "@document": {
-          "before": "3fa657bcdece8289774ab07e6b2fe7bbc4e3ef5466c9dd69703698be15d3615c",
-          "after": "4fdc609e8d4e299ea4507fb669180fbedd1bcd231ac9316d17a5aa612d1a06ca"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "54bba4974222321866201270e8b1f0236de6975ed302d68fb41d2d7897594613",
-      "after_sha256": "67ffa57dc599e9a83c21c39b6fafba3d1f3a959ee5f294d6003124f5c9ff1ad5",
-      "owners": {
-        "@document": {
-          "before": "54bba4974222321866201270e8b1f0236de6975ed302d68fb41d2d7897594613",
-          "after": "67ffa57dc599e9a83c21c39b6fafba3d1f3a959ee5f294d6003124f5c9ff1ad5"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "76684ea0d1e27ff7ee3dc8ed2f8b7ca2b871c28fcdca3e9fdc5872496adf777f",
-      "after_sha256": "36860366af5961a9472f7318bae6c78cd8c391e92621b405c0359245f1eaabc8",
-      "owners": {
-        "@document": {
-          "before": "76684ea0d1e27ff7ee3dc8ed2f8b7ca2b871c28fcdca3e9fdc5872496adf777f",
-          "after": "36860366af5961a9472f7318bae6c78cd8c391e92621b405c0359245f1eaabc8"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "f836f2da7150a025bed61d4dc45aeec025350ab2a5353bcd571a2043c82aa020",
-      "after_sha256": "568c78c0f07e778a530503bfd590751d3f5c72457ca03e9695a51d1943e92e07",
-      "owners": {
-        "@document": {
-          "before": "f836f2da7150a025bed61d4dc45aeec025350ab2a5353bcd571a2043c82aa020",
-          "after": "568c78c0f07e778a530503bfd590751d3f5c72457ca03e9695a51d1943e92e07"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "e3b0ea2a885fd4a2c611da21ca6c7ae60c21450348d2f4ef08f7617ace207445",
-      "after_sha256": "12d83a23712a14f0338d3cb9651681ce86a85d79afb349aa77f7f19aa003a36f",
-      "owners": {
-        "@document": {
-          "before": "e3b0ea2a885fd4a2c611da21ca6c7ae60c21450348d2f4ef08f7617ace207445",
-          "after": "12d83a23712a14f0338d3cb9651681ce86a85d79afb349aa77f7f19aa003a36f"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "2da5c6fdf6f19cf09eea62bc65fc8f4ec712a3b7b98dcf8c50625f1799399d85",
-      "after_sha256": "b984fd7310faa51d70a87c47298e8d877fbf02ab0aa525db52a593b5963be43b",
-      "owners": {
-        "@document": {
-          "before": "2da5c6fdf6f19cf09eea62bc65fc8f4ec712a3b7b98dcf8c50625f1799399d85",
-          "after": "b984fd7310faa51d70a87c47298e8d877fbf02ab0aa525db52a593b5963be43b"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "aff9b5373535eadd42a1fe079789f8b708a80e869e8bdf32f7585b819f5a66be",
-      "after_sha256": "586c445324844c83b9c36a1d6a57d2e9a88dde2702c6daeb82c944ac3503c45e",
-      "owners": {
-        "@document": {
-          "before": "aff9b5373535eadd42a1fe079789f8b708a80e869e8bdf32f7585b819f5a66be",
-          "after": "586c445324844c83b9c36a1d6a57d2e9a88dde2702c6daeb82c944ac3503c45e"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "790914c7db3c0e972a58782179be52a28ac09a73794c45308ccff3a86c7a38f8",
-      "after_sha256": "1617e4d7d6ab95e97c76888393ca5f7cca27987ea69034a1e060ed52baae0292",
-      "owners": {
-        "@document": {
-          "before": "790914c7db3c0e972a58782179be52a28ac09a73794c45308ccff3a86c7a38f8",
-          "after": "1617e4d7d6ab95e97c76888393ca5f7cca27987ea69034a1e060ed52baae0292"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "6dc20bb27bd2a6765ad7cfca2af6a9659f76f85e1a57bf2ffab509a4d3fcb41e",
-      "after_sha256": "3384a52c92315f0936bed9aa47cd33a900c79f26bb8a041ace2480cf621778f7",
-      "owners": {
-        "@document": {
-          "before": "6dc20bb27bd2a6765ad7cfca2af6a9659f76f85e1a57bf2ffab509a4d3fcb41e",
-          "after": "3384a52c92315f0936bed9aa47cd33a900c79f26bb8a041ace2480cf621778f7"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "a410a7c4fa2f54aa08e50e23bd05d7bf14348afb358025d5472609304ced74b0",
-      "after_sha256": "3007eb9877b0ee12c01ef2df448f41b75f41c41cdb519b1d1c93ee2cc20cb41a",
-      "owners": {
-        "@document": {
-          "before": "a410a7c4fa2f54aa08e50e23bd05d7bf14348afb358025d5472609304ced74b0",
-          "after": "3007eb9877b0ee12c01ef2df448f41b75f41c41cdb519b1d1c93ee2cc20cb41a"
+          "before": "5539a69ab2cce62d5b36564898c65013586d8f896627d247d2a005aafe39cabb",
+          "after": "5d005b2caf289207ef19ad60518be81a9a5edfb2c591cd839bf505bc6abbe003"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "cc14ee40b73107d33dcf4e54c8caae8d9c289210fa0868841ac7a56ee282affd",
-      "after_sha256": "d582cedaaeb0f89c48f892383828182d7ce06182fa34a0d4efb127659513950f",
+      "before_sha256": "d582cedaaeb0f89c48f892383828182d7ce06182fa34a0d4efb127659513950f",
+      "after_sha256": "debf529127ba0370df4414d69474da3d79e410a9c5770bdffa568bb4df17ed39",
       "owners": {
         "@document": {
-          "before": "cc14ee40b73107d33dcf4e54c8caae8d9c289210fa0868841ac7a56ee282affd",
-          "after": "d582cedaaeb0f89c48f892383828182d7ce06182fa34a0d4efb127659513950f"
+          "before": "d582cedaaeb0f89c48f892383828182d7ce06182fa34a0d4efb127659513950f",
+          "after": "debf529127ba0370df4414d69474da3d79e410a9c5770bdffa568bb4df17ed39"
+        }
+      }
+    },
+    "contracts/examples/projections/hidden_secondary_redaction_view.json": {
+      "before_sha256": "f6fe8a9f508ce842ecd259214a6efe076b11bc042c4a9e95acc3e144e6905d18",
+      "after_sha256": "1c4e8f542d19604574532e88b9d0f842529abaa7ac50bad416e79d85017d9af0",
+      "owners": {
+        "@document": {
+          "before": "f6fe8a9f508ce842ecd259214a6efe076b11bc042c4a9e95acc3e144e6905d18",
+          "after": "1c4e8f542d19604574532e88b9d0f842529abaa7ac50bad416e79d85017d9af0"
+        }
+      }
+    },
+    "contracts/examples/projections/initial_setup_view_player1.json": {
+      "before_sha256": "ec1d5b1f62e92cc1555ba9a7bf67bc5625f6ce7a106e8b0e34a7da208c6377f8",
+      "after_sha256": "6a3b2eff0ce4d20a0afcc13759f1ae07738efbe4740acdc2d30547d92a7e67de",
+      "owners": {
+        "@document": {
+          "before": "ec1d5b1f62e92cc1555ba9a7bf67bc5625f6ce7a106e8b0e34a7da208c6377f8",
+          "after": "6a3b2eff0ce4d20a0afcc13759f1ae07738efbe4740acdc2d30547d92a7e67de"
+        }
+      }
+    },
+    "contracts/examples/projections/initial_setup_view_player2.json": {
+      "before_sha256": "b68bd26e846821e29b7a3fc92a6ee522c93d05aaac7b7a066abe8ba308049895",
+      "after_sha256": "b90b911cecaf57effa92804e1df04d16fb57b095d2b43beffd4ebffc30ab5a7a",
+      "owners": {
+        "@document": {
+          "before": "b68bd26e846821e29b7a3fc92a6ee522c93d05aaac7b7a066abe8ba308049895",
+          "after": "b90b911cecaf57effa92804e1df04d16fb57b095d2b43beffd4ebffc30ab5a7a"
+        }
+      }
+    },
+    "contracts/examples/projections/post_deployment_view.json": {
+      "before_sha256": "7bead41aae8d0396bfdf9e00edeb72a96d32f22a90fe59354ab211e0e4c4f14d",
+      "after_sha256": "945b637e8ab75bb98fd2d158c9313994690ce6247390ce876363d242488fe7ee",
+      "owners": {
+        "@document": {
+          "before": "7bead41aae8d0396bfdf9e00edeb72a96d32f22a90fe59354ab211e0e4c4f14d",
+          "after": "945b637e8ab75bb98fd2d158c9313994690ce6247390ce876363d242488fe7ee"
+        }
+      }
+    },
+    "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_a.json": {
+      "before_sha256": "94204ffc9e604329609c790a391da22cb17b1f477fed742af9c173305dddf336",
+      "after_sha256": "8b90808fa5b5f513b1efa658c71203ae58fe6d8e392e2ef754b9cbe98399fcba",
+      "owners": {
+        "@document": {
+          "before": "94204ffc9e604329609c790a391da22cb17b1f477fed742af9c173305dddf336",
+          "after": "8b90808fa5b5f513b1efa658c71203ae58fe6d8e392e2ef754b9cbe98399fcba"
+        }
+      }
+    },
+    "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_b.json": {
+      "before_sha256": "e947fcdd76cc1a7116717dfb36348589408d6a85e94e58259edfbfdf733a14b4",
+      "after_sha256": "9a7ecf1c66e5c3bb46001f72be4026c82d4c6eab189a1d0d6985dc2216ca391b",
+      "owners": {
+        "@document": {
+          "before": "e947fcdd76cc1a7116717dfb36348589408d6a85e94e58259edfbfdf733a14b4",
+          "after": "9a7ecf1c66e5c3bb46001f72be4026c82d4c6eab189a1d0d6985dc2216ca391b"
+        }
+      }
+    },
+    "contracts/examples/projections/visible_modifier_datacard_view.json": {
+      "before_sha256": "7d31b4e09fb645b1fdc638c7d35f62b8574d6944ca887c506b8cdeaea8126ca3",
+      "after_sha256": "9989d80170ee9eb970ef0496bc3176cfe9ffcff56f4b1087f76b88241f50b720",
+      "owners": {
+        "@document": {
+          "before": "7d31b4e09fb645b1fdc638c7d35f62b8574d6944ca887c506b8cdeaea8126ca3",
+          "after": "9989d80170ee9eb970ef0496bc3176cfe9ffcff56f4b1087f76b88241f50b720"
         }
       }
     },
     "contracts/examples/replay-metadata.json": {
-      "before_sha256": "69b89adff37520f58c6cc9caab0911f8ae30849c92a2dc301c970b7994c63426",
-      "after_sha256": "3fe6c803bd8835daba9932197bf49ec3f1e7ac6ac019f9d4d55db7709269d4e8",
+      "before_sha256": "3fe6c803bd8835daba9932197bf49ec3f1e7ac6ac019f9d4d55db7709269d4e8",
+      "after_sha256": "2b876a94678b533b00ebb69db9279cc20f67676c9f15adb081a97a9efde1f84c",
       "owners": {
         "@document": {
-          "before": "69b89adff37520f58c6cc9caab0911f8ae30849c92a2dc301c970b7994c63426",
-          "after": "3fe6c803bd8835daba9932197bf49ec3f1e7ac6ac019f9d4d55db7709269d4e8"
+          "before": "3fe6c803bd8835daba9932197bf49ec3f1e7ac6ac019f9d4d55db7709269d4e8",
+          "after": "2b876a94678b533b00ebb69db9279cc20f67676c9f15adb081a97a9efde1f84c"
+        }
+      }
+    },
+    "contracts/examples/sessions/create-session.json": {
+      "before_sha256": "98764e6b2532b5985d001593303e5f89a438bb6c2745eec034e60dc882b0561b",
+      "after_sha256": "4ad0a0e8ac1f2179ccd3138344ab407309ece29f7c23ae1b62f605492597e1ae",
+      "owners": {
+        "@document": {
+          "before": "98764e6b2532b5985d001593303e5f89a438bb6c2745eec034e60dc882b0561b",
+          "after": "4ad0a0e8ac1f2179ccd3138344ab407309ece29f7c23ae1b62f605492597e1ae"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "b55dc8246a210a019aed54c59c06ef5b24da84aa5b447866848934610205d2eb",
-      "after_sha256": "5d48262b74b5c98d777acba620c6b4f5dab63a65aa97febf52807aba757747a0",
+      "before_sha256": "5d48262b74b5c98d777acba620c6b4f5dab63a65aa97febf52807aba757747a0",
+      "after_sha256": "72e12f3bdd5245d8db0a48a8008945ec545539d88a050a02b5d08c9186a7def5",
       "owners": {
         "@document": {
-          "before": "b55dc8246a210a019aed54c59c06ef5b24da84aa5b447866848934610205d2eb",
-          "after": "5d48262b74b5c98d777acba620c6b4f5dab63a65aa97febf52807aba757747a0"
+          "before": "5d48262b74b5c98d777acba620c6b4f5dab63a65aa97febf52807aba757747a0",
+          "after": "72e12f3bdd5245d8db0a48a8008945ec545539d88a050a02b5d08c9186a7def5"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "61edbb53a34083ca79556928ac9e89210735eeb4aac8caa7d0b2746cff6fccc7",
-      "after_sha256": "399c6c446ee111235274acc5369b91e5a2f5f8ddbdd3b4e5c8dc86914e5d411c",
+      "before_sha256": "399c6c446ee111235274acc5369b91e5a2f5f8ddbdd3b4e5c8dc86914e5d411c",
+      "after_sha256": "56e6cf7ded022d7950ab5d52b7bc6dafcd9bf254278984ac7d7d66b886700a8e",
       "owners": {
         "@document": {
-          "before": "61edbb53a34083ca79556928ac9e89210735eeb4aac8caa7d0b2746cff6fccc7",
-          "after": "399c6c446ee111235274acc5369b91e5a2f5f8ddbdd3b4e5c8dc86914e5d411c"
+          "before": "399c6c446ee111235274acc5369b91e5a2f5f8ddbdd3b4e5c8dc86914e5d411c",
+          "after": "56e6cf7ded022d7950ab5d52b7bc6dafcd9bf254278984ac7d7d66b886700a8e"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-create.json": {
+      "before_sha256": "17a4491eec3ab0fd099acb17b2bd9f9b50e7bcdba901ab7d85f93fb3bf463a8a",
+      "after_sha256": "7b3029bc1f08d85494f9d3316b2325bddec1cb6a5f23f8cfdc8a6b9d36846468",
+      "owners": {
+        "@document": {
+          "before": "17a4491eec3ab0fd099acb17b2bd9f9b50e7bcdba901ab7d85f93fb3bf463a8a",
+          "after": "7b3029bc1f08d85494f9d3316b2325bddec1cb6a5f23f8cfdc8a6b9d36846468"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "447a5708ec2c021354fc1cc0c08e21f9f98df8a716d62c36e41be80987a2523f",
-      "after_sha256": "3da6af042e4f16fa49b412a2e88c5b0c0be4a18e73df7a8218c557292ce30ba3",
+      "before_sha256": "3da6af042e4f16fa49b412a2e88c5b0c0be4a18e73df7a8218c557292ce30ba3",
+      "after_sha256": "20a03bf4d0f56b4dd690c086a99799a895c57b0cb78e4ae580dfd9be3f575305",
       "owners": {
         "@document": {
-          "before": "447a5708ec2c021354fc1cc0c08e21f9f98df8a716d62c36e41be80987a2523f",
-          "after": "3da6af042e4f16fa49b412a2e88c5b0c0be4a18e73df7a8218c557292ce30ba3"
+          "before": "3da6af042e4f16fa49b412a2e88c5b0c0be4a18e73df7a8218c557292ce30ba3",
+          "after": "20a03bf4d0f56b4dd690c086a99799a895c57b0cb78e4ae580dfd9be3f575305"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "ad05dd98e9fb13ab4b552b2b7787e2f0f648e0b841ae5d26ab4e3217df696cd1",
-      "after_sha256": "0a469a3ddc3f35e5b2e9818f7cbfeeb2895852b1c395b014af1be40ad5ca7948",
+      "before_sha256": "0a469a3ddc3f35e5b2e9818f7cbfeeb2895852b1c395b014af1be40ad5ca7948",
+      "after_sha256": "4138d36392cfb4ee659c26fa5e41235569cc65a189c43b1d0f0a6ae6cbda847a",
       "owners": {
         "@document": {
-          "before": "ad05dd98e9fb13ab4b552b2b7787e2f0f648e0b841ae5d26ab4e3217df696cd1",
-          "after": "0a469a3ddc3f35e5b2e9818f7cbfeeb2895852b1c395b014af1be40ad5ca7948"
+          "before": "0a469a3ddc3f35e5b2e9818f7cbfeeb2895852b1c395b014af1be40ad5ca7948",
+          "after": "4138d36392cfb4ee659c26fa5e41235569cc65a189c43b1d0f0a6ae6cbda847a"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "c2b222663425a388f204c56dbe894340a1a3d760c190e87bed046610e7028256",
-      "after_sha256": "4b4281360b392b0d1502a41b04434311fc8dc7690710a68a209b7171dc295fc1",
+      "before_sha256": "4b4281360b392b0d1502a41b04434311fc8dc7690710a68a209b7171dc295fc1",
+      "after_sha256": "3e5bc482d98084eda040675a94caaa7028764f99b0a96193b252abecfc32fc6c",
       "owners": {
         "@document": {
-          "before": "c2b222663425a388f204c56dbe894340a1a3d760c190e87bed046610e7028256",
-          "after": "4b4281360b392b0d1502a41b04434311fc8dc7690710a68a209b7171dc295fc1"
+          "before": "4b4281360b392b0d1502a41b04434311fc8dc7690710a68a209b7171dc295fc1",
+          "after": "3e5bc482d98084eda040675a94caaa7028764f99b0a96193b252abecfc32fc6c"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "1f18c46bba79285501fc69fe7baaa13c56c0edc6d71e05b130245c054efab61e",
-      "after_sha256": "6721c633da816ac80ac0a69d429114b0fc28900907e8ffe8ab014587bed6234c",
+      "before_sha256": "6721c633da816ac80ac0a69d429114b0fc28900907e8ffe8ab014587bed6234c",
+      "after_sha256": "e541f76e4262acd64d797501c322eb1ae4f401498e9ff7e243503cb62395f45c",
       "owners": {
         "@document": {
-          "before": "1f18c46bba79285501fc69fe7baaa13c56c0edc6d71e05b130245c054efab61e",
-          "after": "6721c633da816ac80ac0a69d429114b0fc28900907e8ffe8ab014587bed6234c"
+          "before": "6721c633da816ac80ac0a69d429114b0fc28900907e8ffe8ab014587bed6234c",
+          "after": "e541f76e4262acd64d797501c322eb1ae4f401498e9ff7e243503cb62395f45c"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "813d6c0d4041f6beb89388f0b0586bc207bd050d3e8c958b23b5c907543c61a7",
-      "after_sha256": "60a358720a6f8a4e72006f601d8705249864469bf8667de2d999c6b861991db7",
+      "before_sha256": "60a358720a6f8a4e72006f601d8705249864469bf8667de2d999c6b861991db7",
+      "after_sha256": "f26027dcdd6d9e2e504fe702728b24cc2f2fadc4d1945de673dbf8448d6df8f5",
       "owners": {
         "@document": {
-          "before": "813d6c0d4041f6beb89388f0b0586bc207bd050d3e8c958b23b5c907543c61a7",
-          "after": "60a358720a6f8a4e72006f601d8705249864469bf8667de2d999c6b861991db7"
+          "before": "60a358720a6f8a4e72006f601d8705249864469bf8667de2d999c6b861991db7",
+          "after": "f26027dcdd6d9e2e504fe702728b24cc2f2fadc4d1945de673dbf8448d6df8f5"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "956f59aab9367a8c4fb89fb78157f30f855613f6361f278a912b2067c7f2fd9a",
-      "after_sha256": "a0aba56a28ce6addc174b11c3ffe07e2fcf993e4fda56c572b595d8a00ee945c",
+      "before_sha256": "a0aba56a28ce6addc174b11c3ffe07e2fcf993e4fda56c572b595d8a00ee945c",
+      "after_sha256": "2d63aa6b769c300832e08b41d7e0e785c64be540267302e8b20566106e48129d",
       "owners": {
         "@document": {
-          "before": "956f59aab9367a8c4fb89fb78157f30f855613f6361f278a912b2067c7f2fd9a",
-          "after": "a0aba56a28ce6addc174b11c3ffe07e2fcf993e4fda56c572b595d8a00ee945c"
+          "before": "a0aba56a28ce6addc174b11c3ffe07e2fcf993e4fda56c572b595d8a00ee945c",
+          "after": "2d63aa6b769c300832e08b41d7e0e785c64be540267302e8b20566106e48129d"
         }
       }
     },
-    "docs/A32_HISTORICAL_CHECKPOINT_RECONSTRUCTION.md": {
-      "before_sha256": "3d7f0da6fa7c9bd51bcf614246f85fbd0ee4e8d601d997f6ae5923cce2925b09",
-      "after_sha256": "cdfd501edf5d80c0093f4199dfb4be758266c30554d252bdb8c9abfee9aad75d",
+    "data/source_audits/event_companion_2026_10/README.md": {
+      "before_sha256": null,
+      "after_sha256": "f49e3665591f3be6661d3bdaa9cd41ffc8b325527c9d3bd238a9a409bcd198f3",
       "owners": {
         "@document": {
-          "before": "3d7f0da6fa7c9bd51bcf614246f85fbd0ee4e8d601d997f6ae5923cce2925b09",
-          "after": "cdfd501edf5d80c0093f4199dfb4be758266c30554d252bdb8c9abfee9aad75d"
+          "before": null,
+          "after": "f49e3665591f3be6661d3bdaa9cd41ffc8b325527c9d3bd238a9a409bcd198f3"
         }
       }
     },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "0dccf71f44f1d1a9073de3fc67758701d76e01bf6a86f6e6afaca5af19e7bcb5",
-      "after_sha256": "8b5180630934d8b29e7eb46edf239a8f410f6569153e789e28957fddb369d263",
+    "data/source_audits/event_companion_2026_10/event_companion_layouts_pages_8_53.json": {
+      "before_sha256": null,
+      "after_sha256": "94476b9c2b3756ac49e5045d31b4cfc577451ceeda87aee01df5431ae457f111",
       "owners": {
         "@document": {
-          "before": "0dccf71f44f1d1a9073de3fc67758701d76e01bf6a86f6e6afaca5af19e7bcb5",
-          "after": "8b5180630934d8b29e7eb46edf239a8f410f6569153e789e28957fddb369d263"
+          "before": null,
+          "after": "94476b9c2b3756ac49e5045d31b4cfc577451ceeda87aee01df5431ae457f111"
+        }
+      }
+    },
+    "data/source_audits/event_companion_2026_10/migration-review.json": {
+      "before_sha256": null,
+      "after_sha256": "857595a548ab1ca91b7e09f90706b78348bfdbaffe0abd995309641bcfa35484",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "857595a548ab1ca91b7e09f90706b78348bfdbaffe0abd995309641bcfa35484"
+        }
+      }
+    },
+    "data/source_audits/event_companion_2026_10/official-source-observation.json": {
+      "before_sha256": null,
+      "after_sha256": "35c250e72869faf2c84e29eedde84f37b55825f69505e53c602373f66327cb2e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "35c250e72869faf2c84e29eedde84f37b55825f69505e53c602373f66327cb2e"
+        }
+      }
+    },
+    "docs/BATTLEFIELD_VIEWER.md": {
+      "before_sha256": "3fb2568afcb6d2c35b9707257ff1009f7566c9b2cd129942bdd20885ae843c7b",
+      "after_sha256": "4120c86c7465369a46d830f64c2076d3d123efd24094041af1c29265aa7cd921",
+      "owners": {
+        "@document": {
+          "before": "3fb2568afcb6d2c35b9707257ff1009f7566c9b2cd129942bdd20885ae843c7b",
+          "after": "4120c86c7465369a46d830f64c2076d3d123efd24094041af1c29265aa7cd921"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "e61b30811be6179a958d3491d47e0f012af4968c307b8ec55ea39e8725dc323b",
-      "after_sha256": "19c902affb7b4dbcc98327b7ec6b3c2cb6ae6909b63d32e40c84fd61b03c411a",
+      "before_sha256": "19c902affb7b4dbcc98327b7ec6b3c2cb6ae6909b63d32e40c84fd61b03c411a",
+      "after_sha256": "912494d1e6f4942cb624b4a30f361a7e4fb51f36b1bb7f6afbd86ca92b920299",
       "owners": {
         "@document": {
-          "before": "e61b30811be6179a958d3491d47e0f012af4968c307b8ec55ea39e8725dc323b",
-          "after": "19c902affb7b4dbcc98327b7ec6b3c2cb6ae6909b63d32e40c84fd61b03c411a"
+          "before": "19c902affb7b4dbcc98327b7ec6b3c2cb6ae6909b63d32e40c84fd61b03c411a",
+          "after": "912494d1e6f4942cb624b4a30f361a7e4fb51f36b1bb7f6afbd86ca92b920299"
         }
       }
     },
     "docs/MISSION_IMPLEMENTATION_STATUS.md": {
-      "before_sha256": "1a115802b31b029fee6b1cd59f04a70a3e7225f8c66067a7fa7bc61a0ab68919",
-      "after_sha256": "49854199142a9e435ee3ebebb13445204319e9922d860dc9a2e2504a1847f536",
+      "before_sha256": "49854199142a9e435ee3ebebb13445204319e9922d860dc9a2e2504a1847f536",
+      "after_sha256": "287c4a7ae325637f12ee181642ce51aeef780a5fe0db3378ee10385cd33b327c",
       "owners": {
         "@document": {
-          "before": "1a115802b31b029fee6b1cd59f04a70a3e7225f8c66067a7fa7bc61a0ab68919",
-          "after": "49854199142a9e435ee3ebebb13445204319e9922d860dc9a2e2504a1847f536"
-        }
-      }
-    },
-    "docs/performance/current/event-secondary-cap-a32-reconstruction-20261104.json": {
-      "before_sha256": null,
-      "after_sha256": "26c370198f2a3834aff41da6c04a49b90494fc9ecde589879b3772d1129310e1",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "26c370198f2a3834aff41da6c04a49b90494fc9ecde589879b3772d1129310e1"
+          "before": "49854199142a9e435ee3ebebb13445204319e9922d860dc9a2e2504a1847f536",
+          "after": "287c4a7ae325637f12ee181642ce51aeef780a5fe0db3378ee10385cd33b327c"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "7878bc8ff4ecf6b2da3e183b71b82d5ff6437bd58066a2672d458789558e286a",
-      "after_sha256": "3907b58d0fe3a582f02cef41eddf6412a7e810061e23bc5b48106f36f75ddabc",
+      "before_sha256": "3907b58d0fe3a582f02cef41eddf6412a7e810061e23bc5b48106f36f75ddabc",
+      "after_sha256": "ce6d996f2303be86d5cd9864f7db10efd63a77e091907a8450318e88b5cb8e6d",
       "owners": {
         "@document": {
-          "before": "7878bc8ff4ecf6b2da3e183b71b82d5ff6437bd58066a2672d458789558e286a",
-          "after": "3907b58d0fe3a582f02cef41eddf6412a7e810061e23bc5b48106f36f75ddabc"
+          "before": "3907b58d0fe3a582f02cef41eddf6412a7e810061e23bc5b48106f36f75ddabc",
+          "after": "ce6d996f2303be86d5cd9864f7db10efd63a77e091907a8450318e88b5cb8e6d"
+        }
+      }
+    },
+    "docs/source_rules/eng_14-10_wh40k_event_companion-rdwnqprl4c-nj8oqogadv.pdf": {
+      "before_sha256": null,
+      "after_sha256": "187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "ca8ac260c5afc6fe64eb88e420211887b632570eb8879d54677aee63479ce5c4",
-      "after_sha256": "cd9b1a1830807e3887df93f641b632c4d9e3bb30db43f24131b80d297795888d",
+      "before_sha256": "cd9b1a1830807e3887df93f641b632c4d9e3bb30db43f24131b80d297795888d",
+      "after_sha256": "b1fff29b380d97f9be22e27b1ff418b091625be7614907b0e88303bd11ed8bf3",
       "owners": {
         "@document": {
-          "before": "ca8ac260c5afc6fe64eb88e420211887b632570eb8879d54677aee63479ce5c4",
-          "after": "cd9b1a1830807e3887df93f641b632c4d9e3bb30db43f24131b80d297795888d"
-        }
-      }
-    },
-    "src/warhammer40k_core/adapters/checkpoint_reconstruction.py": {
-      "before_sha256": "f3eefd48ef0cf21bb429e22c8f6751f9dc056b5d7d3903c788f4b4f8daeddf3a",
-      "after_sha256": "796fefbff999b2c807ad212e1bbb2e3db7c3b99feb76811e596c7a4f69bf61ef",
-      "owners": {
-        "@module": {
-          "before": "a3d31990c97439c8572845ab54b06d5900390d2b80ceffd2292a1c7d62b80f1f",
-          "after": "059bfe86e1ae9832159a5fa3716b4472c7b52cfc4b721ebeed164bb3037ef647"
-        },
-        "_mapped_mission_source_identity": {
-          "before": null,
-          "after": "3706d3b6476f52dad167e0c5f5cc25af1936fe256fddccabd47fdd620709568d"
-        },
-        "_validate_mapping": {
-          "before": "f6b6b84de909af3fefbda2a75f1c94412521f280a76b7eacde3a95d92c6ccb06",
-          "after": "e056ea55431b57cf41c482d5a9de6547be1baa911b002c893c2c214191a3541c"
-        },
-        "reconstruct_local_checkpoint": {
-          "before": "4af11a183ac2468a73b63c7b89e6bc871fcd085a1033d56af7bde30cb9d55c27",
-          "after": "574db395a90e0426b4e1f2e8a2ba44b798c87942b978a1bc8443348b733ef62d"
-        }
-      }
-    },
-    "src/warhammer40k_core/core/mission_scoring_payload.py": {
-      "before_sha256": null,
-      "after_sha256": "260df947586ea4afc6e2095db3406a1a10b2b5ef98ada80d5c807a9fbcc9d1be",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "8f7ac261a1f399fbfca7c65f64a14749ac98f14f188010a8482cf43b454a498e"
-        },
-        "MissionPackScoringDefinitionPayload": {
-          "before": null,
-          "after": "9a54586d3db94020dd0873633457de3861a45d84b002aaaf641cbc92723a7195"
-        }
-      }
-    },
-    "src/warhammer40k_core/core/missions.py": {
-      "before_sha256": "5be4dc888e1f0f9445c127037e6bfd9576180117b5a705aa7e1ccb03cb8f4e78",
-      "after_sha256": "fc0c87a7236ea21fbc31ca9b186d6caada8b12f12eb2c7aba359a7070c489d29",
-      "owners": {
-        "@module": {
-          "before": "9b0e01f90b899a9ad2f648ed38b254a6140ada9c3b0d24dd11f514962283f7e5",
-          "after": "4e12b3244da5f3cb6f42321b790b931a4098018d3d4990e5edb75805d0d6acdc"
-        },
-        "MissionPackScoringDefinition": {
-          "before": "0e484f967ea504a2a4158e6acc22f0007273f6e166b5facf382e41290e6b181b",
-          "after": "f6947d93f2ec572a8c45328ca89d15ea292c18f744a1e5daa73cb81debf49513"
-        },
-        "MissionPackScoringDefinition.__post_init__": {
-          "before": "95964d25a12481928958916033fad11630ecc4d80cebc72121615160d29c8553",
-          "after": "2f48ed1c66481a6dccfa68bbc4b5b8af6ad360ecb92ca8bc5d211e3204fb692b"
-        },
-        "MissionPackScoringDefinition.from_payload": {
-          "before": "bf9b9a57c7063739c0426364a58ccb59e0a28442d145ffcf8778e3869ffed1d3",
-          "after": "cf80f5a43e94964b508b341e3792d535672420136acca0ff9a45303c5299c6db"
-        },
-        "MissionPackScoringDefinition.to_payload": {
-          "before": "e156d3933ed8df7a59474e970f161ca15da03571bebff0dc087997aed4f699d4",
-          "after": "94e923df669f33743cb0e6905fc2d7ebc85b98b8b7499a2a960d9bed04a65cb8"
-        },
-        "MissionPackScoringDefinitionPayload": {
-          "before": "2afe77418ab1c6c6145fbede9b2a14b062c4744b2117ee57caae840358197b25",
-          "after": null
-        }
-      }
-    },
-    "src/warhammer40k_core/core/secondary_vp_cap_scope.py": {
-      "before_sha256": null,
-      "after_sha256": "2c0ca59f19e461cb6eb5c7fe11ac28b57ff2a3111f97b354d0f6815ba15916c2",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "2cae58d56725d50aa0de0af12490e0cf938f4af603e1359db186d9fb96d1c46c"
-        },
-        "SecondaryVictoryPointCapScope": {
-          "before": null,
-          "after": "efc714b5672333b3874a78ddd44de341fc630b1188ffc09afc4fd6d01001887d"
-        },
-        "secondary_vp_cap_scope_from_token": {
-          "before": null,
-          "after": "b8be439808bb57549f1d5ff078e25d83f34e3c5e82089538d97152b1734214a9"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/mission_scoring_policies.py": {
-      "before_sha256": "5fcf648464838a0fce4e9ebc7a32cd3c809813d52c98213d3780047a9bcd78b8",
-      "after_sha256": "2df8a6ffa1fc61530f45020d5a521b29ff768410cb84212e5feb09f6c544256b",
-      "owners": {
-        "_validate_common_policy_fields": {
-          "before": "789811875ad3d4ca9ff0de02d6100341a627779103486e10c714d4f29ab43f8e",
-          "after": "e72a9e45d106c710fa1fd7db980ba86e5e01744de58da3c4998780f06deb7322"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/missions.py": {
-      "before_sha256": "3137321dafc27e63c28ba9c535c41b98ee1006df50e25b0b0cc75ccd50f47c8f",
-      "after_sha256": "7d1211180b4c9b0c5e1325f5b5dba8927d00beb4bd675c671ee95a15b927ce93",
-      "owners": {
-        "mission_scoring_policies_from_setup": {
-          "before": "83ae65da2a5daff8467e466561a5bf669437dbc36deb8e2aab0be15f74920397",
-          "after": "4a56b777c47a00562ae3e1e7d243cbbf8a74de061badd37a7ca2704533b2cd22"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/scoring.py": {
-      "before_sha256": "81c529cbe79e9979f1f8f7ebd84c012850de1638ecfe3c32edc4929d11448386",
-      "after_sha256": "cca2294fe71a42585e4e64ff73f76a4d4049c85dc36d06d5b304e215c5642f90",
-      "owners": {
-        "@module": {
-          "before": "e574d640e8ce05789504a351e3c15eba9d0241237b69e77e36be8932b9e66ddd",
-          "after": "da978d88ad33e181bad06a1087ab0f3e83254aae0b15fe37344b64f8107966d4"
-        },
-        "MissionScoringPolicy": {
-          "before": "e6c404454598c2f5d78f94ad31c2a34cfa1ac861d638fad287be3b3e30f0bc72",
-          "after": "cad2a4b961e2818dced20c63222449525373b5faaa234e80056c059fb8e47d89"
-        },
-        "MissionScoringPolicy.__post_init__": {
-          "before": "80e3454bee2f46e4329c103fc74b8e2efaac8c035ea0e565b2c23fcc0908b01f",
-          "after": "1ab08d0f82d7784424e5eecaecbd8b83bcca1b9ec977e717cd6fb27a8dcd636e"
-        },
-        "MissionScoringPolicy.from_payload": {
-          "before": "91de1a0ee347bf889bf12ec82fb9a9eacafde5b1a44fe12a4238f6994599d362",
-          "after": "1da50f901d0356a047c4da12547bb26591dd9f3444e5d76215204ba7a440aab8"
-        },
-        "MissionScoringPolicy.to_payload": {
-          "before": "964a81dd87a087a5b81e5be20acb63f4854281f9f364fc193da934369f9ccb04",
-          "after": "d43032c2e51d30b28db78952339cd7326b3b7d9a005b62727fde959c8e549775"
-        },
-        "MissionScoringPolicyPayload": {
-          "before": "8ba62ce964e8d8e5735d4b530323a5e9df21fdeec6d91195f1cf78dcf4b9aff9",
-          "after": "b9ea91f56c9483588b1673d46ac9b380d6a154697cec5a1724fc5d1fb92c565f"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/scoring_cap_audit.py": {
-      "before_sha256": "4e63172b6c6451b2728a8e9c41452115ec6aff3d77ed1f4aa08109ba3e830aae",
-      "after_sha256": "aadb7cda932a22ad191fecfe82c5f5b1bfc5b1b6995cfc912f4af39b830416a0",
-      "owners": {
-        "@module": {
-          "before": "fe68c97c99607bd3e3537bb480d60ca15f902ab563b46cb1fcc3e831a71efa19",
-          "after": "e972be09f3a814d232d06cbd51658f9cc4c1dd6501f29dd409ba92f4920d516e"
-        },
-        "metadata_with_vp_cap_audit": {
-          "before": "2335cb64009548a4e0a73e7b702dd85301f07f9fcd6e7e1df6f95bf43e3c967a",
-          "after": "6d2924f6250a42aefabbe68af05f85a787597da2fb7f14adc7c54b69e428aa62"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/victory_point_cap_resolution.py": {
-      "before_sha256": "f8475aea2c4d57efb48873ae02120660c5d51796381923789e3b797ab3b415a7",
-      "after_sha256": "c954a52ad4fb683c5fcf8298dc6d9d3683b979358cf8a185bbfa973eca545cf8",
-      "owners": {
-        "@module": {
-          "before": "dd4e9d6063c089bda6cdc928981dd722ea7dc60d8a7e7d427b7c0ff281d10077",
-          "after": "ea3a6930adbde59d5c646317dd23d5b3eaa61065aba1aa55cd3729afcd1e9542"
-        },
-        "resolve_victory_point_cap": {
-          "before": "2d4a739b04e323b9f8f01d7f8043af7fb3b77fb765fd1c7fe757eba58d761d3e",
-          "after": "cc27870ba2bdcd4ef108ee4efd1eb9d3a9604c8584b7667bdf51f2ffc1285336"
+          "before": "cd9b1a1830807e3887df93f641b632c4d9e3bb30db43f24131b80d297795888d",
+          "after": "b1fff29b380d97f9be22e27b1ff418b091625be7614907b0e88303bd11ed8bf3"
         }
       }
     },
     "src/warhammer40k_core/rules/mission_pack_import.py": {
-      "before_sha256": "dddc3c9a83da8ece844093c12152cbc160c18e0633ca67edef41a1d16a7db77f",
-      "after_sha256": "c80c97dfbb57bed42960ae6ca6f9683ebf7b468ced6f939fe841a7308b00c86a",
+      "before_sha256": "c80c97dfbb57bed42960ae6ca6f9683ebf7b468ced6f939fe841a7308b00c86a",
+      "after_sha256": "1f3d3df6ccff744e8e98de13be243da1f85beff39242dfa2607f3956968904e1",
       "owners": {
-        "chapter_approved_2026_27_mission_pack": {
-          "before": "93712f4230f43961688dd767799467d3f8e9f42350a0ba0bcc8989d5556ba617",
-          "after": "c878baa71ed1aac2ad4767c98641e32fee95d54b4bd11b9cc563b89dbf46e3d2"
-        },
         "warhammer_event_companion_2026_07_mission_pack": {
-          "before": "d55ca73a09d0cdad3c1a34af746b8bba51e04e92c9313e8c33bd840868a5371e",
-          "after": "b35f8468f4f953284c74df2e6eea29da1559020efcf36d0c8ce068a9b4b391f1"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chapter_approved_2026_27.py": {
-      "before_sha256": "a6954a460e96bb209447be2dc2a75c74aaa8eff2890cd69bc98ccc1b1acf3ee2",
-      "after_sha256": "473580fc5d1d0a55aef1a20194877623828873fcbee1ac9c0dd084e1585a9e3f",
-      "owners": {
-        "@module": {
-          "before": "a00ca218a8bb963ae6f3912394f8edc5755d3d3f0b7a78db152f434ce126711d",
-          "after": "f9699e109012d9b1b5d9bd976585585a918951cf0ac73fd56e8f97d48248aa55"
-        },
-        "SourceMissionPackScoringRow": {
-          "before": "605efdb910fb49acc1843d7ca359c0e5b46ad3301ee8ebbf052e96260ca34fc1",
-          "after": "d57996e7686595f259777a9122fec21c0564d9991325d798fccca5b8b1d15017"
-        },
-        "SourceMissionPackScoringRow.to_payload": {
-          "before": "684409d59a322fd2aab173b6c23ab692e0c14bd27e1a46cfc2a23a7b96d5dbc5",
-          "after": "808ea7d596c0a68c8126f79cfc2420ec6a7af96ca945453673ea2b5a376c38e0"
-        },
-        "mission_pack_scoring_row": {
-          "before": "84aa607e3fd523689afa268e4afc6ea3497b02616934726f36961127cb44e9e8",
-          "after": "f65caac05ea2ecad2eb41a80d7d52f28056eaf600eff9549217770bec4402b85"
+          "before": "b35f8468f4f953284c74df2e6eea29da1559020efcf36d0c8ce068a9b4b391f1",
+          "after": "9b714208196d4eb6a4ae95081418cccf8d916899d8e74894ae48a324c95cafcc"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py": {
-      "before_sha256": "fd7d0c7a7a21f9decaa482e7c201c9e4617acd2c3633d53f18ad1a308f00d5f5",
-      "after_sha256": "ddecfba92afba56a2477b981aaa12472895a8e19cde8a8c8a2b3da6bb20bde0c",
+      "before_sha256": "ddecfba92afba56a2477b981aaa12472895a8e19cde8a8c8a2b3da6bb20bde0c",
+      "after_sha256": "8920d679654d11c65eba8d243c1a1a8d06b8b7059246c1a51d55539b146744e9",
       "owners": {
         "@module": {
-          "before": "b5d2c8e5662fed85e56d14335763d5ba1ba62cd549aecbe19343b70e98f2ed52",
-          "after": "9a6f6d01f2f1d3af38ff120ac7a1f0540b9ac77ea0fd0bdc0f67610621b33518"
+          "before": "9a6f6d01f2f1d3af38ff120ac7a1f0540b9ac77ea0fd0bdc0f67610621b33518",
+          "after": "6037845a0d6fa0b2d646083bc1346f3f01592a121a9ce3d99430b1419bbe5cc1"
         },
-        "mission_pack_scoring_row": {
-          "before": "78f90bc86af99c4b4e1b61338ae9ca3c83b0dcaf96ade06daa91818a3038bba8",
-          "after": "2cdc93ad83f514ed1bbe357b1e2cddbe51b11da45ffa98031901d92b29ab500a"
+        "_battlefield_layout_definition": {
+          "before": "968315c485f67a5e99dcbc5fb619c64b8a5666389890f85d47086a598cdf5061",
+          "after": "1a7fd4a1e38438c47a53084608ff1a256b990fa664e397f2f6b9cc8e23c175fd"
+        },
+        "_battlefield_objective_definitions": {
+          "before": "320f64ace3c53b563bdf146b616f4a5c59c968ce01e96f209251c07af05bba60",
+          "after": "b22a29950a7d7838a8ccbb2bbab6d70edd0ffedcebe9477dc4d4c61b16bdb9f4"
+        },
+        "_battlefield_objective_terrain_area_definitions": {
+          "before": "858464333edfa6d0a5d93d07b29aa6e999d1d01668a3981554af08edb9dc2b1f",
+          "after": "3371589fc2f8752c8de74e9ce4197555a1047daee22cec5372f592e0d040d6e1"
+        },
+        "_battlefield_regions": {
+          "before": "890597f99cf277707e9e3ece55d3ed7e31e228e257020b8d3db269b02a29a8d6",
+          "after": "ba3791b449341b591401708edfa9b5b41d11b882ed4f394f61ff67a81fdf219f"
+        },
+        "_placed_terrain_area_from_anchor_spec": {
+          "before": "dc31065a751f89734307077795064a7f8e745175927de74d0bb198416072c642",
+          "after": "2026439cd1d49d0a07552b803a5dad763a5b54af1dc53340e9f4f7e4c985ad23"
+        },
+        "_placed_terrain_areas_from_specs": {
+          "before": "f8dfc2cdda5ef3ba188303712eedb1b16b7495513b35b3593adec119e77de71d",
+          "after": "bcadd4e925181567a9305c3a1ecfe42308780059afdccf2c85f0574f78c5786c"
+        },
+        "layout_descriptor_rows": {
+          "before": "a27397a7c7b41eae70964951f3d2c46e254cbb3f6339c23e6980a7991a638ba9",
+          "after": "3241960ecc06c0f909f04fab92efd92c3ec0bf1af693eb145e4b341f7d3efc95"
         }
       }
     },
-    "tests/event_secondary_round_cap_helpers.py": {
-      "before_sha256": null,
-      "after_sha256": "cbe4fb25ca91a86c1c4f9d864c309a6fe1134fb166ebb6f694f335b6f38284f5",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-battlefields.json": {
+      "before_sha256": "028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f",
+      "after_sha256": "577464ade3daf3a940257f8f385a09abff69e6de740198f157b91e1aed35dbec",
+      "owners": {
+        "@document": {
+          "before": "028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f",
+          "after": "577464ade3daf3a940257f8f385a09abff69e6de740198f157b91e1aed35dbec"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_full_artifact_geometry_validation.py": {
+      "before_sha256": "8847c9f9ab06f76333b29f3113cbfb598b22d5743a6387074bbaf1afb955c755",
+      "after_sha256": "9b63ec57ea12912360dbea31318995588a721db2a4ec70022722afb1e1e7c33e",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "efab80685bd0ae0d1b8171c1f8c68cf697dbdf752fdc43520227fe0d402e6f6c"
+          "before": "bed4a4310e68a22d5962b2032cbf303f0ac4bcc776c7c4bee3cef956b5d6de13",
+          "after": "2a92c7c046c0ec9f0d7f72db94301eb3af021b01f9d502cd55f2ad044120300c"
         },
-        "assert_native_secondary_round_cap": {
-          "before": null,
-          "after": "2d07032d0496ed05072a22f177f42b4a0a5e4d4fc4f911cbaf67d047b3af0b51"
+        "_is_exact_sum": {
+          "before": "f67f86f77a6fa749f477c7036e2062977c053f0e24027d3d8cda244804d4e9fb",
+          "after": null
         },
-        "assert_native_two_card_tactical_capacity": {
-          "before": null,
-          "after": "813c2c27192a3a0919c935caf6d2f5f5c16687606554fd96ac2bc941ff3a80df"
+        "_is_half_turn": {
+          "before": "38ee7c52df11ef1aef14bab6a3f67f3181cd966b45ffb03f34bf7162ae59614d",
+          "after": null
+        },
+        "validate_area_pose_witness": {
+          "before": "c5a02a224f74541a874a35f9ad03820011902a0bb6ae11c093b019bb1a253274",
+          "after": "403280adef33734cbb2f5c81ac16a14b7a106af3b4e084228779f94a6f532146"
+        },
+        "validate_component_mirror_links": {
+          "before": "28a257ebadbe69d8a5ef09dbbde697b110b613093ff79499e15c57dd8f998d71",
+          "after": "43d36d87555e42fd16ed530d338adf8d848079c39593ca8e912902209f8065dd"
+        },
+        "validate_component_pose_witness": {
+          "before": "a865df8161645befd50ce6061328d6ce95c7b3c114be842695da73f79c832bd6",
+          "after": "9e0e9b8e130f345ffac8279c263c856adbf533f33701c90049393ee3013c724f"
+        },
+        "validate_component_runtime_pose": {
+          "before": "34a11f634fd4a8a81b7a7f7cc5b6c8750a98f90e4e172576bc502589e9325fb4",
+          "after": "655df391acfa548f39f9d89e181df061e624065895d8fb29d64e96294b487391"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_full_artifact_validation.py": {
+      "before_sha256": "e886546c8b5645cdbd5b998a51a95e1eee9c513e6e88bf36c94d122b0a08e583",
+      "after_sha256": "4642b091cf0b84c1b44d9672ad554867252b3df90aa489257ec205af3148bb9f",
+      "owners": {
+        "@module": {
+          "before": "862020beefffc74710703ff77adf2d4ff8b1be8b461fefc80391e014583e5030",
+          "after": "0d82f72784023416d75150284250f98e8f2a0d012bac85ac71008e2202ad059a"
+        },
+        "_is_exact_sum": {
+          "before": "f67f86f77a6fa749f477c7036e2062977c053f0e24027d3d8cda244804d4e9fb",
+          "after": null
+        },
+        "_is_half_turn": {
+          "before": "38ee7c52df11ef1aef14bab6a3f67f3181cd966b45ffb03f34bf7162ae59614d",
+          "after": null
+        },
+        "_validate_component": {
+          "before": "052323ff2e3d022c02005746279826023d54e0cf1a5e428186bfdaa0719a4688",
+          "after": "4191f8639a65c038199972081b5970270424150f383a190e373b13975eb3e0b6"
+        },
+        "_validate_layout": {
+          "before": "5aab0e5544c855de7e8d009edcd43dfc4a7ce06ef47ba01cd1e5a569f3260776",
+          "after": "47855409e265714ebc9e7d2da2dd10af73b292d468433f2789f2f74c93cece5e"
+        },
+        "_validate_terrain_area": {
+          "before": "4dd73ef1c591b11bdcaa71cfc02e20b609fcecc43b5caf422c5cb0443c8d5625",
+          "after": "c706323f6ed4ac1578abac7fc3afeb107d593bb9a08a4106ba163582b619aa76"
+        },
+        "validate_event_companion_battlefield_artifact": {
+          "before": "6b9ae71e2a49e6d796f353ce3becd7b396dd2d360a1ab4702315ff54313c99d7",
+          "after": "e4b53d0432f4f043f2acc832ab613b30b8678d3ec90f55c88b20a3fdbcaf3dc3"
         }
       }
     },
     "tests/infrastructure/missions/unit/test_event_companion.py": {
-      "before_sha256": "ae6351e3f40fb9b9680770e513bcf301a80dd884b51b4a64c33b3d9d690fc563",
-      "after_sha256": "48641abc04fa4c5b6f595c070c2a8283a8aee8645398c7ee185a3d4a66a9c317",
+      "before_sha256": "48641abc04fa4c5b6f595c070c2a8283a8aee8645398c7ee185a3d4a66a9c317",
+      "after_sha256": "a1005d25bb35eedad4257eca8fb95c677b1d2943e38cd8eee9042313a857702d",
       "owners": {
         "test_phase17j_event_companion_package_identity_and_payload_round_trip": {
-          "before": "4a3d66f4f6d4ac884d0b96ff85a210b23b444e31252037db31d81e87929e9ae8",
-          "after": "76456f06570d9228600658df2c5643a8088b41baf59db281a43ae36ef62927ec"
+          "before": "76456f06570d9228600658df2c5643a8088b41baf59db281a43ae36ef62927ec",
+          "after": "d9400b05e7fbf129c33a04e99dc108468bdab4e324aaa0e80e5e7ea72f4dd79e"
+        },
+        "test_phase17n_battlefield_artifact_is_source_hashed_and_strict": {
+          "before": "4312bdd2c54fd42626f45f16456106013277ef700a59799879d852579865fc61",
+          "after": "41b7ec276a7a35ffce98d068e064d5d5ccaca66ddc3d77f409184c2cb293889c"
+        },
+        "test_phase17n_ruin_wall_joints_follow_source_image_registration": {
+          "before": "eeb82467720bebc119a29c0d742aca94504085a5ee47c65f247eeab04614dec8",
+          "after": "e6916c385b8c2b88b80fa272e252d2dd3bfcb386096dae8b914f4fd2fbbb7469"
+        },
+        "test_phase17n_shared_non_ruin_archetypes_expand_to_legal_source_proportions_and_touch": {
+          "before": "f65f16fc83957c67feac75943147ffa887a9e07f5338a1db6f6e30a0676fb7e5",
+          "after": "8a71bd32e7404ce3145e845d9f9be07811d23f6931ad897c0ebba77a28365714"
         }
       }
     },
-    "tests/infrastructure/missions/unit/test_game_end_scoring.py": {
-      "before_sha256": "e8a9d70b39beb869b59e8e549ce09ccafbeaa4af0046d1530c38607a6ef681f8",
-      "after_sha256": "b31fceb663ce6b50ea14f1d399b92e206b1464d8ec03c52fca867f4dc5fcaf9c",
+    "tests/infrastructure/missions/unit/test_event_companion_part2.py": {
+      "before_sha256": "baf996721695969307039d0a87089b8404cd199d60341afe461bbcf85e469b33",
+      "after_sha256": "dcc4dd8eca285b39b1c37eabddb89ff7c54853e195ac2ea7ee9ce105d4d077ec",
       "owners": {
         "@module": {
-          "before": "a101f02e5df2016ca646a37fceddb875c1009f0b7dde723e1a99bd36afeb858d",
-          "after": "c70e2b121a3c1ddd1a5894ccf484c62a7017f0aec583ad71d5ab1ab5a37d8f82"
+          "before": "a241f9f8a8c1d39ad52705151e526026077d1d995f82884f0873f7f44b1920fa",
+          "after": "fe13881fb8b47dd04723feadc9608c1b385950d1a42a495c9e88f828eec8f576"
         },
-        "test_event_secondary_round_cap_native_facade_and_replay": {
+        "test_current_event_layouts_have_bounded_october_source_and_complete_markers": {
           "before": null,
-          "after": "3399035fb44e1b96ad2300413524eb7b52315c8765807756d8faabe8534616b5"
+          "after": "3bd13998102cf3cf646b2e2762eeda8804f29338dae39282e230b41a7b18f4fa"
         },
-        "test_event_secondary_round_cap_two_card_tactical_preview": {
+        "test_current_layout_viewer_projects_and_renders_all_source_geometry": {
           "before": null,
-          "after": "56e7976025e7de5111020b3191d95c29b57e9f59b7cbc9b83678faf9cf390fd1"
+          "after": "50561df6011837dc40eac0090cb693c89ca62100a99b01fec4c579f857ab2c03"
         },
-        "test_phase11f_vp_cap_audit_metadata_shapes_and_validation_are_explicit": {
-          "before": "01dd1dc7fbabbe2457ac0d15b43c6791be07b57231847130c69e8fe370452b09",
-          "after": "8f99d30b331486f1cca2458737b9c3a5370adf72cf921004b5c180d2c1f7e0d3"
+        "test_phase17n_battlefield_builder_rejects_source_drift_without_writing": {
+          "before": "e41ff6bc1bac4eb8894958d73c08157e320771a4dd1bd46fd529ef41bc9d6b54",
+          "after": "21e2d91f39d040c8fde872d06c0e50727d31a14f44ed7daf27277ade68c2fe4b"
         },
-        "test_phase11f_vp_caps_are_enforced_before_winner_determination": {
-          "before": "1f16ba662025ca4b4461ae0fa38eea75ac6162cbde997d2cbb62102e7103ec5b",
-          "after": "0de9ac81763f5976b5344795f90a813eab890e37cbe8f011104408e254098877"
+        "test_phase17n_battlefield_builder_rejects_stale_output_without_writing": {
+          "before": "07b8124cfdfc328c6cb5ab095ecd3d5627d4ff439a0299f554dcb09b61807821",
+          "after": "c3f24b321be7d170ca7e5e09b31a10a7f9b3c8d34ec56153c3d7a6f71ed3ac34"
         },
-        "test_secondary_cap_period_reset_and_source_totals": {
-          "before": null,
-          "after": "3c69d09ada7d31a03d01d05ab57fb41982cb8364f2c17c1b3ae183e15c2c7876"
+        "test_phase17n_battlefield_builder_reproduces_committed_artifact": {
+          "before": "ad1535090556b00606caccdcd497fda1e6dc365f5561c423e1aeefab5ef0c4d5",
+          "after": "fa21eb4cb3c4ecde0bcd0af9abbe6c1d2060ebe5558db4aa75bd2d18299168f0"
         },
-        "test_secondary_cap_source_scope_and_strict_round_trip": {
-          "before": null,
-          "after": "09b459bac189fbe4371f78775c21970b463d975330e4942a2133c93941a913e0"
+        "test_phase17n_light_corner_wall_joints_follow_source_image_registration": {
+          "before": "a4a76c908eae799d2e15620638b8437d5bc431b1a98660619d7fd176122df74e",
+          "after": "3abe823153c3a39a33c22e99cf38a26c7215d99c33bb734dc11c59189769a1ab"
+        },
+        "test_phase17n_meatgrinder_exact_layouts_build_all_source_components": {
+          "before": "7a4653370efbb71c6210089b314cc79127ea6f61cd9fe4f7ec2590f98066e670",
+          "after": "207f81f2555772ccdb86ce1b79b8c0dc41abde8807860f2a7253dac9710a5657"
         }
       }
     },
-    "tests/infrastructure/missions/unit/test_step6g_secondary_certification.py": {
-      "before_sha256": "188ffe6cc56843bb5951da5d1e002eaf2ed0ebc1cfbda03ce8fddefc8b6597bd",
-      "after_sha256": "b58b7f6733ce28e6c16e752a578e47549e201a84ff256c5f4ec62d7e0ac550dc",
-      "owners": {
-        "test_positive_partial_tactical_award_scores_and_discards_the_card": {
-          "before": "59ba3ee4da500e8a6d3a2a7dfaaeeb89113c7b28f0a17680bce769f3d406f29d",
-          "after": "fdcb21d984d319fcbb26369d698438434d8293f374e85d762eacb5cc0a4f3f09"
-        }
-      }
-    },
-    "tests/rules/section18/coverage.json": {
-      "before_sha256": "cde59b060f81707da01097628c950c300ac0df0854a2f69159c8cb378eef9397",
-      "after_sha256": "7802d76e1cc8da4dd5dfb2304155ebb16606e70da5b7fa343e4bd9c276b57e4c",
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "e1a115d6a2f207f6aedd375345e117ed2af7d153ffb3dd1d41aebfda80444bff",
+      "after_sha256": "733ec159c016aa713c979889a3d17e5204f85c8a1ed1d6647ad5e2d747687f4b",
       "owners": {
         "@document": {
-          "before": "cde59b060f81707da01097628c950c300ac0df0854a2f69159c8cb378eef9397",
-          "after": "7802d76e1cc8da4dd5dfb2304155ebb16606e70da5b7fa343e4bd9c276b57e4c"
+          "before": "e1a115d6a2f207f6aedd375345e117ed2af7d153ffb3dd1d41aebfda80444bff",
+          "after": "733ec159c016aa713c979889a3d17e5204f85c8a1ed1d6647ad5e2d747687f4b"
         }
       }
     },
-    "tests/rules/section18/test_facade.py": {
-      "before_sha256": "2465f2e916ccbf7ea4e433bd6820874287e8dec38a226efb5ecb46f1cede64e3",
-      "after_sha256": "043a4266f6e7cb557f8345724e6bedb8dcd85fb76fae7d1b1d92fbfa0b0f8bee",
-      "owners": {
-        "test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes": {
-          "before": "2f0f4ecf6d7bf7944736ccbf1db9d848bdf7d1c1ac9e07bf6334d3c1689ead6d",
-          "after": "0eb9bb3ebe20a3429517a4df081e8fd1a06fcee52fbc0350580e41b22e93ae1d"
-        },
-        "test_a32_oct14_recovery_rejects_inconsistent_reconstructions": {
-          "before": "d5160a3760364067de050133e1c4707716929432270effa6e4ac82b026f98852",
-          "after": "bcdd4eb067c123f06ef5152090c31b582315172af28f26aada513f7374ca4ce2"
-        }
-      }
-    },
-    "tests/shared/category_migration/phase17n_primary_scoring_grammar.py": {
-      "before_sha256": "8d88644f5d89ed384132f38ce4aadaf52d007ef9e06793e1e4594c50dd8f0727",
-      "after_sha256": "5bafe3bfade2b915d81df1d173a71eea9ad7a708cbe7fcfdc1ceb5a94b6861f1",
+    "tools/build_event_companion_battlefields.py": {
+      "before_sha256": "f9cc1b51588f85494d73495fbaa2c436156ca15d306b8801aeb575ba157b3c31",
+      "after_sha256": "071706d3ff94661db7c584b476d063920e98849b0e4d4ca31f143e77a33295ba",
       "owners": {
         "@module": {
-          "before": "eb237930da342e0218561472e981351e0d022e7530c00107386307585fa13949",
-          "after": "560319701a98a4894be09e7f46278c73ec3da29141618908c649565ef2a74bfe"
+          "before": "5244c92a48f2754ee4dcc7d9ecaa5bf2c9760a2c83405aa36565d5fd2f98c2d5",
+          "after": "77ff8ede1d75900f1bc89917cce0d77a0ef07fe6dce35a5f363b1a80b0db7e39"
         },
-        "_runtime_policy": {
-          "before": "9822a73ff5b15ae1c03ca0642c2b3c425f1f3af795b7722cf7513c5d7c58d626",
-          "after": "bc1527594ea10345a8139e3754bf60e9f31ca7deba346117e4760f918d765288"
+        "_area_rows": {
+          "before": "80e6754245c6c971bc3eb4a8f35e6591bf1c16ffea9cdcdbe95c9bff73182e0c",
+          "after": "963c6247579a0fbabcde1da32cccef5dfca9a0ee6f83895feb4eead03284095b"
+        },
+        "_component_rows": {
+          "before": "045de8cd2dee915cd7e7cd7725f8ce269167bc9f00ebdc8b447745ed3ab57bcc",
+          "after": "ce7180df28ce8c62763e99caa36e37bd3a162dec8cb8978cc18d051d606e276d"
+        },
+        "_initial_component_poses": {
+          "before": "d32209dccfb4c8ad1382966c2440e922248451aa545ea02f5cb66378e09080ff",
+          "after": "8dbc39de4fd528c19dd272a3b1c7748146750550f27030281b89d3c789db7ba8"
+        },
+        "build_artifact": {
+          "before": "0b363d79b9f6a38e326f4b3dd43bf9a7b5937b3e1d6061eb0726e4125d302f52",
+          "after": "2718546d6139862b602189623bdc2f60c0c92b26dd3ed82236c2f00c7116fa32"
+        }
+      }
+    },
+    "tools/event_companion_battlefield_builder_catalog.py": {
+      "before_sha256": "5a9f77b3a1de639af2d4abc96a92f77b45bb0c3357aa794d50aaa1c0288aebba",
+      "after_sha256": "a202c0e52ec27a7c6380f99d16b37276a779629c975523b2fe4434e00060d8f2",
+      "owners": {
+        "@module": {
+          "before": "0d9834c9785a30d5ca83c513fa527f090e1ed8ca00a195fdaea582e732077ed3",
+          "after": "421939c4983eecb580f24b10674e67835347101e5d001e240ead02c906eaaba1"
+        }
+      }
+    },
+    "tools/event_companion_battlefield_builder_geometry.py": {
+      "before_sha256": "c2ad130715c14a2cea3a287ba4d4587c4e16931b3439bd597b52aa11b555bf41",
+      "after_sha256": "a0c938d5b9fd313321b5184f4c8fee73b650c4daf428e24b1485461c900701bd",
+      "owners": {
+        "@module": {
+          "before": "a1942553336b0d79d99f839f89c65c115a748da01a174372c07ea299e326fb9c",
+          "after": "e9c725696e503d73d6a260cc2b7706f54c09c936884b403ae93b88a46a498965"
+        },
+        "solve_area_poses": {
+          "before": "53b650f6c2c30386ce415b065b8ea41dff5c69ad04c9e5583d3f86df543e6708",
+          "after": "e6b52d7ce6e5154d9426648ebd5751225d3f383dfd206559647d6899ffec16f6"
+        }
+      }
+    },
+    "tools/event_companion_layout_source/contacts.py": {
+      "before_sha256": null,
+      "after_sha256": "9d67ac77f7ee60742f58992fb01690e4ec2757c6c0eceb5ab9ba388005992491",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "63325be2242f1021b868f1e5154fd10d3ceb73972ed38ffb5b4a5e0e3d067964"
+        },
+        "color": {
+          "before": null,
+          "after": "8cbff00bdb7b7dca09946f6b6c64ebf8421843f168c577102897947e660ee182"
+        },
+        "extract": {
+          "before": null,
+          "after": "f68ded03bb9340ac7079c75e62b26d6e57aa180d6c118d3467b0a09dc2a96c5e"
+        },
+        "polygon": {
+          "before": null,
+          "after": "feb0f732ca7a1fc531d3dc4fbb842001fbed57f55d59b6969ad226da4f356774"
+        },
+        "xy": {
+          "before": null,
+          "after": "23ca2232e7c7966ea84bde1e13763a11a81ac783cbf5bfcd7562de6067529a8f"
+        }
+      }
+    },
+    "tools/event_companion_layout_source/correspond.py": {
+      "before_sha256": null,
+      "after_sha256": "3fd4bf4a4610b5296f21c11d0c03554ae867bddcdbeac72d394d6f0211b07d28",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "f39da12a939aa95091ed98ade949a5e7c8e20be65e3e094b8c84e54ec30aa60c"
+        },
+        "center": {
+          "before": null,
+          "after": "5ebdd8842a9d9587b1daab7caadc69a1c9752e2be649edc5becc564045d9d29d"
+        },
+        "outline": {
+          "before": null,
+          "after": "06af258dcd60f61e0406161329e65a4994ec1983b9f66cbde81573438f8329ac"
+        }
+      }
+    },
+    "tools/event_companion_layout_source/extract.py": {
+      "before_sha256": null,
+      "after_sha256": "c4dc3d97c25797a1d190a617193b0a4b9c8dedf0928b84494302a51b47c89d15",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e6ba1ed337c582456e0fbb676efa595bdf4c605f5780eda7152f6e5016ebef5c"
+        },
+        "asset": {
+          "before": null,
+          "after": "30e38860dcd16ab828fceb9462f376636b9671d3712937050e391fcca7f48e36"
+        },
+        "center": {
+          "before": null,
+          "after": "2c47a6db924437bb87156823e04a3421e5bc8b266a9d2844b128b8c6f9bfbc55"
+        },
+        "imagepose": {
+          "before": null,
+          "after": "64a41cc3e96fe2f1c0e76dce331527eb261fff92886a9c50b337d60ee3134ab0"
+        },
+        "pathpoints": {
+          "before": null,
+          "after": "53b4f17a757288b56b8517cd5822f45d95c80be8bac735ab65664afdc6f8815a"
+        },
+        "pdf": {
+          "before": null,
+          "after": "3dcfdbb9065bda2a9d6c8673d8baf8fd2f7fbf4db72ffbe08a15a2bda07b7c90"
+        },
+        "polygon_world": {
+          "before": null,
+          "after": "f78dc141b5861ea13ee04823546f8ef1220623edfc18db3056025758ae0eafcb"
+        },
+        "q": {
+          "before": null,
+          "after": "c90bc6261f14173669fc83121008cfbcb3ee5ab86794307e111dca1f5d16e177"
+        },
+        "r": {
+          "before": null,
+          "after": "158a9e86406da02a5302b0e594ad46ea46bc94167db0a5a79be2c3e82eef3f77"
+        },
+        "signed_area": {
+          "before": null,
+          "after": "5de59cc0a74aa9ae6355431b8ccb9f6d12acbf6814b5d911ab93fcf1abbcae6b"
+        },
+        "world": {
+          "before": null,
+          "after": "fea127d995e2ce6f76be4abf4ff2702ceb51e14843fdc121830da4be76833ffb"
+        }
+      }
+    },
+    "tools/event_companion_layout_source/observe.py": {
+      "before_sha256": null,
+      "after_sha256": "650b2a28b6bc4415fd718e33274f32eae72f6438000345236bef486c663cf5b2",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "092fbec0d87468a62d100c4d241d796b00ba4e5871ccd5e02049c960a8ab898b"
+        },
+        "affine": {
+          "before": null,
+          "after": "3ef6c7a43b2156726271a4108d8d2477f92373254ce415ba987508f206520806"
+        },
+        "center": {
+          "before": null,
+          "after": "93da6983aadfdf65e6d29e893028e2f3c2af8abc4cf48d46a8ea4b40130b8fa4"
+        },
+        "close": {
+          "before": null,
+          "after": "fdb2cb9f53912563241d89d4b87dc559e102412f21b9f926ac4a534a4f44e753"
+        },
+        "footprints": {
+          "before": null,
+          "after": "d5032470c7f976ee46e642d62b303e63d7e83c5bfe6ad06b8eb0eca9b0e1a56b"
+        },
+        "image_info": {
+          "before": null,
+          "after": "1bfa1092ee2f59b78191158182e2e5901e9f1d1a175225b94551c4032bb6f9f9"
+        },
+        "norm": {
+          "before": null,
+          "after": "631cf6386775541ab3e0a5668e2f9c9a4e99ac4bbb17bbcd82875bab6c3c1938"
+        },
+        "objectives": {
+          "before": null,
+          "after": "b6c9a2934a966342809ffb91edfeb06e3fa99c4a91d2e385261a427c07e07817"
+        },
+        "points": {
+          "before": null,
+          "after": "ba87a6d65d42da46fa74d87861980e535348287c764e63409ac98385305ef365"
+        }
+      }
+    },
+    "tools/event_companion_layout_source/requirements.txt": {
+      "before_sha256": null,
+      "after_sha256": "47cf9d4cac2283eb5d29dcea0d2e86503250dab8159825925edfe673184c1357",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "47cf9d4cac2283eb5d29dcea0d2e86503250dab8159825925edfe673184c1357"
+        }
+      }
+    },
+    "tools/event_companion_layout_source/source_context.py": {
+      "before_sha256": null,
+      "after_sha256": "efa5e371591b36a0f165d5385920f17a0a716ca1c11efd07e047f1386909724a",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "5e476b60cf0f3e0d9ff094cb96417bd4dde8c7eabb2c980ee617e4f4ab2e9eeb"
+        }
+      }
+    },
+    "tools/extract_event_companion_current_layouts.py": {
+      "before_sha256": null,
+      "after_sha256": "a76229f70efc9e2c319a8753b78fa7c10ad886fc55d5d9e9643cecb0cc1c627f",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "421018df4b1d1a54a3f50a3710eac5962ef5724f6df368a1485c0bd6250ad0ce"
+        },
+        "main": {
+          "before": null,
+          "after": "b31bb6e2d8fb07e9a86ac18c836f797c9faec782a348a425cc5c31b43af566cf"
         }
       }
     }
   },
   "rows": {
-    "ci/test_shards/durations.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
-      ],
+    "README.md": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Document bounded current-source provenance and qualification; generated identities and review evidence do not claim timing improvements or change runtime algorithms.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "ci/test_shards/shard-1.txt": {
+    "contracts/examples/decisions/families/submit_movement_proposal.json": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
+        "event-october-layout-generated-movement-example"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
-    "ci/test_shards/shard-10.txt": {
+    "contracts/examples/events/initial-player-a.json": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
+        "issue532-contract44-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
-    "ci/test_shards/shard-11.txt": {
+    "contracts/examples/events/initial-player-b.json": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
+        "issue532-contract44-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "contracts/examples/projections/hidden_secondary_redaction_view.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue532-contract44-publication",
+        "order123-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "contracts/examples/projections/initial_setup_view_player1.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue532-contract44-publication",
+        "order123-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "contracts/examples/projections/initial_setup_view_player2.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue532-contract44-publication",
+        "order123-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "contracts/examples/projections/post_deployment_view.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue532-contract44-publication",
+        "order123-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_a.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue532-contract44-publication",
+        "order123-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_b.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue532-contract44-publication",
+        "order123-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "contracts/examples/projections/visible_modifier_datacard_view.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue532-contract44-publication",
+        "order123-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/replay-metadata.json": {
       "category": "rule_semantics",
@@ -914,317 +887,99 @@
         "d07-generated-current-contract-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "contracts/examples/sessions/create-session.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "d07-generated-current-contract-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "contracts/examples/sessions/session-create.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "d07-generated-current-contract-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -1232,163 +987,99 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
-    "docs/A32_HISTORICAL_CHECKPOINT_RECONSTRUCTION.md": {
+    "data/source_audits/event_companion_2026_10/README.md": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-layout-data-source_audits-event_companion_2026_10-README.md"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "data/source_audits/event_companion_2026_10/event_companion_layouts_pages_8_53.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-layout-data-source_audits-event_companion_2026_10-event_companion_layouts_pages_8_53.json"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "data/source_audits/event_companion_2026_10/migration-review.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-layout-data-source_audits-event_companion_2026_10-migration-review.json"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "data/source_audits/event_companion_2026_10/official-source-observation.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-layout-data-source_audits-event_companion_2026_10-official-source-observation.json"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "docs/BATTLEFIELD_VIEWER.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Document bounded current-source provenance and qualification; generated identities and review evidence do not claim timing improvements or change runtime algorithms.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Document bounded current-source provenance and qualification; generated identities and review evidence do not claim timing improvements or change runtime algorithms.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "docs/MISSION_IMPLEMENTATION_STATUS.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "docs/performance/current/event-secondary-cap-a32-reconstruction-20261104.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Document bounded current-source provenance and qualification; generated identities and review evidence do not claim timing improvements or change runtime algorithms.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Document bounded current-source provenance and qualification; generated identities and review evidence do not claim timing improvements or change runtime algorithms.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/source_rules/eng_14-10_wh40k_event_companion-rdwnqprl4c-nj8oqogadv.pdf": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document bounded current-source provenance and qualification; generated identities and review evidence do not claim timing improvements or change runtime algorithms.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "source-record",
-        "order108-terrain-semantics",
-        "order109-unit-control-semantics",
-        "order110-action-battle-shock-semantics"
+        "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "src/warhammer40k_core/adapters/checkpoint_reconstruction.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "cumulative-exact-001",
-        "event-secondary-round-cap-finite-a32-source-identity"
-      ],
-      "selected_families": [
-        "reconstruction"
-      ],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "src/warhammer40k_core/core/mission_scoring_payload.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "event-secondary-round-cap-core-mission_scoring_payload"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "src/warhammer40k_core/core/missions.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "event-secondary-round-cap-core-missions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "src/warhammer40k_core/core/secondary_vp_cap_scope.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "event-secondary-round-cap-core-secondary_vp_cap_scope"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "src/warhammer40k_core/engine/mission_scoring_policies.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "event-secondary-round-cap-engine-mission_scoring_policies"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "src/warhammer40k_core/engine/missions.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "event-secondary-round-cap-engine-missions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "src/warhammer40k_core/engine/scoring.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "event-secondary-round-cap-engine-scoring"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "src/warhammer40k_core/engine/scoring_cap_audit.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "event-secondary-round-cap-engine-scoring_cap_audit"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "src/warhammer40k_core/engine/victory_point_cap_resolution.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "event-secondary-round-cap-engine-victory_point_cap_resolution"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "src/warhammer40k_core/rules/mission_pack_import.py": {
       "category": "rule_semantics",
@@ -1396,19 +1087,9 @@
         "event-secondary-round-cap-rules-mission_pack_import"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chapter_approved_2026_27.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-record"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py": {
       "category": "rule_semantics",
@@ -1416,19 +1097,39 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
-    "tests/event_secondary_round_cap_helpers.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-battlefields.json": {
       "category": "rule_semantics",
       "operations": [
-        "event-secondary-round-cap-event_secondary_round_cap_helpers"
+        "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_full_artifact_geometry_validation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_full_artifact_validation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
     "tests/infrastructure/missions/unit/test_event_companion.py": {
       "category": "rule_semantics",
@@ -1436,66 +1137,133 @@
         "ci-restructure-tests-infrastructure-missions-unit-test_event_companion.py"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
-    "tests/infrastructure/missions/unit/test_game_end_scoring.py": {
+    "tests/infrastructure/missions/unit/test_event_companion_part2.py": {
       "category": "rule_semantics",
       "operations": [
-        "ci-restructure-tests-infrastructure-missions-unit-test_game_end_scoring.py",
-        "event-secondary-round-cap-infrastructure-missions-unit-test_game_end_scoring"
+        "event-october-layout-native-regressions",
+        "ci-restructure-tests-infrastructure-missions-unit-test_event_companion_part2.py"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
-    "tests/infrastructure/missions/unit/test_step6g_secondary_certification.py": {
+    "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
       "operations": [
-        "ci-restructure-tests-infrastructure-missions-unit-test_step6g_secondary_certification.py"
+        "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
-    "tests/rules/section18/coverage.json": {
+    "tools/build_event_companion_battlefields.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-472204d42ddab990",
-        "supported-ec-source-fixture-controls"
+        "event-october-layout-tools-build_event_companion_battlefields.py"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
-    "tests/rules/section18/test_facade.py": {
+    "tools/event_companion_battlefield_builder_catalog.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-39abdccd2d61a633"
+        "event-october-layout-tools-event_companion_battlefield_builder_catalog.py"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     },
-    "tests/shared/category_migration/phase17n_primary_scoring_grammar.py": {
+    "tools/event_companion_battlefield_builder_geometry.py": {
       "category": "rule_semantics",
       "operations": [
-        "ci-restructure-tests-shared-category_migration-phase17n_primary_scoring_grammar.py"
+        "event-october-layout-tools-event_companion_battlefield_builder_geometry.py"
       ],
       "selected_families": [],
-      "rationale": "Bounded Event Secondary cap correction and its directly required source, fixture, generated identity or review evidence.",
-      "source_obligation": "Retained Event Companion July v1.1 printed page 2 caps Secondary VP at 15 per battle round; October v1.3 confirms the unchanged limit.",
-      "unchanged_work": "The existing ledger traversal and source/contract construction work are unchanged; explicit period selection changes rule outcomes, not search, indexing, caching, serialization algorithms or test selection."
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "tools/event_companion_layout_source/contacts.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-layout-tools-event_companion_layout_source-contacts.py"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "tools/event_companion_layout_source/correspond.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-layout-tools-event_companion_layout_source-correspond.py"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "tools/event_companion_layout_source/extract.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-layout-tools-event_companion_layout_source-extract.py"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "tools/event_companion_layout_source/observe.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-layout-tools-event_companion_layout_source-observe.py"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "tools/event_companion_layout_source/requirements.txt": {
+      "category": "dependency_environment",
+      "operations": [
+        "event-october-layout-tools-event_companion_layout_source-requirements.txt"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": null,
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "tools/event_companion_layout_source/source_context.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-layout-tools-event_companion_layout_source-source_context.py"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "tools/extract_event_companion_current_layouts.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-layout-tools-extract_event_companion_current_layouts.py"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "reconstruction": "docs/performance/current/event-secondary-cap-a32-reconstruction-20261104.json"
-  },
+  "comparisons": {},
   "full_game": null
 }

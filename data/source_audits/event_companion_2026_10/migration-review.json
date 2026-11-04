@@ -1,0 +1,514 @@
+{
+  "schema": "event-layout-october-migration-review-v1",
+  "source_pdf_sha256": "187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2",
+  "source_extraction_sha256": "94476b9c2b3756ac49e5045d31b4cfc577451ceeda87aee01df5431ae457f111",
+  "historical_exception_dispositions": [
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "disruption-vs-disruption-layout-1-terrain-area-07",
+      "historical_value": [
+        2,
+        3,
+        -2
+      ],
+      "current_value": [
+        2,
+        3,
+        -2
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "disruption-vs-disruption-layout-1-terrain-area-10",
+      "historical_value": [
+        2,
+        -4,
+        2
+      ],
+      "current_value": [
+        2,
+        -4,
+        2
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "purge-the-foe-vs-disruption-layout-3-terrain-area-02",
+      "historical_value": [
+        1,
+        2,
+        -7
+      ],
+      "current_value": [
+        1,
+        2,
+        -7
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "purge-the-foe-vs-disruption-layout-3-terrain-area-04",
+      "historical_value": [
+        2,
+        -2,
+        6
+      ],
+      "current_value": [
+        2,
+        -2,
+        6
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "purge-the-foe-vs-disruption-layout-3-terrain-area-13",
+      "historical_value": [
+        2,
+        1,
+        -7
+      ],
+      "current_value": [
+        2,
+        1,
+        -7
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "purge-the-foe-vs-disruption-layout-3-terrain-area-15",
+      "historical_value": [
+        1,
+        -1,
+        6
+      ],
+      "current_value": [
+        1,
+        -1,
+        6
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-13",
+      "historical_value": [
+        0,
+        0,
+        1
+      ],
+      "current_value": [
+        0,
+        0,
+        1
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "reconnaissance-vs-reconnaissance-layout-2-terrain-area-07",
+      "historical_value": [
+        2,
+        3,
+        -2
+      ],
+      "current_value": null,
+      "disposition": "retired_changed_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10",
+      "historical_value": [
+        2,
+        -4,
+        2
+      ],
+      "current_value": null,
+      "disposition": "retired_changed_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "disruption-vs-disruption-layout-2-terrain-area-06",
+      "historical_value": [
+        2,
+        0,
+        2
+      ],
+      "current_value": [
+        2,
+        0,
+        2
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "disruption-vs-disruption-layout-2-terrain-area-11",
+      "historical_value": [
+        2,
+        -4,
+        1
+      ],
+      "current_value": [
+        2,
+        -4,
+        1
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "reconnaissance-vs-reconnaissance-layout-3-terrain-area-06",
+      "historical_value": [
+        2,
+        0,
+        2
+      ],
+      "current_value": null,
+      "disposition": "retired_changed_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "reconnaissance-vs-reconnaissance-layout-3-terrain-area-11",
+      "historical_value": [
+        2,
+        -4,
+        1
+      ],
+      "current_value": null,
+      "disposition": "retired_changed_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-02",
+      "historical_value": [
+        1,
+        4,
+        -1
+      ],
+      "current_value": [
+        1,
+        4,
+        -1
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-04",
+      "historical_value": [
+        2,
+        -4,
+        0
+      ],
+      "current_value": [
+        2,
+        -4,
+        0
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-13",
+      "historical_value": [
+        2,
+        4,
+        -1
+      ],
+      "current_value": [
+        2,
+        4,
+        -1
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-15",
+      "historical_value": [
+        1,
+        -4,
+        1
+      ],
+      "current_value": [
+        1,
+        -4,
+        1
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-08",
+      "historical_value": [
+        2,
+        2,
+        0
+      ],
+      "current_value": [
+        2,
+        2,
+        0
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-09",
+      "historical_value": [
+        2,
+        -3,
+        0
+      ],
+      "current_value": [
+        2,
+        -3,
+        0
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_FIXED_AREA_POSE_STEPS",
+      "identity": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-11",
+      "historical_value": [
+        1,
+        0,
+        -1
+      ],
+      "current_value": [
+        1,
+        0,
+        -1
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_EXACT_SEAM_OFFSETS",
+      "identity": "disruption-vs-disruption-layout-1-terrain-area-10",
+      "historical_value": [
+        0.005440361094,
+        0.010510105572
+      ],
+      "current_value": [
+        0.005440361094,
+        0.010510105572
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_geometry.py",
+      "table": "_REVIEWED_EXACT_SEAM_OFFSETS",
+      "identity": "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10",
+      "historical_value": [
+        0.005440361094,
+        0.010510105572
+      ],
+      "current_value": null,
+      "disposition": "retired_changed_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_catalog.py",
+      "table": "REVIEWED_FIXED_COMPONENT_CENTERS",
+      "identity": "disruption-vs-disruption-layout-3-terrain-area-02-component-01",
+      "historical_value": [
+        10.9,
+        53.45
+      ],
+      "current_value": [
+        10.9,
+        53.45
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_catalog.py",
+      "table": "REVIEWED_FIXED_COMPONENT_CENTERS",
+      "identity": "purge-the-foe-vs-disruption-layout-3-terrain-area-04-component-01",
+      "historical_value": [
+        37.85,
+        41.35
+      ],
+      "current_value": [
+        37.85,
+        41.35
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_catalog.py",
+      "table": "REVIEWED_FIXED_COMPONENT_CENTERS",
+      "identity": "purge-the-foe-vs-disruption-layout-3-terrain-area-07-component-01",
+      "historical_value": [
+        27.05,
+        27.55
+      ],
+      "current_value": [
+        27.05,
+        27.55
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_catalog.py",
+      "table": "REVIEWED_FIXED_COMPONENT_CENTERS",
+      "identity": "purge-the-foe-vs-disruption-layout-3-terrain-area-13-component-01",
+      "historical_value": [
+        6.1,
+        18.5
+      ],
+      "current_value": [
+        6.1,
+        18.5
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_catalog.py",
+      "table": "REVIEWED_FIXED_COMPONENT_CENTERS",
+      "identity": "take-and-hold-vs-priority-assets-layout-3-terrain-area-08-component-03",
+      "historical_value": [
+        35.4,
+        35.6
+      ],
+      "current_value": [
+        35.4,
+        35.6
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_catalog.py",
+      "table": "REVIEWED_FIXED_COMPONENT_CENTERS",
+      "identity": "take-and-hold-vs-priority-assets-layout-3-terrain-area-09-component-02",
+      "historical_value": [
+        8.5,
+        24.3
+      ],
+      "current_value": [
+        8.5,
+        24.3
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    },
+    {
+      "owner": "tools/event_companion_battlefield_builder_catalog.py",
+      "table": "REVIEWED_FIXED_COMPONENT_CENTERS",
+      "identity": "reconnaissance-vs-reconnaissance-layout-1-terrain-area-02-component-01",
+      "historical_value": [
+        10.9,
+        53.45
+      ],
+      "current_value": [
+        10.9,
+        53.45
+      ],
+      "disposition": "retained_unchanged_source_geometry",
+      "evidence": "Current source correspondence records full outline/image observations; final strict builder revalidates all board/contact/component constraints."
+    }
+  ],
+  "meatgrinder_disposition": {
+    "pages": [
+      24,
+      25,
+      26
+    ],
+    "retired": "Historical single source pose and forced point symmetry. Actual current source registered independently for all48 physical footprints; current component poses are independently observed.",
+    "current": "Four candidates per piece, current image axis and raw outline centroid; minimum128+128point boundary fit then unchanged bounded quantization and strict containment/contact checks."
+  },
+  "board_regions": {
+    "retained": "Same44x60 nominal affine and six printed-dimension templates. All45 background registrations, border paths and territory paths unchanged between July/October.",
+    "exceptions": [
+      "Page47 decorative border remains different from common border, already present in July; common background registration is unchanged.",
+      "Page53 defender paint now matches page9 template1; no nominal template change."
+    ],
+    "artwork_max_template_hausdorff_inches": 0.16454
+  },
+  "crop_registration": {
+    "current_xref": 356,
+    "archetype_id": "dense-tall-crates",
+    "current_pixels": [
+      51,
+      87
+    ],
+    "historical_canonical_pixels": [
+      48,
+      87
+    ],
+    "left48_alpha_exact_fraction": 0.998803,
+    "convention": "Keep independently observed image-bbox midpoint; physical footprint model is the existing reviewed project assumption, not inferred raster dimensions.",
+    "canonical_feature_midpoint_offset_pixels": 1.5,
+    "maximum_world_offset_inches": 0.046267835,
+    "affected_page": 10
+  },
+  "historical_contact_dispositions": {
+    "page11": "Two small visible July Single icons were omitted by the historical detector. Current larger icons are included; historical reviewed bytes remain untouched.",
+    "page35": "Fully obscured seq46 icon excluded after final raster visibility check; all219 visible current icons retained."
+  },
+  "inventory": {
+    "layouts": 45,
+    "physical_areas": 720,
+    "components": 1349,
+    "objectives": 249,
+    "contacts": 219,
+    "contact_kinds": {
+      "single": 103,
+      "separate": 116
+    },
+    "logical_areas": 617
+  },
+  "qualification": "Source and independently reconstructed final geometry checked; complete local/remote exact-head gates are recorded separately, not asserted here."
+}

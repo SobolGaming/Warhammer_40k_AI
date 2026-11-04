@@ -20,7 +20,7 @@ _CANDIDATE_BEAM_WIDTH = 1024
 # multiple equivalent candidates. The table pins the deterministic
 # lexicographic member of each minimum-displacement solution; all board,
 # contact, objective, and exact runtime component scores are zero before the
-# two separately documented pages 36/46 exact-seam corrections below.
+# separately documented page 36 exact-seam correction below.
 _REVIEWED_FIXED_AREA_POSE_STEPS = {
     "disruption-vs-disruption-layout-1-terrain-area-07": (2, 3, -2),
     "disruption-vs-disruption-layout-1-terrain-area-10": (2, -4, 2),
@@ -29,12 +29,8 @@ _REVIEWED_FIXED_AREA_POSE_STEPS = {
     "purge-the-foe-vs-disruption-layout-3-terrain-area-13": (2, 1, -7),
     "purge-the-foe-vs-disruption-layout-3-terrain-area-15": (1, -1, 6),
     "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-13": (0, 0, 1),
-    "reconnaissance-vs-reconnaissance-layout-2-terrain-area-07": (2, 3, -2),
-    "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10": (2, -4, 2),
     "disruption-vs-disruption-layout-2-terrain-area-06": (2, 0, 2),
     "disruption-vs-disruption-layout-2-terrain-area-11": (2, -4, 1),
-    "reconnaissance-vs-reconnaissance-layout-3-terrain-area-06": (2, 0, 2),
-    "reconnaissance-vs-reconnaissance-layout-3-terrain-area-11": (2, -4, 1),
     "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-02": (1, 4, -1),
     "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-04": (2, -4, 0),
     "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-13": (2, 4, -1),
@@ -52,21 +48,12 @@ _REVIEWED_FIXED_AREA_POSE_STEPS = {
 # serialized correction below, the selected pair has <=3.44e-13-inch gap, zero
 # overlap, and <=1.59e-12 square inches of component footprint outside its union.
 _REVIEWED_EXACT_SEAM_OFFSETS = {
-    "disruption-vs-disruption-layout-1-terrain-area-10": (
-        0.005440361094,
-        0.010510105572,
-    ),
-    "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10": (
-        0.005440361094,
-        0.010510105572,
-    ),
+    "disruption-vs-disruption-layout-1-terrain-area-10": (0.005440361094, 0.010510105572)
 }
 _REVIEWED_EXACT_SEAM_AREA_IDS = frozenset(
     {
         "disruption-vs-disruption-layout-1-terrain-area-07",
         "disruption-vs-disruption-layout-1-terrain-area-10",
-        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-07",
-        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10",
     }
 )
 
@@ -964,17 +951,6 @@ def solve_area_poses(
     templates: dict[str, tuple[tuple[float, float], ...]],
     component_constraint: Callable[[dict[str, AreaPose]], tuple[int, float]] | None = None,
 ) -> tuple[dict[str, AreaPose], tuple[tuple[str, str], ...]]:
-    if layout["source_pdf_page_number"] in {24, 25, 26}:
-        solved, contact_pairs = _solve_symmetric_area_poses(
-            layout,
-            layout_id=layout_id,
-            templates=templates,
-        )
-        if component_constraint is not None and component_constraint(solved)[0] != 0:
-            raise ValueError(
-                f"Symmetric terrain-area component containment failed for {layout_id}."
-            )
-        return solved, contact_pairs
     if component_constraint is not None:
         solved, contact_pairs = _solve_independent_area_poses(
             layout,

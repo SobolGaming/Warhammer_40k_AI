@@ -33666,6 +33666,245 @@
       ],
       "sensitive": true,
       "mandatory": true
+    },
+    "event-october-layout-data-source_audits-event_companion_2026_10-README.md": {
+      "paths": [
+        "data/source_audits/event_companion_2026_10/README.md"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-data-source_audits-event_companion_2026_10-event_companion_layouts_pages_8_53.json": {
+      "paths": [
+        "data/source_audits/event_companion_2026_10/event_companion_layouts_pages_8_53.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-data-source_audits-event_companion_2026_10-migration-review.json": {
+      "paths": [
+        "data/source_audits/event_companion_2026_10/migration-review.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-data-source_audits-event_companion_2026_10-official-source-observation.json": {
+      "paths": [
+        "data/source_audits/event_companion_2026_10/official-source-observation.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-tools-build_event_companion_battlefields.py": {
+      "paths": [
+        "tools/build_event_companion_battlefields.py"
+      ],
+      "owners": [
+        "@module",
+        "_area_rows",
+        "_component_rows",
+        "_initial_component_poses",
+        "build_artifact"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-tools-event_companion_battlefield_builder_catalog.py": {
+      "paths": [
+        "tools/event_companion_battlefield_builder_catalog.py"
+      ],
+      "owners": [
+        "@module"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-tools-event_companion_battlefield_builder_geometry.py": {
+      "paths": [
+        "tools/event_companion_battlefield_builder_geometry.py"
+      ],
+      "owners": [
+        "@module",
+        "solve_area_poses"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-tools-event_companion_layout_source-contacts.py": {
+      "paths": [
+        "tools/event_companion_layout_source/contacts.py"
+      ],
+      "owners": [
+        "@module",
+        "color",
+        "extract",
+        "polygon",
+        "xy"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-tools-event_companion_layout_source-correspond.py": {
+      "paths": [
+        "tools/event_companion_layout_source/correspond.py"
+      ],
+      "owners": [
+        "@module",
+        "center",
+        "outline"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-tools-event_companion_layout_source-extract.py": {
+      "paths": [
+        "tools/event_companion_layout_source/extract.py"
+      ],
+      "owners": [
+        "@module",
+        "asset",
+        "center",
+        "imagepose",
+        "pathpoints",
+        "pdf",
+        "polygon_world",
+        "q",
+        "r",
+        "signed_area",
+        "world"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-tools-event_companion_layout_source-observe.py": {
+      "paths": [
+        "tools/event_companion_layout_source/observe.py"
+      ],
+      "owners": [
+        "@module",
+        "affine",
+        "center",
+        "close",
+        "footprints",
+        "image_info",
+        "norm",
+        "objectives",
+        "points"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-tools-event_companion_layout_source-requirements.txt": {
+      "paths": [
+        "tools/event_companion_layout_source/requirements.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-tools-event_companion_layout_source-source_context.py": {
+      "paths": [
+        "tools/event_companion_layout_source/source_context.py"
+      ],
+      "owners": [
+        "@module"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-tools-extract_event_companion_current_layouts.py": {
+      "paths": [
+        "tools/extract_event_companion_current_layouts.py"
+      ],
+      "owners": [
+        "@module",
+        "main"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-generated-movement-example": {
+      "paths": [
+        "contracts/examples/decisions/families/submit_movement_proposal.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-layout-native-regressions": {
+      "paths": [
+        "tests/infrastructure/missions/unit/test_event_companion_part2.py"
+      ],
+      "owners": [
+        "test_current_event_layouts_have_bounded_october_source_and_complete_markers",
+        "test_current_layout_viewer_projects_and_renders_all_source_geometry"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
