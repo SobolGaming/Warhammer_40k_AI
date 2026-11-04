@@ -1058,3 +1058,78 @@ def test_native_shooting_owner_waits_for_attack_mortal_choices(
     ).is_complete
     final = session.lifecycle.to_payload()
     assert GameLifecycle.from_payload(final).to_payload() == final
+
+
+def test_effective_save7_engine_checkpoint_restores_forks_and_replays() -> None:
+    import json
+
+    from tests.save7_allocation_helpers import effective_save_session
+    from tests.support.section04_fixtures import finish_attacks
+    from warhammer40k_core.engine.lifecycle_state_queries import active_attack_sequence_for_state
+
+    session = effective_save_session()
+    state = session.lifecycle.state
+    assert state is not None
+    sequence = active_attack_sequence_for_state(state)
+    assert sequence is not None
+    pending_damage = sequence.pending_grouped_damage
+    assert pending_damage is not None
+    assert pending_damage.ordered_allocation_groups()
+    assert all(group.save == 7 for group in pending_damage.ordered_allocation_groups())
+    request = pending(session)
+    assert request.decision_type == "select_damage_allocation_model"
+    assert request.options
+    from pathlib import Path
+
+    from jsonschema import Draft202012Validator
+    from jsonschema.protocols import Validator
+    from referencing import Resource
+    from referencing.jsonschema import DRAFT202012, EMPTY_REGISTRY
+
+    schemas = Path(__file__).resolve().parents[3] / "contracts" / "schemas"
+    registry = EMPTY_REGISTRY
+    for schema_path in sorted(schemas.glob("*.schema.json")):
+        schema = json.loads(schema_path.read_text())
+        registry = registry.with_resource(
+            schema["$id"], Resource.from_contents(schema, default_specification=DRAFT202012)
+        )
+    view_schema = json.loads((schemas / "game-view.schema.json").read_text())
+    persistence_schema = json.loads((schemas / "session-persistence.schema.json").read_text())
+    checkpoint_schema = {
+        "$ref": "#/$defs/local_game_session_checkpoint",
+        "$defs": persistence_schema["$defs"],
+    }
+    for viewer in ("player-a", "player-b"):
+        view = session.view(viewer_player_id=viewer)
+        cast(Validator, Draft202012Validator(view_schema, registry=registry)).validate(
+            cast(JsonValue, view)
+        )
+        displays = [
+            characteristic
+            for display in view["model_display_by_id"].values()
+            for characteristic in display["current_characteristics"].values()
+            if characteristic["characteristic"] == "save"
+        ]
+        assert displays
+        assert all(
+            display["final"] == 7
+            and type(display["final"]) is int
+            and display["value_kind"] == "numeric"
+            for display in displays
+        )
+    checkpoint = json.loads(json.dumps(session.to_persistence_payload()))
+    cast(Validator, Draft202012Validator(checkpoint_schema, registry=registry)).validate(checkpoint)
+    restored = LocalGameSession.from_persistence_payload(checkpoint)
+    assert restored.to_persistence_payload() == checkpoint
+    finals: list[JsonValue] = []
+    for branch in (restored, restored.fork()):
+        assert pending(branch) == request
+        choose(branch, pending(branch), request.options[-1].option_id)
+        finish_attacks(branch)
+        final = branch.to_persistence_payload()
+        assert LocalGameSession.from_persistence_payload(final).to_persistence_payload() == final
+        replay = ReplayRunner.from_payload(branch.replay_artifact(artifact_id="save7:replay")).run()
+        assert replay.status is ReplayRunStatus.REPRODUCED, replay
+        finals.append(final)
+    assert finals[0] == finals[1]
+    assert session.to_persistence_payload() == checkpoint

@@ -33109,6 +33109,89 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "save7-exact-d8df651625f769c6": {
+      "paths": [
+        "src/warhammer40k_core/engine/damage_allocation.py"
+      ],
+      "owners": [
+        "AllocationGroup.__post_init__"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "save7-exact-a3adc1968be49c48": {
+      "paths": [
+        "src/warhammer40k_core/engine/damage_allocation_validation.py"
+      ],
+      "owners": [
+        "@module",
+        "validate_optional_effective_save_characteristic",
+        "validate_optional_save"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "save7-exact-547642cb6d038744": {
+      "paths": [
+        "tests/rules/section04/test_completion_boundaries.py"
+      ],
+      "owners": [
+        "test_effective_save7_engine_checkpoint_restores_forks_and_replays"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "save7-exact-14272f7eb5f29567": {
+      "paths": [
+        "tests/rules/section05/test_allocation_choices.py"
+      ],
+      "owners": [
+        "test_effective_save7_character_and_mixed_group_choices",
+        "test_effective_save_characteristic_constructor_and_decoder",
+        "test_effective_save_characteristic_rejects_malformed_values",
+        "test_effective_save_widening_keeps_d6_and_fnp_bounds",
+        "test_native_bloodletters_unit_and_allocation_roundtrip",
+        "test_native_save7_facade_completes_attack"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "save7-exact-50d0064f13e1390f": {
+      "paths": [
+        "tests/rules/section05/test_saves.py"
+      ],
+      "owners": [
+        "test_effective_save7_current_cover_penalizes_bs_only",
+        "test_effective_save7_improvement_worsening_and_current_cover",
+        "test_effective_save7_is_real_save_except_devastating_wounds",
+        "test_effective_save_widening_keeps_invulnerable_grant_bounds",
+        "test_native_save7_faces_keep_armour_and_invulnerable"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "save7-exact-7a6825eace60cd05": {
+      "paths": [
+        "tests/save7_allocation_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "allocation_group",
+        "effective_save_session",
+        "effective_value",
+        "modified_model",
+        "native_attack_session",
+        "native_target"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

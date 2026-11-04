@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1bd54c19c4853b282c77ffedac213cd3783587f95d5618b1795b5c9824f589d5",
-  "fingerprint": "1bd54c19c4853b282c77ffedac213cd3783587f95d5618b1795b5c9824f589d5",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9c67490093af232f0cbee6df778c3435068478d531d2bb512cc7a5081397092e",
+  "fingerprint": "9c67490093af232f0cbee6df778c3435068478d531d2bb512cc7a5081397092e",
   "resource_count": 3206,
   "resources": [
     {
@@ -2180,9 +2180,9 @@
       "sha256": "4547f22a78de1c95f2d982544021b4640803920d553e0f2feba90be99804c252"
     },
     {
-      "byte_length": 119765,
+      "byte_length": 119838,
       "path": "warhammer40k_core/engine/damage_allocation.py",
-      "sha256": "ad90f81c802eb7571865a3a11a50ad95c811f1965a8aba8b13ea1ddab649250a"
+      "sha256": "524a0aa87e0f7dac45d6e603caadff8259ceb86904d609b7f9864767784c5d14"
     },
     {
       "byte_length": 4893,
@@ -2190,9 +2190,9 @@
       "sha256": "10b7a292e110344698396ae37667fea58c0565b20b6e011303232c74a442e0b4"
     },
     {
-      "byte_length": 5556,
+      "byte_length": 5926,
       "path": "warhammer40k_core/engine/damage_allocation_validation.py",
-      "sha256": "6419181f155228c6ccf9576a829eb23f405f9dfca9397dd0ca1c91b7d3f325ac"
+      "sha256": "0d63378acc5bb04f9e8b07ac8790f42cb0a3bd602541eb433ccfcd3de65d12f8"
     },
     {
       "byte_length": 21221,
