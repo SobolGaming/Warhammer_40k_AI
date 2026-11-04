@@ -245,6 +245,9 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
                 Path(wave_frame.__file__).with_name(wave_frame.AUDIT_ARTIFACT_NAME),
                 Path(daemons_native.__file__).with_name(daemons_native.ARTIFACT_NAME),
                 Path(daemons_native.__file__).with_name(daemons_native.AUDIT_ARTIFACT_NAME),
+                Path(daemons_native.next_three.__file__).with_name(
+                    daemons_native.next_three.AUDIT_ARTIFACT_NAME
+                ),
                 rules / "source_authority_registry.json",
                 rules
                 / "source_packages"

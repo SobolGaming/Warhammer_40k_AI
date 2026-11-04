@@ -12,6 +12,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     daemons_native_2026_11 as daemons_native_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    daemons_next_three_2026_11 as next_three_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     july_faction_packs_2026_07 as july_source,
 )
 
@@ -1067,7 +1070,10 @@ CHAOS_DAEMONS_CURRENT_KEYWORD_CORRECTIONS = tuple(
         removed_keywords=("Shadow Legion",),
         source_package_version=daemons_native_source.SOURCE_VERSION,
     )
-    for datasheet_id, source_id in daemons_native_source.KEYWORD_SOURCE_IDS
+    for datasheet_id, source_id in (
+        *daemons_native_source.KEYWORD_SOURCE_IDS,
+        *next_three_source.KEYWORD_SOURCE_IDS,
+    )
 )
 
 DEFAULT_PDF_CORRECTIONS = (

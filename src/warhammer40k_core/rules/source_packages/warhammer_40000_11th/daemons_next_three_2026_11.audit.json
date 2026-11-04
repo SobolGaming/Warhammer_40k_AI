@@ -1,0 +1,168 @@
+{
+  "app_version": "995",
+  "audit_id": "daemons-next-three-app-mirror-2026-11-04",
+  "audit_schema": "core-v2-faction-source-audit-v2",
+  "edition": "warhammer_40000_11th",
+  "geometry_authority": {
+    "base_authority": "explicit_maintained_app_or_official_model_evidence",
+    "missing_data": "blocks_fieldability",
+    "variants": "exact_model_profile_and_variant_required",
+    "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+  },
+  "locale": "en",
+  "observations": [
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "7df98c8e13367816bb3604dca482294d464dae85b25351bc6475aaf3e43baa02",
+      "captured_text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nFlesh Hounds\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nGore Hound 60 x 35.5mm Oval Base\n\nInvulnerable save: 5+\n\n12\"\n4\n7+\n2\n7+\n1\nFlesh Hound 60 x 35.5mm Oval Base\n\nInvulnerable save: 5+\n\n12\"\n4\n7+\n2\n7+\n1\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nBurning roar\nIGNORES COVER\nTORRENT\n12\"\nD6\n-\n4\n0\n1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nGore-drenched fangs\n3\n3+\n5\n-1\n1\nKEYWORDS\nBEAST\nCHAOS\nDAEMON\nFLESH HOUNDS\nKHORNE\nCOSTS\n5 models\n80 pts\n10 models\n150 pts\nUNIT COMPOSITION\n1 Gore Hound\n4-9 Flesh Hounds\n\nThe Gore Hound is equipped with: burning roar; gore-drenched fangs; collar of Khorne. Every Flesh Hound is equipped with: gore-drenched fangs; collar of Khorne.\n\nLed by\nKARANAK\nBecome a supporter and remove ads\nWARGEAR\nCollar of Khorne\n\nThe bearer has the Feel No Pain 3+ ability against Psychic Attacks.\n\nCORE ABILITIES\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nHunters from the Warp\n\nAt the end of your opponent’s turn, if this unit is not within Engagement Range of one or more enemy units, you can remove it from the battlefield and place it into Strategic Reserves.\n\nSTATS\n26%\nof Chaos Daemons lists, 1.6 per list\n#5\nmost-taken in faction\n27%\nfrom 26% since last update\nIN ARMY LISTS\nPopular detachments\nBLOOD LEGION\nWARPTIDE\nCAVALCADE OF CHAOS\nMost often led by\nKARANAK\nOften taken with\nBLOODCRUSHERS\nBLOODLETTERS\nSKULLMASTER\nBLOODTHIRSTER\nBLOODMASTER",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "model_role": "Gore Hound",
+          "base_statement": "Gore Hound 60 x 35.5mm Oval Base",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        },
+        {
+          "model_role": "Flesh Hound",
+          "base_statement": "Flesh Hound 60 x 35.5mm Oval Base",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "daemons-next-three-2026-11-04:datasheet:flesh-hounds",
+      "observed_at": "2026-11-04T07:12:09.862Z",
+      "official_source_ids": [
+        "gw-11e-chaos-daemons-faction-pack-2026-07"
+      ],
+      "operative_start": "Flesh Hounds\nDATASHEET",
+      "operative_text": "Flesh Hounds\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nGore Hound 60 x 35.5mm Oval Base\n\nInvulnerable save: 5+\n\n12\"\n4\n7+\n2\n7+\n1\nFlesh Hound 60 x 35.5mm Oval Base\n\nInvulnerable save: 5+\n\n12\"\n4\n7+\n2\n7+\n1\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nBurning roar\nIGNORES COVER\nTORRENT\n12\"\nD6\n-\n4\n0\n1\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nGore-drenched fangs\n3\n3+\n5\n-1\n1\nKEYWORDS\nBEAST\nCHAOS\nDAEMON\nFLESH HOUNDS\nKHORNE\nCOSTS\n5 models\n80 pts\n10 models\n150 pts\nUNIT COMPOSITION\n1 Gore Hound\n4-9 Flesh Hounds\n\nThe Gore Hound is equipped with: burning roar; gore-drenched fangs; collar of Khorne. Every Flesh Hound is equipped with: gore-drenched fangs; collar of Khorne.\n\nLed by\nKARANAK\nBecome a supporter and remove ads\nWARGEAR\nCollar of Khorne\n\nThe bearer has the Feel No Pain 3+ ability against Psychic Attacks.\n\nCORE ABILITIES\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nHunters from the Warp\n\nAt the end of your opponent’s turn, if this unit is not within Engagement Range of one or more enemy units, you can remove it from the battlefield and place it into Strategic Reserves.\n\nSTATS\n26%\nof Chaos Daemons lists, 1.6 per list\n#5\nmost-taken in faction\n27%\nfrom 26% since last update\nIN ARMY LISTS\nPopular detachments\nBLOOD LEGION\nWARPTIDE\nCAVALCADE OF CHAOS\nMost often led by\nKARANAK\nOften taken with\nBLOODCRUSHERS\nBLOODLETTERS\nSKULLMASTER\nBLOODTHIRSTER\nBLOODMASTER",
+      "owning_faction_source_id": "faction-app:chaos-daemons",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Three complete maintained unofficial App unit pages admit only the bounded ordinary keyword correction. Global version 995 and faction update 963 are context, not per-unit dates or primary corroboration. Retained Infected Outbreak and Shadow of Chaos prose debt and missing Lord/Plague geometry remain uncorrected; no full-unit, physical admission or game certification.",
+      "source_id": "faction-app:chaos-daemons:datasheet:flesh-hounds",
+      "source_observation_sha256": "eae3357f986f74cca782ed9856b62f19b36f2079f7aabf2f1b76f4da984bfa51",
+      "source_title": "Flesh Hounds",
+      "source_url": "https://www.40k.app/factions/chaos-daemons/units/flesh-hounds",
+      "transcription_sha256": "efabe4b58a17fb6736f34746e6fef42bedfccad483dc3b924f23c85f304a22a6"
+    },
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "d72e1d5e553ab5108d6f7535abe79e57895e2dcb898a2cd6293ec66775a61e7a",
+      "captured_text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nLord of Change\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nLord of Change 100mm\n\nInvulnerable save: 4+\n\n12\"\n10\n6+\n18\n6+\n5\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\n➤ Bolt of Change (witchfire)\nPSYCHIC\n18\"\n9\n2+\n9\n-1\n1\n➤ Bolt of Change (focused witchfire)\nHAZARDOUS\nPSYCHIC\n18\"\n9\n2+\n9\n-2\n3\nRod of sorcery\nPSYCHIC\n18\"\n6\n2+\n8\n-1\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nBaleful sword\nEXTRA ATTACKS\n3\n3+\n7\n-2\n3\nStaff of Tzeentch\nPSYCHIC\n5\n3+\n6\n-1\n3\nKEYWORDS\nCHAOS\nCHARACTER\nDAEMON\nFLY\nLORD OF CHANGE\nMONSTER\nPSYKER\nTZEENTCH\nCOSTS\n1 model\n320 pts\n3rd+ in your army\n+20 pts\nUNIT COMPOSITION\n1 Lord of Change\n\nThis model is equipped with: Bolt of Change; staff of Tzeentch.\n\nWARGEAR OPTIONS\nThis model can be equipped with one of the following: ◦ 1 rod of sorcery ◦ 1 baleful sword\nCORE ABILITIES\nDEADLY DEMISE D6\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nGreater Daemon of Tzeentch\n\nWhile a friendly TZEENTCH LEGIONES DAEMONICA unit is within 6\" of this model, that unit is within your army’s Shadow of Chaos.\n\nDaemon Lord of Tzeentch\n\nWhile a friendly TZEENTCH LEGIONES DAEMONICA unit is within 6\" of this model, each time a model in that unit makes a ranged attack, add 1 to the Strength characteristic of that attack.\n\nMaster of Magicks\n\nIn your Shooting phase, select one of the following abilities: [IGNORES COVER]; [LETHAL HITS]; [SUSTAINED HITS D3]. Until the end of the phase, this model’s Bolt of Change has that ability.\n\nDAMAGED: 1-7 WOUNDS REMAINING\n\nWhile this model has 1-7 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n19%\nof Chaos Daemons lists, 1.3 per list\n#14\nmost-taken in faction\n15%\nfrom 27% since last update\nIN ARMY LISTS\nPopular detachments\nDAEMONIC INCURSION\nSCINTILLATING LEGION\nSHADOW LEGION\nOften taken with\nPINK HORRORS\nBE’LAKOR\nSCREAMERS\nFLAMERS\nKAIROS FATEWEAVER",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "model_role": "Lord of Change",
+          "base_statement": "Lord of Change 100mm",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "daemons-next-three-2026-11-04:datasheet:lord-of-change",
+      "observed_at": "2026-11-04T07:12:58.792Z",
+      "official_source_ids": [
+        "gw-11e-chaos-daemons-faction-pack-2026-07"
+      ],
+      "operative_start": "Lord of Change\nDATASHEET",
+      "operative_text": "Lord of Change\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nLord of Change 100mm\n\nInvulnerable save: 4+\n\n12\"\n10\n6+\n18\n6+\n5\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\n➤ Bolt of Change (witchfire)\nPSYCHIC\n18\"\n9\n2+\n9\n-1\n1\n➤ Bolt of Change (focused witchfire)\nHAZARDOUS\nPSYCHIC\n18\"\n9\n2+\n9\n-2\n3\nRod of sorcery\nPSYCHIC\n18\"\n6\n2+\n8\n-1\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nBaleful sword\nEXTRA ATTACKS\n3\n3+\n7\n-2\n3\nStaff of Tzeentch\nPSYCHIC\n5\n3+\n6\n-1\n3\nKEYWORDS\nCHAOS\nCHARACTER\nDAEMON\nFLY\nLORD OF CHANGE\nMONSTER\nPSYKER\nTZEENTCH\nCOSTS\n1 model\n320 pts\n3rd+ in your army\n+20 pts\nUNIT COMPOSITION\n1 Lord of Change\n\nThis model is equipped with: Bolt of Change; staff of Tzeentch.\n\nWARGEAR OPTIONS\nThis model can be equipped with one of the following: ◦ 1 rod of sorcery ◦ 1 baleful sword\nCORE ABILITIES\nDEADLY DEMISE D6\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nGreater Daemon of Tzeentch\n\nWhile a friendly TZEENTCH LEGIONES DAEMONICA unit is within 6\" of this model, that unit is within your army’s Shadow of Chaos.\n\nDaemon Lord of Tzeentch\n\nWhile a friendly TZEENTCH LEGIONES DAEMONICA unit is within 6\" of this model, each time a model in that unit makes a ranged attack, add 1 to the Strength characteristic of that attack.\n\nMaster of Magicks\n\nIn your Shooting phase, select one of the following abilities: [IGNORES COVER]; [LETHAL HITS]; [SUSTAINED HITS D3]. Until the end of the phase, this model’s Bolt of Change has that ability.\n\nDAMAGED: 1-7 WOUNDS REMAINING\n\nWhile this model has 1-7 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.\n\nSTATS\n19%\nof Chaos Daemons lists, 1.3 per list\n#14\nmost-taken in faction\n15%\nfrom 27% since last update\nIN ARMY LISTS\nPopular detachments\nDAEMONIC INCURSION\nSCINTILLATING LEGION\nSHADOW LEGION\nOften taken with\nPINK HORRORS\nBE’LAKOR\nSCREAMERS\nFLAMERS\nKAIROS FATEWEAVER",
+      "owning_faction_source_id": "faction-app:chaos-daemons",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Three complete maintained unofficial App unit pages admit only the bounded ordinary keyword correction. Global version 995 and faction update 963 are context, not per-unit dates or primary corroboration. Retained Infected Outbreak and Shadow of Chaos prose debt and missing Lord/Plague geometry remain uncorrected; no full-unit, physical admission or game certification.",
+      "source_id": "faction-app:chaos-daemons:datasheet:lord-of-change",
+      "source_observation_sha256": "12a79c7621043f266c7090781774c72565e19baca9e43b99d59caa7080068fd9",
+      "source_title": "Lord of Change",
+      "source_url": "https://www.40k.app/factions/chaos-daemons/units/lord-of-change",
+      "transcription_sha256": "b8f6324f1e7f6c7eec391797b97aab8da442fa0cdebe8a17b182bc3c5d77d171"
+    },
+    {
+      "app_version": "995",
+      "capture_method": "main.innerText",
+      "capture_sha256": "f8a923578105c347d9e25b52b6cee70797b70480ee42ff5e85b5705889cd8c18",
+      "captured_text": "40K.APP\nFACTIONS\nCHAOS DAEMONS\nPlaguebearers\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nPlagueridden 32mm\n\nInvulnerable save: 5+\n\n5\"\n5\n7+\n2\n7+\n2\nPlaguebearer 32mm\n\nInvulnerable save: 5+\n\n5\"\n5\n7+\n2\n7+\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nPlaguesword\nLETHAL HITS\n2\n3+\n4\n-1\n1\nKEYWORDS\nBATTLELINE\nCHAOS\nDAEMON\nINFANTRY\nNURGLE\nPLAGUEBEARERS\nCOSTS\n10 models\n115 pts\nUNIT COMPOSITION\n1 Plagueridden\n9 Plaguebearers\n\nEvery model is equipped with: plaguesword.\n\nLed by\nPOXBRINGER\nSPOILPOX SCRIVENER\nSLOPPITY BILEPIPER\nEPIDEMIUS\nWARGEAR OPTIONS\n1 Plaguebearer that is not equipped with a daemonic icon can be equipped with 1 instrument of Chaos.\n1 Plaguebearer that is not equipped with an instrument of Chaos can be equipped with 1 daemonic icon.\nWARGEAR\nDaemonic Icon\n\nModels in the bearer’s unit have a Leadership characteristic of 6+.\n\nInstrument of Chaos\n\nAdd 1 to Charge rolls made for the bearer’s unit.\n\nCORE ABILITIES\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nInfected Outbreak\n\nAt the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent’s Level of Control over that objective marker is greater than yours at the end of a phase.\n\nSTATS\n29%\nof Chaos Daemons lists, 2.1 per list\n#4\nmost-taken in faction\n29%\nfrom 26% since last update\nIN ARMY LISTS\nPopular detachments\nPLAGUE LEGION\nWARPTIDE\nDAEMONIC INCURSION\nMost often led by\nPOXBRINGER\nSLOPPITY BILEPIPER\nSPOILPOX SCRIVENER\nOften taken with\nGREAT UNCLEAN ONE\nNURGLINGS\nBEASTS OF NURGLE\nPOXBRINGER\nROTIGUS",
+      "completeness": "complete_page",
+      "content_kind": "datasheet",
+      "geometry": [
+        {
+          "model_role": "Plagueridden",
+          "base_statement": "Plagueridden 32mm",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        },
+        {
+          "model_role": "Plaguebearer",
+          "base_statement": "Plaguebearer 32mm",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "fieldability_certified": false,
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required"
+        }
+      ],
+      "identity_status": "resolved",
+      "locale": "en",
+      "objective_scope": "non_core_rules",
+      "observation_id": "daemons-next-three-2026-11-04:datasheet:plaguebearers",
+      "observed_at": "2026-11-04T07:13:59.087Z",
+      "official_source_ids": [
+        "gw-11e-chaos-daemons-faction-pack-2026-07"
+      ],
+      "operative_start": "Plaguebearers\nDATASHEET",
+      "operative_text": "Plaguebearers\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nPlagueridden 32mm\n\nInvulnerable save: 5+\n\n5\"\n5\n7+\n2\n7+\n2\nPlaguebearer 32mm\n\nInvulnerable save: 5+\n\n5\"\n5\n7+\n2\n7+\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nPlaguesword\nLETHAL HITS\n2\n3+\n4\n-1\n1\nKEYWORDS\nBATTLELINE\nCHAOS\nDAEMON\nINFANTRY\nNURGLE\nPLAGUEBEARERS\nCOSTS\n10 models\n115 pts\nUNIT COMPOSITION\n1 Plagueridden\n9 Plaguebearers\n\nEvery model is equipped with: plaguesword.\n\nLed by\nPOXBRINGER\nSPOILPOX SCRIVENER\nSLOPPITY BILEPIPER\nEPIDEMIUS\nWARGEAR OPTIONS\n1 Plaguebearer that is not equipped with a daemonic icon can be equipped with 1 instrument of Chaos.\n1 Plaguebearer that is not equipped with an instrument of Chaos can be equipped with 1 daemonic icon.\nWARGEAR\nDaemonic Icon\n\nModels in the bearer’s unit have a Leadership characteristic of 6+.\n\nInstrument of Chaos\n\nAdd 1 to Charge rolls made for the bearer’s unit.\n\nCORE ABILITIES\nDEEP STRIKE\nFACTION ABILITIES\nTHE SHADOW OF CHAOS\nUNIT ABILITIES\nInfected Outbreak\n\nAt the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent’s Level of Control over that objective marker is greater than yours at the end of a phase.\n\nSTATS\n29%\nof Chaos Daemons lists, 2.1 per list\n#4\nmost-taken in faction\n29%\nfrom 26% since last update\nIN ARMY LISTS\nPopular detachments\nPLAGUE LEGION\nWARPTIDE\nDAEMONIC INCURSION\nMost often led by\nPOXBRINGER\nSLOPPITY BILEPIPER\nSPOILPOX SCRIVENER\nOften taken with\nGREAT UNCLEAN ONE\nNURGLINGS\nBEASTS OF NURGLE\nPOXBRINGER\nROTIGUS",
+      "owning_faction_source_id": "faction-app:chaos-daemons",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "scope_classification": "matched_play",
+      "scope_review": "Three complete maintained unofficial App unit pages admit only the bounded ordinary keyword correction. Global version 995 and faction update 963 are context, not per-unit dates or primary corroboration. Retained Infected Outbreak and Shadow of Chaos prose debt and missing Lord/Plague geometry remain uncorrected; no full-unit, physical admission or game certification.",
+      "source_id": "faction-app:chaos-daemons:datasheet:plaguebearers",
+      "source_observation_sha256": "8981b3d2a29a0a29dcce2ca724c598dea9a04d80aebff134a6ad8e45f9f91e16",
+      "source_title": "Plaguebearers",
+      "source_url": "https://www.40k.app/factions/chaos-daemons/units/plaguebearers",
+      "transcription_sha256": "f48c3cc14592af1351b388338c53a06f8a1b463bc75771f071fd85ed09b26db3"
+    }
+  ],
+  "official_sources": [
+    {
+      "source_id": "gw-11e-chaos-daemons-faction-pack-2026-07",
+      "provider_name": "Games Workshop",
+      "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+      "source_date": "2026-07-22",
+      "artifact_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+      "sha256": "818f7ef144691b9eef6b3c5b5d0a39793690af5a958037b7055215e6675e6a2c",
+      "relationship": "historical_primary_not_current_corroboration"
+    }
+  ],
+  "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+  "selected_source_ids": [
+    "faction-app:chaos-daemons:datasheet:flesh-hounds",
+    "faction-app:chaos-daemons:datasheet:lord-of-change",
+    "faction-app:chaos-daemons:datasheet:plaguebearers"
+  ],
+  "version_evidence": {
+    "source_url": "https://www.40k.app/factions/updates",
+    "observed_at": "2026-11-04T07:11:06.461Z",
+    "statement": "Version 995\nReleased 2026-10-16.",
+    "transcription_sha256": "e6efd2e9a45a208c455693a1855a929e4da0696bc206eaec403958bb45017b54"
+  }
+}

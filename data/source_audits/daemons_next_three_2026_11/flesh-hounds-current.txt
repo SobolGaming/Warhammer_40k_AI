@@ -1,0 +1,115 @@
+40K.APP
+FACTIONS
+CHAOS DAEMONS
+Flesh Hounds
+DATASHEET
+UPDATES
+MODELS
+M
+T
+SV
+W
+LD
+OC
+Gore Hound 60 x 35.5mm Oval Base
+
+Invulnerable save: 5+
+
+12"
+4
+7+
+2
+7+
+1
+Flesh Hound 60 x 35.5mm Oval Base
+
+Invulnerable save: 5+
+
+12"
+4
+7+
+2
+7+
+1
+RANGED WEAPONS
+RNG
+A
+BS
+S
+AP
+D
+Burning roar
+IGNORES COVER
+TORRENT
+12"
+D6
+-
+4
+0
+1
+MELEE WEAPONS
+A
+WS
+S
+AP
+D
+Gore-drenched fangs
+3
+3+
+5
+-1
+1
+KEYWORDS
+BEAST
+CHAOS
+DAEMON
+FLESH HOUNDS
+KHORNE
+COSTS
+5 models
+80 pts
+10 models
+150 pts
+UNIT COMPOSITION
+1 Gore Hound
+4-9 Flesh Hounds
+
+The Gore Hound is equipped with: burning roar; gore-drenched fangs; collar of Khorne. Every Flesh Hound is equipped with: gore-drenched fangs; collar of Khorne.
+
+Led by
+KARANAK
+Become a supporter and remove ads
+WARGEAR
+Collar of Khorne
+
+The bearer has the Feel No Pain 3+ ability against Psychic Attacks.
+
+CORE ABILITIES
+DEEP STRIKE
+FACTION ABILITIES
+THE SHADOW OF CHAOS
+UNIT ABILITIES
+Hunters from the Warp
+
+At the end of your opponent’s turn, if this unit is not within Engagement Range of one or more enemy units, you can remove it from the battlefield and place it into Strategic Reserves.
+
+STATS
+26%
+of Chaos Daemons lists, 1.6 per list
+#5
+most-taken in faction
+27%
+from 26% since last update
+IN ARMY LISTS
+Popular detachments
+BLOOD LEGION
+WARPTIDE
+CAVALCADE OF CHAOS
+Most often led by
+KARANAK
+Often taken with
+BLOODCRUSHERS
+BLOODLETTERS
+SKULLMASTER
+BLOODTHIRSTER
+BLOODMASTER

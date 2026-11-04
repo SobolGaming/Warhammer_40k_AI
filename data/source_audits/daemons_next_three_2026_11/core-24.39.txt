@@ -1,0 +1,6 @@
+24.39
+DAMAGED
+
+This ability always takes the form Damaged X. While a model’s remaining wounds are equal to or less than X, that model is damaged:
+
+While a model is damaged, that model's attacks have -1 to hit rolls.

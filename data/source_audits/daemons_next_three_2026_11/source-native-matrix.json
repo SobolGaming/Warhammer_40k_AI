@@ -1,0 +1,1841 @@
+[
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:flesh-hounds",
+    "field": "movement",
+    "current_source": 12,
+    "native": 12,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:flesh-hounds",
+    "field": "toughness",
+    "current_source": 4,
+    "native": 4,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:flesh-hounds",
+    "field": "save",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:flesh-hounds",
+    "field": "wounds",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:flesh-hounds",
+    "field": "leadership",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:flesh-hounds",
+    "field": "objective_control",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:flesh-hounds",
+    "field": "invulnerable_save",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:flesh-hounds",
+    "field": "base_mm",
+    "current_source": [
+      60,
+      35.5
+    ],
+    "native": [
+      60.0,
+      35.5
+    ],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:flesh-hounds",
+    "field": "height_evidence",
+    "current_source": "not measured in this audit",
+    "native": {
+      "canonical_units": "inches",
+      "coordinate_frame": "model_centered_z_up",
+      "evidence_id": "000001112:flesh-hounds:height",
+      "height_inches": 1.6,
+      "origin": "footprint_center_table_surface",
+      "source_units": "inches"
+    },
+    "disposition": "retained_geometry_not_newly_certified",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Existing base-only factory construction is not full physical fieldability. Preserve Blocked declarations for Lord/Plague."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "movement",
+    "current_source": 12,
+    "native": 12,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "toughness",
+    "current_source": 4,
+    "native": 4,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "save",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "wounds",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "leadership",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "objective_control",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "invulnerable_save",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "base_mm",
+    "current_source": [
+      60,
+      35.5
+    ],
+    "native": [
+      60.0,
+      35.5
+    ],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "height_evidence",
+    "current_source": "not measured in this audit",
+    "native": {
+      "canonical_units": "inches",
+      "coordinate_frame": "model_centered_z_up",
+      "evidence_id": "000001112:gore-hound:height",
+      "height_inches": 1.6,
+      "origin": "footprint_center_table_surface",
+      "source_units": "inches"
+    },
+    "disposition": "retained_geometry_not_newly_certified",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Existing base-only factory construction is not full physical fieldability. Preserve Blocked declarations for Lord/Plague."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:flesh-hounds",
+    "field": "composition_min_max",
+    "current_source": [
+      4,
+      9
+    ],
+    "native": [
+      4,
+      9
+    ],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "composition_min_max",
+    "current_source": [
+      1,
+      1
+    ],
+    "native": [
+      1,
+      1
+    ],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112",
+    "field": "ordinary_keyword:BEAST",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112",
+    "field": "ordinary_keyword:CHAOS",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112",
+    "field": "ordinary_keyword:DAEMON",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112",
+    "field": "ordinary_keyword:FLESH HOUNDS",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112",
+    "field": "ordinary_keyword:KHORNE",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112",
+    "field": "ordinary_keyword:SHADOW LEGION",
+    "current_source": false,
+    "native": true,
+    "disposition": "confirmed_keyword_drift",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Fresh complete own page plus conditional grant source; ordinary native keyword is unconditional. No off-detachment benefit claimed."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112",
+    "field": "faction_keyword:LEGIONES DAEMONICA",
+    "current_source": [
+      "LEGIONES DAEMONICA"
+    ],
+    "native": [
+      "LEGIONES DAEMONICA"
+    ],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Existing owning faction retained; fresh army source supplies context. Own-page ordinary list does not display faction keyword."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "default:000001112:1:1:2:default",
+    "current_source": [
+      "000001112:burning-roar"
+    ],
+    "native": [
+      "000001112:burning-roar"
+    ],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:flesh-hounds",
+    "field": "default:000001112:2:1:3:000001112:flesh-hounds:default",
+    "current_source": [
+      "000001112:gore-drenched-fangs"
+    ],
+    "native": [
+      "000001112:gore-drenched-fangs"
+    ],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "default:000001112:2:1:3:000001112:gore-hound:default",
+    "current_source": [
+      "000001112:gore-drenched-fangs"
+    ],
+    "native": [
+      "000001112:gore-drenched-fangs"
+    ],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:flesh-hounds",
+    "field": "default:000001112:ability-3:1:4:000001112:flesh-hounds:default",
+    "current_source": [
+      "000001112:collar-of-khorne"
+    ],
+    "native": [
+      "000001112:collar-of-khorne"
+    ],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-hound",
+    "field": "default:000001112:ability-3:1:4:000001112:gore-hound:default",
+    "current_source": [
+      "000001112:collar-of-khorne"
+    ],
+    "native": [
+      "000001112:collar-of-khorne"
+    ],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:lord-of-change",
+    "field": "movement",
+    "current_source": 12,
+    "native": 12,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:lord-of-change",
+    "field": "toughness",
+    "current_source": 10,
+    "native": 10,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:lord-of-change",
+    "field": "save",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:lord-of-change",
+    "field": "wounds",
+    "current_source": 18,
+    "native": 18,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:lord-of-change",
+    "field": "leadership",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:lord-of-change",
+    "field": "objective_control",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:lord-of-change",
+    "field": "invulnerable_save",
+    "current_source": 4,
+    "native": 4,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:lord-of-change",
+    "field": "base_mm",
+    "current_source": [
+      100
+    ],
+    "native": [
+      100.0
+    ],
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:lord-of-change",
+    "field": "height_evidence",
+    "current_source": "not measured in this audit",
+    "native": null,
+    "disposition": "geometry_record_absent",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Existing base-only factory construction is not full physical fieldability. Preserve Blocked declarations for Lord/Plague."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:lord-of-change",
+    "field": "composition_min_max",
+    "current_source": [
+      1,
+      1
+    ],
+    "native": [
+      1,
+      1
+    ],
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120",
+    "field": "ordinary_keyword:CHAOS",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120",
+    "field": "ordinary_keyword:CHARACTER",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120",
+    "field": "ordinary_keyword:DAEMON",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120",
+    "field": "ordinary_keyword:FLY",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120",
+    "field": "ordinary_keyword:LORD OF CHANGE",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120",
+    "field": "ordinary_keyword:MONSTER",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120",
+    "field": "ordinary_keyword:PSYKER",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120",
+    "field": "ordinary_keyword:TZEENTCH",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120",
+    "field": "ordinary_keyword:SHADOW LEGION",
+    "current_source": false,
+    "native": true,
+    "disposition": "confirmed_keyword_drift",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Fresh complete own page plus conditional grant source; ordinary native keyword is unconditional. No off-detachment benefit claimed."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120",
+    "field": "faction_keyword:LEGIONES DAEMONICA",
+    "current_source": [
+      "LEGIONES DAEMONICA"
+    ],
+    "native": [
+      "LEGIONES DAEMONICA"
+    ],
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Existing owning faction retained; fresh army source supplies context. Own-page ordinary list does not display faction keyword."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:lord-of-change",
+    "field": "default:000001120:2:1:6:default",
+    "current_source": [
+      "000001120:bolt-of-change"
+    ],
+    "native": [
+      "000001120:bolt-of-change"
+    ],
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:lord-of-change",
+    "field": "default:000001120:5:1:9:default",
+    "current_source": [
+      "000001120:staff-of-tzeentch"
+    ],
+    "native": [
+      "000001120:staff-of-tzeentch"
+    ],
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguebearers",
+    "field": "movement",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguebearers",
+    "field": "toughness",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguebearers",
+    "field": "save",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguebearers",
+    "field": "wounds",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguebearers",
+    "field": "leadership",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguebearers",
+    "field": "objective_control",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguebearers",
+    "field": "invulnerable_save",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguebearers",
+    "field": "base_mm",
+    "current_source": [
+      32
+    ],
+    "native": [
+      32.0
+    ],
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguebearers",
+    "field": "height_evidence",
+    "current_source": "not measured in this audit",
+    "native": null,
+    "disposition": "geometry_record_absent",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Existing base-only factory construction is not full physical fieldability. Preserve Blocked declarations for Lord/Plague."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plagueridden",
+    "field": "movement",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plagueridden",
+    "field": "toughness",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plagueridden",
+    "field": "save",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plagueridden",
+    "field": "wounds",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plagueridden",
+    "field": "leadership",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plagueridden",
+    "field": "objective_control",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plagueridden",
+    "field": "invulnerable_save",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plagueridden",
+    "field": "base_mm",
+    "current_source": [
+      32
+    ],
+    "native": [
+      32.0
+    ],
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plagueridden",
+    "field": "height_evidence",
+    "current_source": "not measured in this audit",
+    "native": null,
+    "disposition": "geometry_record_absent",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Existing base-only factory construction is not full physical fieldability. Preserve Blocked declarations for Lord/Plague."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguebearers",
+    "field": "composition_min_max",
+    "current_source": [
+      9,
+      9
+    ],
+    "native": [
+      9,
+      9
+    ],
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plagueridden",
+    "field": "composition_min_max",
+    "current_source": [
+      1,
+      1
+    ],
+    "native": [
+      1,
+      1
+    ],
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132",
+    "field": "ordinary_keyword:BATTLELINE",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132",
+    "field": "ordinary_keyword:CHAOS",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132",
+    "field": "ordinary_keyword:DAEMON",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132",
+    "field": "ordinary_keyword:INFANTRY",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132",
+    "field": "ordinary_keyword:NURGLE",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132",
+    "field": "ordinary_keyword:PLAGUEBEARERS",
+    "current_source": true,
+    "native": true,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132",
+    "field": "ordinary_keyword:SHADOW LEGION",
+    "current_source": false,
+    "native": true,
+    "disposition": "confirmed_keyword_drift",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Fresh complete own page plus conditional grant source; ordinary native keyword is unconditional. No off-detachment benefit claimed."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132",
+    "field": "faction_keyword:LEGIONES DAEMONICA",
+    "current_source": [
+      "LEGIONES DAEMONICA"
+    ],
+    "native": [
+      "LEGIONES DAEMONICA"
+    ],
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Existing owning faction retained; fresh army source supplies context. Own-page ordinary list does not display faction keyword."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguebearers",
+    "field": "default:000001132:1:1:10:000001132:plaguebearers:default",
+    "current_source": [
+      "000001132:plaguesword"
+    ],
+    "native": [
+      "000001132:plaguesword"
+    ],
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plagueridden",
+    "field": "default:000001132:1:1:10:000001132:plagueridden:default",
+    "current_source": [
+      "000001132:plaguesword"
+    ],
+    "native": [
+      "000001132:plaguesword"
+    ],
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:burning-roar:standard",
+    "field": "range",
+    "current_source": 12,
+    "native": 12,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:burning-roar:standard",
+    "field": "attacks",
+    "current_source": "D6",
+    "native": "D6",
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:burning-roar:standard",
+    "field": "skill",
+    "current_source": 0,
+    "native": 0,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:burning-roar:standard",
+    "field": "strength",
+    "current_source": 4,
+    "native": 4,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:burning-roar:standard",
+    "field": "AP",
+    "current_source": 0,
+    "native": 0,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:burning-roar:standard",
+    "field": "damage",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:burning-roar:standard",
+    "field": "keywords",
+    "current_source": [
+      "Ignores Cover",
+      "Torrent"
+    ],
+    "native": [
+      "Ignores Cover",
+      "Torrent"
+    ],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:burning-roar:standard",
+    "field": "skill_kind",
+    "current_source": "source_dash",
+    "native": "source_dash",
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-drenched-fangs:standard",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-drenched-fangs:standard",
+    "field": "attacks",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-drenched-fangs:standard",
+    "field": "skill",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-drenched-fangs:standard",
+    "field": "strength",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-drenched-fangs:standard",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-drenched-fangs:standard",
+    "field": "damage",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-drenched-fangs:standard",
+    "field": "keywords",
+    "current_source": [],
+    "native": [],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:gore-drenched-fangs:standard",
+    "field": "skill_kind",
+    "current_source": "numeric",
+    "native": "numeric",
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:baleful-sword:standard",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:baleful-sword:standard",
+    "field": "attacks",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:baleful-sword:standard",
+    "field": "skill",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:baleful-sword:standard",
+    "field": "strength",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:baleful-sword:standard",
+    "field": "AP",
+    "current_source": -2,
+    "native": -2,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:baleful-sword:standard",
+    "field": "damage",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:baleful-sword:standard",
+    "field": "keywords",
+    "current_source": [
+      "Extra Attacks"
+    ],
+    "native": [
+      "Extra Attacks"
+    ],
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:baleful-sword:standard",
+    "field": "skill_kind",
+    "current_source": "numeric",
+    "native": "numeric",
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:witchfire",
+    "field": "range",
+    "current_source": 18,
+    "native": 18,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:witchfire",
+    "field": "attacks",
+    "current_source": 9,
+    "native": 9,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:witchfire",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:witchfire",
+    "field": "strength",
+    "current_source": 9,
+    "native": 9,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:witchfire",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:witchfire",
+    "field": "damage",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:witchfire",
+    "field": "keywords",
+    "current_source": [
+      "Psychic"
+    ],
+    "native": [
+      "Psychic"
+    ],
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:witchfire",
+    "field": "skill_kind",
+    "current_source": "numeric",
+    "native": "numeric",
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:focused-witchfire",
+    "field": "range",
+    "current_source": 18,
+    "native": 18,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:focused-witchfire",
+    "field": "attacks",
+    "current_source": 9,
+    "native": 9,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:focused-witchfire",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:focused-witchfire",
+    "field": "strength",
+    "current_source": 9,
+    "native": 9,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:focused-witchfire",
+    "field": "AP",
+    "current_source": -2,
+    "native": -2,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:focused-witchfire",
+    "field": "damage",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:focused-witchfire",
+    "field": "keywords",
+    "current_source": [
+      "Hazardous",
+      "Psychic"
+    ],
+    "native": [
+      "Hazardous",
+      "Psychic"
+    ],
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:bolt-of-change:focused-witchfire",
+    "field": "skill_kind",
+    "current_source": "numeric",
+    "native": "numeric",
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:rod-of-sorcery:standard",
+    "field": "range",
+    "current_source": 18,
+    "native": 18,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:rod-of-sorcery:standard",
+    "field": "attacks",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:rod-of-sorcery:standard",
+    "field": "skill",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:rod-of-sorcery:standard",
+    "field": "strength",
+    "current_source": 8,
+    "native": 8,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:rod-of-sorcery:standard",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:rod-of-sorcery:standard",
+    "field": "damage",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:rod-of-sorcery:standard",
+    "field": "keywords",
+    "current_source": [
+      "Psychic"
+    ],
+    "native": [
+      "Psychic"
+    ],
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:rod-of-sorcery:standard",
+    "field": "skill_kind",
+    "current_source": "numeric",
+    "native": "numeric",
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:staff-of-tzeentch:standard",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:staff-of-tzeentch:standard",
+    "field": "attacks",
+    "current_source": 5,
+    "native": 5,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:staff-of-tzeentch:standard",
+    "field": "skill",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:staff-of-tzeentch:standard",
+    "field": "strength",
+    "current_source": 6,
+    "native": 6,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:staff-of-tzeentch:standard",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:staff-of-tzeentch:standard",
+    "field": "damage",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:staff-of-tzeentch:standard",
+    "field": "keywords",
+    "current_source": [
+      "Psychic"
+    ],
+    "native": [
+      "Psychic"
+    ],
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:staff-of-tzeentch:standard",
+    "field": "skill_kind",
+    "current_source": "numeric",
+    "native": "numeric",
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguesword:standard",
+    "field": "range",
+    "current_source": "melee",
+    "native": "melee",
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguesword:standard",
+    "field": "attacks",
+    "current_source": 2,
+    "native": 2,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguesword:standard",
+    "field": "skill",
+    "current_source": 3,
+    "native": 3,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguesword:standard",
+    "field": "strength",
+    "current_source": 4,
+    "native": 4,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguesword:standard",
+    "field": "AP",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguesword:standard",
+    "field": "damage",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguesword:standard",
+    "field": "keywords",
+    "current_source": [
+      "Lethal Hits"
+    ],
+    "native": [
+      "Lethal Hits"
+    ],
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:plaguesword:standard",
+    "field": "skill_kind",
+    "current_source": "numeric",
+    "native": "numeric",
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:collar-of-khorne",
+    "field": "operative_ability_text",
+    "current_source": "The bearer has the Feel No Pain 3+ ability against Psychic Attacks.",
+    "native": "The bearer has the Feel No Pain 3+ ability against Psychic Attacks.",
+    "disposition": "agrees_normalized",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "000001112:hunters-from-the-warp",
+    "field": "operative_ability_text",
+    "current_source": "At the end of your opponent\u2019s turn, if this unit is not within Engagement Range of one or more enemy units, you can remove it from the battlefield and place it into Strategic Reserves.",
+    "native": "At the end of your opponent's turn, if this unit is not within Engagement Range of one or more enemy units, you can remove it from the battlefield and place it into Strategic Reserves.",
+    "disposition": "agrees_normalized",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:greater-daemon-of-tzeentch-aura",
+    "field": "operative_ability_text",
+    "current_source": "While a friendly TZEENTCH LEGIONES DAEMONICA unit is within 6\" of this model, that unit is within your army\u2019s Shadow of Chaos.",
+    "native": "While a friendly Tzeentch Legiones Daemonica unit is within 6\" of this model, that unit is within your army's Shadow of Chaos.",
+    "disposition": "agrees_normalized",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:daemon-lord-of-tzeentch-aura",
+    "field": "operative_ability_text",
+    "current_source": "While a friendly TZEENTCH LEGIONES DAEMONICA unit is within 6\" of this model, each time a model in that unit makes a ranged attack, add 1 to the Strength characteristic of that attack.",
+    "native": "While a friendly Tzeentch Legiones Daemonica unit is within 6\" of this model, each time a model in that unit makes a ranged attack, add 1 to the Strength characteristic of that attack.",
+    "disposition": "agrees_normalized",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:master-of-magicks-psychic",
+    "field": "operative_ability_text",
+    "current_source": "In your Shooting phase, select one of the following abilities: [IGNORES COVER]; [LETHAL HITS]; [SUSTAINED HITS D3]. Until the end of the phase, this model\u2019s Bolt of Change has that ability.",
+    "native": "In your Shooting phase, select one of the following abilities: [IGNORES COVER]; [LETHAL HITS]; [SUSTAINED HITS D3]. Until the end of the phase, this model's Bolt of Change has that ability.",
+    "disposition": "agrees_normalized",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:daemonic-icon",
+    "field": "operative_ability_text",
+    "current_source": "Models in the bearer\u2019s unit have a Leadership characteristic of 6+.",
+    "native": "Models in the bearer's unit have a Leadership characteristic of 6+.",
+    "disposition": "agrees_normalized",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:instrument-of-chaos",
+    "field": "operative_ability_text",
+    "current_source": "Add 1 to Charge rolls made for the bearer\u2019s unit.",
+    "native": "Add 1 to Charge rolls made for the bearer's unit.",
+    "disposition": "agrees_normalized",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:infected-outbreak",
+    "field": "operative_ability_text",
+    "current_source": "At the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent\u2019s Level of Control over that objective marker is greater than yours at the end of a phase.",
+    "native": "If you control an objective marker at the end of your Command phase and this unit is within range of that objective marker, that objective marker remains under your control, even if you have no models within range of it, until your opponent controls it at the start or end of any turn.",
+    "disposition": "source_descriptor_debt_not_behavior_defect",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:damaged:001",
+    "field": "wounds_min",
+    "current_source": 1,
+    "native": 1,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:damaged:001",
+    "field": "wounds_max",
+    "current_source": 7,
+    "native": 7,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:damaged:001",
+    "field": "modifier",
+    "current_source": -1,
+    "native": -1,
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Catalog/source comparison only; no full gameplay certification."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "gw-11e-mfm-2026-10:faction:chaos-daemons:unit:units-flesh-hounds",
+    "field": "mfm_all_cost_brackets",
+    "current_source": [
+      80,
+      150
+    ],
+    "native": [
+      80,
+      150
+    ],
+    "disposition": "agrees",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Current October MFM source metadata only; no fresh complete army-cost/mustering traversal."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "gw-11e-mfm-2026-10:faction:chaos-daemons:unit:units-lord-of-change",
+    "field": "mfm_all_cost_brackets",
+    "current_source": [
+      320,
+      340
+    ],
+    "native": [
+      320,
+      340
+    ],
+    "disposition": "agrees",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Current October MFM source metadata only; no fresh complete army-cost/mustering traversal."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "gw-11e-mfm-2026-10:faction:chaos-daemons:unit:units-plaguebearers",
+    "field": "mfm_all_cost_brackets",
+    "current_source": [
+      115
+    ],
+    "native": [
+      115
+    ],
+    "disposition": "agrees",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Current October MFM source metadata only; no fresh complete army-cost/mustering traversal."
+  },
+  {
+    "datasheet_id": "000001120",
+    "owner": "000001120:equipment-choice:option-1",
+    "field": "optional_equipment",
+    "current_source": "zero or one of rod/sword",
+    "native": "zero or one of rod/sword",
+    "disposition": "agrees_reviewed",
+    "source_capture": "lord-of-change-current.txt",
+    "limit": "Independent native default/rod/sword constructions passed; no new geometry."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "000001132:optional-equipment",
+    "field": "icon_instrument_distinct_bearers",
+    "current_source": "both allowed on different nonleader Plaguebearers",
+    "native": "both allowed on different nonleader Plaguebearers",
+    "disposition": "agrees_reviewed",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Independent four legal variants/JSON roundtrips and same-bearer rejection passed."
+  },
+  {
+    "datasheet_id": "000001112",
+    "owner": "incoming-leaders",
+    "field": "current_own_page_list",
+    "current_source": [
+      "Karanak"
+    ],
+    "native": [
+      "000001104",
+      "000004102"
+    ],
+    "disposition": "incoming_context_only",
+    "source_capture": "flesh-hounds-current.txt",
+    "limit": "Raw duplicate historical Karanak identity4102 is not native60 admission; no leader admission or two-leader gameplay claim."
+  },
+  {
+    "datasheet_id": "000001132",
+    "owner": "incoming-leaders",
+    "field": "current_own_page_list",
+    "current_source": [
+      "Poxbringer",
+      "Spoilpox Scrivener",
+      "Sloppity Bilepiper",
+      "Epidemius"
+    ],
+    "native": [
+      "000001129",
+      "000001467",
+      "000001468",
+      "000001469"
+    ],
+    "disposition": "incoming_context_only",
+    "source_capture": "plaguebearers-current.txt",
+    "limit": "Own-page recipient context only; no new leader source/admission certification."
+  }
+]

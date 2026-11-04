@@ -1,0 +1,47 @@
+{
+  "prior_sha256": "58301003f10cacbffb2a990b75e6cc5389a04fd2621ac205124f6d8ba22cf73e",
+  "current_sha256": "364ec9341c45730c5854edb956c16a49e01396c9d4eb3e67a4040c30c3ac81a7",
+  "audit_rows": [
+    {
+      "audit_id": "daemons-next-three-app-mirror-2026-11-04",
+      "row_id": "daemons-next-three-2026-11-04:datasheet:flesh-hounds",
+      "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/factions/chaos-daemons/units/flesh-hounds",
+      "source_observation_sha256": "eae3357f986f74cca782ed9856b62f19b36f2079f7aabf2f1b76f4da984bfa51",
+      "identity_kind": "versioned_observation",
+      "identity_value": "995@2026-11-04T07:12:09.862Z"
+    },
+    {
+      "audit_id": "daemons-next-three-app-mirror-2026-11-04",
+      "row_id": "daemons-next-three-2026-11-04:datasheet:lord-of-change",
+      "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/factions/chaos-daemons/units/lord-of-change",
+      "source_observation_sha256": "12a79c7621043f266c7090781774c72565e19baca9e43b99d59caa7080068fd9",
+      "identity_kind": "versioned_observation",
+      "identity_value": "995@2026-11-04T07:12:58.792Z"
+    },
+    {
+      "audit_id": "daemons-next-three-app-mirror-2026-11-04",
+      "row_id": "daemons-next-three-2026-11-04:datasheet:plaguebearers",
+      "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/factions/chaos-daemons/units/plaguebearers",
+      "source_observation_sha256": "8981b3d2a29a0a29dcce2ca724c598dea9a04d80aebff134a6ad8e45f9f91e16",
+      "identity_kind": "versioned_observation",
+      "identity_value": "995@2026-11-04T07:13:59.087Z"
+    }
+  ],
+  "source_package": {
+    "namespace": "core-v2-reviewed-app-mirror",
+    "package_name": "reviewed-daemons-next-three-observations-2026-11",
+    "version": "app-data-995-observed-2026-11-04",
+    "allowed_rule_source_ids": [
+      "faction-app:chaos-daemons:datasheet:flesh-hounds",
+      "faction-app:chaos-daemons:datasheet:lord-of-change",
+      "faction-app:chaos-daemons:datasheet:plaguebearers"
+    ],
+    "catalog_sha256": "0c8d4e86183db267535505d978c8e71f17fab78c9a477128ad4a244b5a72378d"
+  }
+}
