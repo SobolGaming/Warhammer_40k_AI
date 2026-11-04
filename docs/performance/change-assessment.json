@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "e921b927e0de21070df8398c63494510c5461f45",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f4d4a6c0e68be824d716e93d05bbfd2ff36340a3bcd11e174ca2649c23e41be8",
-  "operation_map_sha256": "b14d2c60dab69efc2c4ff33835e17838401c0502acfc17e05a11932ec1b8d7c0",
+  "operation_map_sha256": "a4aab163065ba0f152b94651c78cc54c9650a6623d7eca01e91e87115f399e48",
   "changes": {
     ".gitattributes": {
       "before_sha256": "878a44162d72d2744c4b68accea93c9638b7a5cfc3d636ad749a1e232c5f1120",
@@ -266,11 +266,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "21b9cdaaf38af78a41ddab3de39b3c71fcfaca5e3c4af474e427629c8d2621da",
-      "after_sha256": "707c722b57a42dcbe775745c9d2540cc3b813523f86175320d00e59fa2d653fc",
+      "after_sha256": "84a09321d52d36a418efb25dcda8d2786294996271cf6885cb4a302f33ce9f34",
       "owners": {
         "@document": {
           "before": "21b9cdaaf38af78a41ddab3de39b3c71fcfaca5e3c4af474e427629c8d2621da",
-          "after": "707c722b57a42dcbe775745c9d2540cc3b813523f86175320d00e59fa2d653fc"
+          "after": "84a09321d52d36a418efb25dcda8d2786294996271cf6885cb4a302f33ce9f34"
         }
       }
     },
@@ -554,6 +554,16 @@
         }
       }
     },
+    "data/source_audits/later_ir_icon_2026_11/provenance-successor.json": {
+      "before_sha256": null,
+      "after_sha256": "e15437f43367d05e48bce8ebafb5379155033df4c5af9bb4ca50d2fb4023197e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e15437f43367d05e48bce8ebafb5379155033df4c5af9bb4ca50d2fb4023197e"
+        }
+      }
+    },
     "data/source_audits/later_ir_icon_2026_11/scint-blue-current.json": {
       "before_sha256": null,
       "after_sha256": "79cc3c151b5ba66cce4f4ac5c7ea189325dd1608f66d900671dc316d9d572fd1",
@@ -676,11 +686,11 @@
     },
     "data/source_audits/later_ir_icon_2026_11/source-only-audit.json": {
       "before_sha256": null,
-      "after_sha256": "7c5e971b0eca74f8dc39b871aaa543ad29ee8128fa9a579b985f95e878ec4a92",
+      "after_sha256": "35e3d423a09052e217b52095c67e4d10a514c958891b700c344f4a94a4eed94c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "7c5e971b0eca74f8dc39b871aaa543ad29ee8128fa9a579b985f95e878ec4a92"
+          "after": "35e3d423a09052e217b52095c67e4d10a514c958891b700c344f4a94a4eed94c"
         }
       }
     },
@@ -756,11 +766,11 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "99f224a7d47611b671acc9d5f268e7a946f43a257676d513f918fc6d4cff5e53",
-      "after_sha256": "379a4e05f02efa7b939d6ce0405349eeb195ec517ea6e4ecf20ccb30f11e51a1",
+      "after_sha256": "3b3ce4093a9364ae74a272c7d86dde46f7d712217e035923d5db911a7a98ebae",
       "owners": {
         "@document": {
           "before": "99f224a7d47611b671acc9d5f268e7a946f43a257676d513f918fc6d4cff5e53",
-          "after": "379a4e05f02efa7b939d6ce0405349eeb195ec517ea6e4ecf20ccb30f11e51a1"
+          "after": "3b3ce4093a9364ae74a272c7d86dde46f7d712217e035923d5db911a7a98ebae"
         }
       }
     },
@@ -776,11 +786,11 @@
     },
     "docs/LATER_IR_ICON_PHASE_OWNER_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "f45a571f8a77277f88526eb5010900e16ce84483c305ebb8b99ba5226bcdef9e",
+      "after_sha256": "be42a351ce1fa91f5bed099c2552eb8d46a5b7edd3995197b115966fc36ee08e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f45a571f8a77277f88526eb5010900e16ce84483c305ebb8b99ba5226bcdef9e"
+          "after": "be42a351ce1fa91f5bed099c2552eb8d46a5b7edd3995197b115966fc36ee08e"
         }
       }
     },
@@ -796,11 +806,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "75a69efa14b3a6028e402726fa4271b17c252651bf0ecb73434920ab00a98cbb",
-      "after_sha256": "a9f86310bded62606bd4af7127d2261e9bd05b986ebba30cf5bf9d9721959616",
+      "after_sha256": "b7b65fa26e56c86e4c158385074e0833b696676e74f56175b834ad95b6132eab",
       "owners": {
         "@document": {
           "before": "75a69efa14b3a6028e402726fa4271b17c252651bf0ecb73434920ab00a98cbb",
-          "after": "a9f86310bded62606bd4af7127d2261e9bd05b986ebba30cf5bf9d9721959616"
+          "after": "b7b65fa26e56c86e4c158385074e0833b696676e74f56175b834ad95b6132eab"
         }
       }
     },
@@ -896,7 +906,7 @@
     },
     "tests/code_quality/test_later_ir_icon_source.py": {
       "before_sha256": null,
-      "after_sha256": "e00de03ffa432d33ffbdc15d954062fc6b4c52d930c2fd3fc16f6e8049c79f99",
+      "after_sha256": "d681e2c789387591befc8d3376acf5bbfa04911b598bc125c711997a2c866264",
       "owners": {
         "@module": {
           "before": null,
@@ -908,11 +918,25 @@
         },
         "test_later_ir_twelve_complete_source_observations_are_pinned": {
           "before": null,
-          "after": "e5781870d084614a2330d3ae0050ab6da492bb4a42d3d7d8bc8880d1edd48c59"
+          "after": "63ff56d086ea40095395d59c364385e2290a0961e70352cf4aed273ae88baac2"
         },
         "test_later_ir_versioned_ledger_preserves_all_unselected_rows": {
           "before": null,
           "after": "3783df2617cb46131f296f345bc6bce2545ba25d2229639709e7ab91859e7383"
+        }
+      }
+    },
+    "tests/daemons_final_four_preservation.py": {
+      "before_sha256": "98e463da1b535c47db0ab528c83045eaad8ba6b7523b684dbc6635e00746d02e",
+      "after_sha256": "c1f67ad1094869c0bd5bf4366aaa628cda361425319b9a6609b16ce1cc560818",
+      "owners": {
+        "@module": {
+          "before": "a36510aff22911c6669e7cce932c525c937c602fc6e316a283ba5460ffc66934",
+          "after": "7ee8bedad1f4e8b2b59e1eba4ed0caf9933a277093ab70fd4f232b619fa1fdd6"
+        },
+        "before_daemons_final_four": {
+          "before": "d1836ca81cd4af4ff5ae4391665881c1965a635803f81003af2b9fd6f536f785",
+          "after": "4207dd5108c8255855d9fda4cead01ca603cdc84f560edffcccde468b459357d"
         }
       }
     },
@@ -927,6 +951,70 @@
         "test_icon_shared_phase_boundary_preserves_physical_and_destruction_gates": {
           "before": null,
           "after": "4d40bd5eebe0a62a00c5d86582832f1421a69d1d82efe685758572e11f65827d"
+        }
+      }
+    },
+    "tests/icon_provenance_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "9b63fd668815c0a6802ac4631f1560392ee6e0f51618035ea3f9bec3e59a45c0",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "75497a6e4d4e56b5e335a3366bb3ac92d68f9f0b724bd5f03f1b02b7d89aeef9"
+        },
+        "_digest": {
+          "before": null,
+          "after": "e78ecb108e734e37b58ac9213378d4ba56e5305dab31ec92be2a33e31d757993"
+        },
+        "_inverse": {
+          "before": null,
+          "after": "29ea3799d04052b013c2678ba54d2f9d649181195de874a05cd9a67e51be43f2"
+        },
+        "before_icon_catalog": {
+          "before": null,
+          "after": "65c402ef3c81fdb1cb926b5b03949e5e4214757bac8ff0d5d8fddedef3f3d17a"
+        },
+        "before_icon_component": {
+          "before": null,
+          "after": "79072d37211ed81280a6b6f8e75aaf00801a31e3a9e6f9bd45557226fbf28bc7"
+        },
+        "icon_successor_audit": {
+          "before": null,
+          "after": "80bb1f393ae17cdcdefd76a2e72dd008c98524780f66383ea9f1785208af2a12"
+        }
+      }
+    },
+    "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
+      "before_sha256": "a71037546ed06472b41d6d4d2ec8e9f5eb2bcfbff50ac16f97c50ae3dbaa62a1",
+      "after_sha256": "de16a72d596f87953471c33b9c9abaa6cf87cde8dee535c18816d3622ec22f81",
+      "owners": {
+        "@module": {
+          "before": "d6a54e5608ef9318ec4473b9055690ebf58abbcf952912622a96f0fa5388d51a",
+          "after": "c63a920a8ee134409c31adf967ce0920061951bcfb170d9e0a563d0b67403feb"
+        },
+        "test_daemons_final_four_full_catalog_delta_and_pinned_source": {
+          "before": "71530f20f79f7ae207f52982fba45fdbe6f5dfb2a7c2606ca2d8e59c6ac672c4",
+          "after": "4504dbef088ab9802b5f3524b6d499895355884cd749ebb7d32810c828b0e186"
+        },
+        "test_daemons_native_full_sixty_exact_delta_and_counterparts": {
+          "before": "0a5a5fb992fa80d43b708d43ab6f07386e9891ca0f7ae10f7b8a77f144b18965",
+          "after": "63286a815e191b9c98450a27eddb9ce87f7ed9481d3bd6c5a4433d30186b76dc"
+        },
+        "test_daemons_next_three_full_catalog_delta_and_pinned_source": {
+          "before": "4cdbad6474b0c63560f4dd18595aae1bb3c2985dbeaf10e0f5bd616dca39abe1",
+          "after": "fdbe6d9071f6508c352c49abd9de67b6672eb0e9bfd933089565c2f16c477451"
+        },
+        "test_icon_component_successor_keeps_sticky_exact_and_rejects_partial_or_source_drift": {
+          "before": null,
+          "after": "040eb38d70583b93f7e3c0976114a5837ff92c4931061f33fcf468e56978d4e1"
+        },
+        "test_icon_successor_preserves_complete_historical_catalogs_and_rejects_drift": {
+          "before": null,
+          "after": "a3ce105ba530784f7d2107c715c6fc363310347d3e76f382c0443f5c8f6fd3df"
+        },
+        "test_wave_serpent_frame_exact_native_delta_and_unchanged_counterparts": {
+          "before": "c862509f96ce0da8b46afb0e7d947769e3f3db1de01485849d638ec46f6a2c83",
+          "after": "fcbe11f588fb69f0f1493e0d3bc3336fd18c4a2f6fca7fede1a2310dcc1ad7c3"
         }
       }
     },
@@ -951,6 +1039,20 @@
         "fight_to_end": {
           "before": "9c1313e5f65c2ea5e9345ca452893cae748c220b320ab56a3a5ea6602fda3207",
           "after": "fb388bb2e329d7b563fd549485fac0ab702798bc7edad68919b7c102010ab952"
+        }
+      }
+    },
+    "tests/support/section08_native_mission_source.py": {
+      "before_sha256": "fe8a345a0830c8027fbe12b7596d3b879a431c7f0a588ef842a871c33a92257e",
+      "after_sha256": "8c8d8dba0b664279000949555fcd21f0da6707218c6203b53e1d4d3b0af69a7c",
+      "owners": {
+        "@module": {
+          "before": "7ac934eba59388ae38475022c46ba404774ccffff6cbfa74c943bc9a0bc27b9f",
+          "after": "e9f0268cad80a94a62d8dc1ede0913e3ebc19ac315e39617fa5e41d4da92d640"
+        },
+        "validate_observation": {
+          "before": "872fcda46f0e7a6a9d4d0c3a50ef86416bb79a4ecc099f7a7e4acfdafe138aa6",
+          "after": "d2c220e72c0aa80a0385fd35aee473e10315c7670a97121285c6f0fbc9d7b98a"
         }
       }
     },
@@ -1510,6 +1612,16 @@
       "source_obligation": "Your Shooting phase or the Fight phase: ownShooting remains active_player; both IconFight clauses use either_player, preserving recipient and physical/source destruction gates.",
       "unchanged_work": "No algorithm, cache policy, serializer, event lookup or traversal change. Existing loops, native casualty attribution, Leadership and CP mutation/once owners remain. Serial current-runtime smoke and live semantic/index/cache gates are required; no detailed performance or full-game claim."
     },
+    "data/source_audits/later_ir_icon_2026_11/provenance-successor.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "later-ir-icon-exact-source-observations"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded twelve source-only observations and two IconFight owner corrections through existing shared CP validation/evaluation; derived identities and focused regressions.",
+      "source_obligation": "Your Shooting phase or the Fight phase: ownShooting remains active_player; both IconFight clauses use either_player, preserving recipient and physical/source destruction gates.",
+      "unchanged_work": "No algorithm, cache policy, serializer, event lookup or traversal change. Existing loops, native casualty attribution, Leadership and CP mutation/once owners remain. Serial current-runtime smoke and live semantic/index/cache gates are required; no detailed performance or full-game claim."
+    },
     "data/source_audits/later_ir_icon_2026_11/scint-blue-current.json": {
       "category": "rule_semantics",
       "operations": [
@@ -1848,10 +1960,45 @@
       "source_obligation": "Your Shooting phase or the Fight phase: ownShooting remains active_player; both IconFight clauses use either_player, preserving recipient and physical/source destruction gates.",
       "unchanged_work": "No algorithm, cache policy, serializer, event lookup or traversal change. Existing loops, native casualty attribution, Leadership and CP mutation/once owners remain. Serial current-runtime smoke and live semantic/index/cache gates are required; no detailed performance or full-game claim."
     },
+    "tests/daemons_final_four_preservation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemons-final-exact-cc855fadf3540655"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded twelve source-only observations and two IconFight owner corrections through existing shared CP validation/evaluation; derived identities and focused regressions.",
+      "source_obligation": "Your Shooting phase or the Fight phase: ownShooting remains active_player; both IconFight clauses use either_player, preserving recipient and physical/source destruction gates.",
+      "unchanged_work": "No algorithm, cache policy, serializer, event lookup or traversal change. Existing loops, native casualty attribution, Leadership and CP mutation/once owners remain. Serial current-runtime smoke and live semantic/index/cache gates are required; no detailed performance or full-game claim."
+    },
     "tests/factions/emperors_children/test_selected_consumers.py": {
       "category": "rule_semantics",
       "operations": [
         "later-ir-icon-exact-43d80a5328081a25"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded twelve source-only observations and two IconFight owner corrections through existing shared CP validation/evaluation; derived identities and focused regressions.",
+      "source_obligation": "Your Shooting phase or the Fight phase: ownShooting remains active_player; both IconFight clauses use either_player, preserving recipient and physical/source destruction gates.",
+      "unchanged_work": "No algorithm, cache policy, serializer, event lookup or traversal change. Existing loops, native casualty attribution, Leadership and CP mutation/once owners remain. Serial current-runtime smoke and live semantic/index/cache gates are required; no detailed performance or full-game claim."
+    },
+    "tests/icon_provenance_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "later-ir-icon-exact-e281ca21164b3b52"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded twelve source-only observations and two IconFight owner corrections through existing shared CP validation/evaluation; derived identities and focused regressions.",
+      "source_obligation": "Your Shooting phase or the Fight phase: ownShooting remains active_player; both IconFight clauses use either_player, preserving recipient and physical/source destruction gates.",
+      "unchanged_work": "No algorithm, cache policy, serializer, event lookup or traversal change. Existing loops, native casualty attribution, Leadership and CP mutation/once owners remain. Serial current-runtime smoke and live semantic/index/cache gates are required; no detailed performance or full-game claim."
+    },
+    "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "starfang-deep-strike-exact-8a566d77a945247d",
+        "wave-frame-exact-8a566d77a945247d",
+        "daemons-native-exact-8a566d77a945247d",
+        "daemons-next-exact-8a566d77a945247d",
+        "daemons-final-exact-8a566d77a945247d",
+        "later-ir-icon-exact-8a566d77a945247d"
       ],
       "selected_families": [],
       "rationale": "Bounded twelve source-only observations and two IconFight owner corrections through existing shared CP validation/evaluation; derived identities and focused regressions.",
@@ -1872,6 +2019,16 @@
       "category": "rule_semantics",
       "operations": [
         "qualification40-exact-119301816d259aa2"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded twelve source-only observations and two IconFight owner corrections through existing shared CP validation/evaluation; derived identities and focused regressions.",
+      "source_obligation": "Your Shooting phase or the Fight phase: ownShooting remains active_player; both IconFight clauses use either_player, preserving recipient and physical/source destruction gates.",
+      "unchanged_work": "No algorithm, cache policy, serializer, event lookup or traversal change. Existing loops, native casualty attribution, Leadership and CP mutation/once owners remain. Serial current-runtime smoke and live semantic/index/cache gates are required; no detailed performance or full-game claim."
+    },
+    "tests/support/section08_native_mission_source.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-5efa41c290f18238"
       ],
       "selected_families": [],
       "rationale": "Bounded twelve source-only observations and two IconFight owner corrections through existing shared CP validation/evaluation; derived identities and focused regressions.",

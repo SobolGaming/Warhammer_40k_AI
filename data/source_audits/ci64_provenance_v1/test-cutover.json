@@ -523,10 +523,10 @@
       "sha256": "e1a4a0883ab20effef0518e0e49ff34e5d107f46f1c0f9b1596e5e17e0701357"
     },
     "tests/infrastructure/source/unit/test_starfang_deep_strike.py": {
-      "blob_sha1": "ab2f82a6fd02ff5d79db102eda5e3caefb638313",
-      "bytes": 52515,
+      "blob_sha1": "a31343bc5d11033f250c894e3ac2b0c211b75e77",
+      "bytes": 55479,
       "mode": "100644",
-      "sha256": "a71037546ed06472b41d6d4d2ec8e9f5eb2bcfbff50ac16f97c50ae3dbaa62a1"
+      "sha256": "de16a72d596f87953471c33b9c9abaa6cf87cde8dee535c18816d3622ec22f81"
     },
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
       "blob_sha1": "df3410c8205c6381c11e823fffa94fce68ff9b91",

@@ -1,0 +1,248 @@
+{
+  "schema": "later-ir-icon-exact-provenance-successor-v1",
+  "base": "e921b927e0de21070df8398c63494510c5461f45",
+  "scope": "Test-only exact inverse of two Icon Fight owners and derived hashes; no historical bytes rewritten or runtime rule restored.",
+  "catalog_surfaces": [
+    {
+      "catalog_id": "chaos-daemons-bridge-catalog",
+      "current_hash": "2e2a87bc28b59ed4461a2cd790946cea3c7478bd3c324bcd42544ac847468c47",
+      "prior_hash": "0f724df814b8ad794444672e83cd467dcfac2f453eb8da1ba3dd0a2a81c2d2e9",
+      "inverse": [
+        {
+          "path": [
+            "army_catalog",
+            "datasheets",
+            42,
+            "abilities",
+            0,
+            "rule_ir_payload",
+            "clauses",
+            1,
+            "trigger",
+            "parameters",
+            1,
+            "value"
+          ],
+          "prior": "active_player",
+          "current": "either_player"
+        },
+        {
+          "path": [
+            "army_catalog",
+            "datasheets",
+            42,
+            "abilities",
+            0,
+            "rule_ir_payload",
+            "ir_hash"
+          ],
+          "prior": "c0353aae99491963228d2feb844cdecf080074eab588b8a1fbf565edbab07653",
+          "current": "6e412a43272b85baa6b769f9a0225442a978d7cd43ac0adeb5bddfbcd1706c9f"
+        },
+        {
+          "path": [
+            "army_catalog",
+            "datasheets",
+            43,
+            "abilities",
+            1,
+            "rule_ir_payload",
+            "clauses",
+            1,
+            "trigger",
+            "parameters",
+            1,
+            "value"
+          ],
+          "prior": "active_player",
+          "current": "either_player"
+        },
+        {
+          "path": [
+            "army_catalog",
+            "datasheets",
+            43,
+            "abilities",
+            1,
+            "rule_ir_payload",
+            "ir_hash"
+          ],
+          "prior": "65227dbab2d999a1ad7c4b7b2b2bb4eedfa3a52d8f45f3a3cb891995fd7b5ef5",
+          "current": "deceaf1b6b786ba5d4f57e5dd871f5940f967496f760cb42dfa71fe12ad02869"
+        },
+        {
+          "path": [
+            "package_hash"
+          ],
+          "prior": "0f724df814b8ad794444672e83cd467dcfac2f453eb8da1ba3dd0a2a81c2d2e9",
+          "current": "2e2a87bc28b59ed4461a2cd790946cea3c7478bd3c324bcd42544ac847468c47"
+        },
+        {
+          "path": [
+            "source_artifacts",
+            1,
+            "artifact_hash"
+          ],
+          "prior": "ebea4f8a7139244c4cb81640194f56885c7b67ae5b138f21f9cd2beec53771ce",
+          "current": "e6624ba8f4d4e6186b416a2b4e377f815b248fab8fd2f91b2df09d6424946425"
+        }
+      ]
+    },
+    {
+      "catalog_id": "core-v2:court-of-slaughter-anvanth:2026-08",
+      "current_hash": "f6e17fd128479e1692c227261bd978f4939ff1a0d9ee015d5f832f7756f39136",
+      "prior_hash": "5c8550d3c5965a6eaee6aea3a890371cb9e522f74f164e9b673c76eb03155bf0",
+      "inverse": [
+        {
+          "path": [
+            "army_catalog",
+            "datasheets",
+            16,
+            "abilities",
+            0,
+            "rule_ir_payload",
+            "clauses",
+            1,
+            "trigger",
+            "parameters",
+            1,
+            "value"
+          ],
+          "prior": "active_player",
+          "current": "either_player"
+        },
+        {
+          "path": [
+            "army_catalog",
+            "datasheets",
+            16,
+            "abilities",
+            0,
+            "rule_ir_payload",
+            "ir_hash"
+          ],
+          "prior": "c0353aae99491963228d2feb844cdecf080074eab588b8a1fbf565edbab07653",
+          "current": "6e412a43272b85baa6b769f9a0225442a978d7cd43ac0adeb5bddfbcd1706c9f"
+        },
+        {
+          "path": [
+            "army_catalog",
+            "datasheets",
+            17,
+            "abilities",
+            1,
+            "rule_ir_payload",
+            "clauses",
+            1,
+            "trigger",
+            "parameters",
+            1,
+            "value"
+          ],
+          "prior": "active_player",
+          "current": "either_player"
+        },
+        {
+          "path": [
+            "army_catalog",
+            "datasheets",
+            17,
+            "abilities",
+            1,
+            "rule_ir_payload",
+            "ir_hash"
+          ],
+          "prior": "65227dbab2d999a1ad7c4b7b2b2bb4eedfa3a52d8f45f3a3cb891995fd7b5ef5",
+          "current": "deceaf1b6b786ba5d4f57e5dd871f5940f967496f760cb42dfa71fe12ad02869"
+        },
+        {
+          "path": [
+            "package_hash"
+          ],
+          "prior": "5c8550d3c5965a6eaee6aea3a890371cb9e522f74f164e9b673c76eb03155bf0",
+          "current": "f6e17fd128479e1692c227261bd978f4939ff1a0d9ee015d5f832f7756f39136"
+        },
+        {
+          "path": [
+            "source_artifacts",
+            1,
+            "artifact_hash"
+          ],
+          "prior": "aa73540c06410dd91aad443f004ad6a10b748a613921b986c97097849c4fc6c2",
+          "current": "ad89f948f3f19e6d69f1bfa2082f6c3210a9330da17823ae2334ad2ff13f1590"
+        }
+      ]
+    }
+  ],
+  "unchanged_catalog": {
+    "catalog_id": "core-v2:chaos-daemons-roster:2026-07",
+    "hash": "f910aa113e8da197636e8868b41e58b394961d234dee0e77c04aba31c6e6468f"
+  },
+  "ir_component": {
+    "source_package_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08",
+    "current_hash": "4c802d19d8d58e3f1a8329e71390390f2f70808a98851982fb0459320a8bd87b",
+    "prior_hash": "9163cee3877f67d2d2a364e95126fec14fcb65247a27dbfdbfb84b7e20c39bc7",
+    "current_package_hash": "cc0549e37898f5935e2ee263c75a42643813d81e7ba6a0e2eeb6aeaf958275ab",
+    "prior_package_hash": "076824923ec39f2ce539c6e2dbd1c763143797c688fb36abebfd4104d8f38059",
+    "unchanged_sticky_record_sha256": "c323c932ca64146f13b92968f1b755d323079e1274a864c345e34cecc9e47ac3",
+    "inverse": [
+      {
+        "path": [
+          "package_hash"
+        ],
+        "prior": "076824923ec39f2ce539c6e2dbd1c763143797c688fb36abebfd4104d8f38059",
+        "current": "cc0549e37898f5935e2ee263c75a42643813d81e7ba6a0e2eeb6aeaf958275ab"
+      },
+      {
+        "path": [
+          "records",
+          "000004079:4",
+          "rule_ir",
+          "clauses",
+          1,
+          "trigger",
+          "parameters",
+          1,
+          "value"
+        ],
+        "prior": "active_player",
+        "current": "either_player"
+      },
+      {
+        "path": [
+          "records",
+          "000004079:4",
+          "rule_ir",
+          "ir_hash"
+        ],
+        "prior": "c0353aae99491963228d2feb844cdecf080074eab588b8a1fbf565edbab07653",
+        "current": "6e412a43272b85baa6b769f9a0225442a978d7cd43ac0adeb5bddfbcd1706c9f"
+      },
+      {
+        "path": [
+          "records",
+          "000004080:4",
+          "rule_ir",
+          "clauses",
+          1,
+          "trigger",
+          "parameters",
+          1,
+          "value"
+        ],
+        "prior": "active_player",
+        "current": "either_player"
+      },
+      {
+        "path": [
+          "records",
+          "000004080:4",
+          "rule_ir",
+          "ir_hash"
+        ],
+        "prior": "65227dbab2d999a1ad7c4b7b2b2bb4eedfa3a52d8f45f3a3cb891995fd7b5ef5",
+        "current": "deceaf1b6b786ba5d4f57e5dd871f5940f967496f760cb42dfa71fe12ad02869"
+      }
+    ]
+  }
+}

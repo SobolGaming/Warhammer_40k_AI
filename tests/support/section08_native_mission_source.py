@@ -11,6 +11,7 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
+from tests.icon_provenance_helpers import before_icon_component
 from tests.support.section02_fixtures import Section02Definitions
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
@@ -48,12 +49,15 @@ def validate_observation(raw: bytes) -> dict[str, Any]:
         raise ValueError("Native Command source observation fingerprint changed.")
     crosswalk = row["identity_crosswalk"]
     artifact = faction_pack_rule_ir.source_package_artifact(PACKAGE)
+    component = artifact.payload()
+    previous_component = before_icon_component(component)
     payload = artifact.datasheet_rule_ir_payload_by_source_row_id("000004079:3")
     if (
         payload is None
         or crosswalk["admitted_package_id"] != PACKAGE
         or crosswalk["page_source_id"] != "faction-app:emperors-children:datasheet:tormentors"
-        or artifact.package_hash != crosswalk["admitted_package_hash"]
+        or artifact.package_hash != component["package_hash"]
+        or previous_component["package_hash"] != crosswalk["admitted_package_hash"]
         or payload["source_id"] != SOURCE_ID
         or crosswalk["runtime_source_id"] != SOURCE_ID
         or crosswalk["runtime_rule_id"] != payload["rule_id"]

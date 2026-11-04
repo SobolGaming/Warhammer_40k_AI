@@ -114,6 +114,10 @@
       "bytes": 47238,
       "sha256": "e6d504e80d9eb5feb7930853e0cf761e96e3d501c227f69799c660b17616401e"
     },
+    "provenance-successor.json": {
+      "bytes": 7295,
+      "sha256": "e15437f43367d05e48bce8ebafb5379155033df4c5af9bb4ca50d2fb4023197e"
+    },
     "scint-blue-current.json": {
       "bytes": 2021,
       "sha256": "79cc3c151b5ba66cce4f4ac5c7ea189325dd1608f66d900671dc316d9d572fd1"

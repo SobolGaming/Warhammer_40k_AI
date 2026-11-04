@@ -13,7 +13,7 @@ def test_later_ir_twelve_complete_source_observations_are_pinned() -> None:
     raw = (AUDIT / "source-only-audit.json").read_bytes()
     assert (
         hashlib.sha256(raw).hexdigest()
-        == "7c5e971b0eca74f8dc39b871aaa543ad29ee8128fa9a579b985f95e878ec4a92"
+        == "35e3d423a09052e217b52095c67e4d10a514c958891b700c344f4a94a4eed94c"
     )
     audit = json.loads(raw)
     for name, expected in audit["files"].items():

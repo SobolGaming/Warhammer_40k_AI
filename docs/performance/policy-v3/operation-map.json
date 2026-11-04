@@ -33340,6 +33340,34 @@
       "sensitive": false,
       "mandatory": false
     },
+    "later-ir-icon-exact-e281ca21164b3b52": {
+      "paths": [
+        "tests/icon_provenance_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "_digest",
+        "_inverse",
+        "before_icon_catalog",
+        "before_icon_component",
+        "icon_successor_audit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "later-ir-icon-exact-8a566d77a945247d": {
+      "paths": [
+        "tests/infrastructure/source/unit/test_starfang_deep_strike.py"
+      ],
+      "owners": [
+        "test_icon_component_successor_keeps_sticky_exact_and_rejects_partial_or_source_drift",
+        "test_icon_successor_preserves_complete_historical_catalogs_and_rejects_drift"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
     "later-ir-icon-exact-f5a7877c6bc147f1": {
       "paths": [
         "tests/rules/section08/test_command_flow.py"

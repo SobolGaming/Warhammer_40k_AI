@@ -70,3 +70,11 @@ goal remains12 minutes. No speedup or full-game performance claim is made. Final
 full-package branch-enabled65% coverage, all active quality with260 exact deferrals,
 clean-cache mypy/pyright, lint/import/precommit, source/index/generated/contracts,
 TypeScript/conformance/wheel, separate exact-head reviews and hosted CI remain gates.
+
+Historical source-preservation controls use a pinned, test-only inverse of the
+two Icon owner changes and their derived hashes. Both complete native and paired
+catalog preimages are authenticated before comparison with the retained historical
+packages. The native Command fixture authenticates the complete current IR
+component, reverses only that exact delta, and proves the complete Sticky4079:3
+record unchanged before accepting its original observation crosswalk. Off-delta,
+partial and source drift remain rejected; no historical observation is rewritten.
