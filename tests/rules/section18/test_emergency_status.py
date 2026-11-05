@@ -51,9 +51,9 @@ def test_native_emergency_survivors_become_actually_battle_shocked(
     state = native_state(
         d, shooter, (Pose.at(10, 10),), enemy=carrier, enemy_poses=(Pose.at(18, 10),)
     )
-    # FRAME changes the native LOS fingerprint in deterministic dice history.
-    # Current source: hit 5, wound 5, failed save 1, then five surviving passengers.
-    state.game_id = "section18:emergency:seed-4"
+    # October layout markers change the native deterministic history fingerprint.
+    # Current source: hit 2, wound 5, failed save 1, then five surviving passengers.
+    state.game_id = "section18:emergency:october-22"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     state.army_definitions[:] = [
         replace(a, units=(*a.units, passenger)) if a.player_id == "opponent" else a
@@ -108,14 +108,14 @@ def test_native_emergency_survivors_become_actually_battle_shocked(
     )
     assert all(roll.source == "rng" for roll in rolls)
     assert [(roll.spec.roll_type, roll.values) for roll in rolls] == [
-        ("attack_sequence.hit", (5,)),
+        ("attack_sequence.hit", (2,)),
         ("attack_sequence.wound", (5,)),
         ("attack_sequence.save.invulnerable", (1,)),
         ("destroyed_transport_disembark", (6,)),
-        ("destroyed_transport_disembark", (3,)),
+        ("destroyed_transport_disembark", (5,)),
+        ("destroyed_transport_disembark", (5,)),
+        ("destroyed_transport_disembark", (2,)),
         ("destroyed_transport_disembark", (4,)),
-        ("destroyed_transport_disembark", (6,)),
-        ("destroyed_transport_disembark", (3,)),
     ]
     assert (
         not unit_by_id(state=state, unit_instance_id=carrier.unit_instance_id)

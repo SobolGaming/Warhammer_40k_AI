@@ -10,7 +10,7 @@ from warhammer40k_core.rules.source_packages.artifact_loader import package_arti
 from .event_companion_full_artifact_errors import EventCompanionBattlefieldArtifactError
 from .event_companion_full_artifact_types import ObjectiveArtifact
 
-EXPECTED_ASSOCIATION_SHA256 = "e5422e499b1b77863450f84e8afad58e6c58cfc819af4b31568239993389d9f8"
+EXPECTED_ASSOCIATION_SHA256 = "82df9960fa39582321aff679cdc14cf1ab64989abcfa77b78a2278266cf68db5"
 _PACKAGE = (
     "warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_layouts_2026_06"
 )

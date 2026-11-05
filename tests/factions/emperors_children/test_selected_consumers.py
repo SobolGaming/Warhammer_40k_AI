@@ -1212,7 +1212,7 @@ def test_sorcerer_native_misses_do_not_offer_wracking(
     seen = native_fire(
         session,
         profile_id="000004085:agonising-energies:witchfire",
-        result_id="decision-request-000019:native-fire",
+        result_id="ec-miss-0",
     )
     assert "select_catalog_post_shoot_hit_target_effect" not in seen
     hits = [p["payload"] for p in events(session, "attack_sequence_step") if p["step"] == "hit"]
@@ -1318,7 +1318,7 @@ def test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement() 
         translate_native,
     )
 
-    session = native_session(second_sorcerer=True)
+    session = native_session(second_sorcerer=True, seed="ec-double-0")
     deploy_native(session)
     translate_native(session, "attached-unit:owner:bodyguard", 7.0)
     translate_native(session, "owner:second-sorcerer", 6.2)
@@ -1475,7 +1475,7 @@ def test_sorcerer_native_overwatch_hits_cannot_trigger_own_shooting_wracking(
     )
 
     session = LocalGameSession.from_persistence_payload(sorcerer_native_shooting_checkpoint)
-    native_fire(session, profile_id="000004079:boltgun:standard")
+    native_fire(session, profile_id="000004079:boltgun:standard", result_id="ec-ow-0")
     translate_native(session, "attached-unit:opponent:bodyguard", -7.0)
     before = len(events(session, "attack_sequence_step"))
     seen = native_sorcerer_overwatch(session)

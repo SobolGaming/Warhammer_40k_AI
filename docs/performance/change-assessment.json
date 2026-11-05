@@ -1,7 +1,7 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "75765b6abc1f7205527b4e9c7414ed2fd694021a",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:03903bdcdebb313af4ff38d345372ac96a9a608b1089271e78242a7f57d9d54c",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d7fb3773556b4290625da1027776c8ab796b22c370aedd04ac8ce92f423da543",
   "operation_map_sha256": "b91e3bdeb99342f1640c007ca5747d3e83af374eadf851d627f3e482a5735b55",
   "changes": {
     "README.md": {
@@ -46,11 +46,11 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "d582cedaaeb0f89c48f892383828182d7ce06182fa34a0d4efb127659513950f",
-      "after_sha256": "67ae3ef8187a8907c71952b1d341f12f06d4931c1eb2fafab2df2eb117edc438",
+      "after_sha256": "75893d11825f0d36e9c3a97dc39b4472f97970735fe0043571bba219e3ae3135",
       "owners": {
         "@document": {
           "before": "d582cedaaeb0f89c48f892383828182d7ce06182fa34a0d4efb127659513950f",
-          "after": "67ae3ef8187a8907c71952b1d341f12f06d4931c1eb2fafab2df2eb117edc438"
+          "after": "75893d11825f0d36e9c3a97dc39b4472f97970735fe0043571bba219e3ae3135"
         }
       }
     },
@@ -146,21 +146,21 @@
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "5d48262b74b5c98d777acba620c6b4f5dab63a65aa97febf52807aba757747a0",
-      "after_sha256": "d7078107e02b36a7cf28154e0224df6068bad551981fb9b36d4420e3534fd9ad",
+      "after_sha256": "6c93e66f8840df6323310a593a488d5f7576489ce7f768c3fd87fef0216d9493",
       "owners": {
         "@document": {
           "before": "5d48262b74b5c98d777acba620c6b4f5dab63a65aa97febf52807aba757747a0",
-          "after": "d7078107e02b36a7cf28154e0224df6068bad551981fb9b36d4420e3534fd9ad"
+          "after": "6c93e66f8840df6323310a593a488d5f7576489ce7f768c3fd87fef0216d9493"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "399c6c446ee111235274acc5369b91e5a2f5f8ddbdd3b4e5c8dc86914e5d411c",
-      "after_sha256": "827fd7ad1e85e372d31437129612ef118df712646ed0ab1445636166d8853ff2",
+      "after_sha256": "16e7d1c5c8c6428f272800c1f162bcde23d5ce27aefcbacc6f49bbc7ab746363",
       "owners": {
         "@document": {
           "before": "399c6c446ee111235274acc5369b91e5a2f5f8ddbdd3b4e5c8dc86914e5d411c",
-          "after": "827fd7ad1e85e372d31437129612ef118df712646ed0ab1445636166d8853ff2"
+          "after": "16e7d1c5c8c6428f272800c1f162bcde23d5ce27aefcbacc6f49bbc7ab746363"
         }
       }
     },
@@ -176,61 +176,61 @@
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "3da6af042e4f16fa49b412a2e88c5b0c0be4a18e73df7a8218c557292ce30ba3",
-      "after_sha256": "1a97c79e8dd8feb6dc7094ad1c21385a786cc637be0e3e79e42ab7789f1cd326",
+      "after_sha256": "59f819c71ee9a0cb33cba344fa7138d6b60041c5ab6c715abb9c4288dd75cb6f",
       "owners": {
         "@document": {
           "before": "3da6af042e4f16fa49b412a2e88c5b0c0be4a18e73df7a8218c557292ce30ba3",
-          "after": "1a97c79e8dd8feb6dc7094ad1c21385a786cc637be0e3e79e42ab7789f1cd326"
+          "after": "59f819c71ee9a0cb33cba344fa7138d6b60041c5ab6c715abb9c4288dd75cb6f"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "0a469a3ddc3f35e5b2e9818f7cbfeeb2895852b1c395b014af1be40ad5ca7948",
-      "after_sha256": "04a2090a66261a2c3f38a2a837956e3ca6646398400e3cd3248829ac9fd60d9e",
+      "after_sha256": "9c998e9ce011d68fef5d0e4092763276cee960ac6d27cca225c60a79e0b3ef54",
       "owners": {
         "@document": {
           "before": "0a469a3ddc3f35e5b2e9818f7cbfeeb2895852b1c395b014af1be40ad5ca7948",
-          "after": "04a2090a66261a2c3f38a2a837956e3ca6646398400e3cd3248829ac9fd60d9e"
+          "after": "9c998e9ce011d68fef5d0e4092763276cee960ac6d27cca225c60a79e0b3ef54"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "4b4281360b392b0d1502a41b04434311fc8dc7690710a68a209b7171dc295fc1",
-      "after_sha256": "d66bff148b2988f13ba412161dcc9e627d372e26976eda3c0d8621246d4a3869",
+      "after_sha256": "634d619c573a17c76769469f5376c9eb41eee57e0ea7ee7231f7cbd476b02871",
       "owners": {
         "@document": {
           "before": "4b4281360b392b0d1502a41b04434311fc8dc7690710a68a209b7171dc295fc1",
-          "after": "d66bff148b2988f13ba412161dcc9e627d372e26976eda3c0d8621246d4a3869"
+          "after": "634d619c573a17c76769469f5376c9eb41eee57e0ea7ee7231f7cbd476b02871"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "6721c633da816ac80ac0a69d429114b0fc28900907e8ffe8ab014587bed6234c",
-      "after_sha256": "e8d33005796f0c42eb28e44956a808028ef2db804010b5d596c7d583d73a221f",
+      "after_sha256": "0b9febf447cc829334cf6c64415faf19ffeeafbfac9ffed49f5ffa38d57199fb",
       "owners": {
         "@document": {
           "before": "6721c633da816ac80ac0a69d429114b0fc28900907e8ffe8ab014587bed6234c",
-          "after": "e8d33005796f0c42eb28e44956a808028ef2db804010b5d596c7d583d73a221f"
+          "after": "0b9febf447cc829334cf6c64415faf19ffeeafbfac9ffed49f5ffa38d57199fb"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "60a358720a6f8a4e72006f601d8705249864469bf8667de2d999c6b861991db7",
-      "after_sha256": "907c7f4f335c718b55afad34073f3aea187717eed8f78c1cdb69dfb73c0ad558",
+      "after_sha256": "41fea621f765bce89d5eaad185da71a11c63c3c3ceea095d77efc7f4e3721ac0",
       "owners": {
         "@document": {
           "before": "60a358720a6f8a4e72006f601d8705249864469bf8667de2d999c6b861991db7",
-          "after": "907c7f4f335c718b55afad34073f3aea187717eed8f78c1cdb69dfb73c0ad558"
+          "after": "41fea621f765bce89d5eaad185da71a11c63c3c3ceea095d77efc7f4e3721ac0"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "a0aba56a28ce6addc174b11c3ffe07e2fcf993e4fda56c572b595d8a00ee945c",
-      "after_sha256": "43c8d8aa17b2006c0ae3fbbfe84f915aa8d5379f9175c9d9885cab6363c50a0a",
+      "after_sha256": "2c20c80b3b8b6323b9ca3143e85ee7d4eb2983c8a0788ad27c7b2cb81b630afb",
       "owners": {
         "@document": {
           "before": "a0aba56a28ce6addc174b11c3ffe07e2fcf993e4fda56c572b595d8a00ee945c",
-          "after": "43c8d8aa17b2006c0ae3fbbfe84f915aa8d5379f9175c9d9885cab6363c50a0a"
+          "after": "2c20c80b3b8b6323b9ca3143e85ee7d4eb2983c8a0788ad27c7b2cb81b630afb"
         }
       }
     },
@@ -346,11 +346,11 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "cd9b1a1830807e3887df93f641b632c4d9e3bb30db43f24131b80d297795888d",
-      "after_sha256": "9d1e792f98311ead93902cd83949f8ec97699b11fb0889772223c1bbbcb18bbe",
+      "after_sha256": "dc23abc4bafdccefe9a476b1e8300f33d5d9cfe16037c55e7d787478c671df44",
       "owners": {
         "@document": {
           "before": "cd9b1a1830807e3887df93f641b632c4d9e3bb30db43f24131b80d297795888d",
-          "after": "9d1e792f98311ead93902cd83949f8ec97699b11fb0889772223c1bbbcb18bbe"
+          "after": "dc23abc4bafdccefe9a476b1e8300f33d5d9cfe16037c55e7d787478c671df44"
         }
       }
     },
@@ -418,11 +418,11 @@
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-objective-associations.json": {
       "before_sha256": null,
-      "after_sha256": "e5422e499b1b77863450f84e8afad58e6c58cfc819af4b31568239993389d9f8",
+      "after_sha256": "82df9960fa39582321aff679cdc14cf1ab64989abcfa77b78a2278266cf68db5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e5422e499b1b77863450f84e8afad58e6c58cfc819af4b31568239993389d9f8"
+          "after": "82df9960fa39582321aff679cdc14cf1ab64989abcfa77b78a2278266cf68db5"
         }
       }
     },
@@ -510,11 +510,11 @@
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_objective_associations.py": {
       "before_sha256": null,
-      "after_sha256": "7499aa89c3610d38771eec3c4ef970a73d083e12ec8493d7eaa88542f7a491a7",
+      "after_sha256": "71ced1aa227e8a1b0548c5d69e1632b58fdad12165d607498177896e8c74e2e7",
       "owners": {
         "@module": {
           "before": null,
-          "after": "1b29bbfbb16a8ece19fad66a4996a4d30e78c71c0952d2b77ab8cb8934ebcb85"
+          "after": "923d1c52716aef93da2ae4b60d15be2d87a9e541ca1f21780bbdf9c1ce5afced"
         },
         "ObjectiveAssociation": {
           "before": null,
@@ -531,6 +531,24 @@
         "validate_reviewed_objective_association": {
           "before": null,
           "after": "b0b54c6f8774a92c15562d69112b9be106a2088a3fff0b480246b71c64e2f5ed"
+        }
+      }
+    },
+    "tests/factions/emperors_children/test_selected_consumers.py": {
+      "before_sha256": "f9df29eca94b04eae476f28340b8cb5bbb439170cbd4f8b829b019ce51275619",
+      "after_sha256": "a0ffe35df120411655714e54249e6e5981b1058b9139f0f66df35e0ac6d318c7",
+      "owners": {
+        "test_sorcerer_native_misses_do_not_offer_wracking": {
+          "before": "561f274ca7e191be3926b2f99278135a411469c9e435f8c24cfcdb1ff044176f",
+          "after": "ab8bc5fe34e424b3526814edb964075ac3858ef38ec78037e0760c67627bbb06"
+        },
+        "test_sorcerer_native_overwatch_hits_cannot_trigger_own_shooting_wracking": {
+          "before": "39adf3895f6d956d106827dac52f9fd5ee515e8e244f81dc738f66baad8119cd",
+          "after": "858bf1688b53be175daee7642f7ec5e591aacfcfd6ebb4c4634d1706230725de"
+        },
+        "test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement": {
+          "before": "b77c853ebf7748e902d5fe4031e3b9f4364824798779e51740c734d317ea3812",
+          "after": "77a793ef925c09f1f3b1c745748ce03e628f3fe8abe78871fcb6ee0782cdec9a"
         }
       }
     },
@@ -616,6 +634,36 @@
         }
       }
     },
+    "tests/rules/section09/test_focused_checkpoint.py": {
+      "before_sha256": "6514b37b3b1e3ef6cd57dcd79b226f6709cd57565dde58a6ad4a2d691bf6821e",
+      "after_sha256": "6d2c13d4ddb0318033ded7cd56985a9b1b38c86ad1bcce15c1350285ecf0074b",
+      "owners": {
+        "test_repair_hazard_lethal_wound_uses_native_casualty_authority_before_movement": {
+          "before": "4d7f963e17cd2c5970c98bf58f8fc80bda8e8417bd430732358b6fca88af25fd",
+          "after": "dfb6b0a6804580b776139ac670dc0ca3cb55191084b5390d2df1faa64c1c1d82"
+        }
+      }
+    },
+    "tests/rules/section18/coverage.json": {
+      "before_sha256": "7802d76e1cc8da4dd5dfb2304155ebb16606e70da5b7fa343e4bd9c276b57e4c",
+      "after_sha256": "3ed80a4ce15890396c193982dbc25de1ecbad9abd5073c0850ce1e0cde62b2ca",
+      "owners": {
+        "@document": {
+          "before": "7802d76e1cc8da4dd5dfb2304155ebb16606e70da5b7fa343e4bd9c276b57e4c",
+          "after": "3ed80a4ce15890396c193982dbc25de1ecbad9abd5073c0850ce1e0cde62b2ca"
+        }
+      }
+    },
+    "tests/rules/section18/test_emergency_status.py": {
+      "before_sha256": "33d138d7535a91165197a066e0b9f6bac5ee757453175f57e7539a218ba80d1e",
+      "after_sha256": "c31f93b69751b8ee8ba2e90006d86223e31f67fed2ecc59cc8a26847c5ceb4a8",
+      "owners": {
+        "test_native_emergency_survivors_become_actually_battle_shocked": {
+          "before": "4fbcb74c432a5f7641a4e6e7c3ec9704054d7c8787298ce09f976a295a01185a",
+          "after": "9a2339f3e538da1218e4b3f89e636e1bce075be1a61fe40f28ec0b5320e9a161"
+        }
+      }
+    },
     "tools/build_event_companion_battlefields.py": {
       "before_sha256": "f9cc1b51588f85494d73495fbaa2c436156ca15d306b8801aeb575ba157b3c31",
       "after_sha256": "58552bdca2634c3f04d6be2e10b78856442a87b17774d16a9c06acf1b28a32ce",
@@ -676,11 +724,11 @@
     },
     "tools/event_companion_layout_source/associate_objectives.py": {
       "before_sha256": null,
-      "after_sha256": "eee6af0b313a3559372cad04ad36740b38c26a36127750dac89f8456dc97f31d",
+      "after_sha256": "f1f657a363d2bff89082a7d16b49fa4ea219499be71f928371b2ea577d742ee1",
       "owners": {
         "@module": {
           "before": null,
-          "after": "11c2e2018fac6d0d62b6add10840a40545e7240a56be6c1d6c4a0ff1b440c3bf"
+          "after": "f78ab32d79371a144cb98f5ee305361f6cf788269f1384cec41e62cf827edaa2"
         }
       }
     },
@@ -1285,6 +1333,16 @@
       "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
       "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
+    "tests/factions/emperors_children/test_selected_consumers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sorcerer-admission-exact-22"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout geometry enters proposal-context and deterministic decision history. Refresh only fixed native fixture game/decision inputs and one exact eight-roll numeric oracle to reach the original branches; retain all runtime RNG/rule predicates and downstream assertions. Matched unindexed base/current controls establish the source dependency.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
     "tests/infrastructure/missions/unit/test_event_companion.py": {
       "category": "rule_semantics",
       "operations": [
@@ -1314,6 +1372,38 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "tests/rules/section09/test_focused_checkpoint.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-ff8dededdac63156"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout geometry enters proposal-context and deterministic decision history. Refresh only fixed native fixture game/decision inputs and one exact eight-roll numeric oracle to reach the original branches; retain all runtime RNG/rule predicates and downstream assertions. Matched unindexed base/current controls establish the source dependency.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "tests/rules/section18/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-472204d42ddab990",
+        "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "tests/rules/section18/test_emergency_status.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-97ba81bb1395873b",
+        "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout geometry enters proposal-context and deterministic decision history. Refresh only fixed native fixture game/decision inputs and one exact eight-roll numeric oracle to reach the original branches; retain all runtime RNG/rule predicates and downstream assertions. Matched unindexed base/current controls establish the source dependency.",
       "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
       "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },

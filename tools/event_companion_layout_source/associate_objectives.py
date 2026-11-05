@@ -100,6 +100,6 @@ runtime = {
     "source_review_sha256": EXPECTED_TABLE_SHA256,
     "objectives": dict(sorted(bindings.items())),
 }
-(ROOT / "event-companion-objective-associations.json").write_text(
-    json.dumps(runtime, indent=2) + "\n"
+(ROOT / "event-companion-objective-associations.json").write_bytes(
+    (json.dumps(runtime, indent=2) + "\n").encode("utf-8")
 )

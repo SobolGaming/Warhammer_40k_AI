@@ -115,10 +115,10 @@
       "sha256": "0edf3bc19424cf7882c9a24db3e877fd353696a3ed6718fb0d0ab4e9454ecc44"
     },
     "tests/factions/emperors_children/test_selected_consumers.py": {
-      "blob_sha1": "8e3808a987ecb619d64e20738e5f58035ebd25f5",
-      "bytes": 77301,
+      "blob_sha1": "3c478b0ce89c9898cfd7087acb60a884b8afb935",
+      "bytes": 77316,
       "mode": "100644",
-      "sha256": "f9df29eca94b04eae476f28340b8cb5bbb439170cbd4f8b829b019ce51275619"
+      "sha256": "a0ffe35df120411655714e54249e6e5981b1058b9139f0f66df35e0ac6d318c7"
     },
     "tests/factions/emperors_children/test_shared_attack_consumers.py": {
       "blob_sha1": "4d6141e4a647edbcf7aaa841f7349262e66c08a9",
@@ -1435,10 +1435,10 @@
       "sha256": "b649dd8619fdd612a1f13b9effd3e200982b5d97ca0dba4a2303b52edc91c611"
     },
     "tests/rules/section09/test_focused_checkpoint.py": {
-      "blob_sha1": "f5eadcd428656f8acd6ce6c6d9ab2e5a12b2c7f6",
-      "bytes": 27558,
+      "blob_sha1": "c8e4f55a77c1a0e09b28c2b05296f33fe43f946e",
+      "bytes": 27566,
       "mode": "100644",
-      "sha256": "6514b37b3b1e3ef6cd57dcd79b226f6709cd57565dde58a6ad4a2d691bf6821e"
+      "sha256": "6d2c13d4ddb0318033ded7cd56985a9b1b38c86ad1bcce15c1350285ecf0074b"
     },
     "tests/rules/section09/test_forced_escape.py": {
       "blob_sha1": "4cb1cd94c97a540b5a2227c4aa5d33d25f82a1b2",
@@ -1951,10 +1951,10 @@
       "sha256": "dd10071fe5d07adf4d5960320ce0dba5bda9f58187e5d52df08f1ef2e0871416"
     },
     "tests/rules/section18/test_emergency_status.py": {
-      "blob_sha1": "eb20bb7e4d9e887ada2af04e0836984f680eccbb",
-      "bytes": 9171,
+      "blob_sha1": "bc2384202afc491d37f1d79ee7d9cd97ee6d0cef",
+      "bytes": 9179,
       "mode": "100644",
-      "sha256": "33d138d7535a91165197a066e0b9f6bac5ee757453175f57e7539a218ba80d1e"
+      "sha256": "c31f93b69751b8ee8ba2e90006d86223e31f67fed2ecc59cc8a26847c5ceb4a8"
     },
     "tests/rules/section18/test_facade.py": {
       "blob_sha1": "6468fee39bdf39ec36312db94d14259b40626c81",
