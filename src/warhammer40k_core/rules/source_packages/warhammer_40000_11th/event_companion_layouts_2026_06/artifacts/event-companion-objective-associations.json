@@ -1,0 +1,3514 @@
+{
+  "schema": "reviewed-event-objective-terrain-associations-v1",
+  "source_pdf_sha256": "187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2",
+  "source_review_sha256": "a01e515f43fc4b6c2097a7b2fb5f42024d4979f7a688a3297b34cd911e86f92a",
+  "objectives": {
+    "disruption-vs-disruption-layout-1-attacker-home-01": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-1-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        12.71,
+        51.17
+      ],
+      "illustration_center_inches": [
+        12.71,
+        51.17
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-1-central-01": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-1-terrain-area-07",
+        "disruption-vs-disruption-layout-1-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        21.11,
+        32.87
+      ],
+      "illustration_center_inches": [
+        21.11,
+        32.87
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-1-defender-home-01": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-1-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        32.53,
+        9.23
+      ],
+      "illustration_center_inches": [
+        32.53,
+        9.23
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-1-expansion-01": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-1-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        34.0,
+        47.59
+      ],
+      "illustration_center_inches": [
+        34.0,
+        47.59
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-1-expansion-02": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-1-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        10.13,
+        12.11
+      ],
+      "illustration_center_inches": [
+        10.13,
+        12.11
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-2-attacker-home-01": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-2-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        12.02,
+        51.45
+      ],
+      "illustration_center_inches": [
+        12.02,
+        51.45
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-2-central-01": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-2-terrain-area-06",
+        "disruption-vs-disruption-layout-2-terrain-area-11"
+      ],
+      "runtime_reference_inches": [
+        24.44,
+        31.5
+      ],
+      "illustration_center_inches": [
+        24.44,
+        31.5
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-2-defender-home-01": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-2-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        32.61,
+        8.65
+      ],
+      "illustration_center_inches": [
+        32.61,
+        8.65
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-2-expansion-01": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-2-terrain-area-04"
+      ],
+      "runtime_reference_inches": [
+        35.29,
+        42.46
+      ],
+      "illustration_center_inches": [
+        35.29,
+        42.46
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-2-expansion-02": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-2-terrain-area-13"
+      ],
+      "runtime_reference_inches": [
+        8.84,
+        17.46
+      ],
+      "illustration_center_inches": [
+        8.84,
+        17.46
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-3-attacker-home-01": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-3-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        8.51,
+        51.65
+      ],
+      "illustration_center_inches": [
+        8.51,
+        51.65
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-3-central-01": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-3-terrain-area-08",
+        "disruption-vs-disruption-layout-3-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        20.7,
+        31.92
+      ],
+      "illustration_center_inches": [
+        20.7,
+        31.92
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-3-defender-home-01": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-3-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        36.0,
+        8.47
+      ],
+      "illustration_center_inches": [
+        36.0,
+        8.47
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-3-expansion-01": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-3-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        27.52,
+        52.03
+      ],
+      "illustration_center_inches": [
+        27.52,
+        52.03
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-disruption-layout-3-expansion-02": {
+      "terrain_area_ids": [
+        "disruption-vs-disruption-layout-3-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        16.64,
+        8.95
+      ],
+      "illustration_center_inches": [
+        16.64,
+        8.95
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-1-attacker-home-01": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-1-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        7.71,
+        52.25
+      ],
+      "illustration_center_inches": [
+        7.71,
+        52.25
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-1-central-01": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-1-terrain-area-07",
+        "disruption-vs-priority-assets-layout-1-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        18.99,
+        30.01
+      ],
+      "illustration_center_inches": [
+        18.99,
+        30.01
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-1-defender-home-01": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-1-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        36.42,
+        7.66
+      ],
+      "illustration_center_inches": [
+        36.42,
+        7.66
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-1-expansion-01": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-1-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        30.53,
+        48.57
+      ],
+      "illustration_center_inches": [
+        30.53,
+        48.57
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-1-expansion-02": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-1-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        13.31,
+        11.43
+      ],
+      "illustration_center_inches": [
+        13.31,
+        11.43
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-2-attacker-home-01": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-2-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        17.71,
+        48.1
+      ],
+      "illustration_center_inches": [
+        17.71,
+        48.1
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-2-central-01": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-2-terrain-area-08",
+        "disruption-vs-priority-assets-layout-2-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        22.06,
+        32.76
+      ],
+      "illustration_center_inches": [
+        22.06,
+        32.76
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-2-defender-home-01": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-2-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        26.62,
+        12.63
+      ],
+      "illustration_center_inches": [
+        26.62,
+        12.63
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-2-expansion-01": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-2-terrain-area-06"
+      ],
+      "runtime_reference_inches": [
+        36.64,
+        40.83
+      ],
+      "illustration_center_inches": [
+        36.64,
+        40.83
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-2-expansion-02": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-2-terrain-area-11"
+      ],
+      "runtime_reference_inches": [
+        7.63,
+        19.05
+      ],
+      "illustration_center_inches": [
+        7.63,
+        19.05
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-3-attacker-home-01": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-3-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        8.42,
+        49.93
+      ],
+      "illustration_center_inches": [
+        8.42,
+        49.93
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-3-central-01": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-3-terrain-area-08",
+        "disruption-vs-priority-assets-layout-3-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        22.07,
+        32.98
+      ],
+      "illustration_center_inches": [
+        21.91,
+        33.37
+      ],
+      "runtime_reference_basis": "project_interior_reference_preserving_source_region_memberships"
+    },
+    "disruption-vs-priority-assets-layout-3-defender-home-01": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-3-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        36.25,
+        10.32
+      ],
+      "illustration_center_inches": [
+        36.25,
+        10.32
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-3-expansion-01": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-3-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        32.82,
+        48.04
+      ],
+      "illustration_center_inches": [
+        32.82,
+        48.04
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-priority-assets-layout-3-expansion-02": {
+      "terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-3-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        11.25,
+        12.19
+      ],
+      "illustration_center_inches": [
+        11.25,
+        12.19
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-1-attacker-home": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-1-7x11-5-attacker-home"
+      ],
+      "runtime_reference_inches": [
+        17.32,
+        49.35
+      ],
+      "illustration_center_inches": [
+        17.32,
+        49.35
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-1-central-north": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-1-8x11-5-polygon-north-center"
+      ],
+      "runtime_reference_inches": [
+        26.32,
+        36.7
+      ],
+      "illustration_center_inches": [
+        26.32,
+        36.7
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-1-central-south": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-1-8x11-5-polygon-south-center"
+      ],
+      "runtime_reference_inches": [
+        17.73,
+        23.18
+      ],
+      "illustration_center_inches": [
+        17.73,
+        23.18
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-1-defender-home": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-1-7x11-5-defender-home"
+      ],
+      "runtime_reference_inches": [
+        26.32,
+        10.28
+      ],
+      "illustration_center_inches": [
+        26.32,
+        10.28
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-1-expansion-east": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-1-7x11-5-east-expansion"
+      ],
+      "runtime_reference_inches": [
+        36.55,
+        41.42
+      ],
+      "illustration_center_inches": [
+        36.55,
+        41.42
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-1-expansion-west": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-1-7x11-5-west-expansion"
+      ],
+      "runtime_reference_inches": [
+        7.31,
+        18.88
+      ],
+      "illustration_center_inches": [
+        7.31,
+        18.88
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-2-attacker-home": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-2-7x11-5-attacker-home"
+      ],
+      "runtime_reference_inches": [
+        7.55,
+        50.26
+      ],
+      "illustration_center_inches": [
+        7.55,
+        50.26
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-2-central-east": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-2-7x11-5-central-east"
+      ],
+      "runtime_reference_inches": [
+        27.94,
+        33.21
+      ],
+      "illustration_center_inches": [
+        27.94,
+        33.21
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-2-central-west": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-2-7x11-5-central-west"
+      ],
+      "runtime_reference_inches": [
+        15.93,
+        26.46
+      ],
+      "illustration_center_inches": [
+        15.93,
+        26.46
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-2-defender-home": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-2-7x11-5-defender-home"
+      ],
+      "runtime_reference_inches": [
+        36.53,
+        9.92
+      ],
+      "illustration_center_inches": [
+        36.53,
+        9.92
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-2-expansion-north": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-north-east"
+      ],
+      "runtime_reference_inches": [
+        23.98,
+        51.44
+      ],
+      "illustration_center_inches": [
+        23.98,
+        51.44
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-2-expansion-south": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-south-west"
+      ],
+      "runtime_reference_inches": [
+        20.05,
+        8.56
+      ],
+      "illustration_center_inches": [
+        20.05,
+        8.56
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-3-attacker-home": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-3-7x11-5-attacker-home"
+      ],
+      "runtime_reference_inches": [
+        6.45,
+        45.41
+      ],
+      "illustration_center_inches": [
+        6.45,
+        45.41
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-3-central-north-west": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-3-7x11-5-central-north-west"
+      ],
+      "runtime_reference_inches": [
+        20.2,
+        34.42
+      ],
+      "illustration_center_inches": [
+        20.2,
+        34.42
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-3-central-south-east": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-3-7x11-5-central-south-east"
+      ],
+      "runtime_reference_inches": [
+        23.81,
+        25.52
+      ],
+      "illustration_center_inches": [
+        23.81,
+        25.52
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-3-defender-home": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-3-7x11-5-defender-home"
+      ],
+      "runtime_reference_inches": [
+        37.4,
+        14.88
+      ],
+      "illustration_center_inches": [
+        37.4,
+        14.88
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-3-expansion-north-east": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-north-east"
+      ],
+      "runtime_reference_inches": [
+        31.89,
+        50.92
+      ],
+      "illustration_center_inches": [
+        31.89,
+        50.92
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "disruption-vs-reconnaissance-layout-3-expansion-south-west": {
+      "terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-south-west"
+      ],
+      "runtime_reference_inches": [
+        11.99,
+        9.07
+      ],
+      "illustration_center_inches": [
+        11.99,
+        9.07
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-1-attacker-home-01": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        7.27,
+        51.25
+      ],
+      "illustration_center_inches": [
+        7.27,
+        51.25
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-1-central-01": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-08",
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        24.93,
+        30.2
+      ],
+      "illustration_center_inches": [
+        25.41,
+        30.2
+      ],
+      "runtime_reference_basis": "project_interior_reference_preserving_source_region_memberships"
+    },
+    "priority-assets-vs-priority-assets-layout-1-defender-home-01": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        36.77,
+        8.79
+      ],
+      "illustration_center_inches": [
+        36.77,
+        8.79
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-1-expansion-01": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        29.76,
+        49.75
+      ],
+      "illustration_center_inches": [
+        29.76,
+        49.75
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-1-expansion-02": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        14.11,
+        10.24
+      ],
+      "illustration_center_inches": [
+        14.11,
+        10.24
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-2-attacker-home-01": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-2-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        10.5,
+        50.4
+      ],
+      "illustration_center_inches": [
+        10.5,
+        50.4
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-2-central-01": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-2-terrain-area-08",
+        "priority-assets-vs-priority-assets-layout-2-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        22.03,
+        27.84
+      ],
+      "illustration_center_inches": [
+        22.03,
+        27.84
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-2-defender-home-01": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-2-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        33.85,
+        9.62
+      ],
+      "illustration_center_inches": [
+        33.85,
+        9.62
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-2-expansion-01": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-2-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        33.35,
+        45.62
+      ],
+      "illustration_center_inches": [
+        33.35,
+        45.62
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-2-expansion-02": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-2-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        10.53,
+        14.36
+      ],
+      "illustration_center_inches": [
+        10.53,
+        14.36
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-3-attacker-home-01": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        8.92,
+        48.79
+      ],
+      "illustration_center_inches": [
+        8.92,
+        48.79
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-3-central-01": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-08",
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        21.92,
+        32.94
+      ],
+      "illustration_center_inches": [
+        21.92,
+        33.53
+      ],
+      "runtime_reference_basis": "project_interior_reference_preserving_source_region_memberships"
+    },
+    "priority-assets-vs-priority-assets-layout-3-defender-home-01": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        34.36,
+        10.44
+      ],
+      "illustration_center_inches": [
+        34.36,
+        10.44
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-3-expansion-01": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-05"
+      ],
+      "runtime_reference_inches": [
+        36.36,
+        39.71
+      ],
+      "illustration_center_inches": [
+        36.36,
+        39.71
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "priority-assets-vs-priority-assets-layout-3-expansion-02": {
+      "terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-12"
+      ],
+      "runtime_reference_inches": [
+        7.5,
+        19.19
+      ],
+      "illustration_center_inches": [
+        7.5,
+        19.19
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-1-attacker-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-1-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        9.4,
+        49.55
+      ],
+      "illustration_center_inches": [
+        9.4,
+        49.55
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-1-central-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-1-terrain-area-06"
+      ],
+      "runtime_reference_inches": [
+        24.28,
+        36.67
+      ],
+      "illustration_center_inches": [
+        24.28,
+        36.67
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-1-central-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-1-terrain-area-11"
+      ],
+      "runtime_reference_inches": [
+        20.59,
+        23.28
+      ],
+      "illustration_center_inches": [
+        20.59,
+        23.28
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-1-defender-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-1-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        34.39,
+        10.67
+      ],
+      "illustration_center_inches": [
+        34.39,
+        10.67
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-1-expansion-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-1-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        34.53,
+        46.46
+      ],
+      "illustration_center_inches": [
+        34.53,
+        46.46
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-1-expansion-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-1-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        9.95,
+        13.2
+      ],
+      "illustration_center_inches": [
+        9.95,
+        13.2
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-2-attacker-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-2-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        17.44,
+        49.02
+      ],
+      "illustration_center_inches": [
+        17.44,
+        49.02
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-2-central-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-2-terrain-area-06"
+      ],
+      "runtime_reference_inches": [
+        21.97,
+        33.75
+      ],
+      "illustration_center_inches": [
+        21.97,
+        33.75
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-2-central-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-2-terrain-area-11"
+      ],
+      "runtime_reference_inches": [
+        22.14,
+        26.21
+      ],
+      "illustration_center_inches": [
+        22.14,
+        26.21
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-2-defender-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-2-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        26.68,
+        11.3
+      ],
+      "illustration_center_inches": [
+        26.68,
+        11.3
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-2-expansion-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-2-terrain-area-05"
+      ],
+      "runtime_reference_inches": [
+        34.99,
+        42.95
+      ],
+      "illustration_center_inches": [
+        34.99,
+        42.95
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-2-expansion-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-2-terrain-area-12"
+      ],
+      "runtime_reference_inches": [
+        9.1,
+        17.03
+      ],
+      "illustration_center_inches": [
+        9.1,
+        17.03
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-3-attacker-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        8.56,
+        50.1
+      ],
+      "illustration_center_inches": [
+        8.56,
+        50.1
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-3-central-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-07"
+      ],
+      "runtime_reference_inches": [
+        26.09,
+        32.69
+      ],
+      "illustration_center_inches": [
+        26.09,
+        32.69
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-3-central-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        18.16,
+        27.29
+      ],
+      "illustration_center_inches": [
+        18.16,
+        27.29
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-3-defender-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        35.34,
+        9.9
+      ],
+      "illustration_center_inches": [
+        35.34,
+        9.9
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-3-expansion-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        25.19,
+        50.06
+      ],
+      "illustration_center_inches": [
+        25.19,
+        50.06
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-disruption-layout-3-expansion-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        18.98,
+        10.13
+      ],
+      "illustration_center_inches": [
+        18.98,
+        10.13
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-1-attacker-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-1-terrain-area-05"
+      ],
+      "runtime_reference_inches": [
+        7.92,
+        45.54
+      ],
+      "illustration_center_inches": [
+        7.92,
+        45.54
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-1-central-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-1-terrain-area-07"
+      ],
+      "runtime_reference_inches": [
+        26.57,
+        32.3
+      ],
+      "illustration_center_inches": [
+        26.57,
+        32.3
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-1-central-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-1-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        17.62,
+        27.26
+      ],
+      "illustration_center_inches": [
+        17.62,
+        27.26
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-1-defender-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-1-terrain-area-12"
+      ],
+      "runtime_reference_inches": [
+        36.83,
+        14.98
+      ],
+      "illustration_center_inches": [
+        36.83,
+        14.98
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-1-expansion-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-1-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        27.14,
+        49.92
+      ],
+      "illustration_center_inches": [
+        27.14,
+        49.92
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-1-expansion-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-1-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        16.62,
+        10.2
+      ],
+      "illustration_center_inches": [
+        16.62,
+        10.2
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-2-attacker-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-2-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        8.74,
+        52.31
+      ],
+      "illustration_center_inches": [
+        8.74,
+        52.31
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-2-central-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-2-terrain-area-07"
+      ],
+      "runtime_reference_inches": [
+        24.59,
+        33.62
+      ],
+      "illustration_center_inches": [
+        24.59,
+        33.62
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-2-central-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-2-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        19.16,
+        26.26
+      ],
+      "illustration_center_inches": [
+        19.16,
+        26.26
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-2-defender-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-2-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        36.07,
+        7.79
+      ],
+      "illustration_center_inches": [
+        36.07,
+        7.79
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-2-expansion-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-2-terrain-area-04"
+      ],
+      "runtime_reference_inches": [
+        34.27,
+        42.6
+      ],
+      "illustration_center_inches": [
+        34.27,
+        42.6
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-2-expansion-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-2-terrain-area-13"
+      ],
+      "runtime_reference_inches": [
+        9.0,
+        17.48
+      ],
+      "illustration_center_inches": [
+        9.0,
+        17.48
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-3-attacker-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-3-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        22.77,
+        48.45
+      ],
+      "illustration_center_inches": [
+        22.77,
+        48.45
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-3-central-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-3-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        25.85,
+        30.62
+      ],
+      "illustration_center_inches": [
+        25.85,
+        30.62
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-3-central-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-3-terrain-area-08"
+      ],
+      "runtime_reference_inches": [
+        18.21,
+        29.81
+      ],
+      "illustration_center_inches": [
+        18.21,
+        29.81
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-3-defender-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-3-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        20.53,
+        11.89
+      ],
+      "illustration_center_inches": [
+        20.53,
+        11.89
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-3-expansion-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-3-terrain-area-06"
+      ],
+      "runtime_reference_inches": [
+        34.53,
+        38.57
+      ],
+      "illustration_center_inches": [
+        34.53,
+        38.57
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-priority-assets-layout-3-expansion-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-3-terrain-area-11"
+      ],
+      "runtime_reference_inches": [
+        9.49,
+        21.47
+      ],
+      "illustration_center_inches": [
+        9.49,
+        21.47
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-1-attacker-home": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        8.58,
+        50.32
+      ],
+      "illustration_center_inches": [
+        8.58,
+        50.32
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-1-central-north": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-07"
+      ],
+      "runtime_reference_inches": [
+        26.51,
+        37.47
+      ],
+      "illustration_center_inches": [
+        26.51,
+        37.47
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-1-central-south": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        17.82,
+        22.31
+      ],
+      "illustration_center_inches": [
+        17.82,
+        22.31
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-1-defender-home": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        36.08,
+        9.01
+      ],
+      "illustration_center_inches": [
+        36.08,
+        9.01
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-1-expansion-north-east": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        32.15,
+        52.67
+      ],
+      "illustration_center_inches": [
+        32.15,
+        52.67
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-1-expansion-south-west": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        12.36,
+        8.33
+      ],
+      "illustration_center_inches": [
+        12.36,
+        8.33
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-2-attacker-home": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        9.9,
+        47.73
+      ],
+      "illustration_center_inches": [
+        9.9,
+        47.73
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-2-central-east": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-08"
+      ],
+      "runtime_reference_inches": [
+        33.25,
+        30.55
+      ],
+      "illustration_center_inches": [
+        33.25,
+        30.55
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-2-central-west": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        11.06,
+        29.61
+      ],
+      "illustration_center_inches": [
+        11.06,
+        29.61
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-2-defender-home": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        33.63,
+        12.05
+      ],
+      "illustration_center_inches": [
+        33.63,
+        12.05
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-2-expansion-north-east": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-04"
+      ],
+      "runtime_reference_inches": [
+        37.23,
+        42.98
+      ],
+      "illustration_center_inches": [
+        37.23,
+        42.98
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-2-expansion-south-west": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-13"
+      ],
+      "runtime_reference_inches": [
+        6.86,
+        17.11
+      ],
+      "illustration_center_inches": [
+        6.86,
+        17.11
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-3-attacker-home": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        9.08,
+        51.19
+      ],
+      "illustration_center_inches": [
+        9.08,
+        51.19
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-3-central-north": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-07"
+      ],
+      "runtime_reference_inches": [
+        23.21,
+        35.93
+      ],
+      "illustration_center_inches": [
+        23.21,
+        35.93
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-3-central-south": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        20.35,
+        23.67
+      ],
+      "illustration_center_inches": [
+        20.35,
+        23.67
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-3-defender-home": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        34.81,
+        9.01
+      ],
+      "illustration_center_inches": [
+        34.81,
+        9.01
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-3-expansion-north-east": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        29.28,
+        51.31
+      ],
+      "illustration_center_inches": [
+        29.28,
+        51.31
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-purge-the-foe-layout-3-expansion-south-west": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        15.25,
+        8.98
+      ],
+      "illustration_center_inches": [
+        15.25,
+        8.98
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-1-attacker-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        18.94,
+        48.37
+      ],
+      "illustration_center_inches": [
+        18.94,
+        48.37
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-1-central-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-07"
+      ],
+      "runtime_reference_inches": [
+        24.0,
+        37.17
+      ],
+      "illustration_center_inches": [
+        24.0,
+        37.17
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-1-central-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        20.26,
+        23.67
+      ],
+      "illustration_center_inches": [
+        20.26,
+        23.67
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-1-defender-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        24.9,
+        11.47
+      ],
+      "illustration_center_inches": [
+        24.9,
+        11.47
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-1-expansion-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-08"
+      ],
+      "runtime_reference_inches": [
+        36.22,
+        35.09
+      ],
+      "illustration_center_inches": [
+        36.22,
+        35.09
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-1-expansion-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        8.08,
+        24.86
+      ],
+      "illustration_center_inches": [
+        8.08,
+        24.86
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-2-attacker-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-06"
+      ],
+      "runtime_reference_inches": [
+        6.29,
+        38.96
+      ],
+      "illustration_center_inches": [
+        6.29,
+        38.96
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-2-central-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-07"
+      ],
+      "runtime_reference_inches": [
+        22.32,
+        36.89
+      ],
+      "illustration_center_inches": [
+        22.32,
+        36.89
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-2-central-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        21.65,
+        22.93
+      ],
+      "illustration_center_inches": [
+        21.65,
+        22.93
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-2-defender-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-11"
+      ],
+      "runtime_reference_inches": [
+        37.69,
+        21.16
+      ],
+      "illustration_center_inches": [
+        37.69,
+        21.16
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-2-expansion-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        25.84,
+        48.96
+      ],
+      "illustration_center_inches": [
+        25.84,
+        48.96
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-2-expansion-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        18.23,
+        11.16
+      ],
+      "illustration_center_inches": [
+        18.23,
+        11.16
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-3-attacker-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        12.3,
+        51.74
+      ],
+      "illustration_center_inches": [
+        12.3,
+        51.74
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-3-central-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-06"
+      ],
+      "runtime_reference_inches": [
+        23.62,
+        34.05
+      ],
+      "illustration_center_inches": [
+        23.62,
+        34.05
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-3-central-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-11"
+      ],
+      "runtime_reference_inches": [
+        20.52,
+        25.85
+      ],
+      "illustration_center_inches": [
+        20.52,
+        25.85
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-3-defender-home-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        31.68,
+        8.02
+      ],
+      "illustration_center_inches": [
+        31.68,
+        8.02
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-3-expansion-01": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        34.32,
+        45.77
+      ],
+      "illustration_center_inches": [
+        34.32,
+        45.77
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "purge-the-foe-vs-reconnaissance-layout-3-expansion-02": {
+      "terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        9.33,
+        14.13
+      ],
+      "illustration_center_inches": [
+        9.33,
+        14.13
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-1-attacker-home-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-1-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        10.39,
+        50.31
+      ],
+      "illustration_center_inches": [
+        10.39,
+        50.31
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-1-central-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-1-terrain-area-08",
+        "reconnaissance-vs-priority-assets-layout-1-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        21.05,
+        31.06
+      ],
+      "illustration_center_inches": [
+        21.05,
+        31.06
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-1-defender-home-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-1-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        34.23,
+        9.47
+      ],
+      "illustration_center_inches": [
+        34.23,
+        9.47
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-1-expansion-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-1-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        33.68,
+        47.97
+      ],
+      "illustration_center_inches": [
+        33.68,
+        47.97
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-1-expansion-02": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-1-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        10.43,
+        12.0
+      ],
+      "illustration_center_inches": [
+        10.43,
+        12.0
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-2-attacker-home-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-2-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        11.39,
+        50.04
+      ],
+      "illustration_center_inches": [
+        11.39,
+        50.04
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-2-central-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-2-terrain-area-06",
+        "reconnaissance-vs-priority-assets-layout-2-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        22.02,
+        32.11
+      ],
+      "illustration_center_inches": [
+        22.02,
+        32.11
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-2-defender-home-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-2-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        32.76,
+        10.37
+      ],
+      "illustration_center_inches": [
+        32.76,
+        10.37
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-2-expansion-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-2-terrain-area-04"
+      ],
+      "runtime_reference_inches": [
+        31.59,
+        44.6
+      ],
+      "illustration_center_inches": [
+        31.59,
+        44.6
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-2-expansion-02": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-2-terrain-area-13"
+      ],
+      "runtime_reference_inches": [
+        10.7,
+        16.35
+      ],
+      "illustration_center_inches": [
+        10.7,
+        16.35
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-3-attacker-home-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-3-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        8.08,
+        49.12
+      ],
+      "illustration_center_inches": [
+        8.08,
+        49.12
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-3-central-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-3-terrain-area-07",
+        "reconnaissance-vs-priority-assets-layout-3-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        21.39,
+        31.8
+      ],
+      "illustration_center_inches": [
+        21.39,
+        31.8
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-3-defender-home-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-3-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        35.46,
+        9.99
+      ],
+      "illustration_center_inches": [
+        35.46,
+        9.99
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-3-expansion-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-3-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        31.33,
+        50.08
+      ],
+      "illustration_center_inches": [
+        31.33,
+        50.08
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-priority-assets-layout-3-expansion-02": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-3-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        12.57,
+        9.97
+      ],
+      "illustration_center_inches": [
+        12.57,
+        9.97
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-1-attacker-home-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        8.51,
+        51.65
+      ],
+      "illustration_center_inches": [
+        8.51,
+        51.65
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-1-central-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        17.67,
+        28.95
+      ],
+      "illustration_center_inches": [
+        17.67,
+        28.95
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-1-central-02": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-08"
+      ],
+      "runtime_reference_inches": [
+        26.6,
+        32.18
+      ],
+      "illustration_center_inches": [
+        26.6,
+        32.18
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-1-defender-home-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        36.0,
+        8.47
+      ],
+      "illustration_center_inches": [
+        36.0,
+        8.47
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-1-expansion-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        27.52,
+        52.03
+      ],
+      "illustration_center_inches": [
+        27.52,
+        52.03
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-1-expansion-02": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        16.64,
+        8.95
+      ],
+      "illustration_center_inches": [
+        16.64,
+        8.95
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-2-attacker-home-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        12.71,
+        51.17
+      ],
+      "illustration_center_inches": [
+        12.71,
+        51.17
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-2-central-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-07"
+      ],
+      "runtime_reference_inches": [
+        23.46,
+        33.95
+      ],
+      "illustration_center_inches": [
+        23.46,
+        33.95
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-2-central-02": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        20.48,
+        26.23
+      ],
+      "illustration_center_inches": [
+        20.48,
+        26.23
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-2-defender-home-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        32.53,
+        9.23
+      ],
+      "illustration_center_inches": [
+        32.53,
+        9.23
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-2-expansion-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        34.0,
+        47.59
+      ],
+      "illustration_center_inches": [
+        34.0,
+        47.59
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-2-expansion-02": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        10.13,
+        12.11
+      ],
+      "illustration_center_inches": [
+        10.13,
+        12.11
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-3-attacker-home-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        12.02,
+        51.45
+      ],
+      "illustration_center_inches": [
+        12.02,
+        51.45
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-3-central-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-06"
+      ],
+      "runtime_reference_inches": [
+        23.49,
+        34.05
+      ],
+      "illustration_center_inches": [
+        23.49,
+        34.05
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-3-central-02": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-11"
+      ],
+      "runtime_reference_inches": [
+        20.92,
+        26.0
+      ],
+      "illustration_center_inches": [
+        20.92,
+        26.0
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-3-defender-home-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        32.61,
+        8.65
+      ],
+      "illustration_center_inches": [
+        32.61,
+        8.65
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-3-expansion-01": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-04"
+      ],
+      "runtime_reference_inches": [
+        35.29,
+        42.46
+      ],
+      "illustration_center_inches": [
+        35.29,
+        42.46
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "reconnaissance-vs-reconnaissance-layout-3-expansion-02": {
+      "terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-13"
+      ],
+      "runtime_reference_inches": [
+        8.84,
+        17.46
+      ],
+      "illustration_center_inches": [
+        8.84,
+        17.46
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-1-attacker-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-1-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        6.99,
+        50.35
+      ],
+      "illustration_center_inches": [
+        6.99,
+        50.35
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-1-central-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-1-terrain-area-07",
+        "take-and-hold-vs-disruption-layout-1-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        21.39,
+        31.8
+      ],
+      "illustration_center_inches": [
+        21.39,
+        31.8
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-1-defender-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-1-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        36.99,
+        9.58
+      ],
+      "illustration_center_inches": [
+        36.99,
+        9.58
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-1-expansion-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-1-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        30.42,
+        48.88
+      ],
+      "illustration_center_inches": [
+        30.42,
+        48.88
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-1-expansion-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-1-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        13.56,
+        10.96
+      ],
+      "illustration_center_inches": [
+        13.56,
+        10.96
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-2-attacker-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-2-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        8.55,
+        51.33
+      ],
+      "illustration_center_inches": [
+        8.55,
+        51.33
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-2-central-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-2-terrain-area-07",
+        "take-and-hold-vs-disruption-layout-2-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        23.78,
+        31.1
+      ],
+      "illustration_center_inches": [
+        23.78,
+        31.1
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-2-defender-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-2-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        35.33,
+        8.86
+      ],
+      "illustration_center_inches": [
+        35.33,
+        8.86
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-2-expansion-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-2-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        33.36,
+        46.32
+      ],
+      "illustration_center_inches": [
+        33.36,
+        46.32
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-2-expansion-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-2-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        10.71,
+        13.5
+      ],
+      "illustration_center_inches": [
+        10.71,
+        13.5
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-3-attacker-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-3-terrain-area-04"
+      ],
+      "runtime_reference_inches": [
+        21.85,
+        47.3
+      ],
+      "illustration_center_inches": [
+        21.85,
+        47.3
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-3-central-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-3-terrain-area-08",
+        "take-and-hold-vs-disruption-layout-3-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        19.87,
+        29.88
+      ],
+      "illustration_center_inches": [
+        19.87,
+        29.88
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-3-defender-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-3-terrain-area-13"
+      ],
+      "runtime_reference_inches": [
+        22.34,
+        12.63
+      ],
+      "illustration_center_inches": [
+        22.34,
+        12.63
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-3-expansion-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-3-terrain-area-05"
+      ],
+      "runtime_reference_inches": [
+        35.53,
+        37.56
+      ],
+      "illustration_center_inches": [
+        35.53,
+        37.56
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-disruption-layout-3-expansion-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-3-terrain-area-12"
+      ],
+      "runtime_reference_inches": [
+        7.47,
+        22.22
+      ],
+      "illustration_center_inches": [
+        7.47,
+        22.22
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-1-attacker-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-1-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        10.98,
+        51.63
+      ],
+      "illustration_center_inches": [
+        10.98,
+        51.63
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-1-central-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-1-terrain-area-06"
+      ],
+      "runtime_reference_inches": [
+        20.28,
+        35.64
+      ],
+      "illustration_center_inches": [
+        20.28,
+        35.64
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-1-central-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-1-terrain-area-11"
+      ],
+      "runtime_reference_inches": [
+        24.46,
+        25.06
+      ],
+      "illustration_center_inches": [
+        24.46,
+        25.06
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-1-defender-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-1-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        32.89,
+        8.13
+      ],
+      "illustration_center_inches": [
+        32.89,
+        8.13
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-1-expansion-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-1-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        34.98,
+        45.66
+      ],
+      "illustration_center_inches": [
+        34.98,
+        45.66
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-1-expansion-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-1-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        8.45,
+        14.02
+      ],
+      "illustration_center_inches": [
+        8.45,
+        14.02
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-2-attacker-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-2-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        11.9,
+        49.36
+      ],
+      "illustration_center_inches": [
+        11.9,
+        49.36
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-2-central-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-2-terrain-area-07"
+      ],
+      "runtime_reference_inches": [
+        19.98,
+        34.78
+      ],
+      "illustration_center_inches": [
+        19.98,
+        34.78
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-2-central-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-2-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        24.18,
+        25.34
+      ],
+      "illustration_center_inches": [
+        24.18,
+        25.34
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-2-defender-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-2-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        31.29,
+        10.52
+      ],
+      "illustration_center_inches": [
+        31.29,
+        10.52
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-2-expansion-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-2-terrain-area-08"
+      ],
+      "runtime_reference_inches": [
+        37.51,
+        34.49
+      ],
+      "illustration_center_inches": [
+        37.51,
+        34.49
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-2-expansion-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-2-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        6.6,
+        25.29
+      ],
+      "illustration_center_inches": [
+        6.6,
+        25.29
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-3-attacker-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-06"
+      ],
+      "runtime_reference_inches": [
+        6.07,
+        37.97
+      ],
+      "illustration_center_inches": [
+        6.07,
+        37.97
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-3-central-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-07"
+      ],
+      "runtime_reference_inches": [
+        21.52,
+        34.71
+      ],
+      "illustration_center_inches": [
+        21.52,
+        34.71
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-3-central-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        22.48,
+        25.26
+      ],
+      "illustration_center_inches": [
+        22.48,
+        25.26
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-3-defender-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-11"
+      ],
+      "runtime_reference_inches": [
+        37.69,
+        22.15
+      ],
+      "illustration_center_inches": [
+        37.69,
+        22.15
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-3-expansion-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        25.95,
+        48.96
+      ],
+      "illustration_center_inches": [
+        25.95,
+        48.96
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-priority-assets-layout-3-expansion-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        18.23,
+        11.16
+      ],
+      "illustration_center_inches": [
+        18.23,
+        11.16
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-1-attacker-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        8.37,
+        49.15
+      ],
+      "illustration_center_inches": [
+        8.37,
+        49.15
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-1-central-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-07"
+      ],
+      "runtime_reference_inches": [
+        25.59,
+        32.65
+      ],
+      "illustration_center_inches": [
+        25.59,
+        32.65
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-1-central-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        18.06,
+        27.49
+      ],
+      "illustration_center_inches": [
+        18.06,
+        27.49
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-1-defender-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        35.78,
+        10.66
+      ],
+      "illustration_center_inches": [
+        35.78,
+        10.66
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-1-expansion-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        30.37,
+        49.21
+      ],
+      "illustration_center_inches": [
+        30.37,
+        49.21
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-1-expansion-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        13.36,
+        10.43
+      ],
+      "illustration_center_inches": [
+        13.36,
+        10.43
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-2-attacker-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        8.32,
+        50.41
+      ],
+      "illustration_center_inches": [
+        8.32,
+        50.41
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-2-central-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-07"
+      ],
+      "runtime_reference_inches": [
+        24.87,
+        33.02
+      ],
+      "illustration_center_inches": [
+        24.87,
+        33.02
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-2-central-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        19.52,
+        26.84
+      ],
+      "illustration_center_inches": [
+        19.52,
+        26.84
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-2-defender-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        35.87,
+        9.63
+      ],
+      "illustration_center_inches": [
+        35.87,
+        9.63
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-2-expansion-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        34.58,
+        50.12
+      ],
+      "illustration_center_inches": [
+        34.58,
+        50.12
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-2-expansion-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        9.58,
+        10.08
+      ],
+      "illustration_center_inches": [
+        9.58,
+        10.08
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        10.74,
+        49.92
+      ],
+      "illustration_center_inches": [
+        10.74,
+        49.92
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-3-central-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-08"
+      ],
+      "runtime_reference_inches": [
+        20.99,
+        34.18
+      ],
+      "illustration_center_inches": [
+        20.99,
+        34.18
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-3-central-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        23.08,
+        25.8
+      ],
+      "illustration_center_inches": [
+        23.08,
+        25.8
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        32.86,
+        10.45
+      ],
+      "illustration_center_inches": [
+        32.86,
+        10.45
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-06"
+      ],
+      "runtime_reference_inches": [
+        36.56,
+        37.92
+      ],
+      "illustration_center_inches": [
+        36.56,
+        37.92
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-11"
+      ],
+      "runtime_reference_inches": [
+        7.31,
+        22.16
+      ],
+      "illustration_center_inches": [
+        7.31,
+        22.16
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-1-attacker-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-1-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        12.34,
+        51.11
+      ],
+      "illustration_center_inches": [
+        12.34,
+        51.11
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-1-central-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-1-terrain-area-07",
+        "take-and-hold-vs-reconnaissance-layout-1-terrain-area-10"
+      ],
+      "runtime_reference_inches": [
+        21.95,
+        30.22
+      ],
+      "illustration_center_inches": [
+        21.95,
+        30.22
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-1-defender-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-1-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        31.45,
+        8.51
+      ],
+      "illustration_center_inches": [
+        31.45,
+        8.51
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-1-expansion-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-1-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        34.74,
+        44.2
+      ],
+      "illustration_center_inches": [
+        34.74,
+        44.2
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-1-expansion-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-1-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        9.25,
+        15.78
+      ],
+      "illustration_center_inches": [
+        9.25,
+        15.78
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-2-attacker-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-2-terrain-area-03"
+      ],
+      "runtime_reference_inches": [
+        8.13,
+        47.68
+      ],
+      "illustration_center_inches": [
+        8.13,
+        47.68
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-2-central-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-2-terrain-area-08",
+        "take-and-hold-vs-reconnaissance-layout-2-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        21.15,
+        31.39
+      ],
+      "illustration_center_inches": [
+        21.15,
+        31.39
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-2-defender-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-2-terrain-area-14"
+      ],
+      "runtime_reference_inches": [
+        36.36,
+        12.37
+      ],
+      "illustration_center_inches": [
+        36.36,
+        12.37
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-2-expansion-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-2-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        27.62,
+        49.01
+      ],
+      "illustration_center_inches": [
+        27.62,
+        49.01
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-2-expansion-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-2-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        16.57,
+        10.64
+      ],
+      "illustration_center_inches": [
+        16.57,
+        10.64
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-3-attacker-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-3-terrain-area-01"
+      ],
+      "runtime_reference_inches": [
+        8.41,
+        49.22
+      ],
+      "illustration_center_inches": [
+        8.41,
+        49.22
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-3-central-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-3-terrain-area-08",
+        "take-and-hold-vs-reconnaissance-layout-3-terrain-area-09"
+      ],
+      "runtime_reference_inches": [
+        22.02,
+        30.01
+      ],
+      "illustration_center_inches": [
+        22.02,
+        30.01
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-3-defender-home-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-3-terrain-area-16"
+      ],
+      "runtime_reference_inches": [
+        35.38,
+        10.67
+      ],
+      "illustration_center_inches": [
+        35.38,
+        10.67
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-3-expansion-01": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-3-terrain-area-02"
+      ],
+      "runtime_reference_inches": [
+        33.41,
+        46.82
+      ],
+      "illustration_center_inches": [
+        33.41,
+        46.82
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-reconnaissance-layout-3-expansion-02": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-3-terrain-area-15"
+      ],
+      "runtime_reference_inches": [
+        10.06,
+        13.11
+      ],
+      "illustration_center_inches": [
+        10.06,
+        13.11
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-1-attacker-home": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-1-7x11-5-upper-left"
+      ],
+      "runtime_reference_inches": [
+        16.49,
+        49.85
+      ],
+      "illustration_center_inches": [
+        16.49,
+        49.85
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-1-central": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-1-8x11-5-polygon-central-north",
+        "take-and-hold-vs-take-and-hold-layout-1-8x11-5-polygon-central-south"
+      ],
+      "runtime_reference_inches": [
+        22.02,
+        30.01
+      ],
+      "illustration_center_inches": [
+        22.02,
+        30.01
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-1-defender-home": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-1-7x11-5-lower-right"
+      ],
+      "runtime_reference_inches": [
+        25.76,
+        12.71
+      ],
+      "illustration_center_inches": [
+        25.76,
+        12.71
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-1-expansion-east": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-1-7x11-5-upper-right"
+      ],
+      "runtime_reference_inches": [
+        36.72,
+        41.9
+      ],
+      "illustration_center_inches": [
+        36.72,
+        41.9
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-1-expansion-west": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-1-7x11-5-lower-left"
+      ],
+      "runtime_reference_inches": [
+        7.4,
+        19.16
+      ],
+      "illustration_center_inches": [
+        7.4,
+        19.16
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-2-attacker-home": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-2-7x11-5-left-home"
+      ],
+      "runtime_reference_inches": [
+        6.76,
+        31.2
+      ],
+      "illustration_center_inches": [
+        6.76,
+        31.2
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-2-central": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-2-6x4-north-west",
+        "take-and-hold-vs-take-and-hold-layout-2-6x4-south-east"
+      ],
+      "runtime_reference_inches": [
+        24.21,
+        29.97
+      ],
+      "illustration_center_inches": [
+        24.21,
+        29.97
+      ],
+      "runtime_reference_basis": "project_interior_reference_preserving_source_region_memberships"
+    },
+    "take-and-hold-vs-take-and-hold-layout-2-defender-home": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-2-7x11-5-right-home"
+      ],
+      "runtime_reference_inches": [
+        37.24,
+        28.67
+      ],
+      "illustration_center_inches": [
+        37.24,
+        28.67
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-2-expansion-north": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-2-7x11-5-north-expansion"
+      ],
+      "runtime_reference_inches": [
+        24.92,
+        50.42
+      ],
+      "illustration_center_inches": [
+        24.92,
+        50.42
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-2-expansion-south": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-2-7x11-5-south-expansion"
+      ],
+      "runtime_reference_inches": [
+        19.21,
+        9.36
+      ],
+      "illustration_center_inches": [
+        19.21,
+        9.36
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-3-attacker-home": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west"
+      ],
+      "runtime_reference_inches": [
+        10.08,
+        50.44
+      ],
+      "illustration_center_inches": [
+        10.08,
+        50.44
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-3-central": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
+        "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east"
+      ],
+      "runtime_reference_inches": [
+        21.99,
+        30.01
+      ],
+      "illustration_center_inches": [
+        21.99,
+        30.01
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-3-defender-home": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east"
+      ],
+      "runtime_reference_inches": [
+        33.74,
+        8.88
+      ],
+      "illustration_center_inches": [
+        33.74,
+        8.88
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-3-expansion-north-east": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east"
+      ],
+      "runtime_reference_inches": [
+        34.95,
+        49.26
+      ],
+      "illustration_center_inches": [
+        34.95,
+        49.26
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    },
+    "take-and-hold-vs-take-and-hold-layout-3-expansion-south-west": {
+      "terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west"
+      ],
+      "runtime_reference_inches": [
+        10.21,
+        10.7
+      ],
+      "illustration_center_inches": [
+        10.21,
+        10.7
+      ],
+      "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
+    }
+  }
+}

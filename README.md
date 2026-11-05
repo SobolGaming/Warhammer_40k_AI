@@ -370,10 +370,10 @@ Open `http://127.0.0.1:8765/`. All 15 Event Companion force-disposition
 pairings and every A/B/C variant are available: 45 of 45 source-hashed
 executable battlefield packages with terrain, regions, source-linked objective
 footprints, walls, and floors. Across the package, the viewer exposes 720
-physical terrain-area footprint pieces forming 608 logical rules areas, plus
+physical terrain-area footprint pieces forming 617 logical rules areas, plus
 1,349 physical components. The PDF layout-page Single/Separate glyphs are
-rendered at their source coordinates using the page-8 legend; 112 Single joins
-pair 224 footprint pieces and the other 496 pieces remain individual areas.
+rendered at their source coordinates using the page-8 legend; 103 Single joins
+pair 206 footprint pieces and the other 514 pieces remain individual areas.
 Page 9 contains the source-backed 29-component exception, while every other
 layout contains 30. See
 [docs/BATTLEFIELD_VIEWER.md](docs/BATTLEFIELD_VIEWER.md) for controls, data

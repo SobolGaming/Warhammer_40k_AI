@@ -1,0 +1,4101 @@
+{
+  "status": "reviewed_explicit_objective_terrain_associations",
+  "source_sha256": "187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2",
+  "reviewer": "independent Astra/high coding/source reviewer",
+  "reviewed_visual_sheets": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "objective_count": 249,
+  "all_terrain_linked": true,
+  "multiple_distinct_logical_group_glyph_intersections": 0,
+  "user_clarification": "All 4 are terrain-linked, the icon is just drawn off-center in the terrain footprint to not obscure the green portions of the terrain.",
+  "clarification_authority": "Explicit user correction relayed by parent; artistic reason is not quoted as official PDF prose.",
+  "source_rule_context": [
+    {
+      "authority": "official October Event Companion",
+      "pages": [
+        2,
+        8
+      ],
+      "basis": "Step4 terrain follows selected layout; legend identifies objective roles and Single/Separate terrain groups."
+    },
+    {
+      "authority": "Fresh official Core Rules PDF retrieved by parent from current official downloads index; reviewer independently read/hashverified localPDF",
+      "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833",
+      "pdf_pages": [
+        52,
+        88
+      ],
+      "locators": [
+        "14.01",
+        "14.02",
+        "Rules Appendix: Objectives Not Within A Terrain Area"
+      ],
+      "basis": "Terrain area itself is the objective and membership establishes control range; genuinely unmatched intended objective locations retain40mm pointmarker/3inch-horizontal/5inch-vertical support. Offcenterillustration interpretation is separately supplied by user and supported by fullglyph/group review."
+    }
+  ],
+  "rows": [
+    {
+      "source_pdf_page": 9,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 216,
+      "illustration_center_pdf_points": [
+        255.4618,
+        356.244507
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 9,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 212,
+      "illustration_center_pdf_points": [
+        327.162521,
+        642.179688
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 9,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 206,
+      "illustration_center_pdf_points": [
+        298.20462,
+        508.945221
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-07",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 9,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 210,
+      "illustration_center_pdf_points": [
+        411.841309,
+        417.462418
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-05"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 9,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 221,
+      "illustration_center_pdf_points": [
+        185.166504,
+        592.494354
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-12"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 10,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 223,
+      "illustration_center_pdf_points": [
+        180.256599,
+        499.801208
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 10,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 219,
+      "illustration_center_pdf_points": [
+        415.893295,
+        519.313232
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-08"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 10,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 213,
+      "illustration_center_pdf_points": [
+        315.116302,
+        509.249008
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-06",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": true,
+      "single_contact_icon_suffix": "08",
+      "reviewed_runtime_reference_inches": [
+        24.21,
+        29.97
+      ],
+      "reviewed_anchor_support_source_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-06"
+      ],
+      "reviewed_anchor_basis": "project_interior_reference_preserving_source_region_memberships",
+      "reviewed_region_memberships": [
+        "take-and-hold-vs-take-and-hold-layout-2-defender-territory",
+        "take-and-hold-vs-take-and-hold-layout-2-no-mans-land"
+      ]
+    },
+    {
+      "source_pdf_page": 10,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 217,
+      "illustration_center_pdf_points": [
+        320.605988,
+        351.842606
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 10,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 228,
+      "illustration_center_pdf_points": [
+        276.455414,
+        667.922028
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 11,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 212,
+      "illustration_center_pdf_points": [
+        205.937492,
+        351.738922
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 11,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 227,
+      "illustration_center_pdf_points": [
+        388.801498,
+        671.654724
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 11,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 206,
+      "illustration_center_pdf_points": [
+        297.993103,
+        508.945221
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-08",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 11,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 210,
+      "illustration_center_pdf_points": [
+        398.211609,
+        360.817398
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 11,
+      "source_objective_id": "take-and-hold-vs-take-and-hold-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 238,
+      "illustration_center_pdf_points": [
+        206.868301,
+        657.631195
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 12,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 216,
+      "illustration_center_pdf_points": [
+        192.652306,
+        361.622314
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 12,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 212,
+      "illustration_center_pdf_points": [
+        404.569321,
+        657.899536
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 12,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 257,
+      "illustration_center_pdf_points": [
+        325.815918,
+        488.647522
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 12,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-1-central-02",
+      "role": "central",
+      "source_glyph_seqno": 206,
+      "illustration_center_pdf_points": [
+        267.612495,
+        528.406738
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 12,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 210,
+      "illustration_center_pdf_points": [
+        362.73291,
+        361.163406
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 12,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 227,
+      "illustration_center_pdf_points": [
+        231.245697,
+        659.711334
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 13,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 222,
+      "illustration_center_pdf_points": [
+        192.288292,
+        351.932007
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 13,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 218,
+      "illustration_center_pdf_points": [
+        405.270004,
+        665.827393
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 13,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 212,
+      "illustration_center_pdf_points": [
+        320.210297,
+        485.779907
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 13,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-2-central-02",
+      "role": "central",
+      "source_glyph_seqno": 253,
+      "illustration_center_pdf_points": [
+        278.882294,
+        533.366577
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 13,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 227,
+      "illustration_center_pdf_points": [
+        395.341187,
+        354.148422
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 13,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 216,
+      "illustration_center_pdf_points": [
+        202.042206,
+        662.427338
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 14,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 220,
+      "illustration_center_pdf_points": [
+        211.0299,
+        355.669525
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 14,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 216,
+      "illustration_center_pdf_points": [
+        382.017593,
+        659.571899
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 14,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 244,
+      "illustration_center_pdf_points": [
+        290.224304,
+        476.873901
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-08"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 14,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-3-central-02",
+      "role": "central",
+      "source_glyph_seqno": 210,
+      "illustration_center_pdf_points": [
+        306.373016,
+        541.390625
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 14,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 225,
+      "illustration_center_pdf_points": [
+        410.618286,
+        448.082596
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-06"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 14,
+      "source_objective_id": "take-and-hold-vs-purge-the-foe-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 214,
+      "illustration_center_pdf_points": [
+        184.496994,
+        569.399811
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 15,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 244,
+      "illustration_center_pdf_points": [
+        182.008003,
+        352.3638
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-1-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 15,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 240,
+      "illustration_center_pdf_points": [
+        413.935196,
+        666.276917
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-1-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 15,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 234,
+      "illustration_center_pdf_points": [
+        293.345703,
+        495.228119
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-1-terrain-area-07",
+        "take-and-hold-vs-disruption-layout-1-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 15,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 238,
+      "illustration_center_pdf_points": [
+        363.191589,
+        363.725296
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-1-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 15,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 254,
+      "illustration_center_pdf_points": [
+        232.7668,
+        655.624115
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-1-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 16,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 220,
+      "illustration_center_pdf_points": [
+        194.095894,
+        344.825928
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-2-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 16,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 216,
+      "illustration_center_pdf_points": [
+        401.084793,
+        671.781616
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-2-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 16,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 210,
+      "illustration_center_pdf_points": [
+        311.810791,
+        500.576401
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-2-terrain-area-07",
+        "take-and-hold-vs-disruption-layout-2-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 16,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 214,
+      "illustration_center_pdf_points": [
+        385.901886,
+        383.452713
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-2-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 16,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 230,
+      "illustration_center_pdf_points": [
+        210.788101,
+        636.065155
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-2-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 17,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 225,
+      "illustration_center_pdf_points": [
+        296.909409,
+        375.874329
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-3-terrain-area-04"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 17,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 221,
+      "illustration_center_pdf_points": [
+        300.653702,
+        642.73584
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-3-terrain-area-13"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 17,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 215,
+      "illustration_center_pdf_points": [
+        281.610611,
+        509.956741
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-3-terrain-area-08",
+        "take-and-hold-vs-disruption-layout-3-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 17,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 235,
+      "illustration_center_pdf_points": [
+        402.631287,
+        450.821213
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-3-terrain-area-05"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 17,
+      "source_objective_id": "take-and-hold-vs-disruption-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 219,
+      "illustration_center_pdf_points": [
+        185.724899,
+        568.959137
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-disruption-layout-3-terrain-area-12"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 18,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 134,
+      "illustration_center_pdf_points": [
+        223.337395,
+        346.527802
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-1-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 18,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 114,
+      "illustration_center_pdf_points": [
+        371.154816,
+        674.451019
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-1-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 18,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 220,
+      "illustration_center_pdf_points": [
+        297.649414,
+        507.384689
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-1-terrain-area-07",
+        "take-and-hold-vs-reconnaissance-layout-1-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 18,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 129,
+      "illustration_center_pdf_points": [
+        396.516205,
+        399.728622
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-1-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 18,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 224,
+      "illustration_center_pdf_points": [
+        199.503403,
+        618.512054
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-1-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 19,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 232,
+      "illustration_center_pdf_points": [
+        190.798897,
+        372.987518
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-2-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 19,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 228,
+      "illustration_center_pdf_points": [
+        409.071793,
+        644.748413
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-2-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 19,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 222,
+      "illustration_center_pdf_points": [
+        291.524109,
+        498.355927
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-2-terrain-area-08",
+        "take-and-hold-vs-reconnaissance-layout-2-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 19,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 226,
+      "illustration_center_pdf_points": [
+        341.530304,
+        362.692917
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-2-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 19,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 242,
+      "illustration_center_pdf_points": [
+        256.081093,
+        658.051849
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-2-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 20,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 225,
+      "illustration_center_pdf_points": [
+        193.006401,
+        361.112122
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-3-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 20,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 221,
+      "illustration_center_pdf_points": [
+        401.501816,
+        657.891113
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-3-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 20,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 215,
+      "illustration_center_pdf_points": [
+        298.20462,
+        508.945221
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-3-terrain-area-08",
+        "take-and-hold-vs-reconnaissance-layout-3-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 20,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 219,
+      "illustration_center_pdf_points": [
+        386.303802,
+        379.544998
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-3-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 20,
+      "source_objective_id": "take-and-hold-vs-reconnaissance-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 241,
+      "illustration_center_pdf_points": [
+        205.746002,
+        639.072113
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-reconnaissance-layout-3-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 21,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 162,
+      "illustration_center_pdf_points": [
+        212.877892,
+        342.571411
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-1-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 21,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 158,
+      "illustration_center_pdf_points": [
+        382.23912,
+        677.390991
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-1-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 21,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 152,
+      "illustration_center_pdf_points": [
+        284.78772,
+        465.650604
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-1-terrain-area-06"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 21,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-1-central-02",
+      "role": "central",
+      "source_glyph_seqno": 166,
+      "illustration_center_pdf_points": [
+        317.087494,
+        547.099915
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-1-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 21,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 170,
+      "illustration_center_pdf_points": [
+        398.397705,
+        388.506699
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-1-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 21,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 156,
+      "illustration_center_pdf_points": [
+        193.317993,
+        632.102936
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-1-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 22,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 227,
+      "illustration_center_pdf_points": [
+        219.950798,
+        359.989624
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-2-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 22,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 223,
+      "illustration_center_pdf_points": [
+        369.919815,
+        658.983887
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-2-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 22,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 231,
+      "illustration_center_pdf_points": [
+        282.473297,
+        472.290405
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-2-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 22,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-2-central-02",
+      "role": "central",
+      "source_glyph_seqno": 217,
+      "illustration_center_pdf_points": [
+        314.914597,
+        544.956787
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-2-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 22,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 126,
+      "illustration_center_pdf_points": [
+        417.978607,
+        474.514114
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-2-terrain-area-08"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 22,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 221,
+      "illustration_center_pdf_points": [
+        179.029099,
+        545.298553
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-2-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 23,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 230,
+      "illustration_center_pdf_points": [
+        174.902092,
+        447.719727
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-06"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 23,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 226,
+      "illustration_center_pdf_points": [
+        419.3694,
+        569.458496
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 23,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 140,
+      "illustration_center_pdf_points": [
+        294.366211,
+        472.774628
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 23,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-3-central-02",
+      "role": "central",
+      "source_glyph_seqno": 93,
+      "illustration_center_pdf_points": [
+        301.773499,
+        545.508911
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 23,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 235,
+      "illustration_center_pdf_points": [
+        328.592285,
+        363.092422
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 23,
+      "source_objective_id": "take-and-hold-vs-priority-assets-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 224,
+      "illustration_center_pdf_points": [
+        268.931313,
+        654.107635
+      ],
+      "semantic_source_terrain_area_ids": [
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 24,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-1-attacker-home",
+      "role": "attacker_home",
+      "source_glyph_seqno": 160,
+      "illustration_center_pdf_points": [
+        194.286201,
+        352.655426
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 24,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-1-defender-home",
+      "role": "defender_home",
+      "source_glyph_seqno": 156,
+      "illustration_center_pdf_points": [
+        406.912399,
+        670.651978
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 24,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-1-central-north",
+      "role": "central",
+      "source_glyph_seqno": 153,
+      "illustration_center_pdf_points": [
+        332.899994,
+        451.57431
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 24,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-1-central-south",
+      "role": "central",
+      "source_glyph_seqno": 181,
+      "illustration_center_pdf_points": [
+        265.773407,
+        568.248169
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 24,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-1-expansion-north-east",
+      "role": "expansion",
+      "source_glyph_seqno": 174,
+      "illustration_center_pdf_points": [
+        376.505386,
+        334.567184
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 24,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-1-expansion-south-west",
+      "role": "expansion",
+      "source_glyph_seqno": 171,
+      "illustration_center_pdf_points": [
+        223.54023,
+        675.857208
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 25,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-2-attacker-home",
+      "role": "attacker_home",
+      "source_glyph_seqno": 242,
+      "illustration_center_pdf_points": [
+        204.528999,
+        372.534302
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 25,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-2-defender-home",
+      "role": "defender_home",
+      "source_glyph_seqno": 238,
+      "illustration_center_pdf_points": [
+        388.010696,
+        647.264221
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 25,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-2-central-west",
+      "role": "central",
+      "source_glyph_seqno": 254,
+      "illustration_center_pdf_points": [
+        213.499504,
+        512.041122
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 25,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-2-central-east",
+      "role": "central",
+      "source_glyph_seqno": 232,
+      "illustration_center_pdf_points": [
+        385.020996,
+        504.8284
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-08"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 25,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-2-expansion-north-east",
+      "role": "expansion",
+      "source_glyph_seqno": 236,
+      "illustration_center_pdf_points": [
+        415.823486,
+        409.168106
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-04"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 25,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-2-expansion-south-west",
+      "role": "expansion",
+      "source_glyph_seqno": 247,
+      "illustration_center_pdf_points": [
+        180.985306,
+        608.250824
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-13"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 26,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-3-attacker-home",
+      "role": "attacker_home",
+      "source_glyph_seqno": 157,
+      "illustration_center_pdf_points": [
+        198.186104,
+        345.941803
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 26,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-3-defender-home",
+      "role": "defender_home",
+      "source_glyph_seqno": 153,
+      "illustration_center_pdf_points": [
+        397.130417,
+        670.655396
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 26,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-3-central-north",
+      "role": "central",
+      "source_glyph_seqno": 192,
+      "illustration_center_pdf_points": [
+        307.388092,
+        463.377319
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 26,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-3-central-south",
+      "role": "central",
+      "source_glyph_seqno": 189,
+      "illustration_center_pdf_points": [
+        285.313507,
+        557.799622
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 26,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-3-expansion-north-east",
+      "role": "expansion",
+      "source_glyph_seqno": 173,
+      "illustration_center_pdf_points": [
+        354.361069,
+        344.975723
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 26,
+      "source_objective_id": "purge-the-foe-vs-purge-the-foe-layout-3-expansion-south-west",
+      "role": "expansion",
+      "source_glyph_seqno": 176,
+      "illustration_center_pdf_points": [
+        245.84243,
+        670.839355
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 27,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 235,
+      "illustration_center_pdf_points": [
+        200.659904,
+        358.560913
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-1-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 27,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 231,
+      "illustration_center_pdf_points": [
+        393.848221,
+        657.891113
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-1-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 27,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 257,
+      "illustration_center_pdf_points": [
+        315.651611,
+        457.696014
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-1-terrain-area-06"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 27,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-1-central-02",
+      "role": "central",
+      "source_glyph_seqno": 228,
+      "illustration_center_pdf_points": [
+        287.126617,
+        560.775513
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-1-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 27,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 255,
+      "illustration_center_pdf_points": [
+        394.93956,
+        382.331223
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-1-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 27,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 252,
+      "illustration_center_pdf_points": [
+        204.9132,
+        638.40567
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-1-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 28,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 251,
+      "illustration_center_pdf_points": [
+        262.791603,
+        362.617706
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-2-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 28,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 247,
+      "illustration_center_pdf_points": [
+        334.26152,
+        653.031494
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-2-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 28,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 241,
+      "illustration_center_pdf_points": [
+        297.855621,
+        480.201904
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-2-terrain-area-06"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 28,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-2-central-02",
+      "role": "central",
+      "source_glyph_seqno": 268,
+      "illustration_center_pdf_points": [
+        299.147491,
+        538.233887
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-2-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 28,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 245,
+      "illustration_center_pdf_points": [
+        398.470093,
+        409.394699
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-2-terrain-area-05"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 28,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 256,
+      "illustration_center_pdf_points": [
+        198.326096,
+        608.886444
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-2-terrain-area-12"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 29,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 142,
+      "illustration_center_pdf_points": [
+        194.125603,
+        354.308929
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 29,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 138,
+      "illustration_center_pdf_points": [
+        401.167709,
+        663.802734
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 29,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 135,
+      "illustration_center_pdf_points": [
+        329.64151,
+        488.378326
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 29,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-3-central-02",
+      "role": "central",
+      "source_glyph_seqno": 194,
+      "illustration_center_pdf_points": [
+        268.331604,
+        529.919189
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 29,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 192,
+      "illustration_center_pdf_points": [
+        322.743286,
+        354.59761
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 29,
+      "source_objective_id": "purge-the-foe-vs-disruption-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 153,
+      "illustration_center_pdf_points": [
+        274.677399,
+        662.018524
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 30,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 219,
+      "illustration_center_pdf_points": [
+        274.375992,
+        367.643219
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 30,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 215,
+      "illustration_center_pdf_points": [
+        320.488998,
+        651.703735
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 30,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 229,
+      "illustration_center_pdf_points": [
+        313.528992,
+        453.828705
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 30,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-1-central-02",
+      "role": "central",
+      "source_glyph_seqno": 209,
+      "illustration_center_pdf_points": [
+        284.632812,
+        557.747803
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 30,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 249,
+      "illustration_center_pdf_points": [
+        408.027893,
+        469.894516
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-08"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 30,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 213,
+      "illustration_center_pdf_points": [
+        190.438904,
+        548.63205
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 31,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 225,
+      "illustration_center_pdf_points": [
+        176.602898,
+        440.066101
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-06"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 31,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 221,
+      "illustration_center_pdf_points": [
+        419.3694,
+        577.112122
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 31,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 232,
+      "illustration_center_pdf_points": [
+        300.544495,
+        456.048126
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 31,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-2-central-02",
+      "role": "central",
+      "source_glyph_seqno": 255,
+      "illustration_center_pdf_points": [
+        295.372803,
+        563.493652
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 31,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 230,
+      "illustration_center_pdf_points": [
+        327.741913,
+        363.092422
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 31,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 219,
+      "illustration_center_pdf_points": [
+        268.931313,
+        654.107635
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 32,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 220,
+      "illustration_center_pdf_points": [
+        223.082603,
+        341.721008
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 32,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 216,
+      "illustration_center_pdf_points": [
+        372.884811,
+        678.241394
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 32,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 245,
+      "illustration_center_pdf_points": [
+        310.594025,
+        477.84729
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-06"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 32,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-3-central-02",
+      "role": "central",
+      "source_glyph_seqno": 224,
+      "illustration_center_pdf_points": [
+        286.590881,
+        541.019104
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 32,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 228,
+      "illustration_center_pdf_points": [
+        393.295288,
+        387.656296
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 32,
+      "source_objective_id": "purge-the-foe-vs-reconnaissance-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 214,
+      "illustration_center_pdf_points": [
+        200.121094,
+        631.252533
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 33,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 258,
+      "illustration_center_pdf_points": [
+        189.178001,
+        389.427307
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-1-terrain-area-05"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 33,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 254,
+      "illustration_center_pdf_points": [
+        412.733109,
+        624.681335
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-1-terrain-area-12"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 33,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 248,
+      "illustration_center_pdf_points": [
+        333.378113,
+        491.331604
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-1-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 33,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-1-central-02",
+      "role": "central",
+      "source_glyph_seqno": 265,
+      "illustration_center_pdf_points": [
+        264.159912,
+        530.170105
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-1-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 33,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 252,
+      "illustration_center_pdf_points": [
+        337.771515,
+        355.728714
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-1-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 33,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 263,
+      "illustration_center_pdf_points": [
+        256.460121,
+        661.469025
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-1-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 34,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 243,
+      "illustration_center_pdf_points": [
+        195.522392,
+        337.301025
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-2-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 34,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 239,
+      "illustration_center_pdf_points": [
+        406.82991,
+        680.009705
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-2-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 34,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 253,
+      "illustration_center_pdf_points": [
+        318.06842,
+        481.205902
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-2-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 34,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-2-central-02",
+      "role": "central",
+      "source_glyph_seqno": 233,
+      "illustration_center_pdf_points": [
+        276.094208,
+        537.858521
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-2-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 34,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 237,
+      "illustration_center_pdf_points": [
+        392.905914,
+        412.030899
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-2-terrain-area-04"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 34,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 257,
+      "illustration_center_pdf_points": [
+        197.515396,
+        605.409637
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-2-terrain-area-13"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 35,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 239,
+      "illustration_center_pdf_points": [
+        304.005692,
+        367.022919
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-3-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 35,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 235,
+      "illustration_center_pdf_points": [
+        286.704117,
+        648.493408
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-3-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 35,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 246,
+      "illustration_center_pdf_points": [
+        327.836121,
+        504.244904
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-3-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 35,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-3-central-02",
+      "role": "central",
+      "source_glyph_seqno": 229,
+      "illustration_center_pdf_points": [
+        268.747803,
+        510.476791
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-3-terrain-area-08"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 35,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 233,
+      "illustration_center_pdf_points": [
+        394.949707,
+        443.103622
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-3-terrain-area-06"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 35,
+      "source_objective_id": "purge-the-foe-vs-priority-assets-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 244,
+      "illustration_center_pdf_points": [
+        201.327606,
+        574.74173
+      ],
+      "semantic_source_terrain_area_ids": [
+        "purge-the-foe-vs-priority-assets-layout-3-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 36,
+      "source_objective_id": "disruption-vs-disruption-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 218,
+      "illustration_center_pdf_points": [
+        226.216499,
+        346.10791
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-1-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 36,
+      "source_objective_id": "disruption-vs-disruption-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 214,
+      "illustration_center_pdf_points": [
+        379.479996,
+        668.960693
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-1-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 36,
+      "source_objective_id": "disruption-vs-disruption-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 208,
+      "illustration_center_pdf_points": [
+        291.142792,
+        486.921417
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-1-terrain-area-07",
+        "disruption-vs-disruption-layout-1-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 36,
+      "source_objective_id": "disruption-vs-disruption-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 228,
+      "illustration_center_pdf_points": [
+        390.803101,
+        373.604996
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-1-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 36,
+      "source_objective_id": "disruption-vs-disruption-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 212,
+      "illustration_center_pdf_points": [
+        206.319901,
+        646.78421
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-1-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 37,
+      "source_objective_id": "disruption-vs-disruption-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 221,
+      "illustration_center_pdf_points": [
+        220.922798,
+        343.96402
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-2-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 37,
+      "source_objective_id": "disruption-vs-disruption-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 217,
+      "illustration_center_pdf_points": [
+        380.069809,
+        673.421997
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-2-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 37,
+      "source_objective_id": "disruption-vs-disruption-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 211,
+      "illustration_center_pdf_points": [
+        316.913605,
+        497.525909
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-2-terrain-area-06",
+        "disruption-vs-disruption-layout-2-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 37,
+      "source_objective_id": "disruption-vs-disruption-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 215,
+      "illustration_center_pdf_points": [
+        400.827606,
+        413.103317
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-2-terrain-area-04"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 37,
+      "source_objective_id": "disruption-vs-disruption-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 231,
+      "illustration_center_pdf_points": [
+        196.327698,
+        605.598419
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-2-terrain-area-13"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 38,
+      "source_objective_id": "disruption-vs-disruption-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 224,
+      "illustration_center_pdf_points": [
+        193.743492,
+        342.403412
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-3-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 38,
+      "source_objective_id": "disruption-vs-disruption-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 220,
+      "illustration_center_pdf_points": [
+        406.258804,
+        674.819946
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-3-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 38,
+      "source_objective_id": "disruption-vs-disruption-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 214,
+      "illustration_center_pdf_points": [
+        287.989319,
+        494.300201
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-3-terrain-area-08",
+        "disruption-vs-disruption-layout-3-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 38,
+      "source_objective_id": "disruption-vs-disruption-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 218,
+      "illustration_center_pdf_points": [
+        340.728485,
+        339.491592
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-3-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 38,
+      "source_objective_id": "disruption-vs-disruption-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 234,
+      "illustration_center_pdf_points": [
+        256.598518,
+        671.090912
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-disruption-layout-3-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 39,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 210,
+      "illustration_center_pdf_points": [
+        261.843788,
+        360.06662
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-1-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 39,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 206,
+      "illustration_center_pdf_points": [
+        331.426895,
+        660.887817
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-1-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 39,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 246,
+      "illustration_center_pdf_points": [
+        331.42691,
+        457.437805
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-1-terrain-area-06"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 39,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-1-central-02",
+      "role": "central",
+      "source_glyph_seqno": 249,
+      "illustration_center_pdf_points": [
+        265.024811,
+        561.587524
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-1-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 39,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 204,
+      "illustration_center_pdf_points": [
+        410.567688,
+        421.149002
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-1-terrain-area-05"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 39,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 215,
+      "illustration_center_pdf_points": [
+        184.519608,
+        594.64212
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-1-terrain-area-12"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 40,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 163,
+      "illustration_center_pdf_points": [
+        186.377098,
+        353.061707
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-2-terrain-area-05"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 40,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 159,
+      "illustration_center_pdf_points": [
+        410.409195,
+        663.656921
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-2-terrain-area-12"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 40,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 167,
+      "illustration_center_pdf_points": [
+        343.984009,
+        484.342529
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-2-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 40,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-2-central-02",
+      "role": "central",
+      "source_glyph_seqno": 156,
+      "illustration_center_pdf_points": [
+        251.161407,
+        536.318359
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-2-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 40,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 93,
+      "illustration_center_pdf_points": [
+        313.399994,
+        343.972183
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-2-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 40,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 171,
+      "illustration_center_pdf_points": [
+        282.976257,
+        674.087036
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-2-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 41,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 222,
+      "illustration_center_pdf_points": [
+        177.859093,
+        390.3909
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-3-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 41,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 218,
+      "illustration_center_pdf_points": [
+        417.102005,
+        625.461304
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-3-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 41,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 215,
+      "illustration_center_pdf_points": [
+        284.108215,
+        475.047211
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-3-terrain-area-06"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 41,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-3-central-02",
+      "role": "central",
+      "source_glyph_seqno": 226,
+      "illustration_center_pdf_points": [
+        312.032593,
+        543.519653
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-3-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 41,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 255,
+      "illustration_center_pdf_points": [
+        374.499786,
+        347.968796
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-3-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 41,
+      "source_objective_id": "disruption-vs-reconnaissance-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 230,
+      "illustration_center_pdf_points": [
+        220.696503,
+        670.144623
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-reconnaissance-layout-3-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 42,
+      "source_objective_id": "disruption-vs-priority-assets-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 172,
+      "illustration_center_pdf_points": [
+        187.609001,
+        337.798706
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-1-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 42,
+      "source_objective_id": "disruption-vs-priority-assets-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 168,
+      "illustration_center_pdf_points": [
+        409.573898,
+        681.044189
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-1-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 42,
+      "source_objective_id": "disruption-vs-priority-assets-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 162,
+      "illustration_center_pdf_points": [
+        274.811401,
+        508.945221
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-1-terrain-area-07",
+        "disruption-vs-priority-assets-layout-1-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 42,
+      "source_objective_id": "disruption-vs-priority-assets-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 166,
+      "illustration_center_pdf_points": [
+        363.973511,
+        366.116623
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-1-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 42,
+      "source_objective_id": "disruption-vs-priority-assets-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 182,
+      "illustration_center_pdf_points": [
+        230.883194,
+        652.037018
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-1-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 43,
+      "source_objective_id": "disruption-vs-priority-assets-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 243,
+      "illustration_center_pdf_points": [
+        264.865089,
+        369.678925
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-2-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 43,
+      "source_objective_id": "disruption-vs-priority-assets-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 239,
+      "illustration_center_pdf_points": [
+        333.8069,
+        642.775696
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-2-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 43,
+      "source_objective_id": "disruption-vs-priority-assets-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 236,
+      "illustration_center_pdf_points": [
+        298.54892,
+        487.7966
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-2-terrain-area-08",
+        "disruption-vs-priority-assets-layout-2-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 43,
+      "source_objective_id": "disruption-vs-priority-assets-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 112,
+      "illustration_center_pdf_points": [
+        411.271484,
+        425.665009
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-2-terrain-area-06"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 43,
+      "source_objective_id": "disruption-vs-priority-assets-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 253,
+      "illustration_center_pdf_points": [
+        186.928406,
+        593.356903
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-2-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 44,
+      "source_objective_id": "disruption-vs-priority-assets-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 231,
+      "illustration_center_pdf_points": [
+        193.030495,
+        355.660126
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-3-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 44,
+      "source_objective_id": "disruption-vs-priority-assets-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 227,
+      "illustration_center_pdf_points": [
+        408.246902,
+        660.585693
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-3-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 44,
+      "source_objective_id": "disruption-vs-priority-assets-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 224,
+      "illustration_center_pdf_points": [
+        297.354218,
+        483.071503
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-3-terrain-area-08",
+        "disruption-vs-priority-assets-layout-3-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": true,
+      "single_contact_icon_suffix": "03",
+      "reviewed_runtime_reference_inches": [
+        22.07,
+        32.98
+      ],
+      "reviewed_anchor_support_source_area_ids": [
+        "disruption-vs-priority-assets-layout-3-terrain-area-08"
+      ],
+      "reviewed_anchor_basis": "project_interior_reference_preserving_source_region_memberships",
+      "reviewed_region_memberships": [
+        "disruption-vs-priority-assets-layout-3-attacker-territory",
+        "disruption-vs-priority-assets-layout-3-no-mans-land"
+      ]
+    },
+    {
+      "source_pdf_page": 44,
+      "source_objective_id": "disruption-vs-priority-assets-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 266,
+      "illustration_center_pdf_points": [
+        381.741913,
+        370.205521
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-3-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 44,
+      "source_objective_id": "disruption-vs-priority-assets-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 236,
+      "illustration_center_pdf_points": [
+        214.917496,
+        646.128998
+      ],
+      "semantic_source_terrain_area_ids": [
+        "disruption-vs-priority-assets-layout-3-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 45,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 239,
+      "illustration_center_pdf_points": [
+        193.743492,
+        342.403412
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 45,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 235,
+      "illustration_center_pdf_points": [
+        406.258804,
+        674.819946
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 45,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 229,
+      "illustration_center_pdf_points": [
+        264.595306,
+        517.167343
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 45,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 233,
+      "illustration_center_pdf_points": [
+        340.728485,
+        339.491592
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 45,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 244,
+      "illustration_center_pdf_points": [
+        256.598518,
+        671.090912
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 45,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-1-central-02",
+      "role": "central",
+      "source_glyph_seqno": 282,
+      "illustration_center_pdf_points": [
+        333.626892,
+        492.260223
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-08"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 46,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 211,
+      "illustration_center_pdf_points": [
+        226.216499,
+        346.10791
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 46,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 207,
+      "illustration_center_pdf_points": [
+        379.479996,
+        668.960693
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 46,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 201,
+      "illustration_center_pdf_points": [
+        309.367218,
+        478.653625
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-07"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 46,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 216,
+      "illustration_center_pdf_points": [
+        390.803101,
+        373.604996
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 46,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 205,
+      "illustration_center_pdf_points": [
+        206.319901,
+        646.78421
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 46,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-2-central-02",
+      "role": "central",
+      "source_glyph_seqno": 250,
+      "illustration_center_pdf_points": [
+        286.299011,
+        538.086182
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 47,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 224,
+      "illustration_center_pdf_points": [
+        220.922798,
+        343.96402
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 47,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 220,
+      "illustration_center_pdf_points": [
+        380.069809,
+        673.421997
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 47,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 253,
+      "illustration_center_pdf_points": [
+        309.615021,
+        477.883728
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-06"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 47,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 218,
+      "illustration_center_pdf_points": [
+        400.827606,
+        413.103317
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-04"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 47,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 229,
+      "illustration_center_pdf_points": [
+        196.327698,
+        605.598419
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-13"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 47,
+      "source_objective_id": "reconnaissance-vs-reconnaissance-layout-3-central-02",
+      "role": "central",
+      "source_glyph_seqno": 214,
+      "illustration_center_pdf_points": [
+        289.712006,
+        539.825317
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-11"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 48,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 155,
+      "illustration_center_pdf_points": [
+        208.286598,
+        352.740021
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-1-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 48,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 151,
+      "illustration_center_pdf_points": [
+        392.598221,
+        667.118713
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-1-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 48,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 145,
+      "illustration_center_pdf_points": [
+        290.694702,
+        500.922821
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-1-terrain-area-08",
+        "reconnaissance-vs-priority-assets-layout-1-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 48,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 149,
+      "illustration_center_pdf_points": [
+        388.374695,
+        370.726822
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-1-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 48,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 171,
+      "illustration_center_pdf_points": [
+        208.571594,
+        647.611725
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-1-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 49,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 238,
+      "illustration_center_pdf_points": [
+        216.0308,
+        354.819214
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-2-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 49,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 234,
+      "illustration_center_pdf_points": [
+        381.254898,
+        660.176514
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-2-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 49,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 228,
+      "illustration_center_pdf_points": [
+        298.200195,
+        492.835907
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-2-terrain-area-06",
+        "reconnaissance-vs-priority-assets-layout-2-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 49,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 232,
+      "illustration_center_pdf_points": [
+        372.174988,
+        396.669998
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-2-terrain-area-04"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 49,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 248,
+      "illustration_center_pdf_points": [
+        210.703903,
+        614.159821
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-2-terrain-area-13"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 50,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 237,
+      "illustration_center_pdf_points": [
+        190.426903,
+        361.850616
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-3-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 50,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 233,
+      "illustration_center_pdf_points": [
+        402.144699,
+        663.109741
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-3-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 50,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 230,
+      "illustration_center_pdf_points": [
+        293.345703,
+        495.228119
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-3-terrain-area-07",
+        "reconnaissance-vs-priority-assets-layout-3-terrain-area-10"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 50,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 109,
+      "illustration_center_pdf_points": [
+        370.205109,
+        354.480118
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-3-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 50,
+      "source_objective_id": "reconnaissance-vs-priority-assets-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 253,
+      "illustration_center_pdf_points": [
+        225.113297,
+        663.277618
+      ],
+      "semantic_source_terrain_area_ids": [
+        "reconnaissance-vs-priority-assets-layout-3-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 51,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-1-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 137,
+      "illustration_center_pdf_points": [
+        184.148399,
+        345.464905
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-01"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 51,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-1-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 133,
+      "illustration_center_pdf_points": [
+        412.222794,
+        672.356201
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 51,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-1-central-01",
+      "role": "central",
+      "source_glyph_seqno": 130,
+      "illustration_center_pdf_points": [
+        324.448517,
+        507.516815
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-08",
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": true,
+      "single_contact_icon_suffix": "01",
+      "reviewed_runtime_reference_inches": [
+        24.93,
+        30.2
+      ],
+      "reviewed_anchor_support_source_area_ids": [
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-08"
+      ],
+      "reviewed_anchor_basis": "project_interior_reference_preserving_source_region_memberships",
+      "reviewed_region_memberships": [
+        "priority-assets-vs-priority-assets-layout-1-defender-territory",
+        "priority-assets-vs-priority-assets-layout-1-no-mans-land"
+      ]
+    },
+    {
+      "source_pdf_page": 51,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-1-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 102,
+      "illustration_center_pdf_points": [
+        358.035492,
+        357.002304
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 51,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-1-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 147,
+      "illustration_center_pdf_points": [
+        237.063911,
+        661.16507
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-1-terrain-area-16"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 52,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-2-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 242,
+      "illustration_center_pdf_points": [
+        209.137001,
+        352.0354
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-2-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 52,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-2-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 238,
+      "illustration_center_pdf_points": [
+        389.683609,
+        665.969604
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-2-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 52,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-2-central-01",
+      "role": "central",
+      "source_glyph_seqno": 235,
+      "illustration_center_pdf_points": [
+        298.274597,
+        525.685791
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-2-terrain-area-08",
+        "priority-assets-vs-priority-assets-layout-2-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 52,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-2-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 260,
+      "illustration_center_pdf_points": [
+        385.806,
+        388.773407
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-2-terrain-area-03"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 52,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-2-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 252,
+      "illustration_center_pdf_points": [
+        209.412903,
+        629.463959
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-2-terrain-area-14"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 53,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-3-attacker-home-01",
+      "role": "attacker_home",
+      "source_glyph_seqno": 165,
+      "illustration_center_pdf_points": [
+        196.964417,
+        364.439026
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-02"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 53,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-3-defender-home-01",
+      "role": "defender_home",
+      "source_glyph_seqno": 161,
+      "illustration_center_pdf_points": [
+        393.578812,
+        659.643005
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-15"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 53,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-3-central-01",
+      "role": "central",
+      "source_glyph_seqno": 169,
+      "illustration_center_pdf_points": [
+        297.400818,
+        481.90271
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-08",
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-09"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": true,
+      "single_contact_icon_suffix": "04",
+      "reviewed_runtime_reference_inches": [
+        21.92,
+        32.94
+      ],
+      "reviewed_anchor_support_source_area_ids": [
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-09"
+      ],
+      "reviewed_anchor_basis": "project_interior_reference_preserving_source_region_memberships",
+      "reviewed_region_memberships": [
+        "priority-assets-vs-priority-assets-layout-3-attacker-territory",
+        "priority-assets-vs-priority-assets-layout-3-no-mans-land"
+      ]
+    },
+    {
+      "source_pdf_page": 53,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-3-expansion-01",
+      "role": "expansion",
+      "source_glyph_seqno": 159,
+      "illustration_center_pdf_points": [
+        409.062103,
+        434.267502
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-05"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    },
+    {
+      "source_pdf_page": 53,
+      "source_objective_id": "priority-assets-vs-priority-assets-layout-3-expansion-02",
+      "role": "expansion",
+      "source_glyph_seqno": 130,
+      "illustration_center_pdf_points": [
+        185.980804,
+        592.235443
+      ],
+      "semantic_source_terrain_area_ids": [
+        "priority-assets-vs-priority-assets-layout-3-terrain-area-12"
+      ],
+      "review_basis": "Full glyph and surrounding actual footprint/component imagery visually reviewed in objective-semantic-sheet crops; unique raw glyph overlap supports one logical terrain area, expanded only through explicit Single icons.",
+      "is_center_rule_correction": false,
+      "single_contact_icon_suffix": null
+    }
+  ],
+  "runtime_reference_scope": "Illustration centers are retained independently; explicit project interior references satisfy existing marker-in-linked-union admission. References do not define control or distance geometry, which is the full linked logical terrain area."
+}

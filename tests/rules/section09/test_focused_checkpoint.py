@@ -237,7 +237,7 @@ def test_repair_hazard_lethal_wound_uses_native_casualty_authority_before_moveme
     section09_definitions: Section02Definitions,
 ) -> None:
     _old, state, unit = movement_case(section09_definitions, engaged=True)
-    state.game_id = "focused-hazard-wounded-2"
+    state.game_id = "focused-hazard-wounded-october-0"
     unit = replace(
         unit, own_models=(replace(unit.own_models[0], wounds_remaining=1), unit.own_models[1])
     )

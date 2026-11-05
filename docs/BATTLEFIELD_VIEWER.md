@@ -76,8 +76,8 @@ All 45 Event Companion layouts have source-hashed executable battlefield
 packages. Every package contains 16 terrain-area footprint pieces, explicit
 physical component placements, source-linked objective-to-terrain-area
 bindings, two deployment zones, two territories, and No Man's Land. The 720
-physical footprint pieces form 608 logical rules areas: 112 source-declared
-two-piece Single joins plus 496 singletons. The package also contains 1,349
+physical footprint pieces form 617 logical rules areas: 103 source-declared
+two-piece Single joins plus 514 singletons. The package also contains 1,349
 physical components. The page 9 Take and Hold versus Take and Hold Layout A
 diagram contains one source-backed exception: it has 29 components because one
 downed hovercraft has no tall-crate companion. Every other layout has 30
@@ -90,37 +90,30 @@ vertical middle guides. The six source template dividers are `(0,26)-(44,34)`,
 `(0,15)-(44,45)` respectively.
 
 The canonical generated artifact has SHA-256
-`028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f`
+`5e9dfcef9d91e78ac51ea9019e736f250246e7adf1e0258484f109190cea030a`
 and package hash
-`44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972`.
+`be19e97db9124271cae2dba2cdc8ef76992526b67c11505cf7c10c00435d36a7`.
 Its reviewed page-8 key plus pages-9-53 layout extraction has SHA-256
-`a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f`;
+`9c008361396fee33af9ed1f2352531b62c7c016d189c8984917c9c65224e91d6`;
 the generator also pins the stable runtime identity map at
 `742ab841d1ec1e696f4a5c0e3f2e8c251203d510bf1da85fb30af88023cb64f3`.
 
-All 224 layout-page contact glyphs are retained at 0.05-inch source precision
-and interpreted using the page-8 legend: 112 Single and 112 Separate. Final
-runtime footprint polygons preserve at most one 0.05-inch placement quantum of
-source-fit residual and permit at most `0.000001` square inches of numerical
-overlap. Of the 224 declared contacts, 43 have zero recorded gap and 181 retain
-a source-fit open sliver no wider than 0.05 inches: 80 Single and 101 Separate.
-Of those 43 zero-gap contacts, 41 also have zero overlap. Two page-12 Single
-pairs have `0.00000087` square inches of overlap after six-decimal geometry
-quantization; every other pair has zero recorded overlap.
-Single joins share one rules identity and Separate pairs remain distinct, while
-both preserve source-drawn open board between physical polygons. Two repeated
-Single joins on pages 36 and 46 require one explicit
-`0.011834688335`-inch exact normal correction after their 0.05-inch source
-placement; those joins close with zero gap and zero overlap. The source anchors
-remain separately recorded, and the strict artifact permits no other sub-grid
-pose. Neither label invents rules footprint in source-drawn open board between
-physical polygons. Each measured runtime gap and overlap is retained in the
-generated artifact and validated by the viewer; source-measured
-pre-finalization gaps remain separate provenance.
-Objective centers retain the source vectors' finer 0.01-inch precision.
-When a source-linked objective falls on one physical member of a Single pair,
-its runtime terrain-objective binding expands to every physical member of that
-logical terrain area; open-field objectives remain unbound.
+All 219 visible current layout-page contact glyphs are retained at 0.05 inch
+source precision: 103 Single and 116 Separate. Final runtime contacts retain at
+most 0.05 inch gap and 1e-6 square-inch numerical overlap. Single joins share one rules
+identity; Separate pairs remain distinct. Neither fills source-drawn open board.
+Only the unchanged page 36 join retains its explicit 0.011834688335 inch exact normal
+correction. The changed page 46 source no longer uses that exception. Measured
+source gaps and final runtime gaps remain separate. See the
+[current source review](../data/source_audits/event_companion_2026_10/README.md)
+for all 45 source correspondences and retained/retired modeling exceptions.
+All 249 objectives bind to explicitly reviewed terrain groups, including 21
+Single pairs (270 physical member links). Runtime labels use 0.01-inch project
+reference points inside the linked union. Three displaced illustration centers
+on pages 44, 51 and 53 require adjusted references; page 10 stays unchanged.
+Measured PDF glyph coordinates remain separate artifact evidence. The labels do
+not define range or control: both use the complete linked terrain geometry.
+
 
 The 14 shared terrain archetypes define recurring component footprints and
 wall/floor geometry once for reuse by every layout. The page 9 exception has 69

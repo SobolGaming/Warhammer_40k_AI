@@ -41,10 +41,10 @@ from shapely import affinity
 from shapely.geometry import Point, Polygon
 
 ARTIFACT_SCHEMA = "core-v2-event-companion-full-battlefield-layouts-v1"
-SOURCE_PACKAGE_ID = "gw-11e-warhammer-event-companion-v1-1-2026-07"
-SOURCE_PDF_FILENAME = "eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf"
-SOURCE_PDF_SHA256 = "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20"
-EXPECTED_EXTRACTION_SHA256 = "a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f"
+SOURCE_PACKAGE_ID = "gw-11e-warhammer-event-companion-layouts-v1-3-2026-10"
+SOURCE_PDF_FILENAME = "eng_14-10_wh40k_event_companion-rdwnqprl4c-nj8oqogadv.pdf"
+SOURCE_PDF_SHA256 = "187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2"
+EXPECTED_EXTRACTION_SHA256 = "9c008361396fee33af9ed1f2352531b62c7c016d189c8984917c9c65224e91d6"
 EXPECTED_STABLE_IDENTITY_SHA256 = "742ab841d1ec1e696f4a5c0e3f2e8c251203d510bf1da85fb30af88023cb64f3"
 _TERRAIN_GRID_INCHES = 0.05
 _GEOMETRY_TOLERANCE = 1e-6
@@ -53,8 +53,8 @@ _PIPE_CENTER_SEARCH_STEPS = 2
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_EXTRACTION_PATH = (
     REPOSITORY_ROOT
-    / "data/source_audits/event_companion_2026_06"
-    / "phase17n_event_companion_battlefields_pages_9_53_extraction.json"
+    / "data/source_audits/event_companion_2026_10"
+    / "event_companion_layouts_pages_8_53.json"
 )
 STABLE_IDENTITY_PATH = (
     REPOSITORY_ROOT
@@ -348,16 +348,8 @@ def _area_rows(
         )
         mirror_id = identities.area_id(source_mirror_area_id)
         source_candidate = _source_pose_candidate(raw, pose=pose)
-        page = int(layout["source_pdf_page_number"])
         if uses_reviewed_exact_seam_pose(source_area_id):
             pose_basis = "reviewed_source_pose_with_exact_seam_closure"
-        elif page in {24, 25, 26}:
-            area_index = int(source_area_id.rsplit("-", maxsplit=1)[-1])
-            pose_basis = (
-                "accepted_meatgrinder_exemplar_source_pose"
-                if area_index <= 8
-                else "accepted_meatgrinder_exemplar_exact_point_symmetry"
-            )
         else:
             pose_basis = "reviewed_source_pose_candidate_with_bounded_seam_adjustment"
         rows.append(
@@ -714,31 +706,6 @@ def _initial_component_poses(
                 source_layout_id=source_layout_id,
                 layout_id=layout_id,
             )
-    is_meatgrinder = layout["source_pdf_page_number"] in {24, 25, 26}
-    if not is_meatgrinder:
-        poses: dict[str, ComponentPose] = {}
-        for component_id, raw in sorted(raw_by_id.items()):
-            area_id = _component_area_id(
-                raw,
-                source_layout_id=source_layout_id,
-                layout_id=layout_id,
-            )
-            archetype = archetype_by_id[raw["archetype_id"]]
-            component_vertices = tuple(
-                (float(point["x_inches"]), float(point["y_inches"]))
-                for point in archetype["rules_footprint_polygon"]
-            )
-            poses[component_id] = (
-                _pipe_component_pose(
-                    area_pose=solved_area_poses[area_id],
-                    area_vertices=templates[archetype["footprint_template_id"]],
-                    component_vertices=component_vertices,
-                    local_transform=raw["local_orientation_relative_to_parent"]["local_transform"],
-                )
-                if raw["archetype_id"] == "dense-long-pipes"
-                else _reviewed_component_pose(component_id, raw)
-            )
-        return poses, partner_by_id
     poses: dict[str, ComponentPose] = {}
     for component_id, raw in sorted(raw_by_id.items()):
         area_id = _component_area_id(
@@ -746,18 +713,14 @@ def _initial_component_poses(
             source_layout_id=source_layout_id,
             layout_id=layout_id,
         )
-        area_index = int(area_id.rsplit("-", maxsplit=1)[-1])
-        if area_index > 8 and component_id in partner_by_id:
-            continue
-        area_pose = solved_area_poses[area_id]
         archetype = archetype_by_id[raw["archetype_id"]]
         component_vertices = tuple(
             (float(point["x_inches"]), float(point["y_inches"]))
             for point in archetype["rules_footprint_polygon"]
         )
-        pose = (
+        poses[component_id] = (
             _pipe_component_pose(
-                area_pose=area_pose,
+                area_pose=solved_area_poses[area_id],
                 area_vertices=templates[archetype["footprint_template_id"]],
                 component_vertices=component_vertices,
                 local_transform=raw["local_orientation_relative_to_parent"]["local_transform"],
@@ -765,12 +728,6 @@ def _initial_component_poses(
             if raw["archetype_id"] == "dense-long-pipes"
             else _reviewed_component_pose(component_id, raw)
         )
-        poses[component_id] = pose
-        partner_id = partner_by_id.get(component_id)
-        if partner_id is not None:
-            poses[partner_id] = _mirror_component_pose(pose)
-    if set(poses) != set(raw_by_id):
-        raise ValueError("Source component point-symmetry inventory is incomplete.")
     return poses, partner_by_id
 
 
@@ -1109,15 +1066,7 @@ def _component_rows(
             if source_mirror_component_id is None
             else runtime_component_ids[source_mirror_component_id]
         )
-        page = int(layout["source_pdf_page_number"])
-        if page in {24, 25, 26}:
-            area_index = int(source_area_id.rsplit("-", maxsplit=1)[-1])
-            pose_basis = (
-                "accepted_meatgrinder_exemplar_source_pose"
-                if area_index <= 8
-                else "accepted_meatgrinder_exemplar_exact_point_symmetry"
-            )
-        elif source_component_id in _REVIEWED_FIXED_COMPONENT_CENTERS:
+        if source_component_id in _REVIEWED_FIXED_COMPONENT_CENTERS:
             pose_basis = "reviewed_source_quantization_containment_adjustment"
         elif raw["archetype_id"] == "dense-long-pipes":
             pose_basis = "reviewed_parent_footprint_centered_pipe_pose"
@@ -1187,35 +1136,17 @@ def _objective_rows(
     for raw in layout["objectives"]:
         role = raw["role"]
         role_counts[role] = role_counts.get(role, 0) + 1
-        x_inches, y_inches = raw["battlefield_center_quantized_0_01_inches"]
+        x_inches, y_inches = raw["runtime_reference_inches"]
         source_ids = tuple(
-            _canonical_stable_id(
-                area_id,
-                source_layout_id=source_layout_id,
-                layout_id=layout_id,
-            )
-            for area_id in raw["nearest_area_ids"]
+            _canonical_stable_id(area_id, source_layout_id=source_layout_id, layout_id=layout_id)
+            for area_id in raw["semantic_source_terrain_area_ids"]
         )
-        distances = raw["distances_to_area_polygons_inches"]
-        if distances:
-            if len(source_ids) != len(distances):
-                raise ValueError("Objective source-distance inventory drifted.")
-            source_ids = tuple(
-                area_id
-                for area_id, distance in zip(source_ids, distances, strict=True)
-                if float(distance) <= 0.05 + 1e-9
-            )
-        elif layout["source_pdf_page_number"] not in {24, 25, 26}:
-            raise ValueError("Non-Meatgrinder objectives require source distances.")
+        if not source_ids:
+            raise ValueError("Every reviewed Event objective requires a terrain association.")
         point = Point(float(x_inches), float(y_inches))
-        runtime_distances = tuple(
-            runtime_polygons[area_id].distance(point) for area_id in source_ids
-        )
-        if any(distance > 0.05 + 1e-6 for distance in runtime_distances) or (
-            runtime_distances and min(runtime_distances) > 1e-6
-        ):
+        if min(runtime_polygons[area_id].distance(point) for area_id in source_ids) > 1e-6:
             raise ValueError(
-                f"Objective {raw['objective_id']} exceeded source-proxy binding tolerance."
+                "Reviewed objective reference must lie inside its linked terrain union."
             )
         terrain_area_source_ids = source_ids
         source_objective_id = _canonical_stable_id(
@@ -1234,6 +1165,9 @@ def _objective_rows(
                 "terrain_area_ids": [
                     identities.area_id(area_id) for area_id in terrain_area_source_ids
                 ],
+                "illustration_x_inches": float(raw["battlefield_center_quantized_0_01_inches"][0]),
+                "illustration_y_inches": float(raw["battlefield_center_quantized_0_01_inches"][1]),
+                "runtime_reference_basis": raw["runtime_reference_basis"],
                 "source_symbol_kind": "source_pdf_objective_marker_vector",
             }
         )
@@ -1414,8 +1348,8 @@ def build_artifact(
         "layout_count": 45,
         "terrain_area_count": 720,
         "component_count": 1349,
-        "objective_count": 246,
-        "source_contact_pair_count": 224,
+        "objective_count": 249,
+        "source_contact_pair_count": 219,
         "validation_status": "passed",
     }:
         raise ValueError("Event Companion extraction global audit drifted.")

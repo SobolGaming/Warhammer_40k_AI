@@ -1,0 +1,20 @@
+{
+  "observed_utc": "2026-11-05T00:14:00.291315+00:00",
+  "index_url": "https://www.warhammer-community.com/api/search/downloads/",
+  "index_sha256": "c1c2c97e2b8ba3b76efc3be487971f423633b7a7d4fe2948eb44474cd3ca467b",
+  "url": "https://assets.warhammer-community.com/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf",
+  "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833",
+  "bytes": 32214071,
+  "pages_total": 88,
+  "bounded_authority": {
+    "52": [
+      "14.01: intended terrain area is the objective; distances use its closest part.",
+      "14.02: control range is membership in that terrain area."
+    ],
+    "88": [
+      "Generic genuinely non-terrain objective markers remain supported outside this reviewed Event dataset."
+    ]
+  },
+  "user_clarification": "All 4 are terrain-linked, the icon is just drawn off-center in the terrain footprint to not obscure the green portions of the terrain.",
+  "interpretation_note": "The artistic off-center rationale is user clarification, not quoted official prose. All249 intended associations were independently reviewed against full glyphs and terrain/contact groups."
+}

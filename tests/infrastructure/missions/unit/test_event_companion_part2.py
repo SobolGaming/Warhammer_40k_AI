@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import shutil
 from typing import Any, cast
+
+from scripts import mock_event_layout_ui
 
 from tests.shared.category_migration.phase17j_event_companion import (
     BattlefieldLayoutDefinition,
@@ -89,6 +92,7 @@ from tests.shared.category_migration.phase17j_event_companion import (
     warhammer_event_companion_2026_07_mission_pack,
 )
 from tests.shared.repository_root import REPOSITORY_ROOT
+from warhammer40k_core.engine.objective_control_sources import resolve_objective_control_sources
 
 
 def test_phase17n_light_corner_wall_joints_follow_source_image_registration() -> None:
@@ -96,8 +100,8 @@ def test_phase17n_light_corner_wall_joints_follow_source_image_registration() ->
     extraction_payload = json.loads(
         (
             repository_root
-            / "data/source_audits/event_companion_2026_06"
-            / "phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json"
+            / "data/source_audits/event_companion_2026_10"
+            / "event_companion_layouts_pages_8_53.json"
         ).read_text(encoding="utf-8")
     )
     artifact = event_layouts.battlefield_artifact()
@@ -107,7 +111,7 @@ def test_phase17n_light_corner_wall_joints_follow_source_image_registration() ->
         if archetype.archetype_id.startswith("light-corner-")
     }
 
-    assert set(archetypes_by_xref) == {5478, 5480, 5482, 5484}
+    assert set(archetypes_by_xref) == {5652, 5654, 5656, 5658}
     for archetype in archetypes_by_xref.values():
         minimum_x = min(point.x_inches for point in archetype.rules_footprint_polygon)
         maximum_x = max(point.x_inches for point in archetype.rules_footprint_polygon)
@@ -130,7 +134,10 @@ def test_phase17n_light_corner_wall_joints_follow_source_image_registration() ->
 
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
     checked_component_ids: set[str] = set()
+    frame = extraction_payload["coordinate_frame"]["pdf_to_battlefield_affine"]
     for source_layout in extraction_payload["layouts"]:
+        if source_layout["source_pdf_page_number"] not in {24, 25, 26}:
+            continue
         layout_id = source_layout["layout_id"]
         mission_pool_entry = next(
             entry
@@ -147,18 +154,17 @@ def test_phase17n_light_corner_wall_joints_follow_source_image_registration() ->
         )
         features_by_id = {feature.feature_id: feature for feature in setup.terrain_features}
         for source_component in source_layout["terrain_components"]:
-            area_index = int(source_component["terrain_area_id"].rsplit("-", maxsplit=1)[-1])
+            area_index = int(source_component["parent_area_id"].rsplit("-", maxsplit=1)[-1])
             if area_index > 8:
                 continue
-            source_image = source_component["source_image"]
-            if source_image["xref"] not in archetypes_by_xref:
+            if source_component["source_xref"] not in archetypes_by_xref:
                 continue
             modeled_joint = features_by_id[
                 source_component["component_id"]
             ].rules_footprint_polygon[0]
-            source_joint_x, source_joint_y = source_image[
-                "battlefield_quad_inches_top_left_top_right_bottom_right_bottom_left"
-            ][3]
+            _a, _b, c, d, e, f = source_component["source_affine_normalized_image_to_points"]
+            source_joint_x = (c + e) * frame["x_inches"]["scale"] + frame["x_inches"]["offset"]
+            source_joint_y = (d + f) * frame["y_inches"]["scale"] + frame["y_inches"]["offset"]
             assert (
                 math.dist(
                     (modeled_joint.x_inches, modeled_joint.y_inches),
@@ -242,6 +248,7 @@ def test_phase17n_battlefield_builder_reproduces_committed_artifact() -> None:
     result = subprocess.run(
         [
             sys.executable,
+            "-B",
             str(builder_path),
             "--check",
         ],
@@ -275,6 +282,7 @@ def test_phase17n_battlefield_builder_rejects_stale_output_without_writing(tmp_p
     stale_result = subprocess.run(
         [
             sys.executable,
+            "-B",
             str(builder_path),
             str(extraction_path),
             str(stale_output),
@@ -304,6 +312,7 @@ def test_phase17n_battlefield_builder_rejects_source_drift_without_writing(tmp_p
     extraction_result = subprocess.run(
         [
             sys.executable,
+            "-B",
             str(builder_path),
             str(modified_extraction),
             str(guarded_output),
@@ -339,18 +348,18 @@ def test_phase17n_meatgrinder_exact_layouts_build_all_source_components() -> Non
             (12.36, 8.33),
         ),
         2: (
-            (9.90, 47.73),
+            (9.9, 47.73),
             (33.63, 12.05),
-            (11.39, 29.61),
-            (32.92, 30.55),
+            (11.06, 29.61),
+            (33.25, 30.55),
             (37.23, 42.98),
             (6.86, 17.11),
         ),
         3: (
             (9.08, 51.19),
             (34.81, 9.01),
-            (22.33, 35.93),
-            (21.23, 23.67),
+            (23.21, 35.93),
+            (20.35, 23.67),
             (29.28, 51.31),
             (15.25, 8.98),
         ),
@@ -489,6 +498,7 @@ def test_phase17n_meatgrinder_exact_layouts_build_all_source_components() -> Non
                 feature.classification.value
             )
             assert feature.source_id is not None
+            assert feature.source_id.startswith(f"{event_source.LAYOUT_SOURCE_PACKAGE_ID}:")
             assert (
                 f"terrain-feature-placement:"
                 f"{source_component.component_id.removeprefix(f'{layout_id}-')}"
@@ -1295,3 +1305,143 @@ __all__ += ["shapely_backend", "terrain_area_classifications_by_suffix"]
 __all__ += ["terrain_area_visibility", "terrain_feature_placements_from_specs"]
 __all__ += ["terrain_visibility_areas_from_placements", "validate_mission_setup_source_layout"]
 __all__ += ["visibility_polygon_within_union"]
+
+
+def test_current_event_layouts_have_bounded_october_source_and_complete_markers() -> None:
+    """All layouts use October diagrams while mission/card/base provenance stays explicit."""
+    artifact = event_layouts.battlefield_artifact()
+    assert artifact.source_pdf_sha256 == (
+        "187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2"
+    )
+    assert artifact.source_package_id == "gw-11e-warhammer-event-companion-layouts-v1-3-2026-10"
+    assert len(artifact.layouts) == 45
+    placements = [
+        placement
+        for layout in event_source.battlefield_layout_definitions()
+        for placement in layout.terrain_feature_placements
+    ]
+    assert len(placements) == 1349
+    assert all(
+        placement.source_id.startswith(f"{event_source.LAYOUT_SOURCE_PACKAGE_ID}:")
+        for placement in placements
+    )
+    assert sum(len(layout.objectives) for layout in artifact.layouts) == 249
+    contacts = [contact for layout in artifact.layouts for contact in layout.terrain_area_contacts]
+    assert Counter(contact.kind for contact in contacts) == {"single": 103, "separate": 116}
+    for layout in artifact.layouts:
+        if layout.force_disposition_pair == ("reconnaissance", "reconnaissance"):
+            central = [marker for marker in layout.objectives if marker.role == "central"]
+            assert {marker.objective_id for marker in central} == {
+                f"{layout.layout_id}-central-01",
+                f"{layout.layout_id}-central-02",
+            }
+            assert central[0].terrain_area_ids != central[1].terrain_area_ids
+    # Updating diagram geometry must not relabel historical mission-card/base evidence.
+    assert event_source.SOURCE_VERSION == "1.1"
+
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    linked_count = 0
+    physical_links = 0
+    for layout in artifact.layouts:
+        setup = MissionSetup.from_mission_pack(
+            mission_pack=mission_pack,
+            mission_pool_entry_id=f"mission-{layout.layout_id}",
+            attacker_player_id="player-alpha",
+            attacker_force_disposition_id=layout.force_disposition_pair[0],
+            defender_player_id="player-beta",
+            defender_force_disposition_id=layout.force_disposition_pair[1],
+        )
+        points, components, linked = resolve_objective_control_sources(
+            objective_markers=tuple(
+                marker.to_objective_marker() for marker in setup.objective_markers
+            ),
+            terrain_features=setup.terrain_features,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(),
+            explicit_terrain_objectives=(),
+            objective_terrain_areas=setup.objective_terrain_areas,
+        )
+        assert not points
+        assert not components
+        assert {row.objective_marker_id: set(row.terrain_area_ids) for row in linked} == {
+            marker.objective_id: set(marker.terrain_area_ids) for marker in layout.objectives
+        }
+        linked_count += len(linked)
+        physical_links += sum(len(row.terrain_area_ids) for row in linked)
+    assert linked_count == 249
+    assert physical_links == 270
+    # Model templates keep their historical owner while current instances cite October.
+    assert all(
+        template.source_id.startswith(f"{event_source.SOURCE_PACKAGE_ID}:")
+        for template in event_source.terrain_area_footprint_templates()
+    )
+
+
+def test_current_layout_viewer_projects_and_renders_all_source_geometry() -> None:
+    payload = mock_event_layout_ui.build_data_payload()
+    layouts = cast(dict[str, Any], payload["layouts"])
+    artifact = event_layouts.battlefield_artifact()
+    assert set(layouts) == {layout.layout_id for layout in artifact.layouts}
+    assert sum(layout["logical_terrain_area_count"] for layout in layouts.values()) == 617
+    for source_layout in artifact.layouts:
+        projected = layouts[source_layout.layout_id]
+        authority = projected["battlefield_view"]["authoritative"]
+        objectives = authority["objectives_by_id"]
+        assert set(objectives) == {marker.objective_id for marker in source_layout.objectives}
+        bindings = {
+            binding["objective_marker_id"]: binding
+            for binding in projected["objective_terrain_areas"]
+        }
+        unbound = set(projected["source_unbound_objective_ids"])
+        assert not unbound
+        assert set(bindings).isdisjoint(unbound)
+        assert set(bindings) | unbound == set(objectives)
+        for marker in source_layout.objectives:
+            assert objectives[marker.objective_id]["objective_role"] == marker.role
+            if marker.terrain_area_ids:
+                # A Single source pair is one logical rules area, so runtime
+                # objective bindings expand to every physical member of that area.
+                expected_ids = set(marker.terrain_area_ids)
+                for source_contact in source_layout.terrain_area_contacts:
+                    if source_contact.kind == "single" and expected_ids.intersection(
+                        source_contact.terrain_area_ids
+                    ):
+                        expected_ids.update(source_contact.terrain_area_ids)
+                assert set(bindings[marker.objective_id]["terrain_area_ids"]) == expected_ids
+        for contact in projected["terrain_area_contacts"]:
+            logical_ids = {
+                authority["terrain_areas_by_id"][area_id]["logical_terrain_area_id"]
+                for area_id in contact["terrain_area_ids"]
+            }
+            assert len(logical_ids) == (1 if contact["kind"] == "single" else 2)
+    node = shutil.which("node")
+    assert node is not None, "Node.js is required for the executable viewer regression."
+    renderer = REPOSITORY_ROOT / "scripts/mock_event_layout_ui_assets/viewer_renderer_test.cjs"
+    completed = subprocess.run(
+        [node, str(renderer)],
+        input=json.dumps(payload),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    rendered = json.loads(completed.stdout)
+    assert rendered["tested_azimuth_count"] == 360
+    assert rendered["maximum_hatch_strokes"] <= rendered["hatch_stroke_budget"]
+    counts = rendered["full_catalog_projection_counts"]
+    assert counts["layouts"] == 45
+    assert counts["terrain_areas"] == 720
+    assert counts["terrain_features"] == 1349
+    assert counts["terrain_area_contacts"] == 219
+    assert counts["objective_binding_records"] == 249
+    assert counts["deployment_zones"] == 90
+    assert counts["battlefield_regions"] == 225
+    first_layout = next(iter(layouts.values()))
+    first_layout["terrain_area_contacts"][0]["runtime_pair_gap_inches"] = "0"
+    malformed = subprocess.run(
+        [node, str(renderer)],
+        input=json.dumps(payload),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert malformed.returncode != 0
