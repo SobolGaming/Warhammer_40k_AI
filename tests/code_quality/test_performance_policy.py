@@ -785,7 +785,41 @@ def test_operation_map_uses_real_driver_and_owner_paths() -> None:
         family = object_value(raw)
         assert (ROOT / str(family["driver"])).is_file()
         assert (ROOT / str(family["historical_workload_reference"])).is_file()
-    for raw in object_value(mapping["operations"]).values():
+    operations = object_value(mapping["operations"])
+    retirement = "obsolete-standalone-diagnostic-retirement"
+    retired_paths = [
+        "scripts/probe_order80_normal_move.py",
+        "scripts/probe_order81_revival.py",
+        "scripts/probe_order83_revival_anchors.py",
+        "scripts/check_rapid_ingress_performance.py",
+        "scripts/check_stratagem_cost_performance.py",
+        "scripts/check_disembark_eligibility_performance.py",
+        "scripts/benchmark_order92_melee.py",
+    ]
+    assert operations[retirement] == {
+        "paths": retired_paths,
+        "owners": [
+            "@module",
+            "main",
+            "probe",
+            "projection_results",
+            "_request",
+            "_proposal",
+            "_checkpoint_and_replay",
+        ],
+        "families": [],
+        "sensitive": False,
+        "mandatory": True,
+    }
+    for path in retired_paths:
+        assert path not in paths, path
+        assert not (ROOT / path).exists(), path
+        assert historical_input_bytes(path), path
+    for name, raw in operations.items():
+        # Only the exact approved retirement uses hash-authenticated Git source.
+        # Do not admit these missing paths for any other operation or live driver.
+        if name == retirement:
+            continue
         operation = object_value(raw)
         patterns = operation["paths"]
         assert isinstance(patterns, list)
