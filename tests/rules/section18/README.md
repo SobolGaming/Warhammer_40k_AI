@@ -26,7 +26,7 @@ setup. Native equipped shooting, destruction, hazards and public survivor placem
 reproduce the missing effect from a declared wounded-carrier checkpoint. The shared
 completion recorder now applies the existing direct status, with accepted-decision
 historical reconstruction. No new player-facing choice or envelope. See
-`docs/SECTION18_EMERGENCY_BATTLE_SHOCK_SCOPE.md` and the external red/green receipts.
+[docs/SECTION18_EMERGENCY_BATTLE_SHOCK_SCOPE.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/SECTION18_EMERGENCY_BATTLE_SHOCK_SCOPE.md) and the external red/green receipts.
 
 Companion Terrain Objectives, same-point marker limits and the current Deadly
 Demise/Fight-on-Death decision remain adopted. Inherited Section08, full-suite,

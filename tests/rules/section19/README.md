@@ -1,7 +1,7 @@
 # Section19 attached-unit corpus
 
 Source obligations and full 64-FAQ screen: `coverage.json`. Source, repair and
-supported-input boundaries: `docs/SECTION19_MODEL_ABILITY_SCOPE.md`.
+supported-input boundaries: [docs/SECTION19_MODEL_ABILITY_SCOPE.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/SECTION19_MODEL_ABILITY_SCOPE.md).
 
 New native selected-unit kernels exercise attachment identity, native structured
 eligibility, current bodyguard/leader/support Toughness, keyword union and

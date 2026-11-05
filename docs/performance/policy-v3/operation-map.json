@@ -1098,7 +1098,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/42-to-43.md",
         "contracts/openapi.yaml",
         "contracts/schemas/replay-metadata.schema.json",
         "contracts/schemas/session-command-outcome.schema.json",
@@ -1864,7 +1863,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/43-to-44.md",
         "contracts/openapi.yaml",
         "contracts/redaction-policy.md",
         "contracts/schemas/battlefield-view.schema.json",
@@ -4760,7 +4758,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/44.3.12-to-44.3.13.md",
         "contracts/openapi.yaml"
       ],
       "owners": [
@@ -4856,7 +4853,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/44.3.13-to-44.3.14.md",
         "contracts/openapi.yaml"
       ],
       "owners": [
@@ -4928,7 +4924,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/44.3.14-to-44.3.15.md",
         "contracts/openapi.yaml"
       ],
       "owners": [
@@ -5032,7 +5027,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/44.3.15-to-44.3.16.md",
         "contracts/openapi.yaml"
       ],
       "owners": [
@@ -5169,7 +5163,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/44.3.16-to-44.3.17.md",
         "contracts/openapi.yaml"
       ],
       "owners": [
@@ -5246,7 +5239,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/44.3.17-to-44.3.18.md",
         "contracts/openapi.yaml"
       ],
       "owners": [
@@ -5355,7 +5347,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/44.3.18-to-44.3.19.md",
         "contracts/openapi.yaml"
       ],
       "owners": [
@@ -5431,7 +5422,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/44.3.19-to-44.3.20.md",
         "contracts/openapi.yaml"
       ],
       "owners": [
@@ -5653,11 +5643,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/44.3.20-to-44.3.21.md",
-        "contracts/migrations/44.3.21-to-44.3.22.md",
-        "contracts/migrations/44.3.22-to-44.3.23.md",
-        "contracts/migrations/44.3.23-to-44.3.24.md",
-        "contracts/migrations/44.3.24-to-44.3.25.md",
         "contracts/openapi.yaml",
         "src/warhammer40k_core/adapters/external_contract.py"
       ],
@@ -5802,8 +5787,7 @@
         "tests/d04_combat_helpers.py",
         "tests/unit/test_d04_combat_battle_shock.py",
         "data/source_audits/d04/assertion-exceptions.json",
-        "data/source_audits/d04/baseline-phase10q-transports.py.txt",
-        "contracts/migrations/44.3.25-to-44.3.26.md"
+        "data/source_audits/d04/baseline-phase10q-transports.py.txt"
       ],
       "owners": [
         "*"
@@ -5850,8 +5834,7 @@
         "tests/integration/test_off_battlefield_command_battle_shock.py",
         "tests/physical_history_transport_helpers.py",
         "tests/code_quality/test_physical_history_anchor_provenance.py",
-        "data/source_audits/physical-history-restore/*",
-        "contracts/migrations/44.3.26-to-44.3.27.md"
+        "data/source_audits/physical-history-restore/*"
       ],
       "owners": [
         "*"
@@ -5877,8 +5860,7 @@
         "tests/d06_embark_helpers.py",
         "tests/unit/test_d06_embark_distance.py",
         "tests/integration/test_d06_native_embark_distance.py",
-        "data/source_audits/d06/*",
-        "contracts/migrations/44.3.27-to-44.3.28.md"
+        "data/source_audits/d06/*"
       ],
       "owners": [
         "*"
@@ -5909,8 +5891,7 @@
         "tests/movement_witness_fall_back_helpers.py",
         "tests/unit/test_rules_unit_witness_membership.py",
         "tests/integration/test_movement_witness_membership.py",
-        "data/source_audits/movement-witness/*",
-        "contracts/migrations/44.3.28-to-44.3.29.md"
+        "data/source_audits/movement-witness/*"
       ],
       "owners": [
         "*"
@@ -6005,8 +5986,7 @@
     },
     "d07-retained-source-and-contract-publication": {
       "paths": [
-        "data/source_audits/d07/*",
-        "contracts/migrations/44.3.29-to-44.3.30.md"
+        "data/source_audits/d07/*"
       ],
       "owners": [
         "@document"
@@ -6031,7 +6011,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/44.3.29-to-44.3.30.md",
         "contracts/openapi.yaml",
         "data/source_audits/order135/current-inventory.json"
       ],
@@ -6087,8 +6066,7 @@
     },
     "d09-retained-source-publication": {
       "paths": [
-        "data/source_audits/d09/*",
-        "contracts/migrations/44.3.30-to-44.3.31.md"
+        "data/source_audits/d09/*"
       ],
       "owners": [
         "@document"
@@ -6147,8 +6125,7 @@
     "d10-retained-source-publication": {
       "paths": [
         "data/source_audits/d10/*",
-        "data/source_audits/d10/baseline/*",
-        "contracts/migrations/44.3.31-to-44.3.32.md"
+        "data/source_audits/d10/baseline/*"
       ],
       "owners": [
         "@document"
@@ -6195,8 +6172,7 @@
     "d12-retained-source-publication": {
       "paths": [
         "data/source_audits/d12/*",
-        "data/source_audits/d12/baseline/*",
-        "contracts/migrations/44.3.32-to-44.3.33.md"
+        "data/source_audits/d12/baseline/*"
       ],
       "owners": [
         "@document"
@@ -30199,7 +30175,6 @@
         "contracts/examples/support-profile-player-b-redacted.json",
         "contracts/examples/support-profile.json",
         "contracts/manifest.json",
-        "contracts/migrations/44-to-45.md",
         "contracts/openapi.yaml",
         "contracts/schemas/error-envelope.schema.json",
         "contracts/schemas/session-command-outcome.schema.json",
@@ -33960,6 +33935,35 @@
       ],
       "mandatory": true,
       "sensitive": false
+    },
+    "documentation-reference-maintenance": {
+      "paths": [
+        "contracts/*.md",
+        "contracts/migrations/*.md",
+        "contracts/conformance-scenarios/README.md",
+        "tests/rules/*/README.md"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "audit-rendered-reference-maintenance": {
+      "paths": [
+        "tools/core_rules_40k_app_audit.py",
+        "tools/core_rules_order84_audit.py",
+        "tools/core_rules_order94_audit.py",
+        "tools/core_rules_order95_audit.py"
+      ],
+      "owners": [
+        "markdown",
+        "core_rules_forty_k_app_audit_markdown"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

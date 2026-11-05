@@ -92,7 +92,7 @@ Every category remains open for an individual-clause facade certificate.
 | source-completeness | The complete 40k.app observation and official PDF reconciliation from Order 94 remain selected for 15.11; GDM truncation is retained, not upgraded. |
 | modifier-ownership | Source-preserving individual modifier choices, physical owners, stale/invalid atomicity and viewer/restore authority. Order 93 explicitly unsupported contexts without a sourced producer remain outside this claim. |
 
-Exact regression node IDs and inspected file hashes are in the JSON inventory. [Validation and reproduction](ORDER_95_AUDIT_NOTES.md) distinguish passing checks from certification.
+Exact regression node IDs and inspected file hashes are in the JSON inventory. [Validation and reproduction](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_95_AUDIT_NOTES.md) distinguish passing checks from certification.
 
 ## Complete changelog disposition inventory
 

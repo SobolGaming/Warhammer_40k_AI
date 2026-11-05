@@ -13,7 +13,7 @@ The [audit JSON](../data/source_audits/order84/audit.json) maps every observed
 row to category owners, regression files and explicit open clause-certification
 status. Family regressions do not prove every individual operative clause. Exact retained
 source equivalence and clause-specific facade/replay/visibility proof remain open.
-The [audit notes](ORDER_84_AUDIT_NOTES.md) describe reproduction, scope and validation.
+The [audit notes](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_84_AUDIT_NOTES.md) describe reproduction, scope and validation.
 
 Later source relocations preserve the original audit paths and observations in the JSON:
 
@@ -184,7 +184,7 @@ is historical: C12-04's owner-confirmed v946 Engaging-only resolution controls.
 The September 10 review's repeated B7 labels are retained with their topic suffixes
 in the JSON, including acceptance omissions repaired by Orders 77-80.
 
-- C12-04/C18-07 owner resolutions: [ORDER_72_SCOPE_PLAN.md](../docs/ORDER_72_SCOPE_PLAN.md), [ORDER_62_SCOPE_PLAN.md](../docs/ORDER_62_SCOPE_PLAN.md).
+- C12-04/C18-07 owner resolutions: [ORDER_72_SCOPE_PLAN.md](../docs/ORDER_72_SCOPE_PLAN.md), [ORDER_62_SCOPE_PLAN.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_62_SCOPE_PLAN.md).
 - Heavy movement and vertical distance: [test_order51_flight.py](../tests/unit/test_order51_flight.py), [test_phase13b_shooting_declarations.py](../tests/unit/test_phase13b_shooting_declarations.py).
 - Normal Move occurrence: [test_order80_normal_move.py](../tests/unit/test_order80_normal_move.py).
 - Objective control before cleanup: [test_order79_control_first.py](../tests/unit/test_order79_control_first.py).

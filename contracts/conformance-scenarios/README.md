@@ -122,7 +122,7 @@ anchor and is outside the Phase 18L claim.
 Contract 45 / `error-envelope-v2-diagnostics` preserves typed uncommitted proposal
 rejections for the authenticated current-request owner. The shared redaction owner
 emits only violation codes and nullable fields, or a typed unsupported reason code;
-it omits diagnostics when absent. See [migration 44 to 45](../migrations/44-to-45.md) for the closed
+it omits diagnostics when absent. See [migration 44 to 45](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/44-to-45.md) for the closed
 union, authority boundary, retry behavior and deployment support window.
 Selected authenticated HTTP movement coverage submits a wrong physical model
 inventory, requires `movement_witness_model_inventory_mismatch` on `witness`,

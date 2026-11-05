@@ -47,10 +47,13 @@ def test_core_roadmap_gives_review_findings_unique_owners_before_certification()
     assert by_pr["P18G"].gate == "APP-DRIFT"
     assert by_pr["P18F"].gate == "APP-AUTHORITY"
     assert "source exception was resolved by the repository owner on 2026-09-19" in document
-    assert "[Order 62 scope](ORDER_62_SCOPE_PLAN.md)" in document
+    assert "current 18.07 supersedes that historical engaged-setup interpretation" in document
     assert by_pr["P12B"].gate == "APP-AUTHORITY"
     assert "owner-confirmed official App v946 (2026-09-21)" in document
-    assert "[scope, source resolution and validation](ORDER_72_SCOPE_PLAN.md)" in document
+    assert (
+        "[current consolidation and disembark semantics]"
+        "(CURRENT_RULES.md#consolidation-and-disembark)" in document
+    )
     transport = ("P18A", "P18C", "P18D", "P18E", "P18F", "P18G", "P18H", "P18B")
     for row in rows:
         for dependency in row.prerequisites:

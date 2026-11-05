@@ -2,7 +2,7 @@
 
 Recreated native kernels and one public typed-Core Psychic activation checkpoint.
 The complete source/FAQ inventory and assertion bindings are in `coverage.json`.
-See `docs/SECTION22_OTHER_RULES_SCOPE.md` for exact premises and limitations.
+See [docs/SECTION22_OTHER_RULES_SCOPE.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/SECTION22_OTHER_RULES_SCOPE.md) for exact premises and limitations.
 
 Only `test_inventory.py` receives no gameplay credit. Other files execute engine
 behavior. Separate existing supported Core checkpoints provide persistence/replay

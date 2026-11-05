@@ -452,3 +452,13 @@ The 260-case list remains finite and code-pinned. These include adversarial chec
 of retained historical helpers; they are not passing results. Keep helper code,
 active production and preflight/postflight validators, 1,848 active quality checks
 and all 4,886 selected gameplay cases. No additional omission is authorized.
+
+## Documentation maintenance
+
+Keep current setup/play instructions, contracts, source policies, support limits
+and required contributor guidance. Update these maintained references when work
+lands. Put completed implementation plans, per-PR validation journals and bug-fix
+narratives in issues/PRs, not new tracked files or archive directories. Do not
+remove machine-consumed evidence, source data, compatibility anchors or live
+regression requirements merely because they are historical. Their retirement
+requires updating the owning checks and preserving current semantic requirements.

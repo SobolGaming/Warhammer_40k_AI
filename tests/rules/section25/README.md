@@ -12,4 +12,4 @@ bindings using Python 3.14, whose AST schema differs from the system Python 3.12
 Fixtures share immutable catalogs/mission templates and create fresh requests and
 physical instances. Analytical Core inputs and unmodified real datasheet kernels
 remain distinct; neither implies native provider or legal-roster admission.
-See `docs/SECTION25_MUSTER_ARMIES_SCOPE.md` for ownership and qualifications.
+See [docs/SECTION25_MUSTER_ARMIES_SCOPE.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/SECTION25_MUSTER_ARMIES_SCOPE.md) for ownership and qualifications.

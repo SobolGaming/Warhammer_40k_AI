@@ -14,4 +14,4 @@ Wrong reactive witness inventories reject atomically and permit legal retry.
 Two separate supported Core checkpoints assert strict persistence and exact replay.
 They do not certify the native kernels' complete roster/provider or mission restore.
 Metadata and fresh-graph tests receive no semantic gameplay credit. See
-`docs/SECTION21_FLIGHT_SURGE_SCOPE.md` for repairs, premises and inherited limits.
+[docs/SECTION21_FLIGHT_SURGE_SCOPE.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/SECTION21_FLIGHT_SURGE_SCOPE.md) for repairs, premises and inherited limits.

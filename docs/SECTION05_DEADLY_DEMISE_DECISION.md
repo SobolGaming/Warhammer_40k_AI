@@ -1,6 +1,6 @@
 # Section05 Deadly Demise plus Fight on Death decision
 
-Status: approved specification implemented by the focused task11 checkpoint; independent review pending. The historical decision and source conflict below remain retained. See [focused repair evidence and qualifications](FOCUSED_DEFECT_CHECKPOINT.md).
+Status: approved specification implemented by the focused task11 checkpoint; independent review pending. The historical decision and source conflict below remain retained. See [focused repair evidence and qualifications](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/FOCUSED_DEFECT_CHECKPOINT.md).
 
 ## Approved interaction
 

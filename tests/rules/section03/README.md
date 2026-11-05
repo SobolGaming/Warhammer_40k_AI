@@ -5,7 +5,7 @@ choice before each removal and rechecks complete rules-unit coherency. The two
 original source-correct regressions and all original downstream assertions remain
 enabled. New native finite-choice, rejection, attached-unit, geometry/model-count
 and valid casualty-checkpoint persistence/replay controls are in `test_cleanup.py`.
-See [bounded source and implementation scope](../../../docs/SF03_001_COHERENCY_CHOICE_SCOPE.md).
+See [bounded source and implementation scope](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/SF03_001_COHERENCY_CHOICE_SCOPE.md).
 The same independent review remains pending; the earlier receipts below are history.
 
 # Core Section03 corpus

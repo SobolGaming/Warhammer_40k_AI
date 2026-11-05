@@ -17,7 +17,7 @@ ENGINE = ROOT / "src/warhammer40k_core/engine"
 
 
 def test_every_engine_reroll_consumer_has_an_audited_authorizing_decision() -> None:
-    # See ORDER_96_SCOPE_PLAN.md for each accepted-decision authority. The one
+    # The adapter contract documents accepted-decision authority. The one
     # synthetic component result is Command Re-roll after the submitted CP choice.
     expected = {
         ("attack_sequence_dice_rerolls.py", "apply_source_backed_attack_dice_reroll_decision"),
