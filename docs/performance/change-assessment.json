@@ -14,6 +14,126 @@
         }
       }
     },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "65f0148d2a31290453ae8b763fb96a5effef973ed9dbc0f22e2fa5026f9c9e7e",
+      "after_sha256": "b997a50ddad61a3273c4460b74cc445ef4f87c66c29546b710797a1416168307",
+      "owners": {
+        "@document": {
+          "before": "65f0148d2a31290453ae8b763fb96a5effef973ed9dbc0f22e2fa5026f9c9e7e",
+          "after": "b997a50ddad61a3273c4460b74cc445ef4f87c66c29546b710797a1416168307"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "ba40f14ae00db065baf166f6fe738d662b69ac5478f5ee0470eb0f3f4dfca49d",
+      "after_sha256": "ac5c7da61b5082d63b8d88a1ff69d2fde72789e1e4cd7e24cad879e2c73d17e9",
+      "owners": {
+        "@document": {
+          "before": "ba40f14ae00db065baf166f6fe738d662b69ac5478f5ee0470eb0f3f4dfca49d",
+          "after": "ac5c7da61b5082d63b8d88a1ff69d2fde72789e1e4cd7e24cad879e2c73d17e9"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "4fdc609e8d4e299ea4507fb669180fbedd1bcd231ac9316d17a5aa612d1a06ca",
+      "after_sha256": "ef8d1f82b5fc083ba58e2f31790b484032856c8a4fc8edfdbf9d45647cfc8d68",
+      "owners": {
+        "@document": {
+          "before": "4fdc609e8d4e299ea4507fb669180fbedd1bcd231ac9316d17a5aa612d1a06ca",
+          "after": "ef8d1f82b5fc083ba58e2f31790b484032856c8a4fc8edfdbf9d45647cfc8d68"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "67ffa57dc599e9a83c21c39b6fafba3d1f3a959ee5f294d6003124f5c9ff1ad5",
+      "after_sha256": "585055e1f47f8ae3d0e079a88fe58a71bc06b7c675f48a50d851a013b147e404",
+      "owners": {
+        "@document": {
+          "before": "67ffa57dc599e9a83c21c39b6fafba3d1f3a959ee5f294d6003124f5c9ff1ad5",
+          "after": "585055e1f47f8ae3d0e079a88fe58a71bc06b7c675f48a50d851a013b147e404"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "36860366af5961a9472f7318bae6c78cd8c391e92621b405c0359245f1eaabc8",
+      "after_sha256": "c7489b218e70f135f4009584bbf58c280be08098906b2f9ac418fccfe04a0a6c",
+      "owners": {
+        "@document": {
+          "before": "36860366af5961a9472f7318bae6c78cd8c391e92621b405c0359245f1eaabc8",
+          "after": "c7489b218e70f135f4009584bbf58c280be08098906b2f9ac418fccfe04a0a6c"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "568c78c0f07e778a530503bfd590751d3f5c72457ca03e9695a51d1943e92e07",
+      "after_sha256": "5cb826f1a35625d462ef17376e44173488a73e324ad57463c8186e28a5f134a1",
+      "owners": {
+        "@document": {
+          "before": "568c78c0f07e778a530503bfd590751d3f5c72457ca03e9695a51d1943e92e07",
+          "after": "5cb826f1a35625d462ef17376e44173488a73e324ad57463c8186e28a5f134a1"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "12d83a23712a14f0338d3cb9651681ce86a85d79afb349aa77f7f19aa003a36f",
+      "after_sha256": "c96862d87697ae13bbb5b4324a3167c08bd9f380d7f3a218ba83921e6645c7ad",
+      "owners": {
+        "@document": {
+          "before": "12d83a23712a14f0338d3cb9651681ce86a85d79afb349aa77f7f19aa003a36f",
+          "after": "c96862d87697ae13bbb5b4324a3167c08bd9f380d7f3a218ba83921e6645c7ad"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "b984fd7310faa51d70a87c47298e8d877fbf02ab0aa525db52a593b5963be43b",
+      "after_sha256": "1723c4fc531cdf9c0d4209bbc684b9d3f8d3b799082804eca1acf3825911ead0",
+      "owners": {
+        "@document": {
+          "before": "b984fd7310faa51d70a87c47298e8d877fbf02ab0aa525db52a593b5963be43b",
+          "after": "1723c4fc531cdf9c0d4209bbc684b9d3f8d3b799082804eca1acf3825911ead0"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "586c445324844c83b9c36a1d6a57d2e9a88dde2702c6daeb82c944ac3503c45e",
+      "after_sha256": "ee81af7b2edd724c921acfe3b918b4d44bf4a594924a78ff9164bd712fa6ac2e",
+      "owners": {
+        "@document": {
+          "before": "586c445324844c83b9c36a1d6a57d2e9a88dde2702c6daeb82c944ac3503c45e",
+          "after": "ee81af7b2edd724c921acfe3b918b4d44bf4a594924a78ff9164bd712fa6ac2e"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "1617e4d7d6ab95e97c76888393ca5f7cca27987ea69034a1e060ed52baae0292",
+      "after_sha256": "2fa5674080d719dcbe27a607096ba08d5393499271561a989092d6ee57d21f0e",
+      "owners": {
+        "@document": {
+          "before": "1617e4d7d6ab95e97c76888393ca5f7cca27987ea69034a1e060ed52baae0292",
+          "after": "2fa5674080d719dcbe27a607096ba08d5393499271561a989092d6ee57d21f0e"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "3384a52c92315f0936bed9aa47cd33a900c79f26bb8a041ace2480cf621778f7",
+      "after_sha256": "70551be2fd0d8210c7fe0cb9875dbd7acdc92ee765224c8d2814611fc376e864",
+      "owners": {
+        "@document": {
+          "before": "3384a52c92315f0936bed9aa47cd33a900c79f26bb8a041ace2480cf621778f7",
+          "after": "70551be2fd0d8210c7fe0cb9875dbd7acdc92ee765224c8d2814611fc376e864"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "3007eb9877b0ee12c01ef2df448f41b75f41c41cdb519b1d1c93ee2cc20cb41a",
+      "after_sha256": "4b52f0f04205a7b482f5f8790561fbc99dac8bbf3d2085184f2133fe5222af83",
+      "owners": {
+        "@document": {
+          "before": "3007eb9877b0ee12c01ef2df448f41b75f41c41cdb519b1d1c93ee2cc20cb41a",
+          "after": "4b52f0f04205a7b482f5f8790561fbc99dac8bbf3d2085184f2133fe5222af83"
+        }
+      }
+    },
     "contracts/examples/decisions/families/submit_movement_proposal.json": {
       "before_sha256": "3d59999d54dbba2e660da76329782f513872be5703192fd72d4dfa71752cb62a",
       "after_sha256": "b70fee80b6a628ea48ce8adc72f4e74c073e94a6f9ceed180c9907942925b24f",
@@ -911,6 +1031,126 @@
       "rationale": "Document bounded current-source provenance and qualification; generated identities and review evidence do not claim timing improvements or change runtime algorithms.",
       "source_obligation": null,
       "unchanged_work": null
+    },
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/decisions/families/submit_movement_proposal.json": {
       "category": "rule_semantics",
