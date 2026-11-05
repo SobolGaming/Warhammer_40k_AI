@@ -462,3 +462,9 @@ narratives in issues/PRs, not new tracked files or archive directories. Do not
 remove machine-consumed evidence, source data, compatibility anchors or live
 regression requirements merely because they are historical. Their retirement
 requires updating the owning checks and preserving current semantic requirements.
+
+The owner's 5 November 2026 bounded scripts cleanup supersedes helper retention
+only for the seven obsolete diagnostics named in
+`docs/performance/PERFORMANCE_POLICY.md#retired-diagnostic-entry-points`.
+Preserve the Order 32 probe's retained reference consumer, all historical evidence
+and inventories, current benchmarks, semantic controls, budgets and delivery gates.

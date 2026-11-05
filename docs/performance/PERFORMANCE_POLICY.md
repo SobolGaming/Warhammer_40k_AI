@@ -26,6 +26,40 @@ required GitHub CI run, rather than a duplicate local full run. Focused local
 regressions and static checks remain required; the full selected gameplay suite
 and unchanged 64% full-package branch-coverage gate must pass in CI.
 
+## Retired diagnostic entry points
+
+On 5 November 2026 the owner authorized removing these obsolete standalone helpers
+after checking current callers, dynamic imports, CI and the operation registry:
+
+- `scripts/probe_order80_normal_move.py`
+- `scripts/probe_order81_revival.py`
+- `scripts/probe_order83_revival_anchors.py`
+- `scripts/check_rapid_ingress_performance.py`
+- `scripts/check_stratagem_cost_performance.py`
+- `scripts/check_disembark_eligibility_performance.py`
+- `scripts/benchmark_order92_melee.py`
+
+Only these seven removals supersede the earlier helper-retention requirements in
+this policy, `AGENTS.md` and `docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md`. The
+three probes expect pre-repair defects; the three checkers inspect historical
+reports; the melee diagnostic is outside the current registered workload families.
+None is a current CI entry point or an executable dependency of a retained caller.
+Their source remains available at pre-retirement revision
+`ca7195e7f6421b79fb994cf9103a68d5e7cb83c7` with `git show <revision>:<path>`.
+
+The checker commands in the retained Order 35, 37 and 38 READMEs describe historical
+reproduction and are no longer current-checkout commands. Their original evidence,
+inventories, outcomes and budgets remain byte-exact. Historical input verification
+continues to resolve its existing pinned Git bytes; it does not require these
+seven files in the current checkout. Use the current assessment and serial smoke
+command below for current delivery, together with all required live semantic,
+work-count and cache controls. No benchmark family, test, budget, compatibility
+anchor or coverage requirement is retired by this cleanup.
+
+`scripts/probe_order32_visibility.py` remains because
+`docs/performance/order32/algebraic_reference.py` imports its `contexts` helper.
+This retention does not certify the historical probe on a new runtime or host.
+
 ## Required evidence tiers
 
 Every PR, including documentation and development-tool changes, must provide

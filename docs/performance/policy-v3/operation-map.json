@@ -33950,6 +33950,29 @@
       "sensitive": false,
       "mandatory": false
     },
+    "obsolete-standalone-diagnostic-retirement": {
+      "paths": [
+        "scripts/probe_order80_normal_move.py",
+        "scripts/probe_order81_revival.py",
+        "scripts/probe_order83_revival_anchors.py",
+        "scripts/check_rapid_ingress_performance.py",
+        "scripts/check_stratagem_cost_performance.py",
+        "scripts/check_disembark_eligibility_performance.py",
+        "scripts/benchmark_order92_melee.py"
+      ],
+      "owners": [
+        "@module",
+        "main",
+        "probe",
+        "projection_results",
+        "_request",
+        "_proposal",
+        "_checkpoint_and_replay"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "audit-rendered-reference-maintenance": {
       "paths": [
         "tools/core_rules_40k_app_audit.py",
