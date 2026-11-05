@@ -10,13 +10,14 @@
       "shadow-legion"
     ],
     "enhancement_ids": [
-      "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade"
+      "000009980005",
+      "chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade"
     ],
     "stratagem_ids": []
   },
   "force_disposition_id": "purge-the-foe",
   "battle_size": "strike_force",
-  "declared_total_points": 2075,
+  "declared_total_points": 2000,
   "units": [
     {
       "selection": {
@@ -46,7 +47,7 @@
         "wargear_selections": [],
         "mustering_option_selections": []
       },
-      "declared_points": 320
+      "declared_points": 345
     },
     {
       "selection": {
@@ -62,8 +63,10 @@
           {
             "option_id": "000001120:equipment-choice:option-1",
             "model_profile_id": "000001120:lord-of-change",
-            "wargear_ids": [],
-            "selection_count": 0
+            "wargear_ids": [
+              "000001120:rod-of-sorcery"
+            ],
+            "selection_count": 1
           }
         ],
         "mustering_option_selections": []
@@ -72,25 +75,18 @@
     },
     {
       "selection": {
-        "unit_selection_id": "lord-of-change-2",
-        "datasheet_id": "000001120",
+        "unit_selection_id": "nurglings",
+        "datasheet_id": "000001133",
         "model_profile_selections": [
           {
-            "model_profile_id": "000001120:lord-of-change",
-            "model_count": 1
+            "model_profile_id": "000001133:nurgling-swarms",
+            "model_count": 3
           }
         ],
-        "wargear_selections": [
-          {
-            "option_id": "000001120:equipment-choice:option-1",
-            "model_profile_id": "000001120:lord-of-change",
-            "wargear_ids": [],
-            "selection_count": 0
-          }
-        ],
+        "wargear_selections": [],
         "mustering_option_selections": []
       },
-      "declared_points": 320
+      "declared_points": 45
     },
     {
       "selection": {
@@ -158,7 +154,7 @@
         ],
         "mustering_option_selections": []
       },
-      "declared_points": 200
+      "declared_points": 220
     },
     {
       "selection": {
@@ -192,7 +188,7 @@
         ],
         "mustering_option_selections": []
       },
-      "declared_points": 200
+      "declared_points": 220
     },
     {
       "selection": {
@@ -226,22 +222,70 @@
         ],
         "mustering_option_selections": []
       },
-      "declared_points": 210
+      "declared_points": 260
+    },
+    {
+      "selection": {
+        "unit_selection_id": "seekers",
+        "datasheet_id": "000001145",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001145:heartseeker",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000001145:seekers",
+            "model_count": 4
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000001145:daemonic-icon:option-2",
+            "model_profile_id": "000001145:seekers",
+            "wargear_ids": [
+              "000001145:daemonic-icon"
+            ]
+          },
+          {
+            "option_id": "000001145:instrument-of-chaos:option-1",
+            "model_profile_id": "000001145:seekers",
+            "wargear_ids": [
+              "000001145:instrument-of-chaos"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 85
     }
   ],
   "attachment_declarations": [],
   "enhancement_assignments": [
     {
-      "enhancement_id": "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade",
+      "enhancement_id": "000009980005",
+      "target_unit_selection_id": "bloodthirster",
+      "source_id": "gw-11e-mfm-2026-10:faction:chaos-daemons:detachment:shadow-legion:enhancement:malice-made-manifest",
+      "model_profile_id": "000002582:bloodthirster",
+      "model_index": 1
+    },
+    {
+      "enhancement_id": "chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade",
       "target_unit_selection_id": "bloodcrushers-1",
-      "source_id": "gw-11e-mfm-2026-07:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds",
+      "source_id": "gw-11e-mfm-2026-10:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:soul-shattering-charge",
       "model_profile_id": "000001115:bloodcrushers",
       "model_index": 1
     },
     {
-      "enhancement_id": "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade",
+      "enhancement_id": "chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade",
       "target_unit_selection_id": "bloodcrushers-2",
-      "source_id": "gw-11e-mfm-2026-07:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds",
+      "source_id": "gw-11e-mfm-2026-10:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:soul-shattering-charge",
+      "model_profile_id": "000001115:bloodcrushers",
+      "model_index": 1
+    },
+    {
+      "enhancement_id": "chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade",
+      "target_unit_selection_id": "bloodcrushers-3",
+      "source_id": "gw-11e-mfm-2026-10:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:soul-shattering-charge",
       "model_profile_id": "000001115:bloodcrushers",
       "model_index": 1
     }
@@ -255,8 +299,8 @@
   "dedicated_transport_manifests": [],
   "provenance": {
     "source_format": "warhammer-40000-app-text",
-    "app_version": "v2.1.0 (3)",
-    "data_version": "v895",
-    "points_source_package_id": "gw-11e-mfm-2026-07"
+    "app_version": "v2.8.1 (1)",
+    "data_version": "v995",
+    "points_source_package_id": "gw-11e-mfm-2026-10"
   }
 }
