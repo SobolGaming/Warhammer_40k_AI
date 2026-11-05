@@ -157,6 +157,16 @@
           "after": "fb54e74149c59eaaeb8ee740d035e106d80d90aa11f6ac1c3f5f897f039d232f"
         }
       }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "bb9aa9d973da3bb94a826a76a592630e8588f98ae3dcd2ba022ac4044aa7c268",
+      "after_sha256": "b3886b5f609a33f68dba2a1d2c9f9467208912e2871109eb8c36297a04115c45",
+      "owners": {
+        "@document": {
+          "before": "bb9aa9d973da3bb94a826a76a592630e8588f98ae3dcd2ba022ac4044aa7c268",
+          "after": "b3886b5f609a33f68dba2a1d2c9f9467208912e2871109eb8c36297a04115c45"
+        }
+      }
     }
   },
   "rows": {
@@ -264,6 +274,16 @@
       "rationale": "The existing operation-map admission control recognizes only the exact seven-path approved retirement operation and authenticates each historical script through its existing hash-pinned Git resolver. Every other missing operation path and every missing live driver remains rejected.",
       "source_obligation": "The approved bounded cleanup must preserve source truthfulness, historical integrity and all live benchmark and operation registry checks. This changes the admission rule for the exact authorized retirement, not engine gameplay rules.",
       "unchanged_work": "No runtime, behavioral test, measured workload family, budget or dependency changes. The existing quality node retains all live driver/reference checks and scopes historical source recognition to one exact retirement operation. Both existing mandatory quality-operation mappings remain selected."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only the active AGENTS.md authentication hash after the approved helper-retirement policy change, following the current metadata maintenance used by PR625. Historical hashes, source blocks, gameplay assertion bindings and all other bytes remain unchanged.",
+      "source_obligation": "The existing Section07 coverage-map control must authenticate the current maintained policy while preserving its separately recorded historical governance identity and complete source/semantic assertions.",
+      "unchanged_work": "One current governance metadata hash changes. No behavioral Python, gameplay runtime, test inventory, benchmark workload, source text, historical inventory, budget or assertion changes; the existing mandatory corpus operation remains selected."
     }
   },
   "milestone": "ordinary",
