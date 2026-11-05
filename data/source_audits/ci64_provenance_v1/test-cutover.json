@@ -55,10 +55,10 @@
       "sha256": "caade7cea6dae7b304efb346fb466dfe433dad6f94484a1ed3e1bb5f546443d0"
     },
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
-      "blob_sha1": "71a717d3c8a6b56361497854442e203957943563",
-      "bytes": 16789,
+      "blob_sha1": "9aa86e7b54f70636536ef23a505aa8c09e14afe9",
+      "bytes": 30434,
       "mode": "100644",
-      "sha256": "65aa8236412d5577aa614d48830fbf91e1ad254446759164f5433bcab648e464"
+      "sha256": "ff12fa1ae51918a510a51845bd61cd00fe46e785ec0416f5a5ed8625e82b819d"
     },
     "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py": {
       "blob_sha1": "f4b7dab4965bd32c5db76c33ac8782c764d0dc5b",

@@ -7,6 +7,11 @@ from typing import TypedDict, cast
 
 import pytest
 
+from tests.phase13b_shooting_declaration_helpers import (
+    _compact_shooting_lifecycle,
+    _proposal_from_request,
+    _select_shooting_unit_and_type,
+)
 from tests.support.faction_batch01 import unit_placement
 from warhammer40k_core.adapters.access_control import DEV_ADMIN_TOKEN, bearer_authorization
 from warhammer40k_core.adapters.external_contract import (
@@ -15,6 +20,23 @@ from warhammer40k_core.adapters.external_contract import (
 )
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.server import AdapterGameServer
+from warhammer40k_core.ai.player_policy import (
+    CandidateExhaustedError,
+    PlayerDecisionContext,
+    PolicyAction,
+    PolicyError,
+    PolicyRegistration,
+    PolicyRoute,
+    PolicyRouter,
+    payload_digest,
+)
+from warhammer40k_core.ai.runner import (
+    BoundedPolicyRunner,
+    RunBoundary,
+    RunLimits,
+    RunnerError,
+    RunReport,
+)
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometryEvidenceKind,
     GeometryReviewStatus,
@@ -174,6 +196,368 @@ class _DeploymentFixture(TypedDict):
     placements: dict[str, list[ModelPlacementPayload]]
 
 
+class _MirrorSetupPolicy:
+    """Explicit fixture recipe, not a general policy or automatic pass fallback."""
+
+    def __init__(self, player_id: str, fixture: _DeploymentFixture) -> None:
+        self.fixture = fixture
+        self.units = tuple(
+            unit
+            for unit in fixture["deployment_order"]
+            if unit.startswith(f"cavalcade-{player_id[-1]}:")
+        )
+        self.index = 0
+
+    def choose(self, context: PlayerDecisionContext) -> PolicyAction:
+        family = context.route.decision_type
+        options = {
+            "select_secondary_missions": "fixed:assassination:bring_it_down",
+            "select_reserve_declaration": "complete_reserve_declarations",
+            "select_prebattle_action": "complete_prebattle_actions",
+        }
+        if family in options:
+            return context.select_option(options[family])
+        if family == "select_deployment_unit":
+            unit_id = self.units[self.index]
+            self.index += 1
+            return context.select_option(f"deploy:{unit_id}")
+        assert family == "submit_deployment_placement"
+        request = DeploymentPlacementRequest.from_decision_request_payload(
+            context.request["payload"]
+        )
+        proposal = DeploymentPlacementProposal(
+            proposal_request_id=request.request_id,
+            proposal_kind=request.proposal_kind,
+            game_id=request.game_id,
+            ruleset_descriptor_hash=request.ruleset_descriptor_hash,
+            setup_step=SetupStep.DEPLOY_ARMIES,
+            player_id=context.route.actor_id,
+            unit_instance_id=request.unit_instance_id,
+            placement_kind=request.placement_kind,
+            model_placements=tuple(
+                ModelPlacement.from_payload(p)
+                for p in self.fixture["placements"][request.unit_instance_id]
+            ),
+            context=request.context,
+        )
+        return context.propose(validate_json_value(proposal.to_payload()))
+
+
+class _InvalidPlacementPolicy(_MirrorSetupPolicy):
+    def __init__(self, fixture: _DeploymentFixture, failure: str) -> None:
+        super().__init__("player-b", fixture)
+        self.failure = failure
+
+    def choose(self, context: PlayerDecisionContext) -> PolicyAction:
+        valid = super().choose(context)
+        assert valid.proposal_json is not None
+        payload = json.loads(valid.proposal_json)
+        if self.failure == "stale":
+            payload["proposal_request_id"] = "stale-proposal"
+        elif self.failure == "malformed":
+            payload.pop("game_id")
+        else:
+            assert self.failure == "invalid"
+            payload["model_placements"][0]["pose"]["position"]["x"] = -1000.0
+        return context.propose(validate_json_value(payload))
+
+
+def _deployment_fixture() -> _DeploymentFixture:
+    return cast(
+        _DeploymentFixture,
+        json.loads(
+            Path(__file__)
+            .with_name("fixtures")
+            .joinpath("cavalcade_v995_deployment.json")
+            .read_text()
+        ),
+    )
+
+
+@pytest.mark.parametrize("failure", ["stale", "malformed", "invalid"])
+def test_player_runner_rejects_committed_placement_without_retry(failure: str) -> None:
+    session = _strict_mirror_session()
+    fixture = _deployment_fixture()
+    # Reach the first real proposal through the bounded recipe, then commit one
+    # deliberately invalid proposal. No direct controller replacement or stubs.
+    BoundedPolicyRunner(
+        session=session,
+        router=_mirror_router(fixture),
+        limits=RunLimits(policy_seed=19, max_decisions=4, max_seconds=120),
+    ).run(stop_at=RunBoundary("setup", "deploy_armies"))
+    view = session.view(viewer_player_id="player-b")
+    request = view["pending_decision"]
+    assert request is not None
+    assert request["actor_id"] == "player-b"
+    unit_id = fixture["deployment_order"][0]
+    session.submit_option(
+        request_id=request["request_id"],
+        option_id=f"deploy:{unit_id}",
+        result_id="select-fixture-unit",
+    )
+    route = PolicyRoute.from_view(session.view(viewer_player_id="player-b"))
+    router = PolicyRouter(
+        (
+            PolicyRegistration(
+                route,
+                "invalid-proposal-v1",
+                json.dumps({"failure": failure}),
+                _InvalidPlacementPolicy(fixture, failure),
+            ),
+        )
+    )
+    count = session.decision_record_count()
+    with pytest.raises(RunnerError) as caught:
+        BoundedPolicyRunner(
+            session=session,
+            router=router,
+            limits=RunLimits(policy_seed=19, max_decisions=1, max_seconds=120),
+        ).run()
+    assert session.decision_record_count() == count
+    assert len(caught.value.report.decisions) == 1
+    assert not caught.value.report.decisions[0].accepted
+
+
+def _mirror_router(fixture: _DeploymentFixture) -> PolicyRouter:
+    registrations: list[PolicyRegistration] = []
+    for player in ("player-a", "player-b"):
+        policy = _MirrorSetupPolicy(player, fixture)
+        for family, step, kind in (
+            ("select_secondary_missions", "select_secondary_missions", None),
+            ("select_reserve_declaration", "declare_battle_formations", None),
+            ("select_deployment_unit", "deploy_armies", None),
+            ("submit_deployment_placement", "deploy_armies", "deployment_placement"),
+            ("select_prebattle_action", "resolve_prebattle_actions", None),
+        ):
+            registrations.append(
+                PolicyRegistration(
+                    PolicyRoute(player, family, "setup", step, None, kind),
+                    "mirror-explicit-setup-v1",
+                    json.dumps({"fixture_hash": payload_digest(fixture), "player_id": player}),
+                    policy,
+                )
+            )
+    return PolicyRouter(tuple(registrations))
+
+
+class _ProbePolicy:
+    def __init__(self, failure: str = "none") -> None:
+        self.failure = failure
+        self.contexts: list[PlayerDecisionContext] = []
+
+    def choose(self, context: PlayerDecisionContext) -> PolicyAction:
+        self.contexts.append(context)
+        if self.failure == "exhausted":
+            raise CandidateExhaustedError("Declared search exhausted all candidates.")
+        if self.failure == "malformed":
+            return cast(PolicyAction, None)
+        if self.failure == "submission_kind":
+            return context.propose({})
+        action = context.select_option("fixed:assassination:bring_it_down")
+        if self.failure == "actor":
+            return replace(action, actor_id="player-b")
+        if self.failure == "request":
+            return replace(action, request_id="stale-request")
+        if self.failure == "observation":
+            return replace(action, observation_hash="stale-observation")
+        if self.failure == "invalid":
+            return replace(action, option_id="not-an-engine-option")
+        assert self.failure == "none"
+        return action
+
+
+def _probe_router(session: LocalGameSession, policy: _ProbePolicy) -> PolicyRouter:
+    view = session.view(viewer_player_id="player-a")
+    return PolicyRouter(
+        (
+            PolicyRegistration(
+                PolicyRoute.from_view(view),
+                "probe-v1",
+                '{"choice":"fixed"}',
+                policy,
+            ),
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "failure",
+    [
+        "actor",
+        "request",
+        "observation",
+        "invalid",
+        "malformed",
+        "submission_kind",
+        "exhausted",
+    ],
+)
+def test_player_runner_stops_after_one_bad_choice_without_substituting(failure: str) -> None:
+    session = _strict_mirror_session()
+    policy = _ProbePolicy(failure)
+    initial_records = session.decision_record_count()
+    runner = BoundedPolicyRunner(
+        session=session,
+        router=_probe_router(session, policy),
+        limits=RunLimits(policy_seed=3, max_decisions=3, max_seconds=120),
+    )
+    with pytest.raises(RunnerError) as caught:
+        runner.run()
+    assert len(policy.contexts) == 1
+    assert session.decision_record_count() == initial_records
+    assert len(caught.value.report.decisions) == 1
+    assert not caught.value.report.decisions[0].accepted
+    assert caught.value.report.decisions[0].choice_seconds >= 0
+    with pytest.raises(PolicyError, match="single-use"):
+        runner.run()
+
+
+def test_player_runner_is_reproducible_and_stops_at_decision_budget() -> None:
+    session = _strict_mirror_session()
+    restored = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+    reports: list[RunReport] = []
+    seeds: list[int] = []
+    for current in (session, restored):
+        policy = _ProbePolicy()
+        with pytest.raises(RunnerError, match="decision progress limit") as caught:
+            BoundedPolicyRunner(
+                session=current,
+                router=_probe_router(current, policy),
+                limits=RunLimits(policy_seed=71, max_decisions=1, max_seconds=120),
+            ).run()
+        reports.append(caught.value.report)
+        seeds.append(policy.contexts[0].choice_seed)
+        assert len(policy.contexts) == 1
+        assert len(caught.value.report.decisions) == 1
+        assert caught.value.report.decisions[0].accepted
+        assert (
+            ReplayRunner.from_payload(current.replay_artifact(artifact_id="bounded-first-decision"))
+            .run()
+            .reproduced_exactly
+        )
+    assert reports[0].run_id == reports[1].run_id
+    assert seeds[0] == seeds[1]
+    assert session.to_persistence_payload() == restored.to_persistence_payload()
+
+
+def test_player_context_is_detached_and_hides_opponent_secret_decisions() -> None:
+    session = _strict_mirror_session()
+    view = session.view(viewer_player_id="player-a")
+    context = PlayerDecisionContext.from_view(view, choice_seed=3)
+    original = context.observation_json
+    view["public_secondary_mission_choices"].append({"tamper": True})
+    context.observation["public_secondary_mission_choices"].append({"tamper": True})
+    assert context.observation_json == original
+    assert context.observation == session.view(viewer_player_id="player-a")
+    assert set(context.__slots__) == {"route", "observation_json", "choice_seed"}
+    opponent = session.view(viewer_player_id="player-b")
+    assert opponent["pending_decision"] is not None
+    assert opponent["pending_decision"]["request_id"] == "hidden-request"
+    with pytest.raises(PolicyError, match="own pending actor"):
+        PlayerDecisionContext.from_view(opponent, choice_seed=3)
+    request = context.request
+    session.submit_option(
+        request_id=request["request_id"],
+        option_id="fixed:assassination:bring_it_down",
+        result_id="isolation-explicit-choice",
+    )
+    next_view = session.view(viewer_player_id="player-b")
+    next_context = PlayerDecisionContext.from_view(next_view, choice_seed=4)
+    assert next_context.route.actor_id == "player-b"
+    assert next_view["public_secondary_mission_choices"] == [
+        {"hidden": True, "player_id": "player-a", "selected": True}
+    ]
+    assert "rng_seed" not in next_context.observation
+    assert "rng_state" not in next_context.observation
+
+
+@pytest.mark.parametrize("dimension", ["actor_id", "decision_type", "setup_step", "proposal_kind"])
+def test_player_routes_never_match_a_nearby_setup_route(dimension: str) -> None:
+    session = _strict_mirror_session()
+    route = PolicyRoute.from_view(session.view(viewer_player_id="player-a"))
+    policy = _ProbePolicy()
+    wrong = replace(route, **{dimension: "other"})
+    router = PolicyRouter((PolicyRegistration(wrong, "wrong-v1", "{}", policy),))
+    with pytest.raises(RunnerError, match="Unsupported exact policy route"):
+        BoundedPolicyRunner(
+            session=session,
+            router=router,
+            limits=RunLimits(policy_seed=2, max_decisions=1, max_seconds=120),
+        ).run()
+    assert policy.contexts == []
+    assert session.decision_record_count() == 0
+
+
+def test_player_routes_distinguish_battle_phase_and_reject_duplicates() -> None:
+    command = PolicyRoute("player-a", "resolve_reaction_window", "battle", None, "command", None)
+    fight = replace(command, battle_phase="fight")
+    entry = PolicyRegistration(command, "command-v1", "{}", _ProbePolicy())
+    router = PolicyRouter((entry,))
+    assert router.resolve(command) is entry
+    with pytest.raises(PolicyError, match="Unsupported exact"):
+        router.resolve(fight)
+    with pytest.raises(PolicyError, match="Duplicate"):
+        PolicyRouter((entry, entry))
+
+
+def test_player_runner_time_limit_is_an_error_before_policy_execution() -> None:
+    session = _strict_mirror_session()
+    policy = _ProbePolicy()
+    with pytest.raises(RunnerError, match="elapsed-time progress limit"):
+        BoundedPolicyRunner(
+            session=session,
+            router=_probe_router(session, policy),
+            limits=RunLimits(policy_seed=2, max_decisions=1, max_seconds=1e-12),
+        ).run()
+    assert policy.contexts == []
+    assert session.decision_record_count() == 0
+
+
+def test_player_runner_preserves_engine_auto_selection_records_after_a_legal_action() -> None:
+    lifecycle, units = _compact_shooting_lifecycle()
+    session = LocalGameSession(lifecycle)
+    status = session.advance_until_decision_or_terminal()
+    assert status.decision_request is not None
+    request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=status.decision_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="runner-regression-select",
+    )
+    proposal = _proposal_from_request(
+        request=request, target_unit_id=units["enemy"].unit_instance_id
+    )
+
+    class ShootingPolicy:
+        def choose(self, context: PlayerDecisionContext) -> PolicyAction:
+            return context.propose(validate_json_value(proposal.to_payload()))
+
+    route = PolicyRoute.from_view(session.view(viewer_player_id="player-a"))
+    before = session.decision_record_count()
+    with pytest.raises(RunnerError, match="decision progress limit") as caught:
+        BoundedPolicyRunner(
+            session=session,
+            router=PolicyRouter(
+                (PolicyRegistration(route, "shooting-v1", "{}", ShootingPolicy()),)
+            ),
+            limits=RunLimits(policy_seed=3, max_decisions=1, max_seconds=120),
+        ).run()
+    assert len(caught.value.report.decisions) == 1
+    assert caught.value.report.decisions[0].accepted
+    assert [r.request.decision_type for r in lifecycle.decision_controller.records[before:]] == [
+        "submit_shooting_declaration",
+        "select_resolve_target_unit",
+        "select_attack_weapon_group",
+    ]
+    assert (
+        ReplayRunner.from_payload(
+            session.replay_artifact(artifact_id="runner-auto-selection-regression")
+        )
+        .run()
+        .reproduced_exactly
+    )
+
+
 def test_exact_mirror_deploys_all_78_models_and_replays_to_battle() -> None:
     """Explicit legal setup recipe, submitted through the shared adapter authority."""
     session = _strict_mirror_session()
@@ -187,70 +571,32 @@ def test_exact_mirror_deploys_all_78_models_and_replays_to_battle() -> None:
         ),
     )
     assert fixture["mission_pool_entry_id"] == "mission-purge-the-foe-vs-purge-the-foe-layout-1"
-    for decision_type, option in (
-        ("select_secondary_missions", "fixed:assassination:bring_it_down"),
-        ("select_secondary_missions", "fixed:assassination:bring_it_down"),
-        ("select_reserve_declaration", "complete_reserve_declarations"),
-        ("select_reserve_declaration", "complete_reserve_declarations"),
-    ):
-        request = session.lifecycle.pending_decision_request()
-        assert request is not None
-        assert request.decision_type == decision_type
-        session.submit_option(
-            request_id=request.request_id, option_id=option, result_id=f"{request.request_id}:setup"
-        )
-    for unit_id in fixture["deployment_order"]:
-        request = session.lifecycle.pending_decision_request()
-        assert request is not None
-        assert request.decision_type == "select_deployment_unit"
-        session.submit_option(
-            request_id=request.request_id,
-            option_id=f"deploy:{unit_id}",
-            result_id=f"{request.request_id}:unit",
-        )
-        request = session.lifecycle.pending_decision_request()
-        assert request is not None
-        assert request.decision_type == "submit_deployment_placement"
-        context = DeploymentPlacementRequest.from_decision_request_payload(request.payload)
-        assert context.unit_instance_id == unit_id
-        state = session.lifecycle.state
-        assert state is not None
-        assert request.actor_id is not None
-        proposal = DeploymentPlacementProposal(
-            proposal_request_id=context.request_id,
-            proposal_kind=context.proposal_kind,
-            game_id=state.game_id,
-            ruleset_descriptor_hash=state.ruleset_descriptor_hash,
-            setup_step=SetupStep.DEPLOY_ARMIES,
-            player_id=request.actor_id,
-            unit_instance_id=unit_id,
-            placement_kind=context.placement_kind,
-            model_placements=tuple(
-                ModelPlacement.from_payload(p) for p in fixture["placements"][unit_id]
-            ),
-            context=context.context,
-        )
-        status = session.submit_parameterized_payload(
-            request_id=request.request_id,
-            payload=validate_json_value(proposal.to_payload()),
-            result_id=f"{request.request_id}:placement",
-        )
-        assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    for player in ("player-a", "player-b"):
-        request = session.lifecycle.pending_decision_request()
-        assert request is not None
-        assert request.decision_type == "select_prebattle_action"
-        assert request.actor_id == player
-        assert f"scout_move:cavalcade-{player[-1]}:seekers" in {
-            option.option_id for option in request.options
-        }
-        # Deliberately deploy everyone and decline Scout moves in this setup recipe.
-        status = session.submit_option(
-            request_id=request.request_id,
-            option_id="complete_prebattle_actions",
-            result_id=f"{request.request_id}:hold-position",
-        )
-        assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    router = _mirror_router(fixture)
+    report = BoundedPolicyRunner(
+        session=session,
+        router=router,
+        limits=RunLimits(policy_seed=19, max_decisions=42, max_seconds=120),
+    ).run(stop_at=RunBoundary("battle", "command"))
+    assert report.stop_reason == "requested_boundary"
+    assert len(report.decisions) == 42
+    assert all(t.accepted for t in report.decisions)
+    assert {t.route.actor_id for t in report.decisions} == {"player-a", "player-b"}
+    assert {t.route.proposal_kind for t in report.decisions} == {None, "deployment_placement"}
+    # Command is a real-session phase dispatch boundary, not an invented request.
+    view = session.view(viewer_player_id="player-a")
+    command_route = PolicyRoute.from_view(view)
+    assert command_route.battle_phase == "command"
+    wrong_phase = PolicyRegistration(
+        replace(command_route, battle_phase="fight"), "wrong-phase-v1", "{}", _ProbePolicy()
+    )
+    count = session.decision_record_count()
+    with pytest.raises(RunnerError, match="Unsupported exact policy route"):
+        BoundedPolicyRunner(
+            session=session,
+            router=PolicyRouter((wrong_phase,)),
+            limits=RunLimits(policy_seed=19, max_decisions=1, max_seconds=120),
+        ).run()
+    assert session.decision_record_count() == count
     state = session.lifecycle.state
     assert state is not None
     assert state.stage is GameLifecycleStage.BATTLE

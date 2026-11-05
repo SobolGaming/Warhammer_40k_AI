@@ -9,7 +9,7 @@ and component tests do not certify a complete playable roster.
 | View a battlefield | [Viewer guide](BATTLEFIELD_VIEWER.md) |
 | Understand supported content and limits | [Faction support](FACTION_SUPPORT.md), [mission status](MISSION_IMPLEMENTATION_STATUS.md) |
 | Understand engine boundaries | [Architecture](../ARCHITECTURE_V2.md), [contributor rules](../AGENTS.md) |
-| Implement an adapter or AI policy | [Decision contract](ADAPTER_DECISION_CONTRACT.md), [external contract](../contracts/README.md) |
+| Implement an adapter or AI policy | [Player policy interface and mirror inventory](AI_POLICY_INTERFACE.md), [decision contract](ADAPTER_DECISION_CONTRACT.md), [external contract](../contracts/README.md) |
 | Check current rules interpretations | [Rules semantics](CURRENT_RULES.md), [Core source policy](CORE_RULES_SOURCE_POLICY.md) |
 | Check remaining acceptance work | [Core requirements](CORE_RULES_REMEDIATION_ROADMAP.md), [faction requirements](FACTION_RULES_REMEDIATION_ROADMAP.md) |
 | Change source content | [Faction source policy](FACTION_RULES_SOURCE_POLICY.md), [source fixture boundaries](SOURCE_FIXTURE_HASH_BOUNDARIES.md) |

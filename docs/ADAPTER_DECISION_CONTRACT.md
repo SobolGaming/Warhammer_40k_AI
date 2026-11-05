@@ -1,5 +1,12 @@
 # Adapter Decision Contract
 
+## Player-scoped policy consumers
+
+The [AI policy interface](AI_POLICY_INTERFACE.md) consumes detached player views
+and submits bound finite/proposal actions through the existing session facade.
+It adds no decision family, proposal kind or wire payload. Engine validation,
+accepted decision records, player redaction and replay remain authoritative.
+
 ## Provisional model geometry (45.1)
 
 Session creation accepts the engine's `user_supplied_estimate` and

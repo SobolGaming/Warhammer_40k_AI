@@ -1,797 +1,434 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "b35dcdb774f27eaeef825f9ed408464445be5023",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8616d79fac026931c4c241c10c601149c3800762a537a6c93ac94184b4410062",
-  "operation_map_sha256": "e1c508e8b629f250c95e85c52a17c9975f86fa49b11e71e49f002e010bca0acf",
+  "base": "2b640ffca912f72d74e3b08cec0c0c4b12ce776a",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d7946647455bc4c4e8b953c15971597a1a2847e8ea40bae5fceace8169a6b4bb",
+  "operation_map_sha256": "24db832a0f91c84ee32b94fd051d1960a59991763078b7f3868f90785723b1a0",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "b997a50ddad61a3273c4460b74cc445ef4f87c66c29546b710797a1416168307",
-      "after_sha256": "2cd326f99e6f8c7771f8186c3b6e6ff79e5dc9b82a04a4657afaa62f484546ef",
-      "owners": {
-        "@document": {
-          "before": "b997a50ddad61a3273c4460b74cc445ef4f87c66c29546b710797a1416168307",
-          "after": "2cd326f99e6f8c7771f8186c3b6e6ff79e5dc9b82a04a4657afaa62f484546ef"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "7cc3ba15bdd238c29815242a9b7e825fe15faaeb98a6b9b2470e70e81965eb02",
-      "after_sha256": "45ed8d0a969a1e32a82a60ea2c1542efa86c6819eee5b72f8c0ca8627b909289",
-      "owners": {
-        "@document": {
-          "before": "7cc3ba15bdd238c29815242a9b7e825fe15faaeb98a6b9b2470e70e81965eb02",
-          "after": "45ed8d0a969a1e32a82a60ea2c1542efa86c6819eee5b72f8c0ca8627b909289"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "ac5c7da61b5082d63b8d88a1ff69d2fde72789e1e4cd7e24cad879e2c73d17e9",
-      "after_sha256": "da8c5487b21c2a155312882161b4604eeb8804513d206b0c774b4bbfff7015b9",
-      "owners": {
-        "@document": {
-          "before": "ac5c7da61b5082d63b8d88a1ff69d2fde72789e1e4cd7e24cad879e2c73d17e9",
-          "after": "da8c5487b21c2a155312882161b4604eeb8804513d206b0c774b4bbfff7015b9"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "ef8d1f82b5fc083ba58e2f31790b484032856c8a4fc8edfdbf9d45647cfc8d68",
-      "after_sha256": "f4db9175bdec60588d40c46764a33559c5d6b7cbdbeae1bf74a6c9be5a39b6b3",
-      "owners": {
-        "@document": {
-          "before": "ef8d1f82b5fc083ba58e2f31790b484032856c8a4fc8edfdbf9d45647cfc8d68",
-          "after": "f4db9175bdec60588d40c46764a33559c5d6b7cbdbeae1bf74a6c9be5a39b6b3"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "585055e1f47f8ae3d0e079a88fe58a71bc06b7c675f48a50d851a013b147e404",
-      "after_sha256": "0a6fc9cb6b8506fe633ea95ed6c69dd2df64a6bb279bc9fd3dbeae576f469ac2",
-      "owners": {
-        "@document": {
-          "before": "585055e1f47f8ae3d0e079a88fe58a71bc06b7c675f48a50d851a013b147e404",
-          "after": "0a6fc9cb6b8506fe633ea95ed6c69dd2df64a6bb279bc9fd3dbeae576f469ac2"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "c7489b218e70f135f4009584bbf58c280be08098906b2f9ac418fccfe04a0a6c",
-      "after_sha256": "720a11805093b44d508199d1e5c494304a4d6718cd3dc0dbc899d6847e18ba49",
-      "owners": {
-        "@document": {
-          "before": "c7489b218e70f135f4009584bbf58c280be08098906b2f9ac418fccfe04a0a6c",
-          "after": "720a11805093b44d508199d1e5c494304a4d6718cd3dc0dbc899d6847e18ba49"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "5cb826f1a35625d462ef17376e44173488a73e324ad57463c8186e28a5f134a1",
-      "after_sha256": "58ded83e763b591c38157054d9953bda4b83d517c1b4a0b352e869c8cfb79467",
-      "owners": {
-        "@document": {
-          "before": "5cb826f1a35625d462ef17376e44173488a73e324ad57463c8186e28a5f134a1",
-          "after": "58ded83e763b591c38157054d9953bda4b83d517c1b4a0b352e869c8cfb79467"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "c96862d87697ae13bbb5b4324a3167c08bd9f380d7f3a218ba83921e6645c7ad",
-      "after_sha256": "8c3ca4e073f64d4f571b40d8db6b4657e73cb947c358fa4d46b66997e14a0660",
-      "owners": {
-        "@document": {
-          "before": "c96862d87697ae13bbb5b4324a3167c08bd9f380d7f3a218ba83921e6645c7ad",
-          "after": "8c3ca4e073f64d4f571b40d8db6b4657e73cb947c358fa4d46b66997e14a0660"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "1723c4fc531cdf9c0d4209bbc684b9d3f8d3b799082804eca1acf3825911ead0",
-      "after_sha256": "e1e9bb001210b1962a1d0a368722b391a9c9a7e48523c43de5b5fda418130d18",
-      "owners": {
-        "@document": {
-          "before": "1723c4fc531cdf9c0d4209bbc684b9d3f8d3b799082804eca1acf3825911ead0",
-          "after": "e1e9bb001210b1962a1d0a368722b391a9c9a7e48523c43de5b5fda418130d18"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "ee81af7b2edd724c921acfe3b918b4d44bf4a594924a78ff9164bd712fa6ac2e",
-      "after_sha256": "367df0cecd1f89ef7803dbe78709fa9ea4dfb216a5b8a63d57294f6b032a055f",
-      "owners": {
-        "@document": {
-          "before": "ee81af7b2edd724c921acfe3b918b4d44bf4a594924a78ff9164bd712fa6ac2e",
-          "after": "367df0cecd1f89ef7803dbe78709fa9ea4dfb216a5b8a63d57294f6b032a055f"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "2fa5674080d719dcbe27a607096ba08d5393499271561a989092d6ee57d21f0e",
-      "after_sha256": "82d0d3f31179f88132247ec4d6ffe80aef00b49b7b1b3e1b63aba1f97eb0e5fa",
-      "owners": {
-        "@document": {
-          "before": "2fa5674080d719dcbe27a607096ba08d5393499271561a989092d6ee57d21f0e",
-          "after": "82d0d3f31179f88132247ec4d6ffe80aef00b49b7b1b3e1b63aba1f97eb0e5fa"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "70551be2fd0d8210c7fe0cb9875dbd7acdc92ee765224c8d2814611fc376e864",
-      "after_sha256": "2dd2eb585b0ca512c1189d4738f3a33e5358030886d162dea9cdcfb045b82e0c",
-      "owners": {
-        "@document": {
-          "before": "70551be2fd0d8210c7fe0cb9875dbd7acdc92ee765224c8d2814611fc376e864",
-          "after": "2dd2eb585b0ca512c1189d4738f3a33e5358030886d162dea9cdcfb045b82e0c"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "4b52f0f04205a7b482f5f8790561fbc99dac8bbf3d2085184f2133fe5222af83",
-      "after_sha256": "483448b620198aa158e162165873f434bcc04fdaa0a24bdcd9b25e213f277c97",
-      "owners": {
-        "@document": {
-          "before": "4b52f0f04205a7b482f5f8790561fbc99dac8bbf3d2085184f2133fe5222af83",
-          "after": "483448b620198aa158e162165873f434bcc04fdaa0a24bdcd9b25e213f277c97"
-        }
-      }
-    },
-    "conformance/typescript/src/contract.ts": {
-      "before_sha256": "3e09cf05ae1fd8368fb803bfcb890e98e33719cf299394ab1a31c7d4010a49b9",
-      "after_sha256": "068bf24b6cb26aee2a430546940899e87275a607dfa87de6fe292a93a967235b",
-      "owners": {
-        "@document": {
-          "before": "3e09cf05ae1fd8368fb803bfcb890e98e33719cf299394ab1a31c7d4010a49b9",
-          "after": "068bf24b6cb26aee2a430546940899e87275a607dfa87de6fe292a93a967235b"
-        }
-      }
-    },
-    "conformance/typescript/src/generated/openapi.ts": {
-      "before_sha256": "0cc003fc88c79602579fa01d700182d242a810bd8f161ec072a7aac2d2fb2134",
-      "after_sha256": "dce36276ea5df25657aa794d177057a98528e44d57b47bbffda2b8aff4a5d711",
-      "owners": {
-        "@document": {
-          "before": "0cc003fc88c79602579fa01d700182d242a810bd8f161ec072a7aac2d2fb2134",
-          "after": "dce36276ea5df25657aa794d177057a98528e44d57b47bbffda2b8aff4a5d711"
-        }
-      }
-    },
-    "contracts/compatibility-policy.md": {
-      "before_sha256": "5be95744fb3fe237e82f1365436f2a8828ccdd8585be74ce7fecbde9356d36ac",
-      "after_sha256": "ec59edf8d1326389106422b91d4f3edb9e840f6b7bc5c27767cb1b75b0d92a50",
-      "owners": {
-        "@document": {
-          "before": "5be95744fb3fe237e82f1365436f2a8828ccdd8585be74ce7fecbde9356d36ac",
-          "after": "ec59edf8d1326389106422b91d4f3edb9e840f6b7bc5c27767cb1b75b0d92a50"
-        }
-      }
-    },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "75893d11825f0d36e9c3a97dc39b4472f97970735fe0043571bba219e3ae3135",
-      "after_sha256": "40dc408b712998a94219db95e6783d59497ab46e28b547ea23024365ef79b9f1",
+      "before_sha256": "40dc408b712998a94219db95e6783d59497ab46e28b547ea23024365ef79b9f1",
+      "after_sha256": "bde3dc4014648df4990c197251979cfab43d57f1d68b85646da996cb79012f9f",
       "owners": {
         "@document": {
-          "before": "75893d11825f0d36e9c3a97dc39b4472f97970735fe0043571bba219e3ae3135",
-          "after": "40dc408b712998a94219db95e6783d59497ab46e28b547ea23024365ef79b9f1"
+          "before": "40dc408b712998a94219db95e6783d59497ab46e28b547ea23024365ef79b9f1",
+          "after": "bde3dc4014648df4990c197251979cfab43d57f1d68b85646da996cb79012f9f"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "6c93e66f8840df6323310a593a488d5f7576489ce7f768c3fd87fef0216d9493",
-      "after_sha256": "3d7de4ec9048b4d8072992ebac3b7eb5a29faaf09687f04f281ab65927ca1c3e",
+      "before_sha256": "3d7de4ec9048b4d8072992ebac3b7eb5a29faaf09687f04f281ab65927ca1c3e",
+      "after_sha256": "6316371ed79e744c72a16eab75d56f942ecf7432cb18b852b3be2013f3b2e001",
       "owners": {
         "@document": {
-          "before": "6c93e66f8840df6323310a593a488d5f7576489ce7f768c3fd87fef0216d9493",
-          "after": "3d7de4ec9048b4d8072992ebac3b7eb5a29faaf09687f04f281ab65927ca1c3e"
+          "before": "3d7de4ec9048b4d8072992ebac3b7eb5a29faaf09687f04f281ab65927ca1c3e",
+          "after": "6316371ed79e744c72a16eab75d56f942ecf7432cb18b852b3be2013f3b2e001"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "16e7d1c5c8c6428f272800c1f162bcde23d5ce27aefcbacc6f49bbc7ab746363",
-      "after_sha256": "461a0b8a7b4dc66c5bce1fde5de76dee942fa9ad461ba9e865a625e844c28693",
+      "before_sha256": "461a0b8a7b4dc66c5bce1fde5de76dee942fa9ad461ba9e865a625e844c28693",
+      "after_sha256": "9c20fd4f627e519778581d99093c6ab675acb492758dae9d823c1f69b34fc913",
       "owners": {
         "@document": {
-          "before": "16e7d1c5c8c6428f272800c1f162bcde23d5ce27aefcbacc6f49bbc7ab746363",
-          "after": "461a0b8a7b4dc66c5bce1fde5de76dee942fa9ad461ba9e865a625e844c28693"
+          "before": "461a0b8a7b4dc66c5bce1fde5de76dee942fa9ad461ba9e865a625e844c28693",
+          "after": "9c20fd4f627e519778581d99093c6ab675acb492758dae9d823c1f69b34fc913"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "59f819c71ee9a0cb33cba344fa7138d6b60041c5ab6c715abb9c4288dd75cb6f",
-      "after_sha256": "c3bac16b1ebe673b2807543f8dda06e05f4bf8a9e885a3638ae6ab2aa4948d31",
+      "before_sha256": "c3bac16b1ebe673b2807543f8dda06e05f4bf8a9e885a3638ae6ab2aa4948d31",
+      "after_sha256": "194c4656ff90c3361bf083355432d3949ebbd41af70ac48928348ee8f012d06b",
       "owners": {
         "@document": {
-          "before": "59f819c71ee9a0cb33cba344fa7138d6b60041c5ab6c715abb9c4288dd75cb6f",
-          "after": "c3bac16b1ebe673b2807543f8dda06e05f4bf8a9e885a3638ae6ab2aa4948d31"
+          "before": "c3bac16b1ebe673b2807543f8dda06e05f4bf8a9e885a3638ae6ab2aa4948d31",
+          "after": "194c4656ff90c3361bf083355432d3949ebbd41af70ac48928348ee8f012d06b"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "9c998e9ce011d68fef5d0e4092763276cee960ac6d27cca225c60a79e0b3ef54",
-      "after_sha256": "f674b1523e9c185d799d17401ae710da9a95d47acf7dcc0c6d96f1396036db60",
+      "before_sha256": "f674b1523e9c185d799d17401ae710da9a95d47acf7dcc0c6d96f1396036db60",
+      "after_sha256": "4c408306879495b4ef9f0b8847673d805d3a4920c557175d75cd7578646337c4",
       "owners": {
         "@document": {
-          "before": "9c998e9ce011d68fef5d0e4092763276cee960ac6d27cca225c60a79e0b3ef54",
-          "after": "f674b1523e9c185d799d17401ae710da9a95d47acf7dcc0c6d96f1396036db60"
+          "before": "f674b1523e9c185d799d17401ae710da9a95d47acf7dcc0c6d96f1396036db60",
+          "after": "4c408306879495b4ef9f0b8847673d805d3a4920c557175d75cd7578646337c4"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "634d619c573a17c76769469f5376c9eb41eee57e0ea7ee7231f7cbd476b02871",
-      "after_sha256": "2d81f7f9f5036a57f8c0212ef4f8b418ff706a8009cfe67298f67eed0c6f5470",
+      "before_sha256": "2d81f7f9f5036a57f8c0212ef4f8b418ff706a8009cfe67298f67eed0c6f5470",
+      "after_sha256": "ee8d415762ec58ff4879491f832dc52359d50ce93eaaa9c3a5b04601563c3a68",
       "owners": {
         "@document": {
-          "before": "634d619c573a17c76769469f5376c9eb41eee57e0ea7ee7231f7cbd476b02871",
-          "after": "2d81f7f9f5036a57f8c0212ef4f8b418ff706a8009cfe67298f67eed0c6f5470"
+          "before": "2d81f7f9f5036a57f8c0212ef4f8b418ff706a8009cfe67298f67eed0c6f5470",
+          "after": "ee8d415762ec58ff4879491f832dc52359d50ce93eaaa9c3a5b04601563c3a68"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "0b9febf447cc829334cf6c64415faf19ffeeafbfac9ffed49f5ffa38d57199fb",
-      "after_sha256": "4ea80881a2ef860c22b15ff3f923cab3b1a790bb0ba4fc6e0ccafa268c2b503f",
+      "before_sha256": "4ea80881a2ef860c22b15ff3f923cab3b1a790bb0ba4fc6e0ccafa268c2b503f",
+      "after_sha256": "19ecc0e9584f389fb921f1c503481e451372a9ce345d9006d7e28c6b1dcc11e6",
       "owners": {
         "@document": {
-          "before": "0b9febf447cc829334cf6c64415faf19ffeeafbfac9ffed49f5ffa38d57199fb",
-          "after": "4ea80881a2ef860c22b15ff3f923cab3b1a790bb0ba4fc6e0ccafa268c2b503f"
+          "before": "4ea80881a2ef860c22b15ff3f923cab3b1a790bb0ba4fc6e0ccafa268c2b503f",
+          "after": "19ecc0e9584f389fb921f1c503481e451372a9ce345d9006d7e28c6b1dcc11e6"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "48fc897f0c2723ca4173a9f34638a147bf19844402608ff81b14eda1705f6884",
-      "after_sha256": "51bbb80707299c865de44e1329d1e0b68eaabcd87ee01437738d841d28c60696",
+      "before_sha256": "51bbb80707299c865de44e1329d1e0b68eaabcd87ee01437738d841d28c60696",
+      "after_sha256": "1f316a37e07a1c4b61073926193f34b289fa907e1145797bbbd1f4643f9e292e",
       "owners": {
         "@document": {
-          "before": "48fc897f0c2723ca4173a9f34638a147bf19844402608ff81b14eda1705f6884",
-          "after": "51bbb80707299c865de44e1329d1e0b68eaabcd87ee01437738d841d28c60696"
-        }
-      }
-    },
-    "contracts/openapi.yaml": {
-      "before_sha256": "4f7cc0769da02937fd08aba9f27451dac561f1d518c142a2f067ed3830e104ab",
-      "after_sha256": "9fae2c822f6c6919f8c6ab3f806855f81a980eb6cc8425c980060a3dfc08a5d4",
-      "owners": {
-        "@document": {
-          "before": "4f7cc0769da02937fd08aba9f27451dac561f1d518c142a2f067ed3830e104ab",
-          "after": "9fae2c822f6c6919f8c6ab3f806855f81a980eb6cc8425c980060a3dfc08a5d4"
-        }
-      }
-    },
-    "contracts/schemas/create-session.schema.json": {
-      "before_sha256": "405bb4a554ba48c1948b88161703da7a55ce430e4af4463d00662c917087edcd",
-      "after_sha256": "457c1834d249ca7dfd2f2d58ae2aeeb69654b67c76364384c6b43f73bbfef2c1",
-      "owners": {
-        "@document": {
-          "before": "405bb4a554ba48c1948b88161703da7a55ce430e4af4463d00662c917087edcd",
-          "after": "457c1834d249ca7dfd2f2d58ae2aeeb69654b67c76364384c6b43f73bbfef2c1"
-        }
-      }
-    },
-    "data/army_lists/cavalcade-shadow-bloodthirster.json": {
-      "before_sha256": "9a78216808ef4e66dbb478e0281a471bff273b894d94a07876d68361d2e4b6b1",
-      "after_sha256": "bd69a396e6089f6de2f992cf8266be4d6af33a5d29fbdec0bb3345548971f15b",
-      "owners": {
-        "@document": {
-          "before": "9a78216808ef4e66dbb478e0281a471bff273b894d94a07876d68361d2e4b6b1",
-          "after": "bd69a396e6089f6de2f992cf8266be4d6af33a5d29fbdec0bb3345548971f15b"
+          "before": "51bbb80707299c865de44e1329d1e0b68eaabcd87ee01437738d841d28c60696",
+          "after": "1f316a37e07a1c4b61073926193f34b289fa907e1145797bbbd1f4643f9e292e"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "2c20c80b3b8b6323b9ca3143e85ee7d4eb2983c8a0788ad27c7b2cb81b630afb",
-      "after_sha256": "2dec09b5ad5abec792d4fbf3b2d5ebc67b212df3c0a5391c3c378041db0aef59",
+      "before_sha256": "2dec09b5ad5abec792d4fbf3b2d5ebc67b212df3c0a5391c3c378041db0aef59",
+      "after_sha256": "3bd1286b35b754ae289f719d418173fdfa6ce481e5102aa1fdccf2ea84a60fa3",
       "owners": {
         "@document": {
-          "before": "2c20c80b3b8b6323b9ca3143e85ee7d4eb2983c8a0788ad27c7b2cb81b630afb",
-          "after": "2dec09b5ad5abec792d4fbf3b2d5ebc67b212df3c0a5391c3c378041db0aef59"
-        }
-      }
-    },
-    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
-      "before_sha256": "dc6f02478cc5d9f6bbb2e3a3aea7ef6378402ff4bf3f10b5e6ce7b223d6348c7",
-      "after_sha256": "102273d6ae0d5c053d0743d3e321d38f58779c948440ac22489220155c9f6150",
-      "owners": {
-        "@document": {
-          "before": "dc6f02478cc5d9f6bbb2e3a3aea7ef6378402ff4bf3f10b5e6ce7b223d6348c7",
-          "after": "102273d6ae0d5c053d0743d3e321d38f58779c948440ac22489220155c9f6150"
+          "before": "2dec09b5ad5abec792d4fbf3b2d5ebc67b212df3c0a5391c3c378041db0aef59",
+          "after": "3bd1286b35b754ae289f719d418173fdfa6ce481e5102aa1fdccf2ea84a60fa3"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "5afacd32bf5af0c5b7cb0044ace32891e22d22bfcfcf6fe5c6d315436714eea1",
-      "after_sha256": "90c18a7f9febfd95bb752f7e58373e58c140a1ecf704e2a72f22171e34ee1592",
+      "before_sha256": "90c18a7f9febfd95bb752f7e58373e58c140a1ecf704e2a72f22171e34ee1592",
+      "after_sha256": "56213b041dfe24b9665cfe1350fc384ce808c091e7eaf92ee403ff940fb51373",
       "owners": {
         "@document": {
-          "before": "5afacd32bf5af0c5b7cb0044ace32891e22d22bfcfcf6fe5c6d315436714eea1",
-          "after": "90c18a7f9febfd95bb752f7e58373e58c140a1ecf704e2a72f22171e34ee1592"
+          "before": "90c18a7f9febfd95bb752f7e58373e58c140a1ecf704e2a72f22171e34ee1592",
+          "after": "56213b041dfe24b9665cfe1350fc384ce808c091e7eaf92ee403ff940fb51373"
         }
       }
     },
-    "docs/FACTION_RULES_SOURCE_POLICY.md": {
-      "before_sha256": "275c18c619582fa1244d8d7198d4ae977c798d310e5dd0619fb68af92a6715c7",
-      "after_sha256": "a1113d9ed60b3bb8d42b85c5f8b0a6f9b1462e2cfb2486e89a35e9a9e952fda7",
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": null,
+      "after_sha256": "20a16c0676a32a4f5c9c2a0e2f31a351dbc696c9c0a437f6ac3aa811bc52d9d2",
       "owners": {
         "@document": {
-          "before": "275c18c619582fa1244d8d7198d4ae977c798d310e5dd0619fb68af92a6715c7",
-          "after": "a1113d9ed60b3bb8d42b85c5f8b0a6f9b1462e2cfb2486e89a35e9a9e952fda7"
+          "before": null,
+          "after": "20a16c0676a32a4f5c9c2a0e2f31a351dbc696c9c0a437f6ac3aa811bc52d9d2"
         }
       }
     },
-    "docs/factions/chaos-daemons.md": {
-      "before_sha256": "4fa1d97f4ae51df9003cf0ee7a19c05c512229ab4952d2a3f3f51468d8c04a51",
-      "after_sha256": "1d13278983edfddb2cabf839444ca922f9e9760e0b28f12b3c55e40897cfab86",
+    "docs/README.md": {
+      "before_sha256": "792a719796e21c7b56c5b4233882923c0c6786edc73515bb5dd45023db81886e",
+      "after_sha256": "67b71d15f65b0a722b1f0c7bfb9142364c6ff7d18724665a6f5bf4d096f632a6",
       "owners": {
         "@document": {
-          "before": "4fa1d97f4ae51df9003cf0ee7a19c05c512229ab4952d2a3f3f51468d8c04a51",
-          "after": "1d13278983edfddb2cabf839444ca922f9e9760e0b28f12b3c55e40897cfab86"
+          "before": "792a719796e21c7b56c5b4233882923c0c6786edc73515bb5dd45023db81886e",
+          "after": "67b71d15f65b0a722b1f0c7bfb9142364c6ff7d18724665a6f5bf4d096f632a6"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "50cc77eb1c7c4408e67657aa4197baf84ecf3a2e7718d8a75964933900dd949b",
-      "after_sha256": "75fb3b56d96fb86b452afaf9c12d528fa2841756c96360648cb1a802f5257356",
+      "before_sha256": "75fb3b56d96fb86b452afaf9c12d528fa2841756c96360648cb1a802f5257356",
+      "after_sha256": "0965fe07908fb76be0fa0bbfd301ea93ceefb02eccc616f964aa525aef73043e",
       "owners": {
         "@document": {
-          "before": "50cc77eb1c7c4408e67657aa4197baf84ecf3a2e7718d8a75964933900dd949b",
-          "after": "75fb3b56d96fb86b452afaf9c12d528fa2841756c96360648cb1a802f5257356"
+          "before": "75fb3b56d96fb86b452afaf9c12d528fa2841756c96360648cb1a802f5257356",
+          "after": "0965fe07908fb76be0fa0bbfd301ea93ceefb02eccc616f964aa525aef73043e"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "dc23abc4bafdccefe9a476b1e8300f33d5d9cfe16037c55e7d787478c671df44",
-      "after_sha256": "832529c53d39608779a32bc42b56f2a19907cc35acad086bf09996cfa066153b",
+      "before_sha256": "832529c53d39608779a32bc42b56f2a19907cc35acad086bf09996cfa066153b",
+      "after_sha256": "b81902f05efad0b4d70bdbaa7683505dac72032725055cae25ee2c59f74ad027",
       "owners": {
         "@document": {
-          "before": "dc23abc4bafdccefe9a476b1e8300f33d5d9cfe16037c55e7d787478c671df44",
-          "after": "832529c53d39608779a32bc42b56f2a19907cc35acad086bf09996cfa066153b"
+          "before": "832529c53d39608779a32bc42b56f2a19907cc35acad086bf09996cfa066153b",
+          "after": "b81902f05efad0b4d70bdbaa7683505dac72032725055cae25ee2c59f74ad027"
         }
       }
     },
-    "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "e72ee19e8f437fd5a6516c1a78e3cda6b515e3089dad30528500f0a1fc61a93d",
-      "after_sha256": "42cdd96179521b7ddb8608f815c736c6a1542f2435079b6294ac42652c38752c",
-      "owners": {
-        "@module": {
-          "before": "516f3ab7868281ad2d8ce535b2bd5cf1f5f9a180843f960a2d3af0246537b168",
-          "after": "dda2ad0f0fff9d9af5e4221789c00088a3be3471999f2e5ad10a0ec8c2528386"
-        }
-      }
-    },
-    "src/warhammer40k_core/core/model_geometry_catalog.py": {
-      "before_sha256": "1579960d284f646952b263fef997e1e52b779980e83252d5b7d3f6f5d9802746",
-      "after_sha256": "800a0a86cc1e9ab2a31a44d383d1ee01fd6db5d278aa4c12ad7e46d800049707",
-      "owners": {
-        "GeometryEvidenceKind": {
-          "before": "69a3d67dd13c5fa38fb66a680566b251f7dacff98e8a4c807b506298fd761bfd",
-          "after": "311cb54cc8d56c34e293603964b4105826c768d17337da514440656713c15a98"
-        },
-        "ModelGeometrySourceEvidence.__post_init__": {
-          "before": "67e83b1de8bf95c6d1f317eaafb8fc857088c51391edeae27fb72206902919a3",
-          "after": "47205d2a400ba5fcb2324c35339f02eb733ec9c993bd53a7a61ab000cea11fb0"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/datasheets.py": {
-      "before_sha256": "5b2a2a0a1da0bf63a2ecb738625b1bd12a493d8b2672918c7c9320fb0b3c1ae9",
-      "after_sha256": "f4e6d46d05532194884ced40bdc14870bb87012c4d427604814493fbb6c5bb8a",
-      "owners": {
-        "@module": {
-          "before": "0dd646f83fc24b3906493e5110062d80f7404c94bc36d718a35b222ec5b8571d",
-          "after": "563ab327e41f81fd531dbe55d98ee27fd9e767a30134f8ea6e827d75b0f6944a"
-        },
-        "_enemy_rules_unit_within_source_engagement_range": {
-          "before": "2a92ab315e330519ea5fd7131b931e7b4dfac36da2df6b702aee6098b36c587e",
-          "after": null
-        },
-        "mischief_makers_hit_roll_modifier": {
-          "before": "75f4c4648369221939854eaeccfa205e3b5397289b6d19733e5e19cd6cfa5565",
-          "after": "17af077c40379060cc2c9f2b1a04ea9d5fa7f6928e556cd261f3fce7d247a4cd"
-        },
-        "runtime_contribution": {
-          "before": "342a03dc27b2d6a39fe4cd0ab98a75886b17a637b6476a513b57d51116a31a01",
-          "after": "d07bb87da2b16ab7394db77b212ac3313de419faa8e0154501f058d6ea8f371e"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/descriptor_consumption.py": {
-      "before_sha256": "3cb473b77ee532bee61a724a7b5a370fa29f43390c909448d80ad59e6ef41192",
-      "after_sha256": "2d5c8678bf374ca04e4cb58fced453cbbf50ef36faf5181a07376f469cbe79bf",
-      "owners": {
-        "descriptor_consumption_records": {
-          "before": "7819289bd5786bcf2df162da8ea058f1ed43b5fbad4df7d64eb9dea800967a61",
-          "after": "be832008062205b595e76a2b1398b96a939893cb9d53ee5c4a53dce400c796a6"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/selected_fight_proximity_modifiers.py": {
+    "src/warhammer40k_core/ai/player_policy.py": {
       "before_sha256": null,
-      "after_sha256": "004a87c3cf68d45a3df6ddbfdde66f5ea6909f2f15287a3f19b1d8f7fa3b7f9d",
+      "after_sha256": "42b42094740aeadb44060c86cc618956b55cea39b6aa47653d1bb66dc25ba057",
       "owners": {
         "@module": {
           "before": null,
-          "after": "eb06e881a6297ccf0c0e40c36fc91b1df91f557b14fe94983928865f5fb6b82d"
+          "after": "f02103658099bb0e8bf6b1d843ef3cd1624cc66a410c49c62cc9898d7bc736cc"
         },
-        "EnemySelectedFightHitModifier": {
+        "CandidateExhaustedError": {
           "before": null,
-          "after": "a4e6b5a751962e3aafcdf9ee746da0fd8e6a897748510433dfde4c5df2eb8758"
+          "after": "4935d6447132b17488c00bf50eacb1033926312c94cc8ab6ae382a1a46fa1296"
         },
-        "EnemySelectedFightHitModifier.__post_init__": {
+        "PlayerDecisionContext": {
           "before": null,
-          "after": "a559302080c340a46df6fc1b508067b9fc26cb70b2392f30497fe154cc32e832"
+          "after": "be1f1d193bce72ca644e594e417668b3c6d54e44cdaf4f905b097f1154dd7b8a"
         },
-        "EnemySelectedFightHitModifier.selection_binding": {
+        "PlayerDecisionContext.__post_init__": {
           "before": null,
-          "after": "f7629b566eb0564f589923e19dca75995cb7d4980f8c3aba1bb5b4b6e0578460"
+          "after": "881980e5227f6ef24abe89bd2a74254403e3de0f8feac5591b069b8b8e9a0ab7"
         },
-        "capture_enemy_selected_fight_modifier": {
+        "PlayerDecisionContext.from_view": {
           "before": null,
-          "after": "31d815bd637c79e287927be307a4efba47bb186d949dccf8d2e3635ceb0fc278"
+          "after": "90fea1c6cf1586ef5c1e16e1e65de9e387e2ad8f1d3f6a1636623a1e3e56d412"
         },
-        "captured_enemy_selected_fight_hit_modifier": {
+        "PlayerDecisionContext.observation": {
           "before": null,
-          "after": "9df99640a40605257b297228ae750d97d60f127babcf9861ebc6c15f42b023f1"
+          "after": "c2b36813433267ec100cbee186fc4e88c993a268beaf84490293eb82a8c78b11"
+        },
+        "PlayerDecisionContext.observation_hash": {
+          "before": null,
+          "after": "afc0c3fadc7bb46bcb398ee95f939a8fa54ea609f77c0863d97ae5064dc27274"
+        },
+        "PlayerDecisionContext.propose": {
+          "before": null,
+          "after": "b5d831b1b4ed18d1e10c8f332ed8ba8203c8d3ec2743ac9d873f8dd89919759e"
+        },
+        "PlayerDecisionContext.request": {
+          "before": null,
+          "after": "eb02dcbfce70133408f25c821e4fc6a3606056e51bcaf828f1166b8d9b8c3374"
+        },
+        "PlayerDecisionContext.select_option": {
+          "before": null,
+          "after": "1288a2ea11a7e5e0fe3ab2990f9c2d504d8a27c04f9d7c5905b5e50e152f78bf"
+        },
+        "PlayerPolicy": {
+          "before": null,
+          "after": "ceaa3e7a2aabc338aae432af987494894f56a819736baee1782e6c716dc79367"
+        },
+        "PlayerPolicy.choose": {
+          "before": null,
+          "after": "b730eaed4905abe3017d0f01676acb7fb05897a89ce9d93ce32627f7021f49e8"
+        },
+        "PolicyAction": {
+          "before": null,
+          "after": "75dfa532d43e55137fac02b235627dded5a78d871bf3e3089bac47ef9b967561"
+        },
+        "PolicyAction.__post_init__": {
+          "before": null,
+          "after": "6e0c17a91a2ded789f12add553931315906a93d2068414110c3dcc6330925376"
+        },
+        "PolicyError": {
+          "before": null,
+          "after": "681330ecd62f943ec87d34bfa6dfbf0fd77ef6d00ab45e67a67fd86459f5fc40"
+        },
+        "PolicyRegistration": {
+          "before": null,
+          "after": "27223555de3e74106f001960a409baecb1d734fb7239617ab369ea4ef8a3d727"
+        },
+        "PolicyRegistration.__post_init__": {
+          "before": null,
+          "after": "c77a84cafd0a1248531fab42b6e073231a61eb32e79e850fd6c0990745b50ef1"
+        },
+        "PolicyRoute": {
+          "before": null,
+          "after": "593566cbdb156edd46113af24fae01e647ef6f95238ddd0f713382f56db84205"
+        },
+        "PolicyRoute.__post_init__": {
+          "before": null,
+          "after": "be026a5ce9ecb87209ed98488160119928919cdfb7b0c84583f2822b548b925e"
+        },
+        "PolicyRoute.from_view": {
+          "before": null,
+          "after": "ef51b82831f6845ea6a70a6f6ecca184390698eda9578b94bc8ab1b17ea4c529"
+        },
+        "PolicyRouter": {
+          "before": null,
+          "after": "77cc5a6c50494fe1933b07e62e0fec7e87c36d953e4861fcc39febccb3ab55bb"
+        },
+        "PolicyRouter.__init__": {
+          "before": null,
+          "after": "10b24f1e6627f90a12c700f3ac4b6a2b870598b03db9181585d67700129ae931"
+        },
+        "PolicyRouter.resolve": {
+          "before": null,
+          "after": "57c8ff01c8083b558b706c7475dfa23768bc258be41b4117f5ccc2594602b729"
+        },
+        "payload_digest": {
+          "before": null,
+          "after": "6f022c7e6795633e1ec64508e79a81513bf63d21374a30d69b591c4bb1b89e2b"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/__init__.py": {
+    "src/warhammer40k_core/ai/runner.py": {
       "before_sha256": null,
-      "after_sha256": "d81e9614226a7cf7a2aa66764bb6bdfa0668cdc5d625a1b099cf3cae8e166f1f",
+      "after_sha256": "436dc799f0edf27cb17925c507f83184ec17a0d4d02b4f1eb3ca1e0c77e9edc4",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b485a368a74674b75b53a7473628d67ce76c32f255abf0a3bb428e265c116f54"
+          "after": "4778a7708a08fe5a6d8ba1893113a4b802104d4349f088b80093739cc9776d17"
         },
-        "CavalcadeCatalogError": {
+        "BoundedPolicyRunner": {
           "before": null,
-          "after": "eb92f5554ec11cc202babcf51ffd8bc30a178d2e7d616a6e9e8d6dcef5ae94d2"
+          "after": "bfdae329c2ce7836c57510ee4d90d6ff38826fdd1524e328be2b571ffac19d48"
         },
-        "catalog_package": {
+        "BoundedPolicyRunner.__init__": {
           "before": null,
-          "after": "b5ff9701ae60cb28a3247d3031badb3b6630b70f2ff829bdd7123fe346d9a579"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/artifacts/catalog.json": {
-      "before_sha256": null,
-      "after_sha256": "d174bea9f2adb2a0d9b319fa3cfe0a0f43ef2157161df78b59ec90e3fc5bc8b2",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "d174bea9f2adb2a0d9b319fa3cfe0a0f43ef2157161df78b59ec90e3fc5bc8b2"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/artifacts/geometry.json": {
-      "before_sha256": null,
-      "after_sha256": "55d7d1fd3ef8260dcef6b3fb7b3345ecbf8db3f14747a38cdadb0e64ec380fef",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "55d7d1fd3ef8260dcef6b3fb7b3345ecbf8db3f14747a38cdadb0e64ec380fef"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/artifacts/source-review.json": {
-      "before_sha256": null,
-      "after_sha256": "f49e9bf5064f4377d222d5be2d69ae996798efb5a790ac3e043d4381a11d54ef",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "f49e9bf5064f4377d222d5be2d69ae996798efb5a790ac3e043d4381a11d54ef"
-        }
-      }
-    },
-    "tests/code_quality/test_generated_faction_docs.py": {
-      "before_sha256": "56112aaf41292964270c0d72067e2eb949d5ef830c5f2dda568ea3f649f4d332",
-      "after_sha256": "f898a5d03504072a92948ebdbdcc2b874bc96e7d231d70f27e6717f436490935",
-      "owners": {
-        "test_chaos_daemons_document_scopes_checked_in_roster_evidence": {
-          "before": "3c2a7a71d24b2c07fef4d75cd7b6237e8c5c0d1c54e0e5338d28c1e1aed1ef39",
-          "after": "a56beafd134262dc1c7d7f53a7433140f659ed2ad9edb9ddfa5f6a298477b846"
-        }
-      }
-    },
-    "tests/code_quality/test_unit_model_semantics.py": {
-      "before_sha256": "5351de42735fec6c3a71a4a05fcb9c706027a3aef0c8263573b79a937dcd7f9d",
-      "after_sha256": "bc0cb27b47c7162bde2606bd9501a9c5d0a5dee2740ef5ff03af7a20c80ddedf",
-      "owners": {
-        "@module": {
-          "before": "0097cf982f138703c4afc02afaa335255b91a5d8b603706a9a32ba5197aa48bd",
-          "after": "e71dde4b401e5b1220ad4e0538b7654fe0f1a19164078c56988d22282e8330c8"
+          "after": "574e45bfb0760b0e873f743f5c03721c74131c29feac695cc060e4a80d5b5a7b"
         },
-        "test_content_and_stratagem_engagement_consumers_keep_living_authority_separate": {
-          "before": "ccb0dfc7a0c0320f82f29cf6712b022bac8834bbb95cd541989b6a13b7200d57",
-          "after": "976bc52993c15f27a6546265c71369c81250114e4e56f5487bfaec260820878c"
-        }
-      }
-    },
-    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
-      "before_sha256": "96a7a23a1aeed115aa7dbb97559735a4552f35f1d5c3657106736a3c706187e9",
-      "after_sha256": "fa4f094d73c08b236fc892c92614f48f2a7f62f8fb4cd9202ecf67a5af26e2c8",
-      "owners": {
-        "@module": {
-          "before": "48c5fc6e8f0517e153bc9407c23b4911cba5b0dfec8b19f45c5e49a28c2312d5",
-          "after": "1af657fffe2e0039df5f64408529cb25098158a51a0fa14ae9a778a961169863"
-        }
-      }
-    },
-    "tests/factions/chaos_daemons/integration/fixtures/cavalcade_v995_deployment.json": {
-      "before_sha256": null,
-      "after_sha256": "ea97058b09ca8b92fbdd259b7fea118c8102885253f348b0d1a7c29b98cd8368",
-      "owners": {
-        "@document": {
+        "BoundedPolicyRunner._check_status": {
           "before": null,
-          "after": "ea97058b09ca8b92fbdd259b7fea118c8102885253f348b0d1a7c29b98cd8368"
+          "after": "960ce1883b21d772aa5636e64e38815c438ead56355fe72804084fe9eeae57a0"
+        },
+        "BoundedPolicyRunner._check_time": {
+          "before": null,
+          "after": "a4208a3a0442068dee7e079d7e66a04a7f7a31fca88c035965440405212788c9"
+        },
+        "BoundedPolicyRunner._fail": {
+          "before": null,
+          "after": "14cb2c0a29b7f38dfb0d81a980c0cd067fcba3b61ae08cd3ffb80c50678d28a3"
+        },
+        "BoundedPolicyRunner._report": {
+          "before": null,
+          "after": "a1280774ffd2bbe7a6023a406dca0800a470d11cbfb4bdd2b8d4a3b3ddb6c69a"
+        },
+        "BoundedPolicyRunner._validate_action": {
+          "before": null,
+          "after": "244d1f4dfac760ab87db6b7c4d53a4acb931c5860a761c0a92b412dd0f5a9bc3"
+        },
+        "BoundedPolicyRunner.run": {
+          "before": null,
+          "after": "fab3f57790c604a539f974788b2ac4b991d3c8970586786f59c5fc4407f92925"
+        },
+        "DecisionTiming": {
+          "before": null,
+          "after": "0d183b1ed362b290d60552d67f4fdb2bd5f8807d4c1f93ac42aa16b864736546"
+        },
+        "RunBoundary": {
+          "before": null,
+          "after": "f48ba6c9799a749f8d32860337db97dd7dd57c5b02cbe3ba724a15f2434e9380"
+        },
+        "RunBoundary.__post_init__": {
+          "before": null,
+          "after": "7f328adfb20aafcc0553d6aa988a4086ca14129a62a9732bacf2788fd2353774"
+        },
+        "RunBoundary.matches": {
+          "before": null,
+          "after": "45f1a41d33b0edceab46dc9bf9d4f3aa674adaca753f233cc9d2af0cca04a1ae"
+        },
+        "RunLimits": {
+          "before": null,
+          "after": "36b15a993a0b2311743b731aeede4774d8b38c722bdb3ee220096d9ca3f8c4ea"
+        },
+        "RunLimits.__post_init__": {
+          "before": null,
+          "after": "4d00b090a390a00f81e280df452cb8ce2876f192e8df489bdde82f87009023e6"
+        },
+        "RunReport": {
+          "before": null,
+          "after": "8ab6ddd0c56a232c58c481ea026c3620335c06a89fecf66615fe8b1943851009"
+        },
+        "RunnerError": {
+          "before": null,
+          "after": "3a7310785fde007b9a8a644e253a6b0c5bb66c03ec647dd49c99bbce52a5bf41"
+        },
+        "RunnerError.__init__": {
+          "before": null,
+          "after": "91576f2d4c689b2ca9e993eef2a1d9066cda491fd643772b9cf90815e598eff7"
         }
       }
     },
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
-      "before_sha256": null,
-      "after_sha256": "65aa8236412d5577aa614d48830fbf91e1ad254446759164f5433bcab648e464",
+      "before_sha256": "65aa8236412d5577aa614d48830fbf91e1ad254446759164f5433bcab648e464",
+      "after_sha256": "ff12fa1ae51918a510a51845bd61cd00fe46e785ec0416f5a5ed8625e82b819d",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "64f989e4e0b1abc01be6bbb87b077d89403d6c59210d1482e8e43932ec6a10c3"
+          "before": "64f989e4e0b1abc01be6bbb87b077d89403d6c59210d1482e8e43932ec6a10c3",
+          "after": "f328d859b5aa6a5e71006b2e2a4ad0bcc42c554c0eb68c9764045216e08f1177"
         },
-        "_DeploymentFixture": {
+        "_InvalidPlacementPolicy": {
           "before": null,
-          "after": "0d0f4b0fc033ddaf36cfc48262147aa35508960c936384a9fafc2b0a48aed1a4"
+          "after": "9f4063a2d8cd373659b90bfb9c10ef954ef41ff829578f13f3b44fb209768f2b"
         },
-        "_strict_mirror_session": {
+        "_InvalidPlacementPolicy.__init__": {
           "before": null,
-          "after": "303ce46ffb1f372b1d90b6f6d04cff874c6d728b044d2d347267e65d54bc1b8d"
+          "after": "3fbcf731e0a145b0b3924c887cc0063baace073a786cbaf1c0cb8fb3e90a6cfb"
         },
-        "test_exact_mirror_config_passes_network_admission": {
+        "_InvalidPlacementPolicy.choose": {
           "before": null,
-          "after": "9c778419508fde9ac43d7ca93c8a37d4ddbe15f30b399320ec8225e68ece4627"
+          "after": "3080bcdcf09c648df4f77d37bd76dd48741b21a1ecf2231a9e0cbb6cc78d4766"
+        },
+        "_MirrorSetupPolicy": {
+          "before": null,
+          "after": "b80ee2d60d602a866837c6be762f564155f15db03582bb36ebbcb85c38d3eb6c"
+        },
+        "_MirrorSetupPolicy.__init__": {
+          "before": null,
+          "after": "9053bc2735cd25770bf75fe076f2f865ca51ad8e96fa66e04d84774ade350f8a"
+        },
+        "_MirrorSetupPolicy.choose": {
+          "before": null,
+          "after": "f6da00982e65f52bc11a8f8ca809fe52373b4eb9ea8d6d92353c9f90fd024479"
+        },
+        "_ProbePolicy": {
+          "before": null,
+          "after": "d780d473e8bcbe6151e22559849f5f94001806a639b56fd83e56224e3972fe5d"
+        },
+        "_ProbePolicy.__init__": {
+          "before": null,
+          "after": "de4d64c85e451d860cfb01c9ab8159175ef59f4ca70b2a0e2a79921660f050c4"
+        },
+        "_ProbePolicy.choose": {
+          "before": null,
+          "after": "911ab78fe4500d03368221c85e0fc2d721a5662492fd14ad9321de48e52d5657"
+        },
+        "_deployment_fixture": {
+          "before": null,
+          "after": "b727ba7757f4a38902fae7b3046fe783a6c8460ca95769edbf967b62dd1893a4"
+        },
+        "_mirror_router": {
+          "before": null,
+          "after": "32483dd468c1f3cf83745510215940cd9f1c0f0383052c2b8ce39958c53a6637"
+        },
+        "_probe_router": {
+          "before": null,
+          "after": "8558b3c58ea07092288c77be59ab191b5d5c0ddba4112e008601c68f9ed42363"
         },
         "test_exact_mirror_deploys_all_78_models_and_replays_to_battle": {
-          "before": null,
-          "after": "da9c7bc2d21dbd57418e8bad8cd8fe3feed559cfd69f225f43c2658b3d159a12"
+          "before": "da9c7bc2d21dbd57418e8bad8cd8fe3feed559cfd69f225f43c2658b3d159a12",
+          "after": "3faabdcdd2728e2d77f8ce836e4975aedbd6154d2226d61942d4bce4d2f9e4d6"
         },
-        "test_mischief_makers_uses_selection_boundary_and_survives_source_movement": {
+        "test_player_context_is_detached_and_hides_opponent_secret_decisions": {
           "before": null,
-          "after": "8eaab1fc0ff26d1bcaedde7b7667ce0f7ce0d31c006bed9e7e03f1a632b3386d"
+          "after": "c370cc3657f61e3744ebfb3abc4f4359dd33b7e259d9c24f6c8af5cf4d5d86e9"
         },
-        "test_provisional_geometry_round_trips_without_promoting_estimates": {
+        "test_player_routes_distinguish_battle_phase_and_reject_duplicates": {
           "before": null,
-          "after": "fbbfe155b21523e29968542ae2730a2ff96061fe83a1589f8fbcd2533d1b4fbc"
+          "after": "2faf829248e8ff69f90c631661f74917c41c5252168ba51481df13c55faa2c2c"
         },
-        "test_strict_mirror_session_finishes_mustering_and_round_trips_setup": {
+        "test_player_routes_never_match_a_nearby_setup_route": {
           "before": null,
-          "after": "5007eb39a92103f99ebac7cacbcd64854100bb6d77fc97810f5b9b2f58390759"
+          "after": "ecaa74ef59f78b3edbb7c630ef6701822800a608a42a7eb62c1daf35db80e108"
         },
-        "test_v995_army_strictly_musters_independently_for_both_players": {
+        "test_player_runner_is_reproducible_and_stops_at_decision_budget": {
           "before": null,
-          "after": "d57756f77186b3147b573764963c895bc9fd5d3a5915b168467f575a3bab1fa0"
-        }
-      }
-    },
-    "tools/generate_ability_support_matrix.py": {
-      "before_sha256": "83212c06e46ee50419d5f33386a8dc11875d1c9365be94a8031593b120b7ac69",
-      "after_sha256": "ce85c47a0bd2405892a6312cacbea09246c8e1faa3764f2e10fd75aad3884668",
-      "owners": {
-        "_chaos_daemons_semantic_snapshot_markdown": {
-          "before": "8a92a7697e482ffe8368929660a8db1dc3e6e3538270852980f171baa29c4637",
-          "after": "ffeebb738dc7183ca87914682c3f5b67e8d44b529095f0bec670757de5296726"
-        }
-      }
-    },
-    "tools/generate_cavalcade_v995_catalog.py": {
-      "before_sha256": null,
-      "after_sha256": "f4eed2e0a778e264d3873bcdc2e63ea00417fef22d383dd10da7565f785b2c3b",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "a15ef138a07f3f5e207c2e76f710df66b1d5b737f7c7df830bd68fda29cf5ba8"
+          "after": "09623ded9f77691b07768ee3bd150b455df193485876e740cddc69456c25c8b0"
         },
-        "_additional_catalog": {
+        "test_player_runner_preserves_engine_auto_selection_records_after_a_legal_action": {
           "before": null,
-          "after": "4e70339ff624f7cb23c8d757b7e5dc814b01e518c0aa33336d20012eb4d35c78"
+          "after": "05b75c099f47842b5dfa70b252fe074e699d4db3a28ccb6d7f8cde0a4bb9ddd3"
         },
-        "_catalog_from_bridge": {
+        "test_player_runner_rejects_committed_placement_without_retry": {
           "before": null,
-          "after": "dd028d10359e3c61f255d74cfe8c6fe0cdae8c29dbed63cdff1b9ef19783b2ce"
+          "after": "94249d18eda56d01529b06b2b1b9ec7057e87cd50cab53a1e59c4714b0e5067b"
         },
-        "_current_additional_core_descriptions": {
+        "test_player_runner_stops_after_one_bad_choice_without_substituting": {
           "before": null,
-          "after": "0b83ca97e2dad50a3bfb9c4b06d1eb7312f1a28f1da221508d4f0923942d4792"
+          "after": "ec5a83a39fa7af4ff13ecfccf07092140e1944cfdada23ed3dbfc0a6f358d65e"
         },
-        "_promote": {
+        "test_player_runner_time_limit_is_an_error_before_policy_execution": {
           "before": null,
-          "after": "0574489ec2ef16634589a26aa9a39a9249ce567b9cc617ad25590d6b3b88dba4"
-        },
-        "build_catalog_package": {
-          "before": null,
-          "after": "60bc63f6ba26dd412f70aed1dd7bcd8017da9275fa8f9d9152069e327d8e8852"
-        },
-        "main": {
-          "before": null,
-          "after": "9604919095aeea77e2f89567f2787501e2d6f22a147db2a486d490b000a5de20"
+          "after": "b2f140e9ed62b1987e95695b344a488491798f9c5f97971f843659e46cafd2ba"
         }
       }
     }
   },
   "rows": {
-    "ci/test_shards/durations.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission",
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "conformance/typescript/src/contract.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
-    },
-    "conformance/typescript/src/generated/openapi.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
-    },
-    "contracts/compatibility-policy.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
-    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -799,9 +436,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -809,9 +446,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -819,9 +456,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -829,9 +466,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -839,9 +476,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -849,9 +486,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -859,39 +496,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
-    },
-    "contracts/openapi.yaml": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
-    },
-    "contracts/schemas/create-session.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
-    },
-    "data/army_lists/cavalcade-shadow-bloodthirster.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add the source-reviewed Nurglings and Seekers catalog closure, October Enhancement assignments, explicit provisional geometry and exact exported roster; preserve the authenticated July catalog and installed MFM data.",
-      "source_obligation": "The supplied v995 roster, retained official datasheet review, existing October MFM authority and explicit geometry evidence define all new source records. Model counts, equipment, Upgrade assignments and 220/220/260 Bloodcrusher prices are preserved.",
-      "unchanged_work": "Catalog construction, MFM point calculation, geometry conversion, hashing and runtime source-index algorithms remain unchanged. New records and generated runtime identity bind this source admission without refreshing historical performance evidence."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -899,49 +506,41 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maintain current source policy, contract guidance, generated support inventory and explicit ownership of this diff; historical evidence and live policy validators are unchanged.",
-      "source_obligation": "Official retained Chaos Daemons datasheets, October MFM assignments, and explicit provisional geometry evidence define the admitted roster; Mischief Makers captures eligibility at selection and expires at phase end.",
-      "unchanged_work": "Shared spatial engagement validation, persisting-effect serialization, modifier registry, setup validation and replay algorithms remain unchanged. The rule adds a source-bound selection grant and consumes its phase-scoped effect instead of reevaluating engagement during attacks."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintain current source policy, contract guidance, generated support inventory and explicit ownership of this diff; historical evidence and live policy validators are unchanged.",
-      "source_obligation": "Official retained Chaos Daemons datasheets, October MFM assignments, and explicit provisional geometry evidence define the admitted roster; Mischief Makers captures eligibility at selection and expires at phase end.",
-      "unchanged_work": "Shared spatial engagement validation, persisting-effect serialization, modifier registry, setup validation and replay algorithms remain unchanged. The rule adds a source-bound selection grant and consumes its phase-scoped effect instead of reevaluating engagement during attacks."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
-    "docs/FACTION_RULES_SOURCE_POLICY.md": {
+    "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintain current source policy, contract guidance, generated support inventory and explicit ownership of this diff; historical evidence and live policy validators are unchanged.",
-      "source_obligation": "Official retained Chaos Daemons datasheets, October MFM assignments, and explicit provisional geometry evidence define the admitted roster; Mischief Makers captures eligibility at selection and expires at phase end.",
-      "unchanged_work": "Shared spatial engagement validation, persisting-effect serialization, modifier registry, setup validation and replay algorithms remain unchanged. The rule adds a source-bound selection grant and consumes its phase-scoped effect instead of reevaluating engagement during attacks."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
-    "docs/factions/chaos-daemons.md": {
+    "docs/README.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintain current source policy, contract guidance, generated support inventory and explicit ownership of this diff; historical evidence and live policy validators are unchanged.",
-      "source_obligation": "Official retained Chaos Daemons datasheets, October MFM assignments, and explicit provisional geometry evidence define the admitted roster; Mischief Makers captures eligibility at selection and expires at phase end.",
-      "unchanged_work": "Shared spatial engagement validation, persisting-effect serialization, modifier registry, setup validation and replay algorithms remain unchanged. The rule adds a source-bound selection grant and consumes its phase-scoped effect instead of reevaluating engagement during attacks."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintain current source policy, contract guidance, generated support inventory and explicit ownership of this diff; historical evidence and live policy validators are unchanged.",
-      "source_obligation": "Official retained Chaos Daemons datasheets, October MFM assignments, and explicit provisional geometry evidence define the admitted roster; Mischief Makers captures eligibility at selection and expires at phase end.",
-      "unchanged_work": "Shared spatial engagement validation, persisting-effect serialization, modifier registry, setup validation and replay algorithms remain unchanged. The rule adds a source-bound selection grant and consumes its phase-scoped effect instead of reevaluating engagement during attacks."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -949,135 +548,29 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Add the source-reviewed Nurglings and Seekers catalog closure, October Enhancement assignments, explicit provisional geometry and exact exported roster; preserve the authenticated July catalog and installed MFM data.",
-      "source_obligation": "The supplied v995 roster, retained official datasheet review, existing October MFM authority and explicit geometry evidence define all new source records. Model counts, equipment, Upgrade assignments and 220/220/260 Bloodcrusher prices are preserved.",
-      "unchanged_work": "Catalog construction, MFM point calculation, geometry conversion, hashing and runtime source-index algorithms remain unchanged. New records and generated runtime identity bind this source admission without refreshing historical performance evidence."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
-    "src/warhammer40k_core/adapters/external_contract.py": {
+    "src/warhammer40k_core/ai/player_policy.py": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication"
+        "player-policy-boundary"
       ],
       "selected_families": [],
-      "rationale": "Contract 45.1 admits the existing engine geometry estimate kinds and provisional review status; regenerate client enums and real-session examples without changing schema-validation or serialization algorithms.",
-      "source_obligation": "The owner-approved provisional geometry policy and canonical ModelGeometrySourceEvidence values must be admitted consistently by local and network session creation, with strict engine geometry validation retained.",
-      "unchanged_work": "Only accepted enum values, the compatible bundle version, generated client types and published identities change. Request routing, schema-validator implementation, persistence format and reconstruction/cache algorithms remain unchanged."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
-    "src/warhammer40k_core/core/model_geometry_catalog.py": {
+    "src/warhammer40k_core/ai/runner.py": {
       "category": "rule_semantics",
       "operations": [
-        "sorcerer-admission-exact-07"
+        "player-policy-boundary"
       ],
       "selected_families": [],
-      "rationale": "Add the source-reviewed Nurglings and Seekers catalog closure, October Enhancement assignments, explicit provisional geometry and exact exported roster; preserve the authenticated July catalog and installed MFM data.",
-      "source_obligation": "The supplied v995 roster, retained official datasheet review, existing October MFM authority and explicit geometry evidence define all new source records. Model counts, equipment, Upgrade assignments and 220/220/260 Bloodcrusher prices are preserved.",
-      "unchanged_work": "Catalog construction, MFM point calculation, geometry conversion, hashing and runtime source-index algorithms remain unchanged. New records and generated runtime identity bind this source admission without refreshing historical performance evidence."
-    },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/datasheets.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Mischief Makers must capture enemy engagement at selection to fight and retain its melee hit modifier until phase end. Use existing selection hooks and persisting effects for this rule timing repair.",
-      "source_obligation": "The retained official Nurglings datasheet applies its exclusion and engagement condition when an enemy is selected to fight, before pile-in, and retains the penalty until the phase ends.",
-      "unchanged_work": "Shared exact engagement geometry, modifier dispatch and effect serialization algorithms remain unchanged. This ability adds a source-bound selection grant and consumes the captured phase-scoped effect instead of reevaluating distance during each attack; no generic query/cache optimization is introduced."
-    },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/descriptor_consumption.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Mischief Makers must capture enemy engagement at selection to fight and retain its melee hit modifier until phase end. Use existing selection hooks and persisting effects for this rule timing repair.",
-      "source_obligation": "The retained official Nurglings datasheet applies its exclusion and engagement condition when an enemy is selected to fight, before pile-in, and retains the penalty until the phase ends.",
-      "unchanged_work": "Shared exact engagement geometry, modifier dispatch and effect serialization algorithms remain unchanged. This ability adds a source-bound selection grant and consumes the captured phase-scoped effect instead of reevaluating distance during each attack; no generic query/cache optimization is introduced."
-    },
-    "src/warhammer40k_core/engine/selected_fight_proximity_modifiers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Mischief Makers must capture enemy engagement at selection to fight and retain its melee hit modifier until phase end. Use existing selection hooks and persisting effects for this rule timing repair.",
-      "source_obligation": "The retained official Nurglings datasheet applies its exclusion and engagement condition when an enemy is selected to fight, before pile-in, and retains the penalty until the phase ends.",
-      "unchanged_work": "Shared exact engagement geometry, modifier dispatch and effect serialization algorithms remain unchanged. This ability adds a source-bound selection grant and consumes the captured phase-scoped effect instead of reevaluating distance during each attack; no generic query/cache optimization is introduced."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/__init__.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-record"
-      ],
-      "selected_families": [],
-      "rationale": "Add the source-reviewed Nurglings and Seekers catalog closure, October Enhancement assignments, explicit provisional geometry and exact exported roster; preserve the authenticated July catalog and installed MFM data.",
-      "source_obligation": "The supplied v995 roster, retained official datasheet review, existing October MFM authority and explicit geometry evidence define all new source records. Model counts, equipment, Upgrade assignments and 220/220/260 Bloodcrusher prices are preserved.",
-      "unchanged_work": "Catalog construction, MFM point calculation, geometry conversion, hashing and runtime source-index algorithms remain unchanged. New records and generated runtime identity bind this source admission without refreshing historical performance evidence."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/artifacts/catalog.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-record"
-      ],
-      "selected_families": [],
-      "rationale": "Add the source-reviewed Nurglings and Seekers catalog closure, October Enhancement assignments, explicit provisional geometry and exact exported roster; preserve the authenticated July catalog and installed MFM data.",
-      "source_obligation": "The supplied v995 roster, retained official datasheet review, existing October MFM authority and explicit geometry evidence define all new source records. Model counts, equipment, Upgrade assignments and 220/220/260 Bloodcrusher prices are preserved.",
-      "unchanged_work": "Catalog construction, MFM point calculation, geometry conversion, hashing and runtime source-index algorithms remain unchanged. New records and generated runtime identity bind this source admission without refreshing historical performance evidence."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/artifacts/geometry.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-record"
-      ],
-      "selected_families": [],
-      "rationale": "Add the source-reviewed Nurglings and Seekers catalog closure, October Enhancement assignments, explicit provisional geometry and exact exported roster; preserve the authenticated July catalog and installed MFM data.",
-      "source_obligation": "The supplied v995 roster, retained official datasheet review, existing October MFM authority and explicit geometry evidence define all new source records. Model counts, equipment, Upgrade assignments and 220/220/260 Bloodcrusher prices are preserved.",
-      "unchanged_work": "Catalog construction, MFM point calculation, geometry conversion, hashing and runtime source-index algorithms remain unchanged. New records and generated runtime identity bind this source admission without refreshing historical performance evidence."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/artifacts/source-review.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-record"
-      ],
-      "selected_families": [],
-      "rationale": "Add the source-reviewed Nurglings and Seekers catalog closure, October Enhancement assignments, explicit provisional geometry and exact exported roster; preserve the authenticated July catalog and installed MFM data.",
-      "source_obligation": "The supplied v995 roster, retained official datasheet review, existing October MFM authority and explicit geometry evidence define all new source records. Model counts, equipment, Upgrade assignments and 220/220/260 Bloodcrusher prices are preserved.",
-      "unchanged_work": "Catalog construction, MFM point calculation, geometry conversion, hashing and runtime source-index algorithms remain unchanged. New records and generated runtime identity bind this source admission without refreshing historical performance evidence."
-    },
-    "tests/code_quality/test_generated_faction_docs.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maintain current source policy, contract guidance, generated support inventory and explicit ownership of this diff; historical evidence and live policy validators are unchanged.",
-      "source_obligation": "Official retained Chaos Daemons datasheets, October MFM assignments, and explicit provisional geometry evidence define the admitted roster; Mischief Makers captures eligibility at selection and expires at phase end.",
-      "unchanged_work": "Shared spatial engagement validation, persisting-effect serialization, modifier registry, setup validation and replay algorithms remain unchanged. The rule adds a source-bound selection grant and consumes its phase-scoped effect instead of reevaluating engagement during attacks."
-    },
-    "tests/code_quality/test_unit_model_semantics.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maintain current source policy, contract guidance, generated support inventory and explicit ownership of this diff; historical evidence and live policy validators are unchanged.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-vyper-source-regression-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "tests/factions/chaos_daemons/integration/fixtures/cavalcade_v995_deployment.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     },
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
       "category": "rule_semantics",
@@ -1085,29 +578,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
-      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
-      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
-    },
-    "tools/generate_ability_support_matrix.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-support-report"
-      ],
-      "selected_families": [],
-      "rationale": "Add the source-reviewed Nurglings and Seekers catalog closure, October Enhancement assignments, explicit provisional geometry and exact exported roster; preserve the authenticated July catalog and installed MFM data.",
-      "source_obligation": "The supplied v995 roster, retained official datasheet review, existing October MFM authority and explicit geometry evidence define all new source records. Model counts, equipment, Upgrade assignments and 220/220/260 Bloodcrusher prices are preserved.",
-      "unchanged_work": "Catalog construction, MFM point calculation, geometry conversion, hashing and runtime source-index algorithms remain unchanged. New records and generated runtime identity bind this source admission without refreshing historical performance evidence."
-    },
-    "tools/generate_cavalcade_v995_catalog.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add the source-reviewed Nurglings and Seekers catalog closure, October Enhancement assignments, explicit provisional geometry and exact exported roster; preserve the authenticated July catalog and installed MFM data.",
-      "source_obligation": "The supplied v995 roster, retained official datasheet review, existing October MFM authority and explicit geometry evidence define all new source records. Model counts, equipment, Upgrade assignments and 220/220/260 Bloodcrusher prices are preserved.",
-      "unchanged_work": "Catalog construction, MFM point calculation, geometry conversion, hashing and runtime source-index algorithms remain unchanged. New records and generated runtime identity bind this source admission without refreshing historical performance evidence."
+      "rationale": "Add an exact player policy API and bounded session driver with explicit committed-action failures; maintain current instructions, integration coverage and generated runtime identity without changing engine rules or submission payload families.",
+      "source_obligation": "The authorized PR2 requires player-only observations, actor/request/view binding, explicit actor/family/setup-or-phase/proposal routing, strict engine authority, replay, deterministic configuration identity and bounded diagnostics. The exact v995 mirror is setup-to-Command evidence only.",
+      "unchanged_work": "Existing rules evaluation, geometry/path searches, serialization implementations, checkpoint/replay authority, source indexing, benchmark workloads and cache policies remain unchanged. New policy-side snapshot/binding work is exercised by real-session timing diagnostics and the required serial current-runtime smoke; no full-game speed or optimization claim is made."
     }
   },
   "milestone": "ordinary",
