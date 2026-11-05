@@ -147,6 +147,16 @@
           "after": null
         }
       }
+    },
+    "tests/code_quality/test_performance_policy.py": {
+      "before_sha256": "ed6aba3c0e0f1c1ed3a95c557ac46b5b8678a81b3ba292801073312d270197b3",
+      "after_sha256": "9d0c00f9c06bcbcee258f33510266b182560200d5d442754dd355554bec3dee3",
+      "owners": {
+        "test_operation_map_uses_real_driver_and_owner_paths": {
+          "before": "a87f2b70458ab7eb4dcafb4ce68e2172bbbb096208717a2d913c05252f795e59",
+          "after": "fb54e74149c59eaaeb8ee740d035e106d80d90aa11f6ac1c3f5f897f039d232f"
+        }
+      }
     }
   },
   "rows": {
@@ -243,6 +253,17 @@
       "rationale": "Owner-approved retirement of an obsolete standalone diagnostic. Current caller, dynamic-import, CI and operation-registry audits found no executable consumer or registered live workload family.",
       "source_obligation": "The approved bounded cleanup retires only confirmed obsolete scripts; preserve the Order 32 contexts consumer, historical evidence and all supported gameplay and delivery controls.",
       "unchanged_work": "No packaged runtime, dependency, current benchmark family, fixture, test, budget, compatibility anchor or coverage configuration changes. Current serial smoke and all live semantic/work/cache gates remain required."
+    },
+    "tests/code_quality/test_performance_policy.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci64-provenance-c8a1c41e8f12a86f5176cb3116bad5fc710ca45c9bc40c0f0a8e9230613ff960",
+        "ci67-transaction-c8a1c41e8f12a86f5176cb3116bad5fc710ca45c9bc40c0f0a8e9230613ff960"
+      ],
+      "selected_families": [],
+      "rationale": "The existing operation-map admission control recognizes only the exact seven-path approved retirement operation and authenticates each historical script through its existing hash-pinned Git resolver. Every other missing operation path and every missing live driver remains rejected.",
+      "source_obligation": "The approved bounded cleanup must preserve source truthfulness, historical integrity and all live benchmark and operation registry checks. This changes the admission rule for the exact authorized retirement, not engine gameplay rules.",
+      "unchanged_work": "No runtime, behavioral test, measured workload family, budget or dependency changes. The existing quality node retains all live driver/reference checks and scopes historical source recognition to one exact retirement operation. Both existing mandatory quality-operation mappings remain selected."
     }
   },
   "milestone": "ordinary",
