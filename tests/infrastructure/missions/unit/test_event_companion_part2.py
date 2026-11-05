@@ -92,6 +92,7 @@ from tests.shared.category_migration.phase17j_event_companion import (
     warhammer_event_companion_2026_07_mission_pack,
 )
 from tests.shared.repository_root import REPOSITORY_ROOT
+from warhammer40k_core.engine.objective_control_sources import resolve_objective_control_sources
 
 
 def test_phase17n_light_corner_wall_joints_follow_source_image_registration() -> None:
@@ -497,6 +498,7 @@ def test_phase17n_meatgrinder_exact_layouts_build_all_source_components() -> Non
                 feature.classification.value
             )
             assert feature.source_id is not None
+            assert feature.source_id.startswith(f"{event_source.LAYOUT_SOURCE_PACKAGE_ID}:")
             assert (
                 f"terrain-feature-placement:"
                 f"{source_component.component_id.removeprefix(f'{layout_id}-')}"
@@ -1313,6 +1315,16 @@ def test_current_event_layouts_have_bounded_october_source_and_complete_markers(
     )
     assert artifact.source_package_id == "gw-11e-warhammer-event-companion-layouts-v1-3-2026-10"
     assert len(artifact.layouts) == 45
+    placements = [
+        placement
+        for layout in event_source.battlefield_layout_definitions()
+        for placement in layout.terrain_feature_placements
+    ]
+    assert len(placements) == 1349
+    assert all(
+        placement.source_id.startswith(f"{event_source.LAYOUT_SOURCE_PACKAGE_ID}:")
+        for placement in placements
+    )
     assert sum(len(layout.objectives) for layout in artifact.layouts) == 249
     contacts = [contact for layout in artifact.layouts for contact in layout.terrain_area_contacts]
     assert Counter(contact.kind for contact in contacts) == {"single": 103, "separate": 116}
@@ -1326,6 +1338,47 @@ def test_current_event_layouts_have_bounded_october_source_and_complete_markers(
             assert central[0].terrain_area_ids != central[1].terrain_area_ids
     # Updating diagram geometry must not relabel historical mission-card/base evidence.
     assert event_source.SOURCE_VERSION == "1.1"
+
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    unbound_ids: set[str] = set()
+    for layout in artifact.layouts:
+        expected_unbound = {
+            marker.objective_id for marker in layout.objectives if not marker.terrain_area_ids
+        }
+        if not expected_unbound:
+            continue
+        setup = MissionSetup.from_mission_pack(
+            mission_pack=mission_pack,
+            mission_pool_entry_id=f"mission-{layout.layout_id}",
+            attacker_player_id="player-alpha",
+            attacker_force_disposition_id=layout.force_disposition_pair[0],
+            defender_player_id="player-beta",
+            defender_force_disposition_id=layout.force_disposition_pair[1],
+        )
+        points, components, linked = resolve_objective_control_sources(
+            objective_markers=tuple(
+                marker.to_objective_marker() for marker in setup.objective_markers
+            ),
+            terrain_features=setup.terrain_features,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(),
+            explicit_terrain_objectives=(),
+            objective_terrain_areas=setup.objective_terrain_areas,
+        )
+        assert {marker.objective_marker_id for marker in points} == expected_unbound
+        assert not components
+        assert expected_unbound.isdisjoint(marker.objective_marker_id for marker in linked)
+        unbound_ids.update(expected_unbound)
+    assert unbound_ids == {
+        "take-and-hold-vs-take-and-hold-layout-2-central",
+        "disruption-vs-priority-assets-layout-3-central-01",
+        "priority-assets-vs-priority-assets-layout-1-central-01",
+        "priority-assets-vs-priority-assets-layout-3-central-01",
+    }
+    # Model templates keep their historical owner while current instances cite October.
+    assert all(
+        template.source_id.startswith(f"{event_source.SOURCE_PACKAGE_ID}:")
+        for template in event_source.terrain_area_footprint_templates()
+    )
 
 
 def test_current_layout_viewer_projects_and_renders_all_source_geometry() -> None:

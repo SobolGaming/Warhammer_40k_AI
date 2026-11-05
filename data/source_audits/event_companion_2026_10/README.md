@@ -38,7 +38,7 @@ mirror layout adds `central-02`; the nearest old central retains `central-01`.
 These conventions neither broaden the ordinary loader nor the finite A32 recovery.
 
 Current source observations independently cover 720 outlines, 1349 components,
-249 objectives and 219 visible contacts.103 disjoint Single pairs yield 617 logical
+249 objectives and 219 visible contacts. 103 disjoint Single pairs yield 617 logical
 areas; Separate pairs remain distinct. Single objective bindings expand to all
 physical members of the logical area. Source coordinates and final geometry are
 separate: terrain uses 0.05 inch placement, objectives 0.01 inch, final contacts retain
@@ -56,3 +56,11 @@ source-ID-bound correction. No placement/contact tolerance was expanded.
 
 Source review is not full-game certification. Final tests, type/quality/coverage,
 generated contracts, performance and exact-head remote gates are separate evidence.
+
+Page 10's central marker remains an ordinary point objective: its raw center is
+0.054079 and 0.068049 inches outside the two nearest source outlines. The simplified
+quantized runtime footprint overlaps it by 0.069997 inches, but no component does.
+The supported control-source resolver preserves the ordinary point; it does not
+infer a link from nominal terrain-area overlap. The other three source-unbound
+markers remain ordinary points too. This bounded model overlay is recorded rather
+than changing source binding thresholds or manufacturing a source relationship.

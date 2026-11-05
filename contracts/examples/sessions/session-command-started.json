@@ -1,8 +1,8 @@
 {
   "accepted": true,
   "checkpoint": {
-    "event_cursor": "JkSU13oOKWFGVTEOO7_zXOfexdDq_PCOmAhxFPWzWC_TS8jcUGe2x70O6yAq7mbK",
-    "projection_state_hash": "ca5b140933a5d6ad79645a5165b4b338c61954f1d3e8333ff0a865c138f91776",
+    "event_cursor": "vuv4HIwYIRVYk9yOEZt2LAJEa0Cr_H50F6_cFAHd690gRglwmR4ttfKhJvIEazAs",
+    "projection_state_hash": "278ee3613afb68b0beb4c99f44f7f9c501eb7afc55f5f88630ce6fa7499639ba",
     "session_revision": 1,
     "viewer_player_id": null,
     "visibility_role": "administrator"
@@ -10,8 +10,8 @@
   "command_id": "phase18g-contract-start-000001",
   "committed": true,
   "event_range": {
-    "from_cursor": "ROv2YECQkc2yxDOCXTVQFbaw-O6vZR7WXcJFHerMV4OcHi2TrhynTQF3XOSZhlR3",
-    "to_cursor": "JkSU13oOKWFGVTEOO7_zXOfexdDq_PCOmAhxFPWzWC_TS8jcUGe2x70O6yAq7mbK"
+    "from_cursor": "JTStOyjGu8bz-9A830Pmd_5i4GLIFJXa9PhrM8JerTqG4foDF9FgOfY-uLdClrqi",
+    "to_cursor": "vuv4HIwYIRVYk9yOEZt2LAJEa0Cr_H50F6_cFAHd690gRglwmR4ttfKhJvIEazAs"
   },
   "operation": "start_session",
   "outcome_code": "command_committed",
@@ -19,9 +19,9 @@
   "session": {
     "catalog_id": "phase9a-canonical",
     "created_at": "2026-07-18T20:00:00Z",
-    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:56009daa17965657ab46aa0b839c49f01fdece4b90a322fcf6e7989f228f0caa",
+    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f9ba59c8dca52eb0abc92ebf7df5209011643b51ae2238ee94000e9ed89d9e24",
     "engine_version": "0.1.0",
-    "event_cursor": "JkSU13oOKWFGVTEOO7_zXOfexdDq_PCOmAhxFPWzWC_TS8jcUGe2x70O6yAq7mbK",
+    "event_cursor": "vuv4HIwYIRVYk9yOEZt2LAJEa0Cr_H50F6_cFAHd690gRglwmR4ttfKhJvIEazAs",
     "game_id": "phase18e-contract-session",
     "last_activity_at": "2026-07-18T20:00:00Z",
     "lifecycle_status": {
@@ -33,7 +33,7 @@
       "stage": "setup",
       "status_kind": "waiting_for_decision"
     },
-    "projection_state_hash": "ca5b140933a5d6ad79645a5165b4b338c61954f1d3e8333ff0a865c138f91776",
+    "projection_state_hash": "278ee3613afb68b0beb4c99f44f7f9c501eb7afc55f5f88630ce6fa7499639ba",
     "rules_overlay_ids": [],
     "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
     "ruleset_id": {

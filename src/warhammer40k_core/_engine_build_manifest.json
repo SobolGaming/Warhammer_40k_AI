@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:56009daa17965657ab46aa0b839c49f01fdece4b90a322fcf6e7989f228f0caa",
-  "fingerprint": "56009daa17965657ab46aa0b839c49f01fdece4b90a322fcf6e7989f228f0caa",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f9ba59c8dca52eb0abc92ebf7df5209011643b51ae2238ee94000e9ed89d9e24",
+  "fingerprint": "f9ba59c8dca52eb0abc92ebf7df5209011643b51ae2238ee94000e9ed89d9e24",
   "resource_count": 3212,
   "resources": [
     {
@@ -15020,9 +15020,9 @@
       "sha256": "5582567775ffa248c99b71232a757e004f96206fe7ae0c4464d438228937eb50"
     },
     {
-      "byte_length": 87219,
+      "byte_length": 87226,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py",
-      "sha256": "8920d679654d11c65eba8d243c1a1a8d06b8b7059246c1a51d55539b146744e9"
+      "sha256": "858ad9a9fc07ba0f16c7b722767297413378e3fc558e507b9f31c656c3dc9709"
     },
     {
       "byte_length": 76485,

@@ -100,7 +100,7 @@ def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> N
 
     assert mission_pack.mission_pack_id == "11e-warhammer-event-companion-2026-07"
     assert source_package.source_commit_or_import_hash == (
-        "ce5795fa09755d9874f1df6e2625e7ffc53731d46bf4b7f2084ae6b8412e95ac"
+        "ae6214659782de27c34a7039ae3bdc4e5ba6befc31ded3c61bd5b3c40a765574"
     )
     assert source_package.to_payload() == {
         "edition_id": "warhammer_40000_11th",

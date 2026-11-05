@@ -73,7 +73,7 @@ DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-EXPECTED_SOURCE_IMPORT_HASH = "ce5795fa09755d9874f1df6e2625e7ffc53731d46bf4b7f2084ae6b8412e95ac"
+EXPECTED_SOURCE_IMPORT_HASH = "ae6214659782de27c34a7039ae3bdc4e5ba6befc31ded3c61bd5b3c40a765574"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -1766,7 +1766,7 @@ def _terrain_feature_area_placements(
     return terrain_feature_placements_from_specs(
         layout_id=layout_id,
         source_layout_id=layout_source.source_layout_id,
-        source_package_id=SOURCE_PACKAGE_ID,
+        source_package_id=LAYOUT_SOURCE_PACKAGE_ID,
         terrain_areas=terrain_areas,
         specs=layout_source.terrain_feature_placement_specs,
     )

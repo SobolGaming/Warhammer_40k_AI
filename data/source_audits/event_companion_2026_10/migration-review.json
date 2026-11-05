@@ -510,5 +510,15 @@
     },
     "logical_areas": 617
   },
-  "qualification": "Source and independently reconstructed final geometry checked; complete local/remote exact-head gates are recorded separately, not asserted here."
+  "qualification": "Source and independently reconstructed final geometry checked; complete local/remote exact-head gates are recorded separately, not asserted here.",
+  "page10_unbound_objective_model_limit": {
+    "objective_id": "take-and-hold-vs-take-and-hold-layout-2-central",
+    "source_nearest_footprint_distances_inches": [
+      0.0540786103,
+      0.0680488069
+    ],
+    "source_binding_threshold_inches": 0.05,
+    "nominal_runtime_footprint_penetration_inches": 0.06999705,
+    "disposition": "Retain independently observed source-unbound ordinary point objective. The simplified quantized area polygon overlaps the marker, but no physical component contains it; actual objective-control resolution preserves the point objective. Do not infer a terrain binding from the nominal area alone. Existing source threshold, solver and physical-model assumptions are unchanged."
+  }
 }
