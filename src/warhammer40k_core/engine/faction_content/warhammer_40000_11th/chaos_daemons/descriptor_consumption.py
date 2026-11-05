@@ -83,8 +83,11 @@ def descriptor_consumption_records() -> tuple[CatalogDescriptorConsumptionRecord
         CatalogDescriptorConsumptionRecord(
             ability_id=datasheets.NURGLINGS_MISCHIEF_MAKERS_ABILITY_ID,
             source_kind=CatalogAbilitySourceKind.DATASHEET,
-            semantic_categories=("datasheet.engagement_range.melee_hit_roll_modifier",),
-            runtime_consumer_ids=(datasheets.MISCHIEF_MAKERS_HIT_MODIFIER_ID,),
+            semantic_categories=("datasheet.selected_to_fight.melee_hit_roll_modifier",),
+            runtime_consumer_ids=(
+                datasheets.MISCHIEF_MAKERS_MODIFIER.selection_binding().hook_id,
+                datasheets.MISCHIEF_MAKERS_HIT_MODIFIER_ID,
+            ),
         ),
         CatalogDescriptorConsumptionRecord(
             ability_id=datasheets.POXBRINGER_FECULENT_DESPAIR_ABILITY_ID,

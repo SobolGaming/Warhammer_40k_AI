@@ -167,13 +167,13 @@ export interface components {
             /** @constant */
             coordinate_frame: "model_centered_z_up"; document_reference: string | null; evidence_id: string;
             /** @enum {string} */
-            evidence_kind: "official_base_size" | "official_model_profile" | "manual_measurement" | "crowd_sourced_measurement";
+            evidence_kind: "official_base_size" | "official_model_profile" | "manual_measurement" | "crowd_sourced_measurement" | "user_supplied_estimate" | "unverified_estimate";
             /** @enum {string} */
             measurement_kind: "footprint" | "support_base" | "z_offset" | "height";
             /** @enum {string} */
             origin: "footprint_center_table_surface" | "support_base_center_table_surface";
             /** @enum {string} */
-            reviewer_status: "accepted" | "needs_review";
+            reviewer_status: "accepted" | "needs_review" | "provisional_estimate";
             source_dimensions: components["schemas"]["create-session--geometry_dimensions.schema"]; source_id: string;
             /** @enum {string} */
             source_units: "millimeters" | "inches"; url: string | null;

@@ -83,7 +83,6 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.physical_engagement import (
     scenario_physically_engaged_enemy_rules_unit_ids,
-    scenario_rules_units_are_physically_engaged,
 )
 from warhammer40k_core.engine.profile_modifiers import profile_with_delta
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
@@ -96,6 +95,10 @@ from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
+)
+from warhammer40k_core.engine.selected_fight_proximity_modifiers import (
+    EnemySelectedFightHitModifier,
+    captured_enemy_selected_fight_hit_modifier,
 )
 from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlContext,
@@ -170,6 +173,12 @@ DELUGE_OBJECTIVE_CONTROL_MODIFIER_ID = (
 MISCHIEF_MAKERS_HIT_MODIFIER_ID = (
     "warhammer_40000_11th:chaos_daemons:datasheet:nurglings:mischief_makers"
 )
+MISCHIEF_MAKERS_MODIFIER = EnemySelectedFightHitModifier(
+    ability_id=NURGLINGS_MISCHIEF_MAKERS_ABILITY_ID,
+    modifier_id=MISCHIEF_MAKERS_HIT_MODIFIER_ID,
+    operand=-1,
+    excluded_keyword_tokens=("titanic",),
+)
 FECULENT_DESPAIR_HOOK_ID = (
     "warhammer_40000_11th:chaos_daemons:datasheet:poxbringer:feculent_despair"
 )
@@ -196,6 +205,7 @@ def runtime_contribution() -> RuntimeContentContribution:
 
     return RuntimeContentContribution(
         contribution_id=CONTRIBUTION_ID,
+        fight_unit_selected_hook_bindings=(MISCHIEF_MAKERS_MODIFIER.selection_binding(),),
         hit_roll_modifier_bindings=(
             HitRollModifierBinding(
                 modifier_id=KHORNE_HIT_MODIFIER_ID,
@@ -384,27 +394,7 @@ def deluge_objective_control_modifier(
 
 
 def mischief_makers_hit_roll_modifier(context: HitRollModifierContext) -> int:
-    if type(context) is not HitRollModifierContext:
-        raise GameLifecycleError("Mischief Makers requires a HitRollModifierContext.")
-    if context.source_phase is not BattlePhase.FIGHT:
-        return 0
-    if context.weapon_profile.range_profile.kind is not RangeProfileKind.MELEE:
-        return 0
-    attacking_rules_unit = rules_unit_view_by_id(
-        state=context.state,
-        unit_instance_id=context.attacking_unit_instance_id,
-    )
-    if _rules_unit_has_keywords(attacking_rules_unit, required_keywords=("titanic",)):
-        return 0
-    return (
-        -1
-        if _enemy_rules_unit_within_source_engagement_range(
-            state=context.state,
-            target_unit_instance_id=context.attacking_unit_instance_id,
-            ability_id=NURGLINGS_MISCHIEF_MAKERS_ABILITY_ID,
-        )
-        else 0
-    )
+    return captured_enemy_selected_fight_hit_modifier(MISCHIEF_MAKERS_MODIFIER, context)
 
 
 def feculent_despair_battle_shock_modifiers(
@@ -812,56 +802,6 @@ def _enemy_source_aura_player_ids(
                 source_player_ids.add(army.player_id)
                 break
     return tuple(sorted(source_player_ids))
-
-
-def _enemy_rules_unit_within_source_engagement_range(
-    *,
-    state: object,
-    target_unit_instance_id: str,
-    ability_id: str,
-) -> bool:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Chaos Daemons enemy engagement lookup requires GameState.")
-    if state.battlefield_state is None:
-        raise GameLifecycleError(
-            "Chaos Daemons enemy engagement lookup requires battlefield_state."
-        )
-    target_rules_unit = rules_unit_view_by_id(
-        state=state,
-        unit_instance_id=target_unit_instance_id,
-    )
-    if not rules_unit_has_present_model(
-        state=state,
-        rules_unit=target_rules_unit,
-    ):
-        return False
-    scenario = battlefield_scenario_for_state(state=state)
-    for army in _chaos_daemons_armies(state):
-        if army.player_id == target_rules_unit.owner_player_id:
-            continue
-        for source_unit in army.units:
-            if not _unit_has_datasheet_ability(source_unit, ability_id):
-                continue
-            source_rules_unit = rules_unit_view_by_id(
-                state=state,
-                unit_instance_id=source_unit.unit_instance_id,
-            )
-            if not _component_unit_has_placed_alive_model(
-                state=state,
-                rules_unit=source_rules_unit,
-                component_unit=source_unit,
-            ):
-                continue
-            if scenario_rules_units_are_physically_engaged(
-                scenario=scenario,
-                ruleset_descriptor=state.runtime_ruleset_descriptor(),
-                first_unit_instance_id=source_rules_unit.unit_instance_id,
-                second_unit_instance_id=target_rules_unit.unit_instance_id,
-            ):
-                return True
-    return False
 
 
 def _infected_outbreak_sticky_state(

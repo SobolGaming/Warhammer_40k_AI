@@ -1,0 +1,80 @@
+{
+  "schema": "cavalcade-v995-provisional-geometry-v1",
+  "policy": "docs/FACTION_RULES_SOURCE_POLICY.md#geometry-authority",
+  "origin": "footprint_center_table_surface",
+  "measurement_origin": "Bottom of support base at table surface",
+  "uncertainty": "Unverified representative approximation; pose, assembly and decorative parts vary. No validated error bound or tournament geometry certification.",
+  "replacement_policy": "Replace this active version with exact-sculpt measurements when available; preserve provenance and provisional status in persistence and replay.",
+  "heights": [
+    {
+      "datasheet_id": "000002582",
+      "model_name": "Bloodthirster",
+      "height_mm": 200,
+      "configuration": "Modern plastic Bloodthirster, low pose with great axe; highest intact wing or weapon",
+      "evidence_kind": "crowd_sourced_measurement",
+      "reviewer_status": "provisional_estimate",
+      "reference": "https://www.reddit.com/r/ageofsigmar/comments/v0zdiv/looking_to_convert_a_bloodthirster_whats_the/",
+      "method": "Explicit provisional disposition of the existing crowd-sourced candidate; no independent physical verification."
+    },
+    {
+      "datasheet_id": "000001120",
+      "model_name": "Lord of Change",
+      "height_mm": 185,
+      "configuration": "Modern plastic Lord of Change with staff and rod; highest intact wing or staff",
+      "evidence_kind": "crowd_sourced_measurement",
+      "reviewer_status": "provisional_estimate",
+      "reference": "https://www.dakkadakka.com/dakkaforum/posts/list/745548.page",
+      "method": "Explicit provisional disposition of the existing crowd-sourced candidate; no independent physical verification."
+    },
+    {
+      "datasheet_id": "000001132",
+      "model_name": "Plagueridden",
+      "height_mm": 40,
+      "configuration": "Standard plastic Plaguebearer kit champion on 32 mm base; highest horn or weapon",
+      "evidence_kind": "crowd_sourced_measurement",
+      "reviewer_status": "provisional_estimate",
+      "reference": "https://www.reddit.com/r/ageofsigmar/comments/wh19l0/plaguebearer_height/",
+      "method": "Explicit provisional disposition of the existing crowd-sourced candidate; no independent physical verification."
+    },
+    {
+      "datasheet_id": "000001132",
+      "model_name": "Plaguebearers",
+      "height_mm": 40,
+      "configuration": "Standard plastic Plaguebearer infantry on 32 mm bases; representative intact body/weapon; ornamental carriers require later exact variant measurement",
+      "evidence_kind": "crowd_sourced_measurement",
+      "reviewer_status": "provisional_estimate",
+      "reference": "https://www.reddit.com/r/ageofsigmar/comments/wh19l0/plaguebearer_height/",
+      "method": "Explicit provisional disposition of the existing crowd-sourced candidate; no independent physical verification."
+    },
+    {
+      "datasheet_id": "000001133",
+      "model_name": "Nurgling Swarms",
+      "height_mm": 45,
+      "configuration": "Modern plastic stacked Nurgling swarm on 40 mm round base; highest horn in the assembled tower",
+      "evidence_kind": "unverified_estimate",
+      "reviewer_status": "provisional_estimate",
+      "reference": "official-pdf:chaos-daemons:pages-80-81",
+      "method": "Agent-selected nominal simulation estimate for the identified plastic sculpt, informed by the retained official illustration; no physical measurement or reliable image scale. The number is an explicit provisional assumption, never an inferred default."
+    },
+    {
+      "datasheet_id": "000001145",
+      "model_name": "Heartseeker",
+      "height_mm": 75,
+      "configuration": "Standard plastic Seeker kit champion on 60 by 35.5 mm oval base; highest horn or claw",
+      "evidence_kind": "unverified_estimate",
+      "reviewer_status": "provisional_estimate",
+      "reference": "official-pdf:chaos-daemons:pages-110-111",
+      "method": "Agent-selected nominal simulation estimate for the identified plastic sculpt, informed by the retained official illustration; no physical measurement or reliable image scale. The number is an explicit provisional assumption, never an inferred default."
+    },
+    {
+      "datasheet_id": "000001145",
+      "model_name": "Seekers",
+      "height_mm": 95,
+      "configuration": "Standard plastic Seeker kit on 60 by 35.5 mm oval base including icon/instrument representative configuration; highest ornament",
+      "evidence_kind": "unverified_estimate",
+      "reviewer_status": "provisional_estimate",
+      "reference": "official-pdf:chaos-daemons:pages-110-111",
+      "method": "Agent-selected nominal simulation estimate for the identified plastic sculpt, informed by the retained official illustration; no physical measurement or reliable image scale. The number is an explicit provisional assumption, never an inferred default."
+    }
+  ]
+}

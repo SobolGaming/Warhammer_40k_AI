@@ -36,6 +36,7 @@ class GeometryEvidenceKind(StrEnum):
     MANUAL_MEASUREMENT = "manual_measurement"
     CROWD_SOURCED_MEASUREMENT = "crowd_sourced_measurement"
     USER_SUPPLIED_ESTIMATE = "user_supplied_estimate"
+    UNVERIFIED_ESTIMATE = "unverified_estimate"
 
 
 class GeometryMeasurementKind(StrEnum):
@@ -257,6 +258,11 @@ class ModelGeometrySourceEvidence:
             and self.reviewer_status is GeometryReviewStatus.ACCEPTED
         ):
             raise ModelGeometryCatalogError("A user-supplied estimate cannot be verified evidence.")
+        if (
+            self.evidence_kind is GeometryEvidenceKind.UNVERIFIED_ESTIMATE
+            and self.reviewer_status is GeometryReviewStatus.ACCEPTED
+        ):
+            raise ModelGeometryCatalogError("An unverified estimate cannot be verified evidence.")
         if self.reviewer_status is GeometryReviewStatus.PROVISIONAL_ESTIMATE and (
             self.evidence_kind
             in {
