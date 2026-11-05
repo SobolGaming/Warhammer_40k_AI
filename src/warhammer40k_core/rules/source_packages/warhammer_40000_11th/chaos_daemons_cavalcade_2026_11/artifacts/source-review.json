@@ -1,0 +1,51 @@
+{
+  "schema": "cavalcade-v995-source-review-v1",
+  "official_pdf": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+  "official_pdf_sha256": "818f7ef144691b9eef6b3c5b5d0a39793690af5a958037b7055215e6675e6a2c",
+  "historical_catalog_id": "core-v2:chaos-daemons-roster:2026-07",
+  "points_source_package_id": "gw-11e-mfm-2026-10",
+  "datasheets": [
+    {
+      "datasheet_id": "000001133",
+      "name": "Nurglings",
+      "pages": [
+        80,
+        81
+      ],
+      "official_text": "NURGLINGS\nKEYWORDS: Swarm, Battleline, Chaos, Daemon, Nurgle, Nurglings\nMELEE WEAPONS\nRANGE\nA\nWS\nS\nAP\nD\nDiseased claws and teeth [LETHAL HITS]\nMelee\n4\n5+\n2\n0\n1\nFACTION KEYWORDS: \nLegiones Daemonica\nABILITIES\nCORE: Deep Strike, Infiltrators\nFACTION: The Shadow of Chaos\nMischief Makers: Each time an enemy unit (excluding Titanic \nunits) within Engagement Range of one or more units with \nthis ability is selected to fight, until the end of the phase, \neach time a model in that enemy unit makes a melee attack, \nsubtract 1 from the Hit roll.\nINVULNERABLE SAVE\n5+\nM\nT\nSV\nW\nLD\nOC\n5\"\n3\n7+\n4\n8+\n0\n\nWARGEAR OPTIONS\n\t\u25a0\u0007None\nUNIT COMPOSITION\n\t\u25a03-6 Nurgling Swarms\nEvery model is equipped with: diseased claws and teeth.\nNURGLINGS\nNurglings are malicious plague mites that pour across the battlefield \nin giggling masses. These foul imps might seem almost amusing from \na distance, yet the illusion is shattered as the Nurglings spill forth to \nengulf their screaming victims in a rancid avalanche of needle fangs, \nfilthy talons and bloated flesh.\nKEYWORDS: Swarm, Battleline, Chaos, Daemon, Nurgle, Nurglings\nFACTION KEYWORDS: \nLegiones Daemonica\n",
+      "official_text_sha256": "49ca5e6a3519594080ed93ed5011f9ba315b9330062ca4c4d67bfc565df558fa",
+      "reviewed_fields": [
+        "abilities",
+        "composition",
+        "datasheet_keywords",
+        "faction_keywords",
+        "model_characteristics",
+        "mustering_options",
+        "wargear_options",
+        "weapon_profiles"
+      ],
+      "input_payload_sha256": "006ad1d2679e6286797d635473e3f813e1f58cda929c2d6a170c484822595b53"
+    },
+    {
+      "datasheet_id": "000001145",
+      "name": "Seekers",
+      "pages": [
+        110,
+        111
+      ],
+      "official_text": "SEEKERS\nKEYWORDS: Mounted, Chaos, Daemon, Slaanesh, Seekers\nMELEE WEAPONS\nRANGE\nA\nWS\nS\nAP\nD\nLashing tongue [EXTRA ATTACKS, LETHAL HITS]\nMelee\n2\n4+\n4\n0\n1\nSlashing claws [DEVASTATING WOUNDS]\nMelee\n3\n3+\n4\n-1\n1\nFACTION KEYWORDS: \nLegiones Daemonica\nABILITIES\nCORE: Deep Strike, Scouts 9\"\nFACTION: The Shadow of Chaos\nUnholy Speed: You can re-roll Advance and Charge rolls made \nfor this unit.\nWARGEAR ABILITIES\nDaemonic Icon: Models in the bearer\u2019s unit have a Leadership \ncharacteristic of 6+.\nInstrument of Chaos: Add 1 to Charge rolls made for the \nbearer\u2019s unit.\nINVULNERABLE SAVE\n5+\nM\nT\nSV\nW\nLD\nOC\n14\"\n4\n7+\n2\n7+\n1\n\nWARGEAR OPTIONS\n\t\u25a0\u00071 Seeker that is not equipped with a daemonic icon can be equipped with 1 instrument of Chaos. \n\t\u25a0\u00071 Seeker that is not equipped with an instrument of Chaos can be equipped with 1 daemonic icon. \nUNIT COMPOSITION\n\t\u25a01 Heartseeker\n\t\u25a04-9 Seekers\nEvery model is equipped with: lashing tongue; \nslashing claws.\nSEEKERS\nSat astride swift Steeds of Slaanesh, Seekers pursue their mortal prey \nwith obsessive delight. Even the fastest of mortal vehicles cannot \noutpace these vicious entities, while those who stand and fight soon \nfind their ranks smashed asunder by charging shock cavalry drawn \nfrom the darkest depths of nightmare.\nKEYWORDS: Mounted, Chaos, Daemon, Slaanesh, Seekers\nFACTION KEYWORDS: \nLegiones Daemonica\n",
+      "official_text_sha256": "73273766405e451038613a258196028ee8b2f0f4ae162144de21c556bb2b6222",
+      "reviewed_fields": [
+        "abilities",
+        "composition",
+        "datasheet_keywords",
+        "faction_keywords",
+        "model_characteristics",
+        "mustering_options",
+        "wargear_options",
+        "weapon_profiles"
+      ],
+      "input_payload_sha256": "e938ba44e442be6a94a2aabaca079bd6ec2af654fa1229a0ddf618bff2ec3209"
+    }
+  ]
+}

@@ -72,10 +72,12 @@ def test_generated_faction_documents_share_one_section_structure(filename: str) 
 def test_chaos_daemons_document_scopes_checked_in_roster_evidence() -> None:
     document = _generated_faction_documents()["chaos-daemons.md"]
 
-    assert "reprices to 2,075 points under the July MFM" in document
-    assert "correctly rejected as 75 points over the 2,000-point limit" in document
-    assert "accepted Bloodcrushers, Bloodhunter, and Be'lakor geometry records" in document
-    assert "those four diagnostics" in document
+    assert "declares 2,000 points in nine units and 39 models" in document
+    assert "declared unit prices match the October MFM" in document
+    assert "220, 220, and 260 points for the upgraded Bloodcrusher units" in document
+    assert "catalog reconciles Nurglings and Seekers" in document
+    assert "seven provisional height estimates" in document
+    assert "strict mirror regression deploys all 78 models" in document
     assert "Cavalcade of Chaos and Shadow Legion runtime bundles" in document
     assert "does not claim `FULL_GAME_SUPPORTED` or `REPLAY_VERIFIED`" in document
 

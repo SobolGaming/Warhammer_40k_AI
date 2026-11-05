@@ -167,7 +167,9 @@
                 "official_base_size",
                 "official_model_profile",
                 "manual_measurement",
-                "crowd_sourced_measurement"
+                "crowd_sourced_measurement",
+                "user_supplied_estimate",
+                "unverified_estimate"
               ],
               "type": "string"
             },
@@ -183,7 +185,7 @@
               "type": "string"
             },
             "reviewer_status": {
-              "enum": ["accepted", "needs_review"],
+              "enum": ["accepted", "needs_review", "provisional_estimate"],
               "type": "string"
             },
             "source_dimensions": {

@@ -479,6 +479,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:chaos_daemons:datasheet:keeper_of_secrets:daemon_lord_of_slaanesh` | Daemon Lord Of Slaanesh |
 | `warhammer_40000_11th:chaos_daemons:datasheet:lord_of_change:daemon_lord_of_tzeentch` | Daemon Lord of Tzeentch |
 | `warhammer_40000_11th:chaos_daemons:datasheet:nurglings:mischief_makers` | Mischief Makers |
+| `warhammer_40000_11th:chaos_daemons:datasheet:nurglings:mischief_makers:selected-to-fight` | Selected To Fight |
 | `warhammer_40000_11th:chaos_daemons:datasheet:plaguebearers:infected_outbreak` | Infected Outbreak |
 | `warhammer_40000_11th:chaos_daemons:datasheet:poxbringer:feculent_despair` | Feculent Despair |
 | `warhammer_40000_11th:chaos_daemons:datasheet:rotigus:deluge_of_nurgle:movement` | Movement |

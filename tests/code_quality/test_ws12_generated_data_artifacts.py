@@ -172,6 +172,9 @@ _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
     "app_core_rules_hidden_2026_08_09": (
         "owner_transcription_with_project_authoritative_app_mirror_source"
     ),
+    "chaos_daemons_cavalcade_2026_11": (
+        "reviewed_roster_catalog_with_official_pdf_mfm_and_provisional_geometry"
+    ),
     "chaos_daemons_roster_2026_07": "official_roster_source",
     "court_of_slaughter_anvanth_2026_08": "official_roster_source",
     "core_stratagems_2026_08": (

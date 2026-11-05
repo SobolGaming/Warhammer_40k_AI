@@ -1,5 +1,15 @@
 # Adapter Decision Contract
 
+## Provisional model geometry (45.1)
+
+Session creation accepts the engine's `user_supplied_estimate` and
+`unverified_estimate` geometry evidence kinds and `provisional_estimate` review
+status. The same explicit dimensions and source evidence pass through local and
+network admission. The engine still rejects missing dimensions, blocked review
+records, and estimates labelled as accepted evidence under the
+[geometry source policy](FACTION_RULES_SOURCE_POLICY.md#geometry-authority).
+Existing payload-family versions and decision submissions are unchanged.
+
 ## Section 25 public roster disclosure (44.5)
 
 The existing viewer-scoped GameView adds optional `public_army_rosters`. It is

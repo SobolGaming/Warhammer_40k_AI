@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d7fb3773556b4290625da1027776c8ab796b22c370aedd04ac8ce92f423da543",
-  "fingerprint": "d7fb3773556b4290625da1027776c8ab796b22c370aedd04ac8ce92f423da543",
-  "resource_count": 3214,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8616d79fac026931c4c241c10c601149c3800762a537a6c93ac94184b4410062",
+  "fingerprint": "8616d79fac026931c4c241c10c601149c3800762a537a6c93ac94184b4410062",
+  "resource_count": 3219,
   "resources": [
     {
       "byte_length": 113,
@@ -67,7 +67,7 @@
     {
       "byte_length": 6280,
       "path": "warhammer40k_core/adapters/external_contract.py",
-      "sha256": "e72ee19e8f437fd5a6516c1a78e3cda6b515e3089dad30528500f0a1fc61a93d"
+      "sha256": "42cdd96179521b7ddb8608f815c736c6a1542f2435079b6294ac42652c38752c"
     },
     {
       "byte_length": 2445,
@@ -215,9 +215,9 @@
       "sha256": "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d"
     },
     {
-      "byte_length": 13557,
+      "byte_length": 13662,
       "path": "warhammer40k_core/contracts/schemas/create-session.schema.json",
-      "sha256": "405bb4a554ba48c1948b88161703da7a55ce430e4af4463d00662c917087edcd"
+      "sha256": "457c1834d249ca7dfd2f2d58ae2aeeb69654b67c76364384c6b43f73bbfef2c1"
     },
     {
       "byte_length": 3341,
@@ -525,9 +525,9 @@
       "sha256": "fc0c87a7236ea21fbc31ca9b186d6caada8b12f12eb2c7aba359a7070c489d29"
     },
     {
-      "byte_length": 48472,
+      "byte_length": 48788,
       "path": "warhammer40k_core/core/model_geometry_catalog.py",
-      "sha256": "1579960d284f646952b263fef997e1e52b779980e83252d5b7d3f6f5d9802746"
+      "sha256": "800a0a86cc1e9ab2a31a44d383d1ee01fd6db5d278aa4c12ad7e46d800049707"
     },
     {
       "byte_length": 12710,
@@ -4460,14 +4460,14 @@
       "sha256": "cf5ff683e5a192db86ce7bbb3862ee47a4a649c5dc46e085415003270b0e560c"
     },
     {
-      "byte_length": 58169,
+      "byte_length": 55999,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/datasheets.py",
-      "sha256": "5b2a2a0a1da0bf63a2ecb738625b1bd12a493d8b2672918c7c9320fb0b3c1ae9"
+      "sha256": "f4e6d46d05532194884ced40bdc14870bb87012c4d427604814493fbb6c5bb8a"
     },
     {
-      "byte_length": 4555,
+      "byte_length": 4667,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/descriptor_consumption.py",
-      "sha256": "3cb473b77ee532bee61a724a7b5a370fa29f43390c909448d80ad59e6ef41192"
+      "sha256": "2d5c8678bf374ca04e4cb58fced453cbbf50ef36faf5181a07376f469cbe79bf"
     },
     {
       "byte_length": 172,
@@ -12770,6 +12770,11 @@
       "sha256": "66872a560dcca98344c2d3c0fe0bd95349e4a024b55b56f27771f8fb167f1939"
     },
     {
+      "byte_length": 6775,
+      "path": "warhammer40k_core/engine/selected_fight_proximity_modifiers.py",
+      "sha256": "004a87c3cf68d45a3df6ddbfdde66f5ea6909f2f15287a3f19b1d8f7fa3b7f9d"
+    },
+    {
       "byte_length": 1000,
       "path": "warhammer40k_core/engine/selected_target_context.py",
       "sha256": "d82f177dd4a258dcd9e4d2c023000de348c8b0ddacfcd21046b201d3019688a2"
@@ -14263,6 +14268,26 @@
       "byte_length": 5139,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/app_core_rules_hidden_2026_08_09/artifacts/hidden.json",
       "sha256": "a63c25996e95c03f0953fc3841e47228d6d9533cdb4ef34a8e2324bc29d0f902"
+    },
+    {
+      "byte_length": 2767,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/__init__.py",
+      "sha256": "d81e9614226a7cf7a2aa66764bb6bdfa0668cdc5d625a1b099cf3cae8e166f1f"
+    },
+    {
+      "byte_length": 210351,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/artifacts/catalog.json",
+      "sha256": "d174bea9f2adb2a0d9b319fa3cfe0a0f43ef2157161df78b59ec90e3fc5bc8b2"
+    },
+    {
+      "byte_length": 4837,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/artifacts/geometry.json",
+      "sha256": "55d7d1fd3ef8260dcef6b3fb7b3345ecbf8db3f14747a38cdadb0e64ec380fef"
+    },
+    {
+      "byte_length": 4286,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/artifacts/source-review.json",
+      "sha256": "f49e9bf5064f4377d222d5be2d69ae996798efb5a790ac3e043d4381a11d54ef"
     },
     {
       "byte_length": 10518,

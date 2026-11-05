@@ -149,7 +149,8 @@ exact sculpt/configuration, origin and endpoint, source/method, uncertainty and
 replacement policy in its linked versioned evidence document. Preserve its
 `provisional_estimate` review status in catalog, persistence and replay payloads;
 do not relabel it as verified/official evidence. User-relayed AI estimates use
-`user_supplied_estimate`, not `manual_measurement`. Such estimates cannot use the
+`user_supplied_estimate`, not `manual_measurement`. Agent-selected nominal
+dimensions use `unverified_estimate`. Both estimate kinds cannot use the
 `accepted` status. Existing `needs_review` entries remain blocked until explicitly
 dispositioned; missing/unknown dimensions have no fallback. The Sorcerer example
 is [the provisional geometry record](../data/source_audits/sorcerer_2026_11/geometry.json).

@@ -33987,6 +33987,40 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "cavalcade-v995-roster-admission": {
+      "paths": [
+        "data/army_lists/cavalcade-shadow-bloodthirster.json",
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/datasheets.py",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py",
+        "tests/factions/chaos_daemons/integration/fixtures/cavalcade_v995_deployment.json",
+        "tools/generate_cavalcade_v995_catalog.py",
+        "ci/test_shards/*",
+        "src/warhammer40k_core/engine/selected_fight_proximity_modifiers.py",
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/descriptor_consumption.py",
+        "contracts/schemas/create-session.schema.json",
+        "contracts/compatibility-policy.md"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "setup",
+        "fight"
+      ],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "cavalcade-v995-support-report": {
+      "paths": [
+        "tools/generate_ability_support_matrix.py"
+      ],
+      "owners": [
+        "_chaos_daemons_semantic_snapshot_markdown"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
