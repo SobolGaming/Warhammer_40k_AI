@@ -426,11 +426,11 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "19c902affb7b4dbcc98327b7ec6b3c2cb6ae6909b63d32e40c84fd61b03c411a",
-      "after_sha256": "7a1b0be026f615cdba81ab7087e823a7d8642c35a4e8c9aac0ecaf4e9d1eb487",
+      "after_sha256": "7adb2a8e382f4e6cbf091da3cb1a8f0ac60de2476f3ac908f7d0f58c799f30eb",
       "owners": {
         "@document": {
           "before": "19c902affb7b4dbcc98327b7ec6b3c2cb6ae6909b63d32e40c84fd61b03c411a",
-          "after": "7a1b0be026f615cdba81ab7087e823a7d8642c35a4e8c9aac0ecaf4e9d1eb487"
+          "after": "7adb2a8e382f4e6cbf091da3cb1a8f0ac60de2476f3ac908f7d0f58c799f30eb"
         }
       }
     },
