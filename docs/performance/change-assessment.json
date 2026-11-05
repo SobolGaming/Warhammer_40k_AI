@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "b35dcdb774f27eaeef825f9ed408464445be5023",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8616d79fac026931c4c241c10c601149c3800762a537a6c93ac94184b4410062",
-  "operation_map_sha256": "ed9b2b98fd7c29bf87d346d3b3120b0064127d0e71c9596a6831cf86d5d685a2",
+  "operation_map_sha256": "e1c508e8b629f250c95e85c52a17c9975f86fa49b11e71e49f002e010bca0acf",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "b997a50ddad61a3273c4460b74cc445ef4f87c66c29546b710797a1416168307",
@@ -326,11 +326,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "50cc77eb1c7c4408e67657aa4197baf84ecf3a2e7718d8a75964933900dd949b",
-      "after_sha256": "ffdbb3ad5cee396ebfc1fac036e3f3095df5f1b2c3f51c2063806ea7ba2d4aea",
+      "after_sha256": "75fb3b56d96fb86b452afaf9c12d528fa2841756c96360648cb1a802f5257356",
       "owners": {
         "@document": {
           "before": "50cc77eb1c7c4408e67657aa4197baf84ecf3a2e7718d8a75964933900dd949b",
-          "after": "ffdbb3ad5cee396ebfc1fac036e3f3095df5f1b2c3f51c2063806ea7ba2d4aea"
+          "after": "75fb3b56d96fb86b452afaf9c12d528fa2841756c96360648cb1a802f5257356"
         }
       }
     },
@@ -485,6 +485,30 @@
         "test_chaos_daemons_document_scopes_checked_in_roster_evidence": {
           "before": "3c2a7a71d24b2c07fef4d75cd7b6237e8c5c0d1c54e0e5338d28c1e1aed1ef39",
           "after": "a56beafd134262dc1c7d7f53a7433140f659ed2ad9edb9ddfa5f6a298477b846"
+        }
+      }
+    },
+    "tests/code_quality/test_unit_model_semantics.py": {
+      "before_sha256": "5351de42735fec6c3a71a4a05fcb9c706027a3aef0c8263573b79a937dcd7f9d",
+      "after_sha256": "bc0cb27b47c7162bde2606bd9501a9c5d0a5dee2740ef5ff03af7a20c80ddedf",
+      "owners": {
+        "@module": {
+          "before": "0097cf982f138703c4afc02afaa335255b91a5d8b603706a9a32ba5197aa48bd",
+          "after": "e71dde4b401e5b1220ad4e0538b7654fe0f1a19164078c56988d22282e8330c8"
+        },
+        "test_content_and_stratagem_engagement_consumers_keep_living_authority_separate": {
+          "before": "ccb0dfc7a0c0320f82f29cf6712b022bac8834bbb95cd541989b6a13b7200d57",
+          "after": "976bc52993c15f27a6546265c71369c81250114e4e56f5487bfaec260820878c"
+        }
+      }
+    },
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
+      "before_sha256": "96a7a23a1aeed115aa7dbb97559735a4552f35f1d5c3657106736a3c706187e9",
+      "after_sha256": "fa4f094d73c08b236fc892c92614f48f2a7f62f8fb4cd9202ecf67a5af26e2c8",
+      "owners": {
+        "@module": {
+          "before": "48c5fc6e8f0517e153bc9407c23b4911cba5b0dfec8b19f45c5e49a28c2312d5",
+          "after": "1af657fffe2e0039df5f64408529cb25098158a51a0fa14ae9a778a961169863"
         }
       }
     },
@@ -942,7 +966,7 @@
     "src/warhammer40k_core/core/model_geometry_catalog.py": {
       "category": "rule_semantics",
       "operations": [
-        "cavalcade-v995-roster-admission"
+        "sorcerer-admission-exact-07"
       ],
       "selected_families": [],
       "rationale": "Add the source-reviewed Nurglings and Seekers catalog closure, October Enhancement assignments, explicit provisional geometry and exact exported roster; preserve the authenticated July catalog and installed MFM data.",
@@ -1027,6 +1051,24 @@
       "source_obligation": "Official retained Chaos Daemons datasheets, October MFM assignments, and explicit provisional geometry evidence define the admitted roster; Mischief Makers captures eligibility at selection and expires at phase end.",
       "unchanged_work": "Shared spatial engagement validation, persisting-effect serialization, modifier registry, setup validation and replay algorithms remain unchanged. The rule adds a source-bound selection grant and consumes its phase-scoped effect instead of reevaluating engagement during attacks."
     },
+    "tests/code_quality/test_unit_model_semantics.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maintain current source policy, contract guidance, generated support inventory and explicit ownership of this diff; historical evidence and live policy validators are unchanged.",
+      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
+      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
+    },
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-regression-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Validate the exact strict v995 mirror roster, source-layout deployment, network admission, provisional evidence and selection-boundary timing. Generated inventory and shard durations describe the selected behavioral tests.",
+      "source_obligation": "Each player must field the supplied nine-unit, 39-model, 2000-point export independently through strict domain construction and ordinary facade submissions; regression fixtures never waive legality or required geometry.",
+      "unchanged_work": "This adds semantic regressions and updates their generated selection/profile metadata. Runtime benchmark drivers, measured performance workloads, cache counters, live smoke cases and every retained historical measurement remain unchanged."
+    },
     "tests/factions/chaos_daemons/integration/fixtures/cavalcade_v995_deployment.json": {
       "category": "rule_semantics",
       "operations": [
@@ -1050,7 +1092,7 @@
     "tools/generate_ability_support_matrix.py": {
       "category": "rule_semantics",
       "operations": [
-        "cavalcade-v995-roster-admission"
+        "cavalcade-v995-support-report"
       ],
       "selected_families": [],
       "rationale": "Add the source-reviewed Nurglings and Seekers catalog closure, October Enhancement assignments, explicit provisional geometry and exact exported roster; preserve the authenticated July catalog and installed MFM data.",

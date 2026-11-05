@@ -79,6 +79,7 @@ FIGHT_MOVEMENT_MODE_AUTHORITY = (
 FIGHT_GEOMETRY = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_geometry.py"
 FIGHT_RESOLUTION = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_resolution.py"
 PHYSICAL_ENGAGEMENT = ROOT / "src" / "warhammer40k_core" / "engine" / "physical_engagement.py"
+SELECTED_FIGHT_PROXIMITY = ENGINE / "selected_fight_proximity_modifiers.py"
 CHARGE_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "charge.py"
 MOVEMENT_GEOMETRY = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement_geometry.py"
@@ -1005,31 +1006,35 @@ def test_content_and_stratagem_engagement_consumers_keep_living_authority_separa
     assert "battlefield_scenario_for_state" in _direct_call_names(opportunity_scenario)
     assert "present_destroyed_model_ids" in ast.unparse(opportunity_scenario)
 
-    for path, function_name, physical_call in (
+    for path, function_name, living_call, physical_call in (
         (
-            CHAOS_DAEMONS_DATASHEETS,
-            "_enemy_rules_unit_within_source_engagement_range",
+            SELECTED_FIGHT_PROXIMITY,
+            "capture_enemy_selected_fight_modifier",
+            "active_ability_model_ids_for_unit",
             "scenario_rules_units_are_physically_engaged",
         ),
         (
             CHAOS_DAEMONS_DATASHEETS,
             "_enemy_rules_unit_ids_within_source_engagement_range",
+            "rules_unit_has_present_model",
             "scenario_physically_engaged_enemy_rules_unit_ids",
         ),
         (
             SHADOW_LEGION_ENHANCEMENTS,
             "_unit_is_enemy_within_mantle_of_gloom",
+            "rules_unit_has_present_model",
             "scenario_rules_units_are_physically_engaged",
         ),
         (
             SHADOW_LEGION_ENHANCEMENTS,
             "_enemy_rules_unit_ids_within_engagement_range",
+            "rules_unit_has_present_model",
             "scenario_physically_engaged_enemy_rules_unit_ids",
         ),
     ):
         consumer = _function_node(path=path, function_name=function_name)
         calls = _direct_call_names(consumer)
-        assert "rules_unit_has_present_model" in calls
+        assert living_call in calls
         assert physical_call in calls
 
     corsair_engagement = _function_node(

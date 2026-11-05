@@ -33995,9 +33995,7 @@
         "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py",
         "tests/factions/chaos_daemons/integration/fixtures/cavalcade_v995_deployment.json",
         "tools/generate_cavalcade_v995_catalog.py",
-        "tools/generate_ability_support_matrix.py",
         "ci/test_shards/*",
-        "src/warhammer40k_core/core/model_geometry_catalog.py",
         "src/warhammer40k_core/engine/selected_fight_proximity_modifiers.py",
         "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/descriptor_consumption.py",
         "contracts/schemas/create-session.schema.json",
@@ -34010,6 +34008,17 @@
         "setup",
         "fight"
       ],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "cavalcade-v995-support-report": {
+      "paths": [
+        "tools/generate_ability_support_matrix.py"
+      ],
+      "owners": [
+        "_chaos_daemons_semantic_snapshot_markdown"
+      ],
+      "families": [],
       "sensitive": false,
       "mandatory": false
     }
