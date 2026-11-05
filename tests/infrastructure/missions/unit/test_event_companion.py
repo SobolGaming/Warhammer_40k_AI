@@ -89,6 +89,8 @@ from tests.shared.category_migration.phase17j_event_companion import (
     warhammer_event_companion_2026_07_mission_pack,
 )
 from tests.shared.repository_root import REPOSITORY_ROOT
+from tests.support.section02_fixtures import Section02Definitions
+from tests.support.section14_fixtures import section14_definitions
 
 
 def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> None:
@@ -100,7 +102,7 @@ def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> N
 
     assert mission_pack.mission_pack_id == "11e-warhammer-event-companion-2026-07"
     assert source_package.source_commit_or_import_hash == (
-        "ae6214659782de27c34a7039ae3bdc4e5ba6befc31ded3c61bd5b3c40a765574"
+        "4832f73e470caa4d0906fef06af3f05f53b00a68bbfdbb3d2c639eec6e323fb0"
     )
     assert source_package.to_payload() == {
         "edition_id": "warhammer_40000_11th",
@@ -1016,7 +1018,7 @@ def test_phase17n_battlefield_artifact_is_source_hashed_and_strict() -> None:
         )
 
     stale_hash_payload = json.loads(raw)
-    stale_hash_payload["layouts"][0]["objectives"][0]["x_inches"] = 8.59
+    stale_hash_payload["package_hash"] = "0" * 64
     with pytest.raises(ValueError, match="package hash is stale"):
         event_layouts.validate_battlefield_artifact_bytes(json.dumps(stale_hash_payload).encode())
 
@@ -1030,7 +1032,7 @@ def test_phase17n_battlefield_artifact_is_source_hashed_and_strict() -> None:
             separators=(",", ":"),
         ).encode()
     ).hexdigest()
-    with pytest.raises(ValueError, match="drifted from its reviewed pin"):
+    with pytest.raises(ValueError, match="illustration and semantic reference evidence drifted"):
         event_layouts.validate_battlefield_artifact_bytes(
             json.dumps(rehashed_coordinate_payload).encode()
         )
@@ -1349,3 +1351,135 @@ __all__ += ["polygon_overlap_area", "subprocess", "sys", "terrain_area_classific
 __all__ += ["terrain_area_visibility", "terrain_feature_placements_from_specs"]
 __all__ += ["terrain_visibility_areas_from_placements", "validate_mission_setup_source_layout"]
 __all__ += ["visibility_polygon_within_union"]
+
+
+@pytest.mark.parametrize(
+    ("page", "inside", "outside"),
+    [
+        (10, ((19.6, 26.4), (19.4, 33.4)), (28.4, 30.6)),
+        (44, ((25.4, 27.6), (18.6, 27.6)), (21.2, 37.4)),
+        (51, ((19.6, 33.6), (19.6, 26.6)), (29.4, 31.6)),
+        (53, ((25.4, 27.6), (18.6, 27.6)), (21.8, 37.4)),
+    ],
+)
+def test_displaced_event_glyphs_control_both_single_members(
+    section14_definitions: Section02Definitions,
+    page: int,
+    inside: tuple[tuple[float, float], ...],
+    outside: tuple[float, float],
+) -> None:
+    from tests.support.section14_fixtures import context, objective_state
+    from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
+    from warhammer40k_core.engine.objective_control import (
+        ObjectiveControlRecord,
+        resolve_objective_control,
+    )
+    from warhammer40k_core.engine.objective_geometry import (
+        ObjectiveGeometry,
+        measure_model_to_objective,
+    )
+    from warhammer40k_core.engine.objective_geometry_sources import linked_objective_geometry
+
+    layout = next(
+        row for row in event_layouts.battlefield_artifact().layouts if row.source_page == page
+    )
+    source = next(row for row in layout.objectives if row.role == "central")
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id=f"mission-{layout.layout_id}",
+        attacker_player_id="owner",
+        attacker_force_disposition_id=layout.force_disposition_pair[0],
+        defender_player_id="opponent",
+        defender_force_disposition_id=layout.force_disposition_pair[1],
+    )
+    link = next(
+        row
+        for row in setup.objective_terrain_areas
+        if row.objective_marker_id == source.objective_id
+    )
+    assert len(link.terrain_area_ids) == 2
+    marker = next(
+        row.to_objective_marker()
+        for row in setup.objective_markers
+        if row.objective_marker_id == source.objective_id
+    )
+    geometry = linked_objective_geometry(link, terrain_areas=setup.terrain_areas)
+    for position, expected in (*((position, True) for position in inside), (outside, False)):
+        # Native-definition measurement checkpoint; no deployment or earlier movement is asserted.
+        state, unit, _ = objective_state(section14_definitions, x=position[0], enemy_x=42)
+        battlefield = state.battlefield_state
+        assert battlefield is not None
+        placement = battlefield.unit_placement_by_id(unit.unit_instance_id)
+        moved = placement.with_model_placements(
+            tuple(row.with_pose(Pose.at(*position)) for row in placement.model_placements)
+        )
+        state.replace_battlefield_state(battlefield.with_unit_placement(moved))
+        native = context(state)
+        linked = replace(
+            native,
+            objective_markers=(),
+            objective_terrain_areas=(link,),
+            objective_terrain_area_markers=(marker,),
+            terrain_areas=setup.terrain_areas,
+            terrain_features=setup.terrain_features,
+        )
+        record = resolve_objective_control(linked)
+        result = record.result_by_objective_id(source.objective_id)
+        assert (result.controlled_by_player_id == "owner") is expected
+        assert (
+            ObjectiveControlRecord.from_payload(json.loads(json.dumps(record.to_payload())))
+            == record
+        )
+        model = geometry_model_for_placement(
+            model=unit.own_models[0], placement=moved.model_placements[0]
+        )
+        assert (
+            measure_model_to_objective(model=model, objective=geometry).within_control_range
+            is expected
+        )
+        old_glyph = replace(
+            marker, x_inches=source.illustration_x_inches, y_inches=source.illustration_y_inches
+        )
+        assert (
+            measure_model_to_objective(
+                model=model, objective=ObjectiveGeometry.from_marker(old_glyph)
+            ).within_control_range
+            is not expected
+        )
+
+
+@pytest.mark.parametrize("page", [10, 44, 51, 53])
+@pytest.mark.parametrize("mutation", ["missing", "partial", "wrong"])
+def test_displaced_event_objective_rejects_missing_or_wrong_reviewed_group(
+    page: int, mutation: str
+) -> None:
+    validation = importlib.import_module(
+        "warhammer40k_core.rules.source_packages.warhammer_40000_11th."
+        "event_companion_layouts_2026_06.event_companion_full_artifact_validation"
+    )
+
+    artifact = event_layouts.battlefield_artifact()
+    layout = next(row for row in artifact.layouts if row.source_page == page)
+    marker = next(row for row in layout.objectives if row.role == "central")
+    wrong = next(
+        row.area_id for row in layout.terrain_areas if row.area_id not in marker.terrain_area_ids
+    )
+    ids = (
+        ()
+        if mutation == "missing"
+        else marker.terrain_area_ids[:1]
+        if mutation == "partial"
+        else (wrong,)
+    )
+    changed = msgspec.structs.replace(marker, terrain_area_ids=ids)
+    bad_layout = msgspec.structs.replace(
+        layout, objectives=tuple(changed if row == marker else row for row in layout.objectives)
+    )
+    bad = msgspec.structs.replace(
+        artifact, layouts=tuple(bad_layout if row == layout else row for row in artifact.layouts)
+    )
+    with pytest.raises(ValueError, match="exact reviewed logical terrain group"):
+        validation.validate_event_companion_battlefield_artifact(bad)
+
+
+__all__ += ["section14_definitions"]

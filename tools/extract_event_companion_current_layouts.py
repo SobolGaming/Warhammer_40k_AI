@@ -43,7 +43,13 @@ def main() -> None:
     work = args.work_dir.resolve()
     work.mkdir(parents=True, exist_ok=True)
     env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1", "EVENT_LAYOUT_AUDIT_WORK_DIR": str(work)}
-    for script in ("observe.py", "correspond.py", "contacts.py", "extract.py"):
+    for script in (
+        "observe.py",
+        "correspond.py",
+        "contacts.py",
+        "extract.py",
+        "associate_objectives.py",
+    ):
         subprocess.run(
             [sys.executable, "-B", str(ROOT / "tools/event_companion_layout_source" / script)],
             env=env,
@@ -67,6 +73,12 @@ def main() -> None:
     output.write_bytes(raw)
     if args.check and raw != (SOURCE_DIR / output.name).read_bytes():
         raise ValueError("Current reviewed layout extraction differs from raw-source reproduction.")
+    association_path = ROOT / (
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "event_companion_layouts_2026_06/artifacts/event-companion-objective-associations.json"
+    )
+    if args.check and (work / association_path.name).read_bytes() != association_path.read_bytes():
+        raise ValueError("Reviewed runtime objective associations are stale.")
     print(f"Source extraction {'verified' if args.check else 'written'}: {output}")
 
 

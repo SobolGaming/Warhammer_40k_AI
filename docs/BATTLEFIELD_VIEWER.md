@@ -90,27 +90,30 @@ vertical middle guides. The six source template dividers are `(0,26)-(44,34)`,
 `(0,15)-(44,45)` respectively.
 
 The canonical generated artifact has SHA-256
-`577464ade3daf3a940257f8f385a09abff69e6de740198f157b91e1aed35dbec`
+`5e9dfcef9d91e78ac51ea9019e736f250246e7adf1e0258484f109190cea030a`
 and package hash
-`f917b72458420bec1616f3d13ac2b7fd68c795976f7212a70d947be76f57324c`.
+`be19e97db9124271cae2dba2cdc8ef76992526b67c11505cf7c10c00435d36a7`.
 Its reviewed page-8 key plus pages-9-53 layout extraction has SHA-256
-`94476b9c2b3756ac49e5045d31b4cfc577451ceeda87aee01df5431ae457f111`;
+`9c008361396fee33af9ed1f2352531b62c7c016d189c8984917c9c65224e91d6`;
 the generator also pins the stable runtime identity map at
 `742ab841d1ec1e696f4a5c0e3f2e8c251203d510bf1da85fb30af88023cb64f3`.
 
 All 219 visible current layout-page contact glyphs are retained at 0.05 inch
 source precision: 103 Single and 116 Separate. Final runtime contacts retain at
-most0.05inch gap and 1e-6 square-inch numerical overlap. Single joins share one rules
+most 0.05 inch gap and 1e-6 square-inch numerical overlap. Single joins share one rules
 identity; Separate pairs remain distinct. Neither fills source-drawn open board.
 Only the unchanged page 36 join retains its explicit 0.011834688335 inch exact normal
 correction. The changed page 46 source no longer uses that exception. Measured
 source gaps and final runtime gaps remain separate. See the
 [current source review](../data/source_audits/event_companion_2026_10/README.md)
 for all 45 source correspondences and retained/retired modeling exceptions.
-Objective centers retain the source vectors' finer 0.01-inch precision.
-When a source-linked objective falls on one physical member of a Single pair,
-its runtime terrain-objective binding expands to every physical member of that
-logical terrain area; open-field objectives remain unbound.
+All 249 objectives bind to explicitly reviewed terrain groups, including 21
+Single pairs (270 physical member links). Runtime labels use 0.01-inch project
+reference points inside the linked union. Three displaced illustration centers
+on pages 44, 51 and 53 require adjusted references; page 10 stays unchanged.
+Measured PDF glyph coordinates remain separate artifact evidence. The labels do
+not define range or control: both use the complete linked terrain geometry.
+
 
 The 14 shared terrain archetypes define recurring component footprints and
 wall/floor geometry once for reuse by every layout. The page 9 exception has 69

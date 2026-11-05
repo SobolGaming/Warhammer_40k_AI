@@ -277,18 +277,13 @@ def _objective_requirements(
     source_layout_id = layout["layout_id"]
     result: list[tuple[Point, tuple[str, ...]]] = []
     for objective in layout["objectives"]:
-        source_ids = tuple(objective["nearest_area_ids"])
-        distances = tuple(objective["distances_to_area_polygons_inches"])
-        if distances:
-            if len(source_ids) != len(distances):
-                raise ValueError("Objective source-distance inventory drifted.")
-            source_ids = tuple(
-                area_id
-                for area_id, distance in zip(source_ids, distances, strict=True)
-                if float(distance) <= _GRID + 1e-9
+        source_ids = tuple(objective["runtime_reference_support_area_ids"])
+        if not source_ids or not set(source_ids) <= set(
+            objective["semantic_source_terrain_area_ids"]
+        ):
+            raise ValueError(
+                "Objective reference support must belong to its reviewed terrain group."
             )
-        elif layout["source_pdf_page_number"] not in {24, 25, 26}:
-            raise ValueError("Non-Meatgrinder objectives require source distances.")
         canonical_ids = tuple(
             _canonical_area_id(
                 area_id,
@@ -298,7 +293,7 @@ def _objective_requirements(
             for area_id in source_ids
         )
         if canonical_ids:
-            x_inches, y_inches = objective["battlefield_center_quantized_0_01_inches"]
+            x_inches, y_inches = objective["runtime_reference_inches"]
             result.append((Point(float(x_inches), float(y_inches)), canonical_ids))
     return tuple(result)
 

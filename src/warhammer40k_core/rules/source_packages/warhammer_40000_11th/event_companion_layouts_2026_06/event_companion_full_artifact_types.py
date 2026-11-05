@@ -160,6 +160,9 @@ class ObjectiveArtifact(msgspec.Struct, frozen=True, forbid_unknown_fields=True)
     y_inches: float
     terrain_area_ids: tuple[str, ...]
     source_symbol_kind: str
+    illustration_x_inches: float
+    illustration_y_inches: float
+    runtime_reference_basis: str
 
 
 class TerrainAreaContactArtifact(msgspec.Struct, frozen=True, forbid_unknown_fields=True):

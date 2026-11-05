@@ -202,11 +202,11 @@ Wazbom Blastajet base row remain separate.
   glyphs on all 45 pages rather than inferred from the horizontal or vertical
   battlefield middle guides.
   The reviewed page-8 key plus pages-9-53 layout extraction SHA-256 is
-  `94476b9c2b3756ac49e5045d31b4cfc577451ceeda87aee01df5431ae457f111`,
+  `9c008361396fee33af9ed1f2352531b62c7c016d189c8984917c9c65224e91d6`,
   the generated artifact SHA-256 is
-  `577464ade3daf3a940257f8f385a09abff69e6de740198f157b91e1aed35dbec`,
+  `5e9dfcef9d91e78ac51ea9019e736f250246e7adf1e0258484f109190cea030a`,
   and its canonical package hash is
-  `f917b72458420bec1616f3d13ac2b7fd68c795976f7212a70d947be76f57324c`.
+  `be19e97db9124271cae2dba2cdc8ef76992526b67c11505cf7c10c00435d36a7`.
   The generator separately pins the stable runtime identity map at
   `742ab841d1ec1e696f4a5c0e3f2e8c251203d510bf1da85fb30af88023cb64f3`.
   The generated `event-companion-battlefields.json` artifact records source

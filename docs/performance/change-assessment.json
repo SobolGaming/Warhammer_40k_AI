@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "75765b6abc1f7205527b4e9c7414ed2fd694021a",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f9ba59c8dca52eb0abc92ebf7df5209011643b51ae2238ee94000e9ed89d9e24",
-  "operation_map_sha256": "b20a061c5b54b0c175377e6cd3005107b13ac189f169cd5214bfd4938e71f7ac",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:03903bdcdebb313af4ff38d345372ac96a9a608b1089271e78242a7f57d9d54c",
+  "operation_map_sha256": "b91e3bdeb99342f1640c007ca5747d3e83af374eadf851d627f3e482a5735b55",
   "changes": {
     "README.md": {
       "before_sha256": "d0950aff1592421b310fe06d4ff455900374fadad7021e0bba06e3db5860ff96",
@@ -16,251 +16,261 @@
     },
     "contracts/examples/decisions/families/submit_movement_proposal.json": {
       "before_sha256": "3d59999d54dbba2e660da76329782f513872be5703192fd72d4dfa71752cb62a",
-      "after_sha256": "79bc8d02fed30b8f376ef12f9ba3a649fac98c166e88057b7bc114fdb4529357",
+      "after_sha256": "b70fee80b6a628ea48ce8adc72f4e74c073e94a6f9ceed180c9907942925b24f",
       "owners": {
         "@document": {
           "before": "3d59999d54dbba2e660da76329782f513872be5703192fd72d4dfa71752cb62a",
-          "after": "79bc8d02fed30b8f376ef12f9ba3a649fac98c166e88057b7bc114fdb4529357"
+          "after": "b70fee80b6a628ea48ce8adc72f4e74c073e94a6f9ceed180c9907942925b24f"
         }
       }
     },
     "contracts/examples/events/initial-player-a.json": {
       "before_sha256": "4d65546e701e0e39db97c8a08433265dd77b767cc5c856674acaf6da111407fe",
-      "after_sha256": "727325407fee2643ec5304e6fbc77a10e75171d76c902f245f5474980d3c1a62",
+      "after_sha256": "e631ef47daabf7ab116b5ba5d3d7c8a035b7fc3299e0f5bbf5e19f012b8de170",
       "owners": {
         "@document": {
           "before": "4d65546e701e0e39db97c8a08433265dd77b767cc5c856674acaf6da111407fe",
-          "after": "727325407fee2643ec5304e6fbc77a10e75171d76c902f245f5474980d3c1a62"
+          "after": "e631ef47daabf7ab116b5ba5d3d7c8a035b7fc3299e0f5bbf5e19f012b8de170"
         }
       }
     },
     "contracts/examples/events/initial-player-b.json": {
       "before_sha256": "5539a69ab2cce62d5b36564898c65013586d8f896627d247d2a005aafe39cabb",
-      "after_sha256": "e04b2d5b76be6bc7a3af635ff9bdd66d61e7c11064c1fdcab6dd82a8c296954f",
+      "after_sha256": "556be2fb41199c3254c9e57b918ae6dcac599715f7c6297d2e69120b21a9bdac",
       "owners": {
         "@document": {
           "before": "5539a69ab2cce62d5b36564898c65013586d8f896627d247d2a005aafe39cabb",
-          "after": "e04b2d5b76be6bc7a3af635ff9bdd66d61e7c11064c1fdcab6dd82a8c296954f"
+          "after": "556be2fb41199c3254c9e57b918ae6dcac599715f7c6297d2e69120b21a9bdac"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "d582cedaaeb0f89c48f892383828182d7ce06182fa34a0d4efb127659513950f",
-      "after_sha256": "51f7d6c132ec713370cffc41def71de3fcd0551f07fcc939e72dba674cd6ff7e",
+      "after_sha256": "67ae3ef8187a8907c71952b1d341f12f06d4931c1eb2fafab2df2eb117edc438",
       "owners": {
         "@document": {
           "before": "d582cedaaeb0f89c48f892383828182d7ce06182fa34a0d4efb127659513950f",
-          "after": "51f7d6c132ec713370cffc41def71de3fcd0551f07fcc939e72dba674cd6ff7e"
+          "after": "67ae3ef8187a8907c71952b1d341f12f06d4931c1eb2fafab2df2eb117edc438"
         }
       }
     },
     "contracts/examples/projections/hidden_secondary_redaction_view.json": {
       "before_sha256": "f6fe8a9f508ce842ecd259214a6efe076b11bc042c4a9e95acc3e144e6905d18",
-      "after_sha256": "bcaa6bd88511985c040fad1cde3804ac1eba26e140275e80dab3246d97960326",
+      "after_sha256": "8c59642f3f9eec9e413958d9581c9911fc3db8eef78bd9df115b8e9167134063",
       "owners": {
         "@document": {
           "before": "f6fe8a9f508ce842ecd259214a6efe076b11bc042c4a9e95acc3e144e6905d18",
-          "after": "bcaa6bd88511985c040fad1cde3804ac1eba26e140275e80dab3246d97960326"
+          "after": "8c59642f3f9eec9e413958d9581c9911fc3db8eef78bd9df115b8e9167134063"
         }
       }
     },
     "contracts/examples/projections/initial_setup_view_player1.json": {
       "before_sha256": "ec1d5b1f62e92cc1555ba9a7bf67bc5625f6ce7a106e8b0e34a7da208c6377f8",
-      "after_sha256": "d97ff350d18a858a7cdb5d3e9bed1fc729b2418ea8e83148ac6b219afa2bdb81",
+      "after_sha256": "252cc3499e0f2d9877c08faeba3fdfbb037a7455dfcf6b6d79a7faec128d4040",
       "owners": {
         "@document": {
           "before": "ec1d5b1f62e92cc1555ba9a7bf67bc5625f6ce7a106e8b0e34a7da208c6377f8",
-          "after": "d97ff350d18a858a7cdb5d3e9bed1fc729b2418ea8e83148ac6b219afa2bdb81"
+          "after": "252cc3499e0f2d9877c08faeba3fdfbb037a7455dfcf6b6d79a7faec128d4040"
         }
       }
     },
     "contracts/examples/projections/initial_setup_view_player2.json": {
       "before_sha256": "b68bd26e846821e29b7a3fc92a6ee522c93d05aaac7b7a066abe8ba308049895",
-      "after_sha256": "774bd28a259368d74cd6b3c0718ffdafb65c76969af57f88461b834ac397a9e6",
+      "after_sha256": "9dc58a85c285c4a209269257256d1be0b59a403459d9a9e7679f30d5cdfe1752",
       "owners": {
         "@document": {
           "before": "b68bd26e846821e29b7a3fc92a6ee522c93d05aaac7b7a066abe8ba308049895",
-          "after": "774bd28a259368d74cd6b3c0718ffdafb65c76969af57f88461b834ac397a9e6"
+          "after": "9dc58a85c285c4a209269257256d1be0b59a403459d9a9e7679f30d5cdfe1752"
         }
       }
     },
     "contracts/examples/projections/post_deployment_view.json": {
       "before_sha256": "7bead41aae8d0396bfdf9e00edeb72a96d32f22a90fe59354ab211e0e4c4f14d",
-      "after_sha256": "e5956dfa34bb553d3b47d2b121102fa60a004af6501150175dc20ab2ca139f39",
+      "after_sha256": "c87776d825cb02ba61bb33f31389c25bf3c12832050806a99054863472403f3a",
       "owners": {
         "@document": {
           "before": "7bead41aae8d0396bfdf9e00edeb72a96d32f22a90fe59354ab211e0e4c4f14d",
-          "after": "e5956dfa34bb553d3b47d2b121102fa60a004af6501150175dc20ab2ca139f39"
+          "after": "c87776d825cb02ba61bb33f31389c25bf3c12832050806a99054863472403f3a"
         }
       }
     },
     "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_a.json": {
       "before_sha256": "94204ffc9e604329609c790a391da22cb17b1f477fed742af9c173305dddf336",
-      "after_sha256": "e0a2aff2b0637b10916739968aa8d327a0725cf060d09f18abe55dad54b5b499",
+      "after_sha256": "a99383a0b62c967a6bca3565eb31c9014f9760d0cc4d481df8eb2ff67c4d0cd2",
       "owners": {
         "@document": {
           "before": "94204ffc9e604329609c790a391da22cb17b1f477fed742af9c173305dddf336",
-          "after": "e0a2aff2b0637b10916739968aa8d327a0725cf060d09f18abe55dad54b5b499"
+          "after": "a99383a0b62c967a6bca3565eb31c9014f9760d0cc4d481df8eb2ff67c4d0cd2"
         }
       }
     },
     "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_b.json": {
       "before_sha256": "e947fcdd76cc1a7116717dfb36348589408d6a85e94e58259edfbfdf733a14b4",
-      "after_sha256": "7fea8747ce43f32fcc8dc745046603592e8be2285c0050829ca2d5f6475e0838",
+      "after_sha256": "f60d20e2c570b36f49d9cb97e315106e036784a9097776289ca28a071de7507d",
       "owners": {
         "@document": {
           "before": "e947fcdd76cc1a7116717dfb36348589408d6a85e94e58259edfbfdf733a14b4",
-          "after": "7fea8747ce43f32fcc8dc745046603592e8be2285c0050829ca2d5f6475e0838"
+          "after": "f60d20e2c570b36f49d9cb97e315106e036784a9097776289ca28a071de7507d"
         }
       }
     },
     "contracts/examples/projections/visible_modifier_datacard_view.json": {
       "before_sha256": "7d31b4e09fb645b1fdc638c7d35f62b8574d6944ca887c506b8cdeaea8126ca3",
-      "after_sha256": "1619eef7978405d433705b02a0862566c70b20e707cefc42dd5df13c4dc2da35",
+      "after_sha256": "2a52f1e1d60d4bb3d2889d488ce44ccb41aebd5c1526c68709b0f15d6046b39c",
       "owners": {
         "@document": {
           "before": "7d31b4e09fb645b1fdc638c7d35f62b8574d6944ca887c506b8cdeaea8126ca3",
-          "after": "1619eef7978405d433705b02a0862566c70b20e707cefc42dd5df13c4dc2da35"
+          "after": "2a52f1e1d60d4bb3d2889d488ce44ccb41aebd5c1526c68709b0f15d6046b39c"
         }
       }
     },
     "contracts/examples/replay-metadata.json": {
       "before_sha256": "3fe6c803bd8835daba9932197bf49ec3f1e7ac6ac019f9d4d55db7709269d4e8",
-      "after_sha256": "260a6ce882dabf7f6a57a000e69d84dd51bf916733ee716007fdf3d5f7477fe0",
+      "after_sha256": "5b10fbdd345433a3efd22c40ff6cf3d98d620734998a90be05846656bbdaa007",
       "owners": {
         "@document": {
           "before": "3fe6c803bd8835daba9932197bf49ec3f1e7ac6ac019f9d4d55db7709269d4e8",
-          "after": "260a6ce882dabf7f6a57a000e69d84dd51bf916733ee716007fdf3d5f7477fe0"
+          "after": "5b10fbdd345433a3efd22c40ff6cf3d98d620734998a90be05846656bbdaa007"
         }
       }
     },
     "contracts/examples/sessions/create-session.json": {
       "before_sha256": "98764e6b2532b5985d001593303e5f89a438bb6c2745eec034e60dc882b0561b",
-      "after_sha256": "ea673160664017f4e8f0c93c341c2adb51a3ef56ab2548e24ea09584154f4c2c",
+      "after_sha256": "9fe30f6ae3c7ca427d75b33166ea05c3ce1efcca9f39a01100dc5acc62f36bf2",
       "owners": {
         "@document": {
           "before": "98764e6b2532b5985d001593303e5f89a438bb6c2745eec034e60dc882b0561b",
-          "after": "ea673160664017f4e8f0c93c341c2adb51a3ef56ab2548e24ea09584154f4c2c"
+          "after": "9fe30f6ae3c7ca427d75b33166ea05c3ce1efcca9f39a01100dc5acc62f36bf2"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "5d48262b74b5c98d777acba620c6b4f5dab63a65aa97febf52807aba757747a0",
-      "after_sha256": "9cef3d61745712f6e2866efaf753a757c60f13f2b73ed194cdd3482ba2f6aaf2",
+      "after_sha256": "d7078107e02b36a7cf28154e0224df6068bad551981fb9b36d4420e3534fd9ad",
       "owners": {
         "@document": {
           "before": "5d48262b74b5c98d777acba620c6b4f5dab63a65aa97febf52807aba757747a0",
-          "after": "9cef3d61745712f6e2866efaf753a757c60f13f2b73ed194cdd3482ba2f6aaf2"
+          "after": "d7078107e02b36a7cf28154e0224df6068bad551981fb9b36d4420e3534fd9ad"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "399c6c446ee111235274acc5369b91e5a2f5f8ddbdd3b4e5c8dc86914e5d411c",
-      "after_sha256": "99b9ca4441c2fb06abdcfe99e6c4a74916a38e9c47e209287fa406234796d099",
+      "after_sha256": "827fd7ad1e85e372d31437129612ef118df712646ed0ab1445636166d8853ff2",
       "owners": {
         "@document": {
           "before": "399c6c446ee111235274acc5369b91e5a2f5f8ddbdd3b4e5c8dc86914e5d411c",
-          "after": "99b9ca4441c2fb06abdcfe99e6c4a74916a38e9c47e209287fa406234796d099"
+          "after": "827fd7ad1e85e372d31437129612ef118df712646ed0ab1445636166d8853ff2"
         }
       }
     },
     "contracts/examples/sessions/session-create.json": {
       "before_sha256": "17a4491eec3ab0fd099acb17b2bd9f9b50e7bcdba901ab7d85f93fb3bf463a8a",
-      "after_sha256": "13d2edcc9b1dc1a5526f883a70b52c2e466914abdbdabd35634b9a1a0810615f",
+      "after_sha256": "7209810fa1751dd69ea0ab45296f21e19a347e1a7a72fef6fc7f67a0d047e9c4",
       "owners": {
         "@document": {
           "before": "17a4491eec3ab0fd099acb17b2bd9f9b50e7bcdba901ab7d85f93fb3bf463a8a",
-          "after": "13d2edcc9b1dc1a5526f883a70b52c2e466914abdbdabd35634b9a1a0810615f"
+          "after": "7209810fa1751dd69ea0ab45296f21e19a347e1a7a72fef6fc7f67a0d047e9c4"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "3da6af042e4f16fa49b412a2e88c5b0c0be4a18e73df7a8218c557292ce30ba3",
-      "after_sha256": "5eb9d3354d35e6d55400419fa36c2fa9a7152f27013ffa48b2fd8a17a2bee268",
+      "after_sha256": "1a97c79e8dd8feb6dc7094ad1c21385a786cc637be0e3e79e42ab7789f1cd326",
       "owners": {
         "@document": {
           "before": "3da6af042e4f16fa49b412a2e88c5b0c0be4a18e73df7a8218c557292ce30ba3",
-          "after": "5eb9d3354d35e6d55400419fa36c2fa9a7152f27013ffa48b2fd8a17a2bee268"
+          "after": "1a97c79e8dd8feb6dc7094ad1c21385a786cc637be0e3e79e42ab7789f1cd326"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "0a469a3ddc3f35e5b2e9818f7cbfeeb2895852b1c395b014af1be40ad5ca7948",
-      "after_sha256": "c8d0a2d8656694749f5da7e8ee0a76d406a91ad2ca358b93dfcea3b0db520357",
+      "after_sha256": "04a2090a66261a2c3f38a2a837956e3ca6646398400e3cd3248829ac9fd60d9e",
       "owners": {
         "@document": {
           "before": "0a469a3ddc3f35e5b2e9818f7cbfeeb2895852b1c395b014af1be40ad5ca7948",
-          "after": "c8d0a2d8656694749f5da7e8ee0a76d406a91ad2ca358b93dfcea3b0db520357"
+          "after": "04a2090a66261a2c3f38a2a837956e3ca6646398400e3cd3248829ac9fd60d9e"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "4b4281360b392b0d1502a41b04434311fc8dc7690710a68a209b7171dc295fc1",
-      "after_sha256": "065efbcc1906dd6ab4257da7204a6adcb19443f61c1673385cd744a0952c430f",
+      "after_sha256": "d66bff148b2988f13ba412161dcc9e627d372e26976eda3c0d8621246d4a3869",
       "owners": {
         "@document": {
           "before": "4b4281360b392b0d1502a41b04434311fc8dc7690710a68a209b7171dc295fc1",
-          "after": "065efbcc1906dd6ab4257da7204a6adcb19443f61c1673385cd744a0952c430f"
+          "after": "d66bff148b2988f13ba412161dcc9e627d372e26976eda3c0d8621246d4a3869"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "6721c633da816ac80ac0a69d429114b0fc28900907e8ffe8ab014587bed6234c",
-      "after_sha256": "45d61c5133307be87236e6e48127ee20ec30a1a1ae476522a815cdafbf299eb4",
+      "after_sha256": "e8d33005796f0c42eb28e44956a808028ef2db804010b5d596c7d583d73a221f",
       "owners": {
         "@document": {
           "before": "6721c633da816ac80ac0a69d429114b0fc28900907e8ffe8ab014587bed6234c",
-          "after": "45d61c5133307be87236e6e48127ee20ec30a1a1ae476522a815cdafbf299eb4"
+          "after": "e8d33005796f0c42eb28e44956a808028ef2db804010b5d596c7d583d73a221f"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "60a358720a6f8a4e72006f601d8705249864469bf8667de2d999c6b861991db7",
-      "after_sha256": "3ed63248767d1a2843a3bfbd925ae608b63c1d7eb5a66b8d44394b4bc9316c08",
+      "after_sha256": "907c7f4f335c718b55afad34073f3aea187717eed8f78c1cdb69dfb73c0ad558",
       "owners": {
         "@document": {
           "before": "60a358720a6f8a4e72006f601d8705249864469bf8667de2d999c6b861991db7",
-          "after": "3ed63248767d1a2843a3bfbd925ae608b63c1d7eb5a66b8d44394b4bc9316c08"
+          "after": "907c7f4f335c718b55afad34073f3aea187717eed8f78c1cdb69dfb73c0ad558"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "a0aba56a28ce6addc174b11c3ffe07e2fcf993e4fda56c572b595d8a00ee945c",
-      "after_sha256": "f5bade53695d745f6118583e718aeeed06ea4b13317e606a5e9ace236af57a42",
+      "after_sha256": "43c8d8aa17b2006c0ae3fbbfe84f915aa8d5379f9175c9d9885cab6363c50a0a",
       "owners": {
         "@document": {
           "before": "a0aba56a28ce6addc174b11c3ffe07e2fcf993e4fda56c572b595d8a00ee945c",
-          "after": "f5bade53695d745f6118583e718aeeed06ea4b13317e606a5e9ace236af57a42"
+          "after": "43c8d8aa17b2006c0ae3fbbfe84f915aa8d5379f9175c9d9885cab6363c50a0a"
         }
       }
     },
     "data/source_audits/event_companion_2026_10/README.md": {
       "before_sha256": null,
-      "after_sha256": "2efc420df1df5af261b50f7f12680c7d9b413b01bf37bcb3cfcbbc34bea9e400",
+      "after_sha256": "7b36818b91198b3169169a2b2bc7cd15e61a49e1798edb52991204d9edc901af",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2efc420df1df5af261b50f7f12680c7d9b413b01bf37bcb3cfcbbc34bea9e400"
+          "after": "7b36818b91198b3169169a2b2bc7cd15e61a49e1798edb52991204d9edc901af"
         }
       }
     },
     "data/source_audits/event_companion_2026_10/event_companion_layouts_pages_8_53.json": {
       "before_sha256": null,
-      "after_sha256": "94476b9c2b3756ac49e5045d31b4cfc577451ceeda87aee01df5431ae457f111",
+      "after_sha256": "9c008361396fee33af9ed1f2352531b62c7c016d189c8984917c9c65224e91d6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "94476b9c2b3756ac49e5045d31b4cfc577451ceeda87aee01df5431ae457f111"
+          "after": "9c008361396fee33af9ed1f2352531b62c7c016d189c8984917c9c65224e91d6"
         }
       }
     },
     "data/source_audits/event_companion_2026_10/migration-review.json": {
       "before_sha256": null,
-      "after_sha256": "149bbcbe1a8c14504b3bdadad640c906353138f33ff998e41dd8442b45a2ebdc",
+      "after_sha256": "39a51aff36547d39cd7f7df2c514c23e1b0feabdea1ab6bee80d80686215d2a6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "149bbcbe1a8c14504b3bdadad640c906353138f33ff998e41dd8442b45a2ebdc"
+          "after": "39a51aff36547d39cd7f7df2c514c23e1b0feabdea1ab6bee80d80686215d2a6"
+        }
+      }
+    },
+    "data/source_audits/event_companion_2026_10/objective-rules-source-receipt.json": {
+      "before_sha256": null,
+      "after_sha256": "ac6d7eb85be5fcc0a5408a16474a864e32138994012c1299ad30bf364060ee8a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ac6d7eb85be5fcc0a5408a16474a864e32138994012c1299ad30bf364060ee8a"
         }
       }
     },
@@ -274,43 +284,53 @@
         }
       }
     },
+    "data/source_audits/event_companion_2026_10/reviewed-objective-associations.json": {
+      "before_sha256": null,
+      "after_sha256": "a01e515f43fc4b6c2097a7b2fb5f42024d4979f7a688a3297b34cd911e86f92a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a01e515f43fc4b6c2097a7b2fb5f42024d4979f7a688a3297b34cd911e86f92a"
+        }
+      }
+    },
     "docs/BATTLEFIELD_VIEWER.md": {
       "before_sha256": "3fb2568afcb6d2c35b9707257ff1009f7566c9b2cd129942bdd20885ae843c7b",
-      "after_sha256": "4120c86c7465369a46d830f64c2076d3d123efd24094041af1c29265aa7cd921",
+      "after_sha256": "36a05601d75e64fc8a9a8c40a31f785eb71a2f020a24e92c8c29dffbcc147f38",
       "owners": {
         "@document": {
           "before": "3fb2568afcb6d2c35b9707257ff1009f7566c9b2cd129942bdd20885ae843c7b",
-          "after": "4120c86c7465369a46d830f64c2076d3d123efd24094041af1c29265aa7cd921"
+          "after": "36a05601d75e64fc8a9a8c40a31f785eb71a2f020a24e92c8c29dffbcc147f38"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "19c902affb7b4dbcc98327b7ec6b3c2cb6ae6909b63d32e40c84fd61b03c411a",
-      "after_sha256": "912494d1e6f4942cb624b4a30f361a7e4fb51f36b1bb7f6afbd86ca92b920299",
+      "after_sha256": "7a1b0be026f615cdba81ab7087e823a7d8642c35a4e8c9aac0ecaf4e9d1eb487",
       "owners": {
         "@document": {
           "before": "19c902affb7b4dbcc98327b7ec6b3c2cb6ae6909b63d32e40c84fd61b03c411a",
-          "after": "912494d1e6f4942cb624b4a30f361a7e4fb51f36b1bb7f6afbd86ca92b920299"
+          "after": "7a1b0be026f615cdba81ab7087e823a7d8642c35a4e8c9aac0ecaf4e9d1eb487"
         }
       }
     },
     "docs/MISSION_IMPLEMENTATION_STATUS.md": {
       "before_sha256": "49854199142a9e435ee3ebebb13445204319e9922d860dc9a2e2504a1847f536",
-      "after_sha256": "287c4a7ae325637f12ee181642ce51aeef780a5fe0db3378ee10385cd33b327c",
+      "after_sha256": "f1b5c15dc96a2493559e8aafc43cf5f55dc08dbbaa2978781528a0140390de47",
       "owners": {
         "@document": {
           "before": "49854199142a9e435ee3ebebb13445204319e9922d860dc9a2e2504a1847f536",
-          "after": "287c4a7ae325637f12ee181642ce51aeef780a5fe0db3378ee10385cd33b327c"
+          "after": "f1b5c15dc96a2493559e8aafc43cf5f55dc08dbbaa2978781528a0140390de47"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "3907b58d0fe3a582f02cef41eddf6412a7e810061e23bc5b48106f36f75ddabc",
-      "after_sha256": "ce6d996f2303be86d5cd9864f7db10efd63a77e091907a8450318e88b5cb8e6d",
+      "after_sha256": "28febe5fe93e1d2d0dbdcbe398e4d27cef3223c1cf61daa4f265af50b97c2f49",
       "owners": {
         "@document": {
           "before": "3907b58d0fe3a582f02cef41eddf6412a7e810061e23bc5b48106f36f75ddabc",
-          "after": "ce6d996f2303be86d5cd9864f7db10efd63a77e091907a8450318e88b5cb8e6d"
+          "after": "28febe5fe93e1d2d0dbdcbe398e4d27cef3223c1cf61daa4f265af50b97c2f49"
         }
       }
     },
@@ -326,11 +346,11 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "cd9b1a1830807e3887df93f641b632c4d9e3bb30db43f24131b80d297795888d",
-      "after_sha256": "3d830bd17bbab6728b41947b439d6c38c43ad8b8b09954bd87c44a7a0e1ff452",
+      "after_sha256": "9d1e792f98311ead93902cd83949f8ec97699b11fb0889772223c1bbbcb18bbe",
       "owners": {
         "@document": {
           "before": "cd9b1a1830807e3887df93f641b632c4d9e3bb30db43f24131b80d297795888d",
-          "after": "3d830bd17bbab6728b41947b439d6c38c43ad8b8b09954bd87c44a7a0e1ff452"
+          "after": "9d1e792f98311ead93902cd83949f8ec97699b11fb0889772223c1bbbcb18bbe"
         }
       }
     },
@@ -346,11 +366,11 @@
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py": {
       "before_sha256": "ddecfba92afba56a2477b981aaa12472895a8e19cde8a8c8a2b3da6bb20bde0c",
-      "after_sha256": "858ad9a9fc07ba0f16c7b722767297413378e3fc558e507b9f31c656c3dc9709",
+      "after_sha256": "57779fbe197bc81fe58086587a265720aecbfc2c7f743cda89dba6e47c75db31",
       "owners": {
         "@module": {
           "before": "9a6f6d01f2f1d3af38ff120ac7a1f0540b9ac77ea0fd0bdc0f67610621b33518",
-          "after": "5c008d22b1b34a2f8f163ef17de18c51686871c67bee8a6071499bd10b40b6d6"
+          "after": "e5fb4df8f0c974c233e8be1c9c1d193d7c2dc29d83b09eebdae9274eca7741c5"
         },
         "_battlefield_layout_definition": {
           "before": "968315c485f67a5e99dcbc5fb619c64b8a5666389890f85d47086a598cdf5061",
@@ -388,11 +408,21 @@
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-battlefields.json": {
       "before_sha256": "028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f",
-      "after_sha256": "577464ade3daf3a940257f8f385a09abff69e6de740198f157b91e1aed35dbec",
+      "after_sha256": "5e9dfcef9d91e78ac51ea9019e736f250246e7adf1e0258484f109190cea030a",
       "owners": {
         "@document": {
           "before": "028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f",
-          "after": "577464ade3daf3a940257f8f385a09abff69e6de740198f157b91e1aed35dbec"
+          "after": "5e9dfcef9d91e78ac51ea9019e736f250246e7adf1e0258484f109190cea030a"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-objective-associations.json": {
+      "before_sha256": null,
+      "after_sha256": "e5422e499b1b77863450f84e8afad58e6c58cfc819af4b31568239993389d9f8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e5422e499b1b77863450f84e8afad58e6c58cfc819af4b31568239993389d9f8"
         }
       }
     },
@@ -430,13 +460,23 @@
         }
       }
     },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_full_artifact_types.py": {
+      "before_sha256": "7d640c6143e9d321186e8912ca1fbe7c658df7a6a6e51b956802941ecc580bf3",
+      "after_sha256": "249fe33e4fcad31fce1b58cb722dd940047377bc4decb23bb9d573532814de18",
+      "owners": {
+        "ObjectiveArtifact": {
+          "before": "b422d6cbd715a5903c66ca7aac351c7743924d2460d69e7b17e8faa820f8cdcb",
+          "after": "ea7d574198f5b249601fe8ca979a84d47e22e3923320785555e9609b117fe151"
+        }
+      }
+    },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_full_artifact_validation.py": {
       "before_sha256": "e886546c8b5645cdbd5b998a51a95e1eee9c513e6e88bf36c94d122b0a08e583",
-      "after_sha256": "4642b091cf0b84c1b44d9672ad554867252b3df90aa489257ec205af3148bb9f",
+      "after_sha256": "97dedc1c12d650411a8e2cf93c8e5a443f4c49e53fc290930e45b7b8b3f4c34f",
       "owners": {
         "@module": {
           "before": "862020beefffc74710703ff77adf2d4ff8b1be8b461fefc80391e014583e5030",
-          "after": "0d82f72784023416d75150284250f98e8f2a0d012bac85ac71008e2202ad059a"
+          "after": "c704c7713c2f917008bd930ea1132e7d752cf73dced10aa325a5dbd6057351bc"
         },
         "_is_exact_sum": {
           "before": "f67f86f77a6fa749f477c7036e2062977c053f0e24027d3d8cda244804d4e9fb",
@@ -454,27 +494,69 @@
           "before": "5aab0e5544c855de7e8d009edcd43dfc4a7ce06ef47ba01cd1e5a569f3260776",
           "after": "47855409e265714ebc9e7d2da2dd10af73b292d468433f2789f2f74c93cece5e"
         },
+        "_validate_objectives": {
+          "before": "8957fc2e9b9dd9831e18c9d8e70c7d7dfd248b557382bde13fbe17c36f137d28",
+          "after": "75e903c28ed62db05528855ce65c0ed1c12fefc40a3d5ff4d9c70ab12b24ace4"
+        },
         "_validate_terrain_area": {
           "before": "4dd73ef1c591b11bdcaa71cfc02e20b609fcecc43b5caf422c5cb0443c8d5625",
           "after": "c706323f6ed4ac1578abac7fc3afeb107d593bb9a08a4106ba163582b619aa76"
         },
         "validate_event_companion_battlefield_artifact": {
           "before": "6b9ae71e2a49e6d796f353ce3becd7b396dd2d360a1ab4702315ff54313c99d7",
-          "after": "e4b53d0432f4f043f2acc832ab613b30b8678d3ec90f55c88b20a3fdbcaf3dc3"
+          "after": "f6a706b62c39d078d2d0938f94f146ac0898dbcf448fc867a40d7c9cb3ded568"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_objective_associations.py": {
+      "before_sha256": null,
+      "after_sha256": "7499aa89c3610d38771eec3c4ef970a73d083e12ec8493d7eaa88542f7a491a7",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "1b29bbfbb16a8ece19fad66a4996a4d30e78c71c0952d2b77ab8cb8934ebcb85"
+        },
+        "ObjectiveAssociation": {
+          "before": null,
+          "after": "aa3979e345040eef6bd767bb58f49a19f42e039951842eee1bd6a93795bdcc7b"
+        },
+        "ObjectiveAssociationTable": {
+          "before": null,
+          "after": "f750030574ad6b00957fc8ec207993b7c5d3f9fb6a88c8ef38efb775c217fcc9"
+        },
+        "reviewed_objective_associations": {
+          "before": null,
+          "after": "bd6f532e4f69f95c9c302c84af69ef3931aafeb2ba7aa5ef1ce9669a84b2707c"
+        },
+        "validate_reviewed_objective_association": {
+          "before": null,
+          "after": "b0b54c6f8774a92c15562d69112b9be106a2088a3fff0b480246b71c64e2f5ed"
         }
       }
     },
     "tests/infrastructure/missions/unit/test_event_companion.py": {
       "before_sha256": "48641abc04fa4c5b6f595c070c2a8283a8aee8645398c7ee185a3d4a66a9c317",
-      "after_sha256": "7c68b3e47a33adc811dc4dca3e288742b6a810e5b38abea9bb3d49ac31c47590",
+      "after_sha256": "09b4a1539de437c4ae175113326eb438f16ea074e4b1df6287957a9d48cba691",
       "owners": {
+        "@module": {
+          "before": "926a0a365ce5ec3d6a80d32d2843f8e877907967b6a73ad5081d1bf78cb05876",
+          "after": "2c3c2ea3e657a7688b5ed8b1b257bca8df8309397e3548c138141ecfc7f8d54f"
+        },
+        "test_displaced_event_glyphs_control_both_single_members": {
+          "before": null,
+          "after": "6f4644b42e69723e1d22fc25ca3073acb6e4f6dec832be9ad76e08bb5ca0f883"
+        },
+        "test_displaced_event_objective_rejects_missing_or_wrong_reviewed_group": {
+          "before": null,
+          "after": "8735f2e08da8b5212bd37ba8d6a452fe3c651f2fdd9283c66947d0a1205b49a1"
+        },
         "test_phase17j_event_companion_package_identity_and_payload_round_trip": {
           "before": "76456f06570d9228600658df2c5643a8088b41baf59db281a43ae36ef62927ec",
-          "after": "05214e5599ccdcec83bb65a9f278fd26f967b700500edb8176f31dac71814757"
+          "after": "3313bfcf8d48dd2eaa6135ea0ef8b37ccafa8cf29e548ad01255e39a26d84084"
         },
         "test_phase17n_battlefield_artifact_is_source_hashed_and_strict": {
           "before": "4312bdd2c54fd42626f45f16456106013277ef700a59799879d852579865fc61",
-          "after": "41b7ec276a7a35ffce98d068e064d5d5ccaca66ddc3d77f409184c2cb293889c"
+          "after": "d0c4bc675890bc702dfbd876d69e3a56a08fef804c9b1ab01934b31acfb3ed7c"
         },
         "test_phase17n_ruin_wall_joints_follow_source_image_registration": {
           "before": "eeb82467720bebc119a29c0d742aca94504085a5ee47c65f247eeab04614dec8",
@@ -488,7 +570,7 @@
     },
     "tests/infrastructure/missions/unit/test_event_companion_part2.py": {
       "before_sha256": "baf996721695969307039d0a87089b8404cd199d60341afe461bbcf85e469b33",
-      "after_sha256": "5e4ddb148cc116dfd6fd5f2b9e9b1f455b02d2393cf05ca9175e7b4fb55c7189",
+      "after_sha256": "4c607413c811d417fae5af23c1df1ac525f1597f47448a58a1dcc7b7774531ec",
       "owners": {
         "@module": {
           "before": "a241f9f8a8c1d39ad52705151e526026077d1d995f82884f0873f7f44b1920fa",
@@ -496,11 +578,11 @@
         },
         "test_current_event_layouts_have_bounded_october_source_and_complete_markers": {
           "before": null,
-          "after": "32a105962ee074038c15ec01db4a9c6ecd6d984f45023571747be7770c623289"
+          "after": "707ff06caa34bb594b4b0b0c87bf901f782e8f35046cb5c91df4addacc9d19e5"
         },
         "test_current_layout_viewer_projects_and_renders_all_source_geometry": {
           "before": null,
-          "after": "50561df6011837dc40eac0090cb693c89ca62100a99b01fec4c579f857ab2c03"
+          "after": "046abf8d917ac4bc9e3e919c4ceb8117520855b87f86eeb200c9e68b2d3b7856"
         },
         "test_phase17n_battlefield_builder_rejects_source_drift_without_writing": {
           "before": "e41ff6bc1bac4eb8894958d73c08157e320771a4dd1bd46fd529ef41bc9d6b54",
@@ -536,11 +618,11 @@
     },
     "tools/build_event_companion_battlefields.py": {
       "before_sha256": "f9cc1b51588f85494d73495fbaa2c436156ca15d306b8801aeb575ba157b3c31",
-      "after_sha256": "071706d3ff94661db7c584b476d063920e98849b0e4d4ca31f143e77a33295ba",
+      "after_sha256": "58552bdca2634c3f04d6be2e10b78856442a87b17774d16a9c06acf1b28a32ce",
       "owners": {
         "@module": {
           "before": "5244c92a48f2754ee4dcc7d9ecaa5bf2c9760a2c83405aa36565d5fd2f98c2d5",
-          "after": "77ff8ede1d75900f1bc89917cce0d77a0ef07fe6dce35a5f363b1a80b0db7e39"
+          "after": "551893f4137e4f46ce5b152aaf9231c6099083b8f1b628233858370da89005db"
         },
         "_area_rows": {
           "before": "80e6754245c6c971bc3eb4a8f35e6591bf1c16ffea9cdcdbe95c9bff73182e0c",
@@ -553,6 +635,10 @@
         "_initial_component_poses": {
           "before": "d32209dccfb4c8ad1382966c2440e922248451aa545ea02f5cb66378e09080ff",
           "after": "8dbc39de4fd528c19dd272a3b1c7748146750550f27030281b89d3c789db7ba8"
+        },
+        "_objective_rows": {
+          "before": "18c7eed96299ad29ed0498174e97cc09e58d090fb45ed88604c209ba75192689",
+          "after": "000911de6fdd93373535b0a9ff4f345f7c903fc16bcc2ef54ab35efccae84675"
         },
         "build_artifact": {
           "before": "0b363d79b9f6a38e326f4b3dd43bf9a7b5937b3e1d6061eb0726e4125d302f52",
@@ -572,15 +658,29 @@
     },
     "tools/event_companion_battlefield_builder_geometry.py": {
       "before_sha256": "c2ad130715c14a2cea3a287ba4d4587c4e16931b3439bd597b52aa11b555bf41",
-      "after_sha256": "a0c938d5b9fd313321b5184f4c8fee73b650c4daf428e24b1485461c900701bd",
+      "after_sha256": "56d2579dc3bb38875ae6c265ddc3914b172356ac594df11065472af05a7c1765",
       "owners": {
         "@module": {
           "before": "a1942553336b0d79d99f839f89c65c115a748da01a174372c07ea299e326fb9c",
           "after": "e9c725696e503d73d6a260cc2b7706f54c09c936884b403ae93b88a46a498965"
         },
+        "_objective_requirements": {
+          "before": "309465708d109ed3637d40ab1ac46678fe2efbea45e701a659d6d7770f73221f",
+          "after": "36e5ca958d02d316122c492cae98b79a66396a01bc163b4057609ed22a0667ad"
+        },
         "solve_area_poses": {
           "before": "53b650f6c2c30386ce415b065b8ea41dff5c69ad04c9e5583d3f86df543e6708",
           "after": "e6b52d7ce6e5154d9426648ebd5751225d3f383dfd206559647d6899ffec16f6"
+        }
+      }
+    },
+    "tools/event_companion_layout_source/associate_objectives.py": {
+      "before_sha256": null,
+      "after_sha256": "eee6af0b313a3559372cad04ad36740b38c26a36127750dac89f8456dc97f31d",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "11c2e2018fac6d0d62b6add10840a40545e7240a56be6c1d6c4a0ff1b440c3bf"
         }
       }
     },
@@ -742,7 +842,7 @@
     },
     "tools/extract_event_companion_current_layouts.py": {
       "before_sha256": null,
-      "after_sha256": "a76229f70efc9e2c319a8753b78fa7c10ad886fc55d5d9e9643cecb0cc1c627f",
+      "after_sha256": "9792366dff9a62e1fadf4f793d290ce3e1af331599d9aa4b7f0c100828a6782f",
       "owners": {
         "@module": {
           "before": null,
@@ -750,7 +850,7 @@
         },
         "main": {
           "before": null,
-          "after": "b31bb6e2d8fb07e9a86ac18c836f797c9faec782a348a425cc5c31b43af566cf"
+          "after": "bf6b38fbdcb6df8b4d9d7857ab8ace4de9c3cfd57ece5760d075fec51b0e2100"
         }
       }
     }
@@ -771,8 +871,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/events/initial-player-a.json": {
       "category": "rule_semantics",
@@ -782,8 +882,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/events/initial-player-b.json": {
       "category": "rule_semantics",
@@ -793,8 +893,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -803,8 +903,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/projections/hidden_secondary_redaction_view.json": {
       "category": "rule_semantics",
@@ -814,8 +914,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/projections/initial_setup_view_player1.json": {
       "category": "rule_semantics",
@@ -825,8 +925,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/projections/initial_setup_view_player2.json": {
       "category": "rule_semantics",
@@ -836,8 +936,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/projections/post_deployment_view.json": {
       "category": "rule_semantics",
@@ -847,8 +947,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_a.json": {
       "category": "rule_semantics",
@@ -858,8 +958,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_b.json": {
       "category": "rule_semantics",
@@ -869,8 +969,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/projections/visible_modifier_datacard_view.json": {
       "category": "rule_semantics",
@@ -880,8 +980,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/replay-metadata.json": {
       "category": "rule_semantics",
@@ -892,8 +992,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/sessions/create-session.json": {
       "category": "rule_semantics",
@@ -902,8 +1002,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -912,8 +1012,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -922,8 +1022,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/sessions/session-create.json": {
       "category": "rule_semantics",
@@ -932,8 +1032,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -942,8 +1042,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -952,8 +1052,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -962,8 +1062,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -972,8 +1072,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -982,8 +1082,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -992,8 +1092,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "data/source_audits/event_companion_2026_10/README.md": {
       "category": "rule_semantics",
@@ -1002,8 +1102,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "data/source_audits/event_companion_2026_10/event_companion_layouts_pages_8_53.json": {
       "category": "rule_semantics",
@@ -1012,8 +1112,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "data/source_audits/event_companion_2026_10/migration-review.json": {
       "category": "rule_semantics",
@@ -1022,8 +1122,18 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "data/source_audits/event_companion_2026_10/objective-rules-source-receipt.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-objective-rules-receipt"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "data/source_audits/event_companion_2026_10/official-source-observation.json": {
       "category": "rule_semantics",
@@ -1032,8 +1142,18 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "data/source_audits/event_companion_2026_10/reviewed-objective-associations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-objective-reviewed-association-source"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "docs/BATTLEFIELD_VIEWER.md": {
       "category": "governance",
@@ -1082,8 +1202,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "src/warhammer40k_core/rules/mission_pack_import.py": {
       "category": "rule_semantics",
@@ -1092,8 +1212,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py": {
       "category": "rule_semantics",
@@ -1102,8 +1222,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-battlefields.json": {
       "category": "rule_semantics",
@@ -1112,8 +1232,18 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-objective-associations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_full_artifact_geometry_validation.py": {
       "category": "rule_semantics",
@@ -1122,8 +1252,18 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_full_artifact_types.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_full_artifact_validation.py": {
       "category": "rule_semantics",
@@ -1132,18 +1272,29 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/event_companion_objective_associations.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tests/infrastructure/missions/unit/test_event_companion.py": {
       "category": "rule_semantics",
       "operations": [
+        "event-october-objective-native-controls",
         "ci-restructure-tests-infrastructure-missions-unit-test_event_companion.py"
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tests/infrastructure/missions/unit/test_event_companion_part2.py": {
       "category": "rule_semantics",
@@ -1153,8 +1304,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -1163,8 +1314,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tools/build_event_companion_battlefields.py": {
       "category": "rule_semantics",
@@ -1173,8 +1324,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tools/event_companion_battlefield_builder_catalog.py": {
       "category": "rule_semantics",
@@ -1183,8 +1334,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tools/event_companion_battlefield_builder_geometry.py": {
       "category": "rule_semantics",
@@ -1193,8 +1344,18 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
+    },
+    "tools/event_companion_layout_source/associate_objectives.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "event-october-objective-association-extraction"
+      ],
+      "selected_families": [],
+      "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tools/event_companion_layout_source/contacts.py": {
       "category": "rule_semantics",
@@ -1203,8 +1364,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tools/event_companion_layout_source/correspond.py": {
       "category": "rule_semantics",
@@ -1213,8 +1374,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tools/event_companion_layout_source/extract.py": {
       "category": "rule_semantics",
@@ -1223,8 +1384,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tools/event_companion_layout_source/observe.py": {
       "category": "rule_semantics",
@@ -1233,8 +1394,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tools/event_companion_layout_source/requirements.txt": {
       "category": "dependency_environment",
@@ -1244,7 +1405,7 @@
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
       "source_obligation": null,
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tools/event_companion_layout_source/source_context.py": {
       "category": "rule_semantics",
@@ -1253,8 +1414,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     },
     "tools/extract_event_companion_current_layouts.py": {
       "category": "rule_semantics",
@@ -1263,8 +1424,8 @@
       ],
       "selected_families": [],
       "rationale": "Current layout source migration: update source records and their strict consumer expectations; retain established numerical tolerances and semantic boundaries without a runtime optimization claim.",
-      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and stable objective correspondence.",
-      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. Offline PDF extraction is development-only and never enters engine state."
+      "source_obligation": "Official October Event Companion page8 legend and45layout diagrams require current observations, truthful bounded ownership, strict shape/contact admission and explicit reviewed terrain-objective associations. Official Core Rules page52 clauses14.01/14.02 require area-based objective range/control.",
+      "unchanged_work": "Shared gameplay movement/search, query caches, event/state serialization and replay algorithms remain unchanged; layout geometry and declared semantic ownership change. The new immutable hash-pinned249-row association resource adds a one-time decode/hash through the existing cached-source pattern and per-objective exact lookups. Offline PDF extraction is development-only and never enters engine state."
     }
   },
   "milestone": "ordinary",

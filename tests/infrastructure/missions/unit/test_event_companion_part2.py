@@ -1340,13 +1340,9 @@ def test_current_event_layouts_have_bounded_october_source_and_complete_markers(
     assert event_source.SOURCE_VERSION == "1.1"
 
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
-    unbound_ids: set[str] = set()
+    linked_count = 0
+    physical_links = 0
     for layout in artifact.layouts:
-        expected_unbound = {
-            marker.objective_id for marker in layout.objectives if not marker.terrain_area_ids
-        }
-        if not expected_unbound:
-            continue
         setup = MissionSetup.from_mission_pack(
             mission_pack=mission_pack,
             mission_pool_entry_id=f"mission-{layout.layout_id}",
@@ -1364,16 +1360,15 @@ def test_current_event_layouts_have_bounded_october_source_and_complete_markers(
             explicit_terrain_objectives=(),
             objective_terrain_areas=setup.objective_terrain_areas,
         )
-        assert {marker.objective_marker_id for marker in points} == expected_unbound
+        assert not points
         assert not components
-        assert expected_unbound.isdisjoint(marker.objective_marker_id for marker in linked)
-        unbound_ids.update(expected_unbound)
-    assert unbound_ids == {
-        "take-and-hold-vs-take-and-hold-layout-2-central",
-        "disruption-vs-priority-assets-layout-3-central-01",
-        "priority-assets-vs-priority-assets-layout-1-central-01",
-        "priority-assets-vs-priority-assets-layout-3-central-01",
-    }
+        assert {row.objective_marker_id: set(row.terrain_area_ids) for row in linked} == {
+            marker.objective_id: set(marker.terrain_area_ids) for marker in layout.objectives
+        }
+        linked_count += len(linked)
+        physical_links += sum(len(row.terrain_area_ids) for row in linked)
+    assert linked_count == 249
+    assert physical_links == 270
     # Model templates keep their historical owner while current instances cite October.
     assert all(
         template.source_id.startswith(f"{event_source.SOURCE_PACKAGE_ID}:")
@@ -1397,6 +1392,7 @@ def test_current_layout_viewer_projects_and_renders_all_source_geometry() -> Non
             for binding in projected["objective_terrain_areas"]
         }
         unbound = set(projected["source_unbound_objective_ids"])
+        assert not unbound
         assert set(bindings).isdisjoint(unbound)
         assert set(bindings) | unbound == set(objectives)
         for marker in source_layout.objectives:
@@ -1436,7 +1432,7 @@ def test_current_layout_viewer_projects_and_renders_all_source_geometry() -> Non
     assert counts["terrain_areas"] == 720
     assert counts["terrain_features"] == 1349
     assert counts["terrain_area_contacts"] == 219
-    assert counts["objective_binding_records"] == 245
+    assert counts["objective_binding_records"] == 249
     assert counts["deployment_zones"] == 90
     assert counts["battlefield_regions"] == 225
     first_layout = next(iter(layouts.values()))

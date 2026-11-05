@@ -44,7 +44,7 @@ ARTIFACT_SCHEMA = "core-v2-event-companion-full-battlefield-layouts-v1"
 SOURCE_PACKAGE_ID = "gw-11e-warhammer-event-companion-layouts-v1-3-2026-10"
 SOURCE_PDF_FILENAME = "eng_14-10_wh40k_event_companion-rdwnqprl4c-nj8oqogadv.pdf"
 SOURCE_PDF_SHA256 = "187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2"
-EXPECTED_EXTRACTION_SHA256 = "94476b9c2b3756ac49e5045d31b4cfc577451ceeda87aee01df5431ae457f111"
+EXPECTED_EXTRACTION_SHA256 = "9c008361396fee33af9ed1f2352531b62c7c016d189c8984917c9c65224e91d6"
 EXPECTED_STABLE_IDENTITY_SHA256 = "742ab841d1ec1e696f4a5c0e3f2e8c251203d510bf1da85fb30af88023cb64f3"
 _TERRAIN_GRID_INCHES = 0.05
 _GEOMETRY_TOLERANCE = 1e-6
@@ -1136,35 +1136,17 @@ def _objective_rows(
     for raw in layout["objectives"]:
         role = raw["role"]
         role_counts[role] = role_counts.get(role, 0) + 1
-        x_inches, y_inches = raw["battlefield_center_quantized_0_01_inches"]
+        x_inches, y_inches = raw["runtime_reference_inches"]
         source_ids = tuple(
-            _canonical_stable_id(
-                area_id,
-                source_layout_id=source_layout_id,
-                layout_id=layout_id,
-            )
-            for area_id in raw["nearest_area_ids"]
+            _canonical_stable_id(area_id, source_layout_id=source_layout_id, layout_id=layout_id)
+            for area_id in raw["semantic_source_terrain_area_ids"]
         )
-        distances = raw["distances_to_area_polygons_inches"]
-        if distances:
-            if len(source_ids) != len(distances):
-                raise ValueError("Objective source-distance inventory drifted.")
-            source_ids = tuple(
-                area_id
-                for area_id, distance in zip(source_ids, distances, strict=True)
-                if float(distance) <= 0.05 + 1e-9
-            )
-        elif layout["source_pdf_page_number"] not in {24, 25, 26}:
-            raise ValueError("Non-Meatgrinder objectives require source distances.")
+        if not source_ids:
+            raise ValueError("Every reviewed Event objective requires a terrain association.")
         point = Point(float(x_inches), float(y_inches))
-        runtime_distances = tuple(
-            runtime_polygons[area_id].distance(point) for area_id in source_ids
-        )
-        if any(distance > 0.05 + 1e-6 for distance in runtime_distances) or (
-            runtime_distances and min(runtime_distances) > 1e-6
-        ):
+        if min(runtime_polygons[area_id].distance(point) for area_id in source_ids) > 1e-6:
             raise ValueError(
-                f"Objective {raw['objective_id']} exceeded source-proxy binding tolerance."
+                "Reviewed objective reference must lie inside its linked terrain union."
             )
         terrain_area_source_ids = source_ids
         source_objective_id = _canonical_stable_id(
@@ -1183,6 +1165,9 @@ def _objective_rows(
                 "terrain_area_ids": [
                     identities.area_id(area_id) for area_id in terrain_area_source_ids
                 ],
+                "illustration_x_inches": float(raw["battlefield_center_quantized_0_01_inches"][0]),
+                "illustration_y_inches": float(raw["battlefield_center_quantized_0_01_inches"][1]),
+                "runtime_reference_basis": raw["runtime_reference_basis"],
                 "source_symbol_kind": "source_pdf_objective_marker_vector",
             }
         )

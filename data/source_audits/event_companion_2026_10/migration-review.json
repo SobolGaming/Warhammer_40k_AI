@@ -1,7 +1,7 @@
 {
   "schema": "event-layout-october-migration-review-v1",
   "source_pdf_sha256": "187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2",
-  "source_extraction_sha256": "94476b9c2b3756ac49e5045d31b4cfc577451ceeda87aee01df5431ae457f111",
+  "source_extraction_sha256": "9c008361396fee33af9ed1f2352531b62c7c016d189c8984917c9c65224e91d6",
   "historical_exception_dispositions": [
     {
       "owner": "tools/event_companion_battlefield_builder_geometry.py",
@@ -511,14 +511,48 @@
     "logical_areas": 617
   },
   "qualification": "Source and independently reconstructed final geometry checked; complete local/remote exact-head gates are recorded separately, not asserted here.",
-  "page10_unbound_objective_model_limit": {
-    "objective_id": "take-and-hold-vs-take-and-hold-layout-2-central",
-    "source_nearest_footprint_distances_inches": [
-      0.0540786103,
-      0.0680488069
-    ],
-    "source_binding_threshold_inches": 0.05,
-    "nominal_runtime_footprint_penetration_inches": 0.06999705,
-    "disposition": "Retain independently observed source-unbound ordinary point objective. The simplified quantized area polygon overlaps the marker, but no physical component contains it; actual objective-control resolution preserves the point objective. Do not infer a terrain binding from the nominal area alone. Existing source threshold, solver and physical-model assumptions are unchanged."
+  "objective_semantic_review": {
+    "terrain_objective_count": 249,
+    "single_pair_objective_count": 21,
+    "physical_member_links": 270,
+    "review_table": "reviewed-objective-associations.json",
+    "rules_receipt": "objective-rules-source-receipt.json",
+    "superseded_interpretation": "The earlier four ordinary-point classification was incorrect: illustrative glyph centers do not determine terrain-objective association. All four explicitly designate their central Single terrain group.",
+    "illustration_and_reference": "Measured glyph centers are preserved separately; three bounded project semantic reference points satisfy unchanged public marker-inside-linked-union admission. Page10 reference remains unchanged.",
+    "runtime_reference_changes": [
+      {
+        "page": 44,
+        "illustration": [
+          21.91,
+          33.37
+        ],
+        "reference": [
+          22.07,
+          32.98
+        ]
+      },
+      {
+        "page": 51,
+        "illustration": [
+          25.41,
+          30.2
+        ],
+        "reference": [
+          24.93,
+          30.2
+        ]
+      },
+      {
+        "page": 53,
+        "illustration": [
+          21.92,
+          33.53
+        ],
+        "reference": [
+          21.92,
+          32.94
+        ]
+      }
+    ]
   }
 }

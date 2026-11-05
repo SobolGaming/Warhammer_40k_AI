@@ -4910,7 +4910,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.83862
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            16.49,
+            49.85
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-take-and-hold-layout-1-defender-home-01",
@@ -4947,7 +4958,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.506766
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            25.76,
+            12.71
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-take-and-hold-layout-1-central-01",
@@ -4984,7 +5006,20 @@
           "distances_to_area_polygons_inches": [
             0.0,
             0.023828
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-1-terrain-area-07",
+            "take-and-hold-vs-take-and-hold-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            22.02,
+            30.01
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-1-terrain-area-07",
+            "take-and-hold-vs-take-and-hold-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-take-and-hold-layout-1-expansion-01",
@@ -5021,7 +5056,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.477835
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-1-terrain-area-05"
+          ],
+          "runtime_reference_inches": [
+            36.72,
+            41.9
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-1-terrain-area-05"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-take-and-hold-layout-1-expansion-02",
@@ -5058,7 +5104,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.244904
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-1-terrain-area-12"
+          ],
+          "runtime_reference_inches": [
+            7.4,
+            19.16
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-1-terrain-area-12"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -9237,7 +9294,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.867295
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-2-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            6.76,
+            31.2
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-2-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-take-and-hold-layout-2-defender-home-01",
@@ -9274,7 +9342,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.741439
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-2-terrain-area-08"
+          ],
+          "runtime_reference_inches": [
+            37.24,
+            28.67
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-2-terrain-area-08"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-take-and-hold-layout-2-central-01",
@@ -9311,7 +9390,19 @@
           "distances_to_area_polygons_inches": [
             0.054079,
             0.068049
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-2-terrain-area-06",
+            "take-and-hold-vs-take-and-hold-layout-2-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            24.21,
+            29.97
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-2-terrain-area-06"
+          ],
+          "runtime_reference_basis": "project_interior_reference_preserving_source_region_memberships"
         },
         {
           "objective_id": "take-and-hold-vs-take-and-hold-layout-2-expansion-01",
@@ -9348,7 +9439,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.336065
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            24.92,
+            50.42
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-take-and-hold-layout-2-expansion-02",
@@ -9385,7 +9487,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.470576
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            19.21,
+            9.36
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -13470,7 +13583,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.459018
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            10.08,
+            50.44
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-take-and-hold-layout-3-defender-home-01",
@@ -13507,7 +13631,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.884149
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            33.74,
+            8.88
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-take-and-hold-layout-3-central-01",
@@ -13544,7 +13679,20 @@
           "distances_to_area_polygons_inches": [
             0.0,
             0.04764
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-3-terrain-area-08",
+            "take-and-hold-vs-take-and-hold-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            21.99,
+            30.01
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-3-terrain-area-08",
+            "take-and-hold-vs-take-and-hold-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-take-and-hold-layout-3-expansion-01",
@@ -13581,7 +13729,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.036919
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-3-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            34.95,
+            49.26
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-3-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-take-and-hold-layout-3-expansion-02",
@@ -13618,7 +13777,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.83
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-3-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            10.21,
+            10.7
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-3-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -17714,7 +17884,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.355318
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            8.37,
+            49.15
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-1-defender-home-01",
@@ -17751,7 +17932,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.466905
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            35.78,
+            10.66
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-1-central-01",
@@ -17788,7 +17980,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.600816
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            25.59,
+            32.65
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-1-central-02",
@@ -17825,7 +18028,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.63239
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            18.06,
+            27.49
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-1-expansion-01",
@@ -17862,7 +18076,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.785918
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            30.37,
+            49.21
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-1-expansion-02",
@@ -17899,7 +18124,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.977268
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            13.36,
+            10.43
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -22028,7 +22264,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.392067
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            8.32,
+            50.41
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-2-defender-home-01",
@@ -22065,7 +22312,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.397722
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            35.87,
+            9.63
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-2-central-01",
@@ -22102,7 +22360,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.201631
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            24.87,
+            33.02
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-2-central-02",
@@ -22139,7 +22408,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.954489
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            19.52,
+            26.84
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-2-expansion-01",
@@ -22176,7 +22456,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.27604
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            34.58,
+            50.12
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-2-expansion-02",
@@ -22213,7 +22504,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.127435
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            9.58,
+            10.08
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -26253,7 +26555,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.207719
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            10.74,
+            49.92
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01",
@@ -26290,7 +26603,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.862637
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            32.86,
+            10.45
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-central-01",
@@ -26327,7 +26651,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.273249
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-08"
+          ],
+          "runtime_reference_inches": [
+            20.99,
+            34.18
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-08"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-central-02",
@@ -26364,7 +26699,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.407274
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            23.08,
+            25.8
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-expansion-01",
@@ -26401,7 +26747,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.745987
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-06"
+          ],
+          "runtime_reference_inches": [
+            36.56,
+            37.92
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-expansion-02",
@@ -26438,7 +26795,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.876309
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            7.31,
+            22.16
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -30475,7 +30843,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.571365
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            6.99,
+            50.35
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-disruption-layout-1-defender-home-01",
@@ -30512,7 +30891,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.573887
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            36.99,
+            9.58
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-disruption-layout-1-central-01",
@@ -30549,7 +30939,19 @@
           "distances_to_area_polygons_inches": [
             0.0,
             0.30696
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-1-terrain-area-07",
+            "take-and-hold-vs-disruption-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            21.39,
+            31.8
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-1-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-disruption-layout-1-expansion-01",
@@ -30586,7 +30988,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             4.70368
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            30.42,
+            48.88
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-disruption-layout-1-expansion-02",
@@ -30623,7 +31036,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             4.868619
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            13.56,
+            10.96
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -34708,7 +35132,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.119462
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-2-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            8.55,
+            51.33
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-2-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-disruption-layout-2-defender-home-01",
@@ -34745,7 +35180,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.833633
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-2-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            35.33,
+            8.86
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-2-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-disruption-layout-2-central-01",
@@ -34782,7 +35228,19 @@
           "distances_to_area_polygons_inches": [
             0.0,
             2.077201
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-2-terrain-area-07",
+            "take-and-hold-vs-disruption-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            23.78,
+            31.1
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-disruption-layout-2-expansion-01",
@@ -34819,7 +35277,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.15844
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            33.36,
+            46.32
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-disruption-layout-2-expansion-02",
@@ -34856,7 +35325,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.070358
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            10.71,
+            13.5
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -38937,7 +39417,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.139531
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-3-terrain-area-04"
+          ],
+          "runtime_reference_inches": [
+            21.85,
+            47.3
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-3-terrain-area-04"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-disruption-layout-3-defender-home-01",
@@ -38974,7 +39465,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.31646
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-3-terrain-area-13"
+          ],
+          "runtime_reference_inches": [
+            22.34,
+            12.63
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-3-terrain-area-13"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-disruption-layout-3-central-01",
@@ -39011,7 +39513,19 @@
           "distances_to_area_polygons_inches": [
             0.0,
             1.908249
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-3-terrain-area-08",
+            "take-and-hold-vs-disruption-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            19.87,
+            29.88
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-disruption-layout-3-expansion-01",
@@ -39048,7 +39562,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.602578
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-3-terrain-area-05"
+          ],
+          "runtime_reference_inches": [
+            35.53,
+            37.56
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-3-terrain-area-05"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-disruption-layout-3-expansion-02",
@@ -39085,7 +39610,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.192658
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-3-terrain-area-12"
+          ],
+          "runtime_reference_inches": [
+            7.47,
+            22.22
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-disruption-layout-3-terrain-area-12"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -43170,7 +43706,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.210302
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            12.34,
+            51.11
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-reconnaissance-layout-1-defender-home-01",
@@ -43207,7 +43754,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.608197
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            31.45,
+            8.51
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-reconnaissance-layout-1-central-01",
@@ -43244,7 +43802,20 @@
           "distances_to_area_polygons_inches": [
             0.0,
             0.0
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-1-terrain-area-07",
+            "take-and-hold-vs-reconnaissance-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            21.95,
+            30.22
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-1-terrain-area-07",
+            "take-and-hold-vs-reconnaissance-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-reconnaissance-layout-1-expansion-01",
@@ -43281,7 +43852,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.117728
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            34.74,
+            44.2
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-reconnaissance-layout-1-expansion-02",
@@ -43318,7 +43900,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.108027
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            9.25,
+            15.78
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -47491,7 +48084,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.845733
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            8.13,
+            47.68
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-reconnaissance-layout-2-defender-home-01",
@@ -47528,7 +48132,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.136015
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            36.36,
+            12.37
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-reconnaissance-layout-2-central-01",
@@ -47565,7 +48180,20 @@
           "distances_to_area_polygons_inches": [
             0.0,
             0.002787
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-08",
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            21.15,
+            31.39
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-09",
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-08"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-reconnaissance-layout-2-expansion-01",
@@ -47602,7 +48230,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.412282
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            27.62,
+            49.01
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-reconnaissance-layout-2-expansion-02",
@@ -47639,7 +48278,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.279977
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            16.57,
+            10.64
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -51724,7 +52374,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.778546
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            8.41,
+            49.22
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-reconnaissance-layout-3-defender-home-01",
@@ -51761,7 +52422,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.500361
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            35.38,
+            10.67
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-reconnaissance-layout-3-central-01",
@@ -51798,7 +52470,20 @@
           "distances_to_area_polygons_inches": [
             0.0,
             0.0
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-3-terrain-area-08",
+            "take-and-hold-vs-reconnaissance-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            22.02,
+            30.01
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-3-terrain-area-08",
+            "take-and-hold-vs-reconnaissance-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-reconnaissance-layout-3-expansion-01",
@@ -51835,7 +52520,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.106684
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-3-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            33.41,
+            46.82
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-3-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-reconnaissance-layout-3-expansion-02",
@@ -51872,7 +52568,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.734206
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-3-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            10.06,
+            13.11
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-reconnaissance-layout-3-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -55953,7 +56660,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.741595
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            10.98,
+            51.63
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-1-defender-home-01",
@@ -55990,7 +56708,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.921288
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            32.89,
+            8.13
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-1-central-01",
@@ -56027,7 +56756,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.353673
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-1-terrain-area-06"
+          ],
+          "runtime_reference_inches": [
+            20.28,
+            35.64
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-1-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-1-central-02",
@@ -56064,7 +56804,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.342266
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-1-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            24.46,
+            25.06
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-1-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-1-expansion-01",
@@ -56101,7 +56852,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.355655
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            34.98,
+            45.66
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-1-expansion-02",
@@ -56138,7 +56900,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.684043
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            8.45,
+            14.02
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -60170,7 +60943,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.435768
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-2-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            11.9,
+            49.36
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-2-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-2-defender-home-01",
@@ -60207,7 +60991,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.768115
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            31.29,
+            10.52
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-2-central-01",
@@ -60244,7 +61039,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.297558
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            19.98,
+            34.78
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-2-central-02",
@@ -60281,7 +61087,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.406872
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-2-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            24.18,
+            25.34
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-2-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-2-expansion-01",
@@ -60318,7 +61135,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.124484
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-2-terrain-area-08"
+          ],
+          "runtime_reference_inches": [
+            37.51,
+            34.49
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-2-terrain-area-08"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-2-expansion-02",
@@ -60355,7 +61183,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.446517
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            6.6,
+            25.29
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -64392,7 +65231,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.825625
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-3-terrain-area-06"
+          ],
+          "runtime_reference_inches": [
+            6.07,
+            37.97
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-3-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-3-defender-home-01",
@@ -64429,7 +65279,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.565883
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-3-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            37.69,
+            22.15
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-3-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-3-central-01",
@@ -64466,7 +65327,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.039603
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-3-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            21.52,
+            34.71
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-3-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-3-central-02",
@@ -64503,7 +65375,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.075579
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-3-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            22.48,
+            25.26
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-3-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-3-expansion-01",
@@ -64540,7 +65423,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.808971
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            25.95,
+            48.96
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "take-and-hold-vs-priority-assets-layout-3-expansion-02",
@@ -64577,7 +65471,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.483124
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            18.23,
+            11.16
+          ],
+          "runtime_reference_support_area_ids": [
+            "take-and-hold-vs-priority-assets-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -68706,7 +69611,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.112448
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            8.58,
+            50.32
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-1-defender-home",
@@ -68743,7 +69659,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             10.119746
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            36.08,
+            9.01
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-1-central-north",
@@ -68780,7 +69707,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.11031
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            26.51,
+            37.47
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-1-central-south",
@@ -68817,7 +69755,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.470274
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            17.82,
+            22.31
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-1-expansion-north-east",
@@ -68854,7 +69803,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.162411
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            32.15,
+            52.67
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-1-expansion-south-west",
@@ -68891,7 +69851,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.237753
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            12.36,
+            8.33
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -72928,7 +73899,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.733817
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            9.9,
+            47.73
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-2-defender-home",
@@ -72965,7 +73947,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.864348
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            33.63,
+            12.05
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-2-central-west",
@@ -73002,7 +73995,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.454083
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            11.06,
+            29.61
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-2-central-east",
@@ -73039,7 +74043,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.688504
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-08"
+          ],
+          "runtime_reference_inches": [
+            33.25,
+            30.55
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-08"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-2-expansion-north-east",
@@ -73076,7 +74091,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.074706
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-04"
+          ],
+          "runtime_reference_inches": [
+            37.23,
+            42.98
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-04"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-2-expansion-south-west",
@@ -73113,7 +74139,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.134644
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-13"
+          ],
+          "runtime_reference_inches": [
+            6.86,
+            17.11
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-13"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -77150,7 +78187,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.720087
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            9.08,
+            51.19
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-3-defender-home",
@@ -77187,7 +78235,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.474616
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            34.81,
+            9.01
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-3-central-north",
@@ -77224,7 +78283,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.93929
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            23.21,
+            35.93
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-3-central-south",
@@ -77261,7 +78331,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.1689
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            20.35,
+            23.67
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-3-expansion-north-east",
@@ -77298,7 +78379,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.531783
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            29.28,
+            51.31
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-purge-the-foe-layout-3-expansion-south-west",
@@ -77335,7 +78427,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.425678
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            15.25,
+            8.98
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -81372,7 +82475,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.67276
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            9.4,
+            49.55
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-1-defender-home-01",
@@ -81409,7 +82523,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.175798
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            34.39,
+            10.67
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-1-central-01",
@@ -81446,7 +82571,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.745235
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-1-terrain-area-06"
+          ],
+          "runtime_reference_inches": [
+            24.28,
+            36.67
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-1-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-1-central-02",
@@ -81483,7 +82619,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.614859
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-1-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            20.59,
+            23.28
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-1-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-1-expansion-01",
@@ -81520,7 +82667,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.667655
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            34.53,
+            46.46
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-1-expansion-02",
@@ -81557,7 +82715,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.69963
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            9.95,
+            13.2
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -85594,7 +86763,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.097026
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            17.44,
+            49.02
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-2-defender-home-01",
@@ -85631,7 +86811,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.750971
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            26.68,
+            11.3
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-2-central-01",
@@ -85668,7 +86859,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.470326
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-2-terrain-area-06"
+          ],
+          "runtime_reference_inches": [
+            21.97,
+            33.75
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-2-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-2-central-02",
@@ -85705,7 +86907,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.542053
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-2-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            22.14,
+            26.21
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-2-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-2-expansion-01",
@@ -85742,7 +86955,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.169308
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-2-terrain-area-05"
+          ],
+          "runtime_reference_inches": [
+            34.99,
+            42.95
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-2-terrain-area-05"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-2-expansion-02",
@@ -85779,7 +87003,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.215005
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-2-terrain-area-12"
+          ],
+          "runtime_reference_inches": [
+            9.1,
+            17.03
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-2-terrain-area-12"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -89816,7 +91051,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.633205
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            8.56,
+            50.1
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-3-defender-home-01",
@@ -89853,7 +91099,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.731657
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            35.34,
+            9.9
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-3-central-01",
@@ -89890,7 +91147,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.018847
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-3-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            26.09,
+            32.69
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-3-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-3-central-02",
@@ -89927,7 +91195,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.223978
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-3-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            18.16,
+            27.29
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-3-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-3-expansion-01",
@@ -89964,7 +91243,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.332562
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            25.19,
+            50.06
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-disruption-layout-3-expansion-02",
@@ -90001,7 +91291,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.197794
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-disruption-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            18.98,
+            10.13
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-disruption-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -94041,7 +95342,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.03381
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            18.94,
+            48.37
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-1-defender-home-01",
@@ -94078,7 +95390,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.90098
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            24.9,
+            11.47
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-1-central-01",
@@ -94115,7 +95438,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.602302
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            24.0,
+            37.17
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-1-central-02",
@@ -94152,7 +95486,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.723006
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            20.26,
+            23.67
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-1-expansion-01",
@@ -94189,7 +95534,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.01647
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-08"
+          ],
+          "runtime_reference_inches": [
+            36.22,
+            35.09
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-08"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-1-expansion-02",
@@ -94226,7 +95582,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.614325
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            8.08,
+            24.86
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -98263,7 +99630,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.79766
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-06"
+          ],
+          "runtime_reference_inches": [
+            6.29,
+            38.96
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-2-defender-home-01",
@@ -98300,7 +99678,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.467711
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            37.69,
+            21.16
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-2-central-01",
@@ -98337,7 +99726,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.662838
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            22.32,
+            36.89
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-2-central-02",
@@ -98374,7 +99774,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.449649
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            21.65,
+            22.93
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-2-expansion-01",
@@ -98411,7 +99822,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.928188
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            25.84,
+            48.96
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-2-expansion-02",
@@ -98448,7 +99870,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.790357
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            18.23,
+            11.16
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -102573,7 +104006,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.803178
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            12.3,
+            51.74
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-3-defender-home-01",
@@ -102610,7 +104054,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.965869
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            31.68,
+            8.02
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-3-central-01",
@@ -102647,7 +104102,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.678731
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-06"
+          ],
+          "runtime_reference_inches": [
+            23.62,
+            34.05
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-3-central-02",
@@ -102684,7 +104150,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.691256
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            20.52,
+            25.85
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-3-expansion-01",
@@ -102721,7 +104198,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.794906
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            34.32,
+            45.77
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-reconnaissance-layout-3-expansion-02",
@@ -102758,7 +104246,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.03272
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            9.33,
+            14.13
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -106790,7 +108289,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.248102
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-1-terrain-area-05"
+          ],
+          "runtime_reference_inches": [
+            7.92,
+            45.54
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-1-terrain-area-05"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-1-defender-home-01",
@@ -106827,7 +108337,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.879083
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-1-terrain-area-12"
+          ],
+          "runtime_reference_inches": [
+            36.83,
+            14.98
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-1-terrain-area-12"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-1-central-01",
@@ -106864,7 +108385,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.328758
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-1-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            26.57,
+            32.3
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-1-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-1-central-02",
@@ -106901,7 +108433,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.541175
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            17.62,
+            27.26
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-1-expansion-01",
@@ -106938,7 +108481,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.980378
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            27.14,
+            49.92
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-1-expansion-02",
@@ -106975,7 +108529,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.154549
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            16.62,
+            10.2
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -111012,7 +112577,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             11.149355
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            8.74,
+            52.31
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-2-defender-home-01",
@@ -111049,7 +112625,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             11.495128
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            36.07,
+            7.79
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-2-central-01",
@@ -111086,7 +112673,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             4.920806
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            24.59,
+            33.62
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-2-central-02",
@@ -111123,7 +112721,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.218541
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            19.16,
+            26.26
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-2-expansion-01",
@@ -111160,7 +112769,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.532979
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-2-terrain-area-04"
+          ],
+          "runtime_reference_inches": [
+            34.27,
+            42.6
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-2-terrain-area-04"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-2-expansion-02",
@@ -111197,7 +112817,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.645623
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-2-terrain-area-13"
+          ],
+          "runtime_reference_inches": [
+            9.0,
+            17.48
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-2-terrain-area-13"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -115237,7 +116868,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.210103
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-3-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            22.77,
+            48.45
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-3-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-3-defender-home-01",
@@ -115274,7 +116916,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.476747
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-3-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            20.53,
+            11.89
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-3-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-3-central-01",
@@ -115311,7 +116964,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.42864
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            25.85,
+            30.62
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-3-central-02",
@@ -115348,7 +117012,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.435563
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-3-terrain-area-08"
+          ],
+          "runtime_reference_inches": [
+            18.21,
+            29.81
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-3-terrain-area-08"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-3-expansion-01",
@@ -115385,7 +117060,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.819245
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-3-terrain-area-06"
+          ],
+          "runtime_reference_inches": [
+            34.53,
+            38.57
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-3-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "purge-the-foe-vs-priority-assets-layout-3-expansion-02",
@@ -115422,7 +117108,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.842807
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-3-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            9.49,
+            21.47
+          ],
+          "runtime_reference_support_area_ids": [
+            "purge-the-foe-vs-priority-assets-layout-3-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -119459,7 +121156,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.572056
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            12.71,
+            51.17
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-disruption-layout-1-defender-home-01",
@@ -119496,7 +121204,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.73166
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            32.53,
+            9.23
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-disruption-layout-1-central-01",
@@ -119533,7 +121252,19 @@
           "distances_to_area_polygons_inches": [
             0.0,
             2.261808
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-1-terrain-area-07",
+            "disruption-vs-disruption-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            21.11,
+            32.87
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-1-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-disruption-layout-1-expansion-01",
@@ -119570,7 +121301,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.447543
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            34.0,
+            47.59
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-disruption-layout-1-expansion-02",
@@ -119607,7 +121349,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.364162
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            10.13,
+            12.11
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -123776,7 +125529,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.270448
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-2-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            12.02,
+            51.45
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-2-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-disruption-layout-2-defender-home-01",
@@ -123813,7 +125577,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.81142
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-2-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            32.61,
+            8.65
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-2-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-disruption-layout-2-central-01",
@@ -123850,7 +125625,19 @@
           "distances_to_area_polygons_inches": [
             0.0,
             0.064236
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-2-terrain-area-06",
+            "disruption-vs-disruption-layout-2-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            24.44,
+            31.5
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-2-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-disruption-layout-2-expansion-01",
@@ -123887,7 +125674,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.71513
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-2-terrain-area-04"
+          ],
+          "runtime_reference_inches": [
+            35.29,
+            42.46
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-2-terrain-area-04"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-disruption-layout-2-expansion-02",
@@ -123924,7 +125722,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.536756
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-2-terrain-area-13"
+          ],
+          "runtime_reference_inches": [
+            8.84,
+            17.46
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-2-terrain-area-13"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -128005,7 +129814,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.934401
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-3-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            8.51,
+            51.65
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-3-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-disruption-layout-3-defender-home-01",
@@ -128042,7 +129862,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.937372
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-3-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            36.0,
+            8.47
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-3-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-disruption-layout-3-central-01",
@@ -128079,7 +129910,19 @@
           "distances_to_area_polygons_inches": [
             0.0,
             0.18404
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-3-terrain-area-08",
+            "disruption-vs-disruption-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            20.7,
+            31.92
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-disruption-layout-3-expansion-01",
@@ -128116,7 +129959,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.704939
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            27.52,
+            52.03
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-disruption-layout-3-expansion-02",
@@ -128153,7 +130007,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.141931
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-disruption-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            16.64,
+            8.95
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-disruption-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -132330,7 +134195,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.589073
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            17.32,
+            49.35
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-1-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-1-defender-home-01",
@@ -132367,7 +134243,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.266059
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            26.32,
+            10.28
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-1-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-1-central-01",
@@ -132404,7 +134291,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.298533
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-1-terrain-area-06"
+          ],
+          "runtime_reference_inches": [
+            26.32,
+            36.7
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-1-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-1-central-02",
@@ -132441,7 +134339,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.319906
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-1-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            17.73,
+            23.18
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-1-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-1-expansion-01",
@@ -132478,7 +134387,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.182758
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-1-terrain-area-05"
+          ],
+          "runtime_reference_inches": [
+            36.55,
+            41.42
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-1-terrain-area-05"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-1-expansion-02",
@@ -132515,7 +134435,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.142777
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-1-terrain-area-12"
+          ],
+          "runtime_reference_inches": [
+            7.31,
+            18.88
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-1-terrain-area-12"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -136644,7 +138575,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             10.969796
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-2-terrain-area-05"
+          ],
+          "runtime_reference_inches": [
+            7.55,
+            50.26
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-2-terrain-area-05"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-2-defender-home-01",
@@ -136681,7 +138623,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             11.083094
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-2-terrain-area-12"
+          ],
+          "runtime_reference_inches": [
+            36.53,
+            9.92
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-2-terrain-area-12"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-2-central-01",
@@ -136718,7 +138671,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             4.322394
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            27.94,
+            33.21
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-2-central-02",
@@ -136755,7 +138719,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             4.277254
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            15.93,
+            26.46
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-2-expansion-01",
@@ -136792,7 +138767,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.930295
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            23.98,
+            51.44
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-2-expansion-02",
@@ -136829,7 +138815,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.959633
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            20.05,
+            8.56
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -140869,7 +142866,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.556558
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            6.45,
+            45.41
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-3-defender-home-01",
@@ -140906,7 +142914,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.411721
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            37.4,
+            14.88
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-3-central-01",
@@ -140943,7 +142962,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.416968
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-3-terrain-area-06"
+          ],
+          "runtime_reference_inches": [
+            20.2,
+            34.42
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-3-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-3-central-02",
@@ -140980,7 +143010,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.466327
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-3-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            23.81,
+            25.52
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-3-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-3-expansion-01",
@@ -141017,7 +143058,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.181286
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            31.89,
+            50.92
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-reconnaissance-layout-3-expansion-02",
@@ -141054,7 +143106,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.152619
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-reconnaissance-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            11.99,
+            9.07
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-reconnaissance-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -145183,7 +147246,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             10.366515
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            7.71,
+            52.25
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-priority-assets-layout-1-defender-home-01",
@@ -145220,7 +147294,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             10.588473
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            36.42,
+            7.66
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-priority-assets-layout-1-central-01",
@@ -145257,7 +147342,19 @@
           "distances_to_area_polygons_inches": [
             0.039591,
             0.086813
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-1-terrain-area-07",
+            "disruption-vs-priority-assets-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            18.99,
+            30.01
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-1-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-priority-assets-layout-1-expansion-01",
@@ -145294,7 +147391,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.863924
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            30.53,
+            48.57
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-priority-assets-layout-1-expansion-02",
@@ -145331,7 +147439,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.698163
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            13.31,
+            11.43
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -149319,7 +151438,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.613033
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            17.71,
+            48.1
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-priority-assets-layout-2-defender-home-01",
@@ -149356,7 +151486,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.280867
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            26.62,
+            12.63
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-priority-assets-layout-2-central-01",
@@ -149393,7 +151534,19 @@
           "distances_to_area_polygons_inches": [
             0.019452,
             0.074568
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-2-terrain-area-08",
+            "disruption-vs-priority-assets-layout-2-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            22.06,
+            32.76
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-2-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-priority-assets-layout-2-expansion-01",
@@ -149430,7 +151583,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.745523
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-2-terrain-area-06"
+          ],
+          "runtime_reference_inches": [
+            36.64,
+            40.83
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-2-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-priority-assets-layout-2-expansion-02",
@@ -149467,7 +151631,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.662015
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-2-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            7.63,
+            19.05
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-2-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -153460,7 +155635,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.293071
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-3-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            8.42,
+            49.93
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-3-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-priority-assets-layout-3-defender-home-01",
@@ -153497,7 +155683,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.902284
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-3-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            36.25,
+            10.32
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-3-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-priority-assets-layout-3-central-01",
@@ -153534,7 +155731,19 @@
           "distances_to_area_polygons_inches": [
             0.340488,
             0.381932
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-3-terrain-area-08",
+            "disruption-vs-priority-assets-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            22.07,
+            32.98
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-3-terrain-area-08"
+          ],
+          "runtime_reference_basis": "project_interior_reference_preserving_source_region_memberships"
         },
         {
           "objective_id": "disruption-vs-priority-assets-layout-3-expansion-01",
@@ -153571,7 +155780,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.101199
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            32.82,
+            48.04
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "disruption-vs-priority-assets-layout-3-expansion-02",
@@ -153608,7 +155828,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.961662
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            11.25,
+            12.19
+          ],
+          "runtime_reference_support_area_ids": [
+            "disruption-vs-priority-assets-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -157689,7 +159920,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.934401
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            8.51,
+            51.65
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-1-defender-home-01",
@@ -157726,7 +159968,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.937372
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            36.0,
+            8.47
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-1-central-01",
@@ -157763,7 +160016,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.817374
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-1-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            17.67,
+            28.95
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-1-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-1-expansion-01",
@@ -157800,7 +160064,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.704939
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            27.52,
+            52.03
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-1-expansion-02",
@@ -157837,7 +160112,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.141931
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            16.64,
+            8.95
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-1-central-02",
@@ -157874,7 +160160,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.777067
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-1-terrain-area-08"
+          ],
+          "runtime_reference_inches": [
+            26.6,
+            32.18
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-1-terrain-area-08"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -162006,7 +164303,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.572056
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-2-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            12.71,
+            51.17
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-2-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-2-defender-home-01",
@@ -162043,7 +164351,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.73166
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-2-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            32.53,
+            9.23
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-2-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-2-central-01",
@@ -162080,7 +164399,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.170976
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_inches": [
+            23.46,
+            33.95
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-2-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-2-expansion-01",
@@ -162117,7 +164447,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.447543
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            34.0,
+            47.59
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-2-expansion-02",
@@ -162154,7 +164495,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.364172
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            10.13,
+            12.11
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-2-central-02",
@@ -162191,7 +164543,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.97441
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            20.48,
+            26.23
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -166316,7 +168679,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.270448
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            12.02,
+            51.45
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-3-defender-home-01",
@@ -166353,7 +168727,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.81142
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            32.61,
+            8.65
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-3-central-01",
@@ -166390,7 +168775,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             4.666699
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-3-terrain-area-06"
+          ],
+          "runtime_reference_inches": [
+            23.49,
+            34.05
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-3-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-3-expansion-01",
@@ -166427,7 +168823,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.71513
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-3-terrain-area-04"
+          ],
+          "runtime_reference_inches": [
+            35.29,
+            42.46
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-3-terrain-area-04"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-3-expansion-02",
@@ -166464,7 +168871,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.536756
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-3-terrain-area-13"
+          ],
+          "runtime_reference_inches": [
+            8.84,
+            17.46
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-3-terrain-area-13"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-reconnaissance-layout-3-central-02",
@@ -166501,7 +168919,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             4.628692
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-3-terrain-area-11"
+          ],
+          "runtime_reference_inches": [
+            20.92,
+            26.0
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-reconnaissance-layout-3-terrain-area-11"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -170538,7 +172967,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.276165
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            10.39,
+            50.31
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-priority-assets-layout-1-defender-home-01",
@@ -170575,7 +173015,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.69754
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            34.23,
+            9.47
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-priority-assets-layout-1-central-01",
@@ -170612,7 +173063,19 @@
           "distances_to_area_polygons_inches": [
             0.0,
             0.228302
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-1-terrain-area-08",
+            "reconnaissance-vs-priority-assets-layout-1-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            21.05,
+            31.06
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-1-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-priority-assets-layout-1-expansion-01",
@@ -170649,7 +173112,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.232972
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            33.68,
+            47.97
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-priority-assets-layout-1-expansion-02",
@@ -170686,7 +173160,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.195464
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            10.43,
+            12.0
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -174855,7 +177340,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.347245
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            11.39,
+            50.04
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-priority-assets-layout-2-defender-home-01",
@@ -174892,7 +177388,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.948833
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            32.76,
+            10.37
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-priority-assets-layout-2-central-01",
@@ -174929,7 +177436,19 @@
           "distances_to_area_polygons_inches": [
             0.0,
             1.743554
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-06",
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            22.02,
+            32.11
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-06"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-priority-assets-layout-2-expansion-01",
@@ -174966,7 +177485,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             4.582593
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-04"
+          ],
+          "runtime_reference_inches": [
+            31.59,
+            44.6
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-04"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-priority-assets-layout-2-expansion-02",
@@ -175003,7 +177533,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             5.896056
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-13"
+          ],
+          "runtime_reference_inches": [
+            10.7,
+            16.35
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-13"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -179084,7 +181625,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.759297
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            8.08,
+            49.12
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-priority-assets-layout-3-defender-home-01",
@@ -179121,7 +181673,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.907321
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            35.46,
+            9.99
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-priority-assets-layout-3-central-01",
@@ -179158,7 +181721,19 @@
           "distances_to_area_polygons_inches": [
             0.0,
             0.30696
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-07",
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-10"
+          ],
+          "runtime_reference_inches": [
+            21.39,
+            31.8
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-07"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-priority-assets-layout-3-expansion-01",
@@ -179195,7 +181770,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.620075
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            31.33,
+            50.08
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "reconnaissance-vs-priority-assets-layout-3-expansion-02",
@@ -179232,7 +181818,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.615995
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            12.57,
+            9.97
+          ],
+          "runtime_reference_support_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -183401,7 +185998,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.453269
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_inches": [
+            7.27,
+            51.25
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-01"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "priority-assets-vs-priority-assets-layout-1-defender-home-01",
@@ -183438,7 +186046,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             9.503567
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            36.77,
+            8.79
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "priority-assets-vs-priority-assets-layout-1-central-01",
@@ -183475,7 +186094,19 @@
           "distances_to_area_polygons_inches": [
             0.398201,
             0.471032
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-08",
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            24.93,
+            30.2
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-08"
+          ],
+          "runtime_reference_basis": "project_interior_reference_preserving_source_region_memberships"
         },
         {
           "objective_id": "priority-assets-vs-priority-assets-layout-1-expansion-01",
@@ -183512,7 +186143,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.247506
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            29.76,
+            49.75
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "priority-assets-vs-priority-assets-layout-1-expansion-02",
@@ -183549,7 +186191,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             6.183331
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_inches": [
+            14.11,
+            10.24
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-16"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -187542,7 +190195,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.134583
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            10.5,
+            50.4
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-2-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "priority-assets-vs-priority-assets-layout-2-defender-home-01",
@@ -187579,7 +190243,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.097221
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            33.85,
+            9.62
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-2-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "priority-assets-vs-priority-assets-layout-2-central-01",
@@ -187616,7 +190291,20 @@
           "distances_to_area_polygons_inches": [
             0.0,
             0.016283
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-2-terrain-area-08",
+            "priority-assets-vs-priority-assets-layout-2-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            22.03,
+            27.84
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-2-terrain-area-08",
+            "priority-assets-vs-priority-assets-layout-2-terrain-area-09"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "priority-assets-vs-priority-assets-layout-2-expansion-01",
@@ -187653,7 +190341,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.495689
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_inches": [
+            33.35,
+            45.62
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-2-terrain-area-03"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "priority-assets-vs-priority-assets-layout-2-expansion-02",
@@ -187690,7 +190389,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.5097
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_inches": [
+            10.53,
+            14.36
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-2-terrain-area-14"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -191678,7 +194388,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.387201
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-02"
+          ],
+          "runtime_reference_inches": [
+            8.92,
+            48.79
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-02"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "priority-assets-vs-priority-assets-layout-3-defender-home-01",
@@ -191715,7 +194436,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             8.295089
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-15"
+          ],
+          "runtime_reference_inches": [
+            34.36,
+            10.44
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-15"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "priority-assets-vs-priority-assets-layout-3-central-01",
@@ -191752,7 +194484,19 @@
           "distances_to_area_polygons_inches": [
             0.537001,
             0.574118
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-08",
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_inches": [
+            21.92,
+            32.94
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-09"
+          ],
+          "runtime_reference_basis": "project_interior_reference_preserving_source_region_memberships"
         },
         {
           "objective_id": "priority-assets-vs-priority-assets-layout-3-expansion-01",
@@ -191789,7 +194533,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.597884
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-05"
+          ],
+          "runtime_reference_inches": [
+            36.36,
+            39.71
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-05"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         },
         {
           "objective_id": "priority-assets-vs-priority-assets-layout-3-expansion-02",
@@ -191826,7 +194581,18 @@
           "distances_to_area_polygons_inches": [
             0.0,
             7.570192
-          ]
+          ],
+          "semantic_source_terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-12"
+          ],
+          "runtime_reference_inches": [
+            7.5,
+            19.19
+          ],
+          "runtime_reference_support_area_ids": [
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-12"
+          ],
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group"
         }
       ],
       "eye_contact_icons": [
@@ -225951,5 +228717,6 @@
         }
       ]
     }
-  ]
+  ],
+  "objective_association_review_sha256": "a01e515f43fc4b6c2097a7b2fb5f42024d4979f7a688a3297b34cd911e86f92a"
 }

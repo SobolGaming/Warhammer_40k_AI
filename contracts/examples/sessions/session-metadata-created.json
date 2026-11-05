@@ -1,9 +1,9 @@
 {
   "catalog_id": "phase9a-canonical",
   "created_at": "2026-07-18T20:00:00Z",
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f9ba59c8dca52eb0abc92ebf7df5209011643b51ae2238ee94000e9ed89d9e24",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:03903bdcdebb313af4ff38d345372ac96a9a608b1089271e78242a7f57d9d54c",
   "engine_version": "0.1.0",
-  "event_cursor": "JTStOyjGu8bz-9A830Pmd_5i4GLIFJXa9PhrM8JerTqG4foDF9FgOfY-uLdClrqi",
+  "event_cursor": "_6jXIAvMxJLgvFV-4U6yPo3ImfsOU2rW1CJx3TozHKX_7ouioH9RALvfDB0zQQRs",
   "game_id": "phase18e-contract-session",
   "last_activity_at": "2026-07-18T20:00:00Z",
   "lifecycle_status": {
@@ -15,7 +15,7 @@
     "stage": "setup",
     "status_kind": "advanced"
   },
-  "projection_state_hash": "f10f4646e95765c937ba84e102aaadfd19519cba4dfca63564dc3d66ee323c64",
+  "projection_state_hash": "cc537663dfa8b9da2425c4d1a46b29485ded59f417b0fced158fe77a14188ad0",
   "rules_overlay_ids": [],
   "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
   "ruleset_id": {

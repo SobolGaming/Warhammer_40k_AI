@@ -57,10 +57,26 @@ source-ID-bound correction. No placement/contact tolerance was expanded.
 Source review is not full-game certification. Final tests, type/quality/coverage,
 generated contracts, performance and exact-head remote gates are separate evidence.
 
-Page 10's central marker remains an ordinary point objective: its raw center is
-0.054079 and 0.068049 inches outside the two nearest source outlines. The simplified
-quantized runtime footprint overlaps it by 0.069997 inches, but no component does.
-The supported control-source resolver preserves the ordinary point; it does not
-infer a link from nominal terrain-area overlap. The other three source-unbound
-markers remain ordinary points too. This bounded model overlay is recorded rather
-than changing source binding thresholds or manufacturing a source relationship.
+## Objective associations and illustration centers
+
+All 249 objective glyphs designate terrain objectives: 228 single-footprint groups
+and 21 two-piece Single groups, totaling 270 physical member references.
+`reviewed-objective-associations.json` records the explicit all-page visual review.
+The four displaced central symbols on pages 10, 44, 51 and 53 still designate their
+central Single terrain group. Their centers were offset to preserve visibility of
+the green artwork; center-to-outline distance does not determine this association.
+The user supplied that interpretation, independently confirmed by all 249 glyph
+reviews. Official Core Rules page 52 clauses 14.01 and 14.02 establish terrain-area
+measurement and control; `objective-rules-source-receipt.json` pins that primary
+source. Generic non-terrain markers remain supported outside this Event dataset.
+
+Measured glyph centers remain `illustration_x_inches` / `illustration_y_inches` in
+the generated artifact. Public marker coordinates are project semantic reference
+points inside the reviewed group, retaining the existing strict generic admission
+boundary. Page 10 stays (24.21, 29.97); page 44 changes (21.91, 33.37) to (22.07, 32.98),
+page 51 (25.41, 30.20) to (24.93, 30.20), and page 53 (21.92, 33.53) to (21.92, 32.94).
+These three adjusted points are not measured PDF positions. All other reference
+points retain their quantized illustration centers. The viewer labels the runtime
+reference points; objective control and range use the complete linked terrain area.
+Exact reviewed associations are pinned; there is no proximity or nearest-terrain
+fallback and no geometry tolerance increase.

@@ -51,7 +51,7 @@
     52,
     53
   ],
-  "source_extraction_payload_sha256": "94476b9c2b3756ac49e5045d31b4cfc577451ceeda87aee01df5431ae457f111",
+  "source_extraction_payload_sha256": "9c008361396fee33af9ed1f2352531b62c7c016d189c8984917c9c65224e91d6",
   "source_coordinate_frame": {
     "pdf_background_image_xref": 5664,
     "pdf_background_image_sha256": "2eda9e45dadd328907dba59ca1f6630e816571e2bcfc20b1f5bf97f0c8b8772a",
@@ -3295,6 +3295,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-1-7x11-5-upper-left"
           ],
+          "illustration_x_inches": 16.49,
+          "illustration_y_inches": 49.85,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -3307,6 +3310,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-1-7x11-5-lower-right"
           ],
+          "illustration_x_inches": 25.76,
+          "illustration_y_inches": 12.71,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -3320,6 +3326,9 @@
             "take-and-hold-vs-take-and-hold-layout-1-8x11-5-polygon-central-north",
             "take-and-hold-vs-take-and-hold-layout-1-8x11-5-polygon-central-south"
           ],
+          "illustration_x_inches": 22.02,
+          "illustration_y_inches": 30.01,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -3332,6 +3341,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-1-7x11-5-upper-right"
           ],
+          "illustration_x_inches": 36.72,
+          "illustration_y_inches": 41.9,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -3344,6 +3356,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-1-7x11-5-lower-left"
           ],
+          "illustration_x_inches": 7.4,
+          "illustration_y_inches": 19.16,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -5519,6 +5534,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-2-7x11-5-left-home"
           ],
+          "illustration_x_inches": 6.76,
+          "illustration_y_inches": 31.2,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -5531,6 +5549,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-2-7x11-5-right-home"
           ],
+          "illustration_x_inches": 37.24,
+          "illustration_y_inches": 28.67,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -5540,7 +5561,13 @@
           "role": "central",
           "x_inches": 24.21,
           "y_inches": 29.97,
-          "terrain_area_ids": [],
+          "terrain_area_ids": [
+            "take-and-hold-vs-take-and-hold-layout-2-6x4-south-east",
+            "take-and-hold-vs-take-and-hold-layout-2-6x4-north-west"
+          ],
+          "illustration_x_inches": 24.21,
+          "illustration_y_inches": 29.97,
+          "runtime_reference_basis": "project_interior_reference_preserving_source_region_memberships",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -5553,6 +5580,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-2-7x11-5-north-expansion"
           ],
+          "illustration_x_inches": 24.92,
+          "illustration_y_inches": 50.42,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -5565,6 +5595,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-2-7x11-5-south-expansion"
           ],
+          "illustration_x_inches": 19.21,
+          "illustration_y_inches": 9.36,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -7704,6 +7737,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west"
           ],
+          "illustration_x_inches": 10.08,
+          "illustration_y_inches": 50.44,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -7716,6 +7752,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east"
           ],
+          "illustration_x_inches": 33.74,
+          "illustration_y_inches": 8.88,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -7729,6 +7768,9 @@
             "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
             "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east"
           ],
+          "illustration_x_inches": 21.99,
+          "illustration_y_inches": 30.01,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -7741,6 +7783,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east"
           ],
+          "illustration_x_inches": 34.95,
+          "illustration_y_inches": 49.26,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -7753,6 +7798,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west"
           ],
+          "illustration_x_inches": 10.21,
+          "illustration_y_inches": 10.7,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -10207,6 +10255,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-03"
           ],
+          "illustration_x_inches": 8.37,
+          "illustration_y_inches": 49.15,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -10219,6 +10270,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-14"
           ],
+          "illustration_x_inches": 35.78,
+          "illustration_y_inches": 10.66,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -10231,6 +10285,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-07"
           ],
+          "illustration_x_inches": 25.59,
+          "illustration_y_inches": 32.65,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -10243,6 +10300,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-10"
           ],
+          "illustration_x_inches": 18.06,
+          "illustration_y_inches": 27.49,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -10255,6 +10315,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-01"
           ],
+          "illustration_x_inches": 30.37,
+          "illustration_y_inches": 49.21,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -10267,6 +10330,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-16"
           ],
+          "illustration_x_inches": 13.36,
+          "illustration_y_inches": 10.43,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -12417,6 +12483,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-02"
           ],
+          "illustration_x_inches": 8.32,
+          "illustration_y_inches": 50.41,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -12429,6 +12498,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-15"
           ],
+          "illustration_x_inches": 35.87,
+          "illustration_y_inches": 9.63,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -12441,6 +12513,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-07"
           ],
+          "illustration_x_inches": 24.87,
+          "illustration_y_inches": 33.02,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -12453,6 +12528,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-10"
           ],
+          "illustration_x_inches": 19.52,
+          "illustration_y_inches": 26.84,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -12465,6 +12543,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-01"
           ],
+          "illustration_x_inches": 34.58,
+          "illustration_y_inches": 50.12,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -12477,6 +12558,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-2-terrain-area-16"
           ],
+          "illustration_x_inches": 9.58,
+          "illustration_y_inches": 10.08,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -14877,6 +14961,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-01"
           ],
+          "illustration_x_inches": 10.74,
+          "illustration_y_inches": 49.92,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -14889,6 +14976,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-16"
           ],
+          "illustration_x_inches": 32.86,
+          "illustration_y_inches": 10.45,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -14901,6 +14991,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-08"
           ],
+          "illustration_x_inches": 20.99,
+          "illustration_y_inches": 34.18,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -14913,6 +15006,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-09"
           ],
+          "illustration_x_inches": 23.08,
+          "illustration_y_inches": 25.8,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -14925,6 +15021,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-06"
           ],
+          "illustration_x_inches": 36.56,
+          "illustration_y_inches": 37.92,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -14937,6 +15036,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-11"
           ],
+          "illustration_x_inches": 7.31,
+          "illustration_y_inches": 22.16,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -17080,6 +17182,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-disruption-layout-1-terrain-area-02"
           ],
+          "illustration_x_inches": 6.99,
+          "illustration_y_inches": 50.35,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -17092,6 +17197,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-disruption-layout-1-terrain-area-15"
           ],
+          "illustration_x_inches": 36.99,
+          "illustration_y_inches": 9.58,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -17102,8 +17210,12 @@
           "x_inches": 21.39,
           "y_inches": 31.8,
           "terrain_area_ids": [
-            "take-and-hold-vs-disruption-layout-1-terrain-area-07"
+            "take-and-hold-vs-disruption-layout-1-terrain-area-07",
+            "take-and-hold-vs-disruption-layout-1-terrain-area-10"
           ],
+          "illustration_x_inches": 21.39,
+          "illustration_y_inches": 31.8,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -17116,6 +17228,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-disruption-layout-1-terrain-area-03"
           ],
+          "illustration_x_inches": 30.42,
+          "illustration_y_inches": 48.88,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -17128,6 +17243,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-disruption-layout-1-terrain-area-14"
           ],
+          "illustration_x_inches": 13.56,
+          "illustration_y_inches": 10.96,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -19299,6 +19417,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-disruption-layout-2-terrain-area-01"
           ],
+          "illustration_x_inches": 8.55,
+          "illustration_y_inches": 51.33,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -19311,6 +19432,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-disruption-layout-2-terrain-area-16"
           ],
+          "illustration_x_inches": 35.33,
+          "illustration_y_inches": 8.86,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -19321,8 +19445,12 @@
           "x_inches": 23.78,
           "y_inches": 31.1,
           "terrain_area_ids": [
-            "take-and-hold-vs-disruption-layout-2-terrain-area-07"
+            "take-and-hold-vs-disruption-layout-2-terrain-area-07",
+            "take-and-hold-vs-disruption-layout-2-terrain-area-10"
           ],
+          "illustration_x_inches": 23.78,
+          "illustration_y_inches": 31.1,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -19335,6 +19463,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-disruption-layout-2-terrain-area-03"
           ],
+          "illustration_x_inches": 33.36,
+          "illustration_y_inches": 46.32,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -19347,6 +19478,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-disruption-layout-2-terrain-area-14"
           ],
+          "illustration_x_inches": 10.71,
+          "illustration_y_inches": 13.5,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -21482,6 +21616,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-disruption-layout-3-terrain-area-04"
           ],
+          "illustration_x_inches": 21.85,
+          "illustration_y_inches": 47.3,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -21494,6 +21631,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-disruption-layout-3-terrain-area-13"
           ],
+          "illustration_x_inches": 22.34,
+          "illustration_y_inches": 12.63,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -21504,8 +21644,12 @@
           "x_inches": 19.87,
           "y_inches": 29.88,
           "terrain_area_ids": [
+            "take-and-hold-vs-disruption-layout-3-terrain-area-08",
             "take-and-hold-vs-disruption-layout-3-terrain-area-09"
           ],
+          "illustration_x_inches": 19.87,
+          "illustration_y_inches": 29.88,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -21518,6 +21662,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-disruption-layout-3-terrain-area-05"
           ],
+          "illustration_x_inches": 35.53,
+          "illustration_y_inches": 37.56,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -21530,6 +21677,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-disruption-layout-3-terrain-area-12"
           ],
+          "illustration_x_inches": 7.47,
+          "illustration_y_inches": 22.22,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -23723,6 +23873,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-reconnaissance-layout-1-terrain-area-01"
           ],
+          "illustration_x_inches": 12.34,
+          "illustration_y_inches": 51.11,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -23735,6 +23888,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-reconnaissance-layout-1-terrain-area-16"
           ],
+          "illustration_x_inches": 31.45,
+          "illustration_y_inches": 8.51,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -23748,6 +23904,9 @@
             "take-and-hold-vs-reconnaissance-layout-1-terrain-area-07",
             "take-and-hold-vs-reconnaissance-layout-1-terrain-area-10"
           ],
+          "illustration_x_inches": 21.95,
+          "illustration_y_inches": 30.22,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -23760,6 +23919,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-reconnaissance-layout-1-terrain-area-03"
           ],
+          "illustration_x_inches": 34.74,
+          "illustration_y_inches": 44.2,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -23772,6 +23934,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-reconnaissance-layout-1-terrain-area-14"
           ],
+          "illustration_x_inches": 9.25,
+          "illustration_y_inches": 15.78,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -25947,6 +26112,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-reconnaissance-layout-2-terrain-area-03"
           ],
+          "illustration_x_inches": 8.13,
+          "illustration_y_inches": 47.68,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -25959,6 +26127,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-reconnaissance-layout-2-terrain-area-14"
           ],
+          "illustration_x_inches": 36.36,
+          "illustration_y_inches": 12.37,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -25969,9 +26140,12 @@
           "x_inches": 21.15,
           "y_inches": 31.39,
           "terrain_area_ids": [
-            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-09",
-            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-08"
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-08",
+            "take-and-hold-vs-reconnaissance-layout-2-terrain-area-09"
           ],
+          "illustration_x_inches": 21.15,
+          "illustration_y_inches": 31.39,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -25984,6 +26158,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-reconnaissance-layout-2-terrain-area-02"
           ],
+          "illustration_x_inches": 27.62,
+          "illustration_y_inches": 49.01,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -25996,6 +26173,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-reconnaissance-layout-2-terrain-area-15"
           ],
+          "illustration_x_inches": 16.57,
+          "illustration_y_inches": 10.64,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -28135,6 +28315,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-reconnaissance-layout-3-terrain-area-01"
           ],
+          "illustration_x_inches": 8.41,
+          "illustration_y_inches": 49.22,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -28147,6 +28330,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-reconnaissance-layout-3-terrain-area-16"
           ],
+          "illustration_x_inches": 35.38,
+          "illustration_y_inches": 10.67,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -28160,6 +28346,9 @@
             "take-and-hold-vs-reconnaissance-layout-3-terrain-area-08",
             "take-and-hold-vs-reconnaissance-layout-3-terrain-area-09"
           ],
+          "illustration_x_inches": 22.02,
+          "illustration_y_inches": 30.01,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -28172,6 +28361,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-reconnaissance-layout-3-terrain-area-02"
           ],
+          "illustration_x_inches": 33.41,
+          "illustration_y_inches": 46.82,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -28184,6 +28376,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-reconnaissance-layout-3-terrain-area-15"
           ],
+          "illustration_x_inches": 10.06,
+          "illustration_y_inches": 13.11,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -30580,6 +30775,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-1-terrain-area-01"
           ],
+          "illustration_x_inches": 10.98,
+          "illustration_y_inches": 51.63,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -30592,6 +30790,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-1-terrain-area-16"
           ],
+          "illustration_x_inches": 32.89,
+          "illustration_y_inches": 8.13,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -30604,6 +30805,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-1-terrain-area-06"
           ],
+          "illustration_x_inches": 20.28,
+          "illustration_y_inches": 35.64,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -30616,6 +30820,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-1-terrain-area-11"
           ],
+          "illustration_x_inches": 24.46,
+          "illustration_y_inches": 25.06,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -30628,6 +30835,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-1-terrain-area-03"
           ],
+          "illustration_x_inches": 34.98,
+          "illustration_y_inches": 45.66,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -30640,6 +30850,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-1-terrain-area-14"
           ],
+          "illustration_x_inches": 8.45,
+          "illustration_y_inches": 14.02,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -32746,6 +32959,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-2-terrain-area-01"
           ],
+          "illustration_x_inches": 11.9,
+          "illustration_y_inches": 49.36,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -32758,6 +32974,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-2-terrain-area-15"
           ],
+          "illustration_x_inches": 31.29,
+          "illustration_y_inches": 10.52,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -32770,6 +32989,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-2-terrain-area-07"
           ],
+          "illustration_x_inches": 19.98,
+          "illustration_y_inches": 34.78,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -32782,6 +33004,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-2-terrain-area-09"
           ],
+          "illustration_x_inches": 24.18,
+          "illustration_y_inches": 25.34,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -32794,6 +33019,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-2-terrain-area-08"
           ],
+          "illustration_x_inches": 37.51,
+          "illustration_y_inches": 34.49,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -32806,6 +33034,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-2-terrain-area-10"
           ],
+          "illustration_x_inches": 6.6,
+          "illustration_y_inches": 25.29,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -34974,6 +35205,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-3-terrain-area-06"
           ],
+          "illustration_x_inches": 6.07,
+          "illustration_y_inches": 37.97,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -34986,6 +35220,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-3-terrain-area-11"
           ],
+          "illustration_x_inches": 37.69,
+          "illustration_y_inches": 22.15,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -34998,6 +35235,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-3-terrain-area-07"
           ],
+          "illustration_x_inches": 21.52,
+          "illustration_y_inches": 34.71,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -35010,6 +35250,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-3-terrain-area-10"
           ],
+          "illustration_x_inches": 22.48,
+          "illustration_y_inches": 25.26,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -35022,6 +35265,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-3-terrain-area-03"
           ],
+          "illustration_x_inches": 25.95,
+          "illustration_y_inches": 48.96,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -35034,6 +35280,9 @@
           "terrain_area_ids": [
             "take-and-hold-vs-priority-assets-layout-3-terrain-area-14"
           ],
+          "illustration_x_inches": 18.23,
+          "illustration_y_inches": 11.16,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -37148,6 +37397,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-03"
           ],
+          "illustration_x_inches": 8.58,
+          "illustration_y_inches": 50.32,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -37160,6 +37412,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-14"
           ],
+          "illustration_x_inches": 36.08,
+          "illustration_y_inches": 9.01,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -37172,6 +37427,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-07"
           ],
+          "illustration_x_inches": 26.51,
+          "illustration_y_inches": 37.47,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -37184,6 +37442,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-10"
           ],
+          "illustration_x_inches": 17.82,
+          "illustration_y_inches": 22.31,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -37196,6 +37457,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-01"
           ],
+          "illustration_x_inches": 32.15,
+          "illustration_y_inches": 52.67,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -37208,6 +37472,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-16"
           ],
+          "illustration_x_inches": 12.36,
+          "illustration_y_inches": 8.33,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -39608,6 +39875,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-03"
           ],
+          "illustration_x_inches": 9.9,
+          "illustration_y_inches": 47.73,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -39620,6 +39890,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-14"
           ],
+          "illustration_x_inches": 33.63,
+          "illustration_y_inches": 12.05,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -39632,6 +39905,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-09"
           ],
+          "illustration_x_inches": 11.06,
+          "illustration_y_inches": 29.61,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -39644,6 +39920,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-08"
           ],
+          "illustration_x_inches": 33.25,
+          "illustration_y_inches": 30.55,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -39656,6 +39935,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-04"
           ],
+          "illustration_x_inches": 37.23,
+          "illustration_y_inches": 42.98,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -39668,6 +39950,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-13"
           ],
+          "illustration_x_inches": 6.86,
+          "illustration_y_inches": 17.11,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -41814,6 +42099,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-03"
           ],
+          "illustration_x_inches": 9.08,
+          "illustration_y_inches": 51.19,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -41826,6 +42114,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-14"
           ],
+          "illustration_x_inches": 34.81,
+          "illustration_y_inches": 9.01,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -41838,6 +42129,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-07"
           ],
+          "illustration_x_inches": 23.21,
+          "illustration_y_inches": 35.93,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -41850,6 +42144,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-10"
           ],
+          "illustration_x_inches": 20.35,
+          "illustration_y_inches": 23.67,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -41862,6 +42159,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-01"
           ],
+          "illustration_x_inches": 29.28,
+          "illustration_y_inches": 51.31,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -41874,6 +42174,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-16"
           ],
+          "illustration_x_inches": 15.25,
+          "illustration_y_inches": 8.98,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -44020,6 +44323,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-1-terrain-area-01"
           ],
+          "illustration_x_inches": 9.4,
+          "illustration_y_inches": 49.55,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -44032,6 +44338,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-1-terrain-area-16"
           ],
+          "illustration_x_inches": 34.39,
+          "illustration_y_inches": 10.67,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -44044,6 +44353,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-1-terrain-area-06"
           ],
+          "illustration_x_inches": 24.28,
+          "illustration_y_inches": 36.67,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -44056,6 +44368,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-1-terrain-area-11"
           ],
+          "illustration_x_inches": 20.59,
+          "illustration_y_inches": 23.28,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -44068,6 +44383,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-1-terrain-area-03"
           ],
+          "illustration_x_inches": 34.53,
+          "illustration_y_inches": 46.46,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -44080,6 +44398,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-1-terrain-area-14"
           ],
+          "illustration_x_inches": 9.95,
+          "illustration_y_inches": 13.2,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -46480,6 +46801,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-2-terrain-area-03"
           ],
+          "illustration_x_inches": 17.44,
+          "illustration_y_inches": 49.02,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -46492,6 +46816,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-2-terrain-area-14"
           ],
+          "illustration_x_inches": 26.68,
+          "illustration_y_inches": 11.3,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -46504,6 +46831,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-2-terrain-area-06"
           ],
+          "illustration_x_inches": 21.97,
+          "illustration_y_inches": 33.75,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -46516,6 +46846,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-2-terrain-area-11"
           ],
+          "illustration_x_inches": 22.14,
+          "illustration_y_inches": 26.21,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -46528,6 +46861,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-2-terrain-area-05"
           ],
+          "illustration_x_inches": 34.99,
+          "illustration_y_inches": 42.95,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -46540,6 +46876,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-2-terrain-area-12"
           ],
+          "illustration_x_inches": 9.1,
+          "illustration_y_inches": 17.03,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -48690,6 +49029,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-3-terrain-area-03"
           ],
+          "illustration_x_inches": 8.56,
+          "illustration_y_inches": 50.1,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -48702,6 +49044,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-3-terrain-area-14"
           ],
+          "illustration_x_inches": 35.34,
+          "illustration_y_inches": 9.9,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -48714,6 +49059,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-3-terrain-area-07"
           ],
+          "illustration_x_inches": 26.09,
+          "illustration_y_inches": 32.69,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -48726,6 +49074,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-3-terrain-area-10"
           ],
+          "illustration_x_inches": 18.16,
+          "illustration_y_inches": 27.29,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -48738,6 +49089,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-3-terrain-area-01"
           ],
+          "illustration_x_inches": 25.19,
+          "illustration_y_inches": 50.06,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -48750,6 +49104,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-disruption-layout-3-terrain-area-16"
           ],
+          "illustration_x_inches": 18.98,
+          "illustration_y_inches": 10.13,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -50896,6 +51253,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-03"
           ],
+          "illustration_x_inches": 18.94,
+          "illustration_y_inches": 48.37,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -50908,6 +51268,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-14"
           ],
+          "illustration_x_inches": 24.9,
+          "illustration_y_inches": 11.47,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -50920,6 +51283,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-07"
           ],
+          "illustration_x_inches": 24.0,
+          "illustration_y_inches": 37.17,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -50932,6 +51298,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-10"
           ],
+          "illustration_x_inches": 20.26,
+          "illustration_y_inches": 23.67,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -50944,6 +51313,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-08"
           ],
+          "illustration_x_inches": 36.22,
+          "illustration_y_inches": 35.09,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -50956,6 +51328,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-09"
           ],
+          "illustration_x_inches": 8.08,
+          "illustration_y_inches": 24.86,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -53120,6 +53495,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-06"
           ],
+          "illustration_x_inches": 6.29,
+          "illustration_y_inches": 38.96,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -53132,6 +53510,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-11"
           ],
+          "illustration_x_inches": 37.69,
+          "illustration_y_inches": 21.16,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -53144,6 +53525,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-07"
           ],
+          "illustration_x_inches": 22.32,
+          "illustration_y_inches": 36.89,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -53156,6 +53540,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-10"
           ],
+          "illustration_x_inches": 21.65,
+          "illustration_y_inches": 22.93,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -53168,6 +53555,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-02"
           ],
+          "illustration_x_inches": 25.84,
+          "illustration_y_inches": 48.96,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -53180,6 +53570,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-2-terrain-area-15"
           ],
+          "illustration_x_inches": 18.23,
+          "illustration_y_inches": 11.16,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -55290,6 +55683,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-01"
           ],
+          "illustration_x_inches": 12.3,
+          "illustration_y_inches": 51.74,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -55302,6 +55698,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-16"
           ],
+          "illustration_x_inches": 31.68,
+          "illustration_y_inches": 8.02,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -55314,6 +55713,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-06"
           ],
+          "illustration_x_inches": 23.62,
+          "illustration_y_inches": 34.05,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -55326,6 +55728,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-11"
           ],
+          "illustration_x_inches": 20.52,
+          "illustration_y_inches": 25.85,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -55338,6 +55743,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-03"
           ],
+          "illustration_x_inches": 34.32,
+          "illustration_y_inches": 45.77,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -55350,6 +55758,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-reconnaissance-layout-3-terrain-area-14"
           ],
+          "illustration_x_inches": 9.33,
+          "illustration_y_inches": 14.13,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -57456,6 +57867,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-1-terrain-area-05"
           ],
+          "illustration_x_inches": 7.92,
+          "illustration_y_inches": 45.54,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -57468,6 +57882,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-1-terrain-area-12"
           ],
+          "illustration_x_inches": 36.83,
+          "illustration_y_inches": 14.98,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -57480,6 +57897,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-1-terrain-area-07"
           ],
+          "illustration_x_inches": 26.57,
+          "illustration_y_inches": 32.3,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -57492,6 +57912,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-1-terrain-area-10"
           ],
+          "illustration_x_inches": 17.62,
+          "illustration_y_inches": 27.26,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -57504,6 +57927,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-1-terrain-area-02"
           ],
+          "illustration_x_inches": 27.14,
+          "illustration_y_inches": 49.92,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -57516,6 +57942,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-1-terrain-area-15"
           ],
+          "illustration_x_inches": 16.62,
+          "illustration_y_inches": 10.2,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -59634,6 +60063,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-2-terrain-area-02"
           ],
+          "illustration_x_inches": 8.74,
+          "illustration_y_inches": 52.31,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -59646,6 +60078,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-2-terrain-area-15"
           ],
+          "illustration_x_inches": 36.07,
+          "illustration_y_inches": 7.79,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -59658,6 +60093,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-2-terrain-area-07"
           ],
+          "illustration_x_inches": 24.59,
+          "illustration_y_inches": 33.62,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -59670,6 +60108,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-2-terrain-area-10"
           ],
+          "illustration_x_inches": 19.16,
+          "illustration_y_inches": 26.26,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -59682,6 +60123,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-2-terrain-area-04"
           ],
+          "illustration_x_inches": 34.27,
+          "illustration_y_inches": 42.6,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -59694,6 +60138,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-2-terrain-area-13"
           ],
+          "illustration_x_inches": 9.0,
+          "illustration_y_inches": 17.48,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -62094,6 +62541,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-3-terrain-area-02"
           ],
+          "illustration_x_inches": 22.77,
+          "illustration_y_inches": 48.45,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -62106,6 +62556,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-3-terrain-area-15"
           ],
+          "illustration_x_inches": 20.53,
+          "illustration_y_inches": 11.89,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -62118,6 +62571,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-3-terrain-area-09"
           ],
+          "illustration_x_inches": 25.85,
+          "illustration_y_inches": 30.62,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -62130,6 +62586,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-3-terrain-area-08"
           ],
+          "illustration_x_inches": 18.21,
+          "illustration_y_inches": 29.81,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -62142,6 +62601,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-3-terrain-area-06"
           ],
+          "illustration_x_inches": 34.53,
+          "illustration_y_inches": 38.57,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -62154,6 +62616,9 @@
           "terrain_area_ids": [
             "purge-the-foe-vs-priority-assets-layout-3-terrain-area-11"
           ],
+          "illustration_x_inches": 9.49,
+          "illustration_y_inches": 21.47,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -64343,6 +64808,9 @@
           "terrain_area_ids": [
             "disruption-vs-disruption-layout-1-terrain-area-01"
           ],
+          "illustration_x_inches": 12.71,
+          "illustration_y_inches": 51.17,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -64355,6 +64823,9 @@
           "terrain_area_ids": [
             "disruption-vs-disruption-layout-1-terrain-area-16"
           ],
+          "illustration_x_inches": 32.53,
+          "illustration_y_inches": 9.23,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -64365,8 +64836,12 @@
           "x_inches": 21.11,
           "y_inches": 32.87,
           "terrain_area_ids": [
-            "disruption-vs-disruption-layout-1-terrain-area-07"
+            "disruption-vs-disruption-layout-1-terrain-area-07",
+            "disruption-vs-disruption-layout-1-terrain-area-10"
           ],
+          "illustration_x_inches": 21.11,
+          "illustration_y_inches": 32.87,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -64379,6 +64854,9 @@
           "terrain_area_ids": [
             "disruption-vs-disruption-layout-1-terrain-area-03"
           ],
+          "illustration_x_inches": 34.0,
+          "illustration_y_inches": 47.59,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -64391,6 +64869,9 @@
           "terrain_area_ids": [
             "disruption-vs-disruption-layout-1-terrain-area-14"
           ],
+          "illustration_x_inches": 10.13,
+          "illustration_y_inches": 12.11,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -66522,6 +67003,9 @@
           "terrain_area_ids": [
             "disruption-vs-disruption-layout-2-terrain-area-01"
           ],
+          "illustration_x_inches": 12.02,
+          "illustration_y_inches": 51.45,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -66534,6 +67018,9 @@
           "terrain_area_ids": [
             "disruption-vs-disruption-layout-2-terrain-area-16"
           ],
+          "illustration_x_inches": 32.61,
+          "illustration_y_inches": 8.65,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -66544,8 +67031,12 @@
           "x_inches": 24.44,
           "y_inches": 31.5,
           "terrain_area_ids": [
+            "disruption-vs-disruption-layout-2-terrain-area-06",
             "disruption-vs-disruption-layout-2-terrain-area-11"
           ],
+          "illustration_x_inches": 24.44,
+          "illustration_y_inches": 31.5,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -66558,6 +67049,9 @@
           "terrain_area_ids": [
             "disruption-vs-disruption-layout-2-terrain-area-04"
           ],
+          "illustration_x_inches": 35.29,
+          "illustration_y_inches": 42.46,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -66570,6 +67064,9 @@
           "terrain_area_ids": [
             "disruption-vs-disruption-layout-2-terrain-area-13"
           ],
+          "illustration_x_inches": 8.84,
+          "illustration_y_inches": 17.46,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -68799,6 +69296,9 @@
           "terrain_area_ids": [
             "disruption-vs-disruption-layout-3-terrain-area-02"
           ],
+          "illustration_x_inches": 8.51,
+          "illustration_y_inches": 51.65,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -68811,6 +69311,9 @@
           "terrain_area_ids": [
             "disruption-vs-disruption-layout-3-terrain-area-15"
           ],
+          "illustration_x_inches": 36.0,
+          "illustration_y_inches": 8.47,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -68821,8 +69324,12 @@
           "x_inches": 20.7,
           "y_inches": 31.92,
           "terrain_area_ids": [
+            "disruption-vs-disruption-layout-3-terrain-area-08",
             "disruption-vs-disruption-layout-3-terrain-area-09"
           ],
+          "illustration_x_inches": 20.7,
+          "illustration_y_inches": 31.92,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -68835,6 +69342,9 @@
           "terrain_area_ids": [
             "disruption-vs-disruption-layout-3-terrain-area-01"
           ],
+          "illustration_x_inches": 27.52,
+          "illustration_y_inches": 52.03,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -68847,6 +69357,9 @@
           "terrain_area_ids": [
             "disruption-vs-disruption-layout-3-terrain-area-16"
           ],
+          "illustration_x_inches": 16.64,
+          "illustration_y_inches": 8.95,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -71047,6 +71560,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-1-7x11-5-attacker-home"
           ],
+          "illustration_x_inches": 17.32,
+          "illustration_y_inches": 49.35,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -71059,6 +71575,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-1-7x11-5-defender-home"
           ],
+          "illustration_x_inches": 26.32,
+          "illustration_y_inches": 10.28,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -71071,6 +71590,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-1-8x11-5-polygon-north-center"
           ],
+          "illustration_x_inches": 26.32,
+          "illustration_y_inches": 36.7,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -71083,6 +71605,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-1-8x11-5-polygon-south-center"
           ],
+          "illustration_x_inches": 17.73,
+          "illustration_y_inches": 23.18,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -71095,6 +71620,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-1-7x11-5-east-expansion"
           ],
+          "illustration_x_inches": 36.55,
+          "illustration_y_inches": 41.42,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -71107,6 +71635,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-1-7x11-5-west-expansion"
           ],
+          "illustration_x_inches": 7.31,
+          "illustration_y_inches": 18.88,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -73257,6 +73788,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-2-7x11-5-attacker-home"
           ],
+          "illustration_x_inches": 7.55,
+          "illustration_y_inches": 50.26,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -73269,6 +73803,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-2-7x11-5-defender-home"
           ],
+          "illustration_x_inches": 36.53,
+          "illustration_y_inches": 9.92,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -73281,6 +73818,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-2-7x11-5-central-east"
           ],
+          "illustration_x_inches": 27.94,
+          "illustration_y_inches": 33.21,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -73293,6 +73833,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-2-7x11-5-central-west"
           ],
+          "illustration_x_inches": 15.93,
+          "illustration_y_inches": 26.46,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -73305,6 +73848,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-north-east"
           ],
+          "illustration_x_inches": 23.98,
+          "illustration_y_inches": 51.44,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -73317,6 +73863,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-south-west"
           ],
+          "illustration_x_inches": 20.05,
+          "illustration_y_inches": 8.56,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -75485,6 +76034,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-3-7x11-5-attacker-home"
           ],
+          "illustration_x_inches": 6.45,
+          "illustration_y_inches": 45.41,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -75497,6 +76049,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-3-7x11-5-defender-home"
           ],
+          "illustration_x_inches": 37.4,
+          "illustration_y_inches": 14.88,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -75509,6 +76064,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-3-7x11-5-central-north-west"
           ],
+          "illustration_x_inches": 20.2,
+          "illustration_y_inches": 34.42,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -75521,6 +76079,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-3-7x11-5-central-south-east"
           ],
+          "illustration_x_inches": 23.81,
+          "illustration_y_inches": 25.52,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -75533,6 +76094,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-north-east"
           ],
+          "illustration_x_inches": 31.89,
+          "illustration_y_inches": 50.92,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -75545,6 +76109,9 @@
           "terrain_area_ids": [
             "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-south-west"
           ],
+          "illustration_x_inches": 11.99,
+          "illustration_y_inches": 9.07,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -77916,6 +78483,9 @@
           "terrain_area_ids": [
             "disruption-vs-priority-assets-layout-1-terrain-area-01"
           ],
+          "illustration_x_inches": 7.71,
+          "illustration_y_inches": 52.25,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -77928,6 +78498,9 @@
           "terrain_area_ids": [
             "disruption-vs-priority-assets-layout-1-terrain-area-16"
           ],
+          "illustration_x_inches": 36.42,
+          "illustration_y_inches": 7.66,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -77938,8 +78511,12 @@
           "x_inches": 18.99,
           "y_inches": 30.01,
           "terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-1-terrain-area-07",
             "disruption-vs-priority-assets-layout-1-terrain-area-10"
           ],
+          "illustration_x_inches": 18.99,
+          "illustration_y_inches": 30.01,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -77952,6 +78529,9 @@
           "terrain_area_ids": [
             "disruption-vs-priority-assets-layout-1-terrain-area-02"
           ],
+          "illustration_x_inches": 30.53,
+          "illustration_y_inches": 48.57,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -77964,6 +78544,9 @@
           "terrain_area_ids": [
             "disruption-vs-priority-assets-layout-1-terrain-area-15"
           ],
+          "illustration_x_inches": 13.31,
+          "illustration_y_inches": 11.43,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -80085,6 +80668,9 @@
           "terrain_area_ids": [
             "disruption-vs-priority-assets-layout-2-terrain-area-03"
           ],
+          "illustration_x_inches": 17.71,
+          "illustration_y_inches": 48.1,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -80097,6 +80683,9 @@
           "terrain_area_ids": [
             "disruption-vs-priority-assets-layout-2-terrain-area-14"
           ],
+          "illustration_x_inches": 26.62,
+          "illustration_y_inches": 12.63,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -80107,8 +80696,12 @@
           "x_inches": 22.06,
           "y_inches": 32.76,
           "terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-2-terrain-area-08",
             "disruption-vs-priority-assets-layout-2-terrain-area-09"
           ],
+          "illustration_x_inches": 22.06,
+          "illustration_y_inches": 32.76,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -80121,6 +80714,9 @@
           "terrain_area_ids": [
             "disruption-vs-priority-assets-layout-2-terrain-area-06"
           ],
+          "illustration_x_inches": 36.64,
+          "illustration_y_inches": 40.83,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -80133,6 +80729,9 @@
           "terrain_area_ids": [
             "disruption-vs-priority-assets-layout-2-terrain-area-11"
           ],
+          "illustration_x_inches": 7.63,
+          "illustration_y_inches": 19.05,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -82304,6 +82903,9 @@
           "terrain_area_ids": [
             "disruption-vs-priority-assets-layout-3-terrain-area-02"
           ],
+          "illustration_x_inches": 8.42,
+          "illustration_y_inches": 49.93,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -82316,6 +82918,9 @@
           "terrain_area_ids": [
             "disruption-vs-priority-assets-layout-3-terrain-area-15"
           ],
+          "illustration_x_inches": 36.25,
+          "illustration_y_inches": 10.32,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -82323,9 +82928,15 @@
           "source_objective_id": "disruption-vs-priority-assets-layout-3-central-01",
           "name": "Central Objective 1",
           "role": "central",
-          "x_inches": 21.91,
-          "y_inches": 33.37,
-          "terrain_area_ids": [],
+          "x_inches": 22.07,
+          "y_inches": 32.98,
+          "terrain_area_ids": [
+            "disruption-vs-priority-assets-layout-3-terrain-area-08",
+            "disruption-vs-priority-assets-layout-3-terrain-area-09"
+          ],
+          "illustration_x_inches": 21.91,
+          "illustration_y_inches": 33.37,
+          "runtime_reference_basis": "project_interior_reference_preserving_source_region_memberships",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -82338,6 +82949,9 @@
           "terrain_area_ids": [
             "disruption-vs-priority-assets-layout-3-terrain-area-03"
           ],
+          "illustration_x_inches": 32.82,
+          "illustration_y_inches": 48.04,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -82350,6 +82964,9 @@
           "terrain_area_ids": [
             "disruption-vs-priority-assets-layout-3-terrain-area-14"
           ],
+          "illustration_x_inches": 11.25,
+          "illustration_y_inches": 12.19,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -84808,6 +85425,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-1-terrain-area-02"
           ],
+          "illustration_x_inches": 8.51,
+          "illustration_y_inches": 51.65,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -84820,6 +85440,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-1-terrain-area-15"
           ],
+          "illustration_x_inches": 36.0,
+          "illustration_y_inches": 8.47,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -84832,6 +85455,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-1-terrain-area-09"
           ],
+          "illustration_x_inches": 17.67,
+          "illustration_y_inches": 28.95,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -84844,6 +85470,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-1-terrain-area-01"
           ],
+          "illustration_x_inches": 27.52,
+          "illustration_y_inches": 52.03,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -84856,6 +85485,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-1-terrain-area-16"
           ],
+          "illustration_x_inches": 16.64,
+          "illustration_y_inches": 8.95,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -84868,6 +85500,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-1-terrain-area-08"
           ],
+          "illustration_x_inches": 26.6,
+          "illustration_y_inches": 32.18,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -87064,6 +87699,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-2-terrain-area-01"
           ],
+          "illustration_x_inches": 12.71,
+          "illustration_y_inches": 51.17,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -87076,6 +87714,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-2-terrain-area-16"
           ],
+          "illustration_x_inches": 32.53,
+          "illustration_y_inches": 9.23,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -87088,6 +87729,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-2-terrain-area-07"
           ],
+          "illustration_x_inches": 23.46,
+          "illustration_y_inches": 33.95,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -87100,6 +87744,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-2-terrain-area-03"
           ],
+          "illustration_x_inches": 34.0,
+          "illustration_y_inches": 47.59,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -87112,6 +87759,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-2-terrain-area-14"
           ],
+          "illustration_x_inches": 10.13,
+          "illustration_y_inches": 12.11,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -87124,6 +87774,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10"
           ],
+          "illustration_x_inches": 20.48,
+          "illustration_y_inches": 26.23,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -89230,6 +89883,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-3-terrain-area-01"
           ],
+          "illustration_x_inches": 12.02,
+          "illustration_y_inches": 51.45,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -89242,6 +89898,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-3-terrain-area-16"
           ],
+          "illustration_x_inches": 32.61,
+          "illustration_y_inches": 8.65,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -89254,6 +89913,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-3-terrain-area-06"
           ],
+          "illustration_x_inches": 23.49,
+          "illustration_y_inches": 34.05,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -89266,6 +89928,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-3-terrain-area-04"
           ],
+          "illustration_x_inches": 35.29,
+          "illustration_y_inches": 42.46,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -89278,6 +89943,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-3-terrain-area-13"
           ],
+          "illustration_x_inches": 8.84,
+          "illustration_y_inches": 17.46,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -89290,6 +89958,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-reconnaissance-layout-3-terrain-area-11"
           ],
+          "illustration_x_inches": 20.92,
+          "illustration_y_inches": 26.0,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -91511,6 +92182,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-priority-assets-layout-1-terrain-area-01"
           ],
+          "illustration_x_inches": 10.39,
+          "illustration_y_inches": 50.31,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -91523,6 +92197,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-priority-assets-layout-1-terrain-area-16"
           ],
+          "illustration_x_inches": 34.23,
+          "illustration_y_inches": 9.47,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -91533,8 +92210,12 @@
           "x_inches": 21.05,
           "y_inches": 31.06,
           "terrain_area_ids": [
+            "reconnaissance-vs-priority-assets-layout-1-terrain-area-08",
             "reconnaissance-vs-priority-assets-layout-1-terrain-area-09"
           ],
+          "illustration_x_inches": 21.05,
+          "illustration_y_inches": 31.06,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -91547,6 +92228,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-priority-assets-layout-1-terrain-area-02"
           ],
+          "illustration_x_inches": 33.68,
+          "illustration_y_inches": 47.97,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -91559,6 +92243,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-priority-assets-layout-1-terrain-area-15"
           ],
+          "illustration_x_inches": 10.43,
+          "illustration_y_inches": 12.0,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -93690,6 +94377,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-priority-assets-layout-2-terrain-area-02"
           ],
+          "illustration_x_inches": 11.39,
+          "illustration_y_inches": 50.04,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -93702,6 +94392,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-priority-assets-layout-2-terrain-area-15"
           ],
+          "illustration_x_inches": 32.76,
+          "illustration_y_inches": 10.37,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -93712,8 +94405,12 @@
           "x_inches": 22.02,
           "y_inches": 32.11,
           "terrain_area_ids": [
-            "reconnaissance-vs-priority-assets-layout-2-terrain-area-06"
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-06",
+            "reconnaissance-vs-priority-assets-layout-2-terrain-area-09"
           ],
+          "illustration_x_inches": 22.02,
+          "illustration_y_inches": 32.11,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -93726,6 +94423,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-priority-assets-layout-2-terrain-area-04"
           ],
+          "illustration_x_inches": 31.59,
+          "illustration_y_inches": 44.6,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -93738,6 +94438,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-priority-assets-layout-2-terrain-area-13"
           ],
+          "illustration_x_inches": 10.7,
+          "illustration_y_inches": 16.35,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -95959,6 +96662,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-priority-assets-layout-3-terrain-area-03"
           ],
+          "illustration_x_inches": 8.08,
+          "illustration_y_inches": 49.12,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -95971,6 +96677,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-priority-assets-layout-3-terrain-area-14"
           ],
+          "illustration_x_inches": 35.46,
+          "illustration_y_inches": 9.99,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -95981,8 +96690,12 @@
           "x_inches": 21.39,
           "y_inches": 31.8,
           "terrain_area_ids": [
-            "reconnaissance-vs-priority-assets-layout-3-terrain-area-07"
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-07",
+            "reconnaissance-vs-priority-assets-layout-3-terrain-area-10"
           ],
+          "illustration_x_inches": 21.39,
+          "illustration_y_inches": 31.8,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -95995,6 +96708,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-priority-assets-layout-3-terrain-area-01"
           ],
+          "illustration_x_inches": 31.33,
+          "illustration_y_inches": 50.08,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -96007,6 +96723,9 @@
           "terrain_area_ids": [
             "reconnaissance-vs-priority-assets-layout-3-terrain-area-16"
           ],
+          "illustration_x_inches": 12.57,
+          "illustration_y_inches": 9.97,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -98128,6 +98847,9 @@
           "terrain_area_ids": [
             "priority-assets-vs-priority-assets-layout-1-terrain-area-01"
           ],
+          "illustration_x_inches": 7.27,
+          "illustration_y_inches": 51.25,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -98140,6 +98862,9 @@
           "terrain_area_ids": [
             "priority-assets-vs-priority-assets-layout-1-terrain-area-15"
           ],
+          "illustration_x_inches": 36.77,
+          "illustration_y_inches": 8.79,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -98147,9 +98872,15 @@
           "source_objective_id": "priority-assets-vs-priority-assets-layout-1-central-01",
           "name": "Central Objective 1",
           "role": "central",
-          "x_inches": 25.41,
+          "x_inches": 24.93,
           "y_inches": 30.2,
-          "terrain_area_ids": [],
+          "terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-08",
+            "priority-assets-vs-priority-assets-layout-1-terrain-area-09"
+          ],
+          "illustration_x_inches": 25.41,
+          "illustration_y_inches": 30.2,
+          "runtime_reference_basis": "project_interior_reference_preserving_source_region_memberships",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -98162,6 +98893,9 @@
           "terrain_area_ids": [
             "priority-assets-vs-priority-assets-layout-1-terrain-area-02"
           ],
+          "illustration_x_inches": 29.76,
+          "illustration_y_inches": 49.75,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -98174,6 +98908,9 @@
           "terrain_area_ids": [
             "priority-assets-vs-priority-assets-layout-1-terrain-area-16"
           ],
+          "illustration_x_inches": 14.11,
+          "illustration_y_inches": 10.24,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -100291,6 +101028,9 @@
           "terrain_area_ids": [
             "priority-assets-vs-priority-assets-layout-2-terrain-area-02"
           ],
+          "illustration_x_inches": 10.5,
+          "illustration_y_inches": 50.4,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -100303,6 +101043,9 @@
           "terrain_area_ids": [
             "priority-assets-vs-priority-assets-layout-2-terrain-area-15"
           ],
+          "illustration_x_inches": 33.85,
+          "illustration_y_inches": 9.62,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -100316,6 +101059,9 @@
             "priority-assets-vs-priority-assets-layout-2-terrain-area-08",
             "priority-assets-vs-priority-assets-layout-2-terrain-area-09"
           ],
+          "illustration_x_inches": 22.03,
+          "illustration_y_inches": 27.84,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -100328,6 +101074,9 @@
           "terrain_area_ids": [
             "priority-assets-vs-priority-assets-layout-2-terrain-area-03"
           ],
+          "illustration_x_inches": 33.35,
+          "illustration_y_inches": 45.62,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -100340,6 +101089,9 @@
           "terrain_area_ids": [
             "priority-assets-vs-priority-assets-layout-2-terrain-area-14"
           ],
+          "illustration_x_inches": 10.53,
+          "illustration_y_inches": 14.36,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -102467,6 +103219,9 @@
           "terrain_area_ids": [
             "priority-assets-vs-priority-assets-layout-3-terrain-area-02"
           ],
+          "illustration_x_inches": 8.92,
+          "illustration_y_inches": 48.79,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -102479,6 +103234,9 @@
           "terrain_area_ids": [
             "priority-assets-vs-priority-assets-layout-3-terrain-area-15"
           ],
+          "illustration_x_inches": 34.36,
+          "illustration_y_inches": 10.44,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -102487,8 +103245,14 @@
           "name": "Central Objective 1",
           "role": "central",
           "x_inches": 21.92,
-          "y_inches": 33.53,
-          "terrain_area_ids": [],
+          "y_inches": 32.94,
+          "terrain_area_ids": [
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-08",
+            "priority-assets-vs-priority-assets-layout-3-terrain-area-09"
+          ],
+          "illustration_x_inches": 21.92,
+          "illustration_y_inches": 33.53,
+          "runtime_reference_basis": "project_interior_reference_preserving_source_region_memberships",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -102501,6 +103265,9 @@
           "terrain_area_ids": [
             "priority-assets-vs-priority-assets-layout-3-terrain-area-05"
           ],
+          "illustration_x_inches": 36.36,
+          "illustration_y_inches": 39.71,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         },
         {
@@ -102513,6 +103280,9 @@
           "terrain_area_ids": [
             "priority-assets-vs-priority-assets-layout-3-terrain-area-12"
           ],
+          "illustration_x_inches": 7.5,
+          "illustration_y_inches": 19.19,
+          "runtime_reference_basis": "observed_glyph_reference_within_reviewed_terrain_group",
           "source_symbol_kind": "source_pdf_objective_marker_vector"
         }
       ],
@@ -102684,5 +103454,5 @@
       ]
     }
   ],
-  "package_hash": "f917b72458420bec1616f3d13ac2b7fd68c795976f7212a70d947be76f57324c"
+  "package_hash": "be19e97db9124271cae2dba2cdc8ef76992526b67c11505cf7c10c00435d36a7"
 }

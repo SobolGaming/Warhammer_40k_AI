@@ -33728,7 +33728,8 @@
         "_area_rows",
         "_component_rows",
         "_initial_component_poses",
-        "build_artifact"
+        "build_artifact",
+        "_objective_rows"
       ],
       "families": [
         "setup"
@@ -33755,7 +33756,8 @@
       ],
       "owners": [
         "@module",
-        "solve_area_poses"
+        "solve_area_poses",
+        "_objective_requirements"
       ],
       "families": [
         "setup"
@@ -33899,6 +33901,59 @@
       "owners": [
         "test_current_event_layouts_have_bounded_october_source_and_complete_markers",
         "test_current_layout_viewer_projects_and_renders_all_source_geometry"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-objective-reviewed-association-source": {
+      "paths": [
+        "data/source_audits/event_companion_2026_10/reviewed-objective-associations.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-objective-rules-receipt": {
+      "paths": [
+        "data/source_audits/event_companion_2026_10/objective-rules-source-receipt.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-objective-association-extraction": {
+      "paths": [
+        "tools/event_companion_layout_source/associate_objectives.py"
+      ],
+      "owners": [
+        "@module"
+      ],
+      "families": [
+        "setup"
+      ],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "event-october-objective-native-controls": {
+      "paths": [
+        "tests/infrastructure/missions/unit/test_event_companion.py"
+      ],
+      "owners": [
+        "test_displaced_event_glyphs_control_both_single_members",
+        "test_displaced_event_objective_rejects_missing_or_wrong_reviewed_group"
       ],
       "families": [
         "setup"
