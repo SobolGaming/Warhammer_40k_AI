@@ -229,6 +229,11 @@ and these invariants are enforced by tests:
 
 ## Getting started
 
+Use the [documentation index](docs/README.md) to find current play, integration,
+source and contributor guidance. Completed plans and delivery journals remain
+in Git history and PRs.
+
+
 For faction coverage, start with the [faction support guides](docs/FACTION_SUPPORT.md).
 They list current army rules, detachments and unit costs, separate historical
 implementation evidence from fieldability/playability, and link the

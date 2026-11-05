@@ -193,7 +193,10 @@ def markdown(audit: dict[str, Any]) -> str:
         "row to category owners, regression files and explicit open clause-certification",
         "status. Family regressions do not prove every individual operative clause. Exact retained",
         "source equivalence and clause-specific facade/replay/visibility proof remain open.",
-        "The [audit notes](ORDER_84_AUDIT_NOTES.md) describe reproduction, scope and validation.",
+        "The [audit notes]("
+        "https://github.com/SobolGaming/Warhammer_40k_AI/blob/"
+        "9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_84_AUDIT_NOTES.md)"
+        " describe reproduction, scope and validation.",
         "",
         "Later source relocations preserve the original audit paths and observations in the JSON:",
         "",

@@ -10,7 +10,7 @@ The existing fail-closed movement-location validation remains mandatory.
 The regression reproduces the failure from the canonical loaded/unloaded reserve
 session by submitting ordinary public decisions through round three. No edited
 historical checkpoint is needed to reach the failure. Source policy and deadline
-selection remain those recorded in [Order 64](ORDER_64_SCOPE_PLAN.md); its offline
+selection remain those recorded in [Order 64](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_64_SCOPE_PLAN.md); its offline
 source generator remains reproducible.
 
 The owning path is the shared lifecycle boundary through

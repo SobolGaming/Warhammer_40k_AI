@@ -13,7 +13,7 @@ Native clause kernels deliberately omit complete roster admission. Persistence
 assertions execute separately at an existing supported Core checkpoint; they do
 not certify the native kernel's roster/provider or prior mission setup. Original
 failed native-checkpoint attempts and all assertions are retained in the author
-packet. See `docs/SECTION20_STRATEGIC_RESERVES_SCOPE.md` for scope and limits.
+packet. See [docs/SECTION20_STRATEGIC_RESERVES_SCOPE.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/SECTION20_STRATEGIC_RESERVES_SCOPE.md) for scope and limits.
 
 Metadata and fresh-state isolation checks receive no semantic gameplay credit.
 Independent review and exact Windows/Linux source/case/phase/JUnit parity remain

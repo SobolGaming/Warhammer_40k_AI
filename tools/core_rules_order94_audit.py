@@ -242,7 +242,10 @@ def markdown(audit: SourceReview) -> str:
         "September mirror share an App version.",
         "",
         "The GDM comparison uses the immutable September 24 observation from the "
-        "[Order 84 negative audit](ORDER_84_AUDIT_NOTES.md). The exact pinned public asset "
+        "[Order 84 negative audit]("
+        "https://github.com/SobolGaming/Warhammer_40k_AI/blob/"
+        "9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_84_AUDIT_NOTES.md)"
+        ". The exact pinned public asset "
         "was retrieved again and its eight blocks reproduced the historical hashes. "
         "Retrieval does not redate or version that observation.",
         "",
@@ -254,7 +257,14 @@ def markdown(audit: SourceReview) -> str:
     lines.extend(["", "## Boundaries", ""])
     lines.extend(f"- {limit}" for limit in audit.limits)
     lines.extend(
-        ["", "See [scope and validation](ORDER_94_SCOPE_PLAN.md) for the delivery record.", ""]
+        [
+            "",
+            "See [scope and validation]("
+            "https://github.com/SobolGaming/Warhammer_40k_AI/blob/"
+            "9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_94_SCOPE_PLAN.md)"
+            " for the delivery record.",
+            "",
+        ]
     )
     return "\n".join(lines)
 

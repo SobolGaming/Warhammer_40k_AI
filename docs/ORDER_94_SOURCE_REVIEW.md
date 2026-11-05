@@ -20,7 +20,7 @@ Policy: `core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02`
 The retained official PDF, page 57 / 15.11, agrees on every operative clause below.
 Its SHA-256 is `f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`. This is wording corroboration, not an assertion that a June PDF and an unversioned September mirror share an App version.
 
-The GDM comparison uses the immutable September 24 observation from the [Order 84 negative audit](ORDER_84_AUDIT_NOTES.md). The exact pinned public asset was retrieved again and its eight blocks reproduced the historical hashes. Retrieval does not redate or version that observation.
+The GDM comparison uses the immutable September 24 observation from the [Order 84 negative audit](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_84_AUDIT_NOTES.md). The exact pinned public asset was retrieved again and its eight blocks reproduced the historical hashes. Retrieval does not redate or version that observation.
 
 | Operative requirement | Historical GDM | Reconciliation |
 |---|---|---|
@@ -44,4 +44,4 @@ The GDM comparison uses the immutable September 24 observation from the [Order 8
 - Owner and regression links trace existing behavior; they do not independently certify every rule clause. PFINAL still requires a fresh complete Core audit after all prerequisite PRs merge.
 - Historical Order 84 evidence and its negative CAUDIT-01 outcome remain unchanged. No faction support, gameplay support-status upgrade, contract change, or full-game performance claim is made.
 
-See [scope and validation](ORDER_94_SCOPE_PLAN.md) for the delivery record.
+See [scope and validation](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_94_SCOPE_PLAN.md) for the delivery record.

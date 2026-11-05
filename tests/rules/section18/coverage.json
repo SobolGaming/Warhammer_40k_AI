@@ -3869,7 +3869,7 @@
   "authenticated_inputs": {
     "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
     "data/source_audits/v963_shock/captures/core-page.js": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026",
-    "docs/SECTION05_DEADLY_DEMISE_DECISION.md": "3b4aac0079939d4c2d8c9068901c737c7d51cbe10c5495adf270c47077b63c2c",
+    "docs/SECTION05_DEADLY_DEMISE_DECISION.md": "ea96baeda244d160c655a923939a0577089bc3f8a48ce810069fc1b5ee10aaa7",
     "tests/rules/section18/test_attached.py": "d23660806374db51e9911b02a755d3b3730d39a5e42a3a9c582df32598b23b5c",
     "tests/rules/section18/test_combat.py": "cd52e0d1b51def7655f99cf189396af2a5f7eedb8d2b4a53e3319bc7a6a311af",
     "tests/rules/section18/test_disembark.py": "4ca60395ad8dd62064b49e77c0c48660a89abf901ab4da711c0f8ef8f80c5cf8",

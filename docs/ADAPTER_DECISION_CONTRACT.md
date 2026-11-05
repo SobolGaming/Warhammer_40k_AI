@@ -49,7 +49,7 @@ only if a group remains broken. The final ordinary cleanup record completes the
 turn boundary without repeating casualties. A `coherency_casualty_required`
 Primary scoring wait retains the existing frozen control authority while the
 choice is pending. Existing persistence containers remain strict-runtime bound;
-there is no compatibility migration. See [source/scope](SF03_001_COHERENCY_CHOICE_SCOPE.md).
+there is no compatibility migration. See [source/scope](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/SF03_001_COHERENCY_CHOICE_SCOPE.md).
 
 
 ## SF04: model and unit attack completion
@@ -63,7 +63,7 @@ consumers use the complete authenticated
 union. `shot_unit_ids` represents completed ordinary ranged attacks rather than
 accepted declarations. Empty selections retain their separate restriction
 authority. Exact runtime identity is required; old artifacts are neither
-relabelled nor migrated. See [source and scope](SF04_COMPLETION_REPAIR.md).
+relabelled nor migrated. See [source and scope](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/SF04_COMPLETION_REPAIR.md).
 
 ## Order135: physical visibility and battlefield-edge origins
 
@@ -94,7 +94,7 @@ existing persistent effects and native finite activity choices. No decision,
 proposal, visibility or envelope shape is added. Constructed qualifying checkpoints
 exercise valid restore, forks, role views and exact replay; they do not admit an
 in-turn deployment provider. Gameplay certification remains open pending a granting
-rule and consumer. See [Order134](ORDER_134_SCOPE_PLAN.md).
+rule and consumer. See [Order134](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_134_SCOPE_PLAN.md).
 
 ## Order124: nested attack reroll conditions
 
@@ -114,7 +114,7 @@ projections and persistence/replay envelopes carry the Core name-keyword repair.
 A display alias creates no identity, and attached unit union does not grant
 component names to unrelated models. No decision/schema family is added.
 Contract44.3.9 keeps exact current-runtime replay authority. See
-[Order123](ORDER_123_SCOPE_PLAN.md).
+[Order123](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_123_SCOPE_PLAN.md).
 
 ## Order122: default effect lifetimes
 
@@ -123,7 +123,7 @@ persistence envelopes carry the shared Core default lifetime repair. Compiled
 source duration remains null; the persisted expiration records the triggering
 period or given phase and actual active turn owner. Pending choices, viewers,
 forks and exact replay use the same engine authority and current runtime identity.
-No request/schema family is added. See [Order122](ORDER_122_SCOPE_PLAN.md).
+No request/schema family is added. See [Order122](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_122_SCOPE_PLAN.md).
 
 ## Order119: source-authorized Movement-phase reposition
 
@@ -841,7 +841,7 @@ still be started when its owner chooses Primary scoring first; a later completio
 or Consecration choice does not rewrite that evidence. Restore authenticates
 those snapshots against the real mission events before the selected commit.
 Contract 15, replay v9 and operator persistence v7 reject older artifacts that
-cannot supply this authority; see `contracts/migrations/14-to-15.md`.
+cannot supply this authority; see [contracts/migrations/14-to-15.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/14-to-15.md).
 
 Phase 18L adds no player-facing decision type, finite-option family, proposal
 kind, public response field, or visibility exception. It advances the additive
@@ -2032,7 +2032,7 @@ Phase 12C source-backed Core Stratagems are adapter-visible through these handle
 - `core:heroic-intervention`: at the end of the opponent Charge phase, submit a friendly unengaged unit within 12 inches and an explicit `proposal.effect_selection.mode`. A VEHICLE must be a CHARACTER or WALKER. Contract 21 uses ordinary Charge declaration, modifier-ignore, grant, reroll, target/replacement and witnessed movement decisions. Into the Fray costs one additional CP and limits the modified roll to six before separate distance modifiers; Leap to Defend permits enemies that made a Charge move this phase. See the Order 50 section below.
 - `core:counteroffensive`: parameterized target proposal in the opponent Fight phase just after an enemy unit has fought. Accepted use costs 2 CP, validates that the target is eligible to fight through `FightOrderState`, records a Fights First effect until end of phase, and records the selected activation with a `counteroffensive:<stratagem_use_id>` interrupt ID before lifecycle progression resumes.
 - `core:crushing-impact`: finite `use_stratagem` choice in the active player's Charge phase just after the selected friendly MONSTER/VEHICLE rules unit ends a Charge move. Its engine-enumerated `effect_selection.enemy_target_unit_instance_id` and `effect_selection.model_instance_id` identify an engaged enemy rules unit and a living, placed source model engaged with it. Retained destroyed models cannot be selected. Accepted use rolls the selected model's modified Toughness in D6, applies self wounds for 1s and enemy wounds for 5+, with an independent six-wound cap on each packet, and emits `crushing_impact_resolved`. See Order 48 below.
-- `core:epic-challenge`: parameterized target proposal just after a friendly CHARACTER unit is selected to fight. `proposal.effect_selection.character_model_instance_id` selects one CHARACTER model in the target rules unit, including an admitted attached Leader or Support. D12 resolves current logical membership through the shared rules-unit authority while requiring that physical model's own CHARACTER keyword and living battlefield placement. A unit's keyword union does not make its non-CHARACTER Bodyguard models eligible. Model or selected-unit mismatch rejects through the existing typed `invalid_reason` envelope before queue/CP/use/effects/history commit; the same request remains available for legal retry. Accepted use records a per-phase Precision effect for that model's melee weapons and emits `epic_challenge_precision_registered`. The proposal shape, existing model ID field, effect/event shape and viewer policy are unchanged; [D12 scope](D12_EPIC_CHALLENGE_SCOPE.md) records the supported boundaries.
+- `core:epic-challenge`: parameterized target proposal just after a friendly CHARACTER unit is selected to fight. `proposal.effect_selection.character_model_instance_id` selects one CHARACTER model in the target rules unit, including an admitted attached Leader or Support. D12 resolves current logical membership through the shared rules-unit authority while requiring that physical model's own CHARACTER keyword and living battlefield placement. A unit's keyword union does not make its non-CHARACTER Bodyguard models eligible. Model or selected-unit mismatch rejects through the existing typed `invalid_reason` envelope before queue/CP/use/effects/history commit; the same request remains available for legal retry. Accepted use records a per-phase Precision effect for that model's melee weapons and emits `epic_challenge_precision_registered`. The proposal shape, existing model ID field, effect/event shape and viewer policy are unchanged; [D12 scope](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/D12_EPIC_CHALLENGE_SCOPE.md) records the supported boundaries.
 
 Phase 14G freezes the Charge/Fight ruleset contract but does not emit new player-facing decisions. `RulesetDescriptor.charge_policy` defines after-roll charge-target selection, 12" declaration/target-selection gates, rolled-distance target eligibility, charge-move endpoint constraints, and the Fights First grant. `RulesetDescriptor.fight_policy` defines the Start/Pile In/Fight/Consolidate/End step order, Fight-step-start engagement eligibility, current-engagement eligibility, charged-this-turn eligibility, Fights First and Remaining Combats ordering bands, both-player pile-in/consolidation sequencing, the more-than-5" eligible-pass rule, explicit Normal/Overrun fight types, and Ongoing/Engaging/Objective consolidation modes. Phase 15 Charge/Fight implementations must consume these source-contract payloads and then add or update this document for every finite option family, proposal kind, pending request payload, decision record, or event shape they expose.
 
@@ -2218,7 +2218,7 @@ Scouts keeps every universally shared distance and the lowest unshared distance
 as finite prebattle choices, including Dedicated Transport cargo. Selection and
 path proposal validation both enforce the chosen distance.
 
-See [contract 25 to 26](../contracts/migrations/25-to-26.md) for persistence,
+See [contract 25 to 26](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/25-to-26.md) for persistence,
 replay and client migration.
 
 
@@ -2250,7 +2250,7 @@ Required Phase 12 adapter-contract tests:
 Phase 13A terrain visibility, line of sight, and cover foundation does not create player-facing choices. Its `LineOfSightWitness` and `BenefitOfCoverResult` payloads are engine-owned evidence consumed by later shooting decisions and events. `BenefitOfCoverResult` records deterministic feature sources through `source_feature_ids` and feature `source_records`, and terrain-area sources through `source_terrain_area_ids` and typed area records containing the terrain-area ID, classification, LoS policy, and cover-source reason. The current 11th Edition producer uses `not_fully_visible_because_of_feature` for feature evidence and `within_terrain_area` or `not_fully_visible_because_of_terrain_area` for area evidence; `wholly_within_feature` remains deserializable for historical evidence but does not independently grant 11th Edition cover.
 
 Order 32 replaces sampled model-visibility evidence with continuous analytic
-predicates under [Contract 14](../contracts/migrations/13-to-14.md).
+predicates under [Contract 14](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/13-to-14.md).
 R32-001 preserves that contract: unit-scoped ability visibility uses authenticated
 rules-present observer components, including retained-only components, until
 cleanup. It changes eligibility through the existing decision path without adding
@@ -2649,7 +2649,7 @@ its displayed App-data version 946, source-linked RuleIR, historical official
 PDF provenance and exact source hashes. The generic ability consumer and
 Stratagem provider load these descriptors without display-name branching.
 Contract 12 records this mutation/redaction change and the target witness rename
-to `present_model_instance_ids`; see `contracts/migrations/11-to-12.md`.
+to `present_model_instance_ids`; see [contracts/migrations/11-to-12.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/11-to-12.md).
 
 The authoritative log marks logical death before any resulting destruction
 reaction or physical-removal event. `model_logical_death_recorded` is a private
@@ -2735,7 +2735,7 @@ Phase 13D supports these shooting-coupled Core Stratagem target proposals:
 
 - Smokescreen uses stable source `gw-11e-core-stratagems:core:smokescreen` and `generic:rule-ir` execution. At the opponent Shooting phase start, `use_stratagem` enumerates friendly SMOKE rules units through `friendly_smoke_unit`. Accepted use grants Cover to that rules unit and to attack targets whose incomplete visibility is caused by its present models. Cover expires at the active shooting player's phase end and does not modify Hit rolls.
 - `core:explosives`: during the owner's Shooting phase, finite `use_stratagem` options bind a friendly unengaged `EXPLOSIVES`/`GRENADES` rules unit and an `effect_selection` object with exactly `effect_selection_kind: "source_model_and_enemy_unit"`, `source_model_instance_id`, and `enemy_target_unit_instance_id`. Each option commits all three choices; the model must be a living, placed member with either keyword, and the enemy rules unit must be unengaged, within 8 inches of and visible to that model. Advance always excludes use; Fall Back excludes it unless shooting is permitted. Shared Action shooting restrictions, already-shot state, target permission, timing and affordability are revalidated before queue pop or CP spend. The selected model is preserved in `StratagemUseRecord.effect_selection`, `explosives_resolved.source_model_instance_id`, and destruction/mortal-wound continuation evidence. The friendly unit alone is targeted; both canonical rules units are affected. Six D6 cause one mortal wound per 4+, using ordinary defender allocation and Feel No Pain decisions, then the same Shooting phase resumes. Explosives does not itself mark either unit as having shot. Declining a window allows later opportunities after another unit is selected/resolved. The obsolete start-phase parameterized trigger-target path is removed; clients select the engine-emitted option ID without supplying choice payloads.
-- `core:fire-overwatch` (Order 45, external contract 17): one optional `end_phase` opportunity at the end of the opponent's Movement phase, independent of movement or setup history. Its deterministic window ID is `fire-overwatch-end-movement-round-{round:02d}-player-{player}`; the trigger payload contains only `timing_window_id` and `trigger_window: "end_opponent_movement_phase"`. The existing `submit_stratagem_target_proposal` selects one friendly living, present, unengaged, non-`TITANIC` rules unit that can shoot and has at least one legal Snap declaration. Window discovery follows the existing optional proposal/affordability contract and shared basic shooter/present-enemy checks; it does not solve every possible shot before the player decides whether to use the Stratagem. Current CP cost, Battle-shock, Action restrictions, source-target protections and loaded target-restriction hooks are revalidated before accepting the proposed shooter. A submitted proposal must preserve the exact issued context. Accepted use spends CP once and opens the shared out-of-phase shooting state. Its canonical `submit_shooting_declaration` offers all eligible enemy rules units, including stationary enemies, without a triggering-enemy binding. The player chooses one visible enemy within 24 inches of the shooting rules unit, measured across all present attacking components; every declared physical weapon copy must target that same enemy using `snap`. An attached component without a ranged weapon can supply the unit-range measurement. Removed components cannot supply it. Per-weapon range and visibility still apply. Candidates whose source-forced type is unavailable have `is_legal: false`, an empty `shooting_types` list and `forced_shooting_type_unavailable`. Unknown, stale, drifted, protected or otherwise invalid targets reject before queue pop, record creation or mutation. Attached shooter and target identities are canonical rules-unit IDs. Non-automatic hits require an unmodified six regardless of BS or modifiers unless an explicitly Snap/Overwatch-authorized source changes the threshold; Torrent still auto-hits, and Hit rolls cannot be rerolled. Hit payloads retain `unmodified_success_threshold_active`, `minimum_unmodified_success` and source provenance. Completion applies the shared post-Snap Action lock until the parent phase ends. Selected-to-shoot grants, target/group selection, Precision, allocation, saves, Feel No Pain and destruction interruptions use the ordinary engine decision path. Persistence and exact replay retain the chosen enemy and parent reaction state. Phase-end sequencing resumes only after the attack completes, with one Overwatch opportunity regardless of the number of enemy moves; simultaneous effects continue through the shared sequencing authority. See [the contract migration](../contracts/migrations/16-to-17.md).
+- `core:fire-overwatch` (Order 45, external contract 17): one optional `end_phase` opportunity at the end of the opponent's Movement phase, independent of movement or setup history. Its deterministic window ID is `fire-overwatch-end-movement-round-{round:02d}-player-{player}`; the trigger payload contains only `timing_window_id` and `trigger_window: "end_opponent_movement_phase"`. The existing `submit_stratagem_target_proposal` selects one friendly living, present, unengaged, non-`TITANIC` rules unit that can shoot and has at least one legal Snap declaration. Window discovery follows the existing optional proposal/affordability contract and shared basic shooter/present-enemy checks; it does not solve every possible shot before the player decides whether to use the Stratagem. Current CP cost, Battle-shock, Action restrictions, source-target protections and loaded target-restriction hooks are revalidated before accepting the proposed shooter. A submitted proposal must preserve the exact issued context. Accepted use spends CP once and opens the shared out-of-phase shooting state. Its canonical `submit_shooting_declaration` offers all eligible enemy rules units, including stationary enemies, without a triggering-enemy binding. The player chooses one visible enemy within 24 inches of the shooting rules unit, measured across all present attacking components; every declared physical weapon copy must target that same enemy using `snap`. An attached component without a ranged weapon can supply the unit-range measurement. Removed components cannot supply it. Per-weapon range and visibility still apply. Candidates whose source-forced type is unavailable have `is_legal: false`, an empty `shooting_types` list and `forced_shooting_type_unavailable`. Unknown, stale, drifted, protected or otherwise invalid targets reject before queue pop, record creation or mutation. Attached shooter and target identities are canonical rules-unit IDs. Non-automatic hits require an unmodified six regardless of BS or modifiers unless an explicitly Snap/Overwatch-authorized source changes the threshold; Torrent still auto-hits, and Hit rolls cannot be rerolled. Hit payloads retain `unmodified_success_threshold_active`, `minimum_unmodified_success` and source provenance. Completion applies the shared post-Snap Action lock until the parent phase ends. Selected-to-shoot grants, target/group selection, Precision, allocation, saves, Feel No Pain and destruction interruptions use the ordinary engine decision path. Persistence and exact replay retain the chosen enemy and parent reaction state. Phase-end sequencing resumes only after the attack completes, with one Overwatch opportunity regardless of the number of enemy moves; simultaneous effects continue through the shared sequencing authority. See [the contract migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/16-to-17.md).
 
 Fire Overwatch is not emitted from the active player's normal Shooting phase and is not represented by a persisting marker. It uses a dedicated out-of-phase shooting state so adapters see the same declaration, Precision, allocation, save, Feel No Pain, and attack-resolution decisions as normal shooting without mutating the active Shooting phase state.
 
@@ -2890,7 +2890,7 @@ visibility and the shared adapter redaction policy are unchanged; clients never
 supply or mutate engine-derived endpoint evidence. Persistence uses
 `session-persistence-v11-charge-model-endpoints`; replay uses
 `replay-artifact-v13-charge-model-endpoints`. See
-[the migration](../contracts/migrations/18-to-19.md). Orders 49–51 retain their
+[the migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/18-to-19.md). Orders 49–51 retain their
 separately scheduled orchestration work.
 
 The Phase 15B Charge Move request uses the shared parameterized proposal wrapper:
@@ -2981,7 +2981,7 @@ Order127 / Contract44.3.13 routes redeploy placement through normal deployment
 geometry and typed all-model Infiltrators permission. Outside-zone redeployment
 retains the more-than-eight-inch enemy-unit and enemy-zone restrictions. New
 prebattle diagnostics mirror the existing deployment diagnostics; see
-`contracts/migrations/44.3.12-to-44.3.13.md`. The existing finite/parameterized
+[contracts/migrations/44.3.12-to-44.3.13.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/44.3.12-to-44.3.13.md). The existing finite/parameterized
 submission, atomic invalid/retry, event and viewer-redaction contract applies.
 Scout reserve setup retains its existing zone restriction.
 
@@ -5809,7 +5809,7 @@ keyword inventories. Clients must use the unit projection for current eligibilit
 not aggregate every historical model row. No player choice, finite option ID,
 proposal kind, or mutation bypass is added. Existing casualty, retained-destruction,
 healing and split submissions still use the common lifecycle decision path.
-See [Contract 12 to 13](../contracts/migrations/12-to-13.md) for family versions and
+See [Contract 12 to 13](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/12-to-13.md) for family versions and
 checkpoint compatibility.
 
 Order 36 records each actual model destruction beside its consumed destruction-cause
@@ -6156,7 +6156,7 @@ evidence; adapters render the engine result and never recalculate hit success.
 The existing finite/proposal decision families and shared viewer-redaction path
 cover this work. There is no new player choice. Contract 16 versions the changed
 nested hit-record requirements, replay and operator persistence; see
-`contracts/migrations/15-to-16.md`. Old records are not supplied inferred
+[contracts/migrations/15-to-16.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/15-to-16.md). Old records are not supplied inferred
 thresholds or a compatibility fallback.
 
 R43-001 restoration and pre-submission validation bind every resumable hit copy
@@ -6308,7 +6308,7 @@ without changing their event or viewer projection hashes.
 
 These changed targeting/mutation and checkpoint semantics advance metadata and
 command result/outcome families to v20, replay to v14 and persistence to v12.
-See [19-to-20](../contracts/migrations/19-to-20.md). Order 50 below supersedes the Heroic-specific continuation payload and completes
+See [19-to-20](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/19-to-20.md). Order 50 below supersedes the Heroic-specific continuation payload and completes
 the shared modifier/eligibility pipeline.
 
 
@@ -6347,7 +6347,7 @@ request and do not move models. Target changes use the existing P04 replacement
 choice. All adapters and replay submit the same engine-owned decisions.
 
 Saved v20 sessions and replays require their matching deployment; see
-[20-to-21](../contracts/migrations/20-to-21.md). Historical Order 49 flow names above
+[20-to-21](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/20-to-21.md). Historical Order 49 flow names above
 are superseded by this section.
 
 ## Order 51: per-move flight and turn distances (contract 22)
@@ -6379,7 +6379,7 @@ checks Charge/reactive choices against their finite records. The ledger stays
 internal; existing viewer-scoped projection and event redaction cover public
 movement choices and their existing unit/model references.
 
-See [contract migration 21 to 22](../contracts/migrations/21-to-22.md).
+See [contract migration 21 to 22](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/21-to-22.md).
 
 ## Order 52: Surge targets and phase movement authority (contract 23)
 
@@ -6433,7 +6433,7 @@ reactive movement and parameterized setup consume the same lock. Physical model
 identity preserves the lock through attached-unit casualties. The ledger is not
 added to viewer projections; existing shared decision/event redaction applies.
 
-See [contract migration 22 to 23](../contracts/migrations/22-to-23.md).
+See [contract migration 22 to 23](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/22-to-23.md).
 
 ## Order 53 — per-move all-model keyword commitment
 
@@ -6462,7 +6462,7 @@ reproduces the event stream. Existing Battle-shock cleanup remains authoritative
 These decisions, proposals and completed results are public gameplay information;
 all players receive them through the existing viewer-scoped projection/event APIs.
 
-See [Contract 24 migration](../contracts/migrations/23-to-24.md) for the persistence,
+See [Contract 24 migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/23-to-24.md) for the persistence,
 replay and required terrain-path field version boundary.
 
 
@@ -6484,8 +6484,8 @@ end-turn cleanup carry the result; restore authenticates restriction evidence.
 Pregame deployment imposes no first-turn lock. Edge information and placements
 are public. No new decision type, option family or hidden payload is introduced.
 
-See [Contract 25 migration](../contracts/migrations/24-to-25.md) and
-[scope/consumer audit](ORDER_54_SCOPE_PLAN.md).
+See [Contract 25 migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/24-to-25.md) and
+[scope/consumer audit](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_54_SCOPE_PLAN.md).
 
 Source corner edges (`north_west_corner`, `north_east_corner`,
 `south_west_corner`, `south_east_corner`) designate their two adjoining
@@ -6636,7 +6636,7 @@ unit ID to the accepted return target before comparing stored setup history.
 Coordinated edits to the completion flag and phase history are rejected.
 Existing return event visibility
 applies to these fields. Contract 27 versions persistence and replay; see the
-[migration](../contracts/migrations/26-to-27.md). No new decision family, proposal
+[migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/26-to-27.md). No new decision family, proposal
 kind or visibility permission is introduced.
 
 
@@ -6654,7 +6654,7 @@ Charge ineligibility remains through all turn-end rules and expires before the
 next part. Shared Engaging Fight queues and redaction remain unchanged.
 Contract 42.1 changes normative source behavior with unchanged payload-family
 shapes. Saves/replays retain exact original runtime requirements; no old-queue
-conversion is introduced. See [source and acceptance](V963_SHOCK_SCOPE_PLAN.md).
+conversion is introduced. See [source and acceptance](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/V963_SHOCK_SCOPE_PLAN.md).
 
 ## Order 63 — reserve Transports and inherited Rapid Disembark
 
@@ -6678,7 +6678,7 @@ attempt; restore replays from it to authenticate the policy and later passenger
 placements even after the source effect or turn expires. A missing, malformed or
 altered origin or derived policy fails closed. Ingress movement status uses the
 actual turn's phase movement history. No new decision family or proposal kind
-is introduced. See [migration 28 to 29](../contracts/migrations/28-to-29.md).
+is introduced. See [migration 28 to 29](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/28-to-29.md).
 
 ## Order 64: reserve and ingress lifetimes (contract 30)
 
@@ -6704,7 +6704,7 @@ redaction owns all viewer-scoped projection and event behavior. Repositioning do
 not reset Advance/Fall Back/Disembark history or effect duration; spatial effects
 are reevaluated against current presence and geometry.
 
-See [migration 29 to 30](../contracts/migrations/29-to-30.md) and the dedicated
+See [migration 29 to 30](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/29-to-30.md) and the dedicated
 [reconstruction performance guard](performance/order64/README.md).
 
 
@@ -6748,7 +6748,7 @@ and authenticated turn-end history. Existing shared viewer redaction applies to
 requests and events; operator persistence is never a player projection. No new
 player-choice family or adapter mutation path is introduced. Contract 31, replay
 v25 and persistence v23 deliberately reject prior semantic histories; see
-[the migration](../contracts/migrations/30-to-31.md).
+[the migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/30-to-31.md).
 
 
 ## Order 66: Aircraft (contract 32)
@@ -6775,7 +6775,7 @@ choosing Take to the Skies. Non-FLY pile-in/consolidation/Surge selections ignor
 Aircraft, while physical endpoints still respect model overlap and engagement.
 
 Legacy Hover mode fields and Aircraft edge-exit movement are retired. See
-[contract migration 31 to 32](../contracts/migrations/31-to-32.md). No new finite
+[contract migration 31 to 32](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/31-to-32.md). No new finite
 family, proposal kind or submission wrapper is introduced.
 
 
@@ -6808,7 +6808,7 @@ model/rules-unit projections derive keywords from actual model presence. Split
 lineage and restore retain the same selected Enhancement bearer after ownership
 changes or death. Invalid or drifted saved selections fail reconstruction.
 Contract 33 rejects earlier incomplete records; see
-[the migration](../contracts/migrations/32-to-33.md).
+[the migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/32-to-33.md).
 
 Corsair Coterie bearer restrictions use the selected model's canonical keywords:
 ANHRATHE for all four Enhancements, CHARACTER additionally for Archraider, and
@@ -6837,10 +6837,10 @@ and attachment_declaration_invalid diagnostics. The report shares attachment for
 validation with army construction. Construction constraints are enforced even when
 a test request relaxes points/Warlord certification. Hidden information, viewer
 scoping and in-game decision envelopes do not change. Persistence and replay require
-the new catalog/engine identity; see [migration 33 to 34](../contracts/migrations/33-to-34.md).
+the new catalog/engine identity; see [migration 33 to 34](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/33-to-34.md).
 
 Force-disposition validation retains one choice from the selected detachments' union,
-consistent with the reviewed source resolution in [Order 69](ORDER_69_SCOPE_PLAN.md).
+consistent with the reviewed source resolution in [Order 69](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_69_SCOPE_PLAN.md).
 Faction-specific constraint population remains FM0 work.
 
 ## Order 70 — live model-complete Fights First
@@ -6889,7 +6889,7 @@ The existing shared declaration validation rejects illegal or stale model/target
 permissions before queue pop. Ordinary, reaction, Snap/Overwatch, retained and
 Firing Deck attacks retain that same path. Source values change within existing
 string fields, so Contract 34's schemas remain valid; the exact runtime identity
-continues to reject old persistence and bind replay. See [Order 71](ORDER_71_SCOPE_PLAN.md).
+continues to reject old persistence and bind replay. See [Order 71](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_71_SCOPE_PLAN.md).
 
 
 ## Order 73 — Emergency Disembark geometry completeness
@@ -7020,7 +7020,7 @@ viewer-visible payload shape.
 Existing finite selections and typed movement proposals cover the player choices.
 Both adapters and replay continue through lifecycle submission, with unchanged
 viewer visibility. Contract 35, persistence v27 and replay v29 require explicit
-occurrence evidence; see [the migration](../contracts/migrations/34-to-35.md).
+occurrence evidence; see [the migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/34-to-35.md).
 
 
 ## Order 82 — rules-unit revival engagement
@@ -7070,7 +7070,7 @@ Pre-return enemy engagement remains a separate Order 82 predicate.
 Both viewers receive the existing public revival request/event projection; no
 hidden-information policy changes. Replay and persistence use Contract 37's
 strict schema boundary and exact runtime identity. See
-[the migration](../contracts/migrations/36-to-37.md).
+[the migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/36-to-37.md).
 
 ## Order 84: interpreted dice and tied physical components
 
@@ -7112,7 +7112,7 @@ choice and raises an explicit domain error until a source authorizes disclosure.
 
 Contract 38 requires the new assignment fields. Old saves and replays require
 their exact original deployment; no six-clamping or missing-history compatibility
-path is provided. See [migration 37 to 38](../contracts/migrations/37-to-38.md).
+path is provided. See [migration 37 to 38](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/37-to-38.md).
 
 Order 84 Hit/Wound payloads require `critical_is_threshold`, preserving default
 exact-six versus source-defined inclusive critical thresholds. Hit payloads require
@@ -7159,7 +7159,7 @@ policy. No hidden off-battlefield model enters a feasibility query.
 Restore rejects source, movement, budget, geometry, turn, duplicate/missing query
 or pair inventory drift. An unresolved feasibility calculation produces a typed
 invalid movement result and cannot create contact authority. See
-[contract migration 38 to 39](../contracts/migrations/38-to-39.md).
+[contract migration 38 to 39](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/38-to-39.md).
 
 ### Order 86 / P01I: shared quarter occupancy
 
@@ -7221,7 +7221,7 @@ Automatic attack stages may contain null target/characteristic metadata.
 
 All existing decision families retain their shared lifecycle validation and
 mutation path. No adapter, projection, validation or restore path is authorized to
-roll or choose a random characteristic. See [contract migration 39 to 40](../contracts/migrations/39-to-40.md).
+roll or choose a random characteristic. See [contract migration 39 to 40](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/39-to-40.md).
 
 
 ## Order 88 — absent Strength interactions
@@ -7410,7 +7410,7 @@ viewer projections and deltas. Private restore/replay origin evidence does not
 appear in projections or response metadata. Persistence and replay authenticate
 recorded occurrence identity and source evidence; old histories require their
 original runtime and are not filled with inferred decisions. See
-[Contract 40 to 41](../contracts/migrations/40-to-41.md) for wire versions and
+[Contract 40 to 41](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/40-to-41.md) for wire versions and
 client migration.
 
 Random profile values additionally preserve optional `ignored_modifier_ids` while
@@ -7436,7 +7436,7 @@ Actual modifiers to a model's healing-trigger roll use `healing_roll`, including
 Soulstealer's conditional +1. The attack-completion owner requests the existing
 finite choice before the healing die or mutation and resumes the same source
 occurrence. Intrinsic healing amounts and granted ability thresholds are not
-roll operations. See [the owner inventory](ORDER_93_OWNER_INVENTORY.md) for the
+roll operations. See [the owner inventory](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_93_OWNER_INVENTORY.md) for the
 source/consumer boundaries and audit limits.
 
 Desperate Escape uses `desperate_escape_roll` for each physical model's hazard
@@ -7580,7 +7580,7 @@ random defensive-profile reconstruction. Unresolved target replacement rebuilds
 pools and queries its new canonical target; already gathered attacks are not
 retargeted. Both facades, viewers, persistence and replay share these owners.
 Clients copy engine options and must discard old cached group IDs. See the
-[43 migration](../contracts/migrations/42-to-43.md) for family versions and support.
+[43 migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/42-to-43.md) for family versions and support.
 
 ### Contract 44: canonical movement actor membership
 
@@ -7591,7 +7591,7 @@ Use the published poses, original request context, committed Charge targets and
 budget; membership grants no legal-movement authority. Hidden simultaneous
 formation membership is null for opponents until reveal. Split, casualty and
 physical-removal updates appear on the next projection. See
-[`43-to-44.md`](../contracts/migrations/43-to-44.md).
+[`43-to-44.md`](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/43-to-44.md).
 
 Issue 532 audit: ordinary Movement requests (`movement_action_decisions.py`) and
 Pile In/Consolidate requests (`fight_movement_lifecycle.py`) also name canonical
@@ -7641,7 +7641,7 @@ eligibility and continuation, without changing other Action restrictions.
 Adapters observe the ordinary public Action state/event path; clearing the later
 Battle-shock status cannot revive a terminal Action. Existing event and
 persistence schemas remain unchanged; saves/replays require the exact runtime
-identity. See [Order 110](ORDER_110_SCOPE_PLAN.md) for bounded source scope.
+identity. See [Order 110](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_110_SCOPE_PLAN.md) for bounded source scope.
 
 
 ## Order113: Blast X and Cleave X (Contract 44.2 unchanged)
@@ -7713,7 +7713,7 @@ Hit event, Sustained generation, or Lethal choice. Critical Wounds and their
 wound-stage effects remain possible. Existing finite/proposal requests and
 viewer-scoped event/persistence/replay shapes cover this correction; no new
 decision or field is introduced. Old histories require their original runtime.
-See [source and complete consumer validation](V963_SNAP_SCOPE_PLAN.md).
+See [source and complete consumer validation](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/V963_SNAP_SCOPE_PLAN.md).
 
 ## Order115 / Contract 44.3.2: absent Movement authority
 
@@ -7819,7 +7819,7 @@ Contract44.3.11 retains the existing selected-target Shooting-start finite reque
 and source-linked payload. Source-mandatory selections expose eligible unit
 options without decline; existing optional records retain decline. Catalog loading,
 validation, engine-owned mutation, viewers and exact persistence/replay use the
-shared authority. No decision/schema family is added. See [Order125](ORDER_125_SCOPE_PLAN.md).
+shared authority. No decision/schema family is added. See [Order125](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_125_SCOPE_PLAN.md).
 
 Contract44.3.12 retains model_paths in submitted physical movement order. Each
 model completes its witnessed translation/rotation before the next model starts;
@@ -7827,7 +7827,7 @@ earlier models occupy final poses and later models retain their initial poses.
 The model_ids() inventory remains canonical. Ordinary and attached Movement,
 Scout, Charge, Fight and triggered moves share occupancy authority. Existing
 payload families, invalid atomicity and engine persistence/replay remain; see
-[Order126 scope](ORDER_126_SCOPE_PLAN.md).
+[Order126 scope](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ORDER_126_SCOPE_PLAN.md).
 
 
 Order128 / Contract44.3.14 uses the existing deployment, redeploy and reserve
@@ -7914,7 +7914,7 @@ restriction expires at current turn end. Ordinary own Command selection and
 success/failure control shock lifetime. Exact-history restore/fork/replay binds
 the direct status to accepted setup and completed hazard. No Battle-shock test
 or outcome trigger is fabricated and no prior-runtime migration is inferred.
-See [the migration](../contracts/migrations/44.3.25-to-44.3.26.md).
+See [the migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/44.3.25-to-44.3.26.md).
 
 
 ### D06 actual Embark distance
@@ -7925,7 +7925,7 @@ living rules-unit model within an inclusive actual three inches. Runtime/example
 refresh without schema, proposal, event envelope or viewer changes. Existing
 atomic typed rejection/retry, exact-runtime restore/fork and replay apply.
 Analytical FRAME geometry does not certify native faction applicability.
-See [D06 scope](D06_EMBARK_DISTANCE_SCOPE.md) and the contract migration.
+See [D06 scope](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/D06_EMBARK_DISTANCE_SCOPE.md) and the contract migration.
 
 ## Movement-witness membership prerequisite
 
@@ -7939,8 +7939,8 @@ uses the same pending request. Well-formed rule-invalid geometry retains its
 recorded-attempt and fresh-request retry behavior. Existing all-role projections,
 events, persistence and exact replay use the shared engine path. No new decision,
 proposal kind, wire shape, terrain permission or compatibility shim is introduced.
-See [scope and acceptance](MOVEMENT_WITNESS_MEMBERSHIP_SCOPE.md) and
-[Contract migration](../contracts/migrations/44.3.28-to-44.3.29.md).
+See [scope and acceptance](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/MOVEMENT_WITNESS_MEMBERSHIP_SCOPE.md) and
+[Contract migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/44.3.28-to-44.3.29.md).
 
 
 ## D07 model-owned upper Ruins floors
@@ -7956,7 +7956,7 @@ intact; runtime identity and generated examples change. Save/load and replay req
 the matching runtime. No old-runtime compatibility converter or new provider,
 faction, SWARM or full Core certification is supplied.
 
-[Contract migration](../contracts/migrations/44.3.29-to-44.3.30.md).
+[Contract migration](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/44.3.29-to-44.3.30.md).
 
 
 ## D02 grouped Save-step timing
@@ -7966,7 +7966,7 @@ Command Re-roll choices. Existing finite reroll requests, physical contexts,
 viewer redaction, persistence and replay schemas cover this timing correction.
 No decision family, field or option shape is added. Runtime identity and generated
 examples are refreshed; old-runtime artifacts still require their producing
-runtime. See [source and scope](D02_SAVE_STEP_SCOPE.md).
+runtime. See [source and scope](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/D02_SAVE_STEP_SCOPE.md).
 
 ## Focused hazard and Fight continuation corrections
 
@@ -8038,7 +8038,7 @@ payload, public operation or released contract family change is introduced.
 Contract 45 / `error-envelope-v2-diagnostics` preserves typed uncommitted proposal
 rejections for the authenticated current-request owner. The shared redaction owner
 emits only violation codes and nullable fields, or a typed unsupported reason code;
-it omits diagnostics when absent. See [migration 44 to 45](../contracts/migrations/44-to-45.md) for the closed
+it omits diagnostics when absent. See [migration 44 to 45](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/44-to-45.md) for the closed
 union, authority boundary, retry behavior and deployment support window.
 Selected authenticated HTTP movement coverage submits a wrong physical model
 inventory, requires `movement_witness_model_inventory_mismatch` on `witness`,

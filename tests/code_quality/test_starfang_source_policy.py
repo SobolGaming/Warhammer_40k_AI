@@ -59,8 +59,35 @@ def test_starfang_source_smoke_binding_and_predecessor_are_exact() -> None:
     mapping = read_object(ROOT / "docs/performance/policy-v3/operation-map.json")
     old_mapping = read_object_from_git("docs/performance/policy-v3/operation-map.json")
     old_operations = object_value(old_mapping["operations"])
+    # Retiring tracked prose must not leave dead selectors in the live map.
+    # All operations, runtime/test selectors and policy settings remain exact.
+    retired_docs = {
+        path
+        for path in subprocess.check_output(
+            [
+                "git",
+                "diff",
+                "--name-only",
+                "--diff-filter=D",
+                BASE,
+                "HEAD",
+                "--",
+                "docs/",
+                "contracts/",
+            ],
+            cwd=ROOT,
+            text=True,
+        ).splitlines()
+        if path.endswith(".md") and not (ROOT / path).exists()
+    }
     for name, operation in old_operations.items():
-        assert object_value(mapping["operations"])[name] == operation
+        expected_operation = object_value(operation).copy()
+        expected_operation["paths"] = [
+            path
+            for path in cast(list[str], expected_operation["paths"])
+            if path not in retired_docs
+        ]
+        assert object_value(mapping["operations"])[name] == expected_operation
 
 
 def read_object_from_git(path: str) -> dict[str, object]:

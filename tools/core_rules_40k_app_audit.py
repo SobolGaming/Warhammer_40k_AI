@@ -308,7 +308,10 @@ def core_rules_forty_k_app_audit_markdown(
         "",
         "## September 10 review",
         "",
-        "The [fresh clause review](CORE_RULES_ROADMAP_REVIEW_2026_09_10.md) records the "
+        "The [fresh clause review]("
+        "https://github.com/SobolGaming/Warhammer_40k_AI/blob/"
+        "9fba7dc56d9093d76bdc65019859f8904a888c53/docs/CORE_RULES_ROADMAP_REVIEW_2026_09_10.md)"
+        " records the "
         "browser observations, repository checks and qualifications behind the updated plan. "
         "It does not certify all 25 categories or introduce runtime source evidence. New "
         "observations follow [the maintained-mirror policy](CORE_RULES_SOURCE_POLICY.md); "

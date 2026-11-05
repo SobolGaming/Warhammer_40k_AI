@@ -52,18 +52,18 @@ Contract 45 publishes `error-envelope-v2-diagnostics`, a closed error union with
 optional owner-only diagnostic codes and fields. This is a major release because
 closed v1 clients reject the new discriminator and diagnostic properties.
 Retain 44.x through at least 2027-10-29 and one released 45.x minor line, whichever
-is later. See [migration 44 to 45](migrations/44-to-45.md).
+is later. See [migration 44 to 45](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/44-to-45.md).
 
 Contract 44 adds required current canonical rules-unit membership to battlefield
 models. Retain 43.x through at least 2027-10-02 and one released 44.x minor line,
-whichever is later. See [migration 43 to 44](migrations/43-to-44.md).
+whichever is later. See [migration 43 to 44](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/43-to-44.md).
 
 Contract 43 requires a Boolean target CHARACTER context on gathered attack groups.
 It preserves physical weapon contributions while changing group identity and
 target-dependent PRECISION equivalence. Retain 42.x through at least 2027-10-02
 and one released 43.x minor line, whichever is later. Old saves and replays require
 their original runtime; missing historical target context is never inferred.
-See [migration 42 to 43](migrations/42-to-43.md).
+See [migration 42 to 43](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/42-to-43.md).
 
 Contract 42.1 applies the current Shock Disembark source: ordinary unengaged
 setup, no Shock-generated forced Fight response, and charge ineligibility through
@@ -72,112 +72,112 @@ handling, and the engine-owned pending-continuation protocol remain unchanged.
 Clients follow engine-authored pending decisions; selected source rules determine
 which queues are emitted. All family versions and the 42.0 persistence envelope remain unchanged.
 Old rule-generated states and replays require their exact original runtime.
-See [V963-SHOCK](../docs/V963_SHOCK_SCOPE_PLAN.md).
+See [V963-SHOCK](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/V963_SHOCK_SCOPE_PLAN.md).
 
 Contract 42 permits selected ranged weapons to carry an explicit null target and
 separates selected weapons from actual attacks. Retain 41.x through at least
 2027-09-28 and one released 42.x minor line, whichever is later. Old saves and
-replays require their original runtime. See [migration 41 to 42](migrations/41-to-42.md).
+replays require their original runtime. See [migration 41 to 42](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/41-to-42.md).
 
 Contract 41 preserves individual modifier operations and controlling-player
 subset selections. Retain 40.x through at least 2027-09-27 and one released 41.x
 minor line, whichever is later. Older saves and replays require their exact
 original runtime; no lost operation identities are inferred. See
-[migration 40 to 41](migrations/40-to-41.md).
+[migration 40 to 41](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/40-to-41.md).
 
 Contract 40 adds explicit random source expressions and evaluation occurrences.
 Retain 39.x through at least 2027-09-25 and one released 40.x minor line, whichever
-is later. See [migration 39 to 40](migrations/39-to-40.md).
+is later. See [migration 39 to 40](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/39-to-40.md).
 
 Contract 39 authenticates deemed contact and body geometry separately from rules
 bases. Retain 38.x through at least 2027-09-25 and one released 39.x minor line,
-whichever is later. See [migration 38 to 39](migrations/38-to-39.md).
+whichever is later. See [migration 38 to 39](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/38-to-39.md).
 
 Contract 38 requires explicit dice override component scope and assignment
 evidence in interpreted roll views. Retain 37.x through at least 2027-09-24 and
 one released 38.x minor line, whichever is later. Old checkpoints and replays
 require their original engine build; no missing dice history is inferred.
-See [migration 37 to 38](migrations/37-to-38.md).
+See [migration 37 to 38](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/37-to-38.md).
 
 Contract 36 applies revival engagement to canonical enemy rules units at the
 pre-return physical boundary and authenticates that scope on restore. Retain
 35.x through at least 2027-09-24 and one released 36.x minor line, whichever
-is later. See [migration 35 to 36](migrations/35-to-36.md).
+is later. See [migration 35 to 36](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/35-to-36.md).
 
 Contract 35 requires the turn owner in Normal Move history and explicit movement
 mode in reactive completion evidence. Retain 34.x through at least 2027-09-23
 and one released 35.x minor line, whichever is later. See
-[migration 34 to 35](migrations/34-to-35.md).
+[migration 34 to 35](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/34-to-35.md).
 
 Contract 34 requires explicit canonical detachment identity and construction records.
 Retain 33.x through at least 2027-09-21 and one released 34.x minor line, whichever
-is later. See [migration 33 to 34](migrations/33-to-34.md).
+is later. See [migration 33 to 34](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/33-to-34.md).
 
 Contract 33 requires explicit Warlord and Enhancement model selections. Retain
 32.x through at least 2027-09-20 and one released 33.x minor line, whichever is
-later. See [migration 32 to 33](migrations/32-to-33.md).
+later. See [migration 32 to 33](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/32-to-33.md).
 
 Contract 32 implements ingress-only Aircraft and mandatory opponent-turn-end
 returns. Retain 31.x through at least 2027-09-20 and one released 32.x minor
-line, whichever is later; see [31-to-32.md](migrations/31-to-32.md).
+line, whichever is later; see [31-to-32.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/31-to-32.md).
 
 Contract 31 implements all-cargo Firing Deck snapshots and turn-long shooting
 restrictions. Retain 30.x through at least 2027-09-20 and one released 31.x minor
-line, whichever is later; see [30-to-31.md](migrations/30-to-31.md).
+line, whichever is later; see [30-to-31.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/30-to-31.md).
 
-Contract 27 introduced authenticated setup kinds in phase movement history. See [26-to-27.md](migrations/26-to-27.md); retain 26.x through
+Contract 27 introduced authenticated setup kinds in phase movement history. See [26-to-27.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/26-to-27.md); retain 26.x through
 at least 2027-09-19 and one released 27.x minor line, whichever is later.
 
-Contract 26 implemented controlling-player ability-instance selection. See [25-to-26.md](migrations/25-to-26.md); retain 25.x through
+Contract 26 implemented controlling-player ability-instance selection. See [25-to-26.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/25-to-26.md); retain 25.x through
 at least 2027-09-17 and one released 26.x minor line, whichever is later.
 
-Contract 25 introduced oversized setup and required mission edge identity. See [24-to-25.md](migrations/24-to-25.md); retain 24.x through
+Contract 25 introduced oversized setup and required mission edge identity. See [24-to-25.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/24-to-25.md); retain 24.x through
 at least 2027-09-17 and one released 25.x minor line, whichever is later.
 Earlier deployment retention obligations remain.
 
 Contract 21 shares Heroic Intervention with ordinary Charge authority. It supports
-major 21 only; see [20-to-21.md](migrations/20-to-21.md). Keep the preceding 20.x
+major 21 only; see [20-to-21.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/20-to-21.md). Keep the preceding 20.x
 deployment available through at least 2027-09-15 and one released 21.x minor line,
 whichever is later. Earlier deployment retention obligations remain in force.
 
 Contract 20 implements whole Charge rerolls and canonical Command Re-roll
-unit targeting. It supports major 20 only; see [19-to-20.md](migrations/19-to-20.md).
+unit targeting. It supports major 20 only; see [19-to-20.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/19-to-20.md).
 Earlier deployment retention obligations remain in force.
 
 Contract 19 implements canonical attached Charge actors and required per-model
-endpoint evidence. It supports major 19 only; see [18-to-19.md](migrations/18-to-19.md).
+endpoint evidence. It supports major 19 only; see [18-to-19.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/18-to-19.md).
 Earlier deployment retention obligations below remain in force.
 
 
 The reference server supports one contract major at a time. Contract 17 changes
 Fire Overwatch to one opponent Movement phase-end opportunity with an independent
 single-enemy Snap Shooting choice as documented in
-[16-to-17.md](migrations/16-to-17.md). Metadata and command response families
+[16-to-17.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/16-to-17.md). Metadata and command response families
 advance to v17, operator persistence to v9 and replay to v11. Old movement-trigger
 checkpoints require their matching deployment; no trigger-to-phase-end conversion
 is inferred.
 
 Contract 16 adds
 required hit-threshold provenance and changes critical-hit evaluation as documented
-in [15-to-16.md](migrations/15-to-16.md). Old hit records cannot supply that
+in [15-to-16.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/15-to-16.md). Old hit records cannot supply that
 authority and require their original deployment.
 
 Contract 15 changes
 rule ordering, temporary active-player authority and persisted source/batch
-history as documented in [14-to-15.md](migrations/14-to-15.md). Metadata and command
+history as documented in [14-to-15.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/14-to-15.md). Metadata and command
 response families advance to v15, replay to v9 and operator persistence to v7.
 Old sessions require their original deployment; missing history is never inferred.
 
 Contract 14 changes
 the engine-owned nested visibility evidence contract as documented in
-[13-to-14.md](migrations/13-to-14.md). Metadata and command response families
+[13-to-14.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/13-to-14.md). Metadata and command response families
 advance to v14 and operator persistence to v6. Existing open-JSON request,
 projection and event envelopes keep their shapes. Old sampled witnesses cannot
 be converted into continuous evidence; no checkpoint migration is provided.
 
 Contract 13 adds source-linked
 model keyword ownership and current rules-unit keyword projections as documented in
-[12-to-13.md](migrations/12-to-13.md). Metadata and command response families advance
+[12-to-13.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/12-to-13.md). Metadata and command response families advance
 to v13, game views to v12, session projections to v8, and operator persistence to v5.
 New model display fields are required. Existing proposal and decision families remain
 unchanged. Old checkpoints cannot supply missing model ownership and are rejected;
@@ -185,7 +185,7 @@ no model-keyword inference from legacy runtime unit payloads is supported.
 
 Contract 12 changes
 Fight On Death retention, deferred destruction and target presence as documented
-in [11-to-12.md](migrations/11-to-12.md). Metadata and command response families
+in [11-to-12.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/11-to-12.md). Metadata and command response families
 advance to v12, and operator persistence advances to v4. It retains Contract 11's
 proposal families and weapon-instance requirements. Contract 11 made
 `weapon_instance_id` mandatory for every equipped ranged-weapon copy exposed or
@@ -273,7 +273,7 @@ Deployers upgrading a hosted 10.x service must retain a separately deployed
 whichever is later. The Contract 11 reference server does not provide content
 negotiation or parallel Contract 10 endpoints. Contract 10 persistence and
 shooting-declaration artifacts remain valid only against that retained 10.x
-deployment. See `migrations/10-to-11.md`.
+deployment. See [migrations/10-to-11.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/10-to-11.md).
 
 Deployers upgrading a hosted 9.x service must retain a separately deployed 9.x
 adapter through at least 2027-08-16 and one released 10.x minor line, whichever
@@ -286,10 +286,10 @@ session metadata after authentication. Contract 9 replay artifacts remain
 valid only against the retained 9.x deployment; their missing
 objective-control-authority and scoring-state registries are never inferred as
 empty. Prior retention dates remain in force for
-deployers covered by earlier migrations. See `migrations/9-to-10.md`,
-`migrations/8-to-9.md`, `migrations/7-to-8.md`,
-`migrations/6-to-7.md`, `migrations/5-to-6.md`,
-`migrations/4-to-5.md`, and `migrations/3-to-4.md`.
+deployers covered by earlier migrations. See [migrations/9-to-10.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/9-to-10.md),
+[migrations/8-to-9.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/8-to-9.md), [migrations/7-to-8.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/7-to-8.md),
+[migrations/6-to-7.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/6-to-7.md), [migrations/5-to-6.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/5-to-6.md),
+[migrations/4-to-5.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/4-to-5.md), and [migrations/3-to-4.md](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/3-to-4.md).
 
 Unknown or mismatched request `schema_version` values fail before engine
 mutation with `schema_version_mismatch`. Servers never reinterpret a request
@@ -298,19 +298,19 @@ using a nearby schema version.
 Order 62 supports major 28. Retain the major 27 deployment through at least
 2027-09-19 and one released 28.x minor line, whichever is later. Earlier
 retention obligations and immutable baselines remain in force. See
-[migration 27 to 28](migrations/27-to-28.md).
+[migration 27 to 28](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/27-to-28.md).
 
 
 Order 63 supports major 29. Retain the major 28 deployment through at least
 2027-09-19 and one released 29.x minor line, whichever is later. Earlier
 retention obligations and immutable baselines remain in force. See
-[migration 28 to 29](migrations/28-to-29.md).
+[migration 28 to 29](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/28-to-29.md).
 
 Order 64 supports major 30. Retain the major 29 deployment through at least
 2027-09-19 and one released 30.x minor line, whichever is later. Earlier
-retention obligations remain in force. See [migration 29 to 30](migrations/29-to-30.md).
+retention obligations remain in force. See [migration 29 to 30](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/29-to-30.md).
 
 Contract 37 requires authenticated phase-start revival membership on battlefield
 placement requests and events. Retain 36.x through at least 2027-09-24 and one
 released 37.x minor line, whichever is later. See
-[migration 36 to 37](migrations/36-to-37.md).
+[migration 36 to 37](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/contracts/migrations/36-to-37.md).
