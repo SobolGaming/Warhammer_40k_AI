@@ -51,9 +51,10 @@ because retained inverse helpers contain assertions. The directory option is for
 testing the same fixed authenticated inventory; it admits no alternate manifest.
 
 There is no new CI job, required check or publication barrier. The existing
-720-second setup-and-test cutoff, coverage aggregation/artifacts, complete-package
-branch denominator and temporary 65% floor, quality 600-second cutoff and serial
-180-second smoke remain unchanged, as do all 260 exact deferrals. This removes
+owner-approved setup-and-test cutoff is 780 seconds and the active coverage floor
+is 66.5%. Coverage aggregation/artifacts, the complete-package branch denominator,
+the quality 600-second cutoff, the serial 180-second smoke and all 260 exact
+deferrals remain required. This removes
 demonstrated fixture coupling; it does not claim a CI speedup or full-game
 certification. Relevant rule/schema changes still require explicit migration
 while retaining the old bytes; snapshots contain data, never executable Python.

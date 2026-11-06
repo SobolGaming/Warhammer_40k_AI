@@ -300,8 +300,8 @@ _SCOPES = (
     ReviewedScope(
         PR2_BASE,
         PR2_SPEC_PATH,
-        "ac7c34a6e2c037a3be8dc67514c597ca962cfed0dc915b7841afa4b2fd26325f",
-        "9f74633f8d7acfb529aac5c7e362d752be2c2cbdd22af0a4f8d446e69eb93496",
+        "78f73243bc5529d1e06d4244c760756412dca6e854ab16c4ffe500f228810d8f",
+        "7ac23e105ab14bd84680515b588081481529c0da9f0d64c99424aa40555957c9",
         PR2_REPORT_PATH,
         frozenset(
             [
@@ -479,6 +479,9 @@ _SCOPES = (
         ),
         frozenset(
             [
+                "pyproject.toml",
+                "tests/code_quality/test_quality_runtime.py",
+                "tests/code_quality/test_section08_native_mission_source.py",
                 "ci/quality_shards/all.txt",
                 "ci/quality_shards/shard-1.txt",
                 "ci/quality_shards/shard-3.txt",

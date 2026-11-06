@@ -34205,6 +34205,21 @@
       "sensitive": false,
       "mandatory": true
     },
+    "behavioral-worksteal-dispatch-tests": {
+      "paths": [
+        "tests/code_quality/test_ci_performance_gates.py"
+      ],
+      "owners": [
+        "test_duration_dispatch_balances_actual_initial_worksteal_chunks",
+        "test_duration_dispatch_profile_controls_the_real_worker_hook",
+        "test_duration_dispatch_rejects_missing_or_invalid_measurements",
+        "test_junit_case_profiles_preserve_class_parameters_and_complete_nodes",
+        "test_serial_mirror_balancing_preserves_measurements_and_accounts_for_execution"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "private-rng-owner-13093005fda46651": {
       "paths": [
         "conformance/typescript/src/scenario.ts"

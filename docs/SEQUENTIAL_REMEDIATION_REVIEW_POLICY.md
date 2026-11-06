@@ -167,3 +167,19 @@ The PR591 cutover ledger and its authenticated 64% field remain historical sourc
 records. Their admission checks retain that exact value; they do not configure the
 active coverage threshold. Prior measurements, approvals and qualification records
 retain their original meaning. This update does not claim any gate has passed.
+
+## CI and coverage update - 6 November 2026
+
+The owner approved a thirteen-minute CI goal and raised the active coverage
+threshold from 65% to 66.5%. Behavioral source-index setup and covered execution
+use a 780-second step cutoff. Local configuration, documented commands and the
+combined CI coverage gate enforce 66.5%, with two decimal places so the fractional
+boundary is checked precisely.
+
+Full-package branch measurement, the selected tests, coverage omissions and
+exclusions, the exact 260 deferred quality cases, the 120-second bounded mirror
+runner, performance comparisons and every other delivery gate remain unchanged.
+The separate 180-second complete performance command and 600-second quality-lane
+limits remain in force. Post-merge coverage work must still restore 85%.
+Historical records retain their original thresholds and outcomes; no prior failed
+CI run is reclassified. A per-step cutoff does not prove the end-to-end CI goal.

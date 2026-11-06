@@ -245,7 +245,7 @@ def test_source_history_guard_precedes_index_and_covered_pytest() -> None:
         < step.index("tools.ability_support_sources")
         < step.index("--cov=warhammer40k_core")
     )
-    assert "timeout-minutes: 12" in step
+    assert "timeout-minutes: 13" in step
 
 
 def test_source_history_rejects_optimized_interpreter() -> None:
