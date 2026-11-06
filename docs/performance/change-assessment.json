@@ -66,11 +66,11 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "2cd326f99e6f8c7771f8186c3b6e6ff79e5dc9b82a04a4657afaa62f484546ef",
-      "after_sha256": "50efe894e8d53bd3661726a6702a1d2c91497f62fba622f9e76a315677677f45",
+      "after_sha256": "d6d1b1e7f606cffaf8f5d28260f85a2f05c42ba8dc13254ced18fee0927a1874",
       "owners": {
         "@document": {
           "before": "2cd326f99e6f8c7771f8186c3b6e6ff79e5dc9b82a04a4657afaa62f484546ef",
-          "after": "50efe894e8d53bd3661726a6702a1d2c91497f62fba622f9e76a315677677f45"
+          "after": "d6d1b1e7f606cffaf8f5d28260f85a2f05c42ba8dc13254ced18fee0927a1874"
         }
       }
     },
@@ -746,21 +746,21 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "2dec09b5ad5abec792d4fbf3b2d5ebc67b212df3c0a5391c3c378041db0aef59",
-      "after_sha256": "845b6f261b73b0535c57e4a68716abf33a7a4664b7919aaa104e964f40b3fa84",
+      "after_sha256": "4f36516a17aab99628b972d6664f9bb78ea91d7b12dd9d273bcb512ba52c3690",
       "owners": {
         "@document": {
           "before": "2dec09b5ad5abec792d4fbf3b2d5ebc67b212df3c0a5391c3c378041db0aef59",
-          "after": "845b6f261b73b0535c57e4a68716abf33a7a4664b7919aaa104e964f40b3fa84"
+          "after": "4f36516a17aab99628b972d6664f9bb78ea91d7b12dd9d273bcb512ba52c3690"
         }
       }
     },
     "data/source_audits/private_rng_fixture_preimages_v1.json": {
       "before_sha256": null,
-      "after_sha256": "c147fb074cc039440adef92e9825f086afe157f28d310e7bc46edd8898b33e99",
+      "after_sha256": "9ac0a8797daf82c33832d94d81a93592b9ca9ffc1a6a746b626c4ffe0fb57fba",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c147fb074cc039440adef92e9825f086afe157f28d310e7bc46edd8898b33e99"
+          "after": "9ac0a8797daf82c33832d94d81a93592b9ca9ffc1a6a746b626c4ffe0fb57fba"
         }
       }
     },
@@ -2866,11 +2866,11 @@
     },
     "tests/code_quality/test_ci_performance_gates.py": {
       "before_sha256": "054e621925a4d5be98b90fa76f6f5f3823033dcbb1db27e6edfda0550b194fff",
-      "after_sha256": "eb28bea5612c75ec7a42cb726844cb646bc073b43ce231d5dbacc74ab66be830",
+      "after_sha256": "b8e24c00acce95f4d5a643450c66cd679a3878e3a6e7a02c03ec956c8074042c",
       "owners": {
         "test_duration_dispatch_balances_actual_initial_worksteal_chunks": {
           "before": null,
-          "after": "d378421127ab8e5f4fa20b291d138358d990aac0790a1aa3e5bf2f6b3da688dd"
+          "after": "8f44a1c260eb4307087c12e459ab6f8d9e589635967defade89c354788e4b463"
         },
         "test_duration_dispatch_profile_controls_the_real_worker_hook": {
           "before": null,
@@ -3658,7 +3658,7 @@
     },
     "tests/infrastructure/decisions/unit/test_physical_proposal_prevalidation.py": {
       "before_sha256": "3b3172c020b40288408e17ae2c5cb7955d273743ad4b7bc01a96b8b06f7d9d8a",
-      "after_sha256": "074b14e2f91c6ce99cc3795c01df99fa6030b2038d7cba02d87c2f6ff5ae4efb",
+      "after_sha256": "545c340333e2ec2400a4517db68d6531763b842048db317e6b0afa81f2a6b815",
       "owners": {
         "@module": {
           "before": "659782d4398c6d9b55ae9a2cab52bf375c06392b4624d4198079982055333f7b",
@@ -3682,7 +3682,7 @@
         },
         "test_policy_payload_digest_performs_one_complete_json_validation": {
           "before": null,
-          "after": "f592e73d37db8f30ae2c5acfd124ae4d2680767ca71e2689809ceb28e912f6b0"
+          "after": "6a0864c01bd3bc0a242b01ec878c805c122d767771081145ea796b1fae0e2093"
         },
         "test_projection_snapshot_binds_complete_viewer_context": {
           "before": null,
@@ -4740,11 +4740,11 @@
     },
     "tests/support/private_rng_fixture_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "ea6e48a442b3bf7bebdf003255a03b2a03bf46586cad6384c4285c2bea0f0114",
+      "after_sha256": "d748b16149b417c8cb6ea19afbf180ab0f16c74bff8b5a900a92b33d8d5ccdf1",
       "owners": {
         "@module": {
           "before": null,
-          "after": "bb12506309869c9d0d1928ae245fef4849dd020a55fedb67c3a0c232407308f5"
+          "after": "8d9f42aa17f23266f8fba5dd7b14290dd035c0370e7928a6c66098746b7f6f8a"
         },
         "FixtureEdit": {
           "before": null,
@@ -5828,7 +5828,7 @@
       "selected_families": [],
       "rationale": "CI-only measured test dispatch balances the actual consecutive four-worker xdist chunks after deselection. Complete current-head twelve-shard hosted results assess the scheduling outcome; weights remain recorded estimates, not full-game performance evidence. The original serial contract benchmark does not enable this behavioral profile.",
       "source_obligation": "Preserve every selected case, actual xdist capacities, original finite S25 validation, and the twelve-minute cutoff. Reject missing or malformed declared weights without substituting an execution policy.",
-      "unchanged_work": "No engine rule, gameplay search, legality, replay or mutation changes. Existing test selection, coverage denominator and floor, exact260deferrals and all numeric budgets remain unchanged."
+      "unchanged_work": "No engine rule, gameplay search, legality, replay or mutation changes. Existing test selection, coverage denominator and floor, exact 260 deferrals and all numeric budgets remain unchanged."
     },
     "scripts/export_ui_contract_fixtures.py": {
       "category": "rule_semantics",
@@ -7073,7 +7073,7 @@
       "selected_families": [],
       "rationale": "CI-only measured test dispatch balances the actual consecutive four-worker xdist chunks after deselection. Complete current-head twelve-shard hosted results assess the scheduling outcome; weights remain recorded estimates, not full-game performance evidence. The original serial contract benchmark does not enable this behavioral profile.",
       "source_obligation": "Preserve every selected case, actual xdist capacities, original finite S25 validation, and the twelve-minute cutoff. Reject missing or malformed declared weights without substituting an execution policy.",
-      "unchanged_work": "No engine rule, gameplay search, legality, replay or mutation changes. Existing test selection, coverage denominator and floor, exact260deferrals and all numeric budgets remain unchanged."
+      "unchanged_work": "No engine rule, gameplay search, legality, replay or mutation changes. Existing test selection, coverage denominator and floor, exact 260 deferrals and all numeric budgets remain unchanged."
     },
     "tests/core_stratagem_helpers.py": {
       "category": "rule_semantics",

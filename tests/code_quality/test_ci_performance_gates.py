@@ -33,7 +33,7 @@ def test_duration_dispatch_balances_actual_initial_worksteal_chunks() -> None:
         order = sharding.duration_worksteal_order(nodes, workers=4, selector_seconds=weights)
         assert sorted(order) == list(range(len(nodes)))
         counts = {file: sum(node.startswith(file + "::") for node in nodes) for file in weights}
-        totals = []
+        totals: list[float] = []
         offset = 0
         for worker in range(4):
             width = (len(nodes) - offset) // (4 - worker)

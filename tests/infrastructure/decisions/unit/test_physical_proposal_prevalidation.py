@@ -361,7 +361,7 @@ def test_immutable_player_observation_hash_uses_its_canonical_json_without_decod
 
 def test_policy_payload_digest_performs_one_complete_json_validation() -> None:
     payload = {"nested": [{"finite": 1.5, "text": "detached"}], "tuple": (1, 2)}
-    profiles = []
+    profiles: list[int] = []
     for operation in (canonical_json, payload_digest):
         with cProfile.Profile() as profile:
             operation(payload)
