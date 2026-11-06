@@ -452,7 +452,35 @@ jobs:
           uv run --no-sync python -B -m tools.ability_support_sources \
             data/source_snapshots/wahapedia/10th-edition/2026-06-14/json \
             "$SELECTED_ARMY_SOURCE_INDEX"
-          uv run --no-sync pytest "${shard_paths[@]}" \
+          isolated_status=0
+          isolation_args=()
+          parallel_timing_dir="$TEST_TIMING_DIR"
+          if [[ "$SHARD_ID" == "11" ]]; then
+            # Coverage contention can consume the runner's real 120-second limit.
+            # Keep that limit and the complete inventory; isolate this case only.
+            isolated_case="tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
+            grep -Fxq "${isolated_case%%::*}" "$SHARD_MANIFEST"
+            if TEST_TIMING_DIR="$TEST_TIMING_DIR/isolated-mirror" \
+              uv run --no-sync pytest "$isolated_case" \
+                -n 1 \
+                --dist=worksteal \
+                --selected-army-source-index="$SELECTED_ARMY_SOURCE_INDEX" \
+                --cov=warhammer40k_core \
+                --cov-report= \
+                --cov-fail-under=0 \
+                --durations=100 \
+                --durations-min=0.1 \
+                --junitxml="reports/behavior-shard-${SHARD_ID}-isolated-mirror.xml"; then
+              echo "Isolated mirror test passed."
+            else
+              isolated_status=$?
+            fi
+            isolation_args=(--deselect "$isolated_case" --cov-append)
+            parallel_timing_dir="$TEST_TIMING_DIR/remainder"
+          fi
+          parallel_status=0
+          if TEST_TIMING_DIR="$parallel_timing_dir" \
+            uv run --no-sync pytest "${shard_paths[@]}" "${isolation_args[@]}" \
             -n auto \
             --dist=worksteal \
             --selected-army-source-index="$SELECTED_ARMY_SOURCE_INDEX" \
@@ -461,7 +489,14 @@ jobs:
             --cov-fail-under=0 \
             --durations=100 \
             --durations-min=0.1 \
-            --junitxml="reports/behavior-shard-${SHARD_ID}.xml"
+            --junitxml="reports/behavior-shard-${SHARD_ID}.xml"; then
+            echo "Parallel shard cases passed."
+          else
+            parallel_status=$?
+          fi
+          if (( isolated_status != 0 || parallel_status != 0 )); then
+            exit 1
+          fi
 
       - name: Upload shard test report
         if: always()

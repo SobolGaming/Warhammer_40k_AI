@@ -4,6 +4,16 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8c7330faff976bff443ea3988b50b29936b434e35f917bed1e774732e5219436",
   "operation_map_sha256": "fe82262786b87186f7b1e756a3241927e9003fe7e21dc1d71f3be9285601d2d2",
   "changes": {
+    ".github/workflows/ci.yml": {
+      "before_sha256": "c86e3fdb957764ad34c6f76da650d0665e074c5a6027e9581203193c591d6e3e",
+      "after_sha256": "48e26d398688b939b14b82a0c4f8d25385f2b2e57814feee6bddac03396ae5f6",
+      "owners": {
+        "@document": {
+          "before": "c86e3fdb957764ad34c6f76da650d0665e074c5a6027e9581203193c591d6e3e",
+          "after": "48e26d398688b939b14b82a0c4f8d25385f2b2e57814feee6bddac03396ae5f6"
+        }
+      }
+    },
     "ci/quality_shards/all.txt": {
       "before_sha256": "4aa209b3aaaa50b36ca2d4d6497cfecbeb5c67e8b7f04e4582924c69418f77e0",
       "after_sha256": "18a8cc87f635ff4c5164d8f6fca55dc4f5f075d6c9bf915fcbb314da65964459",
@@ -666,61 +676,61 @@
     },
     "docs/performance/current/pr2-player_boundary.json": {
       "before_sha256": null,
-      "after_sha256": "073a172cdd739683208bc6bd40a9c59ea792f43149c510d1585926401eead098",
+      "after_sha256": "1518bcbda5f6fe568558d5346a00e301138bd3950fe8c8168affaa4e66ac5157",
       "owners": {
         "@document": {
           "before": null,
-          "after": "073a172cdd739683208bc6bd40a9c59ea792f43149c510d1585926401eead098"
+          "after": "1518bcbda5f6fe568558d5346a00e301138bd3950fe8c8168affaa4e66ac5157"
         }
       }
     },
     "docs/performance/current/pr2-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "a34203f7b4061df321281210ca3de4d139fce6a6f6ee7fb80a9a90bedc20961d",
+      "after_sha256": "b75f6c2bad1c7bc46fdef40f5effb698c825a91b7918c60b03f2034957560752",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a34203f7b4061df321281210ca3de4d139fce6a6f6ee7fb80a9a90bedc20961d"
+          "after": "b75f6c2bad1c7bc46fdef40f5effb698c825a91b7918c60b03f2034957560752"
         }
       }
     },
     "docs/performance/current/pr2-roster.json": {
       "before_sha256": null,
-      "after_sha256": "ccbd48ab8ff699ccab91d9d26afa921a54ad9110ba5ad1eef2a0a598fc45b461",
+      "after_sha256": "cec7998f345c1d327c64dc99775c3f8a8ce5523a6919e3deadfcbd321c6038dc",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ccbd48ab8ff699ccab91d9d26afa921a54ad9110ba5ad1eef2a0a598fc45b461"
+          "after": "cec7998f345c1d327c64dc99775c3f8a8ce5523a6919e3deadfcbd321c6038dc"
         }
       }
     },
     "docs/performance/current/pr2-session_command_fork.json": {
       "before_sha256": null,
-      "after_sha256": "d17bbcd4a94c90942a0ce3467968e8af1b6cbfc2853b422887b80f472354fa38",
+      "after_sha256": "3be57edef7bb5186f1d0a087e9389199d58594ebca10f36f5d2c8540d15caa32",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d17bbcd4a94c90942a0ce3467968e8af1b6cbfc2853b422887b80f472354fa38"
+          "after": "3be57edef7bb5186f1d0a087e9389199d58594ebca10f36f5d2c8540d15caa32"
         }
       }
     },
     "docs/performance/current/pr2-source-reuse-2b640-v4.json": {
       "before_sha256": null,
-      "after_sha256": "4560e0ed90b7671b3ec6af405cc1c6775d56b802609ba3d1215fc34899717a47",
+      "after_sha256": "fc0ee3103e29f998209d37bbf134bf6de91d0edeb5488a83b9ad7cc1e3900643",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4560e0ed90b7671b3ec6af405cc1c6775d56b802609ba3d1215fc34899717a47"
+          "after": "fc0ee3103e29f998209d37bbf134bf6de91d0edeb5488a83b9ad7cc1e3900643"
         }
       }
     },
     "docs/performance/current/pr2-tactical_draw.json": {
       "before_sha256": null,
-      "after_sha256": "15508f36d5f57f50e436f49ef97f94c2e35e407a87629ab0cb17e4cb58041d73",
+      "after_sha256": "8456afb6a1b240114cb2f13e8d574431241573fdb938ac4383041fab3fb5eb10",
       "owners": {
         "@document": {
           "before": null,
-          "after": "15508f36d5f57f50e436f49ef97f94c2e35e407a87629ab0cb17e4cb58041d73"
+          "after": "8456afb6a1b240114cb2f13e8d574431241573fdb938ac4383041fab3fb5eb10"
         }
       }
     },
@@ -4672,6 +4682,14 @@
     }
   },
   "rows": {
+    ".github/workflows/ci.yml": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
     "ci/quality_shards/all.txt": {
       "category": "governance",
       "operations": [],
