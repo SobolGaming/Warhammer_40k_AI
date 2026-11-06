@@ -25,6 +25,7 @@ from tests.support.faction_layout_preservation import (
     layout_live_reference,
     verify_layout_original,
 )
+from tests.support.private_rng_fixture_preservation import private_rng_fixture_predecessor
 from tests.support.section13_preservation import preserved_section13_golden_bytes
 
 MANIFEST = "data/source_audits/category_migration/preservation.json"
@@ -518,7 +519,11 @@ def verify_migrated_test(root: Path, relative: str) -> tuple[bytes, MigrationRec
     current: dict[str, bytes] = {}
     for path, expected in record["successors"].items():
         raw = preserved_section13_golden_bytes(
-            root, path, _integration_migration_predecessor(root, path, _read(root, path))
+            root,
+            path,
+            _integration_migration_predecessor(
+                root, path, private_rng_fixture_predecessor(path, _read(root, path))
+            ),
         )
         raw = acts_predecessor(root, path, raw)
         if hashlib.sha256(raw).hexdigest() != expected:

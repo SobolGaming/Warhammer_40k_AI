@@ -11,6 +11,7 @@ from typing import cast
 import pytest
 from tools import performance_policy as policy
 from tools.performance_policy import object_value, read_object
+from tools.performance_private_randomness import private_randomness_policy_predecessor
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = "79a27e4a26e180a28457712818d47e274df7c99a"
@@ -47,7 +48,7 @@ def test_starfang_source_smoke_binding_and_predecessor_are_exact() -> None:
             assert not policy.starfang_deep_strike_smoke_operations(
                 base=BASE, path=path, category="rule_semantics", change=changed
             )
-    raw = (ROOT / "tools/performance_policy.py").read_bytes()
+    raw = private_randomness_policy_predecessor((ROOT / "tools/performance_policy.py").read_bytes())
     prior = subprocess.check_output(
         ["git", "show", BASE + ":tools/performance_policy.py"], cwd=ROOT
     )
@@ -485,7 +486,9 @@ def test_wave_frame_performance_scope_is_exact_and_preserves_policy_chain(
 
     predecessor = daemons_native_policy_predecessor(
         daemons_next_policy_predecessor(
-            daemons_final_policy_predecessor(original_read_bytes(policy_path))
+            daemons_final_policy_predecessor(
+                private_randomness_policy_predecessor(original_read_bytes(policy_path))
+            )
         )
     )
 
@@ -586,7 +589,9 @@ def test_daemons_native_performance_scope_is_exact_and_preserves_policy_chain(
     policy_path = ROOT / "tools/performance_policy.py"
     original_read_bytes = Path.read_bytes
     predecessor = daemons_next_policy_predecessor(
-        daemons_final_policy_predecessor(original_read_bytes(policy_path))
+        daemons_final_policy_predecessor(
+            private_randomness_policy_predecessor(original_read_bytes(policy_path))
+        )
     )
 
     def historical_policy_bytes(path: Path) -> bytes:
@@ -650,7 +655,9 @@ def test_daemons_next_three_performance_scope_is_exact_and_preserves_policy_chai
 
     policy_path = ROOT / "tools/performance_policy.py"
     original_read_bytes = Path.read_bytes
-    predecessor = daemons_final_policy_predecessor(original_read_bytes(policy_path))
+    predecessor = daemons_final_policy_predecessor(
+        private_randomness_policy_predecessor(original_read_bytes(policy_path))
+    )
 
     def historical_policy_bytes(path: Path) -> bytes:
         return predecessor if path == policy_path else original_read_bytes(path)
@@ -721,7 +728,9 @@ def test_daemons_next_three_retained_capture_bytes_match_receipts() -> None:
         assert json.loads(capture)["text"].encode("utf-8") == text_bytes
 
 
-def test_daemons_final_four_performance_scope_is_exact_and_preserves_policy_chain() -> None:
+def test_daemons_final_four_performance_scope_is_exact_and_preserves_policy_chain(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from tools.performance_daemons_final import BASE as FINAL_BASE
     from tools.performance_daemons_final import (
         OPERATIONS,
@@ -730,6 +739,14 @@ def test_daemons_final_four_performance_scope_is_exact_and_preserves_policy_chai
     )
     from tools.performance_daemons_final import SCOPE as FINAL_SCOPE
 
+    policy_path = ROOT / "tools/performance_policy.py"
+    original_read_bytes = Path.read_bytes
+    predecessor = private_randomness_policy_predecessor(original_read_bytes(policy_path))
+
+    def historical_policy_bytes(path: Path) -> bytes:
+        return predecessor if path == policy_path else original_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", historical_policy_bytes)
     scope = read_object(ROOT / FINAL_SCOPE)
     for path, change in object_value(scope["changes"]).items():
         assert daemons_final_smoke_operations(

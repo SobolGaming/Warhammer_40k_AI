@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
+import subprocess
 from copy import deepcopy
 from pathlib import Path
 from typing import cast
@@ -33,6 +35,21 @@ def _pairs(report: dict[str, object]) -> list[dict[str, object]]:
     return cast(list[dict[str, object]], report["ordered_pairs"])
 
 
+def _measured_specification() -> dict[str, object]:
+    """Use the authenticated measured-era family, independently of today's driver."""
+    inputs = campaign.verify_archive(ROOT)
+    manifest = policy.read_object(ROOT / campaign.ARCHIVE / "manifest.json.txt")
+    head = policy.object_value(policy.object_value(manifest["sides"])["head"])
+    blob = policy.object_value(head["source"])[policy.MAP]
+    if not isinstance(blob, str):
+        raise TypeError("Measured operation-map blob identity is malformed.")
+    raw = subprocess.check_output(["git", "cat-file", "blob", blob], cwd=ROOT)
+    if hashlib.sha256(raw).hexdigest() != inputs[policy.MAP]:
+        raise ValueError("Measured operation-map bytes drifted.")
+    mapping = policy.object_value(json.loads(raw))
+    return policy.object_value(policy.object_value(mapping["families"])["reconstruction"])
+
+
 def _validate(report: dict[str, object]) -> list[dict[str, object]]:
     inputs = _measured()
     fixture = policy.canonical_digest(
@@ -49,9 +66,7 @@ def _validate(report: dict[str, object]) -> list[dict[str, object]]:
         runtime_id=campaign.RUNTIME,
         input_digest=campaign.MEASURED_DIGEST,
         family="reconstruction",
-        specification=policy.object_value(
-            policy.object_value(policy.read_object(ROOT / policy.MAP)["families"])["reconstruction"]
-        ),
+        specification=_measured_specification(),
         base_runtime_id=BASE_RUNTIME,
         expected_inputs={
             "lock_sha256": inputs["uv.lock"],

@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 from typing import NotRequired, TypedDict, cast
 
+from tests.support.private_rng_fixture_preservation import private_rng_fixture_predecessor
+
 MANIFEST = "data/source_audits/faction_test_layout/preservation.json"
 MANIFEST_SHA256 = "7b092d9304f52885883d09c32893a35589419d6bf95dbf1331a60ce3cd51442a"
 ORIGINALS = frozenset(
@@ -113,10 +115,19 @@ def verify_layout_original(root: Path, relative: str) -> tuple[bytes, LayoutReco
     if hashlib.sha256(original).hexdigest() != record["original_sha256"]:
         raise ValueError("Faction layout original bytes drifted.")
     current: dict[str, dict[str, str]] = {}
+    authenticated_contents: dict[str, bytes] = {}
     for name, expected in record["successors"].items():
         content = _read(root, name)
         if hashlib.sha256(content).hexdigest() != expected:
+            try:
+                content = private_rng_fixture_predecessor(name, content)
+            except ValueError as error:
+                raise ValueError(
+                    "Faction layout private RNG fixture bytes drifted: " + name
+                ) from error
+        if hashlib.sha256(content).hexdigest() != expected:
             raise ValueError("Faction layout live successor bytes drifted: " + name)
+        authenticated_contents[name] = content
         current[name] = _definitions(
             content,
             shadow_fixture_maintenance=(
@@ -136,7 +147,7 @@ def verify_layout_original(root: Path, relative: str) -> tuple[bytes, LayoutReco
         path, target = record["definitions"][symbol].split("::", 1)
         node = next(
             value
-            for value in ast.parse(_read(root, path)).body
+            for value in ast.parse(authenticated_contents[path]).body
             if isinstance(value, ast.FunctionDef) and value.name == target
         )
         if len(node.body) <= statement_count or not any(

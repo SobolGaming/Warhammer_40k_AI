@@ -40,6 +40,7 @@ ENGINE_DICE_MODULES = frozenset(
     }
 )
 REDACTION_CONSUMER_MODULES = (
+    SRC / "adapters" / "local_session.py",
     SRC / "adapters" / "projection.py",
     SRC / "adapters" / "event_stream.py",
     SRC / "adapters" / "server.py",
@@ -163,6 +164,37 @@ def test_phase18e_client_network_headless_modules_do_not_own_dice_rng() -> None:
     assert not violations
 
 
+def _scoped_sync_delegation_violations(tree: ast.Module) -> list[str]:
+    required = {
+        "view_for_context",
+        "status_for_context",
+        "authoritative_event_page_for_context",
+        "visible_event_count_for_context",
+    }
+    found: set[str] = set()
+    violations: list[str] = []
+    for node in ast.walk(tree):
+        if not (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and isinstance(node.func.value, ast.Attribute)
+            and node.func.value.attr == "adapter_session"
+        ):
+            continue
+        if node.func.attr not in required:
+            violations.append("unscoped adapter session method: " + node.func.attr)
+        else:
+            found.add(node.func.attr)
+        viewers = [keyword.value for keyword in node.keywords if keyword.arg == "viewer"]
+        if len(viewers) != 1 or not (
+            isinstance(viewers[0], ast.Name) and viewers[0].id == "viewer"
+        ):
+            violations.append("adapter session call lacks the current viewer")
+    if found != required:
+        violations.append("scoped adapter session delegation is incomplete")
+    return violations
+
+
 def test_adapter_hidden_decision_redaction_is_centralized() -> None:
     violations: list[str] = []
     for path in REDACTION_CONSUMER_MODULES:
@@ -187,9 +219,31 @@ def test_adapter_hidden_decision_redaction_is_centralized() -> None:
                         f"{path}: defines local hidden-decision type set "
                         f"{sorted(hidden_type_literals)}"
                     )
-        if not imports_shared_redaction:
+        if path.name == "server_sync.py":
+            # Sync delegates to the same player-scoped facade as other clients.
+            # The facade, projection and event stream remain direct consumers
+            # of the single redaction owner, checked by this loop.
+            violations.extend(
+                f"{path}: {detail}" for detail in _scoped_sync_delegation_violations(tree)
+            )
+        elif not imports_shared_redaction:
             violations.append(f"{path}: does not import adapters.redaction")
     assert not violations
+    methods = (
+        "view_for_context",
+        "status_for_context",
+        "authoritative_event_page_for_context",
+        "visible_event_count_for_context",
+    )
+    legal = "\n".join(f"snapshot.adapter_session.{name}(viewer=viewer)" for name in methods)
+    assert not _scoped_sync_delegation_violations(ast.parse(legal))
+    for altered in (
+        legal.replace("viewer=viewer", "viewer=other", 1),
+        legal.replace("viewer=viewer", "", 1),
+        legal.replace("view_for_context", "view", 1),
+        legal + "\nsnapshot.adapter_session.status()",
+    ):
+        assert _scoped_sync_delegation_violations(ast.parse(altered))
 
 
 def test_internal_model_destruction_authority_redaction_covers_public_surfaces() -> None:

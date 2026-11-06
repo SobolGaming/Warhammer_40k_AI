@@ -198,7 +198,7 @@
       "workload_id": "external-contract-orphan-write-independent-check-v1",
       "input_binding": {
         "schema": "tool-input-roles-v4",
-        "role_specification": "docs/performance/policy-v3/defiler-input-roles-v4.json"
+        "role_specification": "docs/performance/policy-v3/pr2-player-boundary-input-roles-v4.json"
       }
     },
     "session_command_fork": {
@@ -300,8 +300,7 @@
         "*from_persistence_payload",
         "*fork",
         "*run",
-        "*replay*",
-        "LocalGameSession._persistence_payload_with_lifecycle_hash"
+        "*replay*"
       ],
       "families": [
         "reconstruction"
@@ -14628,7 +14627,8 @@
         "project_game_view"
       ],
       "families": [
-        "player_boundary"
+        "roster",
+        "external_contract_source_reuse"
       ],
       "sensitive": true,
       "mandatory": true
@@ -34369,6 +34369,17 @@
       "sensitive": false,
       "mandatory": true
     },
+    "private-rng-owner-b84de745aa2ad1df": {
+      "paths": [
+        "data/source_audits/private_rng_fixture_preimages_v1.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "private-rng-owner-83cd0803bcde80cb": {
       "paths": [
         "scripts/build_test_shards.py"
@@ -35088,6 +35099,39 @@
       "sensitive": false,
       "mandatory": true
     },
+    "private-rng-owner-ba23d3523caa6166": {
+      "paths": [
+        "tests/code_quality/test_category_migration_preservation.py"
+      ],
+      "owners": [
+        "test_private_seed_inactive_api_maintenance_preserves_native_source"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-c8a1c41e8f12a86f": {
+      "paths": [
+        "tests/code_quality/test_performance_policy.py"
+      ],
+      "owners": [
+        "test_whispering_web_smoke_scope_and_predecessor_are_exact"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-fac356e49e4b8510": {
+      "paths": [
+        "tests/daemons_native_source_preservation.py"
+      ],
+      "owners": [
+        "before_pr2_comparison_provenance"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "private-rng-owner-d5c2000299dc6587": {
       "paths": [
         "tests/infrastructure/lifecycle/unit/test_lifecycle.py"
@@ -35202,6 +35246,21 @@
       "owners": [
         "@module",
         "fixture_private_rng_seed"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-c6512a8b8ee3d0e9": {
+      "paths": [
+        "tests/support/private_rng_fixture_preservation.py"
+      ],
+      "owners": [
+        "@module",
+        "FixtureEdit",
+        "FixtureRecord",
+        "private_rng_fixture_predecessor",
+        "private_rng_fixture_records"
       ],
       "families": [],
       "sensitive": false,

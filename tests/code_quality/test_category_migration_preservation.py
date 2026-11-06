@@ -42,6 +42,31 @@ def test_private_seed_inactive_api_maintenance_preserves_native_source(tmp_path:
     with pytest.raises(SystemExit, match="native test semantics"):
         validate_private_rng_inactive_source(tmp_path, before)
 
+    from tests.support.private_rng_fixture_preservation import (
+        private_rng_fixture_predecessor,
+        private_rng_fixture_records,
+    )
+
+    for relative, fixture_record in private_rng_fixture_records().items():
+        current = (ROOT / relative).read_bytes()
+        preimage = private_rng_fixture_predecessor(relative, current)
+        assert hashlib.sha256(preimage).hexdigest() == fixture_record["before_sha256"]
+        assert private_rng_fixture_predecessor(relative, preimage) == preimage
+        assert current != preimage
+        for altered in (
+            current + b"\n",
+            (
+                current.replace(b"assert ", b"assert not ", 1)
+                if b"assert " in current
+                else current + b"\nunreviewed_fixture_initializer = True\n"
+            ),
+            current.replace(b"import ", b"import changed_", 1),
+        ):
+            assert altered != current
+            with pytest.raises(ValueError, match="fixture successor bytes drifted"):
+                private_rng_fixture_predecessor(relative, altered)
+    assert private_rng_fixture_predecessor("tests/unknown.py", b"unknown") == b"unknown"
+
 
 def _manifest() -> migration.MigrationManifest:
     return cast(migration.MigrationManifest, json.loads((ROOT / migration.MANIFEST).read_bytes()))
@@ -794,9 +819,10 @@ def test_acts_inactive_api_maintenance_preserves_original_evidence(
     ],
 )
 def test_defiler_registration_retains_exact_acts_predecessor(mutation: str | None) -> None:
+    from tests.daemons_native_source_preservation import before_pr2_comparison_provenance
     from tests.support import acts_preservation as acts
 
-    raw = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    raw = before_pr2_comparison_provenance((ROOT / "tools/source_scope_provenance.py").read_bytes())
     addition = b"COMPARISON_ONLY_SCOPE_BASES = (scopes.ACTS_BASE, scopes.DEFILER_BASE)"
     if mutation is None:
         assert hashlib.sha256(acts.defiler_provenance_predecessor(raw)).hexdigest() == (

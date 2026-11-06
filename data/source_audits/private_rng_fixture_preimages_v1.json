@@ -1,0 +1,822 @@
+{
+  "schema": "private-rng-fixture-preimages-v1",
+  "base": "2b640ffca912f72d74e3b08cec0c0c4b12ce776a",
+  "records": {
+    "tests/factions/aeldari/army_rule_helpers.py": {
+      "before_sha256": "c064df2810553487d83b0141574406b7500ccd893c032b4c645f4a97ef5cdfb8",
+      "after_sha256": "8b541221b679ea751702168abed0ccfbf952768655672e7feda2fe4977ace095",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\n",
+          "removed": "",
+          "offset": 597
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17g-aeldari-star-engines\"),\n",
+          "removed": "",
+          "offset": 8576
+        },
+        {
+          "added": "        _state(lifecycle).private_rng_seed,\n",
+          "removed": "        _state(lifecycle).game_id,\n",
+          "offset": 30088
+        }
+      ]
+    },
+    "tests/factions/aeldari/unit/test_battle_focus_consumers.py": {
+      "before_sha256": "e80f7ad74fe98bb720dd4575422b3d7c82e3ba35e7727fb415d408e371dfab6c",
+      "after_sha256": "7996eb7be15f77fd12da820092f812cadaff57a8571a22c0c07e6ec68d7664e0",
+      "edits": [
+        {
+          "added": "    [(\"fade:0\", True, True), (\"fade:1\", True, False), (\"fade:miss:private-3\", False, False)],\n",
+          "removed": "    [(\"fade:0\", True, True), (\"fade:1\", True, False), (\"fade:6\", False, False)],\n",
+          "offset": 2338
+        },
+        {
+          "added": "        seed=\"fade:later-round:private-0\" if history == \"later_round\" else \"fade:0\",\n",
+          "removed": "        seed=\"fade:0\",\n",
+          "offset": 5781
+        },
+        {
+          "added": "        seed=\"aeldari-current-sudden-consolidation-private-0\",\n",
+          "removed": "        seed=\"aeldari-current-charge-False\",\n",
+          "offset": 17119
+        }
+      ]
+    },
+    "tests/factions/aeldari/unit/test_unit_abilities.py": {
+      "before_sha256": "997de700eb7a4b3c3b500ee3a3b65039a3267d1232c7d836af537bd536cf8a11",
+      "after_sha256": "c0408c4184445ffe93b894a30ad6ef79c568ae9e528ef3f6a29617976aa4cc39",
+      "edits": [
+        {
+          "added": "@pytest.mark.parametrize((\"role\", \"seed\"), ((\"howling-banshees\", 4), (\"howling-banshee-exarch\", 1)))\n",
+          "removed": "@pytest.mark.parametrize((\"role\", \"seed\"), ((\"howling-banshees\", 1), (\"howling-banshee-exarch\", 2)))\n",
+          "offset": 17848
+        }
+      ]
+    },
+    "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py": {
+      "before_sha256": "6328ecbebaf0534354ad79046596ae1c1d119619313058461f442f4b1a80e6a5",
+      "after_sha256": "2bd483b781a20b60eb1011de96f1cac3eb539b017c8a96f441bf0b13e7c3635b",
+      "edits": [
+        {
+          "added": "            scenario.state.private_rng_seed,\r\n",
+          "removed": "            scenario.state.game_id,\r\n",
+          "offset": 6697
+        },
+        {
+          "added": "        scenario.state.private_rng_seed,\r\n",
+          "removed": "        scenario.state.game_id,\r\n",
+          "offset": 12539
+        }
+      ]
+    },
+    "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py": {
+      "before_sha256": "84b323d4e64c5483d97e0e5a3e27e075a3fa74c6911704271545c23600547e6c",
+      "after_sha256": "dfeca2fa09c594e9d0274db16e8d74d1186d5f2e5dcfab7289d02d912c7d5285",
+      "edits": [
+        {
+          "added": "    s = command_scene(\n        faction_definitions,\n        inside=inside,\n        seed=seed,\n        rng_seed_label=\"b04-2:terror:private-0\" if seed == 2 else None,\n    )\n",
+          "removed": "    s = command_scene(faction_definitions, inside=inside, seed=seed)\n",
+          "offset": 887
+        },
+        {
+          "added": "        faction_definitions,\n        manifestation=True,\n        inside=inside,\n        wounded=wounded,\n        seed=2,\n        rng_seed_label=\"b04-2:manifestation:private-11\",\n",
+          "removed": "        faction_definitions, manifestation=True, inside=inside, wounded=wounded, seed=2\n",
+          "offset": 7573
+        },
+        {
+          "added": "        rng_seed_label=\"b04-2:territory:private-1\",\n",
+          "removed": "",
+          "offset": 12499
+        }
+      ]
+    },
+    "tests/factions/death_guard/army_rule_helpers.py": {
+      "before_sha256": "7eeb509c9c8b9cfd50b3dc657c80cc7afe1de55073de9f5d8a0b9c97b409f511",
+      "after_sha256": "73d1b6264fb2f500513bc662a515a26690cdd6d0c4a9bbd1d4cbc91a3467bb76",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\n",
+          "removed": "",
+          "offset": 261
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17g-death-guard-lifecycle-game\"),\n",
+          "removed": "",
+          "offset": 16317
+        }
+      ]
+    },
+    "tests/factions/necrons/unit/test_necrons_army_rule.py": {
+      "before_sha256": "d0fef481241bc77912b8105bd763561d8f551005c010b230c9c52bc99939e827",
+      "after_sha256": "b8b520cdfb0f829bcabb3906158e58f6ee524c667e3d0f0d16fe69e4c1186283",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\n",
+          "removed": "",
+          "offset": 312
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17g-necrons-lifecycle-game\"),\n",
+          "removed": "",
+          "offset": 31154
+        }
+      ]
+    },
+    "tests/factions/tyranids/unit/test_tyranids_army_rule.py": {
+      "before_sha256": "17495a45fc129f7d40eb5bec143a1605d52643a2da2597ddac81e8ea668dbcc4",
+      "after_sha256": "98d207dd98016b737c23332cd8c144f1532bc253bdf99916ec4cdefc9fb10425",
+      "edits": [
+        {
+          "added": "        result_id=\"phase17g-tyranids-omitted-modifier-authority:d07:8:unleash:d07-vector:18:private-1\",\n",
+          "removed": "        result_id=\"phase17g-tyranids-omitted-modifier-authority:d07:8:unleash:d07-vector:18\",\n",
+          "offset": 25180
+        }
+      ]
+    },
+    "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py": {
+      "before_sha256": "f2d9e5541c9449e4f24a83d7d4cc723516660ea166a8e9c2819a2c8a06a4a30c",
+      "after_sha256": "e8548335a237455fce0e5888c15f192a278620aaad31ff2a13139755492e3c56",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\n",
+          "removed": "",
+          "offset": 951
+        },
+        {
+          "added": "    charge_state.private_rng_seed = fixture_private_rng_seed(\"we-charge-consumer:private-0\")\n",
+          "removed": "",
+          "offset": 20448
+        }
+      ]
+    },
+    "tests/factions/world_eaters/world_eaters_helpers.py": {
+      "before_sha256": "8aaa7d2a366c35313dbdc35ca57caa81f460f38133003977c28bd32195fe0c26",
+      "after_sha256": "0b5a4efbddce1b6fca69ec79a577a9bfe317b92491f0f6a2b8f6aa66990ccfc7",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\n",
+          "removed": "",
+          "offset": 244
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17g-world-eaters-lifecycle-game\"),\n",
+          "removed": "",
+          "offset": 3685
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17g-world-eaters-melee-state\"),\n",
+          "removed": "",
+          "offset": 16098
+        }
+      ]
+    },
+    "tests/infrastructure/adapters/unit/test_session_commands.py": {
+      "before_sha256": "3472212073a7814b9cfa10fe262450e05d5747dba9b322c18b0bb8b139ec98fc",
+      "after_sha256": "573b6b1da1c74dec1a87ba74b76626af4007ae37da81ac1ee7fb9e2936dbc731",
+      "edits": [
+        {
+          "added": "    revision = _session_revision(server, session_id=session_id, player_id=player_id)\n",
+          "removed": "    revision = _session_revision(server, session_id=session_id)\n",
+          "offset": 8940
+        },
+        {
+          "added": "    revision_before = _session_revision(server, session_id=session_id, player_id=player_id)\n    authority_revision_before = _session_revision(server, session_id=session_id)\n",
+          "removed": "    revision_before = _session_revision(server, session_id=session_id)\n",
+          "offset": 12386
+        },
+        {
+          "added": "    assert _session_revision(server, session_id=session_id) == authority_revision_before + 1\n",
+          "removed": "",
+          "offset": 14458
+        },
+        {
+          "added": "        _session_revision(server, session_id=session_id, player_id=player_id)\n",
+          "removed": "        revision_before + 1\n",
+          "offset": 14633
+        },
+        {
+          "added": "    assert _field_int(_field_object(outcome, \"session\"), \"session_revision\") > revision_before\n",
+          "removed": "",
+          "offset": 14717
+        },
+        {
+          "added": "    assert _field_int(_field_object(outcome, \"session\"), \"session_revision\") == (\n        server.cursor_codec.decode(_field_string(event_range, \"to_cursor\")).visible_sequence\n    )\n",
+          "removed": "",
+          "offset": 14868
+        },
+        {
+          "added": "    revision = _session_revision(server, session_id=session_id, player_id=player_id)\n",
+          "removed": "    revision = _session_revision(server, session_id=session_id)\n",
+          "offset": 23586
+        },
+        {
+          "added": "    authority_revision_before = _session_revision(server, session_id=session_id)\n",
+          "removed": "",
+          "offset": 25167
+        },
+        {
+          "added": "        assert _session_revision(server, session_id=session_id) == (authority_revision_before + 1)\n        public_revision = _field_int(_field_object(accepted, \"session\"), \"session_revision\")\n        assert public_revision == _session_revision(\n            server, session_id=session_id, player_id=player_id\n        )\n        event_range = _field_object(accepted, \"event_range\")\n        before_cursor = server.cursor_codec.decode(_field_string(event_range, \"from_cursor\"))\n        after_cursor = server.cursor_codec.decode(_field_string(event_range, \"to_cursor\"))\n        assert before_cursor.visible_sequence == revision\n        assert public_revision == after_cursor.visible_sequence > revision\n",
+          "removed": "        assert _field_int(_field_object(accepted, \"session\"), \"session_revision\") == revision + 1\n",
+          "offset": 27670
+        },
+        {
+          "added": "    fork.adapter_session.submit_viewer_option(\n        viewer=ViewerContext.for_player(_field_string(pending, \"actor_id\")),\n",
+          "removed": "    fork.adapter_session.submit_option(\n",
+          "offset": 34359
+        }
+      ]
+    },
+    "tests/infrastructure/decisions/unit/test_physical_proposal_prevalidation.py": {
+      "before_sha256": "3b3172c020b40288408e17ae2c5cb7955d273743ad4b7bc01a96b8b06f7d9d8a",
+      "after_sha256": "210149bed7be12e3d49abe956722f54f03006b2ef8805fe2d7bed224fa996c37",
+      "edits": [
+        {
+          "added": "    assert request.actor_id is not None\r\n    public_request = session.view(viewer_player_id=request.actor_id)[\"pending_decision\"]\r\n    assert public_request is not None\r\n    payload = {**payload, \"proposal_request_id\": public_request[\"request_id\"]}\r\n",
+          "removed": "",
+          "offset": 698
+        },
+        {
+          "added": "            \"request_id\": public_request[\"request_id\"],\r\n",
+          "removed": "            \"request_id\": request.request_id,\r\n",
+          "offset": 1892
+        }
+      ]
+    },
+    "tests/infrastructure/lifecycle/unit/test_lifecycle.py": {
+      "before_sha256": "290ba7617a5a256464cb02fb86b4834ccc1d9f5a54a5b40a2f17c26ddab82cb5",
+      "after_sha256": "b40dfbbafbb98d758a0549b56304291347720c2e562ac743e0d4f72168efa0dd",
+      "edits": [
+        {
+          "added": "from warhammer40k_core.adapters.local_session import LocalGameSession\r\nfrom warhammer40k_core.engine.replay import ReplayRunner\r\n",
+          "removed": "",
+          "offset": 2611
+        },
+        {
+          "added": "\r\n\r\ndef test_tactical_draw_private_sequence_survives_facade_persistence_and_replay() -> None:\r\n    session = LocalGameSession(lifecycle=GameLifecycle())\r\n    session.start(_config())\r\n    session.advance_until_decision_or_terminal()\r\n    lifecycle = session.lifecycle\r\n    _advance_to_battle(lifecycle)\r\n    request = session.advance_until_decision_or_terminal().decision_request\r\n    assert request is not None\r\n    assert request.decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE\r\n    outcome = session.submit_option(\r\n        request_id=request.request_id,\r\n        result_id=\"private-tactical-draw\",\r\n        option_id=\"draw\",\r\n    )\r\n    assert outcome.status_kind is not LifecycleStatusKind.INVALID, outcome\r\n    assert lifecycle.state is not None\r\n    assert lifecycle.state.tactical_secondary_draw_sequence > 0\r\n    assert lifecycle.state.secondary_mission_card_states\r\n    checkpoint = session.to_persistence_payload()\r\n    restored = LocalGameSession.from_persistence_payload(checkpoint)\r\n    assert restored.to_persistence_payload() == checkpoint\r\n    assert restored.lifecycle.state is not None\r\n    assert (\r\n        restored.lifecycle.state.tactical_secondary_draw_sequence\r\n        == lifecycle.state.tactical_secondary_draw_sequence\r\n    )\r\n    replay = ReplayRunner.from_payload(session.replay_artifact(artifact_id=\"private-tactical-draw\"))\r\n    assert replay.run().reproduced_exactly\r\n",
+          "removed": "",
+          "offset": 20327
+        }
+      ]
+    },
+    "tests/infrastructure/missions/unit/test_event_companion_part2.py": {
+      "before_sha256": "4c607413c811d417fae5af23c1df1ac525f1597f47448a58a1dcc7b7774531ec",
+      "after_sha256": "97b8ff3702145d1f7141e3af86b17c160f8898274e2f669dbfb5b9f27be33d74",
+      "edits": [
+        {
+          "added": "        draw_id=\"event-companion:draw-1\",\r\n        private_rng_seed=\"f0\" * 32,\r\n",
+          "removed": "",
+          "offset": 53124
+        }
+      ]
+    },
+    "tests/infrastructure/rule_execution/unit/test_rule_execution.py": {
+      "before_sha256": "4e4d834ad9703805623bf269433f2fde33b563eb994ea65d8a9503fdefc61172",
+      "after_sha256": "11d85d1c0afe0c4eb5dcb846bb9ecb2ec7a8e1f09253b0b9ea564fe371fca179",
+      "edits": [
+        {
+          "added": "from warhammer40k_core.adapters.access_control import ViewerContext\r\nfrom warhammer40k_core.adapters.redaction import viewer_identity_map\r\n",
+          "removed": "",
+          "offset": 6292
+        },
+        {
+          "added": "    canonical_activations = [\r\n        event.to_payload()\r\n        for event in session.lifecycle.decision_controller.event_log.records\r\n        if event.event_type == \"catalog_once_per_battle_ability_activated\"\r\n    ]\r\n    for player, activations in (\r\n        (\"player-a\", player_a_activations),\r\n        (\"player-b\", player_b_activations),\r\n    ):\r\n        identities = viewer_identity_map(\r\n            event_log=session.lifecycle.decision_controller.event_log,\r\n            viewer=ViewerContext.for_player(player),\r\n        )\r\n        assert [identities.resolve(validate_json_value(event)) for event in activations] == (\r\n            canonical_activations\r\n        )\r\n    assert player_a_activations[0][\"event_id\"] != player_b_activations[0][\"event_id\"]\r\n",
+          "removed": "    assert player_a_activations == player_b_activations\r\n",
+          "offset": 16702
+        }
+      ]
+    },
+    "tests/rules/rules24/unit/test_return_on_death.py": {
+      "before_sha256": "2bcfa5c248da8049a0075dfbb56443d0393f94f9fef106e985a7088ccfc1afea",
+      "after_sha256": "487139621a8b063f7f4665f57c2fc7de8a97745f521f77b212fef222a6abd74e",
+      "edits": [
+        {
+          "added": "        state.private_rng_seed,\r\n",
+          "removed": "        state.game_id,\r\n",
+          "offset": 3042
+        }
+      ]
+    },
+    "tests/shared/category_migration/generic_rule_ability_registry.py": {
+      "before_sha256": "a4b6ac2bc8e0941d236a6828528ba342586505e6dccec96d22931f90b7dd4a52",
+      "after_sha256": "e9073314c4607883198dc9133b75983f5e7e27349a2b2b8f17568978a7a1d3ef",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 166
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"generic-rule-ability-keyword-any\"),\r\n",
+          "removed": "",
+          "offset": 17439
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"generic-rule-ability-warptide\"),\r\n",
+          "removed": "",
+          "offset": 19592
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"generic-rule-ability-warptide\"),\r\n",
+          "removed": "",
+          "offset": 21584
+        }
+      ]
+    },
+    "tests/shared/category_migration/horror_split_materialization.py": {
+      "before_sha256": "2c1294f23367ea6ba88e1a1caed88de039599b42519c061dd96eedbed314ec47",
+      "after_sha256": "b5eb2f2958aa9b7a52c7d5bbfccad29d91d96e0e43e4010fc9cabf88f633c2a7",
+      "edits": [
+        {
+          "added": "        state.private_rng_seed,\r\n",
+          "removed": "        state.game_id,\r\n",
+          "offset": 21647
+        },
+        {
+          "added": "        scenario.state.private_rng_seed,\r\n",
+          "removed": "        scenario.state.game_id,\r\n",
+          "offset": 45437
+        },
+        {
+          "added": "        private_rng_seed=scenario.state.private_rng_seed,\r\n",
+          "removed": "",
+          "offset": 50880
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase10d_battlefield_transitions.py": {
+      "before_sha256": "38b7a71d57f0be1198c0d6f872481a560bfb586ff68246e72495f5c7c4eb0b59",
+      "after_sha256": "ed6cfd2e8bf5c0e6a16b3bd9c8ceb91c4957400e406f91c499f12a0c47922635",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 359
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase10d-game\"),\r\n",
+          "removed": "",
+          "offset": 7420
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase11a_mission_pack.py": {
+      "before_sha256": "d2531aa9bfc6ae9295532bbeba4b53ac49d8f99afd2bcd5a7f2f85d655009c45",
+      "after_sha256": "7708eeacd0e6488a486885f8443c932c4b3014c1209bdb18520d359b8f45bf38",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 149
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase11a-game\"),\r\n",
+          "removed": "",
+          "offset": 17410
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase11e_mission_scoring_cleanup_configuration.py": {
+      "before_sha256": "4d985f3b277590588dfce7cf86cf0d7912865b1243a7320be12614574469c22e",
+      "after_sha256": "452c04874194814ab28b64e4b92b38cb8db14eab0f0c46e7e1a9ff805b3adebf",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 1168
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase11e-game\"),\r\n",
+          "removed": "",
+          "offset": 5779
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase11e-game\"),\r\n",
+          "removed": "",
+          "offset": 7491
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase11e-game\"),\r\n",
+          "removed": "",
+          "offset": 9554
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase11e-game\"),\r\n",
+          "removed": "",
+          "offset": 10853
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase11e-game\"),\r\n",
+          "removed": "",
+          "offset": 13961
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase11e-game\"),\r\n",
+          "removed": "",
+          "offset": 16035
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase11e-game\"),\r\n",
+          "removed": "",
+          "offset": 18104
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase11e-game\"),\r\n",
+          "removed": "",
+          "offset": 20163
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase11f_game_end_scoring.py": {
+      "before_sha256": "bf0e02cceb9186b1e29feda915ed702496a49c39ff57f9f5745715bc5c056e9e",
+      "after_sha256": "e75d09b7f17f647cdfcfe16aaac67c40a7b1d9704b9be3aa658f03ba49daf789",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 197
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase11f-game\"),\r\n",
+          "removed": "",
+          "offset": 9067
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase16a_deployment.py": {
+      "before_sha256": "271376170fc7f022f10e6c2bd939beaf607a1b6229c88d645145ae9e8c7f35b0",
+      "after_sha256": "443bdf01d952cffbf9c9841732c7549dd4df6d02189897303dafda4f1223d93e",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 397
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase16a-game\"),\r\n",
+          "removed": "",
+          "offset": 14762
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase16b_prebattle.py": {
+      "before_sha256": "271033e15c945cebdc9848cbb25bdf6331c2a91ca9dba7d45d433e3fc091958f",
+      "after_sha256": "c464286660205ae4917abda62f4d69affeec221f9bd5a5ef5fd4eb5a748bb287",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 336
+        },
+        {
+          "added": "        state.private_rng_seed,\r\n",
+          "removed": "        state.game_id,\r\n",
+          "offset": 23592
+        },
+        {
+          "added": "        state.private_rng_seed,\r\n",
+          "removed": "        state.game_id,\r\n",
+          "offset": 23744
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase16b-game\"),\r\n",
+          "removed": "",
+          "offset": 26431
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase16e_setup_completion.py": {
+      "before_sha256": "db5f0610faa5a6f1c80a0938e89b2e74cb9055beabd19795a5176b989a2bb5da",
+      "after_sha256": "edc1d52158911718711dfd6a543d2ade936095e05588a57222abaf08831eea34",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 245
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase16e-game\"),\r\n",
+          "removed": "",
+          "offset": 9548
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase16e-empty-dedicated-transport\"),\r\n",
+          "removed": "",
+          "offset": 10250
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase16e-cargo-dedicated-transport\"),\r\n",
+          "removed": "",
+          "offset": 11280
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase17d_rule_execution.py": {
+      "before_sha256": "486e031fa7bcbc7661e4e901974ca4a4a1f69916c5f9c9ccb1785393f46a1ba7",
+      "after_sha256": "d5245b7322b0750aabc3fbec6a7aebfa9c2119b5a9940c5cb8c57f9ba592c812",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 312
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17d-game\"),\r\n",
+          "removed": "",
+          "offset": 32573
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17d-game\"),\r\n",
+          "removed": "",
+          "offset": 38499
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase17g_black_templars_army_rule.py": {
+      "before_sha256": "bfd2ffd3e4cbc2e2f4485318faf8799ef276cd95c02e06e79698730e918e5c13",
+      "after_sha256": "5f541bc5208f6421c4fc46c133c600321ef2cec238c203e29ce61c4f840ab7ef",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 233
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(game_id),\r\n",
+          "removed": "",
+          "offset": 7126
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase17g_runtime_content.py": {
+      "before_sha256": "db1297ac648ad8c683d5f279ce6981661e3e3f4fbc338486cc21799af7d64d62",
+      "after_sha256": "9914999dcdeef2380cedef6e7c1287ecf6f92bc2453faac463b683af5f307143",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 397
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"runtime-content-game\"),\r\n",
+          "removed": "",
+          "offset": 18876
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"runtime-content-lifecycle-game\"),\r\n",
+          "removed": "",
+          "offset": 20606
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase17n_primary_scoring_grammar.py": {
+      "before_sha256": "5bafe3bfade2b915d81df1d173a71eea9ad7a708cbe7fcfdc1ceb5a94b6861f1",
+      "after_sha256": "856bbb31196d5b3336a3cc7f7073920cd56d887bbc1e7ac159d47461f4aa5368",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 374
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"primary-evidence-game\"),\r\n",
+          "removed": "",
+          "offset": 4879
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase17n_primary_scoring_spatial_evidence.py": {
+      "before_sha256": "42a471ff039047296773e53884d95fd0082553f430b2008efb25b1cfc3334461",
+      "after_sha256": "059cb52147f86c7b23f6725dec08a5747ac5f554ac7152762ad08242236d96c8",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 160
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17n-spatial-evidence-game\"),\r\n",
+          "removed": "",
+          "offset": 36265
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase18f_session_commands.py": {
+      "before_sha256": "8e465a1d1afb9a628aacccfc2f8ad46ac5b107df0ce978600cc29285ae513f69",
+      "after_sha256": "5d63c68c6bd91fca2ef80148bf80769e2ceaee871fbb90f199e1718688c910ff",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 802
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(game_id),\r\n",
+          "removed": "",
+          "offset": 5125
+        },
+        {
+          "added": "        if pending[\"decision_type\"] != \"hidden_decision\" and pending[\"actor_id\"] == player_id:\r\n",
+          "removed": "        if pending[\"decision_type\"] != \"hidden_decision\":\r\n",
+          "offset": 11119
+        },
+        {
+          "added": "        revision = _session_revision(\r\n            server, session_id=session_id, player_id=_field_string(pending, \"actor_id\")\r\n        )\r\n",
+          "removed": "        revision = _session_revision(server, session_id=session_id)\r\n",
+          "offset": 12541
+        },
+        {
+          "added": "                    expected_revision=_session_revision(\r\n                        server, session_id=session_id, player_id=player_id\r\n                    ),\r\n",
+          "removed": "                    expected_revision=_session_revision(server, session_id=session_id),\r\n",
+          "offset": 14318
+        },
+        {
+          "added": "            expected_revision=_session_revision(server, session_id=session_id, player_id=player_id),\r\n",
+          "removed": "            expected_revision=_session_revision(server, session_id=session_id),\r\n",
+          "offset": 15897
+        },
+        {
+          "added": "def _session_revision(\r\n    server: AdapterGameServer, *, session_id: str, player_id: str | None = None\r\n) -> int:\r\n    metadata = _request(\r\n        server,\r\n        \"GET\",\r\n        f\"/sessions/{session_id}\",\r\n        query=None if player_id is None else {\"viewer_player_id\": player_id},\r\n    )\r\n",
+          "removed": "def _session_revision(server: AdapterGameServer, *, session_id: str) -> int:\r\n    metadata = _request(server, \"GET\", f\"/sessions/{session_id}\")\r\n",
+          "offset": 21003
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase18l_session_persistence.py": {
+      "before_sha256": "4f741f167c47cc99a2f0c38bbef1e1251fdff88fb0356685eaf38f68fb4ca382",
+      "after_sha256": "a34378c4df98d8c067bb62df505bf9535be21453381c8a8c1ae10b6ea14d2d04",
+      "edits": [
+        {
+          "added": "        state.private_rng_seed,\r\n",
+          "removed": "        state.game_id,\r\n",
+          "offset": 34236
+        }
+      ]
+    },
+    "tests/shared/category_migration/phase9b_lifecycle.py": {
+      "before_sha256": "ed3bb0ca207481b8977d01b61723ffc7030f4b692e6d0840ead2ad499f2d7373",
+      "after_sha256": "4d2f3256b9ae63a8eff20afed308582407d668a1ff2fcd5ae420ae65817f841e",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 563
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase9b-game\"),\r\n",
+          "removed": "",
+          "offset": 4385
+        }
+      ]
+    },
+    "tests/shared/category_migration/primary_boundary_scoring_builders.py": {
+      "before_sha256": "03517bb22971ba4e9eaef16d70c6f52657c3ec50a55f2ec370fede0e239cabe4",
+      "after_sha256": "5768d95387d3790a21aba6ff63ceb8dce29894f4ddaebc4d454b2820abf83920",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 1317
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17n-partial-return-game\"),\r\n",
+          "removed": "",
+          "offset": 7081
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase11c-game\"),\r\n",
+          "removed": "",
+          "offset": 10474
+        }
+      ]
+    },
+    "tests/shared/category_migration/primary_boundary_state_and_geometry.py": {
+      "before_sha256": "ddbcfe488d3d81fb728be4281a1a457b959863f6afe2254cbc325030f4c91e87",
+      "after_sha256": "8578f845fae2cdfb7cdc3ed2648edc3d6740b047538efcdd71d294c2f626ad68",
+      "edits": [
+        {
+          "added": "        state.private_rng_seed,\r\n",
+          "removed": "        state.game_id,\r\n",
+          "offset": 18926
+        }
+      ]
+    },
+    "tests/shared/category_migration/return_on_death.py": {
+      "before_sha256": "d2bbf0ce05f7429fb3359c17f131f0c60b3e6659a82b5890b451d0c365cc368f",
+      "after_sha256": "e1c133c280ad0e378c8fc4a540b015fc5ca030f35aee3dccc9760180de2fb9c4",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 237
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"return-on-death-game\"),\r\n",
+          "removed": "",
+          "offset": 15015
+        }
+      ]
+    },
+    "tests/shared/category_migration/tracked_targets.py": {
+      "before_sha256": "4d5d33609eef3c637dc42c4b38883bc768986f289c98a0ef27f11dea1aa6bfeb",
+      "after_sha256": "afdafaa1c026e5f881781a37a5db0527fe5ecad1f769f15a381c5af6bb3f22ba",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 115
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"tracked-target-game\"),\r\n",
+          "removed": "",
+          "offset": 8615
+        }
+      ]
+    },
+    "tests/shared/category_migration/ws14_generic_ir_lifecycle_court.py": {
+      "before_sha256": "76eefc5dd3220cf1084aeebf2d8c89d883af0c1d5fd5483ca2a57089ff180371",
+      "after_sha256": "f6ecdec051cfdc8da06a0d9b54121ff66554145456552d44f74a33c98e53f3e4",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 1380
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"ws14-court-of-the-phoenician-generic-ir-game\"),\r\n",
+          "removed": "",
+          "offset": 1602
+        }
+      ]
+    },
+    "tests/shared/category_migration/ws14_generic_ir_lifecycle_more_dakka.py": {
+      "before_sha256": "4ee7c0fb1e21de9f228d0a7e5a56fb1e00ad944f7cdaee829704e3132719a861",
+      "after_sha256": "27f3faa1d703ef3708ff76fb5be868142fc649061440295447b9d15723b7f490",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 1301
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"ws14-more-dakka-generic-ir-game\"),\r\n",
+          "removed": "",
+          "offset": 1488
+        }
+      ]
+    },
+    "tests/shared/category_migration/ws14_generic_ir_lifecycle_spectacle.py": {
+      "before_sha256": "b796b2dd11bdd9f3eec1edc2e12d0817a04611a4da7cd33a8a0a223a2e85f901",
+      "after_sha256": "33143266ff72974cfa19bb5fc329340f290cfc804762381d12b70cb98b435112",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\r\n",
+          "removed": "",
+          "offset": 1278
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"ws14-spectacle-of-slaughter-generic-ir-game\"),\r\n",
+          "removed": "",
+          "offset": 1463
+        }
+      ]
+    },
+    "tests/unit/test_phase11e_mission_scoring_cleanup.py": {
+      "before_sha256": "891fad03f777fbfb09f26c306326ffe8a6f4aa6e14f9afc625606b182f0ff338",
+      "after_sha256": "dbf7f490958bc11ec474b33da74dc9f76ca099e2f1af1cd2252921c268dd7c47",
+      "edits": [
+        {
+          "added": "        private_rng_seed=\"f0\" * 32,\r\n        draw_id=\"fixture-draw\",\r\n",
+          "removed": "",
+          "offset": 433469
+        },
+        {
+          "added": "            private_rng_seed=\"f0\" * 32,\r\n            draw_id=\"fixture-draw\",\r\n",
+          "removed": "",
+          "offset": 434294
+        },
+        {
+          "added": "            private_rng_seed=\"f0\" * 32,\r\n            draw_id=\"fixture-draw\",\r\n",
+          "removed": "",
+          "offset": 434624
+        },
+        {
+          "added": "            private_rng_seed=\"f0\" * 32,\r\n            draw_id=\"fixture-draw\",\r\n",
+          "removed": "",
+          "offset": 434976
+        },
+        {
+          "added": "            private_rng_seed=\"f0\" * 32,\r\n            draw_id=\"fixture-draw\",\r\n",
+          "removed": "",
+          "offset": 435285
+        },
+        {
+          "added": "            private_rng_seed=\"f0\" * 32,\r\n            draw_id=\"fixture-draw\",\r\n",
+          "removed": "",
+          "offset": 435592
+        }
+      ]
+    }
+  }
+}
