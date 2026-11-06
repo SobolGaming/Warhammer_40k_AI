@@ -113,7 +113,7 @@ class LocalGameSession(AdapterGameSession):
         # export and fork boundaries detach it before any caller can mutate it.
         lifecycle_payload = _lifecycle_payload_copy(self.lifecycle)
         lifecycle_hash = _payload_sha256(cast(JsonValue, lifecycle_payload))
-        initial_replay_payload = copy.deepcopy(self._initial_replay_lifecycle_payload)
+        initial_replay_payload = self._initial_replay_lifecycle_payload
         cached = self._persistence_payload_cache
         if (
             isinstance(cached, dict)
@@ -124,6 +124,7 @@ class LocalGameSession(AdapterGameSession):
             )
         ):
             return cached, lifecycle_hash
+        initial_replay_payload = copy.deepcopy(initial_replay_payload)
         effective_initial_payload = (
             lifecycle_payload
             if initial_replay_payload is None
@@ -357,7 +358,7 @@ class LocalGameSession(AdapterGameSession):
             if initial_replay_value is None
             else copy.deepcopy(cast(GameLifecyclePayload, initial_replay_value))
         )
-        restored._persistence_payload_cache = copy.deepcopy(value)
+        restored._persistence_payload_cache = value
         return restored
 
     def start(self, config: GameConfig) -> LifecycleStatus:
@@ -640,7 +641,8 @@ def _lifecycle_payload_copy(lifecycle: GameLifecycle) -> GameLifecyclePayload:
 
 def _persistence_object(payload: JsonValue) -> dict[str, JsonValue]:
     try:
-        validated = validate_json_value(copy.deepcopy(payload))
+        # Validation recursively constructs detached JSON containers itself.
+        validated = validate_json_value(payload)
     except EventLogError as exc:
         raise LocalGameSessionPersistenceError(
             "LocalGameSession persistence payload is not JSON-safe."

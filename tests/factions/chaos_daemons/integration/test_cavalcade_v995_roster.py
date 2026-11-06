@@ -1550,3 +1550,22 @@ def test_public_checkpoint_export_detaches_both_cold_and_warm_cache() -> None:
         state["game_id"] = "caller-mutated-game"
         assert payload_digest(session.to_persistence_payload()) == expected
         assert session.lifecycle.config.game_id == "pr2-checkpoint-detachment"
+
+
+def test_restored_session_detaches_current_and_initial_input_snapshots() -> None:
+    session = LocalGameSession()
+    session.start(canonical_setup_prebattle_smoke_config(game_id="pr2-restore-input-detachment"))
+    status = session.advance_until_decision_or_terminal()
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    checkpoint = session.to_persistence_payload()
+    expected = json.loads(json.dumps(checkpoint))
+    restored = LocalGameSession.from_persistence_payload(checkpoint)
+    assert isinstance(checkpoint, dict)
+    for key in ("lifecycle", "initial_replay_lifecycle"):
+        lifecycle = checkpoint[key]
+        assert isinstance(lifecycle, dict)
+        state = lifecycle["state"]
+        assert isinstance(state, dict)
+        state["game_id"] = "caller-mutated-game"
+    assert restored.to_persistence_payload() == expected
+    assert restored.view(viewer_player_id="player-a") == session.view(viewer_player_id="player-a")
