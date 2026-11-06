@@ -33,6 +33,7 @@ from warhammer40k_core.adapters.external_contract import (
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.projection import GameViewPayload
 from warhammer40k_core.adapters.server import AdapterGameServer
+from warhammer40k_core.adapters.session_protocol import AuthoritativeSession, SessionProtocolError
 from warhammer40k_core.adapters.session_recovery import (
     recover_server_persistence_payload,
     server_persistence_payload,
@@ -1444,3 +1445,108 @@ def test_player_route_preserves_configured_ordinal_like_public_identity() -> Non
         key == model["model_instance_id"]
         for key, model in battlefield["authoritative"]["models_by_id"].items()
     )
+
+
+def test_recovery_validates_current_checkpoint_once_and_forks_isolated_authority() -> None:
+    session = LocalGameSession()
+    config = canonical_setup_prebattle_smoke_config(game_id="pr2-recovery-isolation")
+    status = session.start(config)
+    record = AuthoritativeSession.create(
+        session_id="session:pr2-recovery-isolation",
+        adapter_session=session,
+        config=config,
+        lifecycle_status=status,
+        created_at="2026-08-21T16:00:00Z",
+        started=True,
+    )
+    payload = record.to_persistence_payload()
+    recovered_payloads: list[JsonValue] = []
+
+    def recover_checkpoint(value: JsonValue) -> LocalGameSession:
+        recovered_payloads.append(json.loads(json.dumps(value)))
+        return LocalGameSession.from_persistence_payload(value)
+
+    restored = AuthoritativeSession.from_persistence_payload(
+        payload, session_recovery_factory=recover_checkpoint
+    )
+    snapshots = payload["revision_snapshots"]
+    assert isinstance(snapshots, list)
+    assert len(recovered_payloads) == len(snapshots)
+    assert restored.to_persistence_payload() == payload
+    snapshot_session = restored.current_snapshot().adapter_session
+    before = snapshot_session.to_persistence_payload()
+    assert restored.adapter_session is not snapshot_session
+    advanced = restored.adapter_session.advance_until_decision_or_terminal()
+    assert advanced.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert restored.adapter_session.to_persistence_payload() != before
+    assert snapshot_session.to_persistence_payload() == before
+
+
+@pytest.mark.parametrize("missing_snapshot", [False, True])
+def test_recovery_rejects_current_checkpoint_drift_before_reuse(missing_snapshot: bool) -> None:
+    session = LocalGameSession()
+    config = canonical_setup_prebattle_smoke_config(game_id="pr2-recovery-drift")
+    status = session.start(config)
+    record = AuthoritativeSession.create(
+        session_id="session:pr2-recovery-drift",
+        adapter_session=session,
+        config=config,
+        lifecycle_status=status,
+        created_at="2026-08-21T16:00:00Z",
+        started=True,
+    )
+    payload = record.to_persistence_payload()
+    if missing_snapshot:
+        payload["revision_snapshots"] = []
+        diagnostic = "current session snapshot is missing"
+    else:
+        adapter_payload = payload["adapter_session"]
+        assert isinstance(adapter_payload, dict)
+        adapter_payload["content_hash"] = "0" * 64
+        diagnostic = "current adapter checkpoint drifted"
+    with pytest.raises(SessionProtocolError, match=diagnostic):
+        AuthoritativeSession.from_persistence_payload(
+            payload, session_recovery_factory=LocalGameSession.from_persistence_payload
+        )
+
+
+def test_authoritative_history_hashes_remain_exact_across_cache_and_progress() -> None:
+    session = LocalGameSession()
+    session.start(canonical_setup_prebattle_smoke_config(game_id="pr2-history-hashes"))
+
+    def assert_history() -> str:
+        history = session.authoritative_history_payload()
+        assert history["checkpoint_hash"] == payload_digest(session.to_persistence_payload())
+        assert history["authoritative_state_hash"] == payload_digest(session.lifecycle.to_payload())
+        assert history["decision_records"] == [
+            record.to_payload() for record in session.lifecycle.decision_controller.records
+        ]
+        assert history["event_records"] == [
+            record.to_payload()
+            for record in session.lifecycle.decision_controller.event_log.records
+        ]
+        return history["authoritative_state_hash"]
+
+    first = assert_history()
+    assert assert_history() == first
+    advanced = session.advance_until_decision_or_terminal()
+    assert advanced.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    progressed = assert_history()
+    assert progressed != first
+    assert assert_history() == progressed
+
+
+def test_public_checkpoint_export_detaches_both_cold_and_warm_cache() -> None:
+    session = LocalGameSession()
+    session.start(canonical_setup_prebattle_smoke_config(game_id="pr2-checkpoint-detachment"))
+    for _ in range(2):
+        checkpoint = session.to_persistence_payload()
+        expected = payload_digest(checkpoint)
+        assert isinstance(checkpoint, dict)
+        lifecycle = checkpoint["lifecycle"]
+        assert isinstance(lifecycle, dict)
+        state = lifecycle["state"]
+        assert isinstance(state, dict)
+        state["game_id"] = "caller-mutated-game"
+        assert payload_digest(session.to_persistence_payload()) == expected
+        assert session.lifecycle.config.game_id == "pr2-checkpoint-detachment"

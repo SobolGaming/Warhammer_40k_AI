@@ -105,6 +105,12 @@ class LocalGameSession(AdapterGameSession):
         return clone
 
     def to_persistence_payload(self) -> JsonValue:
+        checkpoint, _lifecycle_hash = self._persistence_payload_with_lifecycle_hash()
+        return copy.deepcopy(checkpoint)
+
+    def _persistence_payload_with_lifecycle_hash(self) -> tuple[JsonValue, str]:
+        # Internal callers only read this validated checkpoint. The public
+        # export and fork boundaries detach it before any caller can mutate it.
         lifecycle_payload = _lifecycle_payload_copy(self.lifecycle)
         lifecycle_hash = _payload_sha256(cast(JsonValue, lifecycle_payload))
         initial_replay_payload = copy.deepcopy(self._initial_replay_lifecycle_payload)
@@ -117,7 +123,7 @@ class LocalGameSession(AdapterGameSession):
                 cast(JsonValue, initial_replay_payload),
             )
         ):
-            return copy.deepcopy(cached)
+            return cached, lifecycle_hash
         effective_initial_payload = (
             lifecycle_payload
             if initial_replay_payload is None
@@ -155,10 +161,9 @@ class LocalGameSession(AdapterGameSession):
             **payload_without_hash,
             "content_hash": _payload_sha256(cast(JsonValue, payload_without_hash)),
         }
-        validate_json_value(payload)
         validated = validate_json_value(payload)
-        self._persistence_payload_cache = copy.deepcopy(validated)
-        return copy.deepcopy(validated)
+        self._persistence_payload_cache = validated
+        return validated, lifecycle_hash
 
     def authoritative_identity_payload(self) -> AdapterSessionIdentityPayload:
         config = self.lifecycle.config
@@ -175,7 +180,7 @@ class LocalGameSession(AdapterGameSession):
         }
 
     def authoritative_history_payload(self) -> AdapterSessionHistoryPayload:
-        checkpoint = self.to_persistence_payload()
+        checkpoint, lifecycle_hash = self._persistence_payload_with_lifecycle_hash()
         if not isinstance(checkpoint, dict):
             raise LocalGameSessionPersistenceError(
                 "LocalGameSession persistence checkpoint must be an object."
@@ -193,10 +198,10 @@ class LocalGameSession(AdapterGameSession):
             "rng_seed": rng_state["seed"],
             "rng_history": list(rng_state["history"]),
             "rng_draw_count": rng_state["draw_count"],
-            "checkpoint_hash": _payload_sha256(validate_json_value(checkpoint)),
-            "authoritative_state_hash": _payload_sha256(
-                cast(JsonValue, self.lifecycle.to_payload())
-            ),
+            "checkpoint_hash": _payload_sha256(checkpoint),
+            # This is the fresh lifecycle hash used by the checkpoint builder,
+            # including on cache hits; it is never read from stored metadata.
+            "authoritative_state_hash": lifecycle_hash,
         }
 
     @classmethod

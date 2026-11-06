@@ -300,7 +300,8 @@
         "*from_persistence_payload",
         "*fork",
         "*run",
-        "*replay*"
+        "*replay*",
+        "LocalGameSession._persistence_payload_with_lifecycle_hash"
       ],
       "families": [
         "reconstruction"

@@ -689,10 +689,25 @@ class AuthoritativeSession:
             or type(finalized) is not bool
         ):
             raise SessionProtocolError("Persisted session field type is invalid.")
+        current_snapshot = next(
+            (snapshot for snapshot in snapshots if snapshot.session_revision == session_revision),
+            None,
+        )
+        if current_snapshot is None:
+            raise SessionProtocolError("Persisted current session snapshot is missing.")
+        # The snapshot loader has already validated this exact checkpoint and replay.
+        # Validate the duplicated live payload before reusing that proof, then fork
+        # through the adapter's isolated transaction-copy contract. No mutable
+        # authority is shared with the historical snapshot.
+        if canonical_json(value["adapter_session"]) != canonical_json(
+            current_snapshot.adapter_session.to_persistence_payload()
+        ):
+            raise SessionProtocolError("Persisted current adapter checkpoint drifted.")
+        current_adapter_session = current_snapshot.adapter_session.fork()
         record = cls(
             session_id=session_id,
             game_id=game_id,
-            adapter_session=session_recovery_factory(value["adapter_session"]),
+            adapter_session=current_adapter_session,
             player_ids=tuple(player_ids),
             ruleset_id=value["ruleset_id"],
             ruleset_descriptor_hash=ruleset_descriptor_hash,
