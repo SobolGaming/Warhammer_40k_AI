@@ -436,7 +436,30 @@ jobs:
       - name: Sync test dependencies
         run: uv sync --locked --no-default-groups --group test
 
+      - name: Identify selected-source inputs
+        id: source-inputs
+        run: |
+          uv run --no-sync python -B - <<'PY'
+          import hashlib, json, os, sys
+          from pathlib import Path
+          from tools.ability_support_sources import ability_support_index_inputs
+          from warhammer40k_core.rules.selected_source_index import source_input_hashes
+          source = Path("data/source_snapshots/wahapedia/10th-edition/2026-06-14/json")
+          identity = {"python": sys.version, "inputs": source_input_hashes(ability_support_index_inputs(source))}
+          digest = hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write(f"key=selected-source-index-v1-{digest}\n")
+          PY
+
+      - name: Restore exact selected-source index
+        id: source-index-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ runner.temp }}/selected-army-source-index
+          key: ${{ steps.source-inputs.outputs.key }}
+
       - name: Run behavioral coverage shard
+        id: behavior
         # Temporary owner-approved setup-and-test cutoff; total CI goal is 12 minutes.
         timeout-minutes: 12
         env:
@@ -445,14 +468,18 @@ jobs:
           SHARD_ID: ${{ matrix.shard_id }}
           SHARD_MANIFEST: ${{ matrix.manifest }}
           BEHAVIORAL_DISPATCH_PROFILE: ci/test_shards/durations.json
-          SELECTED_ARMY_SOURCE_INDEX: ${{ runner.temp }}/selected-source-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard_id }}
+          SELECTED_ARMY_SOURCE_INDEX: ${{ runner.temp }}/selected-army-source-index
+          SELECTED_INDEX_CACHE_HIT: ${{ steps.source-index-cache.outputs.cache-hit }}
         run: |
           mkdir -p reports
           mapfile -t shard_paths < "$SHARD_MANIFEST"
           uv run --no-sync python -B -m scripts.validate_source_history
-          uv run --no-sync python -B -m tools.ability_support_sources \
-            data/source_snapshots/wahapedia/10th-edition/2026-06-14/json \
-            "$SELECTED_ARMY_SOURCE_INDEX"
+          if [[ "$SELECTED_INDEX_CACHE_HIT" != "true" ]]; then
+            uv run --no-sync python -B -m tools.ability_support_sources \
+              data/source_snapshots/wahapedia/10th-edition/2026-06-14/json \
+              "$SELECTED_ARMY_SOURCE_INDEX"
+            echo "source_index_built=true" >> "$GITHUB_OUTPUT"
+          fi
           isolated_status=0
           isolation_args=()
           parallel_timing_dir="$TEST_TIMING_DIR"
@@ -498,6 +525,13 @@ jobs:
           if (( isolated_status != 0 || parallel_status != 0 )); then
             exit 1
           fi
+
+      - name: Save completed selected-source index
+        if: ${{ always() && steps.behavior.outputs.source_index_built == 'true' }}
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ runner.temp }}/selected-army-source-index
+          key: ${{ steps.source-inputs.outputs.key }}
 
       - name: Upload shard test report
         if: always()
