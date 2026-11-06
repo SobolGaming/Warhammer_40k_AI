@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import cProfile
+from types import CodeType
 from typing import cast
 
 from tests.shared.category_migration.phase16e_setup_completion import (
@@ -71,10 +73,47 @@ from tests.shared.category_migration.phase16e_setup_completion import (
     pytest,
     submit_all_deployments_if_pending,
 )
+from warhammer40k_core.engine.setup_flow import SetupFlow
+
+
+def _setup_authority_restore_counts(profile: cProfile.Profile) -> dict[str, int]:
+    """Count real validated restores owned by setup-request reconstruction."""
+    counts = {"state": 0, "decisions": 0, "authorities": 0, "hooks": 0}
+    for entry in profile.getstats():
+        if not isinstance(entry.code, CodeType) or (
+            entry.code.co_name != "_authoritative_pending_request"
+            or not entry.code.co_filename.replace("\\", "/").endswith("/engine/setup_flow.py")
+        ):
+            continue
+        counts["authorities"] += entry.callcount
+        assert entry.calls is not None
+        for call in entry.calls:
+            if not isinstance(call.code, CodeType):
+                continue
+            name = call.code.co_filename.replace("\\", "/")
+            if call.code.co_name == "next_request_for" and name.endswith(
+                "/engine/start_battle_hooks.py"
+            ):
+                counts["hooks"] += call.callcount
+            if call.code.co_name != "from_payload":
+                continue
+            if name.endswith("/engine/game_state.py"):
+                counts["state"] += call.callcount
+            elif name.endswith("/engine/decision_controller.py"):
+                counts["decisions"] += call.callcount
+    return counts
 
 
 def test_phase16e_full_setup_enters_battle_through_completion_gate() -> None:
-    lifecycle, deployment_status = _advance_to_first_deployment_selection()
+    with cProfile.Profile() as profile:
+        lifecycle, deployment_status = _advance_to_first_deployment_selection()
+    # The two ordinary finite setup choices each reconstruct authority once.
+    assert _setup_authority_restore_counts(profile) == {
+        "state": 2,
+        "decisions": 2,
+        "authorities": 2,
+        "hooks": 0,
+    }
 
     follow_up = submit_all_deployments_if_pending(
         lifecycle,
@@ -185,6 +224,28 @@ def test_phase16e_gate_rejects_pending_setup_decisions_without_queue_pop() -> No
     )
     assert decisions.queue.peek_next() == pending_request
     assert state.stage is GameLifecycleStage.SETUP
+    before_state = json.loads(json.dumps(state.to_payload(), allow_nan=False))
+    before_decisions = json.loads(json.dumps(decisions.to_payload(), allow_nan=False))
+    with cProfile.Profile() as profile:
+        invalid = SetupFlow().invalid_pending_request_status(
+            state=state,
+            decisions=decisions,
+            config=config,
+            pending_request=pending_request,
+            reaction_frame_count=0,
+        )
+    # The pre-advance start-battle snapshot remains independently validated even
+    # when the pending request is rejected at this final setup boundary.
+    assert _setup_authority_restore_counts(profile) == {
+        "state": 2,
+        "decisions": 2,
+        "authorities": 1,
+        "hooks": 0,
+    }
+    assert invalid is not None
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert state.to_payload() == before_state
+    assert decisions.to_payload() == before_decisions
 
 
 def test_phase16e_gate_rejects_empty_manifest_with_cargo_or_deployment() -> None:

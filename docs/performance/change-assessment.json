@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "2b640ffca912f72d74e3b08cec0c0c4b12ce776a",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d1dcdb896669787f88c9de1b6026ce51eda991f49bde45c89a36b1d403971adb",
-  "operation_map_sha256": "54947e932c65d57d79af0d3cb2bbbd6ca5caaed06dd85993e62cac836b0edb18",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:450d1d846e14cddd239cf38e2951589488e86fc55bc99f6c413cdb5aee274802",
+  "operation_map_sha256": "77e6c022a8045a04672d57f0b606f276bb984045428da55be5b51f202f87148a",
   "changes": {
     ".github/pull_request_template.md": {
       "before_sha256": "a86c7d1ca027bb625ffbb12d92982446026d3be0360f2acd900a9408e2dbfb22",
@@ -376,11 +376,11 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "40dc408b712998a94219db95e6783d59497ab46e28b547ea23024365ef79b9f1",
-      "after_sha256": "c1ffe1f812f95c8c2dcedade66fb9f88428dbe9fb08ec9206327a1e36a3c0d2e",
+      "after_sha256": "eebf60997e4b604550aa4364a75cf498fbb32429509d495b0ccc12d92e73b355",
       "owners": {
         "@document": {
           "before": "40dc408b712998a94219db95e6783d59497ab46e28b547ea23024365ef79b9f1",
-          "after": "c1ffe1f812f95c8c2dcedade66fb9f88428dbe9fb08ec9206327a1e36a3c0d2e"
+          "after": "eebf60997e4b604550aa4364a75cf498fbb32429509d495b0ccc12d92e73b355"
         }
       }
     },
@@ -496,21 +496,21 @@
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "3d7de4ec9048b4d8072992ebac3b7eb5a29faaf09687f04f281ab65927ca1c3e",
-      "after_sha256": "56a759f5360002a74a5a497309dc2e481f2bf51928aa9ddc13b98addf3bb39b9",
+      "after_sha256": "b1252d738b4524db4e3d0e32c2bddd5877f4a5419a3ad7038323f0c43bb0078c",
       "owners": {
         "@document": {
           "before": "3d7de4ec9048b4d8072992ebac3b7eb5a29faaf09687f04f281ab65927ca1c3e",
-          "after": "56a759f5360002a74a5a497309dc2e481f2bf51928aa9ddc13b98addf3bb39b9"
+          "after": "b1252d738b4524db4e3d0e32c2bddd5877f4a5419a3ad7038323f0c43bb0078c"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "461a0b8a7b4dc66c5bce1fde5de76dee942fa9ad461ba9e865a625e844c28693",
-      "after_sha256": "8c22dc1b442ad45353b9faf07ddff779cbf6bbf9b8696a8e1239ed5dcae424c5",
+      "after_sha256": "3cd49762190971cdf3540cafe18c061a33b882ea1b061fe2ca5baf09b51c6d5f",
       "owners": {
         "@document": {
           "before": "461a0b8a7b4dc66c5bce1fde5de76dee942fa9ad461ba9e865a625e844c28693",
-          "after": "8c22dc1b442ad45353b9faf07ddff779cbf6bbf9b8696a8e1239ed5dcae424c5"
+          "after": "3cd49762190971cdf3540cafe18c061a33b882ea1b061fe2ca5baf09b51c6d5f"
         }
       }
     },
@@ -526,11 +526,11 @@
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "c3bac16b1ebe673b2807543f8dda06e05f4bf8a9e885a3638ae6ab2aa4948d31",
-      "after_sha256": "40606a4644eb838d80af67aeac4393ebbf3c5e80e9a9639bab554da336eb38fa",
+      "after_sha256": "fb1c46085577963dd5e2d06b2385bf1b6d25e38e2f4a7813bf49f1039210e591",
       "owners": {
         "@document": {
           "before": "c3bac16b1ebe673b2807543f8dda06e05f4bf8a9e885a3638ae6ab2aa4948d31",
-          "after": "40606a4644eb838d80af67aeac4393ebbf3c5e80e9a9639bab554da336eb38fa"
+          "after": "fb1c46085577963dd5e2d06b2385bf1b6d25e38e2f4a7813bf49f1039210e591"
         }
       }
     },
@@ -586,41 +586,41 @@
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "f674b1523e9c185d799d17401ae710da9a95d47acf7dcc0c6d96f1396036db60",
-      "after_sha256": "0037bf3ad8b1360f399763b2831a189284cda75a9f368b77462dd9a676033ff1",
+      "after_sha256": "a2f6ce1f720e9b9f533ddeca5e3b61bebf294808d8587a2abc98d36aefb84eea",
       "owners": {
         "@document": {
           "before": "f674b1523e9c185d799d17401ae710da9a95d47acf7dcc0c6d96f1396036db60",
-          "after": "0037bf3ad8b1360f399763b2831a189284cda75a9f368b77462dd9a676033ff1"
+          "after": "a2f6ce1f720e9b9f533ddeca5e3b61bebf294808d8587a2abc98d36aefb84eea"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "2d81f7f9f5036a57f8c0212ef4f8b418ff706a8009cfe67298f67eed0c6f5470",
-      "after_sha256": "5ee0f773c8165f0cbfc9bfb2874bd5f4d20939103e3ce0732e8839d472c3d22b",
+      "after_sha256": "45b79ba3c4b0b1c03091ac8f9fd5fa840f14c6d695f8d554fc563d0c7593db34",
       "owners": {
         "@document": {
           "before": "2d81f7f9f5036a57f8c0212ef4f8b418ff706a8009cfe67298f67eed0c6f5470",
-          "after": "5ee0f773c8165f0cbfc9bfb2874bd5f4d20939103e3ce0732e8839d472c3d22b"
+          "after": "45b79ba3c4b0b1c03091ac8f9fd5fa840f14c6d695f8d554fc563d0c7593db34"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "4ea80881a2ef860c22b15ff3f923cab3b1a790bb0ba4fc6e0ccafa268c2b503f",
-      "after_sha256": "ff49c47df4dd96ac7d2775ecc01c2d2fc154bb55667216ebaa77af9a6c20dc63",
+      "after_sha256": "f32bb3d9a0caf87d9c0390294b0303843659f420ae383671d77a8c3bf9a86ff4",
       "owners": {
         "@document": {
           "before": "4ea80881a2ef860c22b15ff3f923cab3b1a790bb0ba4fc6e0ccafa268c2b503f",
-          "after": "ff49c47df4dd96ac7d2775ecc01c2d2fc154bb55667216ebaa77af9a6c20dc63"
+          "after": "f32bb3d9a0caf87d9c0390294b0303843659f420ae383671d77a8c3bf9a86ff4"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "51bbb80707299c865de44e1329d1e0b68eaabcd87ee01437738d841d28c60696",
-      "after_sha256": "c0ab13052988c58c7c3df9303b8706882cad2ce4c839834c461892f526c6351f",
+      "after_sha256": "ed82fdb8ed393728e141acf97fa4ef9f18ca4ba8b1eb3bc09d1c529bd0c7c263",
       "owners": {
         "@document": {
           "before": "51bbb80707299c865de44e1329d1e0b68eaabcd87ee01437738d841d28c60696",
-          "after": "c0ab13052988c58c7c3df9303b8706882cad2ce4c839834c461892f526c6351f"
+          "after": "ed82fdb8ed393728e141acf97fa4ef9f18ca4ba8b1eb3bc09d1c529bd0c7c263"
         }
       }
     },
@@ -776,11 +776,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "2dec09b5ad5abec792d4fbf3b2d5ebc67b212df3c0a5391c3c378041db0aef59",
-      "after_sha256": "4f36516a17aab99628b972d6664f9bb78ea91d7b12dd9d273bcb512ba52c3690",
+      "after_sha256": "609c9ed527acedb4a42b01eeed1948b6f5bb60e985088e7715577ca38a4b9aa9",
       "owners": {
         "@document": {
           "before": "2dec09b5ad5abec792d4fbf3b2d5ebc67b212df3c0a5391c3c378041db0aef59",
-          "after": "4f36516a17aab99628b972d6664f9bb78ea91d7b12dd9d273bcb512ba52c3690"
+          "after": "609c9ed527acedb4a42b01eeed1948b6f5bb60e985088e7715577ca38a4b9aa9"
         }
       }
     },
@@ -936,21 +936,21 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "75fb3b56d96fb86b452afaf9c12d528fa2841756c96360648cb1a802f5257356",
-      "after_sha256": "e2a97972bef5c15d1e7a4ba6471d52042c8c49c840386cab9cdc78a10784ac83",
+      "after_sha256": "fc18fe150ad611a2ff4cbc8eaeb67675e15b8ba901cf67746f8593db54c26479",
       "owners": {
         "@document": {
           "before": "75fb3b56d96fb86b452afaf9c12d528fa2841756c96360648cb1a802f5257356",
-          "after": "e2a97972bef5c15d1e7a4ba6471d52042c8c49c840386cab9cdc78a10784ac83"
+          "after": "fc18fe150ad611a2ff4cbc8eaeb67675e15b8ba901cf67746f8593db54c26479"
         }
       }
     },
     "docs/performance/policy-v3/pr2-player-boundary-input-roles-v4.json": {
       "before_sha256": null,
-      "after_sha256": "78f73243bc5529d1e06d4244c760756412dca6e854ab16c4ffe500f228810d8f",
+      "after_sha256": "a59b734f0c18c183655b5be36c0b503a17ee4cd66daf901168d026a5b067a25f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "78f73243bc5529d1e06d4244c760756412dca6e854ab16c4ffe500f228810d8f"
+          "after": "a59b734f0c18c183655b5be36c0b503a17ee4cd66daf901168d026a5b067a25f"
         }
       }
     },
@@ -1148,11 +1148,11 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "832529c53d39608779a32bc42b56f2a19907cc35acad086bf09996cfa066153b",
-      "after_sha256": "40d6225d5463446ab56dd617948aa8f46021f989a5663eee1ebb1b6b28c1bf11",
+      "after_sha256": "717c7b939dcb11a6f6ef3e1110bb65e66bdbb901f52a15350506b2b869cd9294",
       "owners": {
         "@document": {
           "before": "832529c53d39608779a32bc42b56f2a19907cc35acad086bf09996cfa066153b",
-          "after": "40d6225d5463446ab56dd617948aa8f46021f989a5663eee1ebb1b6b28c1bf11"
+          "after": "717c7b939dcb11a6f6ef3e1110bb65e66bdbb901f52a15350506b2b869cd9294"
         }
       }
     },
@@ -2750,6 +2750,16 @@
         }
       }
     },
+    "src/warhammer40k_core/engine/setup_flow.py": {
+      "before_sha256": "ef1775965cb3a906f3e8ad3d6706fe751faa948a139aa6460edf4cf12bf536af",
+      "after_sha256": "7de206d914d7111046c9f25072f5c09cdc9fc23829b7c0a7c515c7542454a183",
+      "owners": {
+        "SetupFlow._authoritative_pending_request": {
+          "before": "abb858f19dbfc325221605407d683e93b997316680662533ffe8768126ecbd94",
+          "after": "f0a78b60fe6d08c31feaeffcc834b97334165d7cb89d42b17dc436a861f5e898"
+        }
+      }
+    },
     "src/warhammer40k_core/engine/shooting_selection_completion.py": {
       "before_sha256": "d3df726de5e469c83a4d80168342aa20cd1ac913fc65e74fd5663efb56b6a9a6",
       "after_sha256": "7e91ed9594c328e8ed005798bfe00a2a132e0f12061986466b35e2f509fbf0b3",
@@ -3885,6 +3895,28 @@
         "test_phase17d_once_per_battle_activation_submits_through_local_session_and_replays": {
           "before": "d83e9231dc74a337a696f3f6e96d340f237ae396c0f34a501a178f48ebb6fb96",
           "after": "6638c2e0d54eba87a5712bb24d19462eb1bae5698ca5a7130ded045aae29cc26"
+        }
+      }
+    },
+    "tests/infrastructure/setup/unit/test_setup_completion.py": {
+      "before_sha256": "70381d17abc9fe99eee60277a7869b2daf404cc79adfd098df9b9d42c8acbd6e",
+      "after_sha256": "3c011656636396eac6c3a51f7b58bd8304332178c409b9d4df983a3604927735",
+      "owners": {
+        "@module": {
+          "before": "c9549816d469630630bb6b0c715f1f620eb08bb78b2dcec21987f3d79bb432bc",
+          "after": "7d3e40526b4938a12916148c3da8e669c799bc67a24a9d82782b26a7246ed88b"
+        },
+        "_setup_authority_restore_counts": {
+          "before": null,
+          "after": "48699d95602a03f149c112b65a17e41be045322507a1ce17f3ef2d606b7385c4"
+        },
+        "test_phase16e_full_setup_enters_battle_through_completion_gate": {
+          "before": "af0b9432c1c203f42e660fba228aedc56c1d35a4030971f978469b230492c7db",
+          "after": "efc6a3a6a2c97b6a52ddbab9a7f3f3df949cf7f236d0cd59b76ac42202268235"
+        },
+        "test_phase16e_gate_rejects_pending_setup_decisions_without_queue_pop": {
+          "before": "2de9d1bd349c850b6a95a48cfede9deb076909d82aa2a690c7ea50a0cf4f12a3",
+          "after": "8fdc979ca7e90f3b2724a4ba7e94a6f41ba999ec6b4ab14c64357f309d787df5"
         }
       }
     },
@@ -5080,11 +5112,11 @@
     },
     "tools/performance_tool_inputs_v4.py": {
       "before_sha256": "3efafb9acf69551cd4737c3c75b70d15d18736e7dfff40b46365fba9a80a399e",
-      "after_sha256": "f5f2eb9508e317f1a379a2802bdfbccffa6e4a87a950e23e0d6be1a4ba27d3aa",
+      "after_sha256": "83a57b7bd9d4b00c5250ce7f5d3f2bb050420616e66e41e6bf13edfde38ed9ff",
       "owners": {
         "@module": {
           "before": "a87b62c44f229d08ccf273481bb289a939278e2d6f7358d971e5e7ac86c359ac",
-          "after": "951cebeb82e468ce72791e34fefd1e9a452b4fdf47fc0f753852058032cf7635"
+          "after": "fc24b0dcad7f214151a49b058be5e139cfd7fb45f525b634244a338d37f2fed4"
         }
       }
     },
@@ -7053,6 +7085,18 @@
       "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
       "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
     },
+    "src/warhammer40k_core/engine/setup_flow.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "setup-request-authority"
+      ],
+      "selected_families": [
+        "player_boundary"
+      ],
+      "rationale": "Preserve primary validated state/controller restoration and request reconstruction. Capture the existing pure start-battle boundary before advance; retain the independent pre-advance hook snapshot only at that boundary. Other setup decisions never consume that second snapshot. The existing native finite_command player-boundary samples execute this authoritative setup path against actual base and head.",
+      "source_obligation": "Preserve all queue, issued-request, nested-request, source, start-battle context and invalid-submission checks and engine-owned mutation. No cached authority, validation bypass, alternate decision path, retry or fallback.",
+      "unchanged_work": "Only unused validated clone pairs are omitted. Existing start-battle snapshots, rule outcomes, current private-RNG and player visibility boundaries, the120-second mirror bound, thirteen-minute CI cutoff,66.5percent full-package coverage gate and all other budgets remain required."
+    },
     "src/warhammer40k_core/engine/shooting_selection_completion.py": {
       "category": "rule_semantics",
       "operations": [
@@ -7646,6 +7690,17 @@
       "category": "rule_semantics",
       "operations": [
         "ci-restructure-tests-infrastructure-rule_execution-unit-test_rule_execution.py"
+      ],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. A pristine history-derived viewer identity map uses a fresh complete event-content hash and full viewer context; every state projection and pending request remains fresh. Immutable canonical policy observations avoid repeated parsing and validation when hashed. CI balances measured node costs across the actual consecutive xdist initial chunks without changing selected cases; the owner separately approved the thirteen-minute cutoff and 66.5% coverage threshold. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
+    "tests/infrastructure/setup/unit/test_setup_completion.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci-restructure-tests-infrastructure-setup-unit-test_setup_completion.py",
+        "private-rng-owner-8e2eab51a3916681"
       ],
       "selected_families": [],
       "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. A pristine history-derived viewer identity map uses a fresh complete event-content hash and full viewer context; every state projection and pending request remains fresh. Immutable canonical policy observations avoid repeated parsing and validation when hashed. CI balances measured node costs across the actual consecutive xdist initial chunks without changing selected cases; the owner separately approved the thirteen-minute cutoff and 66.5% coverage threshold. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",

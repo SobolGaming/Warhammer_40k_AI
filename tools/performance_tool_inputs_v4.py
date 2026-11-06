@@ -300,8 +300,8 @@ _SCOPES = (
     ReviewedScope(
         PR2_BASE,
         PR2_SPEC_PATH,
-        "78f73243bc5529d1e06d4244c760756412dca6e854ab16c4ffe500f228810d8f",
-        "7ac23e105ab14bd84680515b588081481529c0da9f0d64c99424aa40555957c9",
+        "a59b734f0c18c183655b5be36c0b503a17ee4cd66daf901168d026a5b067a25f",
+        "cfdc0fada4864cfcf1bb3b23db48b0166eb305fdfe1624e8d81e7a5ebb2d729a",
         PR2_REPORT_PATH,
         frozenset(
             [
@@ -316,6 +316,7 @@ _SCOPES = (
         ),
         frozenset(
             [
+                "src/warhammer40k_core/engine/setup_flow.py",
                 "contracts/README.md",
                 "contracts/compatibility-policy.md",
                 "contracts/compatibility/46.0.0-shape.json",
@@ -479,6 +480,7 @@ _SCOPES = (
         ),
         frozenset(
             [
+                "tests/infrastructure/setup/unit/test_setup_completion.py",
                 "pyproject.toml",
                 "tests/code_quality/test_quality_runtime.py",
                 "tests/code_quality/test_section08_native_mission_source.py",

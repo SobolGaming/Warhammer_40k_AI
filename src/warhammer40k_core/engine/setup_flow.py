@@ -242,8 +242,12 @@ class SetupFlow:
                 request=nested_request,
                 is_start_battle_request=False,
             )
-        hook_state = GameState.from_payload(state_clone.to_payload())
-        hook_decisions = DecisionController.from_payload(decisions_clone.to_payload())
+        hook_snapshot: tuple[GameState, DecisionController] | None = None
+        if is_start_battle_boundary(state_clone):
+            hook_snapshot = (
+                GameState.from_payload(state_clone.to_payload()),
+                DecisionController.from_payload(decisions_clone.to_payload()),
+            )
         status = self.advance(
             state=state_clone,
             decisions=decisions_clone,
@@ -254,7 +258,8 @@ class SetupFlow:
         if authoritative_request is None:
             return None
         is_start_battle_request = False
-        if is_start_battle_boundary(hook_state):
+        if hook_snapshot is not None:
+            hook_state, hook_decisions = hook_snapshot
             hook_request = self.start_battle_hooks.next_request_for(
                 StartBattleRequestContext(
                     state=hook_state,

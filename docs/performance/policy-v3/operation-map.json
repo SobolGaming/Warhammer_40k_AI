@@ -34220,6 +34220,19 @@
       "sensitive": false,
       "mandatory": true
     },
+    "setup-request-authority": {
+      "paths": [
+        "src/warhammer40k_core/engine/setup_flow.py"
+      ],
+      "owners": [
+        "SetupFlow._authoritative_pending_request"
+      ],
+      "families": [
+        "player_boundary"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
     "private-rng-owner-13093005fda46651": {
       "paths": [
         "conformance/typescript/src/scenario.ts"
@@ -35218,6 +35231,17 @@
       ],
       "owners": [
         "test_tactical_draw_private_sequence_survives_facade_persistence_and_replay"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-8e2eab51a3916681": {
+      "paths": [
+        "tests/infrastructure/setup/unit/test_setup_completion.py"
+      ],
+      "owners": [
+        "_setup_authority_restore_counts"
       ],
       "families": [],
       "sensitive": false,
