@@ -6,11 +6,11 @@
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "c86e3fdb957764ad34c6f76da650d0665e074c5a6027e9581203193c591d6e3e",
-      "after_sha256": "6157debc6b1b6eab7765b53943b5c3426167a6b7b9d67670747c7293f79f7eb5",
+      "after_sha256": "ae8cd5b94df3ab188cfdd8a055a0f8132cdafa34c7bc8b2177a9232d9296944d",
       "owners": {
         "@document": {
           "before": "c86e3fdb957764ad34c6f76da650d0665e074c5a6027e9581203193c591d6e3e",
-          "after": "6157debc6b1b6eab7765b53943b5c3426167a6b7b9d67670747c7293f79f7eb5"
+          "after": "ae8cd5b94df3ab188cfdd8a055a0f8132cdafa34c7bc8b2177a9232d9296944d"
         }
       }
     },
@@ -836,61 +836,61 @@
     },
     "docs/performance/current/pr2-player_boundary.json": {
       "before_sha256": null,
-      "after_sha256": "1518bcbda5f6fe568558d5346a00e301138bd3950fe8c8168affaa4e66ac5157",
+      "after_sha256": "76554cac9838a49b84d4faa3b0a323fe068b9e0a1244a6f1e1fbc50207f67035",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1518bcbda5f6fe568558d5346a00e301138bd3950fe8c8168affaa4e66ac5157"
+          "after": "76554cac9838a49b84d4faa3b0a323fe068b9e0a1244a6f1e1fbc50207f67035"
         }
       }
     },
     "docs/performance/current/pr2-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "b75f6c2bad1c7bc46fdef40f5effb698c825a91b7918c60b03f2034957560752",
+      "after_sha256": "1088b97bb9420e28c6d051626a5c2e7df549029eb73c3c4d36a4c4969e3166a5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b75f6c2bad1c7bc46fdef40f5effb698c825a91b7918c60b03f2034957560752"
+          "after": "1088b97bb9420e28c6d051626a5c2e7df549029eb73c3c4d36a4c4969e3166a5"
         }
       }
     },
     "docs/performance/current/pr2-roster.json": {
       "before_sha256": null,
-      "after_sha256": "cec7998f345c1d327c64dc99775c3f8a8ce5523a6919e3deadfcbd321c6038dc",
+      "after_sha256": "5ec2109a06ef9c2ef43f6dcb41b1acd2514e2cab70a909fc0cfe97757027b08e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "cec7998f345c1d327c64dc99775c3f8a8ce5523a6919e3deadfcbd321c6038dc"
+          "after": "5ec2109a06ef9c2ef43f6dcb41b1acd2514e2cab70a909fc0cfe97757027b08e"
         }
       }
     },
     "docs/performance/current/pr2-session_command_fork.json": {
       "before_sha256": null,
-      "after_sha256": "3be57edef7bb5186f1d0a087e9389199d58594ebca10f36f5d2c8540d15caa32",
+      "after_sha256": "7369f2d9e6966907249a9a2ce823bfa05fc7b52d290820a0d4778db4c129d827",
       "owners": {
         "@document": {
           "before": null,
-          "after": "3be57edef7bb5186f1d0a087e9389199d58594ebca10f36f5d2c8540d15caa32"
+          "after": "7369f2d9e6966907249a9a2ce823bfa05fc7b52d290820a0d4778db4c129d827"
         }
       }
     },
     "docs/performance/current/pr2-source-reuse-2b640-v4.json": {
       "before_sha256": null,
-      "after_sha256": "fc0ee3103e29f998209d37bbf134bf6de91d0edeb5488a83b9ad7cc1e3900643",
+      "after_sha256": "a99efb146245c28d0d7317cd138bae0fdad9102e171351e2b9011452f90bb253",
       "owners": {
         "@document": {
           "before": null,
-          "after": "fc0ee3103e29f998209d37bbf134bf6de91d0edeb5488a83b9ad7cc1e3900643"
+          "after": "a99efb146245c28d0d7317cd138bae0fdad9102e171351e2b9011452f90bb253"
         }
       }
     },
     "docs/performance/current/pr2-tactical_draw.json": {
       "before_sha256": null,
-      "after_sha256": "8456afb6a1b240114cb2f13e8d574431241573fdb938ac4383041fab3fb5eb10",
+      "after_sha256": "2b5104326404132687f569bd67118d320f77225d96fdf8b8c5bb51163c4693cd",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8456afb6a1b240114cb2f13e8d574431241573fdb938ac4383041fab3fb5eb10"
+          "after": "2b5104326404132687f569bd67118d320f77225d96fdf8b8c5bb51163c4693cd"
         }
       }
     },
@@ -4974,9 +4974,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. A pristine history-derived viewer identity map uses a fresh complete event-content hash and full viewer context; every state projection and pending request remains fresh. Immutable canonical policy observations avoid repeated parsing and validation when hashed. CI balances measured node costs across the actual consecutive xdist initial chunks without changing selected cases or limits. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
-      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
-      "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+      "rationale": "CI-only measured worker dispatch, isolated bounded mirror workload and exact-input selected-source index reuse. The cache key binds sys.version and all existing authoritative input hashes. Only exact hits skip the full builder; the normal loader retains complete source and selected-partition validation. Save only after successful construction, including after a later failed test. Cold-cache construction remains within the unchanged deadline; warm reuse does not establish cold-run timing.",
+      "source_obligation": "Preserve every behavioral case, the 120-second mirror runner bound, twelve-minute setup/test cutoff, full-package combined coverage, strict current source validation and failure propagation. No restore-prefix match, corrupt-index rebuild or engine fallback.",
+      "unchanged_work": "No production engine, rules loader, source serializer, test assertion or numeric-budget changes in the CI repair. The shared normal source-index builder and loader are unchanged."
     },
     "README.md": {
       "category": "governance",
