@@ -1526,7 +1526,7 @@
   "unadopted_gaps": [],
   "authenticated_inputs": {
     "AGENTS.md": "e09dccc222ed7e8fe1ae14e934d6e54a61dab13d889473ba61320adc2196c8d9",
-    "README.md": "002857f1f875b03aeba2779530d37a7ca163b11b6e4b563161868d0675154fda",
+    "README.md": "2635a84ff8de5e1696c2e4ac1fa23d9f2d5bf848d02675109dea20f46e4f6ed6",
     "pyproject.toml": "4a599834118401428b3716b83566863849d4a9c72b19a2e9d8cb427da901f58a",
     "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
     "data/source_audits/order97/categories/07.json": "52a349cc268a3c3e9cb0348ac9bb101a2c9a4d83ccde60f99a3d2ad071adc80d",
@@ -1572,5 +1572,5 @@
     "README.md": "ad52bc7e7e40aa9a7e2296f20c8726fcf63a5b92bd087100e09238572901a583",
     "pyproject.toml": "b0fed8cc1f2a25bec5821a96f50e0d7da47ec5e9e8e17df528cd6f69c6d67192"
   },
-  "authenticated_inputs_maintenance": "Three current governance/configuration inputs are refreshed for the reviewed 66.5% coverage floor. Historical authenticated inputs, literal capture authorities and gameplay bindings remain unchanged; this metadata update alone claims no qualification pass."
+  "authenticated_inputs_maintenance": "Three current governance/configuration inputs are refreshed for the reviewed CI and 66.5% coverage settings. Historical authenticated inputs, literal capture authorities and gameplay bindings remain unchanged; this metadata update alone claims no qualification pass."
 }

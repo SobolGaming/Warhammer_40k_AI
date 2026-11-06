@@ -183,3 +183,13 @@ The separate 180-second complete performance command and 600-second quality-lane
 limits remain in force. Post-merge coverage work must still restore 85%.
 Historical records retain their original thresholds and outcomes; no prior failed
 CI run is reclassified. A per-step cutoff does not prove the end-to-end CI goal.
+
+The owner's subsequent conditional authorization took effect after behavioral
+shard 12 in run 42285919569 completed all 259 cases but timed out during
+finalization at thirteen minutes. The active CI goal and behavioral setup/test
+cutoff are now fourteen minutes (840 seconds), superseding the earlier
+thirteen-minute limit. The 66.5% coverage floor, complete branch denominator,
+selected cases, exact 260 deferrals, 120-second mirror runner, 180-second serial
+smoke, 600-second quality limits and every other check remain required. Earlier
+failed runs retain their original outcomes; this update is not a qualification
+claim.

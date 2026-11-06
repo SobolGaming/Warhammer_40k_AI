@@ -51,7 +51,7 @@ because retained inverse helpers contain assertions. The directory option is for
 testing the same fixed authenticated inventory; it admits no alternate manifest.
 
 There is no new CI job, required check or publication barrier. The existing
-owner-approved setup-and-test cutoff is 780 seconds and the active coverage floor
+owner-approved setup-and-test cutoff is 840 seconds and the active coverage floor
 is 66.5%. Coverage aggregation/artifacts, the complete-package branch denominator,
 the quality 600-second cutoff, the serial 180-second smoke and all 260 exact
 deferrals remain required. This removes

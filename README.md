@@ -284,7 +284,7 @@ gate after every shard succeeds. Full type checking and architecture checks also
 in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
 format for a shorter edit/commit loop.
 
-The temporary CI goal is 13 minutes in total. Each behavioral shard has a 780-second
+The temporary CI goal is 14 minutes in total. Each behavioral shard has an 840-second
 cutoff covering source-index setup and its covered test run. The separate complete
 performance command remains limited to 180 seconds, and quality lanes retain their
 600-second limit. Report actual end-to-end time and queue overhead; a per-step
@@ -333,7 +333,7 @@ are recorded in `ci/test_shards/case-partitions.json` under `evidence.weight_ref
 
 Session startup, source-index setup, reporting and runner queues are assessed
 separately. Weight totals are planning inputs, not job wall times or proof of the
-temporary thirteen-minute CI goal. Existing observation-based estimates do not
+temporary fourteen-minute CI goal. Existing observation-based estimates do not
 relax the complete-profile validation below.
 
 A single complete local JUnit XML is also accepted; label its host accurately and
@@ -352,7 +352,7 @@ not substitute file averages for missing case costs. Shard assignment separately
 accounts for the mirror's serial execution, retaining measured times unchanged
 and recording the four-worker execution model. Missing, negative, nonfinite or
 boolean weights fail closed; measurements rounded to zero remain valid. Finite S25 case validation,
-the complete selected inventory and the thirteen-minute deadline remain mandatory.
+the complete selected inventory and the fourteen-minute deadline remain mandatory.
 
 Both Python CI lanes upload JUnit, slowest-test output, and per-worker JSON timing
 artifacts containing collection node IDs, collection time, setup/call/teardown times,

@@ -460,8 +460,8 @@ jobs:
 
       - name: Run behavioral coverage shard
         id: behavior
-        # Temporary owner-approved setup-and-test cutoff; total CI goal is 13 minutes.
-        timeout-minutes: 13
+        # Temporary owner-approved setup-and-test cutoff; total CI goal is 14 minutes.
+        timeout-minutes: 14
         env:
           TEST_TIMING_DIR: reports/behavior-timing
           COVERAGE_FILE: .coverage.${{ matrix.shard_id }}

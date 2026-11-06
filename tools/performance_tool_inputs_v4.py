@@ -300,8 +300,8 @@ _SCOPES = (
     ReviewedScope(
         PR2_BASE,
         PR2_SPEC_PATH,
-        "a59b734f0c18c183655b5be36c0b503a17ee4cd66daf901168d026a5b067a25f",
-        "cfdc0fada4864cfcf1bb3b23db48b0166eb305fdfe1624e8d81e7a5ebb2d729a",
+        "70668f98b890a5ae16ead39d2469f7e01e9684389df45c777041d98bd189b9c5",
+        "782982e6bec27e0e5bb51b6b0aa2dd7f952a60c3a43a3fe8a5a04644737d27a6",
         PR2_REPORT_PATH,
         frozenset(
             [
