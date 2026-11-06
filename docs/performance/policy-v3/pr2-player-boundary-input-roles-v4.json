@@ -235,6 +235,7 @@
     "tests/rules/rules24/unit/test_return_on_death.py": "Untimed quality or behavioral fixture control; outside the native contract builder and its statically resolved charge-fixture imports.",
     "tests/rules/section01/test_01_05_choice.py": "Untimed quality or behavioral fixture control; outside the native contract builder and its statically resolved charge-fixture imports.",
     "tests/rules/section04/test_completion_boundaries.py": "Untimed quality or behavioral fixture control; outside the native contract builder and its statically resolved charge-fixture imports.",
+    "tests/rules/section07/coverage.json": "Refresh only the live authenticated README byte pin for maintained CI guidance; all source blocks, requirement evidence, assertions and qualifications remain unchanged.",
     "tests/rules/section09/coverage.json": "Untimed quality or behavioral fixture control; outside the native contract builder and its statically resolved charge-fixture imports.",
     "tests/rules/section09/test_distances.py": "Untimed quality or behavioral fixture control; outside the native contract builder and its statically resolved charge-fixture imports.",
     "tests/rules/section09/test_fall_back.py": "Untimed quality or behavioral fixture control; outside the native contract builder and its statically resolved charge-fixture imports.",

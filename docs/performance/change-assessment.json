@@ -896,11 +896,11 @@
     },
     "docs/performance/policy-v3/pr2-player-boundary-input-roles-v4.json": {
       "before_sha256": null,
-      "after_sha256": "5105d92bfc418f1224ef35b28a92c1cc23cba4e2beac1bec009777539371b6ef",
+      "after_sha256": "ac7c34a6e2c037a3be8dc67514c597ca962cfed0dc915b7841afa4b2fd26325f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5105d92bfc418f1224ef35b28a92c1cc23cba4e2beac1bec009777539371b6ef"
+          "after": "ac7c34a6e2c037a3be8dc67514c597ca962cfed0dc915b7841afa4b2fd26325f"
         }
       }
     },
@@ -3946,6 +3946,16 @@
         }
       }
     },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "b3886b5f609a33f68dba2a1d2c9f9467208912e2871109eb8c36297a04115c45",
+      "after_sha256": "dcfdba2dc2249cc6d2b8043da50632ae3f2c8e45617ac18c4e9791e3afc5081d",
+      "owners": {
+        "@document": {
+          "before": "b3886b5f609a33f68dba2a1d2c9f9467208912e2871109eb8c36297a04115c45",
+          "after": "dcfdba2dc2249cc6d2b8043da50632ae3f2c8e45617ac18c4e9791e3afc5081d"
+        }
+      }
+    },
     "tests/rules/section09/coverage.json": {
       "before_sha256": "96ffab4c5ebf752dda25328bb249dc0e8e3198d6fa52179716243c8ad2e59053",
       "after_sha256": "bc03df52276ac1772cd2a4df94c73b77aa5ceeca2235656e2edea2345e7b0cd4",
@@ -4930,11 +4940,11 @@
     },
     "tools/performance_tool_inputs_v4.py": {
       "before_sha256": "3efafb9acf69551cd4737c3c75b70d15d18736e7dfff40b46365fba9a80a399e",
-      "after_sha256": "12b0ecd30b7e555bb6d480c30814a1a025a086fb74850c2ebe41b59c61ec1486",
+      "after_sha256": "161eef34afb9c43d0bf283c54fc058a8e44a4ab74ade29d6a5ed0ec4f7f545f3",
       "owners": {
         "@module": {
           "before": "a87b62c44f229d08ccf273481bb289a939278e2d6f7358d971e5e7ac86c359ac",
-          "after": "18cd79c34de77ca86f8d8c8374e7f592ce91e17e31b8bc5d3239760e6c28442f"
+          "after": "85858ef65aa453eb571cefc996a2fe54436434e160ea9c968ffda1eb92bea5af"
         }
       }
     },
@@ -7574,6 +7584,16 @@
       "operations": [
         "ci78-cutover-owners-547642cb6d0387447d3e9bc750839db5ff3ccb75069ffb511c1d8567d774e17d",
         "qualification40-exact-547642cb6d038744"
+      ],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. A pristine history-derived viewer identity map uses a fresh complete event-content hash and full viewer context; every state projection and pending request remains fresh. Immutable canonical policy observations avoid repeated parsing and validation when hashed. CI balances measured node costs across the actual consecutive xdist initial chunks without changing selected cases or limits. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
       "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. A pristine history-derived viewer identity map uses a fresh complete event-content hash and full viewer context; every state projection and pending request remains fresh. Immutable canonical policy observations avoid repeated parsing and validation when hashed. CI balances measured node costs across the actual consecutive xdist initial chunks without changing selected cases or limits. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
