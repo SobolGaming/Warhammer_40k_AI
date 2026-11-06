@@ -644,33 +644,43 @@
         }
       }
     },
-    "docs/performance/current/pr2-reconstruction.json": {
+    "docs/performance/current/pr2-player_boundary.json": {
       "before_sha256": null,
-      "after_sha256": "a3b658fb95607b79c0e947b3ebde66a8cef16d2d9e7760def8d5d37dc93b1154",
+      "after_sha256": "b0561d7a87c05cf6138efdb179862b53019f166299744c88eeebb021b4a016db",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a3b658fb95607b79c0e947b3ebde66a8cef16d2d9e7760def8d5d37dc93b1154"
+          "after": "b0561d7a87c05cf6138efdb179862b53019f166299744c88eeebb021b4a016db"
+        }
+      }
+    },
+    "docs/performance/current/pr2-reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "fe917fc35f18c10433bfdaedaaa6291ea9ab50bdc5f562e47ca8e9859cb985fe",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fe917fc35f18c10433bfdaedaaa6291ea9ab50bdc5f562e47ca8e9859cb985fe"
         }
       }
     },
     "docs/performance/current/pr2-session_command_fork.json": {
       "before_sha256": null,
-      "after_sha256": "adf30a29831d93f8d879c6c9df46b1f4fc3aecfb439c6ee691805ce511772529",
+      "after_sha256": "e5afe680dc70cce5fc5408a623b1d2d65cf676c38725b6b6d2eeb67cd1782e02",
       "owners": {
         "@document": {
           "before": null,
-          "after": "adf30a29831d93f8d879c6c9df46b1f4fc3aecfb439c6ee691805ce511772529"
+          "after": "e5afe680dc70cce5fc5408a623b1d2d65cf676c38725b6b6d2eeb67cd1782e02"
         }
       }
     },
     "docs/performance/current/pr2-tactical_draw.json": {
       "before_sha256": null,
-      "after_sha256": "881986db16d6572800fc68f4f86f8b1f0f4b12023645adafac8bfa3f4b65ce14",
+      "after_sha256": "dcc7e9d151b22161ca4018c000ad4d9338eba9b4c0c45948a6953676ba200546",
       "owners": {
         "@document": {
           "before": null,
-          "after": "881986db16d6572800fc68f4f86f8b1f0f4b12023645adafac8bfa3f4b65ce14"
+          "after": "dcc7e9d151b22161ca4018c000ad4d9338eba9b4c0c45948a6953676ba200546"
         }
       }
     },
@@ -4935,6 +4945,14 @@
       "unchanged_work": "Existing dice stream/history algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, caches and historical controls remain unchanged. Player serialization and retention deliberately change under the new measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
     },
     "docs/performance/PERFORMANCE_POLICY.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream/history algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, caches and historical controls remain unchanged. Player serialization and retention deliberately change under the new measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
+    "docs/performance/current/pr2-player_boundary.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],

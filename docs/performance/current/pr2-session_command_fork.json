@@ -1,0 +1,68 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "session_command_fork",
+  "workload_id": "issue590-authoritative-command-fork-v1",
+  "base_revision": "2b640ffca912f72d74e3b08cec0c0c4b12ce776a",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8c7330faff976bff443ea3988b50b29936b434e35f917bed1e774732e5219436",
+  "head_input_digest": "60bef4fb32214123ebe922932af7aaf02b377bedbc73ad41b9b70721c123a6a1",
+  "budget_profile": "current-change-relative-v1",
+  "historical_failures": [],
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8616d79fac026931c4c241c10c601149c3800762a537a6c93ac94184b4410062",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359412224,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "9a0e09be4c94901206eb4fef77111f8d3f655db3a14202fe80042b6056d630b2",
+    "fixture_sha256": "b4d24aa56d9eab946c25e4a66880d14f46a01c542bc22d3d9cad0a3e91471052",
+    "samples": {
+      "created/fork": [
+        0.14120184300008987,
+        0.14102018200003386,
+        0.14041406299998016
+      ],
+      "started/fork": [
+        0.39592404699999406,
+        0.3907634209999742,
+        0.39379678599993895
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8c7330faff976bff443ea3988b50b29936b434e35f917bed1e774732e5219436",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359412224,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "9a0e09be4c94901206eb4fef77111f8d3f655db3a14202fe80042b6056d630b2",
+    "fixture_sha256": "b4d24aa56d9eab946c25e4a66880d14f46a01c542bc22d3d9cad0a3e91471052",
+    "samples": {
+      "created/fork": [
+        0.14139944800001558,
+        0.139960103999897,
+        0.14097068899991427
+      ],
+      "started/fork": [
+        0.3892021309999336,
+        0.39530737799998406,
+        0.3882646440000599
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  }
+}
