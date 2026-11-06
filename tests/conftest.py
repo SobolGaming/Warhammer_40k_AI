@@ -94,7 +94,11 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         or worker_input.get("s25_scheduler") != "worksteal"
     ):
         return
-    from scripts.build_test_shards import duration_worksteal_order, worksteal_relevance_order
+    from scripts.build_test_shards import (
+        duration_worksteal_order,
+        summary_case_seconds,
+        worksteal_relevance_order,
+    )
 
     order = worksteal_relevance_order(tuple(item.nodeid for item in items), workers=4)
     profile = os.environ.get("BEHAVIORAL_DISPATCH_PROFILE")
@@ -103,7 +107,7 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         weighted = duration_worksteal_order(
             tuple(items[index].nodeid for index in order),
             workers=4,
-            selector_seconds=summary["files"],
+            selector_seconds=summary_case_seconds(summary),
         )
         order = tuple(order[index] for index in weighted)
     items[:] = [items[index] for index in order]

@@ -34189,9 +34189,17 @@
         "tests/conftest.py"
       ],
       "owners": [
+        "@imports",
+        "_balanced_shards",
+        "_case_profile_medians",
+        "_execution_weights",
+        "_read_junit_profile",
+        "_selector_case_peaks",
+        "_summary_payload",
+        "_write_manifests",
         "duration_worksteal_order",
         "pytest_collection_modifyitems",
-        "@imports"
+        "summary_case_seconds"
       ],
       "families": [],
       "sensitive": false,

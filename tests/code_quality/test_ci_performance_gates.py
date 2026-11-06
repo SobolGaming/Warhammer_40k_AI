@@ -78,18 +78,122 @@ def test_duration_dispatch_profile_controls_the_real_worker_hook(
     }
     names = tuple(f"tests/{name}.py::case_{index}" for name in "abcd" for index in range(8))
     profile = tmp_path / "durations.json"
-    profile.write_text(json.dumps({"files": weights}))
+    case_seconds = {name: weights[name.split("::", 1)[0]] / 8 for name in names}
+    case_seconds[names[8]] = 100.0
+    weights["tests/b.py"] = 107.0
+    profile.write_text(
+        json.dumps(
+            {
+                "files": weights,
+                "case_seconds": case_seconds,
+                "profiles": [
+                    {
+                        "source": "complete dispatch fixture",
+                        "junit_sha256": ["a" * 64],
+                        "test_cases": len(names),
+                        "test_files": len(weights),
+                    }
+                ],
+            }
+        )
+    )
     items = [cast(pytest.Item, SimpleNamespace(nodeid=name)) for name in names]
-    expected = sharding.duration_worksteal_order(names, workers=4, selector_seconds=weights)
+    expected = sharding.duration_worksteal_order(names, workers=4, selector_seconds=case_seconds)
     monkeypatch.setattr(pytestconfig, "workerinput", {"s25_scheduler": "worksteal"}, raising=False)
     monkeypatch.setenv("SHARD_ID", "duration-dispatch-control")
     monkeypatch.setenv("PYTEST_XDIST_WORKER_COUNT", "4")
     monkeypatch.setenv("BEHAVIORAL_DISPATCH_PROFILE", str(profile))
     root_hooks.pytest_collection_modifyitems(pytestconfig, items)
     assert [item.nodeid for item in items] == [names[index] for index in expected]
-    profile.write_text(json.dumps({"files": {}}))
+    profile.write_text(json.dumps({"case_seconds": {}}))
     with pytest.raises(SystemExit, match="scheduling weight"):
         root_hooks.pytest_collection_modifyitems(pytestconfig, items)
+
+
+def test_serial_mirror_balancing_preserves_measurements_and_accounts_for_execution() -> None:
+    mirror = sharding.SERIAL_BEHAVIORAL_CASE.split("::", 1)[0]
+    durations = {
+        mirror: 20.0,
+        sharding.SERIAL_BEHAVIORAL_CASE: 180.0,
+        "tests/second.py": 350.0,
+        "tests/third.py": 340.0,
+        "tests/fourth.py": 100.0,
+    }
+    case_seconds = {
+        sharding.SERIAL_BEHAVIORAL_CASE: 180.0,
+        mirror + "::remainder": 20.0,
+        "tests/second.py::one": 175.0,
+        "tests/second.py::two": 175.0,
+        "tests/third.py::one": 170.0,
+        "tests/third.py::two": 170.0,
+        "tests/fourth.py::one": 50.0,
+        "tests/fourth.py::two": 50.0,
+    }
+    shards = sharding._balanced_shards(
+        durations=durations, shard_count=2, case_seconds=case_seconds
+    )
+    isolated = next(shard for shard in shards if mirror in shard.test_files)
+    assert isolated.test_files == (mirror, sharding.SERIAL_BEHAVIORAL_CASE)
+    assert isolated.duration_seconds == 200.0
+    assert sum(shard.duration_seconds for shard in shards) == sum(durations.values())
+    assert (
+        sharding._execution_weights(durations, {sharding.SERIAL_BEHAVIORAL_CASE: 180.0})[
+            sharding.SERIAL_BEHAVIORAL_CASE
+        ]
+        == 720.0
+    )
+    with pytest.raises(SystemExit, match="serial mirror"):
+        sharding._balanced_shards(durations=durations, shard_count=2, case_seconds={})
+    with pytest.raises(SystemExit, match="serial mirror"):
+        sharding._balanced_shards(durations=durations, shard_count=2)
+    # A two-case file must not sit behind the serial node merely because its
+    # average parallel share looks smaller than its longest indivisible case.
+    uneven = {
+        mirror: 0.0,
+        sharding.SERIAL_BEHAVIORAL_CASE: 180.0,
+        "tests/a.py": 900.0,
+        "tests/b.py": 800.0,
+        "tests/heavy.py": 200.0,
+        "tests/light.py": 100.0,
+    }
+    node_costs = {sharding.SERIAL_BEHAVIORAL_CASE: 180.0}
+    for file, count, seconds in (
+        ("a", 9, 100.0),
+        ("b", 8, 100.0),
+        ("heavy", 2, 100.0),
+        ("light", 4, 25.0),
+    ):
+        node_costs.update({f"tests/{file}.py::case_{index}": seconds for index in range(count)})
+    planned = sharding._balanced_shards(durations=uneven, shard_count=3, case_seconds=node_costs)
+    serial_shard = next(
+        shard for shard in planned if sharding.SERIAL_BEHAVIORAL_CASE in shard.test_files
+    )
+    assert "tests/heavy.py" not in serial_shard.test_files
+    assert "tests/light.py" in serial_shard.test_files
+
+
+@pytest.mark.stubbed
+def test_junit_case_profiles_preserve_class_parameters_and_complete_nodes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _write_sample_shards(tmp_path=tmp_path, monkeypatch=monkeypatch)
+    profile = tmp_path / "cases.xml"
+    profile.write_text(
+        '<testsuite tests="3"><testcase classname="tests.unit.test_first.TestGroup" '
+        'name="test_first[slow]" time="9" /><testcase classname="tests.unit.test_first" '
+        'name="test_first[fast]" time="1" /><testcase classname="tests.unit.test_second" '
+        'name="test_second" time="2" /></testsuite>'
+    )
+    assert sharding._case_profile_medians((profile,)) == {
+        "tests/unit/test_first.py::TestGroup::test_first[slow]": 9.0,
+        "tests/unit/test_first.py::test_first[fast]": 1.0,
+        "tests/unit/test_second.py::test_second": 2.0,
+    }
+    profile.write_text(profile.read_text().replace("TestGroup", "OtherGroup"))
+    changed = tmp_path / "changed.xml"
+    changed.write_text(profile.read_text().replace("[slow]", "[new]"))
+    with pytest.raises(SystemExit, match="case inventories"):
+        sharding._case_profile_medians((profile, changed))
 
 
 WORKFLOW_PATH = ROOT / ".github" / "workflows" / "ci.yml"

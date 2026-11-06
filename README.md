@@ -298,8 +298,10 @@ all required tests and other gates must still succeed. See the
 
 The twelve behavioral manifests in `ci/test_shards/` use deterministic
 largest-processing-time balancing. One heavy, source-bound module is partitioned
-into its twenty exact collected cases; every other file remains intact. The
-required quality guard checks that partition against real pytest collection.
+into its twenty exact collected cases. The bounded mirror setup case is a separate
+selector; its file selector denotes the remaining cases. CI always deselects that
+node from parallel work and runs it once on its owning shard. Other files remain
+intact. The required guards verify the exact selected inventory and partition.
 Verify that every selected file or declared case appears exactly once:
 
 ```bash
@@ -322,11 +324,11 @@ uv run --no-sync python scripts/build_test_shards.py \
 The initial measurements are the complete covered hosted runs
 [40872329113](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40872329113)
 and [40874478610](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40874478610),
-each covering all 4,886 cases. Current scheduling estimates take each case's larger
+each covering all 4,886 cases. Historical S25 estimates took each case's larger
 recorded cost, also including fully passed setup/call/teardown observations from
 [40888978899](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40888978899).
 That later run failed; it is not a passing profile. Its 277 failed or unreported
-cases keep authentic older measurements. The exact derivation and timing hashes
+cases retained authentic older measurements. The exact derivation and timing hashes
 are recorded in `ci/test_shards/case-partitions.json` under `evidence.weight_refresh`.
 
 Session startup, source-index setup, reporting and runner queues are assessed
@@ -344,10 +346,12 @@ Historical profiles measure their recorded case inventory; changed cases within 
 existing file require refreshed successful CI reports to reflect their new cost.
 
 Four-worker behavioral CI uses `BEHAVIORAL_DISPATCH_PROFILE` to distribute measured
-costs across xdist's initial worker chunks after deselection. Exact node weights
-remain exact; file totals are divided across their collected cases. This changes
-only execution order. Missing, negative, nonfinite or boolean weights fail closed;
-existing measurements rounded to zero remain valid. Finite S25 case validation,
+case costs across xdist's initial worker chunks after deselection. Complete case
+weights come from the same successful JUnit profiles as the file totals; CI does
+not substitute file averages for missing case costs. Shard assignment separately
+accounts for the mirror's serial execution, retaining measured times unchanged
+and recording the four-worker execution model. Missing, negative, nonfinite or
+boolean weights fail closed; measurements rounded to zero remain valid. Finite S25 case validation,
 the complete selected inventory and the twelve-minute deadline remain mandatory.
 
 Both Python CI lanes upload JUnit, slowest-test output, and per-worker JSON timing

@@ -481,11 +481,10 @@ jobs:
             echo "source_index_built=true" >> "$GITHUB_OUTPUT"
           fi
           isolated_status=0
-          isolation_args=()
           parallel_timing_dir="$TEST_TIMING_DIR"
           isolated_case="tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
-          if grep -Fxq "${isolated_case%%::*}" "$SHARD_MANIFEST" || \
-            grep -Fxq "$isolated_case" "$SHARD_MANIFEST"; then
+          isolation_args=(--deselect "$isolated_case")
+          if grep -Fxq "$isolated_case" "$SHARD_MANIFEST"; then
             # Keep the bounded success fixture separate from concurrent coverage
             # work, including when refreshed costs move it to another shard.
             if TEST_TIMING_DIR="$TEST_TIMING_DIR/isolated-mirror" \

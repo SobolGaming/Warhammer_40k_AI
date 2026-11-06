@@ -2,35 +2,35 @@
   "policy": "rules-engine-performance-v3",
   "base": "2b640ffca912f72d74e3b08cec0c0c4b12ce776a",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d1dcdb896669787f88c9de1b6026ce51eda991f49bde45c89a36b1d403971adb",
-  "operation_map_sha256": "9d54d0220a7408a5ddb4ef969ee5c33af8c0e148841f110064f545d23d80f39e",
+  "operation_map_sha256": "19b8dd883311018dd8644eb21630cf6121587b21255d2ff2282f967228e7bd10",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "c86e3fdb957764ad34c6f76da650d0665e074c5a6027e9581203193c591d6e3e",
-      "after_sha256": "ae8cd5b94df3ab188cfdd8a055a0f8132cdafa34c7bc8b2177a9232d9296944d",
+      "after_sha256": "9068689d87d5e87ab53fc36b3b8adb9294811133cc84c26c88226c8177495f4a",
       "owners": {
         "@document": {
           "before": "c86e3fdb957764ad34c6f76da650d0665e074c5a6027e9581203193c591d6e3e",
-          "after": "ae8cd5b94df3ab188cfdd8a055a0f8132cdafa34c7bc8b2177a9232d9296944d"
+          "after": "9068689d87d5e87ab53fc36b3b8adb9294811133cc84c26c88226c8177495f4a"
         }
       }
     },
     "README.md": {
       "before_sha256": "5290143c5966f4108259ae03f205014691630466c2fc87b56716be1e7c07fb07",
-      "after_sha256": "b95a41a10d7e557b653eec5a1d9b26d6133259bf36d3fcaa4b764d1e161720a4",
+      "after_sha256": "474a47f59651fc338d23af44668fb479f9c5de9130c5ef16bd07f93f108f7fb7",
       "owners": {
         "@document": {
           "before": "5290143c5966f4108259ae03f205014691630466c2fc87b56716be1e7c07fb07",
-          "after": "b95a41a10d7e557b653eec5a1d9b26d6133259bf36d3fcaa4b764d1e161720a4"
+          "after": "474a47f59651fc338d23af44668fb479f9c5de9130c5ef16bd07f93f108f7fb7"
         }
       }
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": "4aa209b3aaaa50b36ca2d4d6497cfecbeb5c67e8b7f04e4582924c69418f77e0",
-      "after_sha256": "a304a2f9d454c8df94b0e0a24fd91b7d4e4a7a427489f3895fb19fd7a9092da1",
+      "after_sha256": "5e2925ff235bc936312151c9bba430e810bd9ce48a98193c445b9012ddd42648",
       "owners": {
         "@document": {
           "before": "4aa209b3aaaa50b36ca2d4d6497cfecbeb5c67e8b7f04e4582924c69418f77e0",
-          "after": "a304a2f9d454c8df94b0e0a24fd91b7d4e4a7a427489f3895fb19fd7a9092da1"
+          "after": "5e2925ff235bc936312151c9bba430e810bd9ce48a98193c445b9012ddd42648"
         }
       }
     },
@@ -46,11 +46,11 @@
     },
     "ci/quality_shards/shard-3.txt": {
       "before_sha256": "175462c224db1ad2e0504c56c90093f5d4cb6b12c6a27dc7e9d383d1c153bf52",
-      "after_sha256": "262fb79a8f2c94e148b37507700af325f9b08f3970c5009a97f099f893f2e19a",
+      "after_sha256": "94be0b01d10dac455539fc091bff4cd7380c2f2f29f24d9fd88fa0441da17daa",
       "owners": {
         "@document": {
           "before": "175462c224db1ad2e0504c56c90093f5d4cb6b12c6a27dc7e9d383d1c153bf52",
-          "after": "262fb79a8f2c94e148b37507700af325f9b08f3970c5009a97f099f893f2e19a"
+          "after": "94be0b01d10dac455539fc091bff4cd7380c2f2f29f24d9fd88fa0441da17daa"
         }
       }
     },
@@ -76,131 +76,131 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "2cd326f99e6f8c7771f8186c3b6e6ff79e5dc9b82a04a4657afaa62f484546ef",
-      "after_sha256": "51143fa85e62adb8c6e288b39d18dcd8ff74ec6e1622b63b58f9942d6e4a97d3",
+      "after_sha256": "56133ccfb8d00c4d3acf8c03bab7c40122b7e9ac5a9da9b81230df799d1b6a7a",
       "owners": {
         "@document": {
           "before": "2cd326f99e6f8c7771f8186c3b6e6ff79e5dc9b82a04a4657afaa62f484546ef",
-          "after": "51143fa85e62adb8c6e288b39d18dcd8ff74ec6e1622b63b58f9942d6e4a97d3"
+          "after": "56133ccfb8d00c4d3acf8c03bab7c40122b7e9ac5a9da9b81230df799d1b6a7a"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "45ed8d0a969a1e32a82a60ea2c1542efa86c6819eee5b72f8c0ca8627b909289",
-      "after_sha256": "d3c29740da5b8641f447ba9cff85c4b9893bd3a286e4da07cd2678e5e74a36ab",
+      "after_sha256": "5a5473c1b2e26c17467076d79a115b696b0688eb8d41a09c6f0b229ec99ce9bb",
       "owners": {
         "@document": {
           "before": "45ed8d0a969a1e32a82a60ea2c1542efa86c6819eee5b72f8c0ca8627b909289",
-          "after": "d3c29740da5b8641f447ba9cff85c4b9893bd3a286e4da07cd2678e5e74a36ab"
+          "after": "5a5473c1b2e26c17467076d79a115b696b0688eb8d41a09c6f0b229ec99ce9bb"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "da8c5487b21c2a155312882161b4604eeb8804513d206b0c774b4bbfff7015b9",
-      "after_sha256": "85f23d9b76a4132618830331a6a8a28cc4fa323c461e8a3d1a28543ba58ead62",
+      "after_sha256": "f583129c4db1c203235099ab380b678a7081af6ffb827c28f358e2e87030b7bd",
       "owners": {
         "@document": {
           "before": "da8c5487b21c2a155312882161b4604eeb8804513d206b0c774b4bbfff7015b9",
-          "after": "85f23d9b76a4132618830331a6a8a28cc4fa323c461e8a3d1a28543ba58ead62"
+          "after": "f583129c4db1c203235099ab380b678a7081af6ffb827c28f358e2e87030b7bd"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "f4db9175bdec60588d40c46764a33559c5d6b7cbdbeae1bf74a6c9be5a39b6b3",
-      "after_sha256": "f4b1e30af14bb1a24aa0c2ffe91ac12e18ad1eb58ef136af00d3ec9fca65b4be",
+      "after_sha256": "60e31c65657867595fc8fb4346fecc518e009ff94bfa9be605fa3ddf83b2897d",
       "owners": {
         "@document": {
           "before": "f4db9175bdec60588d40c46764a33559c5d6b7cbdbeae1bf74a6c9be5a39b6b3",
-          "after": "f4b1e30af14bb1a24aa0c2ffe91ac12e18ad1eb58ef136af00d3ec9fca65b4be"
+          "after": "60e31c65657867595fc8fb4346fecc518e009ff94bfa9be605fa3ddf83b2897d"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "0a6fc9cb6b8506fe633ea95ed6c69dd2df64a6bb279bc9fd3dbeae576f469ac2",
-      "after_sha256": "f7c2eea14779a174e83842a972e79e7f85622a92533d3e017e953b54678a5b8a",
+      "after_sha256": "0ab31f224b21af3dd288007ba1da2ef96ea899531ddfffe164498ff93dee6efe",
       "owners": {
         "@document": {
           "before": "0a6fc9cb6b8506fe633ea95ed6c69dd2df64a6bb279bc9fd3dbeae576f469ac2",
-          "after": "f7c2eea14779a174e83842a972e79e7f85622a92533d3e017e953b54678a5b8a"
+          "after": "0ab31f224b21af3dd288007ba1da2ef96ea899531ddfffe164498ff93dee6efe"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "720a11805093b44d508199d1e5c494304a4d6718cd3dc0dbc899d6847e18ba49",
-      "after_sha256": "115922df0cd9ae707b031dc8b0c42e5f6fbae8022de9e7c0024025fa56f7cbd7",
+      "after_sha256": "f17a6574535a07f28ad2eda56c17f4472b1d6f3399efbdb5079a281239177f9e",
       "owners": {
         "@document": {
           "before": "720a11805093b44d508199d1e5c494304a4d6718cd3dc0dbc899d6847e18ba49",
-          "after": "115922df0cd9ae707b031dc8b0c42e5f6fbae8022de9e7c0024025fa56f7cbd7"
+          "after": "f17a6574535a07f28ad2eda56c17f4472b1d6f3399efbdb5079a281239177f9e"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "58ded83e763b591c38157054d9953bda4b83d517c1b4a0b352e869c8cfb79467",
-      "after_sha256": "5c4db0ed5b4a57f0737330f91273e56dc3803823f341e34b3deafd8d1f0bbc25",
+      "after_sha256": "d8f52b0ae10f70ccf966922582b423a51758f87d7da3dbfe1bb10ece113d9569",
       "owners": {
         "@document": {
           "before": "58ded83e763b591c38157054d9953bda4b83d517c1b4a0b352e869c8cfb79467",
-          "after": "5c4db0ed5b4a57f0737330f91273e56dc3803823f341e34b3deafd8d1f0bbc25"
+          "after": "d8f52b0ae10f70ccf966922582b423a51758f87d7da3dbfe1bb10ece113d9569"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "8c3ca4e073f64d4f571b40d8db6b4657e73cb947c358fa4d46b66997e14a0660",
-      "after_sha256": "b46218d5c4e9cc774e401c943992b0a114d9c6b92ad8758f149a31403754c0c3",
+      "after_sha256": "4bdad1f1819ac6b17f958fd06769460414e5a5f275e624bab693cf0a874715bf",
       "owners": {
         "@document": {
           "before": "8c3ca4e073f64d4f571b40d8db6b4657e73cb947c358fa4d46b66997e14a0660",
-          "after": "b46218d5c4e9cc774e401c943992b0a114d9c6b92ad8758f149a31403754c0c3"
+          "after": "4bdad1f1819ac6b17f958fd06769460414e5a5f275e624bab693cf0a874715bf"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "e1e9bb001210b1962a1d0a368722b391a9c9a7e48523c43de5b5fda418130d18",
-      "after_sha256": "2c2edee6dc90a701226252d11927e2ef8c71c62a80feba5d59627fc63589068e",
+      "after_sha256": "53be93732c4ed1fcd475bf24f009804bcc4404d5eb9336cfed0296b5c1e0a9e4",
       "owners": {
         "@document": {
           "before": "e1e9bb001210b1962a1d0a368722b391a9c9a7e48523c43de5b5fda418130d18",
-          "after": "2c2edee6dc90a701226252d11927e2ef8c71c62a80feba5d59627fc63589068e"
+          "after": "53be93732c4ed1fcd475bf24f009804bcc4404d5eb9336cfed0296b5c1e0a9e4"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "367df0cecd1f89ef7803dbe78709fa9ea4dfb216a5b8a63d57294f6b032a055f",
-      "after_sha256": "d0d9becd43763ced73cea47d06469113d6d9b6970e2766ed7b1af2044fe50ada",
+      "after_sha256": "87a2bb1b4ac379e660eb1a78bc36be536016ec2ef8c0af531ac7fe5468075473",
       "owners": {
         "@document": {
           "before": "367df0cecd1f89ef7803dbe78709fa9ea4dfb216a5b8a63d57294f6b032a055f",
-          "after": "d0d9becd43763ced73cea47d06469113d6d9b6970e2766ed7b1af2044fe50ada"
+          "after": "87a2bb1b4ac379e660eb1a78bc36be536016ec2ef8c0af531ac7fe5468075473"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "82d0d3f31179f88132247ec4d6ffe80aef00b49b7b1b3e1b63aba1f97eb0e5fa",
-      "after_sha256": "368463a403627b98ab958b2e5516c0b128cee8788ac7767f1c56236842da8fcd",
+      "after_sha256": "fe4bb1c0e6dc412f86d1f32ec6ae7a7894176a9d0145d5850c8e1ec87c3954e6",
       "owners": {
         "@document": {
           "before": "82d0d3f31179f88132247ec4d6ffe80aef00b49b7b1b3e1b63aba1f97eb0e5fa",
-          "after": "368463a403627b98ab958b2e5516c0b128cee8788ac7767f1c56236842da8fcd"
+          "after": "fe4bb1c0e6dc412f86d1f32ec6ae7a7894176a9d0145d5850c8e1ec87c3954e6"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "2dd2eb585b0ca512c1189d4738f3a33e5358030886d162dea9cdcfb045b82e0c",
-      "after_sha256": "696edb58b9d47de6313e13aa504e7e9f2d165646953985b47d36c4847c5902e1",
+      "after_sha256": "0a80d90bb6abfdad493262075f41c6934c1640934b86f55e1e7aadc206a898b3",
       "owners": {
         "@document": {
           "before": "2dd2eb585b0ca512c1189d4738f3a33e5358030886d162dea9cdcfb045b82e0c",
-          "after": "696edb58b9d47de6313e13aa504e7e9f2d165646953985b47d36c4847c5902e1"
+          "after": "0a80d90bb6abfdad493262075f41c6934c1640934b86f55e1e7aadc206a898b3"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "483448b620198aa158e162165873f434bcc04fdaa0a24bdcd9b25e213f277c97",
-      "after_sha256": "22827723926561b3b99bf1aec1c61c476eb56b2e350b40c665a980aa96a42c0a",
+      "after_sha256": "3b2d089885ec3bbe1261b266e8ae4beadd74cf6fe4bba36a13491084df5618ad",
       "owners": {
         "@document": {
           "before": "483448b620198aa158e162165873f434bcc04fdaa0a24bdcd9b25e213f277c97",
-          "after": "22827723926561b3b99bf1aec1c61c476eb56b2e350b40c665a980aa96a42c0a"
+          "after": "3b2d089885ec3bbe1261b266e8ae4beadd74cf6fe4bba36a13491084df5618ad"
         }
       }
     },
@@ -896,11 +896,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "75fb3b56d96fb86b452afaf9c12d528fa2841756c96360648cb1a802f5257356",
-      "after_sha256": "500c6aa467de055337c90e7c2da141cec5a6abd6aa001f03f7e7572a03da3bc2",
+      "after_sha256": "de2936ffd53198fbf61b637ee367897afb6526f9bd994d4dfb6a2d13771c3fd2",
       "owners": {
         "@document": {
           "before": "75fb3b56d96fb86b452afaf9c12d528fa2841756c96360648cb1a802f5257356",
-          "after": "500c6aa467de055337c90e7c2da141cec5a6abd6aa001f03f7e7572a03da3bc2"
+          "after": "de2936ffd53198fbf61b637ee367897afb6526f9bd994d4dfb6a2d13771c3fd2"
         }
       }
     },
@@ -926,11 +926,51 @@
     },
     "scripts/build_test_shards.py": {
       "before_sha256": "effaa8fd483abe474b99cda888819aeccc714ddbdcf0fb28e4496347dcc48498",
-      "after_sha256": "b2b0ea4d7057670e8bca48df83fcedbd2888e8f46fde74be518261968715c158",
+      "after_sha256": "123fc177e5662c41bb2b9f375920d9f912568d056f657549c494b97e28f4f0d4",
       "owners": {
         "@module": {
           "before": "034bbf3d5fdbc4cb81f45b97155fdd199ded1f5f269508b558d76fff7ff92cd7",
-          "after": "b3b3fc1f03d027325c6f80b2757c8476157044da2a78457482cf52ca8d745ae8"
+          "after": "c657151b505d7329bf8c9fd9fab05568bf9c1dd6197577619ea1bd8c49fd27c6"
+        },
+        "_balanced_shards": {
+          "before": "1bc0c76118d036783349bc8c027e91f894e51a728aeb1b004ffe672822cd3155",
+          "after": "07b27934792a7e94b8c09390e9b71ecf3a78c6e2e467f1e170a056784d964bcb"
+        },
+        "_behavioral_shard_selectors": {
+          "before": "4a3b8d4fb5d87c6766c70ff5e00c4cf43eb3bc883102dbe616b519fb1b2b03f2",
+          "after": "e443fcaa0db30a3f9ed73c71b299b722094eae368f71f7d412f141bddabf6e65"
+        },
+        "_case_profile_medians": {
+          "before": null,
+          "after": "9ab071cd6371931873fb1ae6931b98d589ea3637dac177bf738a0ca53d40a03d"
+        },
+        "_check_manifests": {
+          "before": "bc3800202bbc82f1082e01db4d191399fd0886992bb926a81cf76a8b21f1b2a3",
+          "after": "168e9490868e82c9af2d6190f61dab30fc1f7860fe72185a258d9f10eb589b1c"
+        },
+        "_execution_weights": {
+          "before": null,
+          "after": "e5437305472882e5b958a6aef1e8030149a24fd7e03ad021f87e2ddb6f959e0d"
+        },
+        "_partitioned_durations": {
+          "before": "ffa640c107f67cef492eff2c0e9dec615d696f6641726c274d719cfb2b9281d9",
+          "after": "89fa0ab9931f5350dd233546b6e3f3ed7033dde3423fcfef1b4663d61462f5e7"
+        },
+        "_read_junit_profile": {
+          "before": "76e6d4f1df0de0dde112b3198565fe1b911aebc48b2b6284d715068bbc5af267",
+          "after": "ad4a97f327087ba089818f1e4c146b35d3f631b685cea5b35c68fef3091bc2bc"
+        },
+        "_selector_case_peaks": {
+          "before": null,
+          "after": "f307cbd199cc8eeccc676f5221fb5aebce92600b9cd7322feca14c97d9ea82fa"
+        },
+        "_summary_payload": {
+          "before": "16e4df2e18b0159e7f1ebdb549035f17c97b13dcbe03667931d3ec7655ace617",
+          "after": "0e3093b5c365c33ff78f15d65eaa884602763daf5900a8fef35b720910bbf159"
+        },
+        "_write_manifests": {
+          "before": "820c1f7460293e39deb4a2c86355a5dc26edeb88f774f0999399b45c32287be7",
+          "after": "ae90bbb2b9fedaf2159c0e9be11d3ada7bfdaf050aab2f68c5920e62819ae55e"
         },
         "behavioral_selection": {
           "before": "1527eba616a8bc8dc68cac7e408dcdaf027d1760b6275fe5969fa2034d78977b",
@@ -939,6 +979,14 @@
         "duration_worksteal_order": {
           "before": null,
           "after": "b693fd1492b3a419a387e6eda1eeffbf47eac78e4c949581c9d06b65b9f44aff"
+        },
+        "main": {
+          "before": "922e26e018fc83d2c3a5a4ff7b0f61338e450cfeb47ced734e4cd2adb0864ba1",
+          "after": "a00c012d56f5195cd705f1c1b6d7ef530146c640126d2fcf2d3e47b2d854608e"
+        },
+        "summary_case_seconds": {
+          "before": null,
+          "after": "1ebdd7834ede7c505a32cf65ebe0806017fcb09928c742d3b03cd95194f1e134"
         },
         "validate_private_rng_inactive_source": {
           "before": null,
@@ -2876,7 +2924,7 @@
     },
     "tests/code_quality/test_ci_performance_gates.py": {
       "before_sha256": "054e621925a4d5be98b90fa76f6f5f3823033dcbb1db27e6edfda0550b194fff",
-      "after_sha256": "b8e24c00acce95f4d5a643450c66cd679a3878e3a6e7a02c03ec956c8074042c",
+      "after_sha256": "cb6535eb76ae6d59885fde6dca9f3f4ddb5742088c57174ceea414daec4bac13",
       "owners": {
         "test_duration_dispatch_balances_actual_initial_worksteal_chunks": {
           "before": null,
@@ -2884,11 +2932,19 @@
         },
         "test_duration_dispatch_profile_controls_the_real_worker_hook": {
           "before": null,
-          "after": "d46e0f45a68132e15536a884a259c2468a9aa0619de6f3927ccfbfbc0834994c"
+          "after": "332a6832254803bd4a0887a796e8b7ad53d0c29a3d956ca13cd7a59018086134"
         },
         "test_duration_dispatch_rejects_missing_or_invalid_measurements": {
           "before": null,
           "after": "72679bda8a2f41ef0ed2f6aa5355459c2d843b85cc091dd65deb632fe043e224"
+        },
+        "test_junit_case_profiles_preserve_class_parameters_and_complete_nodes": {
+          "before": null,
+          "after": "4822f1dc43726c058848191ea657b340434b6fa8720ec6656c36f777072b4f4c"
+        },
+        "test_serial_mirror_balancing_preserves_measurements_and_accounts_for_execution": {
+          "before": null,
+          "after": "0f8ca7bdceda87a5cacb370c312dad5ebbf8c218154b480e5695065acfe67758"
         }
       }
     },
@@ -3030,7 +3086,7 @@
     },
     "tests/conftest.py": {
       "before_sha256": "1ed797609cbef7db5786ad767f554c8c6ad92a077f317df6dc1977e5ee235196",
-      "after_sha256": "cee5bc7b0e0688c4badd298a621d5653f6127534d2c39afdd90fa6867743140b",
+      "after_sha256": "45128336d8bcece2d4bc8e83a54e85ebefd7f0146cffb568c7a8374b02e57d9f",
       "owners": {
         "@module": {
           "before": "8058a5f1f036599ec2e72efa7c21ca8ff23e5e1c8f182f40b73e58540373adfa",
@@ -3038,7 +3094,7 @@
         },
         "pytest_collection_modifyitems": {
           "before": "a0152ea6e73407357ec31b143109ec64a8a559198ef18f7fdf64669a72341c06",
-          "after": "a6b3715cc84fdc3b57853f6d18301bb15dd1a52374a366741660838103a70935"
+          "after": "038761732660887cc6618d87c324cef2a2d92c5d1d73bbaf0b54bfdce7d9afa4"
         }
       }
     },
@@ -3958,11 +4014,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "b3886b5f609a33f68dba2a1d2c9f9467208912e2871109eb8c36297a04115c45",
-      "after_sha256": "dcfdba2dc2249cc6d2b8043da50632ae3f2c8e45617ac18c4e9791e3afc5081d",
+      "after_sha256": "1ca5f6c8e26a4183bec8d4edf0a33721764ab3ffe6364b408218794167a9ae8b",
       "owners": {
         "@document": {
           "before": "b3886b5f609a33f68dba2a1d2c9f9467208912e2871109eb8c36297a04115c45",
-          "after": "dcfdba2dc2249cc6d2b8043da50632ae3f2c8e45617ac18c4e9791e3afc5081d"
+          "after": "1ca5f6c8e26a4183bec8d4edf0a33721764ab3ffe6364b408218794167a9ae8b"
         }
       }
     },
@@ -5857,8 +5913,8 @@
         "private-rng-owner-83cd0803bcde80cb"
       ],
       "selected_families": [],
-      "rationale": "CI-only measured test dispatch balances the actual consecutive four-worker xdist chunks after deselection. Complete current-head twelve-shard hosted results assess the scheduling outcome; weights remain recorded estimates, not full-game performance evidence. The original serial contract benchmark does not enable this behavioral profile.",
-      "source_obligation": "Preserve every selected case, actual xdist capacities, original finite S25 validation, and the twelve-minute cutoff. Reject missing or malformed declared weights without substituting an execution policy.",
+      "rationale": "CI-only measured test dispatch uses all complete JUnit node costs across the actual consecutive four-worker xdist chunks after deselection. Shard assignment explicitly counts the isolated mirror as serial work while preserving raw measured times and recording a separate execution model. Complete current-head twelve-shard hosted results assess the outcome; recorded weights are estimates, not full-game timing certification. The original serial contract benchmark does not enable this behavioral profile.",
+      "source_obligation": "Preserve all5599 selected cases, actual xdist capacities, original finite S25 validation, the120-second mirror runner bound and twelve-minute cutoff. Require complete profile evidence and node costs; reject absent, invalid or mismatched costs without substituting file averages.",
       "unchanged_work": "No engine rule, gameplay search, legality, replay or mutation changes. Existing test selection, coverage denominator and floor, exact 260 deferrals and all numeric budgets remain unchanged."
     },
     "scripts/export_ui_contract_fixtures.py": {
@@ -7102,8 +7158,8 @@
         "qualification40-exact-e52e4ddd58b7ef88"
       ],
       "selected_families": [],
-      "rationale": "CI-only measured test dispatch balances the actual consecutive four-worker xdist chunks after deselection. Complete current-head twelve-shard hosted results assess the scheduling outcome; weights remain recorded estimates, not full-game performance evidence. The original serial contract benchmark does not enable this behavioral profile.",
-      "source_obligation": "Preserve every selected case, actual xdist capacities, original finite S25 validation, and the twelve-minute cutoff. Reject missing or malformed declared weights without substituting an execution policy.",
+      "rationale": "CI-only measured test dispatch uses all complete JUnit node costs across the actual consecutive four-worker xdist chunks after deselection. Shard assignment explicitly counts the isolated mirror as serial work while preserving raw measured times and recording a separate execution model. Complete current-head twelve-shard hosted results assess the outcome; recorded weights are estimates, not full-game timing certification. The original serial contract benchmark does not enable this behavioral profile.",
+      "source_obligation": "Preserve all5599 selected cases, actual xdist capacities, original finite S25 validation, the120-second mirror runner bound and twelve-minute cutoff. Require complete profile evidence and node costs; reject absent, invalid or mismatched costs without substituting file averages.",
       "unchanged_work": "No engine rule, gameplay search, legality, replay or mutation changes. Existing test selection, coverage denominator and floor, exact 260 deferrals and all numeric budgets remain unchanged."
     },
     "tests/core_stratagem_helpers.py": {
