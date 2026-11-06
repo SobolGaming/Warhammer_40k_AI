@@ -64,133 +64,143 @@
         }
       }
     },
+    "ci/test_shards/case-partitions.json": {
+      "before_sha256": "bcfc36b844a020466f03e568058e3ab6600dc5beb756cffad32d3193bd18f8f1",
+      "after_sha256": "157d2b894d783c2c37afa6e104f8973ef2f919d41094b4c1b8156b35eeaa9e4b",
+      "owners": {
+        "@document": {
+          "before": "bcfc36b844a020466f03e568058e3ab6600dc5beb756cffad32d3193bd18f8f1",
+          "after": "157d2b894d783c2c37afa6e104f8973ef2f919d41094b4c1b8156b35eeaa9e4b"
+        }
+      }
+    },
     "ci/test_shards/durations.json": {
       "before_sha256": "2cd326f99e6f8c7771f8186c3b6e6ff79e5dc9b82a04a4657afaa62f484546ef",
-      "after_sha256": "d6d1b1e7f606cffaf8f5d28260f85a2f05c42ba8dc13254ced18fee0927a1874",
+      "after_sha256": "51143fa85e62adb8c6e288b39d18dcd8ff74ec6e1622b63b58f9942d6e4a97d3",
       "owners": {
         "@document": {
           "before": "2cd326f99e6f8c7771f8186c3b6e6ff79e5dc9b82a04a4657afaa62f484546ef",
-          "after": "d6d1b1e7f606cffaf8f5d28260f85a2f05c42ba8dc13254ced18fee0927a1874"
+          "after": "51143fa85e62adb8c6e288b39d18dcd8ff74ec6e1622b63b58f9942d6e4a97d3"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "45ed8d0a969a1e32a82a60ea2c1542efa86c6819eee5b72f8c0ca8627b909289",
-      "after_sha256": "663d6267c6350da3081acffa8490c53b4ea0cb313067d7e57bdcce6addbe109a",
+      "after_sha256": "d3c29740da5b8641f447ba9cff85c4b9893bd3a286e4da07cd2678e5e74a36ab",
       "owners": {
         "@document": {
           "before": "45ed8d0a969a1e32a82a60ea2c1542efa86c6819eee5b72f8c0ca8627b909289",
-          "after": "663d6267c6350da3081acffa8490c53b4ea0cb313067d7e57bdcce6addbe109a"
+          "after": "d3c29740da5b8641f447ba9cff85c4b9893bd3a286e4da07cd2678e5e74a36ab"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "da8c5487b21c2a155312882161b4604eeb8804513d206b0c774b4bbfff7015b9",
-      "after_sha256": "0c347d1e0147bea6e58dad43547a5ffe457bf14258a1676b33cf0783fe06c3d5",
+      "after_sha256": "85f23d9b76a4132618830331a6a8a28cc4fa323c461e8a3d1a28543ba58ead62",
       "owners": {
         "@document": {
           "before": "da8c5487b21c2a155312882161b4604eeb8804513d206b0c774b4bbfff7015b9",
-          "after": "0c347d1e0147bea6e58dad43547a5ffe457bf14258a1676b33cf0783fe06c3d5"
+          "after": "85f23d9b76a4132618830331a6a8a28cc4fa323c461e8a3d1a28543ba58ead62"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "f4db9175bdec60588d40c46764a33559c5d6b7cbdbeae1bf74a6c9be5a39b6b3",
-      "after_sha256": "d1af27b3921e418b004b01b7c368bc4e8b1e52c867019b32e32594d96d28ade0",
+      "after_sha256": "f4b1e30af14bb1a24aa0c2ffe91ac12e18ad1eb58ef136af00d3ec9fca65b4be",
       "owners": {
         "@document": {
           "before": "f4db9175bdec60588d40c46764a33559c5d6b7cbdbeae1bf74a6c9be5a39b6b3",
-          "after": "d1af27b3921e418b004b01b7c368bc4e8b1e52c867019b32e32594d96d28ade0"
+          "after": "f4b1e30af14bb1a24aa0c2ffe91ac12e18ad1eb58ef136af00d3ec9fca65b4be"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "0a6fc9cb6b8506fe633ea95ed6c69dd2df64a6bb279bc9fd3dbeae576f469ac2",
-      "after_sha256": "1098866977088d65aeeb4b6fd4e66ef55cf9fd4fd2ca6491923ea8b0e9ebe545",
+      "after_sha256": "f7c2eea14779a174e83842a972e79e7f85622a92533d3e017e953b54678a5b8a",
       "owners": {
         "@document": {
           "before": "0a6fc9cb6b8506fe633ea95ed6c69dd2df64a6bb279bc9fd3dbeae576f469ac2",
-          "after": "1098866977088d65aeeb4b6fd4e66ef55cf9fd4fd2ca6491923ea8b0e9ebe545"
+          "after": "f7c2eea14779a174e83842a972e79e7f85622a92533d3e017e953b54678a5b8a"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "720a11805093b44d508199d1e5c494304a4d6718cd3dc0dbc899d6847e18ba49",
-      "after_sha256": "ec9e7058d31b15bf6b7e8f6793deb2a7f5ff307c03d7c01bb7b86ac51a20f486",
+      "after_sha256": "115922df0cd9ae707b031dc8b0c42e5f6fbae8022de9e7c0024025fa56f7cbd7",
       "owners": {
         "@document": {
           "before": "720a11805093b44d508199d1e5c494304a4d6718cd3dc0dbc899d6847e18ba49",
-          "after": "ec9e7058d31b15bf6b7e8f6793deb2a7f5ff307c03d7c01bb7b86ac51a20f486"
+          "after": "115922df0cd9ae707b031dc8b0c42e5f6fbae8022de9e7c0024025fa56f7cbd7"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "58ded83e763b591c38157054d9953bda4b83d517c1b4a0b352e869c8cfb79467",
-      "after_sha256": "e714618d55f10a63dff434437ec4e1a0de187c0145c8e5065846c0ca2d4e3443",
+      "after_sha256": "5c4db0ed5b4a57f0737330f91273e56dc3803823f341e34b3deafd8d1f0bbc25",
       "owners": {
         "@document": {
           "before": "58ded83e763b591c38157054d9953bda4b83d517c1b4a0b352e869c8cfb79467",
-          "after": "e714618d55f10a63dff434437ec4e1a0de187c0145c8e5065846c0ca2d4e3443"
+          "after": "5c4db0ed5b4a57f0737330f91273e56dc3803823f341e34b3deafd8d1f0bbc25"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "8c3ca4e073f64d4f571b40d8db6b4657e73cb947c358fa4d46b66997e14a0660",
-      "after_sha256": "ea9b183bc25bd428ed9f03acc67f4a41fc81c6e3b14afdcdc9976056cf003731",
+      "after_sha256": "b46218d5c4e9cc774e401c943992b0a114d9c6b92ad8758f149a31403754c0c3",
       "owners": {
         "@document": {
           "before": "8c3ca4e073f64d4f571b40d8db6b4657e73cb947c358fa4d46b66997e14a0660",
-          "after": "ea9b183bc25bd428ed9f03acc67f4a41fc81c6e3b14afdcdc9976056cf003731"
+          "after": "b46218d5c4e9cc774e401c943992b0a114d9c6b92ad8758f149a31403754c0c3"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "e1e9bb001210b1962a1d0a368722b391a9c9a7e48523c43de5b5fda418130d18",
-      "after_sha256": "27a6f56ec1be6901dc5c7604ce16e2d37586a530704cf5d96caa30dc3d65d054",
+      "after_sha256": "2c2edee6dc90a701226252d11927e2ef8c71c62a80feba5d59627fc63589068e",
       "owners": {
         "@document": {
           "before": "e1e9bb001210b1962a1d0a368722b391a9c9a7e48523c43de5b5fda418130d18",
-          "after": "27a6f56ec1be6901dc5c7604ce16e2d37586a530704cf5d96caa30dc3d65d054"
+          "after": "2c2edee6dc90a701226252d11927e2ef8c71c62a80feba5d59627fc63589068e"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "367df0cecd1f89ef7803dbe78709fa9ea4dfb216a5b8a63d57294f6b032a055f",
-      "after_sha256": "1c0118b9a0731e3a2e08c2df837ae16bc145a6532a418f4b12787ec6b3eeb71c",
+      "after_sha256": "d0d9becd43763ced73cea47d06469113d6d9b6970e2766ed7b1af2044fe50ada",
       "owners": {
         "@document": {
           "before": "367df0cecd1f89ef7803dbe78709fa9ea4dfb216a5b8a63d57294f6b032a055f",
-          "after": "1c0118b9a0731e3a2e08c2df837ae16bc145a6532a418f4b12787ec6b3eeb71c"
+          "after": "d0d9becd43763ced73cea47d06469113d6d9b6970e2766ed7b1af2044fe50ada"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "82d0d3f31179f88132247ec4d6ffe80aef00b49b7b1b3e1b63aba1f97eb0e5fa",
-      "after_sha256": "fea8a8862b0fbc73528c0367ad192e56f851458bca16e5c403acac1350a60638",
+      "after_sha256": "368463a403627b98ab958b2e5516c0b128cee8788ac7767f1c56236842da8fcd",
       "owners": {
         "@document": {
           "before": "82d0d3f31179f88132247ec4d6ffe80aef00b49b7b1b3e1b63aba1f97eb0e5fa",
-          "after": "fea8a8862b0fbc73528c0367ad192e56f851458bca16e5c403acac1350a60638"
+          "after": "368463a403627b98ab958b2e5516c0b128cee8788ac7767f1c56236842da8fcd"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "2dd2eb585b0ca512c1189d4738f3a33e5358030886d162dea9cdcfb045b82e0c",
-      "after_sha256": "f01b8e16f01b9df03792d9d31269207068fd23b14a9891fdedbd81dda2ed8b90",
+      "after_sha256": "696edb58b9d47de6313e13aa504e7e9f2d165646953985b47d36c4847c5902e1",
       "owners": {
         "@document": {
           "before": "2dd2eb585b0ca512c1189d4738f3a33e5358030886d162dea9cdcfb045b82e0c",
-          "after": "f01b8e16f01b9df03792d9d31269207068fd23b14a9891fdedbd81dda2ed8b90"
+          "after": "696edb58b9d47de6313e13aa504e7e9f2d165646953985b47d36c4847c5902e1"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "483448b620198aa158e162165873f434bcc04fdaa0a24bdcd9b25e213f277c97",
-      "after_sha256": "80b973d90c79d53ed2c378dc31c45c117f4f09d64eb4c8d93df6f386e977ccb9",
+      "after_sha256": "22827723926561b3b99bf1aec1c61c476eb56b2e350b40c665a980aa96a42c0a",
       "owners": {
         "@document": {
           "before": "483448b620198aa158e162165873f434bcc04fdaa0a24bdcd9b25e213f277c97",
-          "after": "80b973d90c79d53ed2c378dc31c45c117f4f09d64eb4c8d93df6f386e977ccb9"
+          "after": "22827723926561b3b99bf1aec1c61c476eb56b2e350b40c665a980aa96a42c0a"
         }
       }
     },
@@ -5003,6 +5013,17 @@
     "ci/quality_shards/shard-4.txt": {
       "category": "governance",
       "operations": [],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. A pristine history-derived viewer identity map uses a fresh complete event-content hash and full viewer context; every state projection and pending request remains fresh. Immutable canonical policy observations avoid repeated parsing and validation when hashed. CI balances measured node costs across the actual consecutive xdist initial chunks without changing selected cases or limits. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
+    "ci/test_shards/case-partitions.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-prototype-evidence-b993103c8756949d6e18a5c7bbc83d537b714e12ea71073a04714d38bd6a7d01",
+        "mfm-current-behavior-profile"
+      ],
       "selected_families": [],
       "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. A pristine history-derived viewer identity map uses a fresh complete event-content hash and full viewer context; every state projection and pending request remains fresh. Immutable canonical policy observations avoid repeated parsing and validation when hashed. CI balances measured node costs across the actual consecutive xdist initial chunks without changing selected cases or limits. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
       "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
