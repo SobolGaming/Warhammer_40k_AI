@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.support.section25_fixtures import BODY, UPGRADE, assignment, request, selection
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -44,6 +45,7 @@ def test_prebattle_public_roster_submission_and_json_restoration(
     units = (selection(c, "commander"), selection(c, "body", BODY))
     r = request(c, units=units, assignments=(assignment(units[1], UPGRADE),))
     config = GameConfig(
+        private_rng_seed=fixture_private_rng_seed(f"s25-{first}"),
         game_id=f"s25-{first}",
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(),
         army_catalog=c,
@@ -130,6 +132,7 @@ def test_native_roster_disclosure_distinguishes_physical_upgrade_bearers(
     views: list[GameViewPayload] = []
     for roster in requests:
         config = GameConfig(
+            private_rng_seed=fixture_private_rng_seed(f"s25-disclosure-{first}"),
             game_id=f"s25-disclosure-{first}",
             ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(),
             army_catalog=c,

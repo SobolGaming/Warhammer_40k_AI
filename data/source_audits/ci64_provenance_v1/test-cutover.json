@@ -145,16 +145,16 @@
       "sha256": "c672346fddce939216750dec92a6267ae0bf3747fbf7a564ed09e854ddbcd635"
     },
     "tests/factions/grey_knights/unit/test_grey_knights_army_rule.py": {
-      "blob_sha1": "1f1c3711b463fd989ce74e2dba50a4cdce6796a7",
-      "bytes": 49289,
+      "blob_sha1": "c3103aa1ed58cde1a1eeee3252999f37199dee4d",
+      "bytes": 49440,
       "mode": "100644",
-      "sha256": "d926c85dff2d78252c32e6d71cd7a7775a4f623e2cdb201cfa31632f4afd96d6"
+      "sha256": "da23a8edfc11c789d96a0e4150d6b9551f335d66bb8f2f6152adb8250aa66e17"
     },
     "tests/factions/leagues_of_votann/unit/test_leagues_of_votann_army_rule.py": {
-      "blob_sha1": "37a23ca665996643255445925283c05d879d14c2",
-      "bytes": 41103,
+      "blob_sha1": "2a0fbf58ddaee0f519ee848e2ac7553924ec6592",
+      "bytes": 41269,
       "mode": "100644",
-      "sha256": "115a75dd94f9c1b0e006c6ef8cc90ebf27432ab85b64a6840288935ac9e5d53e"
+      "sha256": "f9702ce55583b61fbbb8d29754ca020e5d085101aa27c412722d02d949c40072"
     },
     "tests/factions/necrons/unit/test_necrons_army_rule.py": {
       "blob_sha1": "a5e382786fcdd7924c3540e100b60e1f0ee8fb02",
@@ -169,16 +169,16 @@
       "sha256": "010c10f67bd0ad474acac5b31f64453ef11132154decb98fe5ea492bf9e7d746"
     },
     "tests/factions/orks/unit/test_orks_army_rule.py": {
-      "blob_sha1": "b76493a55fc2663de0fd88fa04c49a64880dfffd",
-      "bytes": 38870,
+      "blob_sha1": "61cfb837edc48cdfa63304be12a9eb89239e17bd",
+      "bytes": 39023,
       "mode": "100644",
-      "sha256": "d2b72b1c26a7f90b492d6c10a005b59ff742cd64648cdfce1aa9c2699a37f797"
+      "sha256": "63bdaa161c0fe18f6d2921912601b7663b791b8d51885b99061d9fb03acb9a59"
     },
     "tests/factions/tau_empire/unit/test_tau_empire_army_rule.py": {
-      "blob_sha1": "71279f29ffec039320f0bde7e93c18cdcc4963c1",
-      "bytes": 53291,
+      "blob_sha1": "448bbae722ae6c46787c80bfdabc7e47554c1259",
+      "bytes": 53443,
       "mode": "100644",
-      "sha256": "d3cf2c201b025d19d3c03d4e64eaf23417720a7a40d66bdd9e03d3330ef9b422"
+      "sha256": "0365266a1548584e95bc8bd31800cfda4d1b6271d64845d724d2d4df8c58ee92"
     },
     "tests/factions/thousand_sons/unit/test_source_overlays.py": {
       "blob_sha1": "550735dec7bf2ec19a8ab3cf1cac73f503c33f83",
@@ -187,10 +187,10 @@
       "sha256": "1095545a0cd973b567fc1e2b45dd43000fb352b954d0c47f5a4ee3b59e344c6d"
     },
     "tests/factions/tyranids/unit/test_tyranids_army_rule.py": {
-      "blob_sha1": "8b2154d84278043129e438ebe890b3c905d6a6f0",
-      "bytes": 113451,
+      "blob_sha1": "9effc5e0e79d0f234c0ec10041640cdccb4fd3d5",
+      "bytes": 114056,
       "mode": "100644",
-      "sha256": "98d207dd98016b737c23332cd8c144f1532bc253bdf99916ec4cdefc9fb10425"
+      "sha256": "5cc396a43a847aec6ffe04c625a73602b22dfa2ca7340ac0e39276a44b2c0a16"
     },
     "tests/factions/world_eaters/unit/test_blessings_gameplay.py": {
       "blob_sha1": "56b8dcc4c6b9dd11bf1730bf6c4a3c5aced36cce",
@@ -2353,10 +2353,10 @@
       "sha256": "4a126c1a2f3cfd5f9f07dc86f580abb3a8606a4fd5fe91c0839ab6a1b1538276"
     },
     "tests/rules/section25/test_facade.py": {
-      "blob_sha1": "e54ee3f4b68d486c668d1d5b326e7e53f052663c",
-      "bytes": 9962,
+      "blob_sha1": "41f3abc78299264247fbbe2c7804182c8ae09b44",
+      "bytes": 10181,
       "mode": "100644",
-      "sha256": "c858c0385c1eb85c736af7709cb790868715d64247c50cc711d6d92fd5ffb1bb"
+      "sha256": "af8c6e65ec4c1f08920266ccb0f9825bb316250863452377f0fed825cc7b86f2"
     },
     "tests/rules/section25/test_inventory.py": {
       "blob_sha1": "fdfcc2e11b8af331196321466e79bde437c2f190",

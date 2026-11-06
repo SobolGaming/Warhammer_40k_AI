@@ -9,6 +9,7 @@ from typing import cast
 import pytest
 
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
@@ -892,6 +893,7 @@ def _tau_config(*, non_tau_selected: bool) -> GameConfig:
     )
     player_a_detachment_id = NON_TAU_DETACHMENT_ID if non_tau_selected else "kauyon"
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase17g-tau-lifecycle-game"),
         game_id="phase17g-tau-lifecycle-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(

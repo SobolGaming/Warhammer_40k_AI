@@ -108,6 +108,38 @@
         }
       ]
     },
+    "tests/factions/grey_knights/unit/test_grey_knights_army_rule.py": {
+      "before_sha256": "d926c85dff2d78252c32e6d71cd7a7775a4f623e2cdb201cfa31632f4afd96d6",
+      "after_sha256": "da23a8edfc11c789d96a0e4150d6b9551f335d66bb8f2f6152adb8250aa66e17",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\n",
+          "removed": "",
+          "offset": 134
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17g-grey-knights-game\"),\n",
+          "removed": "",
+          "offset": 37348
+        }
+      ]
+    },
+    "tests/factions/leagues_of_votann/unit/test_leagues_of_votann_army_rule.py": {
+      "before_sha256": "115a75dd94f9c1b0e006c6ef8cc90ebf27432ab85b64a6840288935ac9e5d53e",
+      "after_sha256": "f9702ce55583b61fbbb8d29754ca020e5d085101aa27c412722d02d949c40072",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\n",
+          "removed": "",
+          "offset": 283
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17g-leagues-of-votann-runtime-bundle\"),\n",
+          "removed": "",
+          "offset": 36031
+        }
+      ]
+    },
     "tests/factions/necrons/unit/test_necrons_army_rule.py": {
       "before_sha256": "d0fef481241bc77912b8105bd763561d8f551005c010b230c9c52bc99939e827",
       "after_sha256": "b8b520cdfb0f829bcabb3906158e58f6ee524c667e3d0f0d16fe69e4c1186283",
@@ -124,14 +156,91 @@
         }
       ]
     },
+    "tests/factions/orks/unit/test_orks_army_rule.py": {
+      "before_sha256": "d2b72b1c26a7f90b492d6c10a005b59ff742cd64648cdfce1aa9c2699a37f797",
+      "after_sha256": "63bdaa161c0fe18f6d2921912601b7663b791b8d51885b99061d9fb03acb9a59",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\n",
+          "removed": "",
+          "offset": 276
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17g-orks-lifecycle-game\"),\n",
+          "removed": "",
+          "offset": 18785
+        }
+      ]
+    },
+    "tests/factions/tau_empire/unit/test_tau_empire_army_rule.py": {
+      "before_sha256": "d3cf2c201b025d19d3c03d4e64eaf23417720a7a40d66bdd9e03d3330ef9b422",
+      "after_sha256": "0365266a1548584e95bc8bd31800cfda4d1b6271d64845d724d2d4df8c58ee92",
+      "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\n",
+          "removed": "",
+          "offset": 276
+        },
+        {
+          "added": "        private_rng_seed=fixture_private_rng_seed(\"phase17g-tau-lifecycle-game\"),\n",
+          "removed": "",
+          "offset": 37661
+        }
+      ]
+    },
     "tests/factions/tyranids/unit/test_tyranids_army_rule.py": {
       "before_sha256": "17495a45fc129f7d40eb5bec143a1605d52643a2da2597ddac81e8ea668dbcc4",
-      "after_sha256": "98d207dd98016b737c23332cd8c144f1532bc253bdf99916ec4cdefc9fb10425",
+      "after_sha256": "5cc396a43a847aec6ffe04c625a73602b22dfa2ca7340ac0e39276a44b2c0a16",
       "edits": [
+        {
+          "added": "from tests.support.private_randomness import fixture_private_rng_seed\n",
+          "removed": "",
+          "offset": 640
+        },
+        {
+          "added": "        private_rng_seed=\"c4272e8608d764270bb5e6e8c45b1d0657364ec7f4ee26465ab7b87941f90017\",\n",
+          "removed": "",
+          "offset": 22075
+        },
+        {
+          "added": "        private_rng_seed=\"4f5890f491b3e88172686e9bce5abaacf7425507060a0d2b6bd278b09563cc7c\",\n",
+          "removed": "",
+          "offset": 25264
+        },
         {
           "added": "        result_id=\"phase17g-tyranids-omitted-modifier-authority:d07:8:unleash:d07-vector:18:private-1\",\n",
           "removed": "        result_id=\"phase17g-tyranids-omitted-modifier-authority:d07:8:unleash:d07-vector:18\",\n",
-          "offset": 25180
+          "offset": 25436
+        },
+        {
+          "added": "    private_rng_seed: str | None = None,\n",
+          "removed": "",
+          "offset": 84978
+        },
+        {
+          "added": "            private_rng_seed=private_rng_seed,\n",
+          "removed": "",
+          "offset": 85199
+        },
+        {
+          "added": "    private_rng_seed: str | None = None,\n",
+          "removed": "",
+          "offset": 86626
+        },
+        {
+          "added": "        private_rng_seed=(\n            fixture_private_rng_seed(game_id) if private_rng_seed is None else private_rng_seed\n        ),\n",
+          "removed": "",
+          "offset": 86998
+        },
+        {
+          "added": "def _resolved_shadow_lifecycle(\n    *, game_id: str, result_id: str | None = None, private_rng_seed: str | None = None\n) -> GameLifecycle:\n",
+          "removed": "def _resolved_shadow_lifecycle(*, game_id: str, result_id: str | None = None) -> GameLifecycle:\n",
+          "offset": 105210
+        },
+        {
+          "added": "        private_rng_seed=private_rng_seed,\n",
+          "removed": "",
+          "offset": 105415
         }
       ]
     },

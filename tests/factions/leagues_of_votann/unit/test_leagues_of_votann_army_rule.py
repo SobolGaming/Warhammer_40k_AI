@@ -11,6 +11,7 @@ from tests.phase11c_command_phase_helpers import (
     battle_state,
     battle_state_with_center_objective_positions,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.unit_keyword_helpers import with_unit_keywords
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -1012,6 +1013,7 @@ def _weapon_profile() -> WeaponProfile:
 def _votann_runtime_config() -> GameConfig:
     catalog = _votann_runtime_catalog()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase17g-leagues-of-votann-runtime-bundle"),
         game_id="phase17g-leagues-of-votann-runtime-bundle",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(

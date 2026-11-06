@@ -9,6 +9,7 @@ from typing import cast
 import pytest
 
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -474,6 +475,7 @@ def _battle_ready_lifecycle(*, config: GameConfig | None = None) -> GameLifecycl
 def _orks_config() -> GameConfig:
     catalog = _orks_lifecycle_catalog()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase17g-orks-lifecycle-game"),
         game_id="phase17g-orks-lifecycle-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(

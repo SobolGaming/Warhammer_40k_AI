@@ -6,21 +6,21 @@
   "changes": {
     "ci/quality_shards/all.txt": {
       "before_sha256": "4aa209b3aaaa50b36ca2d4d6497cfecbeb5c67e8b7f04e4582924c69418f77e0",
-      "after_sha256": "4fcc8a8734cd61b5d143ded90932a3cdee4157f7ba9762dc5df057d22f8786a8",
+      "after_sha256": "18a8cc87f635ff4c5164d8f6fca55dc4f5f075d6c9bf915fcbb314da65964459",
       "owners": {
         "@document": {
           "before": "4aa209b3aaaa50b36ca2d4d6497cfecbeb5c67e8b7f04e4582924c69418f77e0",
-          "after": "4fcc8a8734cd61b5d143ded90932a3cdee4157f7ba9762dc5df057d22f8786a8"
+          "after": "18a8cc87f635ff4c5164d8f6fca55dc4f5f075d6c9bf915fcbb314da65964459"
         }
       }
     },
     "ci/quality_shards/shard-1.txt": {
       "before_sha256": "fe0f5d82a1f9df7de3367f5d221a9aee331c0ae03a505b1f3cef6d558f448748",
-      "after_sha256": "1beea62732fef6568882b2579a582233bc08854a42d360150b529161bbf6065d",
+      "after_sha256": "f8d47bd22e9ce2405b8cb6f1811e98e568c2ab7b0041580e7df0c861c98be5f7",
       "owners": {
         "@document": {
           "before": "fe0f5d82a1f9df7de3367f5d221a9aee331c0ae03a505b1f3cef6d558f448748",
-          "after": "1beea62732fef6568882b2579a582233bc08854a42d360150b529161bbf6065d"
+          "after": "f8d47bd22e9ce2405b8cb6f1811e98e568c2ab7b0041580e7df0c861c98be5f7"
         }
       }
     },
@@ -586,21 +586,21 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "2dec09b5ad5abec792d4fbf3b2d5ebc67b212df3c0a5391c3c378041db0aef59",
-      "after_sha256": "006be16dce8795f3249e01f61a39019d341fb9c80dc2f971b632fe328325e3db",
+      "after_sha256": "dca33145627ef6b778f0cbdb946f7626b758f5fcd04e89b28aeddc6c2ae60b9b",
       "owners": {
         "@document": {
           "before": "2dec09b5ad5abec792d4fbf3b2d5ebc67b212df3c0a5391c3c378041db0aef59",
-          "after": "006be16dce8795f3249e01f61a39019d341fb9c80dc2f971b632fe328325e3db"
+          "after": "dca33145627ef6b778f0cbdb946f7626b758f5fcd04e89b28aeddc6c2ae60b9b"
         }
       }
     },
     "data/source_audits/private_rng_fixture_preimages_v1.json": {
       "before_sha256": null,
-      "after_sha256": "e6b074af1ef522f58d1b11473b25e819981386d6db69ef3baf78d44a7fe563a4",
+      "after_sha256": "624295c16ad595651c60534cb69872203d60d3549589037e417e45745d8cb456",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e6b074af1ef522f58d1b11473b25e819981386d6db69ef3baf78d44a7fe563a4"
+          "after": "624295c16ad595651c60534cb69872203d60d3549589037e417e45745d8cb456"
         }
       }
     },
@@ -736,11 +736,11 @@
     },
     "docs/performance/policy-v3/pr2-player-boundary-input-roles-v4.json": {
       "before_sha256": null,
-      "after_sha256": "06ac69eb37b761c2ee8673394a0b1151a8bf440e6f249483477f8dfa9eb83cf6",
+      "after_sha256": "d51cb62d64a67e036064de2c0abb0b0a45c4016c3bc0ad137b4ef0cab5f0b8de",
       "owners": {
         "@document": {
           "before": null,
-          "after": "06ac69eb37b761c2ee8673394a0b1151a8bf440e6f249483477f8dfa9eb83cf6"
+          "after": "d51cb62d64a67e036064de2c0abb0b0a45c4016c3bc0ad137b4ef0cab5f0b8de"
         }
       }
     },
@@ -2674,11 +2674,15 @@
     },
     "tests/code_quality/test_order84_dice_authority.py": {
       "before_sha256": "0a7953e042c466e91e6f7b64bde4617b14f75309e99709b65ea79636504cc851",
-      "after_sha256": "90228f91c1865ace21074de011c09c344bfa5d6c20f5cb2092f771f4d35423fd",
+      "after_sha256": "0d49a08aeecf84db957b2a1e39ca28a0a2ea7b7b411e72021ea0b7b288e85c5a",
       "owners": {
         "@module": {
           "before": "9f2d512f083cc24530a5c9f6362d51470c7b19ca195832f402d14e4a08b07321",
           "after": "4c615b6c0ca18b58ef2d39272a69f9702cb6b32c68baea8cca10d22ac83d82c0"
+        },
+        "test_canonical_behavior_fixtures_pin_private_randomness_except_entropy_regression": {
+          "before": null,
+          "after": "26d786879705e43ee81db7f70a268484d28a32d9975a167450eb788f7f68e2f2"
         },
         "test_game_dice_never_initialize_from_public_identity": {
           "before": null,
@@ -3226,6 +3230,34 @@
         }
       }
     },
+    "tests/factions/grey_knights/unit/test_grey_knights_army_rule.py": {
+      "before_sha256": "d926c85dff2d78252c32e6d71cd7a7775a4f623e2cdb201cfa31632f4afd96d6",
+      "after_sha256": "da23a8edfc11c789d96a0e4150d6b9551f335d66bb8f2f6152adb8250aa66e17",
+      "owners": {
+        "@module": {
+          "before": "c3d37d98d5f5a9d4c716b34fcc6727127825eb009f5e225d8de8d5a0c8fd3308",
+          "after": "4377431f0a32f377b0c59139f3f239a6885a3a534e2f48a2fb6ed3ecf69828ae"
+        },
+        "_grey_knights_state": {
+          "before": "3e9ab59a2060f5f1cc8d7f9f704bf7b6a80795d7850d4b977c398dd68dcb973d",
+          "after": "884a9eaf8961ac2c89b6a8f4c40df00fe4ca9152f8c6b37b385f337a7716e2d8"
+        }
+      }
+    },
+    "tests/factions/leagues_of_votann/unit/test_leagues_of_votann_army_rule.py": {
+      "before_sha256": "115a75dd94f9c1b0e006c6ef8cc90ebf27432ab85b64a6840288935ac9e5d53e",
+      "after_sha256": "f9702ce55583b61fbbb8d29754ca020e5d085101aa27c412722d02d949c40072",
+      "owners": {
+        "@module": {
+          "before": "5e24f67c2ee26785aca7f09a3a3309df0704abb3d1c4ca6765840b204eeae28d",
+          "after": "34d28f90ef14f97ab82346e2d57f669406093efe8b500ae59c49bcb656e0ba48"
+        },
+        "_votann_runtime_config": {
+          "before": "83a095a68e3779dd91663a597cb6de96ebb286210a2ab207a2ba5d15d46f75e9",
+          "after": "12580db136213fc97a6c36fa7307b9adcb303cb6f71c4f501bd150d20f675b56"
+        }
+      }
+    },
     "tests/factions/necrons/unit/test_necrons_army_rule.py": {
       "before_sha256": "d0fef481241bc77912b8105bd763561d8f551005c010b230c9c52bc99939e827",
       "after_sha256": "b8b520cdfb0f829bcabb3906158e58f6ee524c667e3d0f0d16fe69e4c1186283",
@@ -3240,13 +3272,61 @@
         }
       }
     },
+    "tests/factions/orks/unit/test_orks_army_rule.py": {
+      "before_sha256": "d2b72b1c26a7f90b492d6c10a005b59ff742cd64648cdfce1aa9c2699a37f797",
+      "after_sha256": "63bdaa161c0fe18f6d2921912601b7663b791b8d51885b99061d9fb03acb9a59",
+      "owners": {
+        "@module": {
+          "before": "7f1a8a1ad9990c05b9cf93bf65945b31b34ee1dc03322b8491779331d79c9122",
+          "after": "3ae4864ed9dccd4ee36c5da0d693f30afce29c228211ec95b79cc119a1071b09"
+        },
+        "_orks_config": {
+          "before": "b05ef293bbbc85345a95ceb7876afaa6366a7c264cdb2cba560ae281fa282271",
+          "after": "fc5c00ae796e23090cf0ff544dd3efc503f5324ea0099f4a59e6bb5d3e219a4c"
+        }
+      }
+    },
+    "tests/factions/tau_empire/unit/test_tau_empire_army_rule.py": {
+      "before_sha256": "d3cf2c201b025d19d3c03d4e64eaf23417720a7a40d66bdd9e03d3330ef9b422",
+      "after_sha256": "0365266a1548584e95bc8bd31800cfda4d1b6271d64845d724d2d4df8c58ee92",
+      "owners": {
+        "@module": {
+          "before": "b65da81c4ce9972ecb670915943ec2afb8beaa044590b5f21460a063692d91c4",
+          "after": "3f8f71285983c7e4d4e44249ff0b3e4247667300b1b0b3e7357a2ea548334aaa"
+        },
+        "_tau_config": {
+          "before": "71ebfa666ac64ea534f7323c4de19313331f10157c06c055256a884f63a5ac4a",
+          "after": "be54dec6b2eab134ee04263f312bbd943aac5408637757c3ee015d8d8c796b00"
+        }
+      }
+    },
     "tests/factions/tyranids/unit/test_tyranids_army_rule.py": {
       "before_sha256": "17495a45fc129f7d40eb5bec143a1605d52643a2da2597ddac81e8ea668dbcc4",
-      "after_sha256": "98d207dd98016b737c23332cd8c144f1532bc253bdf99916ec4cdefc9fb10425",
+      "after_sha256": "5cc396a43a847aec6ffe04c625a73602b22dfa2ca7340ac0e39276a44b2c0a16",
       "owners": {
+        "@module": {
+          "before": "d1a636c18f9b9a129289551f66d41bba80a0afec5cffb2d2d348ee57f82c252f",
+          "after": "404607bd372bcdbd2708357068c738ec23a7d35a56a445a1da3dad3db37e0b7f"
+        },
+        "_battle_ready_lifecycle": {
+          "before": "c56493f3bc889d15063158f6df7ce881c73e526461ad0f873ed22e8592697e8e",
+          "after": "3f14bf6ec0ad2b9ae0a0e48ec59614ebf9854a36638236b4923d832dc879ff24"
+        },
+        "_resolved_shadow_lifecycle": {
+          "before": "c5f523c510aa5458239c26e22a5e6c4421bc93c26437faaa637e583021d5be65",
+          "after": "c162d45bb2343893c0b3252ae36718517287d56a2344a20c53fc5cf8f424c974"
+        },
+        "_tyranids_config": {
+          "before": "1e7bf50c3a95459c2c32b97ead3e302e391fc33cd194a9399328c89d1971bf37",
+          "after": "44331b78d7f8394dde6f909641f159e7a75f0aaaddd8b03c06d09d70e06265af"
+        },
+        "test_restore_rejects_coordinated_shadow_leadership_and_dice_semantic_tamper": {
+          "before": "87741222a5d231864599f62d05834b2d8d7076e345254680800f6127fb8888ca",
+          "after": "55f45fb086748a3ad43e232638d974d7a76aa0c067c9c17ef7c834ce3d916954"
+        },
         "test_restore_rejects_omitted_mandatory_shadow_modifier_application": {
           "before": "f0a9d6401bd0888df55ff8fd709eaf22dcaff9aecc80e84a1c5b061156a88743",
-          "after": "bab2ebac7703d8d0865748d37407e5674edc8f1a577c62f13a752f1f82e335bd"
+          "after": "4609f2ca24bf0f57ec54d728b97f8a369d40371c5ec80a814a5cad359cc87c0b"
         }
       }
     },
@@ -3828,6 +3908,24 @@
         }
       }
     },
+    "tests/rules/section25/test_facade.py": {
+      "before_sha256": "c858c0385c1eb85c736af7709cb790868715d64247c50cc711d6d92fd5ffb1bb",
+      "after_sha256": "af8c6e65ec4c1f08920266ccb0f9825bb316250863452377f0fed825cc7b86f2",
+      "owners": {
+        "@module": {
+          "before": "85bcd864775bca2067a8d507494202419ef5577dfd87e30035fbae33c8a6099e",
+          "after": "1930f690d74dcf196e5ffa71370be523ef1462738413c551e5369554ed9adb1c"
+        },
+        "test_native_roster_disclosure_distinguishes_physical_upgrade_bearers": {
+          "before": "36e5b79b11e3905f9f00c2a23e77a26ae8961dbcacad1a41e9d9e3d9e7a313dc",
+          "after": "30ed51008fcd2e56618114fcf31cd7c11a7c59754794c8e1f8ec75b45c09278a"
+        },
+        "test_prebattle_public_roster_submission_and_json_restoration": {
+          "before": "0383ec149354ad02d4d0fcb1eba1e81aec4f65d91382598b8da913b950657972",
+          "after": "75693839e7812353c88ed263b977db11e35c377df3f4eef50cf620db9061f636"
+        }
+      }
+    },
     "tests/shared/category_migration/generic_rule_ability_registry.py": {
       "before_sha256": "a4b6ac2bc8e0941d236a6828528ba342586505e6dccec96d22931f90b7dd4a52",
       "after_sha256": "e9073314c4607883198dc9133b75983f5e7e27349a2b2b8f17568978a7a1d3ef",
@@ -4364,11 +4462,11 @@
     },
     "tests/support/private_rng_fixture_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "923e7cdbf70ebc5504e00107205df241eeb18fe4f345901d7a0aeabc8069be22",
+      "after_sha256": "79dfbbfc15c88bf84b681a58f2d7eb942b607159f70b0c54199a6b2eeebfb594",
       "owners": {
         "@module": {
           "before": null,
-          "after": "02bb217ccd8229fdbc7cb87bfd3b6ecaa8787c3f05beeb4dc6429a799f250e39"
+          "after": "4f4b20caba41fa23a014c89da4e08e9b9200b3a3f81f70a55ae0b5a740cb3299"
         },
         "FixtureEdit": {
           "before": null,
@@ -4554,11 +4652,11 @@
     },
     "tools/performance_tool_inputs_v4.py": {
       "before_sha256": "3efafb9acf69551cd4737c3c75b70d15d18736e7dfff40b46365fba9a80a399e",
-      "after_sha256": "bed49452806613131e51b3e93ee6ebbaa1486a6c706e6bd7820de58051509a5d",
+      "after_sha256": "a0f4e80b3d7e963e24345cde8abc37a1373e91929fa1365e87d66f2f5117d7e8",
       "owners": {
         "@module": {
           "before": "a87b62c44f229d08ccf273481bb289a939278e2d6f7358d971e5e7ac86c359ac",
-          "after": "9f8de4129772f2d735adfdaad2baac8a1c10bfe78a17d11cfce9b07c70770eee"
+          "after": "37758e69d30159464eed84e482e20567a20140acc0f149c50880f16a0a37255e"
         }
       }
     },
@@ -6697,10 +6795,50 @@
       "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
       "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
     },
+    "tests/factions/grey_knights/unit/test_grey_knights_army_rule.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-3f0b8f4b28a196b2"
+      ],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
+    "tests/factions/leagues_of_votann/unit/test_leagues_of_votann_army_rule.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-60956ce1dd323cf1"
+      ],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
     "tests/factions/necrons/unit/test_necrons_army_rule.py": {
       "category": "rule_semantics",
       "operations": [
         "qualification40-exact-93f45edb85f7ce25"
+      ],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
+    "tests/factions/orks/unit/test_orks_army_rule.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-fdc2512493a85cf6"
+      ],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
+    "tests/factions/tau_empire/unit/test_tau_empire_army_rule.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-053d18814973d5d3"
       ],
       "selected_families": [],
       "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
@@ -7170,6 +7308,16 @@
       "category": "rule_semantics",
       "operations": [
         "daemons-native-exact-2b69c86b0ccce84e"
+      ],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
+    "tests/rules/section25/test_facade.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-ba63e225ed979d0b"
       ],
       "selected_families": [],
       "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",

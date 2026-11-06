@@ -300,8 +300,8 @@ _SCOPES = (
     ReviewedScope(
         PR2_BASE,
         PR2_SPEC_PATH,
-        "06ac69eb37b761c2ee8673394a0b1151a8bf440e6f249483477f8dfa9eb83cf6",
-        "f933eb0cb47354aba29dedab259df401d089ddb0ccd407e7b0854cec4371b2de",
+        "d51cb62d64a67e036064de2c0abb0b0a45c4016c3bc0ad137b4ef0cab5f0b8de",
+        "cd14556658a23c9481cf66289298f1824893d518fd5f4da0ba4f0b7d5e918d34",
         PR2_REPORT_PATH,
         frozenset(
             [
@@ -518,7 +518,11 @@ _SCOPES = (
                 "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py",
                 "tests/factions/death_guard/army_rule_helpers.py",
                 "tests/factions/emperors_children/test_selected_consumers.py",
+                "tests/factions/grey_knights/unit/test_grey_knights_army_rule.py",
+                "tests/factions/leagues_of_votann/unit/test_leagues_of_votann_army_rule.py",
                 "tests/factions/necrons/unit/test_necrons_army_rule.py",
+                "tests/factions/orks/unit/test_orks_army_rule.py",
+                "tests/factions/tau_empire/unit/test_tau_empire_army_rule.py",
                 "tests/factions/tyranids/unit/test_tyranids_army_rule.py",
                 "tests/factions/world_eaters/attack_helpers.py",
                 "tests/factions/world_eaters/unit/test_blessings_gameplay.py",
@@ -563,6 +567,7 @@ _SCOPES = (
                 "tests/rules/section22/coverage.json",
                 "tests/rules/section22/test_damage.py",
                 "tests/rules/section24/test_damaged.py",
+                "tests/rules/section25/test_facade.py",
                 "tests/shared/category_migration/generic_rule_ability_registry.py",
                 "tests/shared/category_migration/horror_split_materialization.py",
                 "tests/shared/category_migration/phase10d_battlefield_transitions.py",

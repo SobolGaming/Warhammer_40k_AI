@@ -164,3 +164,51 @@ def test_private_rng_smoke_scope_is_exact_and_preserves_serializer_and_cache_gat
     assert hashlib.sha256(predecessor).hexdigest() == scope.PRIOR_POLICY_SHA256
     with pytest.raises(ValueError, match="successor drifted"):
         scope.private_randomness_policy_predecessor(policy + b"# unrelated change\n")
+
+
+def test_canonical_behavior_fixtures_pin_private_randomness_except_entropy_regression() -> None:
+    active = {
+        line.split("::", 1)[0]
+        for shard in range(1, 13)
+        for line in (ROOT / f"ci/test_shards/shard-{shard}.txt").read_text().splitlines()
+        if line.startswith("tests/")
+    }
+    helpers = {
+        path.relative_to(ROOT).as_posix()
+        for path in (ROOT / "tests").rglob("*.py")
+        if not path.name.startswith("test_")
+    }
+    unseeded: list[tuple[str, str, str]] = []
+    for relative in sorted(active | helpers):
+        tree = ast.parse((ROOT / relative).read_bytes())
+        parents = {child: node for node in ast.walk(tree) for child in ast.iter_child_nodes(node)}
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            constructor = (
+                node.func.id
+                if isinstance(node.func, ast.Name)
+                else node.func.attr
+                if isinstance(node.func, ast.Attribute)
+                else ""
+            )
+            if constructor not in {"GameConfig", "GameState"} or any(
+                keyword.arg == "private_rng_seed" for keyword in node.keywords
+            ):
+                continue
+            enclosing: list[str] = []
+            current: ast.AST = node
+            while current in parents:
+                current = parents[current]
+                if isinstance(current, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                    enclosing.append(current.name)
+            unseeded.append((relative, ".".join(reversed(enclosing)), constructor))
+    # This single real-domain regression deliberately exercises fresh entropy;
+    # restoring a saved config without private authority remains an error.
+    assert unseeded == [
+        (
+            "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py",
+            "test_fresh_private_seeds_and_explicit_config_copying.fresh_config",
+            "GameConfig",
+        )
+    ]

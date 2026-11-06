@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.unit_keyword_helpers import with_unit_keywords
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
@@ -955,6 +956,7 @@ def _grey_knights_state(
         units=enemy_units,
     )
     state = GameState(
+        private_rng_seed=fixture_private_rng_seed("phase17g-grey-knights-game"),
         game_id="phase17g-grey-knights-game",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,
