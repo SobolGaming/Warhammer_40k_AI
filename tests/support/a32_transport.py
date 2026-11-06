@@ -14,6 +14,7 @@ from tests.order135_transport_helpers import CARRIER as CARRIER
 from tests.order135_transport_helpers import PASSENGER as PASSENGER
 from tests.order135_transport_helpers import transport_config
 from tests.phase13b_shooting_declaration_helpers import _proposal_from_request
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.support.section04_fixtures import weapon_rows
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -75,6 +76,8 @@ def destruction_config() -> GameConfig:
     return replace(
         config,
         game_id="audit-d04-native-emergency-1",
+        # Native hazard rolls retain the four-wound survivor/retry boundary.
+        private_rng_seed=fixture_private_rng_seed("audit-d04-native-emergency-1-private-11"),
         army_catalog=catalog,
         turn_order=("player-b", "player-a"),
     )
@@ -167,7 +170,12 @@ def pending_emergency(*, destroyed_cargo: bool = False) -> LocalGameSession:
                 for d in config.army_catalog.datasheets
             ),
         )
-        config = replace(config, game_id="audit-a32-all-dead-1", army_catalog=catalog)
+        config = replace(
+            config,
+            game_id="audit-a32-all-dead-1",
+            private_rng_seed=fixture_private_rng_seed("audit-a32-all-dead-1"),
+            army_catalog=catalog,
+        )
     session = LocalGameSession()
     session.start(config)
     for _ in range(60):

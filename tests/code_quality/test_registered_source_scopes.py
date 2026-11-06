@@ -740,3 +740,153 @@ def test_banshee_eldrad_provenance_successor_rechecks_complete_bytes_after_succe
         with pytest.raises(ValueError, match="Exact registered edition provenance inputs changed"):
             defiler_provenance_predecessor(changed)
         assert defiler_provenance_predecessor(current) == expected
+
+
+def _pr2_scope(monkeypatch: pytest.MonkeyPatch) -> scopes.ReviewedScope:
+    import sys
+
+    scope = scopes.registered_scope(scopes.PR2_BASE)
+    monkeypatch.setattr(sys.modules[__name__], "SCOPE", scope)
+    return scope
+
+
+def test_pr2_scope_preserves_native_workload_roles_and_comparison_only_provenance(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    scope = _pr2_scope(monkeypatch)
+    assert scope.base == "2b640ffca912f72d74e3b08cec0c0c4b12ce776a"
+    assert scopes.scope_for_specification(scope.spec_path) == scope
+    assert scope.harness == scopes.registered_scope(scopes.DEFILER_BASE).harness
+    assert scope.required == scopes.registered_scope(scopes.DEFILER_BASE).required
+    assert {
+        "scripts/export_ui_contract_fixtures.py",
+        "tests/phase15a_charge_config_helpers.py",
+        "tests/phase15a_charge_declaration_helpers.py",
+        "tests/support/private_randomness.py",
+        "contracts/schemas/session-persistence.schema.json",
+    } <= scope.treatment
+    assert {
+        "contracts/compatibility/46.0.0-shape.json",
+        "contracts/migrations/45-to-46.md",
+    } <= scope.new_treatment
+    assert not any(path.startswith("src/") for path in scope.control)
+    assert all(
+        path.startswith("contracts/examples/")
+        or path in {"contracts/manifest.json", "src/warhammer40k_core/_engine_build_manifest.json"}
+        for path in scope.derived
+    )
+    spec = scopes.read_role_spec(ROOT, scope_base=scope.base)
+    assert inputs.digest(spec) == scope.spec_canonical_sha256
+    report, specification, binding = _report()
+    assert specification["input_binding"] == {
+        "schema": scopes.SCHEMA,
+        "role_specification": scope.spec_path,
+    }
+    _validate(report, specification, binding)
+    for kind in ("spec", "report"):
+        path = ROOT / (scope.spec_path if kind == "spec" else scope.report_path)
+        raw = path.read_bytes() if kind == "spec" else json.dumps(_provenance_report()).encode()
+        text = provenance.registered_provenance_text(ROOT, path, raw, historical_snapshot_inputs)
+        assert text is not None
+        assert not any(token in text for token in retired_identity_tokens())
+    context = provenance.registered_provenance_context(scope.spec_path)
+    assert context is not None
+    assert context[0].overlay_path == ""
+    assert context[1] == scope
+
+
+@pytest.mark.parametrize(
+    "drift",
+    ["common", "missing", "new_treatment", "unknown", "harness", "role", "base", "hash", "raw"],
+)
+def test_pr2_scope_rejects_unreviewed_roles_and_input_drift(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, drift: str
+) -> None:
+    scope = _pr2_scope(monkeypatch)
+    before, after = _inventories()
+
+    def attempt() -> None:
+        if drift == "raw":
+            path = tmp_path / scope.spec_path
+            path.parent.mkdir(parents=True)
+            path.write_bytes((ROOT / scope.spec_path).read_bytes() + b"\n")
+            scopes.read_role_spec(tmp_path, scope_base=scope.base)
+        elif drift == "role":
+            spec: dict[str, Any] = scopes.read_role_spec(ROOT, scope_base=scope.base)
+            fixture_path_name = "tests/support/private_randomness.py"
+            spec["treatment"].remove(fixture_path_name)
+            spec["control_plane"][fixture_path_name] = (
+                "A used fixture cannot be declared untimed control."
+            )
+            scopes.validate_spec(spec, scope_base=scope.base)
+        elif drift in {"base", "hash"}:
+            binding = _binding(before, after)
+            if drift == "hash":
+                binding["role_spec_sha256"] = "f" * 64
+            scopes.validate_scope_binding(
+                scopes.DEFILER_BASE if drift == "base" else scope.base, binding
+            )
+        else:
+            if drift == "common":
+                after["src/real.py"] = "f" * 64
+            elif drift == "missing":
+                del after["uv.lock"]
+            elif drift == "new_treatment":
+                before[next(iter(scope.new_treatment))] = "f" * 64
+            elif drift == "unknown":
+                after["data/unreviewed.json"] = "f" * 64
+            else:
+                after["tests/timing_plugin.py"] = "f" * 64
+            _binding(before, after)
+
+    with pytest.raises(ValueError, match=r"V4|v4|True common"):
+        attempt()
+
+
+@pytest.mark.parametrize(
+    ("side", "index"), [(side, index) for side in ("base", "head") for index in range(3)]
+)
+@pytest.mark.parametrize("missing", ["tree", "sample"])
+def test_pr2_scope_requires_every_native_sample_and_exact_output_tree(
+    monkeypatch: pytest.MonkeyPatch, side: str, index: int, missing: str
+) -> None:
+    _pr2_scope(monkeypatch)
+    report, specification, binding = _report()
+    if missing == "tree":
+        report["generated_output_binding"][side][index].popitem()
+    else:
+        report[side]["samples"]["orphan-write-independent-check"].pop(index)
+    with pytest.raises(ValueError, match=r"samples missing|complete exact generated trees"):
+        _validate(report, specification, binding)
+
+
+@pytest.mark.parametrize("metric", ["mean", "maximum"])
+def test_pr2_scope_retains_original_relative_budgets(
+    monkeypatch: pytest.MonkeyPatch, metric: str
+) -> None:
+    _pr2_scope(monkeypatch)
+    report, specification, binding = _report()
+    report["head"]["samples"]["orphan-write-independent-check"] = (
+        [1.31] * 3 if metric == "mean" else [1.0, 1.0, 1.61]
+    )
+    with pytest.raises(ValueError, match="relative budget exceeded"):
+        _validate(report, specification, binding)
+
+
+def test_pr2_provenance_addition_preserves_exact_prior_bytes_and_rejects_drift() -> None:
+    from tests.daemons_native_source_preservation import before_pr2_comparison_provenance
+
+    raw = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    prior = before_pr2_comparison_provenance(raw)
+    assert hashlib.sha256(prior).hexdigest() == (
+        "95244250ad88ac287f6bcef1c89eea29fe4f70318d9383e9a92b7c103240670d"
+    )
+    assert before_pr2_comparison_provenance(prior) == prior
+    for changed in (
+        raw + b"\n",
+        raw.replace(b"scopes.PR2_BASE", b"scopes.PR2_BASE, scopes.PR2_BASE"),
+        raw.replace(b"return contexts.get(relative)", b"return None"),
+    ):
+        with pytest.raises(ValueError, match="Exact registered edition provenance inputs changed"):
+            before_pr2_comparison_provenance(changed)
+    assert before_pr2_comparison_provenance(raw) == prior

@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import cast
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -308,6 +309,7 @@ def ruleset() -> RulesetDescriptor:
 def reserve_config(*, ruleset_descriptor: RulesetDescriptor) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase10p-game"),
         game_id="phase10p-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=ruleset_descriptor,

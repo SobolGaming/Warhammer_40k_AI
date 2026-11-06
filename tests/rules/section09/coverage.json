@@ -828,7 +828,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section09/test_distances.py::test_each_native_model_uses_m_plus_only_its_advance_roll",
-              "function_ast_sha256": "d3de02bade609b39e54b4260eb30311a39b5fd5dbd25c9c7f85df255c3e95578",
+              "function_ast_sha256": "ae1ac1ae48f8b043e743e72ca5fe1888606e35ca7cb3e0bd00be9e37ae7a90ff",
               "assertions": [
                 "assert isinstance(value, CharacteristicValue)",
                 "assert result.is_valid is (delta <= 0)",
@@ -875,7 +875,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section09/test_distances.py::test_unengaged_start_does_not_allow_engaged_endpoint",
-              "function_ast_sha256": "bfbe4e20cfed7946e656243a1dbdba1957e12e6cf210398a23426de095f0e40a",
+              "function_ast_sha256": "56f87148a14da2fda1c2aafbfb1954697f9d81e85fb7d2bac72c3490e5c2e5f8",
               "assertions": [
                 "assert state.battlefield_state is not None",
                 "assert not result.is_valid",
@@ -1144,7 +1144,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section09/test_distances.py::test_each_native_model_uses_m_plus_only_its_advance_roll",
-              "function_ast_sha256": "d3de02bade609b39e54b4260eb30311a39b5fd5dbd25c9c7f85df255c3e95578",
+              "function_ast_sha256": "ae1ac1ae48f8b043e743e72ca5fe1888606e35ca7cb3e0bd00be9e37ae7a90ff",
               "assertions": [
                 "assert isinstance(value, CharacteristicValue)",
                 "assert result.is_valid is (delta <= 0)",
@@ -1194,7 +1194,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section09/test_distances.py::test_unengaged_start_does_not_allow_engaged_endpoint",
-              "function_ast_sha256": "bfbe4e20cfed7946e656243a1dbdba1957e12e6cf210398a23426de095f0e40a",
+              "function_ast_sha256": "56f87148a14da2fda1c2aafbfb1954697f9d81e85fb7d2bac72c3490e5c2e5f8",
               "assertions": [
                 "assert state.battlefield_state is not None",
                 "assert not result.is_valid",
@@ -1455,7 +1455,7 @@
             },
             {
               "node": "tests/rules/section09/test_fall_back.py::test_failed_escape_hazards_inflict_mortals_instead_of_removing_native_multiwound_models",
-              "function_ast_sha256": "793cf03aeedc40b9be1bbb9b0a2c4b69685671b34af361906789795c035e8d68",
+              "function_ast_sha256": "585d1eecd7b3c655b61dfb114ada24f37510c9b6c29ffb45493528c43ee5964d",
               "assertions": [
                 "assert len(rolls) == 2",
                 "assert failed > 0, 'This retained seed must exercise a failed hazard.'",
@@ -1535,7 +1535,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section09/test_distances.py::test_each_native_model_uses_m_plus_only_its_advance_roll",
-              "function_ast_sha256": "d3de02bade609b39e54b4260eb30311a39b5fd5dbd25c9c7f85df255c3e95578",
+              "function_ast_sha256": "ae1ac1ae48f8b043e743e72ca5fe1888606e35ca7cb3e0bd00be9e37ae7a90ff",
               "assertions": [
                 "assert isinstance(value, CharacteristicValue)",
                 "assert result.is_valid is (delta <= 0)",
@@ -1757,7 +1757,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section09/test_fall_back.py::test_failed_escape_hazards_inflict_mortals_instead_of_removing_native_multiwound_models",
-              "function_ast_sha256": "793cf03aeedc40b9be1bbb9b0a2c4b69685671b34af361906789795c035e8d68",
+              "function_ast_sha256": "585d1eecd7b3c655b61dfb114ada24f37510c9b6c29ffb45493528c43ee5964d",
               "assertions": [
                 "assert len(rolls) == 2",
                 "assert failed > 0, 'This retained seed must exercise a failed hazard.'",
@@ -1790,7 +1790,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section09/test_fall_back.py::test_desperate_escape_hazard_faces_use_the_modified_value",
-              "function_ast_sha256": "db8de319caae74c4aaed3063b04a67a59d62ed881ef09f971fd814cbeaef4c83",
+              "function_ast_sha256": "f898a367d23f17d7d11e4b293f14331f5d6cc09a6a7a9cb3d6b9c93371162fd7",
               "assertions": [
                 "assert roll.value == max(1, face + penalty)",
                 "assert roll.is_failed is (face + penalty <= 2)",

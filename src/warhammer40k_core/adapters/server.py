@@ -57,6 +57,9 @@ from warhammer40k_core.adapters.server_authorization import (
     require_replay_export_allowed as _require_replay_export_allowed,
 )
 from warhammer40k_core.adapters.server_commands import (
+    command_pending_actor as _command_pending_actor,
+)
+from warhammer40k_core.adapters.server_commands import (
     command_pending_decision as _command_pending_decision,
 )
 from warhammer40k_core.adapters.server_commands import (
@@ -507,6 +510,7 @@ class AdapterGameServer:
                 ),
             )
             return _status_response(
+                session=session,
                 game_id=game_id,
                 status=status,
                 viewer=viewer,
@@ -727,7 +731,9 @@ class AdapterGameServer:
                 status_code=existing.status_code,
                 payload=existing.public_payload(),
             )
-        if envelope.expected_session_revision != record.session_revision:
+        if not lifecycle_command:
+            _command_pending_actor(record=record, player_id=player_id)
+        if envelope.expected_session_revision != record.viewer_revision(viewer=viewer):
             raise ServerApiError(
                 status_code=HTTPStatus.CONFLICT,
                 code="session_revision_conflict",
@@ -933,6 +939,7 @@ class AdapterGameServer:
         record = self._create_authoritative_session(config=config)
         viewer = self._bind_principal(principal=principal, record=record)
         return _status_response(
+            session=record.adapter_session,
             game_id=config.game_id,
             status=record.lifecycle_status,
             status_code=HTTPStatus.CREATED,
@@ -1093,6 +1100,7 @@ class AdapterGameServer:
             ),
         )
         return _status_response(
+            session=record.adapter_session,
             game_id=game_id,
             status=outcome.status,
             status_code=(HTTPStatus.OK if outcome.accepted else HTTPStatus.UNPROCESSABLE_ENTITY),
@@ -1153,7 +1161,8 @@ class AdapterGameServer:
         )
         record_count_before = _decision_record_count(record)
         result_id = _required_string(payload, key="result_id")
-        status = session.submit_option(
+        status = session.submit_viewer_option(
+            viewer=viewer,
             request_id=request_id,
             option_id=option_id,
             result_id=result_id,
@@ -1195,6 +1204,7 @@ class AdapterGameServer:
             ),
         )
         return _status_response(
+            session=record.adapter_session,
             game_id=game_id,
             status=outcome.status,
             status_code=(HTTPStatus.OK if outcome.accepted else HTTPStatus.UNPROCESSABLE_ENTITY),
@@ -1256,7 +1266,8 @@ class AdapterGameServer:
         )
         record_count_before = _decision_record_count(record)
         result_id = _required_string(payload, key="result_id")
-        status = session.submit_parameterized_payload(
+        status = session.submit_viewer_parameterized_payload(
+            viewer=viewer,
             request_id=request_id,
             payload=submitted_payload,
             result_id=result_id,

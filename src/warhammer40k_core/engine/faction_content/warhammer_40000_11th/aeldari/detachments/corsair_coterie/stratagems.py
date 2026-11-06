@@ -948,7 +948,7 @@ def _apply_lethal_ruse_mortal_wounds(context: StratagemHandlerContext) -> JsonVa
     if not _unit_has_keyword(unit, ANHRATHE):
         return None
     enemy_unit_id = _engaged_enemy_unit_id(context)
-    manager = DiceRollManager(context.state.game_id, event_log=context.decisions.event_log)
+    manager = DiceRollManager(context.state.private_rng_seed, event_log=context.decisions.event_log)
     rolls = tuple(
         manager.roll(
             DiceRollSpec(
@@ -1127,7 +1127,9 @@ def _request_triggered_move(
     allow_battle_shocked: bool,
     replay_effect_kind: str,
 ) -> tuple[DecisionRequest, JsonValue]:
-    roll_state = DiceRollManager(context.state.game_id, event_log=context.decisions.event_log).roll(
+    roll_state = DiceRollManager(
+        context.state.private_rng_seed, event_log=context.decisions.event_log
+    ).roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),
             reason=f"{context.definition.name} move distance for {unit_instance_id}",

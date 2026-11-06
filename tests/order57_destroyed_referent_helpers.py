@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
@@ -119,6 +120,7 @@ def order57_battle_state() -> tuple[GameState, EventLog]:
     )
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     state = GameState(
+        private_rng_seed=fixture_private_rng_seed("order57-game"),
         game_id="order57-game",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 from typing import cast
 
@@ -26,6 +27,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_scoring_condition_evaluator import (
     SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS,
 )
+from warhammer40k_core.engine.private_randomness import validate_private_rng_seed
 from warhammer40k_core.engine.reserves import ReserveDestructionTimingPolicy
 from warhammer40k_core.engine.scoring import (
     MissionActionScoringRule,
@@ -591,6 +593,8 @@ def reserve_destruction_policy_from_scoring_policy(
 def deterministic_tactical_secondary_draw(
     *,
     mission_setup: MissionSetup,
+    private_rng_seed: str,
+    draw_id: str,
     player_id: str,
     battle_round: int,
     draw_count: int,
@@ -598,6 +602,8 @@ def deterministic_tactical_secondary_draw(
 ) -> tuple[str, ...]:
     if type(mission_setup) is not MissionSetup:
         raise GameLifecycleError("Tactical secondary draw requires MissionSetup.")
+    validate_private_rng_seed(private_rng_seed)
+    requested_draw_id = _validate_identifier("draw_id", draw_id)
     requested_player = _validate_identifier("player_id", player_id)
     requested_round = _validate_positive_int("battle_round", battle_round)
     requested_count = _validate_positive_int("draw_count", draw_count)
@@ -619,6 +625,8 @@ def deterministic_tactical_secondary_draw(
         sorted(
             candidates,
             key=lambda mission_id: _stable_draw_key(
+                private_rng_seed=private_rng_seed,
+                draw_id=requested_draw_id,
                 mission_pack_id=mission_setup.mission_pack_id,
                 player_id=requested_player,
                 battle_round=requested_round,
@@ -630,6 +638,8 @@ def deterministic_tactical_secondary_draw(
 
 def _stable_draw_key(
     *,
+    private_rng_seed: str,
+    draw_id: str,
     mission_pack_id: str,
     player_id: str,
     battle_round: int,
@@ -637,6 +647,7 @@ def _stable_draw_key(
 ) -> str:
     encoded = json.dumps(
         {
+            "draw_id": draw_id,
             "mission_pack_id": mission_pack_id,
             "player_id": player_id,
             "battle_round": battle_round,
@@ -645,7 +656,7 @@ def _stable_draw_key(
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
+    return hmac.new(bytes.fromhex(private_rng_seed), encoded, hashlib.sha256).hexdigest()
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

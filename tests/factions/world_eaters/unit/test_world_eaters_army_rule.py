@@ -35,6 +35,7 @@ from tests.phase15d_fight_resolution_helpers import (
     melee_proposal,
     melee_request,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
@@ -531,6 +532,7 @@ def test_unbridled_bloodlust_charge_modifier_reaches_charge_phase_consumer() -> 
         )
     )
     charge_state = _state_at_phase(state, BattlePhase.CHARGE)
+    charge_state.private_rng_seed = fixture_private_rng_seed("we-charge-consumer:private-0")
     bundle = _runtime_content_bundle(lifecycle)
     decisions = DecisionController()
     handler = ChargePhaseHandler(

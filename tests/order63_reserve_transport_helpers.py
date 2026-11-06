@@ -14,6 +14,7 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.damage_allocation import unit_by_id
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     MovementProposalRequestPayload,
@@ -24,7 +25,7 @@ from warhammer40k_core.geometry.pose import Pose
 
 
 def reserve_transport_session(
-    *, loaded: bool = True, deep_strike: bool = False
+    *, loaded: bool = True, deep_strike: bool = False, config: GameConfig | None = None
 ) -> LocalGameSession:
     unit_poses = None
     if deep_strike:
@@ -33,6 +34,7 @@ def reserve_transport_session(
             "army-beta:enemy-unit": tuple(Pose.at(45 + i * 1.3, 30) for i in range(5)),
         }
     return disembark_session(
+        config=config,
         reserve_transport=True,
         embarked_passenger=loaded,
         deep_strike_transport=deep_strike,

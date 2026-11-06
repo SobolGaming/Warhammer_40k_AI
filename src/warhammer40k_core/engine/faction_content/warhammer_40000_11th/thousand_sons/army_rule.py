@@ -426,7 +426,9 @@ def _resolve_cabal_ritual_attempt(
     option: CabalRitualOption,
 ) -> bool | LifecycleStatus:
     _record_cabal_attempt(context, player_id=player_id, option=option)
-    dice_manager = DiceRollManager(context.state.game_id, event_log=context.decisions.event_log)
+    dice_manager = DiceRollManager(
+        context.state.private_rng_seed, event_log=context.decisions.event_log
+    )
     psychic_roll = dice_manager.roll(
         DiceRollSpec(
             expression=DiceExpression(

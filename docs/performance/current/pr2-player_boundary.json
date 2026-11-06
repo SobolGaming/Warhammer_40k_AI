@@ -1,0 +1,265 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "player_boundary",
+  "workload_id": "native-player-boundary-v2",
+  "base_revision": "2b640ffca912f72d74e3b08cec0c0c4b12ce776a",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:450d1d846e14cddd239cf38e2951589488e86fc55bc99f6c413cdb5aee274802",
+  "head_input_digest": "a4598f175312e55a74b67353475671af74f940e2fed8a689c7f33264e0738027",
+  "budget_profile": "current-change-relative-v1",
+  "historical_failures": [
+    {
+      "status": "failed-before-repair",
+      "operation": "server_restore",
+      "base_revision": "2b640ffca912f72d74e3b08cec0c0c4b12ce776a",
+      "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c19ce7e497adf9f7d14594287db0b191c19a8093ecd623c1f33bdb3df3fb330d",
+      "head_input_digest": "7d38583c7e0a0c75c637e3e7166e16b6a14115f0f36efdd879652f8aea946e49",
+      "samples": {
+        "base": [
+          12.180162784000004,
+          12.385813391999989,
+          12.562300465000021,
+          12.71436131500002,
+          12.632595263999974,
+          12.615824571000019,
+          12.60708983699999
+        ],
+        "head": [
+          19.235511078999934,
+          19.50505016999989,
+          19.84003049799992,
+          19.897313494999935,
+          19.858141531,
+          19.949329682999974,
+          19.902523020000103
+        ]
+      },
+      "mean_limit_seconds": 15.710383505000003,
+      "max_limit_seconds": 19.17154197250003,
+      "reason": "Required viewer retention increased distinct snapshots from two to four; repeated current-checkpoint replay and history serialization exceeded the unchanged matched budget. This failed measurement is retained separately from final qualification."
+    },
+    {
+      "status": "failed-before-repair",
+      "operation": "projection",
+      "base_revision": "2b640ffca912f72d74e3b08cec0c0c4b12ce776a",
+      "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:289468f772d182fd9eeb9b6effa0d213f8aa2a3dd6f05399ee8783c252065eac",
+      "head_input_digest": "a2ae477fc353165a378d40fa0657fbe59ecbba011445578bbf114ac19f170ab1",
+      "samples": {
+        "base": [
+          0.03363473299998532,
+          0.03389460199991845,
+          0.03472039499990842,
+          0.03418529700002182,
+          0.03449130599994987,
+          0.03426935400000275,
+          0.03436363100001927
+        ],
+        "head": [
+          0.05100952600002984,
+          0.04665386800002125,
+          0.04642572900002051,
+          0.046671997000089505,
+          0.04920640800003184,
+          0.26396977199999583,
+          0.04651767599989398
+        ]
+      },
+      "mean_limit_seconds": 0.09277844964282247,
+      "max_limit_seconds": 0.15208059249986264,
+      "reason": "Preserved complete failed matched samples. The projection maximum and strict-restore mean exceeded the unchanged budgets. No samples are excluded or reclassified as passing."
+    },
+    {
+      "status": "failed-before-repair",
+      "operation": "server_restore",
+      "base_revision": "2b640ffca912f72d74e3b08cec0c0c4b12ce776a",
+      "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:289468f772d182fd9eeb9b6effa0d213f8aa2a3dd6f05399ee8783c252065eac",
+      "head_input_digest": "a2ae477fc353165a378d40fa0657fbe59ecbba011445578bbf114ac19f170ab1",
+      "samples": {
+        "base": [
+          12.29647167600001,
+          12.516860629000007,
+          12.68726563100006,
+          12.824482379000074,
+          12.636394910000035,
+          12.675683031999938,
+          12.652972218999935
+        ],
+        "head": [
+          15.565894056999923,
+          15.733528406999994,
+          15.858399962000021,
+          15.951151050000021,
+          16.252493075000075,
+          16.066515048000042,
+          16.301174879999962
+        ]
+      },
+      "mean_limit_seconds": 15.816094727857156,
+      "max_limit_seconds": 19.336723568500112,
+      "reason": "Preserved complete failed matched samples. The projection maximum and strict-restore mean exceeded the unchanged budgets. No samples are excluded or reclassified as passing."
+    }
+  ],
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8616d79fac026931c4c241c10c601149c3800762a537a6c93ac94184b4410062",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359379456,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "d965d156d6836f568420111b1de845afdd6cc84c0dcc7951cab714ed36ca7f79",
+    "fixture_sha256": "8e0c343be304b43230c7b144cc1ab2291b5437bd8885b9a7c1e9460f973990f4",
+    "samples": {
+      "projection": [
+        0.037526465999974334,
+        0.038890509999987444,
+        0.03866725900002166,
+        0.039062102000002596,
+        0.03934577799998351,
+        0.038933127000063905,
+        0.041940387999943596
+      ],
+      "visible_events": [
+        0.0005016270000055556,
+        0.0005272450000006756,
+        0.0005260059999727673,
+        0.0005054670000390615,
+        0.0005086959999971441,
+        0.0005309050000050775,
+        0.0005064270000048054
+      ],
+      "metadata": [
+        0.019076673000029132,
+        0.021182112000019515,
+        0.019485334000023613,
+        0.019356807000008303,
+        0.020840018000001237,
+        0.01948954399995273,
+        0.02143225400004667
+      ],
+      "finite_command": [
+        2.501944117999983,
+        2.6773955950000072,
+        2.683697780999978,
+        2.501592247000019,
+        2.684594722999975,
+        2.5281859350000104,
+        2.790741056999991
+      ],
+      "server_restore": [
+        13.564111601999969,
+        14.026369022999972,
+        14.096259582000016,
+        14.286949101000005,
+        14.161958209000034,
+        14.676098003999982,
+        14.73852822899994
+      ],
+      "retained_cursor": [
+        0.05895727300003273,
+        0.06184461700001975,
+        0.059416472000009435,
+        0.05777011200001425,
+        0.059849774000042544,
+        0.06140300299989576,
+        0.06171559800009163
+      ],
+      "ordinal_identity_projection": [
+        0.03906957099997044,
+        0.04020033799997691,
+        0.2155210299999908,
+        0.04213664799999606,
+        0.039456772999983514,
+        0.04117268300001342,
+        0.04174404700006562
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:450d1d846e14cddd239cf38e2951589488e86fc55bc99f6c413cdb5aee274802",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359379456,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "d965d156d6836f568420111b1de845afdd6cc84c0dcc7951cab714ed36ca7f79",
+    "fixture_sha256": "8e0c343be304b43230c7b144cc1ab2291b5437bd8885b9a7c1e9460f973990f4",
+    "samples": {
+      "projection": [
+        0.06128620799995588,
+        0.05449193100002958,
+        0.05540058199994746,
+        0.05698432799999864,
+        0.054311363000010715,
+        0.05493006400001832,
+        0.055129803999989235
+      ],
+      "visible_events": [
+        0.0017745869999998831,
+        0.0017028099999834012,
+        0.0017806870000640629,
+        0.0016936810000061087,
+        0.0016520930000751832,
+        0.001777427999968495,
+        0.0017368689999557319
+      ],
+      "metadata": [
+        0.03602013399995485,
+        0.0345671710000488,
+        0.036175286000002416,
+        0.03700874699995893,
+        0.035967555000070206,
+        0.03546398799994677,
+        0.03527533700003005
+      ],
+      "finite_command": [
+        2.3532918180000024,
+        2.1939945550000175,
+        2.2729560640000273,
+        2.2651186180000877,
+        2.4607007619999877,
+        2.4475761159999365,
+        2.461127099999999
+      ],
+      "server_restore": [
+        16.267940242999998,
+        16.292600540999956,
+        17.000107859999957,
+        16.78581219700004,
+        16.318771976999983,
+        16.383649463999973,
+        16.556160514
+      ],
+      "retained_cursor": [
+        0.10018825800000286,
+        0.10151675099996282,
+        0.10453730500000802,
+        0.10247720900008517,
+        0.10174972499999058,
+        0.10203504100002192,
+        0.10595823899996049
+      ],
+      "ordinal_identity_projection": [
+        0.058206339999969714,
+        0.056805893999921864,
+        0.056465540999965924,
+        0.05720224899994264,
+        0.05845688900001278,
+        0.05889489000003323,
+        0.058682336000060786
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  }
+}

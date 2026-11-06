@@ -82,6 +82,19 @@ def command_pending_decision(
     request_id: str,
     player_id: str,
 ) -> DecisionRequestViewPayload:
+    pending = command_pending_actor(record=record, player_id=player_id)
+    if pending["request_id"] != request_id:
+        raise ServerApiError(
+            status_code=HTTPStatus.CONFLICT,
+            code="stale_decision_request",
+            message="Command does not target the current pending decision.",
+        )
+    return pending
+
+
+def command_pending_actor(
+    *, record: AuthoritativeSession, player_id: str
+) -> DecisionRequestViewPayload:
     pending = record.adapter_session.view(viewer_player_id=player_id)["pending_decision"]
     if pending is None:
         raise ServerApiError(
@@ -93,12 +106,6 @@ def command_pending_decision(
         raise actor_not_authorized()
     if pending["actor_id"] != player_id:
         raise actor_not_authorized()
-    if pending["request_id"] != request_id:
-        raise ServerApiError(
-            status_code=HTTPStatus.CONFLICT,
-            code="stale_decision_request",
-            message="Command does not target the current pending decision.",
-        )
     return pending
 
 

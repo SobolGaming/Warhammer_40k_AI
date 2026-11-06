@@ -115,7 +115,7 @@ class CatalogFightEndTriggeredMovementRuntime:
         state = context.state
         semantic = fight_end_triggered_movement_descriptor(candidate.clause)
         d3_result = DiceRollManager(
-            state.game_id,
+            state.private_rng_seed,
             event_log=context.decisions.event_log,
         ).roll_d3(
             reason=(

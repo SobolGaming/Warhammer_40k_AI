@@ -35,6 +35,7 @@ def command_scene(
     inside: bool = True,
     seed: int = 0,
     wounded: bool = True,
+    rng_seed_label: str | None = None,
 ) -> Scene:
     s = scene(
         definitions,
@@ -43,6 +44,7 @@ def command_scene(
         phase=BattlePhase.COMMAND,
         active="owner" if manifestation else "opponent",
         seed=f"b04-{seed}",
+        rng_seed_label=rng_seed_label,
     )
     target_id = "own:daemon" if manifestation else "foe:target"
     target = s.units[target_id]

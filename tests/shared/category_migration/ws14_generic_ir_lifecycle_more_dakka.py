@@ -47,11 +47,13 @@ from tests.shared.category_migration.ws14_generic_ir_lifecycle_shared_lifecycle 
     _runtime_content_bundle,
     _state,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 
 
 def _more_dakka_lifecycle_config() -> GameConfig:
     catalog = _more_dakka_catalog()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("ws14-more-dakka-generic-ir-game"),
         game_id="ws14-more-dakka-generic-ir-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),

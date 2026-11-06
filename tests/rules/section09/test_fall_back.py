@@ -4,8 +4,10 @@ from typing import cast
 
 import pytest
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section03_fixtures import grid, native_state, paths, scenario
+from tests.support.section03_session import movement_session
 from tests.support.section09_fixtures import (
     choose,
     events,
@@ -93,7 +95,9 @@ def test_desperate_escape_hazard_faces_use_the_modified_value(
     )
     roll = DesperateEscapeRoll.from_roll_state(
         requirement=requirement,
-        roll_state=DiceRollManager(state.game_id).roll_fixed(requirement.roll_spec(), (face,)),
+        roll_state=DiceRollManager(state.private_rng_seed).roll_fixed(
+            requirement.roll_spec(), (face,)
+        ),
         roll_modifiers=modifiers,
     )
     assert roll.value == max(1, face + penalty)
@@ -186,6 +190,8 @@ def test_failed_escape_hazards_inflict_mortals_instead_of_removing_native_multiw
 ) -> None:
     session, state, unit = movement_case(section09_definitions, engaged=True)
     state.game_id = "section09-hazard-consequence"
+    state.private_rng_seed = fixture_private_rng_seed("section09-hazard-consequence:private-0")
+    session = movement_session(section09_definitions, state)
     if shocked:
         state.battle_shocked_unit_ids.append(unit.unit_instance_id)
     request = choose(session, select(session, unit), "fall_back:desperate_escape")

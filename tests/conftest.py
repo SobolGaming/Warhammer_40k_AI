@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import sys
 from pathlib import Path
@@ -83,7 +84,9 @@ def pytest_configure_node(node: SchedulerWorker) -> None:
     node.workerinput["s25_scheduler"] = node.config.getoption("dist")
 
 
+@pytest.hookimpl(trylast=True)
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    # Built-in -k/-m/--deselect filtering must finish before sizing worker chunks.
     worker_input = cast(dict[str, object], getattr(config, "workerinput", {}))
     if (
         not os.environ.get("SHARD_ID")
@@ -91,9 +94,22 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         or worker_input.get("s25_scheduler") != "worksteal"
     ):
         return
-    from scripts.build_test_shards import worksteal_relevance_order
+    from scripts.build_test_shards import (
+        duration_worksteal_order,
+        summary_case_seconds,
+        worksteal_relevance_order,
+    )
 
     order = worksteal_relevance_order(tuple(item.nodeid for item in items), workers=4)
+    profile = os.environ.get("BEHAVIORAL_DISPATCH_PROFILE")
+    if profile is not None:
+        summary = json.loads(Path(profile).read_text())
+        weighted = duration_worksteal_order(
+            tuple(items[index].nodeid for index in order),
+            workers=4,
+            selector_seconds=summary_case_seconds(summary),
+        )
+        order = tuple(order[index] for index in weighted)
     items[:] = [items[index] for index in order]
 
 

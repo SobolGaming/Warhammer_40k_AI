@@ -217,7 +217,7 @@ def validate_command_battle_shock_reroll_context(
     )
     if expected_permission is None:
         raise GameLifecycleError("Command Battle-shock reroll permission is no longer valid.")
-    expected_request = DiceRollManager(state.game_id).build_reroll_request(
+    expected_request = DiceRollManager(0).build_reroll_request(
         initial_roll_state,
         request_id=request.request_id,
         actor_id=battle_shock_request.player_id,

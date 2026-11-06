@@ -8,6 +8,7 @@ from tests.phase11c_command_phase_helpers import (
     complete_setup_through_gate,
     default_unit_selection,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -90,6 +91,7 @@ ICON_OF_KHORNE_OPTION_ID = "world-eaters-icon-of-khorne"
 def _world_eaters_config() -> GameConfig:
     catalog = _world_eaters_catalog()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase17g-world-eaters-lifecycle-game"),
         game_id="phase17g-world-eaters-lifecycle-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
@@ -408,6 +410,7 @@ def _world_eaters_state_for_melee_fixture(
         scenario.armies[1],
     )
     return GameState(
+        private_rng_seed=fixture_private_rng_seed("phase17g-world-eaters-melee-state"),
         game_id="phase17g-world-eaters-melee-state",
         ruleset_descriptor_hash=ruleset.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,

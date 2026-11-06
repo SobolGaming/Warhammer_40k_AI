@@ -423,8 +423,10 @@ def starfang_deep_strike_policy_predecessor(raw: bytes) -> bytes:
     from tools.performance_daemons_final import daemons_final_policy_predecessor
     from tools.performance_daemons_native import daemons_native_policy_predecessor
     from tools.performance_daemons_next import daemons_next_policy_predecessor
+    from tools.performance_private_randomness import private_randomness_policy_predecessor
     from tools.performance_wave_frame import wave_frame_policy_predecessor
 
+    raw = private_randomness_policy_predecessor(raw)
     raw = daemons_final_policy_predecessor(raw)
     raw = daemons_next_policy_predecessor(raw)
     raw = daemons_native_policy_predecessor(raw)
@@ -1114,6 +1116,7 @@ def validate_assessment(
         from tools.performance_daemons_final import daemons_final_smoke_operations
         from tools.performance_daemons_native import daemons_native_smoke_operations
         from tools.performance_daemons_next import daemons_next_smoke_operations
+        from tools.performance_private_randomness import private_randomness_smoke_operations
         from tools.performance_wave_frame import wave_frame_smoke_operations
 
         smoke_operations = (
@@ -1155,6 +1158,9 @@ def validate_assessment(
                 base=base, path=path, category=category, change=changes[path]
             )
             | daemons_native_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | private_randomness_smoke_operations(
                 base=base, path=path, category=category, change=changes[path]
             )
             | wave_frame_smoke_operations(

@@ -629,7 +629,7 @@ def apply_unit_move_completed_mortal_wound_feel_no_pain_decision(
         UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_SOURCE_KIND
     ):
         raise GameLifecycleError("Move-completed Feel No Pain source context is invalid.")
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     routed = resolve_mortal_wound_decision(
         state=state,
         decisions=decisions,
@@ -685,7 +685,7 @@ def resolve_mortal_wound_effect(
     completed_phase: BattlePhase,
     movement_action: str,
 ) -> LifecycleStatus | None:
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     roll_state = manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),

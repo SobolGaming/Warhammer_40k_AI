@@ -39,6 +39,7 @@ def reserve_choice_session() -> LocalGameSession:
         phase=BattlePhase.FIGHT,
     )
     config = GameConfig(
+        private_rng_seed=state.private_rng_seed,
         game_id=state.game_id,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         army_catalog=catalog,

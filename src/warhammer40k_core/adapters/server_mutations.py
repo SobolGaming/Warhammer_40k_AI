@@ -5,7 +5,6 @@ from typing import cast
 
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.contracts import AdapterGameSession
-from warhammer40k_core.adapters.redaction import redacted_lifecycle_status
 from warhammer40k_core.adapters.server_sync import (
     session_checkpoint,
     session_metadata_payload,
@@ -64,7 +63,7 @@ def session_command_response(
     )
     if attempt_status is not None:
         metadata["lifecycle_status"] = validate_json_value(
-            cast(JsonValue, redacted_lifecycle_status(attempt_status, viewer=viewer))
+            record.adapter_session.status_for_context(attempt_status, viewer=viewer)
         )
     payload = session_command_result_payload(
         operation=operation,

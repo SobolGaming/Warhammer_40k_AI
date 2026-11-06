@@ -115,7 +115,7 @@ def resolve_selected_target_mortal_wound_effect(
     actor_id = result.actor_id
     if actor_id is None:
         raise GameLifecycleError("Selected-target mortal wounds require an acting player.")
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     roll_state = manager.roll(
         DiceRollSpec(
             expression=DiceExpression(

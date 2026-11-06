@@ -118,7 +118,7 @@ def continue_charge_roll(
 
     roll_request, initial = pending_charge_roll(state=state, decisions=decisions)
     roll = latest_reroll_state_for_original_roll(
-        manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
         original_state=initial,
     )
     status = request_command_reroll_if_available(
@@ -202,7 +202,7 @@ def _resolve_charge_roll(
         raise GameLifecycleError(
             "Required Charge target constraint became unavailable after declaration."
         )
-    roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
+    roll_state = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).roll(
         roll_request.spec
     )
     decisions.event_log.append(
@@ -356,7 +356,7 @@ def _apply_charge_roll_reroll_decision(
         cast(DiceRollStatePayload, initial_roll_payload)
     )
     DiceRollManager(
-        state.game_id,
+        state.private_rng_seed,
         event_log=decisions.event_log,
     ).resolve_reroll(
         initial_roll_state,

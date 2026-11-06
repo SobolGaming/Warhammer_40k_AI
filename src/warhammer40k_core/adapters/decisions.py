@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.contracts import (
+    AdapterGameSession,
     FiniteOptionSubmission,
     ParameterizedSubmission,
 )
@@ -9,6 +11,26 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+
+
+def viewer_for_issued_request(*, session: AdapterGameSession, request_id: str) -> ViewerContext:
+    """Bind a local UI/CLI request capability to its sole projected player owner.
+
+    Network authentication remains server-owned. This local host helper never
+    authorizes a remote principal or accepts authoritative request IDs.
+    """
+    owners: list[str] = []
+    for player in session.authoritative_identity_payload()["player_ids"]:
+        pending = session.view(viewer_player_id=player)["pending_decision"]
+        if (
+            pending is not None
+            and pending["actor_id"] == player
+            and pending["request_id"] == request_id
+        ):
+            owners.append(player)
+    if len(owners) != 1:
+        raise GameLifecycleError("Local submission requires one current issued viewer request.")
+    return ViewerContext.for_player(owners[0])
 
 
 def result_for_option(

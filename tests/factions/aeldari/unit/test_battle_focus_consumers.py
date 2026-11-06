@@ -74,7 +74,7 @@ def test_opportunity_seized_native_fall_back_decline_then_normal_move(
 
 @pytest.mark.parametrize(
     ("seed", "hit", "accept"),
-    [("fade:0", True, True), ("fade:1", True, False), ("fade:6", False, False)],
+    [("fade:0", True, True), ("fade:1", True, False), ("fade:miss:private-3", False, False)],
 )
 def test_fade_back_native_hit_or_miss_controls_normal_move(
     faction_definitions: Section02Definitions,
@@ -159,7 +159,7 @@ def test_native_battle_focus_availability_respects_carried_history(
         (selection(d, LORD, "shooter"), selection(d, LORD, "spare")),
         active="opponent",
         phase=phase,
-        seed="fade:0",
+        seed="fade:later-round:private-0" if history == "later_round" else "fade:0",
     )
     if history == "later_round":
         s.state.battle_round = 2
@@ -409,7 +409,7 @@ def test_native_sudden_strike_six_inch_consolidation_and_turn_expiry(
         (selection(d, AUTARCH, "charger"),),
         (selection(d, LORD, "enemy"), selection(d, LORD, "spare")),
         phase=BattlePhase.CHARGE,
-        seed="aeldari-current-charge-False",
+        seed="aeldari-current-sudden-consolidation-private-0",
     )
     locate(s, "own:charger", (Pose.at(10, 10),))
     locate(s, "foe:enemy", (Pose.at(14, 10),))

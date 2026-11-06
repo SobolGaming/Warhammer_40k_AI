@@ -10,7 +10,7 @@
       "additionalProperties": true,
       "properties": {
         "config": {
-          "$ref": "https://warhammer40k-core.local/contracts/v3/create-session.schema.json#/properties/config"
+          "$ref": "https://warhammer40k-core.local/contracts/v4/create-session.schema.json#/properties/config"
         },
         "state": {"$ref": "#/$defs/step5a_replay_state"}
       },
@@ -22,7 +22,7 @@
       "items": {"$ref": "#/$defs/projection_checkpoint"},
       "type": "array"
     },
-    "schema_version": {"const": "replay-artifact-v36-target-aware-attack-groups", "type": "string"},
+    "schema_version": {"const": "replay-artifact-v37-private-rng", "type": "string"},
     "source_identity": {"$ref": "#/$defs/source_identity"}
   },
   "required": [

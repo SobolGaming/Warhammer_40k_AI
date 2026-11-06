@@ -32,11 +32,13 @@ _SMOKE_TYPED_BATTLEFIELD_LAYOUT_ID = "take-and-hold-vs-purge-the-foe-layout-3"
 def canonical_setup_prebattle_smoke_config(
     *,
     game_id: str = "setup-prebattle-ui-smoke",
+    private_rng_seed: str = "f0" * 32,
 ) -> GameConfig:
-    """Config that emits setup/pre-battle adapter request families from real engine state."""
+    """Deterministic test fixture; its public fixed seed is not for real games."""
     catalog = _setup_prebattle_smoke_catalog()
     return GameConfig(
         game_id=game_id,
+        private_rng_seed=private_rng_seed,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
             descriptor_version="core-v2-setup-prebattle-ui-smoke"

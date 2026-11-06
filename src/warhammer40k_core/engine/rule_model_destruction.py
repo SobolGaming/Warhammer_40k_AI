@@ -267,7 +267,7 @@ def apply_rule_model_destruction_mortal_wound_decision(
         cast(DestructionReactionSourcePayload, _payload_object_value(source_context, "source"))
     )
     progress = mortal_wound_resolution_progress(request)
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     routed = resolve_mortal_wound_decision(
         state=state,
         decisions=decisions,
@@ -478,7 +478,7 @@ def _continue_rule_deadly_demise_sources(
     )
     if choice_status is not None:
         return choice_status
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     model_id = _payload_string(root_context, "model_instance_id")
     controller_player_id = _payload_string(root_context, "destroyed_model_controller_player_id")
     if sources and retained_fight_is_completing(state=state, model_instance_id=model_id):
@@ -899,7 +899,7 @@ def _resume_rule_deadly_demise_secondary_continuation(
     )
     if status is not None:
         return status
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     status = _route_rule_deadly_demise_targets(
         state=state,
         decisions=decisions,
@@ -1057,7 +1057,7 @@ def _active_optional_sources(
     model_destroyed_event_id: str,
     provenance: DestructionProvenance,
 ) -> tuple[DestructionReactionSource, ...]:
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     active: list[DestructionReactionSource] = []
     for source in sources:
         descriptor = _trigger_descriptor(source)

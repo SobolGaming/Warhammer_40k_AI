@@ -800,7 +800,9 @@ def _resolved_movement_action_grant_unit_effect_payload(
     scope_id = (
         f"{unit_instance_id}:{grant.hook_id}:{source_request_id}:{source_result_id}:movement-bonus"
     )
-    roll = DiceRollManager(state.game_id, event_log=decisions.event_log).roll_random_characteristic(
+    roll = DiceRollManager(
+        state.private_rng_seed, event_log=decisions.event_log
+    ).roll_random_characteristic(
         characteristic=Characteristic.MOVEMENT,
         timing=RandomCharacteristicTiming.UNIT_WHEN_SELECTED_TO_MOVE,
         scope_id=scope_id,

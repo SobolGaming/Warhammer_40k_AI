@@ -148,7 +148,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section21/test_boundaries.py::test_worked_surge_example_uses_survivors_and_active_players_real_d6",
-              "function_ast_sha256": "5483ca18fac428430d54e21ccd59e0aa89aa8f32a1b0f8e78552f39fc3624e4b",
+              "function_ast_sha256": "03448f1beec7d7e8c5b53ab181248447b4bbaa03cca5db1a4bfe97ea09f4a15b",
               "assertions": [
                 "assert isinstance(own.base, CircularBase)",
                 "assert rolled.original_result.spec.actor_id == state.active_player_id",
@@ -174,7 +174,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section21/test_boundaries.py::test_worked_surge_example_uses_survivors_and_active_players_real_d6",
-              "function_ast_sha256": "5483ca18fac428430d54e21ccd59e0aa89aa8f32a1b0f8e78552f39fc3624e4b",
+              "function_ast_sha256": "03448f1beec7d7e8c5b53ab181248447b4bbaa03cca5db1a4bfe97ea09f4a15b",
               "assertions": [
                 "assert isinstance(own.base, CircularBase)",
                 "assert rolled.original_result.spec.actor_id == state.active_player_id",
@@ -224,7 +224,7 @@
             },
             {
               "node": "tests/rules/section21/test_boundaries.py::test_worked_surge_example_uses_survivors_and_active_players_real_d6",
-              "function_ast_sha256": "5483ca18fac428430d54e21ccd59e0aa89aa8f32a1b0f8e78552f39fc3624e4b",
+              "function_ast_sha256": "03448f1beec7d7e8c5b53ab181248447b4bbaa03cca5db1a4bfe97ea09f4a15b",
               "assertions": [
                 "assert isinstance(own.base, CircularBase)",
                 "assert rolled.original_result.spec.actor_id == state.active_player_id",
@@ -748,7 +748,7 @@
             },
             {
               "node": "tests/rules/section21/test_boundaries.py::test_worked_surge_example_uses_survivors_and_active_players_real_d6",
-              "function_ast_sha256": "5483ca18fac428430d54e21ccd59e0aa89aa8f32a1b0f8e78552f39fc3624e4b",
+              "function_ast_sha256": "03448f1beec7d7e8c5b53ab181248447b4bbaa03cca5db1a4bfe97ea09f4a15b",
               "assertions": [
                 "assert isinstance(own.base, CircularBase)",
                 "assert rolled.original_result.spec.actor_id == state.active_player_id",

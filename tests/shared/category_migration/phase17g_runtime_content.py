@@ -14,6 +14,7 @@ from typing import cast
 import pytest
 
 import warhammer40k_core.engine.lifecycle as lifecycle_module
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.detachment import DetachmentDefinition as CatalogDetachmentDefinition
 from warhammer40k_core.core.detachment import EnhancementDefinition as CatalogEnhancementDefinition
@@ -484,6 +485,7 @@ def _config() -> GameConfig:
         ArmyCatalog.phase9a_canonical_content_pack()
     )
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("runtime-content-game"),
         game_id="runtime-content-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
@@ -524,6 +526,7 @@ def _config() -> GameConfig:
 def _canonical_lifecycle_config() -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("runtime-content-lifecycle-game"),
         game_id="runtime-content-lifecycle-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),

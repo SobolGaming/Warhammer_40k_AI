@@ -10,6 +10,7 @@ from tests.deployment_submission_helpers import (
     default_deployment_pose,
     submit_all_deployments_if_pending,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -244,6 +245,7 @@ def _violation_codes(report: SetupLegalityReport) -> set[str]:
 def _config() -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase16e-game"),
         game_id="phase16e-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
@@ -263,6 +265,7 @@ def _config() -> GameConfig:
 def _empty_dedicated_transport_config() -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase16e-empty-dedicated-transport"),
         game_id="phase16e-empty-dedicated-transport",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
@@ -290,6 +293,7 @@ def _empty_dedicated_transport_config() -> GameConfig:
 def _cargo_dedicated_transport_config() -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase16e-cargo-dedicated-transport"),
         game_id="phase16e-cargo-dedicated-transport",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),

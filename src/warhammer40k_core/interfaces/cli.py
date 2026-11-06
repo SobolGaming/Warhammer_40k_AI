@@ -7,6 +7,7 @@ from warhammer40k_core.adapters.contracts import (
     FiniteOptionSubmission,
     ParameterizedSubmission,
 )
+from warhammer40k_core.adapters.decisions import viewer_for_issued_request
 from warhammer40k_core.adapters.projection import DecisionRequestViewPayload
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -105,7 +106,8 @@ def submit_cli_choice(
     result_id: str,
 ) -> LifecycleStatus:
     option_id = _option_id_for_cli_prompt(prompt=prompt, choice=choice)
-    return session.submit_option(
+    return session.submit_viewer_option(
+        viewer=viewer_for_issued_request(session=session, request_id=_prompt_request_id(prompt)),
         request_id=_prompt_request_id(prompt),
         option_id=option_id,
         result_id=result_id,
@@ -119,7 +121,8 @@ def submit_cli_payload(
     payload: JsonValue,
     result_id: str,
 ) -> LifecycleStatus:
-    return session.submit_parameterized_payload(
+    return session.submit_viewer_parameterized_payload(
+        viewer=viewer_for_issued_request(session=session, request_id=request_id),
         request_id=request_id,
         payload=payload,
         result_id=result_id,

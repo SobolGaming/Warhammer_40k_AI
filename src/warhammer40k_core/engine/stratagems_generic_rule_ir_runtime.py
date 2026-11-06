@@ -520,7 +520,7 @@ def _resolve_generic_roll_pool_mortal_wounds(
         effect_payload,
         "mortal_wounds_per_success",
     )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     rolls = tuple(
         manager.roll(
             DiceRollSpec(
@@ -618,7 +618,7 @@ def _resolve_generic_roll_per_context_target_mortal_wounds(
         unit_instance_id=_single_execution_target_unit_id(state=state, use_record=use_record),
     )
     bonus = _source_keyword_bonus(source_unit=source_unit, effect_payload=effect_payload)
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     target_plans: list[JsonValue] = []
     for target_unit_id in target_unit_ids:
         roll = manager.roll(
@@ -772,7 +772,7 @@ def _resolve_routed_generic_rule_ir_mortal_wounds(
     return _continue_generic_rule_ir_per_target_mortal_wounds(
         state=state,
         decisions=decisions,
-        manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
         batch_payload=_json_object(
             source_context.get("batch_payload"),
             "generic mortal-wound batch",

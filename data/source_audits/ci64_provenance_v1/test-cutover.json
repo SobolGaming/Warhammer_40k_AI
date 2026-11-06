@@ -19,10 +19,10 @@
       "sha256": "65d30e6f443d5db19eb1d9f7c456a2d4bc853495ea0a91e6498df6f4c6a7aa70"
     },
     "tests/factions/aeldari/unit/test_battle_focus_consumers.py": {
-      "blob_sha1": "bb57415dd1398681c52e72e23c008d0d3b84564b",
-      "bytes": 37245,
+      "blob_sha1": "76207ffccfe3c7d26cfa122b5067377c802646ad",
+      "bytes": 37338,
       "mode": "100644",
-      "sha256": "e80f7ad74fe98bb720dd4575422b3d7c82e3ba35e7727fb415d408e371dfab6c"
+      "sha256": "7996eb7be15f77fd12da820092f812cadaff57a8571a22c0c07e6ec68d7664e0"
     },
     "tests/factions/aeldari/unit/test_generic_rule_ability_registry.py": {
       "blob_sha1": "67fc2af2d66d9ee2d4616f3cca20b048b709abae",
@@ -31,22 +31,22 @@
       "sha256": "98aa14f618b2578760c34abbde73aeb8a3839f778e3c008acd51deaab8feac87"
     },
     "tests/factions/aeldari/unit/test_lhykhis.py": {
-      "blob_sha1": "bb9fb011ce48b5d1238b358193adbe452f2f050a",
-      "bytes": 28801,
+      "blob_sha1": "f4d7842d774aba9aad901dd12eb62861c3ea3416",
+      "bytes": 28927,
       "mode": "100644",
-      "sha256": "0463239325b63112262603d1428aea614548284533cdb8e9a62a58e411bd62dc"
+      "sha256": "66c8ff780fdc4b279d3a3de54ed04b0109d4adc7d919f55ce5daf1a819c9648d"
     },
     "tests/factions/aeldari/unit/test_mandiblasters.py": {
-      "blob_sha1": "0b16e5d043c97cc803946154a99d53a13fefcd8a",
-      "bytes": 30377,
+      "blob_sha1": "843f10042a2b25500bf60d86d6ebe8803f0dd6cb",
+      "bytes": 30477,
       "mode": "100644",
-      "sha256": "59b0a61bed2c01540797679d9b857cc77c4d259bcee5d28a7e2ad6e1ed951081"
+      "sha256": "0af64d7b0ff3ee4c0f2cc7c12aa0bafe0ce4f3df85e5292db1bba09a0e17a234"
     },
     "tests/factions/aeldari/unit/test_unit_abilities.py": {
-      "blob_sha1": "28e009f6c31d3abc7ca66f844f42ebb852fb923b",
+      "blob_sha1": "4ed2a13ba0fc5ef98925abc9e9378710d18151fc",
       "bytes": 27309,
       "mode": "100644",
-      "sha256": "997de700eb7a4b3c3b500ee3a3b65039a3267d1232c7d836af537bd536cf8a11"
+      "sha256": "c0408c4184445ffe93b894a30ad6ef79c568ae9e528ef3f6a29617976aa4cc39"
     },
     "tests/factions/black_templars/unit/test_black_templars_army_rule.py": {
       "blob_sha1": "d5246156bd0f1ce96e2e72c4f4f918b667d4210e",
@@ -55,16 +55,16 @@
       "sha256": "caade7cea6dae7b304efb346fb466dfe433dad6f94484a1ed3e1bb5f546443d0"
     },
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
-      "blob_sha1": "71a717d3c8a6b56361497854442e203957943563",
-      "bytes": 16789,
+      "blob_sha1": "e34b65d3e9af4b3a9ee0b60896b799b18fe1fe12",
+      "bytes": 67730,
       "mode": "100644",
-      "sha256": "65aa8236412d5577aa614d48830fbf91e1ad254446759164f5433bcab648e464"
+      "sha256": "80c4a0fa688274d2e1aa2df1eb617364cce620725cc6c49b8003cb936595f2e1"
     },
     "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py": {
-      "blob_sha1": "f4b7dab4965bd32c5db76c33ac8782c764d0dc5b",
-      "bytes": 28172,
+      "blob_sha1": "0de58f2c39866b2b342b65cec198a732cad24d3d",
+      "bytes": 28190,
       "mode": "100644",
-      "sha256": "6328ecbebaf0534354ad79046596ae1c1d119619313058461f442f4b1a80e6a5"
+      "sha256": "2bd483b781a20b60eb1011de96f1cac3eb539b017c8a96f441bf0b13e7c3635b"
     },
     "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py": {
       "blob_sha1": "3a7dd63f628bb0dbd0980aeda215694eb5e27618",
@@ -79,10 +79,10 @@
       "sha256": "682d2860b0655182202231419c04a6c5322b1d30b49cc3b0a3854c4025b5c4f3"
     },
     "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py": {
-      "blob_sha1": "31c324e4b766c3ebcb5ca5f5fdab1a13530064bd",
-      "bytes": 18120,
+      "blob_sha1": "78e7d858ea3f06f76e7be034ac9feb8e45ab5a78",
+      "bytes": 18365,
       "mode": "100644",
-      "sha256": "84b323d4e64c5483d97e0e5a3e27e075a3fa74c6911704271545c23600547e6c"
+      "sha256": "dfeca2fa09c594e9d0274db16e8d74d1186d5f2e5dcfab7289d02d912c7d5285"
     },
     "tests/factions/chaos_daemons/unit/test_generic_ir_support_validation.py": {
       "blob_sha1": "a19fa1df4a1550ce080a90f5a98e646c823187e6",
@@ -121,10 +121,10 @@
       "sha256": "0edf3bc19424cf7882c9a24db3e877fd353696a3ed6718fb0d0ab4e9454ecc44"
     },
     "tests/factions/emperors_children/test_selected_consumers.py": {
-      "blob_sha1": "3c478b0ce89c9898cfd7087acb60a884b8afb935",
-      "bytes": 77316,
+      "blob_sha1": "fb9eb488eb1ff229f7cd1c998a206de2c5d93f3e",
+      "bytes": 77597,
       "mode": "100644",
-      "sha256": "a0ffe35df120411655714e54249e6e5981b1058b9139f0f66df35e0ac6d318c7"
+      "sha256": "82bd3950ff5514b4f9fbd7873cdb82a5115b734346a8aa8121fd4f6a4bef24ad"
     },
     "tests/factions/emperors_children/test_shared_attack_consumers.py": {
       "blob_sha1": "4d6141e4a647edbcf7aaa841f7349262e66c08a9",
@@ -145,22 +145,22 @@
       "sha256": "c672346fddce939216750dec92a6267ae0bf3747fbf7a564ed09e854ddbcd635"
     },
     "tests/factions/grey_knights/unit/test_grey_knights_army_rule.py": {
-      "blob_sha1": "1f1c3711b463fd989ce74e2dba50a4cdce6796a7",
-      "bytes": 49289,
+      "blob_sha1": "c3103aa1ed58cde1a1eeee3252999f37199dee4d",
+      "bytes": 49440,
       "mode": "100644",
-      "sha256": "d926c85dff2d78252c32e6d71cd7a7775a4f623e2cdb201cfa31632f4afd96d6"
+      "sha256": "da23a8edfc11c789d96a0e4150d6b9551f335d66bb8f2f6152adb8250aa66e17"
     },
     "tests/factions/leagues_of_votann/unit/test_leagues_of_votann_army_rule.py": {
-      "blob_sha1": "37a23ca665996643255445925283c05d879d14c2",
-      "bytes": 41103,
+      "blob_sha1": "2a0fbf58ddaee0f519ee848e2ac7553924ec6592",
+      "bytes": 41269,
       "mode": "100644",
-      "sha256": "115a75dd94f9c1b0e006c6ef8cc90ebf27432ab85b64a6840288935ac9e5d53e"
+      "sha256": "f9702ce55583b61fbbb8d29754ca020e5d085101aa27c412722d02d949c40072"
     },
     "tests/factions/necrons/unit/test_necrons_army_rule.py": {
-      "blob_sha1": "3981ec2448fae5f63dcdc085efaed50b056a258a",
-      "bytes": 55195,
+      "blob_sha1": "a5e382786fcdd7924c3540e100b60e1f0ee8fb02",
+      "bytes": 55351,
       "mode": "100644",
-      "sha256": "d0fef481241bc77912b8105bd763561d8f551005c010b230c9c52bc99939e827"
+      "sha256": "b8b520cdfb0f829bcabb3906158e58f6ee524c667e3d0f0d16fe69e4c1186283"
     },
     "tests/factions/orks/integration/test_ws14_generic_ir_lifecycle.py": {
       "blob_sha1": "b0ba83950f3ae212965decadb5691620e1378fa4",
@@ -169,16 +169,16 @@
       "sha256": "010c10f67bd0ad474acac5b31f64453ef11132154decb98fe5ea492bf9e7d746"
     },
     "tests/factions/orks/unit/test_orks_army_rule.py": {
-      "blob_sha1": "b76493a55fc2663de0fd88fa04c49a64880dfffd",
-      "bytes": 38870,
+      "blob_sha1": "61cfb837edc48cdfa63304be12a9eb89239e17bd",
+      "bytes": 39023,
       "mode": "100644",
-      "sha256": "d2b72b1c26a7f90b492d6c10a005b59ff742cd64648cdfce1aa9c2699a37f797"
+      "sha256": "63bdaa161c0fe18f6d2921912601b7663b791b8d51885b99061d9fb03acb9a59"
     },
     "tests/factions/tau_empire/unit/test_tau_empire_army_rule.py": {
-      "blob_sha1": "71279f29ffec039320f0bde7e93c18cdcc4963c1",
-      "bytes": 53291,
+      "blob_sha1": "448bbae722ae6c46787c80bfdabc7e47554c1259",
+      "bytes": 53443,
       "mode": "100644",
-      "sha256": "d3cf2c201b025d19d3c03d4e64eaf23417720a7a40d66bdd9e03d3330ef9b422"
+      "sha256": "0365266a1548584e95bc8bd31800cfda4d1b6271d64845d724d2d4df8c58ee92"
     },
     "tests/factions/thousand_sons/unit/test_source_overlays.py": {
       "blob_sha1": "550735dec7bf2ec19a8ab3cf1cac73f503c33f83",
@@ -187,22 +187,22 @@
       "sha256": "1095545a0cd973b567fc1e2b45dd43000fb352b954d0c47f5a4ee3b59e344c6d"
     },
     "tests/factions/tyranids/unit/test_tyranids_army_rule.py": {
-      "blob_sha1": "734f07cbf7e707315a333fb01ba678544d999c0a",
-      "bytes": 113441,
+      "blob_sha1": "9effc5e0e79d0f234c0ec10041640cdccb4fd3d5",
+      "bytes": 114056,
       "mode": "100644",
-      "sha256": "17495a45fc129f7d40eb5bec143a1605d52643a2da2597ddac81e8ea668dbcc4"
+      "sha256": "5cc396a43a847aec6ffe04c625a73602b22dfa2ca7340ac0e39276a44b2c0a16"
     },
     "tests/factions/world_eaters/unit/test_blessings_gameplay.py": {
-      "blob_sha1": "a2a54739adee2994764c145fb52950bfb9ed041c",
-      "bytes": 17190,
+      "blob_sha1": "56b8dcc4c6b9dd11bf1730bf6c4a3c5aced36cce",
+      "bytes": 17211,
       "mode": "100644",
-      "sha256": "939aad793501c35a415e39866b505ad12bf38a31c2b2c7e856745232aa402e3a"
+      "sha256": "0fcabdc70d52e33e10fcc5a46fb42ecc70921de2c3ab788c5949a2898bc0ba3b"
     },
     "tests/factions/world_eaters/unit/test_icon_gameplay.py": {
-      "blob_sha1": "e705b2758baff722f3ea182c301a195ba63687e2",
-      "bytes": 6316,
+      "blob_sha1": "9a06eea96947262549bef8233cd9ebbea60f8dd4",
+      "bytes": 6352,
       "mode": "100644",
-      "sha256": "0eaf5f39c5dd42bd20db998404cd90c76dc7e06050b0fafe595fe979c38d2489"
+      "sha256": "12c0483ecbbc5d4316de2de0ac02383937e8e9f7cd638626a63ba0a9a2b8e15b"
     },
     "tests/factions/world_eaters/unit/test_icon_of_khorne.py": {
       "blob_sha1": "a91be17c918a7fe9e88607b30ccceccdf04c5b73",
@@ -211,22 +211,22 @@
       "sha256": "5978709148ceaafad7adc244b16d1f87bad62be96293d8e19a06c8f12b3dba24"
     },
     "tests/factions/world_eaters/unit/test_total_carnage_gameplay.py": {
-      "blob_sha1": "fc92211be2d6e1ecfaf0a760a35673347b7fce02",
-      "bytes": 6027,
+      "blob_sha1": "9e5cfaa62f7f9b9f24771b6c71a4c95b86a3eed0",
+      "bytes": 6051,
       "mode": "100644",
-      "sha256": "1ebfea084cc927407627558291b6ad9a771b3abe0d4e9d78e00c6df7ba310500"
+      "sha256": "bde4595d1cd1c514843e9fb22149939547d706c8a7c2efbfa2e4065cf0331535"
     },
     "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py": {
-      "blob_sha1": "a491404aec87cf0a9884538e02f748224735cf58",
-      "bytes": 44179,
+      "blob_sha1": "2840e950e03b2ad11bfa7e5863c863e30c087981",
+      "bytes": 44342,
       "mode": "100644",
-      "sha256": "f2d9e5541c9449e4f24a83d7d4cc723516660ea166a8e9c2819a2c8a06a4a30c"
+      "sha256": "e8548335a237455fce0e5888c15f192a278620aaad31ff2a13139755492e3c56"
     },
     "tests/infrastructure/adapters/unit/test_session_commands.py": {
-      "blob_sha1": "f4f32f78d3d2f274dc50108cbbef704f77b52e77",
-      "bytes": 38250,
+      "blob_sha1": "6232e501f8011b78ac9e99b91792c579baec5694",
+      "bytes": 39577,
       "mode": "100644",
-      "sha256": "3472212073a7814b9cfa10fe262450e05d5747dba9b322c18b0bb8b139ec98fc"
+      "sha256": "573b6b1da1c74dec1a87ba74b76626af4007ae37da81ac1ee7fb9e2936dbc731"
     },
     "tests/infrastructure/decisions/unit/test_opportunity_windows.py": {
       "blob_sha1": "b0be94763a39b968beabc66f08a9c050a8f7cd83",
@@ -235,10 +235,10 @@
       "sha256": "d4f9da68900a559438204bd2fb9500e12900a5441c2d1cab096127fb309aa1f6"
     },
     "tests/infrastructure/decisions/unit/test_physical_proposal_prevalidation.py": {
-      "blob_sha1": "bb5525dfc329cfb374e3de6d9754ce468d3fe949",
-      "bytes": 6827,
+      "blob_sha1": "a87878cdee7cd0138c4b223f0d59ca1dfc09108f",
+      "bytes": 15789,
       "mode": "100644",
-      "sha256": "3b3172c020b40288408e17ae2c5cb7955d273743ad4b7bc01a96b8b06f7d9d8a"
+      "sha256": "545c340333e2ec2400a4517db68d6531763b842048db317e6b0afa81f2a6b815"
     },
     "tests/infrastructure/lifecycle/unit/test_battlefield_transitions.py": {
       "blob_sha1": "90bd5fda8d312490031ec7b50555d0515bc15d41",
@@ -247,10 +247,10 @@
       "sha256": "f4634a690fb11943947ee09407fe16fb75bb8c5e9372d025d6c41fd92b5f8065"
     },
     "tests/infrastructure/lifecycle/unit/test_lifecycle.py": {
-      "blob_sha1": "06a8930237c9675d16c80bdf587a7b93824e379f",
-      "bytes": 20198,
+      "blob_sha1": "9f64336ab3a1f7229344a91389d2c98fa1589fc8",
+      "bytes": 21735,
       "mode": "100644",
-      "sha256": "290ba7617a5a256464cb02fb86b4834ccc1d9f5a54a5b40a2f17c26ddab82cb5"
+      "sha256": "b40dfbbafbb98d758a0549b56304291347720c2e562ac743e0d4f72168efa0dd"
     },
     "tests/infrastructure/lifecycle/unit/test_prebattle.py": {
       "blob_sha1": "b1d7e3281f5941589f5d7b8e0c0a284fd88c7111",
@@ -277,10 +277,10 @@
       "sha256": "09b4a1539de437c4ae175113326eb438f16ea074e4b1df6287957a9d48cba691"
     },
     "tests/infrastructure/missions/unit/test_event_companion_part2.py": {
-      "blob_sha1": "d6629e7748ab67ddc37c519cfbaeec6f8bb8464a",
-      "bytes": 65432,
+      "blob_sha1": "7996621cdf11b959990a2d34e343de4c8a3a717b",
+      "bytes": 65512,
       "mode": "100644",
-      "sha256": "4c607413c811d417fae5af23c1df1ac525f1597f47448a58a1dcc7b7774531ec"
+      "sha256": "97b8ff3702145d1f7141e3af86b17c160f8898274e2f669dbfb5b9f27be33d74"
     },
     "tests/infrastructure/missions/unit/test_game_end_scoring.py": {
       "blob_sha1": "d05354290dca05fecdd35496a649d0ca29a00a04",
@@ -421,10 +421,10 @@
       "sha256": "b83719d03f7e9f95127842d429208450ad481ca40b165d14a89c98a59e08ff4f"
     },
     "tests/infrastructure/rule_execution/unit/test_rule_execution.py": {
-      "blob_sha1": "69517cd862cd5b7e698d2e7e661f0679779414a7",
-      "bytes": 57959,
+      "blob_sha1": "1c2b6cee51f1e1074cbf0f8aeb4333fe5b991c7c",
+      "bytes": 58801,
       "mode": "100644",
-      "sha256": "4e4d834ad9703805623bf269433f2fde33b563eb994ea65d8a9503fdefc61172"
+      "sha256": "11d85d1c0afe0c4eb5dcb846bb9ecb2ec7a8e1f09253b0b9ea564fe371fca179"
     },
     "tests/infrastructure/rule_execution/unit/test_rule_execution_part2.py": {
       "blob_sha1": "9043b502eb304138661672f9258ec33039fcc981",
@@ -469,10 +469,10 @@
       "sha256": "9bb42234104ff2a21e538e311c60a5e40e18480bf3ad76f8a9255e88bf75c92f"
     },
     "tests/infrastructure/setup/unit/test_setup_completion.py": {
-      "blob_sha1": "3ea3e49c25c446d5d10e17c3e8c0148f205cb309",
-      "bytes": 10009,
+      "blob_sha1": "2c4214343e4326f59bb0eb6c0377ece498bc6631",
+      "bytes": 12673,
       "mode": "100644",
-      "sha256": "70381d17abc9fe99eee60277a7869b2daf404cc79adfd098df9b9d42c8acbd6e"
+      "sha256": "3c011656636396eac6c3a51f7b58bd8304332178c409b9d4df983a3604927735"
     },
     "tests/infrastructure/source/unit/test_core_catalog_descriptions.py": {
       "blob_sha1": "84fccff267c076a4434121228ca1f9084c663a1a",
@@ -631,10 +631,10 @@
       "sha256": "d0d6cad486d7d6175cc94d888a74c5f1b50e284fdd316e595b6d1fdf95e56655"
     },
     "tests/rules/rules24/unit/test_return_on_death.py": {
-      "blob_sha1": "b622817d5afcf1c571137183c5575801a0bd2091",
-      "bytes": 32866,
+      "blob_sha1": "6020a75c852cf6b1cd8d2089da7d00efaa6946e2",
+      "bytes": 32875,
       "mode": "100644",
-      "sha256": "2bcfa5c248da8049a0075dfbb56443d0393f94f9fef106e985a7088ccfc1afea"
+      "sha256": "487139621a8b063f7f4665f57c2fc7de8a97745f521f77b212fef222a6abd74e"
     },
     "tests/rules/rules24/unit/test_shadow_form_lookup.py": {
       "blob_sha1": "788cc29675645a439fc91956ddabab2e29c5ebbc",
@@ -799,10 +799,10 @@
       "sha256": "bec00545fa34b671b7dac5afa8dbf731cebcc05dfc49ddcf3965517cf33d7b15"
     },
     "tests/rules/section01/test_01_05_choice.py": {
-      "blob_sha1": "5ee24f84fa57bdbb8e95e2473e5434e7bd803202",
-      "bytes": 2871,
+      "blob_sha1": "40088c36145d2f2ccbbc78ea6720df19b99b881d",
+      "bytes": 2880,
       "mode": "100644",
-      "sha256": "206dd056ae7add16af3ee44caae141ff6042ba9608d456763872c164318c0676"
+      "sha256": "f94d9721b6d9fabde5f00b2a235757b5614ce370b28703183382753f204e7350"
     },
     "tests/rules/section01/test_01_05_dice.py": {
       "blob_sha1": "6c3519e13acea400e2e2c0b6c66e619b1f180345",
@@ -1081,10 +1081,10 @@
       "sha256": "2c199077d997c58e9344b86cf7baab8de7c8e7cf9ee82ed8f1abf6a2f54756d4"
     },
     "tests/rules/section04/test_completion_boundaries.py": {
-      "blob_sha1": "8ffa274057a682dc29cacf1cefd9abe5445ee827",
-      "bytes": 49348,
+      "blob_sha1": "2750a3be9dfdfe540cb072bbdc6c42aa3ea088e5",
+      "bytes": 49367,
       "mode": "100644",
-      "sha256": "4600589661f5647fb82e1a19fb47b43e616200f37dd6aa26c90dbeb315a6a7a2"
+      "sha256": "7dc3b4094568a696ff98f7850611d102b5a9fbd030620a193ba171245da6f2f6"
     },
     "tests/rules/section04/test_coverage_map.py": {
       "blob_sha1": "2f75964963650ff473fcc9111651d6d9745437f4",
@@ -1429,22 +1429,22 @@
       "sha256": "9437b989c77b9d12d8c65f6898bb51832fd61ced040fd53c8c491192933b2dc4"
     },
     "tests/rules/section09/test_distances.py": {
-      "blob_sha1": "d35f6a53d9ef4968d2003991b2b64ecf299f2ee9",
-      "bytes": 9250,
+      "blob_sha1": "bcad8fa2dd1f1c5260599f80cb8764ccb6abf01e",
+      "bytes": 9286,
       "mode": "100644",
-      "sha256": "04da746c129b34fa7bd78c9d7b33893c70661fa48389aafc3d68a1225627f20b"
+      "sha256": "f55b4b360bdb91df763701749de6c0db3cc945a0c264db915c7959806c29fc39"
     },
     "tests/rules/section09/test_fall_back.py": {
-      "blob_sha1": "e992a14a1ce3b5be3358a47ce1286eb1c1097074",
-      "bytes": 13032,
+      "blob_sha1": "c8d4a498af2713e0223bba6ff1d4b6c9278c1758",
+      "bytes": 13357,
       "mode": "100644",
-      "sha256": "b649dd8619fdd612a1f13b9effd3e200982b5d97ca0dba4a2303b52edc91c611"
+      "sha256": "96ec07a79af0e61a6b5c9665a8cb4a80963d7a9fde16c9d18f5cc00e59ee1798"
     },
     "tests/rules/section09/test_focused_checkpoint.py": {
-      "blob_sha1": "c8e4f55a77c1a0e09b28c2b05296f33fe43f946e",
-      "bytes": 27566,
+      "blob_sha1": "d7cbc932bb13a7f20990adac5dd2a5c89feb9648",
+      "bytes": 27832,
       "mode": "100644",
-      "sha256": "6d2c13d4ddb0318033ded7cd56985a9b1b38c86ad1bcce15c1350285ecf0074b"
+      "sha256": "38756ad2d88143e9ea1e1e45f88419023a38ed038b0549d5c1eb5fcaaa2a2f5a"
     },
     "tests/rules/section09/test_forced_escape.py": {
       "blob_sha1": "4cb1cd94c97a540b5a2227c4aa5d33d25f82a1b2",
@@ -1573,10 +1573,10 @@
       "sha256": "b5f16229de28bc1c4ed57a3c7cdb9acce57e7303a7967253ac96a156a42c7881"
     },
     "tests/rules/section11/test_selection.py": {
-      "blob_sha1": "598c68dfc7f97ecb2a46f7276a4c7132b13f30ef",
-      "bytes": 6870,
+      "blob_sha1": "000b2ee6259bd61c3e30e2ff216f78fd6480e714",
+      "bytes": 6878,
       "mode": "100644",
-      "sha256": "fd51f0db9f4630c0a510a7f3509f7791db433558cdf6d470f2ab6225b307ac23"
+      "sha256": "aa93d01ed7d5b81b419d47227d693a240b6fd2de43ee96287fd748211309e071"
     },
     "tests/rules/section12/test_attacks.py": {
       "blob_sha1": "a62f83c43598772073b6378d7b01d672dde40b7c",
@@ -1771,22 +1771,22 @@
       "sha256": "30424138263a92385079062dcc4e16e064285b7dfdaa9e68bc0c9e55b94d5b66"
     },
     "tests/rules/section15/test_mortals.py": {
-      "blob_sha1": "747deb1d58bd96105dbd1b48d91956a5880578b1",
-      "bytes": 12849,
+      "blob_sha1": "23a6cffc42f746c751814f0355f38fad6e01d5c1",
+      "bytes": 12858,
       "mode": "100644",
-      "sha256": "fc1957a725c52e53de686891539c055129069aef43c4d96e654b4e52ba8b243a"
+      "sha256": "69b87b70f634563415cae4950c1fcf6a177bbe47168b86baa266298f2702da8e"
     },
     "tests/rules/section15/test_reactions.py": {
-      "blob_sha1": "2dbfb3a4c1a82db90e928b9f7d605f0912c0531e",
-      "bytes": 11118,
+      "blob_sha1": "55a938b885b0b69bf23257b36d617e73990deeae",
+      "bytes": 11186,
       "mode": "100644",
-      "sha256": "74a64e3a472ede1cbda8ba60ee8c60425175d64be38e790772791dcbc0330a67"
+      "sha256": "907dfbefca3cfba251d180d59c6022c8e6c929855c10b64a0fcda9c6458cb49a"
     },
     "tests/rules/section15/test_reroll.py": {
-      "blob_sha1": "0b0c21b9212afa7eabced2e1d29e207279d2fd6a",
-      "bytes": 5368,
+      "blob_sha1": "fe16164b31e70263ded927c0fc5a0012ede3aeab",
+      "bytes": 5395,
       "mode": "100644",
-      "sha256": "527ba9311213b26f79dc02c8a8c96539820b492b33dd6942d18aa81a9c17c89c"
+      "sha256": "5b343dc9246313ee8b62ec87acc955c13522a33dcda6ca89de2695da25c526a0"
     },
     "tests/rules/section15/test_retained_faq49.py": {
       "blob_sha1": "daebe2f25c26efba577d78f464aace57b92ea611",
@@ -1801,10 +1801,10 @@
       "sha256": "8c4120f01e8e38b49b17fd27cb6f3736f8473d4e01b3136c10f8de652e7606db"
     },
     "tests/rules/section15/test_snap_faqs.py": {
-      "blob_sha1": "70f1d7cabca447d0ef9e94bc9824ec764d56179a",
-      "bytes": 10016,
+      "blob_sha1": "638c9f9ac86548d66ce92eb31bd647ba8dcc960a",
+      "bytes": 10052,
       "mode": "100644",
-      "sha256": "6f99b61d34f052915197dc754dded2744b6a0c1e7a1c4b633fb3ff92201f7407"
+      "sha256": "620c11215968d8782463ebcae8b6d4bc75db6595e2b86960425e689d5605e57a"
     },
     "tests/rules/section15/test_snap_range.py": {
       "blob_sha1": "e3a5a31e88f816bb40e041ac1f77bb5ef4aa2564",
@@ -1957,16 +1957,16 @@
       "sha256": "dd10071fe5d07adf4d5960320ce0dba5bda9f58187e5d52df08f1ef2e0871416"
     },
     "tests/rules/section18/test_emergency_status.py": {
-      "blob_sha1": "bc2384202afc491d37f1d79ee7d9cd97ee6d0cef",
-      "bytes": 9179,
+      "blob_sha1": "307b382dc2410ddf46dc7031e9270b3dc2706a0a",
+      "bytes": 9342,
       "mode": "100644",
-      "sha256": "c31f93b69751b8ee8ba2e90006d86223e31f67fed2ecc59cc8a26847c5ceb4a8"
+      "sha256": "b3c40d4c04b92f0fcc2c6be9d96b2a38c418e39cce5a83a8ae4e9b7f4e98a8ff"
     },
     "tests/rules/section18/test_facade.py": {
-      "blob_sha1": "6468fee39bdf39ec36312db94d14259b40626c81",
-      "bytes": 28617,
+      "blob_sha1": "f0c9fbdf7fee121430baa76f9e0aa1805a1e88ea",
+      "bytes": 33711,
       "mode": "100644",
-      "sha256": "043a4266f6e7cb557f8345724e6bedb8dcd85fb76fae7d1b1d92fbfa0b0f8bee"
+      "sha256": "5cce4a67e50969eb7e3565903b22cc04f0b42f3ec8705398003935c8dbdfd71a"
     },
     "tests/rules/section18/test_faqs.py": {
       "blob_sha1": "7ca728af1f8756f940a33b51b135a48833c41666",
@@ -2107,10 +2107,10 @@
       "sha256": "2983b66c2576b7a10c656641862062433f0d7b5060af28c089fa2b3730581d13"
     },
     "tests/rules/section21/test_boundaries.py": {
-      "blob_sha1": "4a7aa08607311127eea1cc23c6b4626627b215b4",
-      "bytes": 11466,
+      "blob_sha1": "f904ba0784dd4c7cdd43ca77b686ee3e8e47ba40",
+      "bytes": 11475,
       "mode": "100644",
-      "sha256": "f498469b7205049cf7c9ca6612f9d1d3e66b4e7fc4a0f801885a90ebd17b3fdc"
+      "sha256": "a52752c9fced4ec3a28bebda202ea4d602fafa8377c56e8ab6f5beae57c7e7bf"
     },
     "tests/rules/section21/test_clarifications.py": {
       "blob_sha1": "b9745d2e2c7eafac6d336cdb2f1716a576136496",
@@ -2173,10 +2173,10 @@
       "sha256": "01fb8c59d35c85297bc86fb3343f728fd1c5c22074f0a3eb8f1205c4fe983fd0"
     },
     "tests/rules/section22/test_damage.py": {
-      "blob_sha1": "59c6ea21093f95503341f5d441d75999b46beec4",
-      "bytes": 3997,
+      "blob_sha1": "a577cb087a6155200b6500ee59ecbfe05cc12773",
+      "bytes": 4006,
       "mode": "100644",
-      "sha256": "b0aeb44c12e72c31bbdf2bd83b04722b3a6a8b70c6dbf193b0f99f67cede9d09"
+      "sha256": "cf4913d1f393fde61e35c4a6417e354bb0e99f1d8f52742ac2b1eeb248fe78a2"
     },
     "tests/rules/section22/test_facade.py": {
       "blob_sha1": "345e06a3bf178b3fffb3ef8382f25595aa79fa64",
@@ -2269,10 +2269,10 @@
       "sha256": "258e6b7edf7b5fc8e6503c0b6e7b59803dceeeccfa1d48017d4a46a5c9ae2c35"
     },
     "tests/rules/section24/test_damaged.py": {
-      "blob_sha1": "2a6edb7ed560443d26f80411d1b6893d8e0f4ac5",
-      "bytes": 7690,
+      "blob_sha1": "2b5d606611f52929b4793cc14db68418b3627666",
+      "bytes": 7722,
       "mode": "100644",
-      "sha256": "569874d0c7ed1d0105308a4ef570db2580673443df8a5070e7e7153ecec304b3"
+      "sha256": "8072163ffd2c7f9b2853ebfd633751a38b473a7545ad9d24cca9b1f2d2bf6fff"
     },
     "tests/rules/section24/test_facade.py": {
       "blob_sha1": "2185b65e2cf25d38e3cefbb6ac45ea2c47e72dca",
@@ -2353,10 +2353,10 @@
       "sha256": "4a126c1a2f3cfd5f9f07dc86f580abb3a8606a4fd5fe91c0839ab6a1b1538276"
     },
     "tests/rules/section25/test_facade.py": {
-      "blob_sha1": "e54ee3f4b68d486c668d1d5b326e7e53f052663c",
-      "bytes": 9962,
+      "blob_sha1": "41f3abc78299264247fbbe2c7804182c8ae09b44",
+      "bytes": 10181,
       "mode": "100644",
-      "sha256": "c858c0385c1eb85c736af7709cb790868715d64247c50cc711d6d92fd5ffb1bb"
+      "sha256": "af8c6e65ec4c1f08920266ccb0f9825bb316250863452377f0fed825cc7b86f2"
     },
     "tests/rules/section25/test_inventory.py": {
       "blob_sha1": "fdfcc2e11b8af331196321466e79bde437c2f190",
@@ -4732,6 +4732,21 @@
         "sha256": "af531cbe9b8e6b9945e082f23f6dfccef40c029602f77e246fa5157714847a02"
       },
       "recipe": "type-only-battle-phase-cast-v1"
+    },
+    "tests/unit/test_phase11e_mission_scoring_cleanup.py": {
+      "after": {
+        "blob_sha1": "8442e38d93ed6341fb08d10729a9db259cc58632",
+        "bytes": 443656,
+        "mode": "100644",
+        "sha256": "dbf7f490958bc11ec474b33da74dc9f76ca099e2f1af1cd2252921c268dd7c47"
+      },
+      "before": {
+        "blob_sha1": "82992560879e3b03bcea5b84d287298f3d9c2de8",
+        "bytes": 443196,
+        "mode": "100644",
+        "sha256": "891fad03f777fbfb09f26c306326ffe8a6f4aa6e14f9afc625606b182f0ff338"
+      },
+      "recipe": "explicit-private-tactical-draw-seed-v1"
     },
     "tests/unit/test_phase13b_shooting_declarations.py": {
       "after": {

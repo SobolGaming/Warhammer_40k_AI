@@ -97,7 +97,7 @@ def resolve_battle_shock_after_modifier_choices(
                 "battle_shock_test_request": validate_json_value(request.to_payload()),
             },
         )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     return resolve_battle_shock_test_with_optional_reroll(
         state=state,
         decisions=decisions,

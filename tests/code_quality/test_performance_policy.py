@@ -25,6 +25,7 @@ from tools.performance_policy import (
     validate_comparison,
     validate_full_game,
 )
+from tools.performance_private_randomness import private_randomness_policy_predecessor
 
 from tests.performance_evidence_helpers import (
     HISTORICAL_BASE,
@@ -1240,7 +1241,7 @@ def test_core_description_smoke_scope_and_policy_successor_are_exact() -> None:
     assert not core_description_smoke_operations(
         base=base, path=path, category="rule_semantics", change=altered
     )
-    raw = (ROOT / "tools/performance_policy.py").read_bytes()
+    raw = private_randomness_policy_predecessor((ROOT / "tools/performance_policy.py").read_bytes())
     predecessor = subprocess.check_output(
         ["git", "show", base + ":tools/performance_policy.py"], cwd=ROOT
     )
@@ -1336,7 +1337,7 @@ def test_whispering_web_smoke_scope_and_predecessor_are_exact() -> None:
             assert not policy.whispering_web_smoke_operations(
                 base=base, path=path, category="rule_semantics", change=changed
             )
-    raw = (ROOT / "tools/performance_policy.py").read_bytes()
+    raw = private_randomness_policy_predecessor((ROOT / "tools/performance_policy.py").read_bytes())
     prior = subprocess.check_output(
         ["git", "show", base + ":tools/performance_policy.py"], cwd=ROOT
     )

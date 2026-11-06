@@ -234,6 +234,7 @@ def _daemonic_patrons_session(
         ),
     )
     resume_config = GameConfig(
+        private_rng_seed=state.private_rng_seed,
         game_id=state.game_id,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         army_catalog=fixture_catalog,

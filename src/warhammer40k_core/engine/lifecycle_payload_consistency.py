@@ -17,6 +17,7 @@ from warhammer40k_core.engine.prebattle import (
     PreBattleProposalRequest,
     is_prebattle_proposal_request,
 )
+from warhammer40k_core.engine.private_randomness import validate_private_rng_seed_pair
 from warhammer40k_core.engine.rapid_ingress_authority import (
     validate_pending_rapid_ingress_authority,
 )
@@ -35,6 +36,9 @@ def validate_config_state_payload_consistency(
         return
     if state.game_id != config.game_id:
         raise GameLifecycleError("Lifecycle state game_id does not match config.")
+    validate_private_rng_seed_pair(
+        state_seed=state.private_rng_seed, config_seed=config.private_rng_seed
+    )
     if state.player_ids != config.player_ids:
         raise GameLifecycleError("Lifecycle state player_ids do not match config.")
     if state.turn_order != config.turn_order:

@@ -237,7 +237,7 @@ export class ContractHttpClient {
 
   #validateRejectedCommand(body: unknown): SessionCommandOutcome | ErrorEnvelope {
     const payload = jsonObject(body, "HTTP 422 command response");
-    if (payload.schema_version === "session-command-outcome-v45-contract") {
+    if (payload.schema_version === "session-command-outcome-v46-contract") {
       return this.#registry.validate<SessionCommandOutcome>(
         "session-command-outcome.schema.json",
         body,

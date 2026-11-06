@@ -900,7 +900,7 @@ def apply_rules_unit_combat_disembark_feel_no_pain_decision(
         request=request,
         result=result,
         next_request_id=state.next_decision_request_id(),
-        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        dice_manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
     )
     if routed.request is not None:
         decisions.request_decision(routed.request)

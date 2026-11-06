@@ -34,7 +34,7 @@ def build_charge_roll_reroll_request(
     legal_target_unit_instance_ids: tuple[str, ...],
     request_id: str | None = None,
 ) -> DecisionRequest:
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     required_target_ids = required_charge_target_unit_instance_ids(
         state=state,
         unit_instance_id=roll_request.unit_instance_id,

@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.adapters.battlefield_projection import project_battlefield_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
@@ -474,6 +475,7 @@ def _config(*, mission_setup: MissionSetup | None) -> GameConfig:
         else mission_setup.force_disposition_id_for_player("player-b")
     )
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase11a-game"),
         game_id="phase11a-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),

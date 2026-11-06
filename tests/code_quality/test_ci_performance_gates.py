@@ -19,6 +19,183 @@ import scripts.build_test_shards as sharding
 from scripts.check_shard_coverage import check_shard_coverage
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_duration_dispatch_balances_actual_initial_worksteal_chunks() -> None:
+    assert sharding.duration_worksteal_order(
+        ("tests/rounded.py::case",), workers=4, selector_seconds={"tests/rounded.py": 0.0}
+    ) == (0,)
+    weights: dict[str, float] = {
+        f"tests/{name}.py": value for name, value in (("a", 240), ("b", 8), ("c", 8), ("d", 8))
+    }
+    all_nodes = tuple(f"tests/{name}.py::case_{index}" for name in "abcd" for index in range(8))
+    for nodes in (all_nodes, all_nodes[:-1]):
+        order = sharding.duration_worksteal_order(nodes, workers=4, selector_seconds=weights)
+        assert sorted(order) == list(range(len(nodes)))
+        counts = {file: sum(node.startswith(file + "::") for node in nodes) for file in weights}
+        totals: list[float] = []
+        offset = 0
+        for worker in range(4):
+            width = (len(nodes) - offset) // (4 - worker)
+            chunk = [nodes[index] for index in order[offset : offset + width]]
+            costs = [weights[node.split("::")[0]] / counts[node.split("::")[0]] for node in chunk]
+            assert costs == sorted(costs, reverse=True)
+            totals.append(sum(costs))
+            offset += width
+        assert offset == len(nodes)
+        assert max(totals) - min(totals) < 2
+        assert max(totals) < 70  # Alphabetic initial dispatch strands 240 seconds on one worker.
+
+
+@pytest.mark.parametrize("bad_weight", [None, -1, float("nan"), True])
+def test_duration_dispatch_rejects_missing_or_invalid_measurements(bad_weight: object) -> None:
+    weights = {} if bad_weight is None else {"tests/a.py": bad_weight}
+    with pytest.raises(SystemExit, match="scheduling weight"):
+        sharding.duration_worksteal_order(
+            ("tests/a.py::case",), workers=4, selector_seconds=cast(dict[str, float], weights)
+        )
+
+
+def test_duration_dispatch_profile_controls_the_real_worker_hook(
+    tmp_path: Path, pytestconfig: pytest.Config, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tests import conftest as root_hooks
+
+    implementations = pytestconfig.hook.pytest_collection_modifyitems.get_hookimpls()
+    execution = [
+        implementation.function
+        for implementation in reversed(implementations)
+        if not implementation.hookwrapper and not implementation.wrapper
+    ]
+    builtin = next(
+        implementation.function
+        for implementation in implementations
+        if implementation.plugin_name == "main"
+    )
+    assert execution.index(builtin) < execution.index(root_hooks.pytest_collection_modifyitems)
+    weights: dict[str, float] = {
+        f"tests/{name}.py": value for name, value in (("a", 240), ("b", 8), ("c", 8), ("d", 8))
+    }
+    names = tuple(f"tests/{name}.py::case_{index}" for name in "abcd" for index in range(8))
+    profile = tmp_path / "durations.json"
+    case_seconds = {name: weights[name.split("::", 1)[0]] / 8 for name in names}
+    case_seconds[names[8]] = 100.0
+    weights["tests/b.py"] = 107.0
+    profile.write_text(
+        json.dumps(
+            {
+                "files": weights,
+                "case_seconds": case_seconds,
+                "profiles": [
+                    {
+                        "source": "complete dispatch fixture",
+                        "junit_sha256": ["a" * 64],
+                        "test_cases": len(names),
+                        "test_files": len(weights),
+                    }
+                ],
+            }
+        )
+    )
+    items = [cast(pytest.Item, SimpleNamespace(nodeid=name)) for name in names]
+    expected = sharding.duration_worksteal_order(names, workers=4, selector_seconds=case_seconds)
+    monkeypatch.setattr(pytestconfig, "workerinput", {"s25_scheduler": "worksteal"}, raising=False)
+    monkeypatch.setenv("SHARD_ID", "duration-dispatch-control")
+    monkeypatch.setenv("PYTEST_XDIST_WORKER_COUNT", "4")
+    monkeypatch.setenv("BEHAVIORAL_DISPATCH_PROFILE", str(profile))
+    root_hooks.pytest_collection_modifyitems(pytestconfig, items)
+    assert [item.nodeid for item in items] == [names[index] for index in expected]
+    profile.write_text(json.dumps({"case_seconds": {}}))
+    with pytest.raises(SystemExit, match="scheduling weight"):
+        root_hooks.pytest_collection_modifyitems(pytestconfig, items)
+
+
+def test_serial_mirror_balancing_preserves_measurements_and_accounts_for_execution() -> None:
+    mirror = sharding.SERIAL_BEHAVIORAL_CASE.split("::", 1)[0]
+    durations = {
+        mirror: 20.0,
+        sharding.SERIAL_BEHAVIORAL_CASE: 180.0,
+        "tests/second.py": 350.0,
+        "tests/third.py": 340.0,
+        "tests/fourth.py": 100.0,
+    }
+    case_seconds = {
+        sharding.SERIAL_BEHAVIORAL_CASE: 180.0,
+        mirror + "::remainder": 20.0,
+        "tests/second.py::one": 175.0,
+        "tests/second.py::two": 175.0,
+        "tests/third.py::one": 170.0,
+        "tests/third.py::two": 170.0,
+        "tests/fourth.py::one": 50.0,
+        "tests/fourth.py::two": 50.0,
+    }
+    shards = sharding._balanced_shards(
+        durations=durations, shard_count=2, case_seconds=case_seconds
+    )
+    isolated = next(shard for shard in shards if mirror in shard.test_files)
+    assert isolated.test_files == (mirror, sharding.SERIAL_BEHAVIORAL_CASE)
+    assert isolated.duration_seconds == 200.0
+    assert sum(shard.duration_seconds for shard in shards) == sum(durations.values())
+    assert (
+        sharding._execution_weights(durations, {sharding.SERIAL_BEHAVIORAL_CASE: 180.0})[
+            sharding.SERIAL_BEHAVIORAL_CASE
+        ]
+        == 720.0
+    )
+    with pytest.raises(SystemExit, match="serial mirror"):
+        sharding._balanced_shards(durations=durations, shard_count=2, case_seconds={})
+    with pytest.raises(SystemExit, match="serial mirror"):
+        sharding._balanced_shards(durations=durations, shard_count=2)
+    # A two-case file must not sit behind the serial node merely because its
+    # average parallel share looks smaller than its longest indivisible case.
+    uneven = {
+        mirror: 0.0,
+        sharding.SERIAL_BEHAVIORAL_CASE: 180.0,
+        "tests/a.py": 900.0,
+        "tests/b.py": 800.0,
+        "tests/heavy.py": 200.0,
+        "tests/light.py": 100.0,
+    }
+    node_costs = {sharding.SERIAL_BEHAVIORAL_CASE: 180.0}
+    for file, count, seconds in (
+        ("a", 9, 100.0),
+        ("b", 8, 100.0),
+        ("heavy", 2, 100.0),
+        ("light", 4, 25.0),
+    ):
+        node_costs.update({f"tests/{file}.py::case_{index}": seconds for index in range(count)})
+    planned = sharding._balanced_shards(durations=uneven, shard_count=3, case_seconds=node_costs)
+    serial_shard = next(
+        shard for shard in planned if sharding.SERIAL_BEHAVIORAL_CASE in shard.test_files
+    )
+    assert "tests/heavy.py" not in serial_shard.test_files
+    assert "tests/light.py" in serial_shard.test_files
+
+
+@pytest.mark.stubbed
+def test_junit_case_profiles_preserve_class_parameters_and_complete_nodes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _write_sample_shards(tmp_path=tmp_path, monkeypatch=monkeypatch)
+    profile = tmp_path / "cases.xml"
+    profile.write_text(
+        '<testsuite tests="3"><testcase classname="tests.unit.test_first.TestGroup" '
+        'name="test_first[slow]" time="9" /><testcase classname="tests.unit.test_first" '
+        'name="test_first[fast]" time="1" /><testcase classname="tests.unit.test_second" '
+        'name="test_second" time="2" /></testsuite>'
+    )
+    assert sharding._case_profile_medians((profile,)) == {
+        "tests/unit/test_first.py::TestGroup::test_first[slow]": 9.0,
+        "tests/unit/test_first.py::test_first[fast]": 1.0,
+        "tests/unit/test_second.py::test_second": 2.0,
+    }
+    profile.write_text(profile.read_text().replace("TestGroup", "OtherGroup"))
+    changed = tmp_path / "changed.xml"
+    changed.write_text(profile.read_text().replace("[slow]", "[new]"))
+    with pytest.raises(SystemExit, match="case inventories"):
+        sharding._case_profile_medians((profile, changed))
+
+
 WORKFLOW_PATH = ROOT / ".github" / "workflows" / "ci.yml"
 
 
@@ -277,14 +454,15 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
         assert workflow.count(f"manifest: ci/test_shards/shard-{shard}.txt") == 1
     coverage = workflow.partition("\n  coverage-gate:\n")[2]
     assert "scripts/check_shard_coverage.py coverage-data --shard-count 12" in coverage
-    assert "uv run --no-sync coverage report --fail-under=65" in coverage
+    assert "uv run --no-sync coverage report --fail-under=66.5" in coverage
     configuration = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     coverage_config = configuration["tool"]["coverage"]
     assert coverage_config["run"] == {"branch": True, "source": ["warhammer40k_core"]}
     assert coverage_config["report"] == {
         "show_missing": True,
         "skip_covered": True,
-        "fail_under": 65,
+        "fail_under": 66.5,
+        "precision": 2,
     }
     assert "scripts/build_test_shards.py --check --shard-count 12" in workflow
 
@@ -294,7 +472,7 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
     assert len(sharding.deferred_comparison_cases(cutover)) == 260
 
     source = tmp_path / "coverage_boundary.py"
-    source.write_text("\n".join(f"value_{line} = {line}" for line in range(1, 101)) + "\n")
+    source.write_text("\n".join(f"value_{line} = {line}" for line in range(1, 201)) + "\n")
     driver = tmp_path / "coverage_driver.py"
     driver.write_text(
         "import sys\n"
@@ -303,7 +481,7 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
         "prefix = ''.join(source.read_text().splitlines(keepends=True)[:int(sys.argv[2])])\n"
         "exec(compile(prefix, str(source), 'exec'))\n"
     )
-    for covered, expected_status in ((64, 2), (65, 0)):
+    for covered, expected_status in ((132, 2), (133, 0)):
         data_file = tmp_path / f".coverage.{covered}"
         executed = subprocess.run(
             [
@@ -326,7 +504,7 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
         )
         assert executed.returncode == 0, executed.stdout + executed.stderr
         # Exercise both config-default local reporting and CI's explicit override.
-        for override in ([], ["--fail-under=65"]):
+        for override in ([], ["--fail-under=66.5"]):
             result = subprocess.run(
                 [
                     sys.executable,
@@ -344,7 +522,7 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
                 check=False,
             )
             assert result.returncode == expected_status, result.stdout + result.stderr
-            assert f"{covered}%" in result.stdout
+            assert f"{covered / 2:.2f}%" in result.stdout
 
 
 @pytest.mark.parametrize("newline", ["\n", "\r\n", "\r"])

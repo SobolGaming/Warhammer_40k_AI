@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import cast
 
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
@@ -220,6 +221,7 @@ def fight_config(
 ) -> GameConfig:
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed(game_id),
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(

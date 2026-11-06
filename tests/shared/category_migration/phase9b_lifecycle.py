@@ -12,6 +12,7 @@ from tests.model_geometry_helpers import accepted_model_geometry
 from tests.phase17n_secondary_mission_helpers import drain_pending_secondary_mission_setup
 from tests.phase17n_step6g_secondary_certification_helpers import seed_completed_fight_phase
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.model_geometry_catalog import (
     ModelGeometryCatalogRecord,
@@ -94,6 +95,7 @@ def _config(
         )
     catalog = ArmyCatalog.phase9a_canonical_content_pack() if army_catalog is None else army_catalog
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase9b-game"),
         game_id="phase9b-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=descriptor,

@@ -184,7 +184,7 @@ def test_explosives_advance_restriction_applies_even_with_a_shooting_permission(
         player_id="owner",
         unit_instance_id=unit,
     )
-    rolled = DiceRollManager(state.game_id).roll_fixed(roll_request.spec, (3,))
+    rolled = DiceRollManager(state.private_rng_seed).roll_fixed(roll_request.spec, (3,))
     state.record_advanced_unit_state(
         AdvancedUnitState(
             "owner",

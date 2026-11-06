@@ -318,7 +318,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section22/test_damage.py::test_psychic_ability_wounds_reach_psychic_only_protection",
-              "function_ast_sha256": "e5c31f3d6dab2c891f98bb23d2040730565fdc0eeb8a9ac52f5c1d728191292a",
+              "function_ast_sha256": "5fb1a9bbee9b5594003b599f62ffd8f07bf18185a9e3443f13857077df9eca24",
               "assertions": [
                 "assert (state.to_payload(), decisions.to_payload()) == before",
                 "assert bool(result.feel_no_pain_resolutions) is psychic",

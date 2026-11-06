@@ -20,11 +20,19 @@ from warhammer40k_core.adapters.event_stream import (
 from warhammer40k_core.adapters.projection import (
     GameViewPayload,
     RulesCatalogViewPayload,
-    project_game_view,
+    project_game_view_with_history_identities,
     project_rules_catalog_view,
+)
+from warhammer40k_core.adapters.redaction import (
+    authoritative_visible_event_prefix_counts,
+    decision_request_hidden_from_context,
+    public_decision_request_payload,
+    redacted_lifecycle_status,
+    viewer_identity_map,
 )
 from warhammer40k_core.adapters.replay import submit_replay_record
 from warhammer40k_core.adapters.support_profile import SupportProfilePayload, build_support_profile
+from warhammer40k_core.adapters.viewer_identity import ViewerIdentityError, ViewerIdentityMap
 from warhammer40k_core.core.rng import RandomSource, RandomSourceError, RandomSourcePayload
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_record import DecisionRecord
@@ -47,7 +55,7 @@ from warhammer40k_core.engine.replay import (
     replay_event_log_hash,
 )
 
-LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION = "local-game-session-persistence-v1"
+LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION = "local-game-session-persistence-v2-private-rng"
 
 
 class LocalGameSessionPersistencePayload(TypedDict):
@@ -72,6 +80,13 @@ def _new_parameterized_lifecycle() -> GameLifecycle:
     return GameLifecycle(parameterized_movement_proposals=True)
 
 
+@dataclass(frozen=True, slots=True)
+class _ViewerHistoryIdentitySnapshot:
+    history_hash: str
+    viewer: ViewerContext
+    identities: ViewerIdentityMap
+
+
 @dataclass(slots=True)
 class LocalGameSession(AdapterGameSession):
     lifecycle: GameLifecycle = field(default_factory=_new_parameterized_lifecycle)
@@ -85,6 +100,9 @@ class LocalGameSession(AdapterGameSession):
         init=False,
         repr=False,
     )
+    _viewer_identity_snapshot: _ViewerHistoryIdentitySnapshot | None = field(
+        default=None, init=False, repr=False, compare=False
+    )
 
     def fork(self) -> Self:
         clone = type(self)(
@@ -97,9 +115,15 @@ class LocalGameSession(AdapterGameSession):
         return clone
 
     def to_persistence_payload(self) -> JsonValue:
+        checkpoint, _lifecycle_hash = self._persistence_payload_with_lifecycle_hash()
+        return copy.deepcopy(checkpoint)
+
+    def _persistence_payload_with_lifecycle_hash(self) -> tuple[JsonValue, str]:
+        # Internal callers only read this validated checkpoint. The public
+        # export and fork boundaries detach it before any caller can mutate it.
         lifecycle_payload = _lifecycle_payload_copy(self.lifecycle)
         lifecycle_hash = _payload_sha256(cast(JsonValue, lifecycle_payload))
-        initial_replay_payload = copy.deepcopy(self._initial_replay_lifecycle_payload)
+        initial_replay_payload = self._initial_replay_lifecycle_payload
         cached = self._persistence_payload_cache
         if (
             isinstance(cached, dict)
@@ -109,7 +133,8 @@ class LocalGameSession(AdapterGameSession):
                 cast(JsonValue, initial_replay_payload),
             )
         ):
-            return copy.deepcopy(cached)
+            return cached, lifecycle_hash
+        initial_replay_payload = copy.deepcopy(initial_replay_payload)
         effective_initial_payload = (
             lifecycle_payload
             if initial_replay_payload is None
@@ -147,10 +172,9 @@ class LocalGameSession(AdapterGameSession):
             **payload_without_hash,
             "content_hash": _payload_sha256(cast(JsonValue, payload_without_hash)),
         }
-        validate_json_value(payload)
         validated = validate_json_value(payload)
-        self._persistence_payload_cache = copy.deepcopy(validated)
-        return copy.deepcopy(validated)
+        self._persistence_payload_cache = validated
+        return validated, lifecycle_hash
 
     def authoritative_identity_payload(self) -> AdapterSessionIdentityPayload:
         config = self.lifecycle.config
@@ -167,7 +191,7 @@ class LocalGameSession(AdapterGameSession):
         }
 
     def authoritative_history_payload(self) -> AdapterSessionHistoryPayload:
-        checkpoint = self.to_persistence_payload()
+        checkpoint, lifecycle_hash = self._persistence_payload_with_lifecycle_hash()
         if not isinstance(checkpoint, dict):
             raise LocalGameSessionPersistenceError(
                 "LocalGameSession persistence checkpoint must be an object."
@@ -185,10 +209,10 @@ class LocalGameSession(AdapterGameSession):
             "rng_seed": rng_state["seed"],
             "rng_history": list(rng_state["history"]),
             "rng_draw_count": rng_state["draw_count"],
-            "checkpoint_hash": _payload_sha256(validate_json_value(checkpoint)),
-            "authoritative_state_hash": _payload_sha256(
-                cast(JsonValue, self.lifecycle.to_payload())
-            ),
+            "checkpoint_hash": _payload_sha256(checkpoint),
+            # This is the fresh lifecycle hash used by the checkpoint builder,
+            # including on cache hits; it is never read from stored metadata.
+            "authoritative_state_hash": lifecycle_hash,
         }
 
     @classmethod
@@ -344,13 +368,14 @@ class LocalGameSession(AdapterGameSession):
             if initial_replay_value is None
             else copy.deepcopy(cast(GameLifecyclePayload, initial_replay_value))
         )
-        restored._persistence_payload_cache = copy.deepcopy(value)
+        restored._persistence_payload_cache = value
         return restored
 
     def start(self, config: GameConfig) -> LifecycleStatus:
         if type(config) is not GameConfig:
             raise GameLifecycleError("LocalGameSession config must be a GameConfig.")
         self._persistence_payload_cache = None
+        self._viewer_identity_snapshot = None
         status = self.lifecycle.start(config)
         self._initial_replay_lifecycle_payload = None
         return status
@@ -386,17 +411,85 @@ class LocalGameSession(AdapterGameSession):
         )
 
     def view(self, *, viewer_player_id: str) -> GameViewPayload:
-        return project_game_view(
+        player = _validate_viewer_player_id(
             lifecycle=self.lifecycle,
             viewer_player_id=viewer_player_id,
+        )
+        return self.view_for_context(viewer=ViewerContext.for_player(player))
+
+    def _viewer_history_identities(self, *, viewer: ViewerContext) -> ViewerIdentityMap:
+        # This map depends only on complete event history and viewer. Recheck
+        # content, including visibility changes without record-count progress.
+        event_log = self.lifecycle.decision_controller.event_log
+        history_hash = _payload_sha256(cast(JsonValue, event_log.to_payload()))
+        cached = self._viewer_identity_snapshot
+        if cached is None or cached.viewer != viewer or cached.history_hash != history_hash:
+            cached = _ViewerHistoryIdentitySnapshot(
+                history_hash, viewer, viewer_identity_map(event_log=event_log, viewer=viewer)
+            )
+            self._viewer_identity_snapshot = cached
+        # Pending-request and display issuance must never mutate the history map.
+        return copy.deepcopy(cached.identities)
+
+    def _viewer_submission_map(
+        self, *, viewer: ViewerContext, request_id: str
+    ) -> tuple[str, ViewerIdentityMap]:
+        if type(viewer) is not ViewerContext or not viewer.policy.may_submit_decision:
+            raise GameLifecycleError("Viewer is not permitted to submit a decision.")
+        request = self.lifecycle.pending_decision_request()
+        if request is None or request.actor_id != viewer.viewer_player_id:
+            raise GameLifecycleError("Viewer does not own the pending decision.")
+        if decision_request_hidden_from_context(request=request, viewer=viewer):
+            raise GameLifecycleError("Pending decision is hidden from this viewer.")
+        identities = self._viewer_history_identities(viewer=viewer)
+        public = identities.project(public_decision_request_payload(request, viewer=viewer))
+        if not isinstance(public, dict) or public["request_id"] != request_id:
+            raise GameLifecycleError("Viewer submission request is stale or unissued.")
+        return request.request_id, identities
+
+    def submit_viewer_option(
+        self, *, viewer: ViewerContext, request_id: str, option_id: str, result_id: str
+    ) -> LifecycleStatus:
+        authoritative_id, identities = self._viewer_submission_map(
+            viewer=viewer, request_id=request_id
+        )
+        authoritative_option = identities.resolve(option_id, key="option_id")
+        if not isinstance(authoritative_option, str):
+            raise GameLifecycleError("Viewer option identity must remain a string.")
+        return self.submit_option(
+            request_id=authoritative_id, option_id=authoritative_option, result_id=result_id
+        )
+
+    def submit_viewer_parameterized_payload(
+        self, *, viewer: ViewerContext, request_id: str, payload: JsonValue, result_id: str
+    ) -> LifecycleStatus:
+        authoritative_id, identities = self._viewer_submission_map(
+            viewer=viewer, request_id=request_id
+        )
+        try:
+            authoritative_payload = identities.resolve(payload)
+        except ViewerIdentityError as exc:
+            state = self.lifecycle.state
+            if state is None:
+                raise GameLifecycleError("Viewer submission requires a started game.") from exc
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message=str(exc),
+                payload={"viewer_identity_validation": "unissued_or_stale_identity"},
+            )
+        return self.submit_parameterized_payload(
+            request_id=authoritative_id, payload=authoritative_payload, result_id=result_id
         )
 
     def view_for_context(self, *, viewer: ViewerContext) -> GameViewPayload:
         if type(viewer) is not ViewerContext:
             raise GameLifecycleError("LocalGameSession view requires a ViewerContext.")
-        return project_game_view(
+        # Always project current authority. Only history-derived identities are
+        # reused; geometry, requests and all other state remain freshly observed.
+        return project_game_view_with_history_identities(
             lifecycle=self.lifecycle,
             viewer=viewer,
+            history_identities=self._viewer_history_identities(viewer=viewer),
         )
 
     def rules_catalog_view(self) -> RulesCatalogViewPayload:
@@ -452,6 +545,33 @@ class LocalGameSession(AdapterGameSession):
             viewer=viewer,
             visible_limit=visible_limit,
         )
+
+    def authoritative_event_page_for_context(
+        self, cursor: EventStreamCursor, *, viewer: ViewerContext, visible_limit: int
+    ) -> EventStreamPagePayload:
+        self._validate_event_context(cursor=cursor, viewer=viewer)
+        return cursor.authoritative_page_for_context(
+            self.lifecycle.decision_controller.event_log, viewer=viewer, visible_limit=visible_limit
+        )
+
+    def authoritative_visible_event_prefix_counts(
+        self, *, viewer: ViewerContext
+    ) -> tuple[int, ...]:
+        self._validate_event_context(cursor=EventStreamCursor(), viewer=viewer)
+        return authoritative_visible_event_prefix_counts(
+            event_log=self.lifecycle.decision_controller.event_log, viewer=viewer
+        )
+
+    def status_for_context(self, status: LifecycleStatus, *, viewer: ViewerContext) -> JsonValue:
+        identities = viewer_identity_map(
+            event_log=self.lifecycle.decision_controller.event_log, viewer=viewer
+        )
+        request = status.decision_request
+        if request is not None and not decision_request_hidden_from_context(
+            request=request, viewer=viewer
+        ):
+            identities.project(public_decision_request_payload(request, viewer=viewer))
+        return identities.project(cast(JsonValue, redacted_lifecycle_status(status, viewer=viewer)))
 
     def visible_event_count_for_context(
         self,
@@ -548,7 +668,8 @@ def _lifecycle_payload_copy(lifecycle: GameLifecycle) -> GameLifecyclePayload:
 
 def _persistence_object(payload: JsonValue) -> dict[str, JsonValue]:
     try:
-        validated = validate_json_value(copy.deepcopy(payload))
+        # Validation recursively constructs detached JSON containers itself.
+        validated = validate_json_value(payload)
     except EventLogError as exc:
         raise LocalGameSessionPersistenceError(
             "LocalGameSession persistence payload is not JSON-safe."
@@ -567,7 +688,7 @@ def _current_rng_state(lifecycle: GameLifecycle) -> RandomSourcePayload:
         )
     try:
         manager = DiceRollManager(
-            lifecycle.state.game_id,
+            lifecycle.state.private_rng_seed,
             event_log=lifecycle.decision_controller.event_log,
         )
     except (DecisionError, EventLogError) as exc:

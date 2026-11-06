@@ -41,6 +41,7 @@ def movement_session(definitions: Section02Definitions, state: GameState) -> Loc
         for a in state.army_definitions
     )
     config = GameConfig(
+        private_rng_seed=state.private_rng_seed,
         game_id=state.game_id,
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
         army_catalog=definitions.package.army_catalog,

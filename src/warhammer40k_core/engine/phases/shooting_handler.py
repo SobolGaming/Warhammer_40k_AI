@@ -449,7 +449,7 @@ class ShootingPhaseHandler:
             AttackSequenceCompletedContext(
                 state=state,
                 decisions=decisions,
-                dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+                dice_manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
                 runtime_modifier_registry=self.runtime_modifier_registry,
                 source_phase=completed_sequence.source_phase,
                 attack_sequence=completed_sequence,

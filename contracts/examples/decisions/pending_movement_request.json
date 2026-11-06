@@ -72,6 +72,6 @@
     "phase": "movement",
     "source_rule_id": "gw-11e-core-rules:movement-phase:move-units-step"
   },
-  "request_id": "decision-request-000007",
-  "schema_version": "decision-request-view-v5-phase17n-step4"
+  "request_id": "view-request-df438bd51d50b1b79010d1873ac47ccd25e2f0dc60b656c3fa412f6b1e7dac8b",
+  "schema_version": "decision-request-view-v6-viewer-identities"
 }

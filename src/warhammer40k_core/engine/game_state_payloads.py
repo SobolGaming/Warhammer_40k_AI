@@ -105,6 +105,7 @@ if TYPE_CHECKING:
 
 class GameConfigPayload(TypedDict):
     game_id: str
+    private_rng_seed: str
     ruleset_descriptor: RulesetDescriptorPayload
     army_catalog: ArmyCatalogPayload
     army_muster_requests: list[ArmyMusterRequestPayload]
@@ -164,6 +165,8 @@ class RangedAttackHistoryRecordPayload(TypedDict):
 class GameStatePayload(TypedDict):
     random_weapon_ranges: NotRequired[list[WeaponRangeEvaluationPayload]]
     game_id: str
+    private_rng_seed: str
+    tactical_secondary_draw_sequence: int
     ruleset_descriptor_hash: str
     rules_overlay_ids: list[str]
     stage: str

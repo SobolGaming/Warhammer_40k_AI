@@ -16,6 +16,7 @@ from tests.movement_submission_helpers import (
 )
 from tests.phase13b_shooting_declaration_helpers import proposal_from_request
 from tests.phase15c_fight_order_helpers import fight_lifecycle
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -237,6 +238,7 @@ def _aeldari_config(
         selected_datasheet_id = _AELDARI_ASPECT_DATASHEET_ID
         selected_model_profile_id = _AELDARI_ASPECT_MODEL_PROFILE_ID
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase17g-aeldari-star-engines"),
         game_id="phase17g-aeldari-star-engines",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
@@ -790,7 +792,7 @@ def _aspect_shrine_lifecycle_override_request(
     declaration_result_id = "aspect-token-shooting-declaration"
     attack_context_id = f"attack-sequence:{declaration_result_id}:pool-001:attack-001"
     manager = DiceRollManager(
-        _state(lifecycle).game_id,
+        _state(lifecycle).private_rng_seed,
         event_log=lifecycle.decision_controller.event_log,
     )
     manager.roll_fixed(

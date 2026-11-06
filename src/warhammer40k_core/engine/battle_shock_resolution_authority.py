@@ -170,7 +170,7 @@ def parse_pending_battle_shock_reroll_authority(
         or permission.owning_player_id != test_request.player_id
     ):
         raise GameLifecycleError("Pending Battle-shock occurrence context drifted.")
-    expected = DiceRollManager(test_request.game_id).build_reroll_request(
+    expected = DiceRollManager(0).build_reroll_request(
         initial_roll_state,
         request_id=request.request_id,
         actor_id=test_request.player_id,
@@ -486,9 +486,7 @@ def _validate_reroll_decision(
     permission = RerollPermission.from_payload(
         cast(RerollPermissionPayload, _object(payload.get("permission"), "reroll permission"))
     )
-    expected_request = DiceRollManager(
-        _identifier(request_base.get("game_id"), "reroll game")
-    ).build_reroll_request(
+    expected_request = DiceRollManager(0).build_reroll_request(
         original_state,
         request_id=record.request.request_id,
         actor_id=record.request.actor_id,

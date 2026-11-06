@@ -465,7 +465,7 @@ def test_native_banshee_roles_keep_base_five_and_melee_four(
         )
 
 
-@pytest.mark.parametrize(("role", "seed"), (("howling-banshees", 1), ("howling-banshee-exarch", 2)))
+@pytest.mark.parametrize(("role", "seed"), (("howling-banshees", 4), ("howling-banshee-exarch", 1)))
 def test_native_fight_melee_save_restore_and_exact_replay(
     save_definitions: Section02Definitions, role: str, seed: int
 ) -> None:

@@ -338,6 +338,7 @@ def _battlefield_view_payload(
     state = GameState.from_config(
         GameConfig(
             game_id=f"event-companion-viewer-{mission_setup.battlefield_layout_id}",
+            private_rng_seed="f0" * 32,
             allow_legacy_non_strict_rosters=True,
             ruleset_descriptor=ruleset,
             army_catalog=catalog,

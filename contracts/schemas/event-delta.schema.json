@@ -25,7 +25,7 @@
     "resync_required": {"type": "boolean"},
     "retention_limit": {"minimum": 1, "type": "integer"},
     "revision_retention_limit": {"minimum": 1, "type": "integer"},
-    "schema_version": {"const": "event-delta-v5-phase17n-step4", "type": "string"},
+    "schema_version": {"const": "event-delta-v6-viewer-identities", "type": "string"},
     "session_id": {"minLength": 1, "type": "string"},
     "supplied_cursor": {"maxLength": 2048, "minLength": 1, "type": "string"},
     "to_revision": {"minimum": 0, "type": "integer"},

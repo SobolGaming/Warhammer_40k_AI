@@ -91,7 +91,32 @@ def before_daemons_registry(value: dict[str, Any]) -> dict[str, Any]:
     return prior
 
 
+def before_pr2_comparison_provenance(raw: bytes) -> bytes:
+    """Authenticate only the additive PR2 comparison registration before older proofs."""
+    addition = (
+        b"COMPARISON_ONLY_SCOPE_BASES = (scopes.ACTS_BASE, scopes.DEFILER_BASE, scopes.PR2_BASE)"
+    )
+    predecessor = b"COMPARISON_ONLY_SCOPE_BASES = (scopes.ACTS_BASE, scopes.DEFILER_BASE)"
+    if b"scopes.PR2_BASE" not in raw:
+        return raw
+    error = "Exact registered edition provenance inputs changed."
+    if (
+        sha256(raw).hexdigest()
+        != "84ee00289dbffa00eafcd889a9e047c541077e46970a1f6a933d6f3da3a77668"
+        or raw.count(addition) != 1
+    ):
+        raise ValueError(error)
+    prior = raw.replace(addition, predecessor, 1)
+    if (
+        sha256(prior).hexdigest()
+        != "95244250ad88ac287f6bcef1c89eea29fe4f70318d9383e9a92b7c103240670d"
+    ):
+        raise ValueError(error)
+    return prior
+
+
 def before_daemons_provenance(raw: bytes) -> bytes:
+    raw = before_pr2_comparison_provenance(raw)
     if b"DAEMONS_NATIVE_OVERLAY" not in raw:
         return raw
     audit = daemons_audit("provenance-delta")

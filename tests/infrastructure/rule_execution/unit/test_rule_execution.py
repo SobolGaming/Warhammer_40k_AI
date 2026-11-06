@@ -207,6 +207,8 @@ from tests.shared.category_migration.phase17d_rule_execution import (
     validate_reaction_queue_consistency,
     with_unit_keywords,
 )
+from warhammer40k_core.adapters.access_control import ViewerContext
+from warhammer40k_core.adapters.redaction import viewer_identity_map
 
 
 def test_phase17d_once_per_battle_activation_consumes_and_modifies_source_model() -> None:
@@ -445,7 +447,23 @@ def test_phase17d_once_per_battle_activation_submits_through_local_session_and_r
         for event in player_b_events["events"]
         if event["event_type"] == "catalog_once_per_battle_ability_activated"
     ]
-    assert player_a_activations == player_b_activations
+    canonical_activations = [
+        event.to_payload()
+        for event in session.lifecycle.decision_controller.event_log.records
+        if event.event_type == "catalog_once_per_battle_ability_activated"
+    ]
+    for player, activations in (
+        ("player-a", player_a_activations),
+        ("player-b", player_b_activations),
+    ):
+        identities = viewer_identity_map(
+            event_log=session.lifecycle.decision_controller.event_log,
+            viewer=ViewerContext.for_player(player),
+        )
+        assert [identities.resolve(validate_json_value(event)) for event in activations] == (
+            canonical_activations
+        )
+    assert player_a_activations[0]["event_id"] != player_b_activations[0]["event_id"]
     assert len(player_a_activations) == 2
     replay = ReplayRunner.from_payload(
         session.replay_artifact(artifact_id="replay:once-per-battle:fight-boost")

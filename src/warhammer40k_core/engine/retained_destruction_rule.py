@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 def offer_rule_fight_on_death(
     *, state: GameState, decisions: DecisionController, root_context: dict[str, JsonValue]
 ) -> LifecycleStatus | None:
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     placement = ModelPlacement.from_payload(
         cast(ModelPlacementPayload, root_context["destroyed_model_placement"])
     )

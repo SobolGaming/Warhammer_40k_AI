@@ -379,7 +379,7 @@ def _apply_melee_declaration_decision(
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
         proposal=proposal,
         army_catalog=_army_catalog_for_handler(handler),
-        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        dice_manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
         sequence_id=sequence_id,
         state=state,
         runtime_modifier_registry=handler.runtime_modifier_registry,

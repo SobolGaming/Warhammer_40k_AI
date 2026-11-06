@@ -105,7 +105,9 @@ def resolve_native_attack(
             actor_id="player-a",
         )
         rolls.append(_fixed_roll_result(roll_id="we-native-trigger", spec=spec, value=trigger))
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log, injected_results=rolls)
+    manager = DiceRollManager(
+        state.private_rng_seed, event_log=decisions.event_log, injected_results=rolls
+    )
     remaining, _allocated, status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=decisions,

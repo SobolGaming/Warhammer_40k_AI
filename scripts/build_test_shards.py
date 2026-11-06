@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import stat
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
@@ -18,6 +19,11 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 TESTS_ROOT = REPOSITORY_ROOT / "tests"
 EXCLUDED_TEST_DIRECTORIES = {"benchmarks", "code_quality"}
 SHARD_STRATEGY = "largest-processing-time-by-derived-selector-weight"
+BEHAVIORAL_CI_WORKERS = 4
+SERIAL_BEHAVIORAL_CASE = (
+    "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::"
+    "test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
+)
 
 
 class ProfileEvidence(TypedDict):
@@ -68,9 +74,18 @@ def main() -> int:
     if args.profile_source is None or len(args.profile_source) != len(args.junit):
         parser.error("one --profile-source is required per --junit")
     durations, profiles = _profile_medians(tuple(args.junit), tuple(args.profile_source))
-    durations = _rounded_durations(_partitioned_durations(durations))
-    shards = _balanced_shards(durations=durations, shard_count=args.shard_count)
-    _write_manifests(output_dir=output_dir, shards=shards, durations=durations, profiles=profiles)
+    case_seconds = _case_profile_medians(tuple(args.junit))
+    durations = _rounded_durations(_partitioned_durations(durations, case_seconds=case_seconds))
+    shards = _balanced_shards(
+        durations=durations, shard_count=args.shard_count, case_seconds=case_seconds
+    )
+    _write_manifests(
+        output_dir=output_dir,
+        shards=shards,
+        durations=durations,
+        profiles=profiles,
+        case_seconds=case_seconds,
+    )
     return 0
 
 
@@ -354,6 +369,23 @@ def validate_acts_inactive_source(root: Path) -> None:
             raise SystemExit("Acts inactive API successor/preimage changed.")
 
 
+def validate_private_rng_inactive_source(root: Path, before: dict[str, object]) -> None:
+    """Permit six fixture seed/draw pairs; preserve every native source byte."""
+    path = root / "tests/unit/test_phase11e_mission_scoring_cleanup.py"
+    _selection_no_links(root, path)
+    raw, count = re.subn(
+        rb'(?m)^([ ]+)private_rng_seed="f0" \* 32,\r?\n\1draw_id="fixture-draw",\r?\n',
+        b"",
+        path.read_bytes(),
+    )
+    if (
+        count != 6
+        or len(raw) != before["bytes"]
+        or hashlib.sha256(raw).hexdigest() != before["sha256"]
+    ):
+        raise SystemExit("Private RNG inactive API maintenance changed native test semantics.")
+
+
 def behavioral_selection(root: Path) -> BehavioralSelection:
     """Fresh finite cutover admission shared by pytest and shard discovery."""
     root = root.resolve(strict=True)
@@ -426,6 +458,9 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     retained = _selection_members(value["retained_active_files"], root)
     updates = value["inactive_updates"]
     allowed_updates = {
+        "tests/unit/test_phase11e_mission_scoring_cleanup.py": (
+            "explicit-private-tactical-draw-seed-v1"
+        ),
         "tests/unit/test_phase17g_adepta_sororitas_army_rule.py": "acts-turn-api-maintenance-v1",
         "tests/unit/test_phase15c_fight_order.py": "add-pending-decision-requests-v1",
         "tests/unit/test_phase13b_shooting_declarations.py": "add-pending-decision-requests-v1",
@@ -445,6 +480,8 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
         ):
             raise SystemExit("Inactive update native preimage/recipe changed.")
         current.update(_selection_members({name: update["after"]}, root))
+        if update["recipe"] == "explicit-private-tactical-draw-seed-v1":
+            validate_private_rng_inactive_source(root, update["before"])
     if "tests/unit/test_phase17g_adepta_sororitas_army_rule.py" in current:
         validate_acts_inactive_source(root)
     retired = _selection_retirements(root, value["retirements"], value["inactive_legacy_files"])
@@ -572,6 +609,46 @@ def _literal_partition_nodes(root: Path) -> tuple[str, ...]:
     return nodes
 
 
+def duration_worksteal_order(
+    nodeids: tuple[str, ...], *, workers: int, selector_seconds: dict[str, float]
+) -> tuple[int, ...]:
+    """Balance measured costs across xdist's actual consecutive initial chunks."""
+    if type(workers) is not int or workers < 1 or len(nodeids) != len(set(nodeids)):
+        raise SystemExit("Duration dispatch requires positive workers and unique nodes.")
+    if not isinstance(selector_seconds, dict):
+        raise SystemExit("Duration dispatch requires measured scheduling weights.")
+    file_counts: dict[str, int] = {}
+    for node in nodeids:
+        file = node.split("::", 1)[0]
+        file_counts[file] = file_counts.get(file, 0) + 1
+    costs: list[float] = []
+    for node in nodeids:
+        file = node.split("::", 1)[0]
+        selector = node if node in selector_seconds else file
+        if selector not in selector_seconds:
+            raise SystemExit(f"Missing scheduling weight for {node}.")
+        weight = selector_seconds[selector]
+        if type(weight) not in (int, float) or not math.isfinite(weight) or weight < 0:
+            raise SystemExit(f"Invalid scheduling weight for {selector}.")
+        costs.append(float(weight) / (1 if selector == node else file_counts[file]))
+    capacities: list[int] = []
+    remaining = len(nodeids)
+    for worker in range(workers):
+        capacity = remaining // (workers - worker)
+        capacities.append(capacity)
+        remaining -= capacity
+    buckets: list[list[int]] = [[] for _ in range(workers)]
+    totals = [0.0] * workers
+    for index in sorted(range(len(nodeids)), key=lambda index: (-costs[index], index)):
+        worker = min(
+            (worker for worker in range(workers) if len(buckets[worker]) < capacities[worker]),
+            key=lambda worker: (totals[worker], worker),
+        )
+        buckets[worker].append(index)
+        totals[worker] += costs[index]
+    return tuple(index for bucket in buckets for index in bucket)
+
+
 def worksteal_relevance_order(nodeids: tuple[str, ...], *, workers: int) -> tuple[int, ...]:
     """Start the finite expensive S25 cases on distinct existing worker chunks.
 
@@ -644,22 +721,32 @@ def _case_partition(root: Path, files: frozenset[str]) -> dict[str, float]:
 def _behavioral_shard_selectors() -> tuple[str, ...]:
     files = frozenset(_behavioral_test_files())
     partition = _case_partition(REPOSITORY_ROOT, files)
-    return (
-        tuple(sorted((files - {CASE_PARTITION_FILE}) | partition.keys()))
-        if partition
-        else tuple(sorted(files))
-    )
+    selectors = (files - {CASE_PARTITION_FILE}) | partition.keys() if partition else set(files)
+    if SERIAL_BEHAVIORAL_CASE.split("::", 1)[0] in files:
+        # That file selector is its remainder; CI deselects this separately owned node.
+        selectors = set(selectors) | {SERIAL_BEHAVIORAL_CASE}
+    return tuple(sorted(selectors))
 
 
-def _partitioned_durations(durations: dict[str, float]) -> dict[str, float]:
+def _partitioned_durations(
+    durations: dict[str, float], *, case_seconds: dict[str, float] | None = None
+) -> dict[str, float]:
     """Preserve file totals; node ratios are derived scheduling weights, not case profiles."""
     partition = _case_partition(REPOSITORY_ROOT, frozenset(durations))
-    if not partition:
-        return dict(durations)
     result = dict(durations)
-    total = result.pop(CASE_PARTITION_FILE)
-    denominator = sum(partition.values())
-    result.update({node: total * weight / denominator for node, weight in partition.items()})
+    if partition:
+        total = result.pop(CASE_PARTITION_FILE)
+        denominator = sum(partition.values())
+        result.update({node: total * weight / denominator for node, weight in partition.items()})
+    owner = SERIAL_BEHAVIORAL_CASE.split("::", 1)[0]
+    if owner in result:
+        if case_seconds is None or SERIAL_BEHAVIORAL_CASE not in case_seconds:
+            raise SystemExit("Partitioning requires the complete serial mirror case profile.")
+        serial = case_seconds[SERIAL_BEHAVIORAL_CASE]
+        if not 0 <= serial <= result[owner]:
+            raise SystemExit("Serial mirror cost exceeds its measured file total.")
+        result[owner] -= serial
+        result[SERIAL_BEHAVIORAL_CASE] = serial
     return result
 
 
@@ -692,7 +779,22 @@ def _durations_from_junit(junit_path: Path) -> dict[str, float]:
     return _read_junit_profile(junit_path)[0]
 
 
-def _read_junit_profile(junit_path: Path) -> tuple[dict[str, float], tuple[str, ...], int]:
+def _case_profile_medians(paths: tuple[Path, ...]) -> dict[str, float]:
+    measurements: list[dict[str, float]] = []
+    for path in paths:
+        cases: dict[str, float] = {}
+        _read_junit_profile(path, case_seconds=cases)
+        if measurements and cases.keys() != measurements[0].keys():
+            raise SystemExit("Complete JUnit case inventories differ across profile runs.")
+        measurements.append(cases)
+    if not measurements:
+        raise SystemExit("Case scheduling requires a complete JUnit profile.")
+    return {node: median(run[node] for run in measurements) for node in measurements[0]}
+
+
+def _read_junit_profile(
+    junit_path: Path, *, case_seconds: dict[str, float] | None = None
+) -> tuple[dict[str, float], tuple[str, ...], int]:
     paths = tuple(sorted(junit_path.rglob("*.xml"))) if junit_path.is_dir() else (junit_path,)
     if not paths or any(not path.is_file() for path in paths):
         raise SystemExit(f"JUnit profile does not exist or is empty: {junit_path}")
@@ -737,6 +839,16 @@ def _read_junit_profile(junit_path: Path) -> tuple[dict[str, float], tuple[str, 
                     f"JUnit testcase duration must be finite and non-negative: {duration_text}"
                 )
             durations[test_file] = durations.get(test_file, 0.0) + duration
+            if case_seconds is not None:
+                module = test_file[:-3].replace("/", ".")
+                classname = testcase.get("classname", "")
+                if classname != module and not classname.startswith(module + "."):
+                    raise SystemExit("JUnit case scheduling requires an unambiguous module/class.")
+                classes = classname[len(module) :].lstrip(".").replace(".", "::")
+                node = test_file + "::" + (classes + "::" if classes else "") + name
+                if node in case_seconds:
+                    raise SystemExit("Duplicate JUnit scheduling node: " + node)
+                case_seconds[node] = duration
     missing = sorted(set(expected) - set(durations))
     unexpected = sorted(set(durations) - set(expected))
     if missing or unexpected:
@@ -775,21 +887,94 @@ def _rounded_durations(durations: dict[str, float]) -> dict[str, float]:
     return {path: round(duration, 3) for path, duration in durations.items()}
 
 
-def _balanced_shards(*, durations: dict[str, float], shard_count: int) -> tuple[Shard, ...]:
+def _execution_weights(
+    durations: dict[str, float], case_seconds: dict[str, float] | None
+) -> dict[str, float]:
+    weights = dict(durations)
+    owner = SERIAL_BEHAVIORAL_CASE.split("::", 1)[0]
+    if owner in weights or SERIAL_BEHAVIORAL_CASE in weights:
+        if case_seconds is None or SERIAL_BEHAVIORAL_CASE not in case_seconds:
+            raise SystemExit("Scheduling profile lacks the serial mirror case.")
+        if SERIAL_BEHAVIORAL_CASE not in weights:
+            raise SystemExit("Scheduling profile lacks the separate serial mirror selector.")
+        serial = case_seconds[SERIAL_BEHAVIORAL_CASE]
+        if type(serial) not in (int, float) or not math.isfinite(serial) or serial < 0:
+            raise SystemExit("Invalid serial mirror execution cost.")
+        if not math.isclose(weights[SERIAL_BEHAVIORAL_CASE], serial, rel_tol=0, abs_tol=0.001):
+            raise SystemExit("Serial mirror selector cost differs from its complete case profile.")
+        weights[SERIAL_BEHAVIORAL_CASE] *= BEHAVIORAL_CI_WORKERS
+        if not math.isfinite(weights[SERIAL_BEHAVIORAL_CASE]):
+            raise SystemExit("Invalid serial mirror execution cost.")
+    return weights
+
+
+def _balanced_shards(
+    *,
+    durations: dict[str, float],
+    shard_count: int,
+    case_seconds: dict[str, float] | None = None,
+) -> tuple[Shard, ...]:
     assignments: list[list[str]] = [[] for _ in range(shard_count)]
     totals = [0.0] * shard_count
-    for test_file, duration in sorted(durations.items(), key=lambda item: (-item[1], item[0])):
-        shard_index = min(range(shard_count), key=lambda index: (totals[index], index))
+    weights = _execution_weights(durations, case_seconds)
+    peaks = _selector_case_peaks(durations, case_seconds)
+    parallel_totals = [0.0] * shard_count
+    serial_totals = [0.0] * shard_count
+    largest_cases = [0.0] * shard_count
+    for test_file, duration in sorted(weights.items(), key=lambda item: (-item[1], item[0])):
+        serial = test_file == SERIAL_BEHAVIORAL_CASE
+        cost = durations[test_file]
+
+        scores = [
+            (
+                serial_totals[index]
+                + (cost if serial else 0)
+                + max(
+                    (parallel_totals[index] + (0 if serial else cost)) / BEHAVIORAL_CI_WORKERS,
+                    largest_cases[index],
+                    0 if serial else peaks[test_file],
+                ),
+                totals[index],
+                index,
+            )
+            for index in range(shard_count)
+        ]
+        shard_index = min(scores)[2]
         assignments[shard_index].append(test_file)
         totals[shard_index] += duration
+        if serial:
+            serial_totals[shard_index] += cost
+        else:
+            parallel_totals[shard_index] += cost
+            largest_cases[shard_index] = max(largest_cases[shard_index], peaks[test_file])
     return tuple(
         Shard(
             shard_id=index + 1,
-            duration_seconds=totals[index],
+            duration_seconds=sum(durations[name] for name in assignments[index]),
             test_files=tuple(sorted(assignments[index])),
         )
         for index in range(shard_count)
     )
+
+
+def _selector_case_peaks(
+    durations: dict[str, float], case_seconds: dict[str, float] | None
+) -> dict[str, float]:
+    if case_seconds is None:
+        return dict.fromkeys(durations, 0.0)
+    file_peaks: dict[str, float] = {}
+    for node, seconds in case_seconds.items():
+        owner = node.split("::", 1)[0]
+        file_peaks.setdefault(owner, 0.0)
+        if node != SERIAL_BEHAVIORAL_CASE:
+            file_peaks[owner] = max(file_peaks[owner], seconds)
+    peaks: dict[str, float] = {}
+    for selector in durations:
+        source = case_seconds if "::" in selector else file_peaks
+        if selector not in source:
+            raise SystemExit("Missing complete case scheduling weights for " + selector)
+        peaks[selector] = source[selector]
+    return peaks
 
 
 def _write_manifests(
@@ -798,6 +983,7 @@ def _write_manifests(
     shards: tuple[Shard, ...],
     durations: dict[str, float],
     profiles: tuple[ProfileEvidence, ...] = (),
+    case_seconds: dict[str, float] | None = None,
 ) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     for stale_manifest in output_dir.glob("shard-*.txt"):
@@ -805,7 +991,9 @@ def _write_manifests(
     for shard in shards:
         manifest_path = output_dir / f"shard-{shard.shard_id}.txt"
         manifest_path.write_text("\n".join(shard.test_files) + "\n", encoding="utf-8", newline="\n")
-    summary = _summary_payload(shards=shards, durations=durations, profiles=profiles)
+    summary = _summary_payload(
+        shards=shards, durations=durations, profiles=profiles, case_seconds=case_seconds
+    )
     (output_dir / "durations.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -853,7 +1041,14 @@ def _check_manifests(*, output_dir: Path, shard_count: int) -> None:
     except json.JSONDecodeError as error:
         raise SystemExit(f"Shard duration summary is not valid JSON: {summary_path}") from error
     durations = _summary_durations(summary=summary, expected=expected)
-    shards = _balanced_shards(durations=durations, shard_count=shard_count)
+    case_seconds = (
+        summary_case_seconds(summary)
+        if "case_seconds" in cast(dict[str, object], summary)
+        else None
+    )
+    shards = _balanced_shards(
+        durations=durations, shard_count=shard_count, case_seconds=case_seconds
+    )
     for shard in shards:
         if manifest_entries[shard.shard_id] != shard.test_files:
             manifest_path = output_dir / f"shard-{shard.shard_id}.txt"
@@ -861,7 +1056,9 @@ def _check_manifests(*, output_dir: Path, shard_count: int) -> None:
                 f"Shard manifest does not match the duration-balanced assignment: {manifest_path}"
             )
     profiles = _summary_profiles(summary)
-    expected_summary = _summary_payload(shards=shards, durations=durations, profiles=profiles)
+    expected_summary = _summary_payload(
+        shards=shards, durations=durations, profiles=profiles, case_seconds=case_seconds
+    )
     if summary != expected_summary:
         raise SystemExit("Shard duration summary does not match the committed manifests.")
 
@@ -871,8 +1068,9 @@ def _summary_payload(
     shards: tuple[Shard, ...],
     durations: dict[str, float],
     profiles: tuple[ProfileEvidence, ...] = (),
+    case_seconds: dict[str, float] | None = None,
 ) -> dict[str, object]:
-    return {
+    summary: dict[str, object] = {
         "strategy": SHARD_STRATEGY,
         "profiles": list(profiles),
         "shard_count": len(shards),
@@ -887,6 +1085,90 @@ def _summary_payload(
             for shard in shards
         ],
     }
+    if case_seconds is not None:
+        summary["case_seconds"] = dict(sorted(case_seconds.items()))
+        weights = _execution_weights(durations, case_seconds)
+        peaks = _selector_case_peaks(durations, case_seconds)
+        summary["execution_model"] = {
+            "parallel_workers": BEHAVIORAL_CI_WORKERS,
+            "serial_cases": [SERIAL_BEHAVIORAL_CASE],
+            "shard_worker_seconds": {
+                str(shard.shard_id): round(sum(weights[name] for name in shard.test_files), 3)
+                for shard in shards
+            },
+            "assignment_wall_lower_bound_seconds": {
+                str(shard.shard_id): round(
+                    (
+                        durations[SERIAL_BEHAVIORAL_CASE]
+                        if SERIAL_BEHAVIORAL_CASE in shard.test_files
+                        else 0
+                    )
+                    + max(
+                        sum(
+                            durations[name]
+                            for name in shard.test_files
+                            if name != SERIAL_BEHAVIORAL_CASE
+                        )
+                        / BEHAVIORAL_CI_WORKERS,
+                        max(
+                            (
+                                peaks[name]
+                                for name in shard.test_files
+                                if name != SERIAL_BEHAVIORAL_CASE
+                            ),
+                            default=0.0,
+                        ),
+                    ),
+                    3,
+                )
+                for shard in shards
+            },
+        }
+    return summary
+
+
+def summary_case_seconds(summary: object) -> dict[str, float]:
+    """Require declared complete node costs; never substitute file averages in CI."""
+    if not isinstance(summary, dict) or not isinstance(summary.get("case_seconds"), dict):
+        raise SystemExit("Missing complete case scheduling weights.")
+    cases = cast(dict[object, object], summary["case_seconds"])
+    result: dict[str, float] = {}
+    for node, weight in cases.items():
+        if not isinstance(node, str) or "::" not in node:
+            raise SystemExit("Invalid case scheduling weight identity.")
+        if (
+            isinstance(weight, bool)
+            or not isinstance(weight, int | float)
+            or not math.isfinite(weight)
+            or weight < 0
+        ):
+            raise SystemExit("Invalid case scheduling weight.")
+        result[node] = float(weight)
+    if not isinstance(summary.get("profiles"), list) or not isinstance(summary.get("files"), dict):
+        raise SystemExit("Case scheduling weights require complete profile evidence.")
+    profiles = _summary_profiles(summary)
+    owners = {node.split("::", 1)[0] for node in result}
+    files = cast(dict[object, object], summary["files"])
+    if (
+        not profiles
+        or any(
+            profile["test_cases"] != len(result) or profile["test_files"] != len(owners)
+            for profile in profiles
+        )
+        or any(not isinstance(selector, str) for selector in files)
+        or {str(selector).split("::", 1)[0] for selector in files} != owners
+    ):
+        raise SystemExit("Case scheduling weights do not cover the complete profile inventory.")
+    declared = _summary_durations(summary=summary, expected={str(selector) for selector in files})
+    owner_totals: dict[str, float] = {}
+    for selector, seconds in declared.items():
+        owner = selector.split("::", 1)[0]
+        owner_totals[owner] = owner_totals.get(owner, 0.0) + seconds
+    if any(not math.isfinite(total) for total in owner_totals.values()) or any(
+        seconds > owner_totals[node.split("::", 1)[0]] + 0.001 for node, seconds in result.items()
+    ):
+        raise SystemExit("Case scheduling weight exceeds its measured file total.")
+    return result
 
 
 def _summary_profiles(summary: object) -> tuple[ProfileEvidence, ...]:

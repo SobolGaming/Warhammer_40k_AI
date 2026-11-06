@@ -4,8 +4,9 @@ from http import HTTPStatus
 from typing import TypedDict, cast
 
 from warhammer40k_core.adapters.access_control import ViewerContext
+from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.external_contract import LIFECYCLE_STATUS_SCHEMA_VERSION
-from warhammer40k_core.adapters.redaction import public_error_envelope, redacted_lifecycle_status
+from warhammer40k_core.adapters.redaction import public_error_envelope
 from warhammer40k_core.adapters.server_types import ServerResponse
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -33,12 +34,15 @@ def status_response(
     game_id: str,
     status: LifecycleStatus,
     viewer: ViewerContext,
+    session: AdapterGameSession,
     status_code: HTTPStatus = HTTPStatus.OK,
 ) -> ServerResponse:
     payload: ServerGameStatusPayload = {
         "schema_version": LIFECYCLE_STATUS_SCHEMA_VERSION,
         "game_id": game_id,
-        "status": redacted_lifecycle_status(status, viewer=viewer),
+        "status": cast(
+            ServerLifecycleStatusPayload, session.status_for_context(status, viewer=viewer)
+        ),
     }
     return ServerResponse(
         status_code=int(status_code),

@@ -8,20 +8,24 @@ from enum import StrEnum
 from typing import TypedDict, cast
 
 from warhammer40k_core import __version__ as ENGINE_VERSION
-from warhammer40k_core.adapters.access_control import ROLE_POLICY_BY_ROLE, ViewerContext
+from warhammer40k_core.adapters.access_control import (
+    ROLE_POLICY_BY_ROLE,
+    PrincipalRole,
+    ViewerContext,
+)
 from warhammer40k_core.adapters.command_protocol import (
     SessionCommandJournalEntry,
     SessionCommandOutcomeCode,
     SessionCommandSubmissionKind,
 )
 from warhammer40k_core.adapters.contracts import AdapterGameSession
+from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.external_contract import (
     EXTERNAL_CONTRACT_VERSION,
     SESSION_COMMAND_OUTCOME_SCHEMA_VERSION,
     SESSION_COMMAND_RESULT_SCHEMA_VERSION,
     SESSION_METADATA_SCHEMA_VERSION,
 )
-from warhammer40k_core.adapters.redaction import redacted_lifecycle_status
 from warhammer40k_core.adapters.session_events import DEFAULT_EVENT_RETENTION_LIMIT
 from warhammer40k_core.adapters.session_revision import (
     SessionNonCommandOrigin,
@@ -109,7 +113,7 @@ class SessionMetadataPayload(TypedDict):
     lifecycle_status: JsonValue
     terminal_reason: TerminalReasonPayload | None
     created_at: str
-    last_activity_at: str
+    last_activity_at: str | None
     visibility: VisibilityPolicyPayload
     server_contract_version: str
     engine_version: str
@@ -154,13 +158,16 @@ class SessionRevisionSnapshot:
     started: bool
     closed: bool
 
+    def visible_event_count(self, viewer: ViewerContext) -> int:
+        return self.adapter_session.visible_event_count_for_context(
+            EventStreamCursor(self.event_count), viewer=viewer
+        )
+
     def __post_init__(self) -> None:
         if type(self.session_revision) is not int or self.session_revision < 0:
             raise SessionProtocolError("Snapshot revision must be non-negative.")
-        adapter_session: object = self.adapter_session
-        if not isinstance(  # pyright: ignore[reportUnnecessaryIsInstance]
-            adapter_session, AdapterGameSession
-        ):
+        adapter_session = cast(object, self.adapter_session)
+        if not isinstance(adapter_session, AdapterGameSession):
             raise SessionProtocolError("Snapshot requires AdapterGameSession.")
         if type(self.lifecycle_status) is not LifecycleStatus:
             raise SessionProtocolError("Snapshot lifecycle status is invalid.")
@@ -473,8 +480,27 @@ class AuthoritativeSession:
     def snapshot_for_viewer(self, viewer: ViewerContext) -> SessionRevisionSnapshot:
         if type(viewer) is not ViewerContext:
             raise SessionProtocolError("Session snapshot requires ViewerContext.")
-        target_revision = max(0, self.session_revision - viewer.policy.delay_revisions)
-        return self.snapshot(target_revision)
+        delay = viewer.policy.delay_revisions
+        if delay == 0:
+            return self.current_snapshot()
+        boundaries: list[SessionRevisionSnapshot] = []
+        prior: tuple[int, bool, bool] | None = None
+        for snapshot in sorted(
+            self.revision_snapshots.values(), key=lambda item: item.session_revision, reverse=True
+        ):
+            signature = (snapshot.visible_event_count(viewer), snapshot.started, snapshot.closed)
+            if signature != prior:
+                boundaries.append(snapshot)
+                prior = signature
+        return boundaries[min(delay, len(boundaries) - 1)]
+
+    def viewer_revision(
+        self, *, viewer: ViewerContext, snapshot: SessionRevisionSnapshot | None = None
+    ) -> int:
+        target = self.snapshot_for_viewer(viewer) if snapshot is None else snapshot
+        if viewer.policy.omniscient:
+            return target.session_revision
+        return target.visible_event_count(viewer)
 
     def snapshot_at_event_offset(
         self,
@@ -663,10 +689,25 @@ class AuthoritativeSession:
             or type(finalized) is not bool
         ):
             raise SessionProtocolError("Persisted session field type is invalid.")
+        current_snapshot = next(
+            (snapshot for snapshot in snapshots if snapshot.session_revision == session_revision),
+            None,
+        )
+        if current_snapshot is None:
+            raise SessionProtocolError("Persisted current session snapshot is missing.")
+        # The snapshot loader has already validated this exact checkpoint and replay.
+        # Validate the duplicated live payload before reusing that proof, then fork
+        # through the adapter's isolated transaction-copy contract. No mutable
+        # authority is shared with the historical snapshot.
+        if canonical_json(value["adapter_session"]) != canonical_json(
+            current_snapshot.adapter_session.to_persistence_payload()
+        ):
+            raise SessionProtocolError("Persisted current adapter checkpoint drifted.")
+        current_adapter_session = current_snapshot.adapter_session.fork()
         record = cls(
             session_id=session_id,
             game_id=game_id,
-            adapter_session=session_recovery_factory(value["adapter_session"]),
+            adapter_session=current_adapter_session,
             player_ids=tuple(player_ids),
             ruleset_id=value["ruleset_id"],
             ruleset_descriptor_hash=ruleset_descriptor_hash,
@@ -713,7 +754,7 @@ class AuthoritativeSession:
             "session_id": self.session_id,
             "game_id": self.game_id,
             "session_state": snapshot.state.value,
-            "session_revision": snapshot.session_revision,
+            "session_revision": self.viewer_revision(viewer=viewer, snapshot=snapshot),
             "ruleset_id": self.ruleset_id,
             "ruleset_descriptor_hash": self.ruleset_descriptor_hash,
             "rules_overlay_ids": list(self.rules_overlay_ids),
@@ -725,7 +766,7 @@ class AuthoritativeSession:
             "lifecycle_status": validate_json_value(lifecycle_status),
             "terminal_reason": self._terminal_reason(snapshot),
             "created_at": self.created_at,
-            "last_activity_at": snapshot.last_activity_at,
+            "last_activity_at": snapshot.last_activity_at if viewer.policy.omniscient else None,
             "visibility": {
                 "role": viewer.role.value,
                 "player_id": viewer.viewer_player_id,
@@ -768,10 +809,41 @@ class AuthoritativeSession:
     def _prune_snapshots(self) -> None:
         if len(self.revision_snapshots) <= self.revision_retention_limit:
             return
-        retained_revisions = sorted(self.revision_snapshots)[-self.revision_retention_limit :]
+        retained_revisions = self._retained_revision_ids()
         self.revision_snapshots = {
             revision: self.revision_snapshots[revision] for revision in retained_revisions
         }
+
+    def _retained_revision_ids(self) -> set[int]:
+        ordered = sorted(self.revision_history)
+        retained_revisions = set(ordered[-self.revision_retention_limit :])
+        viewers = [ViewerContext.for_player(player) for player in self.player_ids]
+        viewers.append(
+            ViewerContext(
+                principal_id="retention:shared",
+                role=PrincipalRole.DELAYED_SPECTATOR,
+                viewer_player_id=None,
+                policy=ROLE_POLICY_BY_ROLE[PrincipalRole.DELAYED_SPECTATOR],
+            )
+        )
+        # Preserve the first authoritative anchor for each of the last N visible
+        # boundaries. Hidden-only work cannot evict another viewer's history.
+        for viewer in viewers:
+            prefix_counts = self.adapter_session.authoritative_visible_event_prefix_counts(
+                viewer=viewer
+            )
+            boundaries: dict[tuple[int, bool, bool], int] = {}
+            for revision in ordered:
+                commitment = self.revision_history[revision]
+                signature = (
+                    prefix_counts[commitment.event_count],
+                    commitment.started,
+                    commitment.closed,
+                )
+                if signature not in boundaries:
+                    boundaries[signature] = revision
+            retained_revisions.update(list(boundaries.values())[-self.revision_retention_limit :])
+        return retained_revisions
 
     def _validate_revision_history(self, *, require_finalized: bool) -> None:
         if type(self.revision_history) is not dict:
@@ -836,6 +908,7 @@ class AuthoritativeSession:
                             previous=previous,
                             entry=entry,
                             decision_records=decision_records,
+                            event_records=current_history["event_records"],
                         )
                 elif entry is not None:
                     raise SessionProtocolError(
@@ -964,13 +1037,27 @@ class AuthoritativeSession:
         ):
             raise SessionProtocolError("Recovered rejected command lifecycle drifted.")
         revision = entry.committed_session_revision
+        authorization = entry.authorization_context
+        viewer = ViewerContext(
+            principal_id=authorization.principal_id,
+            role=authorization.role,
+            viewer_player_id=authorization.player_id,
+            policy=ROLE_POLICY_BY_ROLE[authorization.role],
+            authorization_epoch=authorization.authorization_epoch,
+        )
+        expected_revision = revision
+        if not viewer.policy.omniscient:
+            prefix_counts = self.adapter_session.authoritative_visible_event_prefix_counts(
+                viewer=viewer
+            )
+            expected_revision = prefix_counts[self.revision_history[revision].event_count]
         if (
             type(metadata["session_revision"]) is not int
             or type(checkpoint["session_revision"]) is not int
             or metadata["session_id"] != self.session_id
             or metadata["game_id"] != self.game_id
-            or metadata["session_revision"] != revision
-            or checkpoint["session_revision"] != revision
+            or metadata["session_revision"] != expected_revision
+            or checkpoint["session_revision"] != expected_revision
         ):
             raise SessionProtocolError("Recovered command journal session identity drifted.")
         if (
@@ -982,7 +1069,6 @@ class AuthoritativeSession:
             or metadata["source_hash"] != self.source_hash
         ):
             raise SessionProtocolError("Recovered command journal source identity drifted.")
-        authorization = entry.authorization_context
         visibility = _persistence_object(
             metadata["visibility"],
             field_name="command journal visibility",
@@ -1013,36 +1099,34 @@ class AuthoritativeSession:
             raise SessionProtocolError("Recovered command journal checkpoint drifted.")
         _validate_cursor(event_range["from_cursor"])
         retained = self.revision_snapshots.get(revision)
-        viewer = ViewerContext(
-            principal_id=authorization.principal_id,
-            role=authorization.role,
-            viewer_player_id=authorization.player_id,
-            policy=ROLE_POLICY_BY_ROLE[authorization.role],
-            authorization_epoch=authorization.authorization_epoch,
-        )
         if retained is not None and (
             metadata["session_state"] != retained.state.value
             or canonical_json(metadata["terminal_reason"])
             != canonical_json(cast(JsonValue, self._terminal_reason(retained)))
             or canonical_json(metadata["lifecycle_status"])
             != canonical_json(
-                cast(
-                    JsonValue,
-                    redacted_lifecycle_status(retained.lifecycle_status, viewer=viewer),
+                retained.adapter_session.status_for_context(
+                    retained.lifecycle_status, viewer=viewer
                 )
             )
         ):
             raise SessionProtocolError("Recovered command journal retained snapshot drifted.")
         activity = metadata["last_activity_at"]
-        if type(activity) is not str:
+        if not viewer.policy.omniscient:
+            if activity is not None:
+                raise SessionProtocolError(
+                    "Recovered command journal private activity timestamp leaked."
+                )
+        elif type(activity) is not str:
             raise SessionProtocolError("Recovered command journal activity timestamp drifted.")
-        activity_time = _parse_timestamp(activity)
-        if (
-            activity_time < _parse_timestamp(self.created_at)
-            or activity_time > _parse_timestamp(self.last_activity_at)
-            or (retained is not None and activity != retained.last_activity_at)
-        ):
-            raise SessionProtocolError("Recovered command journal activity timestamp drifted.")
+        else:
+            activity_time = _parse_timestamp(activity)
+            if (
+                activity_time < _parse_timestamp(self.created_at)
+                or activity_time > _parse_timestamp(self.last_activity_at)
+                or (retained is not None and activity != retained.last_activity_at)
+            ):
+                raise SessionProtocolError("Recovered command journal activity timestamp drifted.")
         if (
             metadata["created_at"] != self.created_at
             or metadata["server_contract_version"] != EXTERNAL_CONTRACT_VERSION
@@ -1128,9 +1212,9 @@ class AuthoritativeSession:
             self.adapter_session.to_persistence_payload()
         ):
             raise SessionProtocolError("Recovered current adapter checkpoint drifted.")
-        expected_revisions = set(range(self.minimum_retained_revision, self.session_revision + 1))
+        expected_revisions = self._retained_revision_ids()
         if set(self.revision_snapshots) != expected_revisions:
-            raise SessionProtocolError("Recovered snapshot revision range is not contiguous.")
+            raise SessionProtocolError("Recovered viewer snapshot retention inventory drifted.")
         previous_event_count = -1
         previous_activity = _parse_timestamp(self.created_at)
         previous_started = False

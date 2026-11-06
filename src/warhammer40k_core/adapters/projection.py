@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 from typing import NotRequired, TypedDict, cast
 
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.battlefield_projection import (
     BattlefieldViewPayload,
+    authoritative_geometry_hash,
     project_battlefield_view,
 )
 from warhammer40k_core.adapters.characteristic_projection import (
@@ -32,8 +34,10 @@ from warhammer40k_core.adapters.redaction import (
     public_primary_rules_unit_turn_start_snapshots,
     public_victory_point_ledger_payload,
     redacted_decision_type_for_hidden_viewer,
+    viewer_identity_map,
     visible_army_units,
 )
+from warhammer40k_core.adapters.viewer_identity import ViewerIdentityMap
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import BaseSizeDefinition, DatasheetAbilityDescriptor
@@ -77,7 +81,7 @@ from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_total,
 )
 
-PROJECTION_SCHEMA_VERSION = "game-view-v13-random-profiles"
+PROJECTION_SCHEMA_VERSION = "game-view-v14-viewer-identities"
 RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"
 
 _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (
@@ -519,6 +523,19 @@ def project_game_view(
     viewer_player_id: str | None = None,
     viewer: ViewerContext | None = None,
 ) -> GameViewPayload:
+    return project_game_view_with_history_identities(
+        lifecycle=lifecycle, viewer_player_id=viewer_player_id, viewer=viewer
+    )
+
+
+def project_game_view_with_history_identities(
+    *,
+    lifecycle: GameLifecycle,
+    viewer_player_id: str | None = None,
+    viewer: ViewerContext | None = None,
+    history_identities: ViewerIdentityMap | None = None,
+) -> GameViewPayload:
+    """Project fresh authority with an optional trusted session-owned history map."""
     if type(lifecycle) is not GameLifecycle:
         raise GameLifecycleError("Game projection requires a GameLifecycle.")
     state = lifecycle.state
@@ -650,6 +667,28 @@ def project_game_view(
             else _nested_interaction_request_views(pending_request, viewer=context)
         ),
     }
+    identities = (
+        viewer_identity_map(event_log=lifecycle.decision_controller.event_log, viewer=context)
+        if history_identities is None
+        else copy.deepcopy(history_identities)
+    )
+    if pending_request is not None and not decision_request_hidden_from_context(
+        request=pending_request, viewer=context
+    ):
+        identities.project(public_decision_request_payload(pending_request, viewer=context))
+    original_battlefield = payload["battlefield_view"]
+    payload = cast(GameViewPayload, identities.project(cast(JsonValue, payload)))
+    public_battlefield = payload["battlefield_view"]
+    if public_battlefield is not None:
+        assert original_battlefield is not None
+        if (
+            public_battlefield["bounds"] != original_battlefield["bounds"]
+            or public_battlefield["authoritative"] != original_battlefield["authoritative"]
+        ):
+            public_battlefield["authoritative_geometry_hash"] = authoritative_geometry_hash(
+                bounds=public_battlefield["bounds"],
+                authoritative=public_battlefield["authoritative"],
+            )
     payload["projection_state_hash"] = _projection_state_hash(payload)
     return payload
 

@@ -9,7 +9,7 @@
     "engine_version": {"minLength": 1, "type": "string"},
     "event_cursor": {"maxLength": 2048, "minLength": 1, "type": "string"},
     "game_id": {"minLength": 1, "type": "string"},
-    "last_activity_at": {"format": "date-time", "type": "string"},
+    "last_activity_at": {"format": "date-time", "type": ["string", "null"]},
     "lifecycle_status": {
       "$ref": "https://warhammer40k-core.local/contracts/v4/lifecycle-status.schema.json#/$defs/status"
     },
@@ -21,8 +21,8 @@
     },
     "ruleset_descriptor_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
     "ruleset_id": {"minProperties": 1, "type": "object"},
-    "schema_version": {"const": "session-metadata-v45-contract", "type": "string"},
-    "server_contract_version": {"pattern": "^45\\.[0-9]+\\.[0-9]+$", "type": "string"},
+    "schema_version": {"const": "session-metadata-v46-contract", "type": "string"},
+    "server_contract_version": {"pattern": "^46\\.[0-9]+\\.[0-9]+$", "type": "string"},
     "session_id": {"minLength": 1, "type": "string"},
     "session_revision": {"minimum": 0, "type": "integer"},
     "session_state": {

@@ -132,7 +132,7 @@ def _apply_explosives_handler(
     if context_error is not None:
         raise GameLifecycleError("Prevalidated Explosives context failed.")
     selection = ExplosivesSelection.from_payload(use_record.effect_selection)
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     roll_state = manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=6, sides=6),
@@ -212,7 +212,7 @@ def apply_explosives_mortal_wound_feel_no_pain_decision(
     source_context = mortal_wound_resolution_source_context(request)
     if not isinstance(source_context, dict) or source_context.get("source_kind") != "explosives":
         raise GameLifecycleError("Explosives Feel No Pain source context is invalid.")
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     routed = resolve_rule_mortal_wound_decision(
         state=state,
         decisions=decisions,
@@ -440,7 +440,7 @@ def _apply_crushing_impact_handler(
             current_value=toughness,
         )
     )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     roll_state = manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=toughness, sides=6),
@@ -530,7 +530,7 @@ def apply_crushing_impact_mortal_wound_decision(
         "crushing_impact_enemy",
     }:
         raise GameLifecycleError("Crushing Impact mortal wound source context is invalid.")
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     routed = resolve_rule_mortal_wound_decision(
         state=state,
         decisions=decisions,
@@ -573,7 +573,7 @@ def complete_crushing_impact_mortal_wounds(
         source_mortal_wounds,
         enemy_mortal_wounds,
     ) = _crushing_impact_details(source_context)
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     source_application_payload: JsonValue
     enemy_application_payload: JsonValue
     if source_context["source_kind"] == "crushing_impact_self":

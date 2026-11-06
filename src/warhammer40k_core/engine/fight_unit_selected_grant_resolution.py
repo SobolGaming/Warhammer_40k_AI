@@ -236,7 +236,7 @@ def apply_fight_unit_selected_grant_immediate_effect(
         state=state,
         unit_instance_id=activation.unit_instance_id,
     )
-    dice_manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    dice_manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     d3_result = dice_manager.roll_d3(
         reason=f"{grant.label} self-inflicted mortal wounds",
         roll_type=SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_D3_ROLL_TYPE,

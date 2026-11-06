@@ -27,6 +27,7 @@ def web_scene(
     *,
     attached: bool = False,
     seed: str = "native-web",
+    rng_seed_label: str | None = None,
     full_target: bool = False,
     charge_ready: bool = False,
     wounded_source: bool = False,
@@ -88,6 +89,7 @@ def web_scene(
         detachment_id_by_faction={"aeldari": "corsair-coterie"},
         phase=BattlePhase.SHOOTING,
         seed=seed,
+        rng_seed_label=rng_seed_label,
         attachments=(AttachmentDeclaration("lhykhis", "spiders"),) if attached else (),
         enemy_attachments=(AttachmentDeclaration("target-leader", "target-body"),)
         if attached_target

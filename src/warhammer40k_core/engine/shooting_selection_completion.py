@@ -68,7 +68,7 @@ def pending_selection_obligations(
     context = AttackSequenceCompletedContext(
         state=state,
         decisions=decisions,
-        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        dice_manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
         runtime_modifier_registry=modifiers,
         source_phase=BattlePhase.SHOOTING,
         attack_sequence=sequence,

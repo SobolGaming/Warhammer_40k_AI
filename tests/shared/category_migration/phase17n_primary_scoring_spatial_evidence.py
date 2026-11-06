@@ -7,6 +7,7 @@ from typing import Any, cast
 
 import pytest
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -822,6 +823,7 @@ def _spatial_evidence_state(
         descriptor_version="core-v2-phase17n-spatial-evidence-test"
     )
     return GameState(
+        private_rng_seed=fixture_private_rng_seed("phase17n-spatial-evidence-game"),
         game_id="phase17n-spatial-evidence-game",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,

@@ -75,13 +75,13 @@
       "phase": "movement",
       "placement_kinds": [],
       "proposal_kind": "normal_move",
-      "request_id": "decision-request-000009",
-      "source_decision_request_id": "decision-request-000008",
-      "source_decision_result_id": "phase18d-family-select-normal-move",
+      "request_id": "view-request-f64ab1b15029bbf44150ca1f9cbc2d3d57325b326f93c29fe8ca8d4ffae7bc8f",
+      "source_decision_request_id": "view-request-6f3783f11b8f64f32c02806912c2cfa18df4485cffafbb42d2afad62d54119be",
+      "source_decision_result_id": "view-result-287923cb41691cca4ac966edd04f76ac9ff4eeee650eaccd93d23d121954726c",
       "spatial_context_hash": "4fef654b948a60bdd3455f8d97ddc188d1811ff3690f9c4a594b44f4f0bbe3d4",
       "unit_instance_id": "army-alpha:intercessor-unit-1"
     }
   },
-  "request_id": "decision-request-000009",
-  "schema_version": "decision-request-view-v5-phase17n-step4"
+  "request_id": "view-request-f64ab1b15029bbf44150ca1f9cbc2d3d57325b326f93c29fe8ca8d4ffae7bc8f",
+  "schema_version": "decision-request-view-v6-viewer-identities"
 }

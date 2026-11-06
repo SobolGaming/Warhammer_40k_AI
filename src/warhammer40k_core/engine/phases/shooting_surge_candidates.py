@@ -110,7 +110,7 @@ def _activate(
         raise GameLifecycleError("Shooting-end grants must share one movement kind.")
     shooting_player_id = completed_sequence.attacker_player_id
     max_distance_bonus_inches = reactions._shooting_end_surge_grant_distance_bonus(grants)
-    roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
+    roll_state = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).roll(
         reactions._shooting_end_surge_distance_roll_spec(
             source_rule_id=grants[0].source_id,
             player_id=reacting_player_id,

@@ -117,7 +117,7 @@ def resume_retained_attack_collateral(
     feel_no_pain = FeelNoPainResolution.from_payload(
         cast(FeelNoPainResolutionPayload, context["feel_no_pain"])
     )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     from warhammer40k_core.engine.attack_destruction_reactions import (
         resolve_mandatory_destruction_reactions_before_removal,
     )

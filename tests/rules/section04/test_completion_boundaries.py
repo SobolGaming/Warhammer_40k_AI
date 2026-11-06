@@ -728,7 +728,7 @@ def test_shared_group_pending_damage_valid_save_fork_continue_and_replay() -> No
         alpha_unit_ids=("subject", "spare"),
         enemy_unit_ids=("enemy",),
         origins={"subject": Pose.at(10, 10), "enemy": Pose.at(18, 10), "spare": Pose.at(40, 35)},
-        game_id="sf04-group-persistence-2",
+        game_id="sf04-group-persistence-2:private-8",
         model_count=2,
         alpha_unit_specs={"subject": (sheet, profile, 2), "spare": (sheet, profile, 1)},
         enemy_unit_specs={"enemy": (sheet, profile, 2)},
@@ -975,7 +975,7 @@ def test_native_shooting_owner_waits_for_attack_mortal_choices(
         already_allocated_model_ids=owner.allocated_model_ids_this_phase,
         runtime_modifier_registry=handler.runtime_modifier_registry,
         dice_manager=DiceRollManager(
-            state.game_id, event_log=decisions.event_log, injected_results=fixed
+            state.private_rng_seed, event_log=decisions.event_log, injected_results=fixed
         ),
     )
     assert remaining is not None

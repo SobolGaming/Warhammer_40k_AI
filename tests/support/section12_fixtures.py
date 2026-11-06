@@ -11,6 +11,7 @@ from time import perf_counter
 from typing import cast
 
 import pytest
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section03_fixtures import geometry, native_state, placement
 from tests.support.section03_session import movement_session
@@ -96,6 +97,7 @@ def engaged_case(
         enemy_poses=(Pose.at(x, 10),),
     )
     state.game_id = seed
+    state.private_rng_seed = fixture_private_rng_seed(seed)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     attach_mission(state)
     from warhammer40k_core.engine.fight_order import unit_is_currently_engaged

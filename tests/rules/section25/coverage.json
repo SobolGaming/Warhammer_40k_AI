@@ -139,7 +139,7 @@
             },
             {
               "node": "tests/rules/section25/test_facade.py::test_prebattle_public_roster_submission_and_json_restoration",
-              "function_ast_sha256": "0383ec149354ad02d4d0fcb1eba1e81aec4f65d91382598b8da913b950657972",
+              "function_ast_sha256": "75693839e7812353c88ed263b977db11e35c377df3f4eef50cf620db9061f636",
               "assertions": [
                 "assert pending is not None",
                 "assert state is not None",
@@ -162,7 +162,7 @@
             },
             {
               "node": "tests/rules/section25/test_facade.py::test_native_roster_disclosure_distinguishes_physical_upgrade_bearers",
-              "function_ast_sha256": "36e5b79b11e3905f9f00c2a23e77a26ae8961dbcacad1a41e9d9e3d9e7a313dc",
+              "function_ast_sha256": "30ed51008fcd2e56618114fcf31cd7c11a7c59754794c8e1f8ec75b45c09278a",
               "assertions": [
                 "assert views[0] != views[1]",
                 "assert views[0]['projection_state_hash'] != views[1]['projection_state_hash']",
@@ -205,7 +205,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section25/test_facade.py::test_prebattle_public_roster_submission_and_json_restoration",
-              "function_ast_sha256": "0383ec149354ad02d4d0fcb1eba1e81aec4f65d91382598b8da913b950657972",
+              "function_ast_sha256": "75693839e7812353c88ed263b977db11e35c377df3f4eef50cf620db9061f636",
               "assertions": [
                 "assert pending is not None",
                 "assert state is not None",
@@ -228,7 +228,7 @@
             },
             {
               "node": "tests/rules/section25/test_facade.py::test_native_roster_disclosure_distinguishes_physical_upgrade_bearers",
-              "function_ast_sha256": "36e5b79b11e3905f9f00c2a23e77a26ae8961dbcacad1a41e9d9e3d9e7a313dc",
+              "function_ast_sha256": "30ed51008fcd2e56618114fcf31cd7c11a7c59754794c8e1f8ec75b45c09278a",
               "assertions": [
                 "assert views[0] != views[1]",
                 "assert views[0]['projection_state_hash'] != views[1]['projection_state_hash']",
@@ -809,7 +809,7 @@
             },
             {
               "node": "tests/rules/section25/test_facade.py::test_prebattle_public_roster_submission_and_json_restoration",
-              "function_ast_sha256": "0383ec149354ad02d4d0fcb1eba1e81aec4f65d91382598b8da913b950657972",
+              "function_ast_sha256": "75693839e7812353c88ed263b977db11e35c377df3f4eef50cf620db9061f636",
               "assertions": [
                 "assert pending is not None",
                 "assert state is not None",
@@ -832,7 +832,7 @@
             },
             {
               "node": "tests/rules/section25/test_facade.py::test_native_roster_disclosure_distinguishes_physical_upgrade_bearers",
-              "function_ast_sha256": "36e5b79b11e3905f9f00c2a23e77a26ae8961dbcacad1a41e9d9e3d9e7a313dc",
+              "function_ast_sha256": "30ed51008fcd2e56618114fcf31cd7c11a7c59754794c8e1f8ec75b45c09278a",
               "assertions": [
                 "assert views[0] != views[1]",
                 "assert views[0]['projection_state_hash'] != views[1]['projection_state_hash']",
@@ -1159,7 +1159,7 @@
             },
             {
               "node": "tests/rules/section25/test_facade.py::test_prebattle_public_roster_submission_and_json_restoration",
-              "function_ast_sha256": "0383ec149354ad02d4d0fcb1eba1e81aec4f65d91382598b8da913b950657972",
+              "function_ast_sha256": "75693839e7812353c88ed263b977db11e35c377df3f4eef50cf620db9061f636",
               "assertions": [
                 "assert pending is not None",
                 "assert state is not None",

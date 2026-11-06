@@ -19,7 +19,7 @@
       "workload_id": "order78-gone-to-ground-v2"
     },
     "reconstruction": {
-      "driver": "scripts/measure_ingress_reconstruction.py",
+      "driver": "scripts/measure_private_rng_reconstruction.py",
       "historical_workload_reference": "docs/performance/order64/head-reconstruction.json",
       "cases": [
         "ingress/restore",
@@ -31,7 +31,7 @@
       ],
       "samples_per_case": 7,
       "budget_profile": "current-change-relative-v1",
-      "workload_id": "loaded-ingress-reconstruction-v1"
+      "workload_id": "loaded-ingress-private-rng-reconstruction-v2"
     },
     "setup": {
       "driver": "scripts/measure_order101.py",
@@ -198,7 +198,7 @@
       "workload_id": "external-contract-orphan-write-independent-check-v1",
       "input_binding": {
         "schema": "tool-input-roles-v4",
-        "role_specification": "docs/performance/policy-v3/defiler-input-roles-v4.json"
+        "role_specification": "docs/performance/policy-v3/pr2-player-boundary-input-roles-v4.json"
       }
     },
     "session_command_fork": {
@@ -211,6 +211,34 @@
       "samples_per_case": 3,
       "budget_profile": "current-change-relative-v1",
       "workload_id": "issue590-authoritative-command-fork-v1"
+    },
+    "tactical_draw": {
+      "driver": "scripts/measure_private_tactical_draw.py",
+      "historical_workload_reference": "scripts/measure_private_tactical_draw.py",
+      "cases": [
+        "1",
+        "2",
+        "deck"
+      ],
+      "samples_per_case": 7,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "native-private-tactical-draw-v1"
+    },
+    "player_boundary": {
+      "driver": "scripts/measure_player_boundary.py",
+      "historical_workload_reference": "scripts/measure_player_boundary.py",
+      "cases": [
+        "projection",
+        "visible_events",
+        "metadata",
+        "finite_command",
+        "server_restore",
+        "retained_cursor",
+        "ordinal_identity_projection"
+      ],
+      "samples_per_case": 7,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "native-player-boundary-v2"
     }
   },
   "operations": {
@@ -34021,6 +34049,1337 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "player-policy-boundary": {
+      "paths": [
+        "src/warhammer40k_core/ai/player_policy.py",
+        "src/warhammer40k_core/ai/runner.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-tactical-draw": {
+      "paths": [
+        "src/warhammer40k_core/engine/missions.py",
+        "src/warhammer40k_core/engine/game_state.py"
+      ],
+      "owners": [
+        "deterministic_tactical_secondary_draw",
+        "_stable_draw_key",
+        "GameState.draw_tactical_secondary_cards"
+      ],
+      "families": [
+        "tactical_draw"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "private-rng-measurement-reconstruction": {
+      "paths": [
+        "scripts/measure_private_rng_reconstruction.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "private-rng-measurement-tactical_draw": {
+      "paths": [
+        "scripts/measure_private_tactical_draw.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "tactical_draw"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "private-rng-shared-measurement-config": {
+      "paths": [
+        "tests/support/fixtures/private_rng_reconstruction_config.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "reconstruction",
+        "tactical_draw"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "player-visible-boundary": {
+      "paths": [
+        "src/warhammer40k_core/adapters/viewer_identity.py",
+        "src/warhammer40k_core/adapters/redaction.py",
+        "src/warhammer40k_core/adapters/projection.py",
+        "src/warhammer40k_core/adapters/event_stream.py",
+        "src/warhammer40k_core/adapters/local_session.py",
+        "src/warhammer40k_core/adapters/server.py",
+        "src/warhammer40k_core/adapters/server_commands.py",
+        "src/warhammer40k_core/adapters/server_sync.py",
+        "src/warhammer40k_core/adapters/server_responses.py",
+        "src/warhammer40k_core/adapters/server_mutations.py",
+        "src/warhammer40k_core/adapters/session_events.py",
+        "src/warhammer40k_core/adapters/session_protocol.py",
+        "src/warhammer40k_core/adapters/session_revision.py",
+        "src/warhammer40k_core/adapters/session_recovery.py",
+        "src/warhammer40k_core/adapters/decisions.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "player_boundary"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "player-visible-boundary-workload": {
+      "paths": [
+        "scripts/measure_player_boundary.py",
+        "tests/support/fixtures/player_boundary_config.json",
+        "tests/support/viewer_identity_fixtures.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "player_boundary"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "viewer-history-identity-cache": {
+      "paths": [
+        "src/warhammer40k_core/adapters/local_session.py",
+        "src/warhammer40k_core/adapters/projection.py"
+      ],
+      "owners": [
+        "LocalGameSession",
+        "LocalGameSession._viewer_history_identities",
+        "LocalGameSession._viewer_submission_map",
+        "LocalGameSession.start",
+        "LocalGameSession.view",
+        "LocalGameSession.view_for_context",
+        "_ViewerHistoryIdentitySnapshot",
+        "project_game_view_with_history_identities"
+      ],
+      "families": [
+        "player_boundary",
+        "roster",
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "behavioral-worksteal-dispatch": {
+      "paths": [
+        "scripts/build_test_shards.py",
+        "tests/conftest.py"
+      ],
+      "owners": [
+        "@imports",
+        "_balanced_shards",
+        "_case_profile_medians",
+        "_execution_weights",
+        "_read_junit_profile",
+        "_selector_case_peaks",
+        "_summary_payload",
+        "_write_manifests",
+        "duration_worksteal_order",
+        "pytest_collection_modifyitems",
+        "summary_case_seconds"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "behavioral-worksteal-dispatch-tests": {
+      "paths": [
+        "tests/code_quality/test_ci_performance_gates.py"
+      ],
+      "owners": [
+        "test_duration_dispatch_balances_actual_initial_worksteal_chunks",
+        "test_duration_dispatch_profile_controls_the_real_worker_hook",
+        "test_duration_dispatch_rejects_missing_or_invalid_measurements",
+        "test_junit_case_profiles_preserve_class_parameters_and_complete_nodes",
+        "test_serial_mirror_balancing_preserves_measurements_and_accounts_for_execution"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "setup-request-authority": {
+      "paths": [
+        "src/warhammer40k_core/engine/setup_flow.py"
+      ],
+      "owners": [
+        "SetupFlow._authoritative_pending_request"
+      ],
+      "families": [
+        "player_boundary"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "private-rng-owner-13093005fda46651": {
+      "paths": [
+        "conformance/typescript/src/scenario.ts"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-516aaf1246c6ecbc": {
+      "paths": [
+        "conformance/typescript/src/type-fixtures/session-command-envelope.type-test.ts"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-6a67d575418cc98b": {
+      "paths": [
+        "contracts/compatibility/46.0.0-shape.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-294ca9f46ebafa7f": {
+      "paths": [
+        "contracts/examples/decisions/families/select_movement_action.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-7de34a732da3e8be": {
+      "paths": [
+        "contracts/examples/decisions/families/select_movement_unit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-f2776479280825ce": {
+      "paths": [
+        "contracts/examples/decisions/families/select_secondary_missions.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-67742a5bc6e32451": {
+      "paths": [
+        "contracts/examples/decisions/pending_movement_request.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-909de599704eecfb": {
+      "paths": [
+        "contracts/examples/sessions/session-command-envelope.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-4f7e25809a289671": {
+      "paths": [
+        "contracts/examples/statuses/advanced.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-96a4ca9eee2e13d7": {
+      "paths": [
+        "contracts/examples/statuses/invalid.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-b28e0e2823e6fd75": {
+      "paths": [
+        "contracts/examples/statuses/terminal.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-9ebf08ff18c3b11e": {
+      "paths": [
+        "contracts/examples/statuses/unsupported.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-87169b37a2603c4b": {
+      "paths": [
+        "contracts/examples/statuses/waiting-for-decision.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-446b8adfba0f8e18": {
+      "paths": [
+        "contracts/schemas/decision-request-view.schema.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-2e5f9025c226e157": {
+      "paths": [
+        "contracts/schemas/event-delta.schema.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-e9f2822eff2ca00b": {
+      "paths": [
+        "contracts/schemas/lifecycle-status.schema.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-fb1b1c785a54b36f": {
+      "paths": [
+        "contracts/schemas/session-command-envelope.schema.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-8d88942847061358": {
+      "paths": [
+        "contracts/schemas/session-create.schema.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-0e6e7df4037f6a95": {
+      "paths": [
+        "contracts/schemas/session-projection.schema.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-b84de745aa2ad1df": {
+      "paths": [
+        "data/source_audits/private_rng_fixture_preimages_v1.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-83cd0803bcde80cb": {
+      "paths": [
+        "scripts/build_test_shards.py"
+      ],
+      "owners": [
+        "validate_private_rng_inactive_source"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-91fe6f656b47ec20": {
+      "paths": [
+        "scripts/export_ui_contract_fixtures.py"
+      ],
+      "owners": [
+        "_config"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-78075feb35dde756": {
+      "paths": [
+        "scripts/mock_event_layout_ui.py"
+      ],
+      "owners": [
+        "_battlefield_view_payload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-24ad600fe4fbe910": {
+      "paths": [
+        "src/warhammer40k_core/adapters/checkpoint_reconstruction.py"
+      ],
+      "owners": [
+        "_mapped_rng_anchors",
+        "_mapped_rng_state",
+        "_mapped_setup_hashes",
+        "_mapped_source_identity"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-284e5048e5c07a77": {
+      "paths": [
+        "src/warhammer40k_core/adapters/command_protocol.py"
+      ],
+      "owners": [
+        "SessionCommandJournalEntry.__post_init__"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-a49518df7a6965a7": {
+      "paths": [
+        "src/warhammer40k_core/adapters/contracts.py"
+      ],
+      "owners": [
+        "AdapterGameSession.authoritative_event_page_for_context",
+        "AdapterGameSession.authoritative_visible_event_prefix_counts",
+        "AdapterGameSession.status_for_context",
+        "AdapterGameSession.submit_option",
+        "AdapterGameSession.submit_parameterized_payload",
+        "AdapterGameSession.submit_viewer_option",
+        "AdapterGameSession.submit_viewer_parameterized_payload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-39c8e53cbc27091a": {
+      "paths": [
+        "src/warhammer40k_core/adapters/headless.py"
+      ],
+      "owners": [
+        "@module",
+        "submit_headless_decision"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-c9f51ba62365899f": {
+      "paths": [
+        "src/warhammer40k_core/adapters/network.py"
+      ],
+      "owners": [
+        "@module",
+        "network_status_payload",
+        "submit_network_option",
+        "submit_network_parameterized_payload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-483e707284340a24": {
+      "paths": [
+        "src/warhammer40k_core/adapters/setup_smoke.py"
+      ],
+      "owners": [
+        "canonical_setup_prebattle_smoke_config"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-15793463ba21ce0d": {
+      "paths": [
+        "src/warhammer40k_core/adapters/ui.py"
+      ],
+      "owners": [
+        "@module",
+        "submit_ui_option",
+        "submit_ui_parameterized_payload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-6794ad6ce15ee135": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_damage_rerolls.py"
+      ],
+      "owners": [
+        "_request_source_backed_damage_reroll_if_available"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-9f5c175b5cff2d2b": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_group_selection.py"
+      ],
+      "owners": [
+        "_continue_grouped_damage_after_interruption",
+        "apply_allocation_order_decision",
+        "apply_damage_allocation_model_decision",
+        "apply_destruction_reaction_decision",
+        "apply_precision_allocation_decision"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-661104fd40261d69": {
+      "paths": [
+        "src/warhammer40k_core/engine/battle_shock_modifier_continuation.py"
+      ],
+      "owners": [
+        "resolve_battle_shock_after_modifier_choices"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-86471146d6a40259": {
+      "paths": [
+        "src/warhammer40k_core/engine/battle_shock_outcome_triggers.py"
+      ],
+      "owners": [
+        "battle_shock_context_for_trigger"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-8258da660f60a865": {
+      "paths": [
+        "src/warhammer40k_core/engine/battle_shock_resolution.py"
+      ],
+      "owners": [
+        "apply_battle_shock_reroll_resolution_decision"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-a5d18c2e198f3784": {
+      "paths": [
+        "src/warhammer40k_core/engine/battle_shock_resolution_authority.py"
+      ],
+      "owners": [
+        "_validate_reroll_decision",
+        "parse_pending_battle_shock_reroll_authority"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-e70d3f3a97bfafbe": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_command_point_test_evaluation.py"
+      ],
+      "owners": [
+        "resolve_phase_command_point_gain"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-0f7dad223a9d5343": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_command_restoration_runtime.py"
+      ],
+      "owners": [
+        "_roll_restoration_d3"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-71b5d8d7c151ce9e": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_fall_back_denial_sequencing.py"
+      ],
+      "owners": [
+        "_resolve_denial"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-fdc66fff93d4d802": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_poisoned_status_runtime.py"
+      ],
+      "owners": [
+        "_resolve_poisoned_target"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-e04ebe4851c2a2e1": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_selected_target_mortal_wounds.py"
+      ],
+      "owners": [
+        "resolve_selected_target_mortal_wound_effect"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-f814d5887038cb89": {
+      "paths": [
+        "src/warhammer40k_core/engine/charge_roll_flow.py"
+      ],
+      "owners": [
+        "_apply_charge_roll_reroll_decision",
+        "_resolve_charge_roll",
+        "continue_charge_roll"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-36d8a15b45e92892": {
+      "paths": [
+        "src/warhammer40k_core/engine/charge_roll_reroll_requests.py"
+      ],
+      "owners": [
+        "build_charge_roll_reroll_request"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-f30807a4d597dd55": {
+      "paths": [
+        "src/warhammer40k_core/engine/command_battle_shock_history.py"
+      ],
+      "owners": [
+        "_validate_pending_reroll_restore_authority",
+        "_validated_reroll_decision_history"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-2c6f8842058b41cb": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/army_rule.py"
+      ],
+      "owners": [
+        "gain_miracle_die"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-60ff0a309f88faf2": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/aeldari/detachments/corsair_coterie/stratagems.py"
+      ],
+      "owners": [
+        "_apply_lethal_ruse_mortal_wounds",
+        "_request_triggered_move"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-7f95b37611863b12": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/aeldari/detachments/path_of_the_outcast/stratagems.py"
+      ],
+      "owners": [
+        "apply_nomads_of_the_hidden_way"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-29cdd5e81bcafbe9": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/shadow_legion/enhancements.py"
+      ],
+      "owners": [
+        "apply_malice_made_manifest_fight_phase_start_result"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-fbb77f2036bc9a03": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_knights/army_rule.py"
+      ],
+      "owners": [
+        "apply_harbingers_selection_result"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-905dc221a820a791": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/imperial_knights/army_rule.py"
+      ],
+      "owners": [
+        "_roll_code_chivalric_d6"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-8628d24e44d97a39": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/necrons/army_rule.py"
+      ],
+      "owners": [
+        "_roll_reanimation_d3"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-b8c61c9aabf0af1d": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/round_sequencing.py"
+      ],
+      "owners": [
+        "request_for"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-000dd02ace20fb94": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_resources.py"
+      ],
+      "owners": [
+        "resolve_faction_resource_refund_roll"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-2010f83c696ab9be": {
+      "paths": [
+        "src/warhammer40k_core/engine/game_state_payloads.py"
+      ],
+      "owners": [
+        "GameConfigPayload",
+        "GameStatePayload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-e1d1f3fa5300abf3": {
+      "paths": [
+        "src/warhammer40k_core/engine/hazardous_completion.py"
+      ],
+      "owners": [
+        "apply_hazardous_completion_decision"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-5cd221b2bfc4e880": {
+      "paths": [
+        "src/warhammer40k_core/engine/lifecycle_payload_consistency.py"
+      ],
+      "owners": [
+        "@module",
+        "validate_config_state_payload_consistency"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-abd0de668dc143e1": {
+      "paths": [
+        "src/warhammer40k_core/engine/melee_weapon_commitment.py"
+      ],
+      "owners": [
+        "prepare_melee_commitment"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-24b1c81407a6c901": {
+      "paths": [
+        "src/warhammer40k_core/engine/missions.py"
+      ],
+      "owners": [
+        "@module"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-eb389593a44c5481": {
+      "paths": [
+        "src/warhammer40k_core/engine/move_keyword_completion.py"
+      ],
+      "owners": [
+        "validate_completion_roll_event"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-f4d8bc950259ab07": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/command.py"
+      ],
+      "owners": [
+        "_resolve_battle_shock_step"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-77be30a6901a668b": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/command_battle_shock_rerolls.py"
+      ],
+      "owners": [
+        "validate_command_battle_shock_reroll_context"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-f6d70d3d0a7b8b70": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py"
+      ],
+      "owners": [
+        "_attack_pools_for_proposal"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-4ae20fd642e2091e": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/shooting_handler.py"
+      ],
+      "owners": [
+        "ShootingPhaseHandler._resolve_completed_out_of_phase_shooting_continuation"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-2293a0929c59e4f2": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/shooting_reactions.py"
+      ],
+      "owners": [
+        "_request_shooting_end_surge_if_available",
+        "_resolve_completed_shooting_attack_sequence_continuation"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-6d6f6400b93859c5": {
+      "paths": [
+        "src/warhammer40k_core/engine/private_randomness.py"
+      ],
+      "owners": [
+        "@module",
+        "new_private_rng_seed",
+        "private_rng_seed_from_payload",
+        "tactical_draw_sequence_from_payload",
+        "validate_private_rng_seed",
+        "validate_private_rng_seed_pair",
+        "validate_tactical_draw_sequence"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-f4a8bb2543fd305d": {
+      "paths": [
+        "src/warhammer40k_core/engine/random_profile_evaluation.py"
+      ],
+      "owners": [
+        "evaluate_model_profile_inventory"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-a66075536ff66df8": {
+      "paths": [
+        "src/warhammer40k_core/engine/random_weapon_range.py"
+      ],
+      "owners": [
+        "evaluate_weapon_ranges"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-c9d68395ec9e5978": {
+      "paths": [
+        "src/warhammer40k_core/engine/replay.py"
+      ],
+      "owners": [
+        "_initial_rng_state_payload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-f412d2158274908b": {
+      "paths": [
+        "src/warhammer40k_core/engine/retained_destruction_attack.py"
+      ],
+      "owners": [
+        "resume_retained_attack_collateral"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-cdad0ddcbf0fe1c1": {
+      "paths": [
+        "src/warhammer40k_core/engine/retained_destruction_cleanup.py"
+      ],
+      "owners": [
+        "continue_retained_destruction_cleanup",
+        "continue_retained_transport_cleanup"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-d613b5f17a2600fc": {
+      "paths": [
+        "src/warhammer40k_core/engine/retained_destruction_rule.py"
+      ],
+      "owners": [
+        "offer_rule_fight_on_death"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-44db21f46a8e0ee4": {
+      "paths": [
+        "src/warhammer40k_core/engine/return_on_death.py"
+      ],
+      "owners": [
+        "resolve_return_on_death_occurrence"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-a26085da58202864": {
+      "paths": [
+        "src/warhammer40k_core/engine/rule_model_destruction.py"
+      ],
+      "owners": [
+        "_active_optional_sources",
+        "_resume_rule_deadly_demise_secondary_continuation",
+        "apply_rule_model_destruction_mortal_wound_decision"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-fa7c289051b9a1a7": {
+      "paths": [
+        "src/warhammer40k_core/engine/shooting_selection_completion.py"
+      ],
+      "owners": [
+        "pending_selection_obligations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-aedfa96d1c16f8a1": {
+      "paths": [
+        "src/warhammer40k_core/engine/stratagems_core_handlers.py"
+      ],
+      "owners": [
+        "_apply_command_reroll_handler",
+        "apply_command_reroll_decision"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-892a44fd0771c0f3": {
+      "paths": [
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py"
+      ],
+      "owners": [
+        "_apply_crushing_impact_handler",
+        "_apply_explosives_handler",
+        "apply_crushing_impact_mortal_wound_decision",
+        "apply_explosives_mortal_wound_feel_no_pain_decision",
+        "complete_crushing_impact_mortal_wounds"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-403a40c6d5309177": {
+      "paths": [
+        "src/warhammer40k_core/engine/stratagems_generic_rule_ir.py"
+      ],
+      "owners": [
+        "_generic_triggered_move_distance_roll"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-b317406a425aafb1": {
+      "paths": [
+        "src/warhammer40k_core/engine/stratagems_generic_rule_ir_runtime.py"
+      ],
+      "owners": [
+        "_resolve_generic_roll_per_context_target_mortal_wounds",
+        "_resolve_generic_roll_pool_mortal_wounds",
+        "_resolve_routed_generic_rule_ir_mortal_wounds"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-0583599968c8259b": {
+      "paths": [
+        "src/warhammer40k_core/engine/surge_authority.py"
+      ],
+      "owners": [
+        "_validate_surge_granted_descriptor",
+        "validate_surge_request",
+        "validate_surge_selection_chain"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-cc1af0a5bc475132": {
+      "paths": [
+        "src/warhammer40k_core/engine/unit_move_completed_hooks.py"
+      ],
+      "owners": [
+        "apply_unit_move_completed_mortal_wound_feel_no_pain_decision",
+        "resolve_mortal_wound_effect"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-1e9cd94f3385029f": {
+      "paths": [
+        "src/warhammer40k_core/interfaces/cli.py"
+      ],
+      "owners": [
+        "@module",
+        "submit_cli_choice",
+        "submit_cli_payload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-ba23d3523caa6166": {
+      "paths": [
+        "tests/code_quality/test_category_migration_preservation.py"
+      ],
+      "owners": [
+        "test_private_seed_inactive_api_maintenance_preserves_native_source"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-c8a1c41e8f12a86f": {
+      "paths": [
+        "tests/code_quality/test_performance_policy.py"
+      ],
+      "owners": [
+        "test_whispering_web_smoke_scope_and_predecessor_are_exact"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-fac356e49e4b8510": {
+      "paths": [
+        "tests/daemons_native_source_preservation.py"
+      ],
+      "owners": [
+        "before_pr2_comparison_provenance"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-6e28e64e600b6796": {
+      "paths": [
+        "tests/infrastructure/decisions/unit/test_physical_proposal_prevalidation.py"
+      ],
+      "owners": [
+        "_projection_session",
+        "_projection_work",
+        "test_immutable_player_observation_hash_uses_its_canonical_json_without_decoding",
+        "test_policy_payload_digest_performs_one_complete_json_validation",
+        "test_projection_snapshot_binds_complete_viewer_context",
+        "test_projection_snapshot_detects_authoritative_geometry_drift_without_record_progress",
+        "test_projection_snapshot_is_not_shared_across_reconstructed_sessions",
+        "test_projection_snapshot_reuse_keeps_returns_detached",
+        "test_projection_snapshot_reuses_only_the_narrow_submission_identity_scope",
+        "test_viewer_identity_cache_rechecks_history_visibility_without_count_progress"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-d5c2000299dc6587": {
+      "paths": [
+        "tests/infrastructure/lifecycle/unit/test_lifecycle.py"
+      ],
+      "owners": [
+        "test_tactical_draw_private_sequence_survives_facade_persistence_and_replay"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-8e2eab51a3916681": {
+      "paths": [
+        "tests/infrastructure/setup/unit/test_setup_completion.py"
+      ],
+      "owners": [
+        "_setup_authority_restore_counts"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-706dcf9a66e53447": {
+      "paths": [
+        "tests/order57_destroyed_referent_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "order57_battle_state"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-2b7566f6cb2126bd": {
+      "paths": [
+        "tests/order59_empty_dedicated_transport_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "order59_empty_transport_config"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-57c32489667b21fc": {
+      "paths": [
+        "tests/order79_choice_helpers.py"
+      ],
+      "owners": [
+        "reserve_choice_session"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-564f82da75a97bad": {
+      "paths": [
+        "tests/phase10p_reserves_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "reserve_config"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-a50bda9ee933a743": {
+      "paths": [
+        "tests/phase15a_charge_config_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "_config"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-06e20876fe68dab0": {
+      "paths": [
+        "tests/phase15a_charge_declaration_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "charge_config"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-1500588970a32351": {
+      "paths": [
+        "tests/phase17n_step5g_pairing_certification_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "assert_pairing_scores_through_lifecycle_restore_views_and_replay"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-289b4077857eeb67": {
+      "paths": [
+        "tests/support/catalog_runtime_fixtures.py"
+      ],
+      "owners": [
+        "@module",
+        "battle_state_with_armies",
+        "battle_state_with_army"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-024cb108504a2c41": {
+      "paths": [
+        "tests/support/private_randomness.py"
+      ],
+      "owners": [
+        "@module",
+        "fixture_private_rng_seed"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-c6512a8b8ee3d0e9": {
+      "paths": [
+        "tests/support/private_rng_fixture_preservation.py"
+      ],
+      "owners": [
+        "@module",
+        "FixtureEdit",
+        "FixtureRecord",
+        "private_rng_fixture_predecessor",
+        "private_rng_fixture_records"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-fd689ac0e1ec1a07": {
+      "paths": [
+        "tests/unit/test_phase11e_mission_scoring_cleanup.py"
+      ],
+      "owners": [
+        "test_mission_policy_and_tactical_draw_are_fail_fast"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

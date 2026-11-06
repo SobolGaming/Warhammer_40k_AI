@@ -594,7 +594,7 @@ def _validated_reroll_decision_history(
         raise GameLifecycleError("Command Battle-shock reroll decision context drift.")
     permission_payload = _payload_object(request_payload.get("permission"))
     permission = RerollPermission.from_payload(cast(RerollPermissionPayload, permission_payload))
-    expected_reroll_request = DiceRollManager(state.game_id).build_reroll_request(
+    expected_reroll_request = DiceRollManager(0).build_reroll_request(
         initial_state,
         request_id=record.request.request_id,
         actor_id=result.request.player_id,
@@ -814,7 +814,7 @@ def _validate_pending_reroll_restore_authority(
     permission = RerollPermission.from_payload(
         cast(RerollPermissionPayload, _payload_object(request_payload.get("permission")))
     )
-    expected_request = DiceRollManager(state.game_id).build_reroll_request(
+    expected_request = DiceRollManager(0).build_reroll_request(
         initial_roll,
         request_id=pending_request.request_id,
         actor_id=test_request.player_id,

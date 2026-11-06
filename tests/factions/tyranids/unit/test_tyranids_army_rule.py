@@ -21,6 +21,7 @@ from tests.phase11c_command_phase_helpers import (
     with_model_offsets,
 )
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.support.synapse_profile import (
     loaded_synapse,
     place_at_gap,
@@ -506,6 +507,7 @@ def test_shadow_outcome_restore_rejects_coordinated_revival_amount_forgery() -> 
 def test_restore_rejects_coordinated_shadow_leadership_and_dice_semantic_tamper() -> None:
     lifecycle = _resolved_shadow_lifecycle(
         game_id="phase17g-tyranids-coordinated-semantics-tamper",
+        private_rng_seed="c4272e8608d764270bb5e6e8c45b1d0657364ec7f4ee26465ab7b87941f90017",
     )
     forged = _mutable_lifecycle_payload(lifecycle)
     events = _mutable_lifecycle_events(forged)
@@ -561,8 +563,9 @@ def test_restore_rejects_coordinated_shadow_leadership_and_dice_semantic_tamper(
 def test_restore_rejects_omitted_mandatory_shadow_modifier_application() -> None:
     lifecycle = _resolved_shadow_lifecycle(
         game_id="phase17g-tyranids-omitted-modifier-authority:d07:8",
+        private_rng_seed="4f5890f491b3e88172686e9bce5abaacf7425507060a0d2b6bd278b09563cc7c",
         # This identity rolls 5+5: the mandatory -1 still passes Leadership 6.
-        result_id="phase17g-tyranids-omitted-modifier-authority:d07:8:unleash:d07-vector:18",
+        result_id="phase17g-tyranids-omitted-modifier-authority:d07:8:unleash:d07-vector:18:private-1",
     )
     forged = _mutable_lifecycle_payload(lifecycle)
     events = _mutable_lifecycle_events(forged)
@@ -1978,11 +1981,13 @@ def _battle_ready_lifecycle(
     enemy_battle_shock_reroll: bool = False,
     enemy_chaos_daemons: bool = False,
     authenticate_reposition: bool = False,
+    private_rng_seed: str | None = None,
 ) -> GameLifecycle:
     other_player_id = "player-b" if active_player_id == "player-a" else "player-a"
     config = replace(
         _tyranids_config(
             game_id=game_id,
+            private_rng_seed=private_rng_seed,
             enemy_unit_count=enemy_unit_count,
             enemy_battle_shock_reroll=enemy_battle_shock_reroll,
             enemy_chaos_daemons=enemy_chaos_daemons,
@@ -2021,6 +2026,7 @@ def _tyranids_config(
     enemy_unit_count: int = 1,
     enemy_battle_shock_reroll: bool = False,
     enemy_chaos_daemons: bool = False,
+    private_rng_seed: str | None = None,
 ) -> GameConfig:
     if type(enemy_unit_count) is not int or enemy_unit_count < 1:
         raise AssertionError("enemy_unit_count must be positive")
@@ -2029,6 +2035,9 @@ def _tyranids_config(
         enemy_chaos_daemons=enemy_chaos_daemons,
     )
     return GameConfig(
+        private_rng_seed=(
+            fixture_private_rng_seed(game_id) if private_rng_seed is None else private_rng_seed
+        ),
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
@@ -2512,9 +2521,12 @@ def _event_payload(decisions: DecisionController, event_type: str) -> dict[str, 
     raise AssertionError(f"missing event {event_type}")
 
 
-def _resolved_shadow_lifecycle(*, game_id: str, result_id: str | None = None) -> GameLifecycle:
+def _resolved_shadow_lifecycle(
+    *, game_id: str, result_id: str | None = None, private_rng_seed: str | None = None
+) -> GameLifecycle:
     lifecycle = _battle_ready_lifecycle(
         game_id=game_id,
+        private_rng_seed=private_rng_seed,
         active_player_id="player-b",
     )
     request = lifecycle.advance_until_decision_or_terminal().decision_request

@@ -238,7 +238,7 @@ def apply_allocation_order_decision(
         state=state,
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
-        manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
         attack_sequence=attack_sequence,
         attack_contexts=attack_contexts,
         allocation_context=decision.allocation_context,
@@ -277,7 +277,7 @@ def apply_damage_allocation_model_decision(
     if attack_sequence.pending_grouped_damage is None:
         raise GameLifecycleError("Damage allocation model decision requires grouped damage.")
     manager = (
-        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
         if dice_manager is None
         else dice_manager
     )
@@ -354,7 +354,7 @@ def apply_precision_allocation_decision(
         )
         for raw_context in raw_attack_contexts
     )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     attack_sequence, normal_wounded_contexts, status = _defer_grouped_devastating_wounds(
         state=state,
         decisions=decisions,
@@ -499,7 +499,7 @@ def apply_feel_no_pain_decision(
         attack_context=attack_context,
     )
     manager = (
-        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
         if dice_manager is None
         else dice_manager
     )
@@ -583,7 +583,7 @@ def apply_destruction_reaction_decision(
             ruleset_descriptor=ruleset_descriptor,
             attack_sequence=attack_sequence,
             already_allocated_model_ids=already_allocated_model_ids,
-            manager=DiceRollManager(state.game_id, event_log=decisions.event_log)
+            manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
             if dice_manager is None
             else dice_manager,
             hooks=resolved_hooks,
@@ -625,7 +625,7 @@ def apply_destruction_reaction_decision(
     continuation = context["continuation"]
     if _is_deadly_demise_continuation(continuation):
         manager = (
-            DiceRollManager(state.game_id, event_log=decisions.event_log)
+            DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
             if dice_manager is None
             else dice_manager
         )
@@ -707,7 +707,7 @@ def _continue_grouped_damage_after_interruption(
             status,
         )
     manager = (
-        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
         if dice_manager is None
         else dice_manager
     )
@@ -749,7 +749,7 @@ def _apply_deferred_mortal_wound_feel_no_pain_decision(
     hooks: AttackSequenceHooks,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     manager = (
-        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
         if dice_manager is None
         else dice_manager
     )

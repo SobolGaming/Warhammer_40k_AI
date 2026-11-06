@@ -7,6 +7,7 @@ from typing import cast
 
 import pytest
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.unit_keyword_helpers import with_unit_keywords
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -407,6 +408,7 @@ def _keyword_any_state() -> GameState:
     )
     battle_phases = tuple(ruleset.battle_phase_sequence.phases)
     return GameState(
+        private_rng_seed=fixture_private_rng_seed("generic-rule-ability-keyword-any"),
         game_id="generic-rule-ability-keyword-any",
         ruleset_descriptor_hash=ruleset.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,
@@ -462,6 +464,7 @@ def _warptide_state() -> GameState:
     )
     battle_phases = tuple(ruleset.battle_phase_sequence.phases)
     return GameState(
+        private_rng_seed=fixture_private_rng_seed("generic-rule-ability-warptide"),
         game_id="generic-rule-ability-warptide",
         ruleset_descriptor_hash=ruleset.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,
@@ -512,6 +515,7 @@ def _minimal_warptide_game_config() -> GameConfig:
     ruleset = RulesetDescriptor.warhammer_40000_eleventh()
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("generic-rule-ability-warptide"),
         game_id="generic-rule-ability-warptide",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=ruleset,

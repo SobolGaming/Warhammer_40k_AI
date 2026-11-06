@@ -17,7 +17,7 @@ from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.assault_disembark import assault_disembark_permission_effect
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.effects import EffectExpiration
-from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.phase import BattlePhase
@@ -46,8 +46,9 @@ def disembark_session(
     unit_poses: dict[str, tuple[Pose, ...]] | None = None,
     oversized_base_diameter_inches: float | None = None,
     supported_carrier: bool = False,
+    config: GameConfig | None = None,
 ) -> LocalGameSession:
-    config = _config()
+    config = _config() if config is None else config
     alpha, beta = config.army_muster_requests
     config = replace(
         config,

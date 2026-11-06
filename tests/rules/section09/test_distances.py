@@ -74,7 +74,7 @@ def test_each_native_model_uses_m_plus_only_its_advance_roll(
         )
         roll = AdvanceRollResult.from_roll_state(
             request=request,
-            roll_state=DiceRollManager(state.game_id).roll_fixed(request.spec, (4,)),
+            roll_state=DiceRollManager(state.private_rng_seed).roll_fixed(request.spec, (4,)),
         )
         result = resolve_advance_move(**kwargs, advance_roll=roll)
         assert result.advance_roll.value == 4
@@ -178,7 +178,8 @@ def test_unengaged_start_does_not_allow_engaged_endpoint(
         result = resolve_advance_move(
             **kwargs,
             advance_roll=AdvanceRollResult.from_roll_state(
-                request=r, roll_state=DiceRollManager(state.game_id).roll_fixed(r.spec, (1,))
+                request=r,
+                roll_state=DiceRollManager(state.private_rng_seed).roll_fixed(r.spec, (1,)),
             ),
         )
     else:

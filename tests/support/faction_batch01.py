@@ -17,6 +17,7 @@ from pathlib import Path
 from time import perf_counter
 
 import pytest
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.support.section02_fixtures import Section02Definitions
 from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
@@ -182,6 +183,7 @@ def scene(
     phase: BattlePhase = BattlePhase.MOVEMENT,
     active: str = "owner",
     seed: str = "faction-batch01",
+    rng_seed_label: str | None = None,
     attachments: tuple[AttachmentDeclaration, ...] = (),
     enemy_attachments: tuple[AttachmentDeclaration, ...] = (),
     setup: bool = False,
@@ -228,6 +230,9 @@ def scene(
             deployment_map_id="batch03:custom-deployment",
         )
     config = GameConfig(
+        private_rng_seed=fixture_private_rng_seed(
+            seed if rng_seed_label is None else rng_seed_label
+        ),
         game_id=seed,
         ruleset_descriptor=runtime_ruleset_descriptor_for_mission_setup(
             mission, rules_overlay_ids=()

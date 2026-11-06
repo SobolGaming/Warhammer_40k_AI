@@ -14,6 +14,7 @@ from tests.support.catalog_runtime_fixtures import (
     battle_state_with_army,
     bloodcrushers_battlefield_state,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.support.selected_to_fight_risk_fixtures import attached_selected_to_fight_risk_fixture
 from warhammer40k_core.core.missions import (
     MissionPackError,
@@ -116,6 +117,7 @@ def _minimal_evidence_game_state(
 ) -> GameState:
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     return GameState(
+        private_rng_seed=fixture_private_rng_seed("primary-evidence-game"),
         game_id="primary-evidence-game",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,

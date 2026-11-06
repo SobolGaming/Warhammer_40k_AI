@@ -8,12 +8,15 @@ from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.capability_manifest import project_capability_manifest
 from warhammer40k_core.adapters.external_contract import ERROR_ENVELOPE_SCHEMA_VERSION
 from warhammer40k_core.adapters.support_profile import SupportProfilePayload
+from warhammer40k_core.adapters.viewer_identity import ViewerIdentityMap
 from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import (
+    EventLog,
     EventRecordPayload,
     JsonValue,
+    canonical_json,
     validate_json_value,
 )
 from warhammer40k_core.engine.game_state import GameState
@@ -68,6 +71,72 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 HIDDEN_DECISION_TYPE = "hidden_decision"
 HIDDEN_REQUEST_ID = "hidden-request"
 HIDDEN_RESULT_ID = "hidden-result"
+
+
+def viewer_identity_map(*, event_log: EventLog, viewer: ViewerContext) -> ViewerIdentityMap:
+    """Bind contract identities using only this viewer's redacted history."""
+    starts = [record for record in event_log.records if record.event_type == "lifecycle_started"]
+    if len(starts) > 1:
+        raise GameLifecycleError("Viewer identity stream contains multiple lifecycle origins.")
+    game_id: JsonValue = None
+    if starts:
+        if not isinstance(starts[0].payload, dict) or type(starts[0].payload["game_id"]) is not str:
+            raise GameLifecycleError("Viewer identity stream has an invalid lifecycle origin.")
+        game_id = starts[0].payload["game_id"]
+    identities = ViewerIdentityMap(
+        canonical_json([game_id, viewer.role.value, viewer.viewer_player_id])
+    )
+    identities.bind_sequence(0, 0)
+    visible = 0
+    for index, record in enumerate(event_log.records, start=1):
+        public = public_event_record_payload(
+            event_id=record.event_id,
+            event_type=record.event_type,
+            payload=record.payload,
+            viewer=viewer,
+        )
+        if public is not None:
+            visible += 1
+        identities.bind_sequence(index, visible)
+        if public is not None:
+            identities.project(cast(JsonValue, public))
+    return identities
+
+
+def authoritative_visible_event_prefix_counts(
+    *, event_log: EventLog, viewer: ViewerContext
+) -> tuple[int, ...]:
+    """Private transport index; never serialize authoritative positions to a viewer."""
+    counts = [0]
+    for record in event_log.records:
+        visible = (
+            public_event_record_payload(
+                event_id=record.event_id,
+                event_type=record.event_type,
+                payload=record.payload,
+                viewer=viewer,
+            )
+            is not None
+        )
+        counts.append(counts[-1] + int(visible))
+    return tuple(counts)
+
+
+def viewer_event_records(*, event_log: EventLog, viewer: ViewerContext) -> list[EventRecordPayload]:
+    identities = viewer_identity_map(event_log=event_log, viewer=viewer)
+    return [
+        cast(EventRecordPayload, identities.project(cast(JsonValue, public)))
+        for record in event_log.records
+        if (
+            public := public_event_record_payload(
+                event_id=record.event_id,
+                event_type=record.event_type,
+                payload=record.payload,
+                viewer=viewer,
+            )
+        )
+        is not None
+    ]
 
 
 def public_army_roster_payload(

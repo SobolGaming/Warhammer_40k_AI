@@ -212,7 +212,7 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=65
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=66.5
 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports
@@ -271,7 +271,7 @@ Focused subsets and `--lf` are for iteration, never replacements for this final 
 PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
   uv run pytest tests --ignore=tests/code_quality \
   -n auto --dist=worksteal \
-  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=65
+  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=66.5
 ```
 
 The `PATH` prefix exposes the Node.js runtime bundled with Codex desktop to the executable
@@ -279,18 +279,18 @@ viewer-renderer regressions. It is safe when that directory is absent: an indepe
 `node` later on the existing `PATH` remains available. Keep this prefix on full-suite runs so those
 tests do not fail only because the desktop shell omitted the bundled runtime.
 
-CI shards this same behavioral suite, combines branch coverage, and applies the temporary 65%
+CI shards this same behavioral suite, combines branch coverage, and applies the temporary 66.5%
 gate after every shard succeeds. Full type checking and architecture checks also remain required
 in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
 format for a shorter edit/commit loop.
 
-The temporary CI goal is 12 minutes in total. Each behavioral shard has a 720-second
+The temporary CI goal is 14 minutes in total. Each behavioral shard has an 840-second
 cutoff covering source-index setup and its covered test run. The separate complete
 performance command remains limited to 180 seconds, and quality lanes retain their
 600-second limit. Report actual end-to-end time and queue overhead; a per-step
 cutoff does not establish that the total goal passed.
 
-The current owner-approved coverage floor is 65%; later coverage work must restore 85%. The full
+The current owner-approved coverage floor is 66.5%; later coverage work must restore 85%. The full
 warhammer40k_core package and branch metric remain unchanged, with no added coverage
 omissions or exclusions. This policy change does not claim either threshold has passed;
 all required tests and other gates must still succeed. See the
@@ -298,8 +298,10 @@ all required tests and other gates must still succeed. See the
 
 The twelve behavioral manifests in `ci/test_shards/` use deterministic
 largest-processing-time balancing. One heavy, source-bound module is partitioned
-into its twenty exact collected cases; every other file remains intact. The
-required quality guard checks that partition against real pytest collection.
+into its twenty exact collected cases. The bounded mirror setup case is a separate
+selector; its file selector denotes the remaining cases. CI always deselects that
+node from parallel work and runs it once on its owning shard. Other files remain
+intact. The required guards verify the exact selected inventory and partition.
 Verify that every selected file or declared case appears exactly once:
 
 ```bash
@@ -322,16 +324,16 @@ uv run --no-sync python scripts/build_test_shards.py \
 The initial measurements are the complete covered hosted runs
 [40872329113](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40872329113)
 and [40874478610](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40874478610),
-each covering all 4,886 cases. Current scheduling estimates take each case's larger
+each covering all 4,886 cases. Historical S25 estimates took each case's larger
 recorded cost, also including fully passed setup/call/teardown observations from
 [40888978899](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40888978899).
 That later run failed; it is not a passing profile. Its 277 failed or unreported
-cases keep authentic older measurements. The exact derivation and timing hashes
+cases retained authentic older measurements. The exact derivation and timing hashes
 are recorded in `ci/test_shards/case-partitions.json` under `evidence.weight_refresh`.
 
 Session startup, source-index setup, reporting and runner queues are assessed
 separately. Weight totals are planning inputs, not job wall times or proof of the
-temporary twelve-minute CI goal. Existing observation-based estimates do not
+temporary fourteen-minute CI goal. Existing observation-based estimates do not
 relax the complete-profile validation below.
 
 A single complete local JUnit XML is also accepted; label its host accurately and
@@ -342,6 +344,15 @@ are rejected. Outside the explicit initial migration seed above, new test files
 require a fresh complete profile; timings are never filled with zero. `durations.json` preserves report SHA-256 hashes and run descriptions.
 Historical profiles measure their recorded case inventory; changed cases within an
 existing file require refreshed successful CI reports to reflect their new cost.
+
+Four-worker behavioral CI uses `BEHAVIORAL_DISPATCH_PROFILE` to distribute measured
+case costs across xdist's initial worker chunks after deselection. Complete case
+weights come from the same successful JUnit profiles as the file totals; CI does
+not substitute file averages for missing case costs. Shard assignment separately
+accounts for the mirror's serial execution, retaining measured times unchanged
+and recording the four-worker execution model. Missing, negative, nonfinite or
+boolean weights fail closed; measurements rounded to zero remain valid. Finite S25 case validation,
+the complete selected inventory and the fourteen-minute deadline remain mandatory.
 
 Both Python CI lanes upload JUnit, slowest-test output, and per-worker JSON timing
 artifacts containing collection node IDs, collection time, setup/call/teardown times,

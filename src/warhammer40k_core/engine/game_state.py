@@ -229,6 +229,13 @@ from warhammer40k_core.engine.primary_turn_start_evidence import (
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     build_primary_unit_destruction_state,
 )
+from warhammer40k_core.engine.private_randomness import (
+    new_private_rng_seed,
+    private_rng_seed_from_payload,
+    tactical_draw_sequence_from_payload,
+    validate_private_rng_seed,
+    validate_tactical_draw_sequence,
+)
 from warhammer40k_core.engine.random_weapon_range import WeaponRangeEvaluation
 from warhammer40k_core.engine.ranged_attack_history_lineage import (
     ranged_attack_history_source_unit_ids as _ranged_attack_history_source_unit_ids,
@@ -573,6 +580,7 @@ class GameConfig:
     player_ids: tuple[str, ...]
     turn_order: tuple[str, ...]
     fixed_secondary_mission_ids: tuple[str, ...]
+    private_rng_seed: str = field(default_factory=new_private_rng_seed, repr=False)
     tactical_secondary_draw_count: int = 2
     max_lifecycle_transitions: int = DEFAULT_MAX_LIFECYCLE_TRANSITIONS
     mission_setup: MissionSetup | None = None
@@ -586,6 +594,7 @@ class GameConfig:
             "game_id",
             _validate_identifier("GameConfig game_id", self.game_id),
         )
+        validate_private_rng_seed(self.private_rng_seed, game_id=self.game_id)
         if type(self.ruleset_descriptor) is not RulesetDescriptor:
             raise GameLifecycleError("GameConfig ruleset_descriptor must be a RulesetDescriptor.")
         if type(self.army_catalog) is not ArmyCatalog:
@@ -683,6 +692,7 @@ class GameConfig:
     def to_payload(self) -> GameConfigPayload:
         payload: GameConfigPayload = {
             "game_id": self.game_id,
+            "private_rng_seed": self.private_rng_seed,
             "ruleset_descriptor": self.ruleset_descriptor.to_payload(),
             "army_catalog": self.army_catalog.to_payload(),
             "army_muster_requests": [request.to_payload() for request in self.army_muster_requests],
@@ -705,6 +715,7 @@ class GameConfig:
     def from_payload(cls, payload: GameConfigPayload) -> Self:
         return cls(
             game_id=payload["game_id"],
+            private_rng_seed=private_rng_seed_from_payload(payload),
             ruleset_descriptor=RulesetDescriptor.from_payload(payload["ruleset_descriptor"]),
             army_catalog=ArmyCatalog.from_payload(payload["army_catalog"]),
             army_muster_requests=tuple(
@@ -1108,6 +1119,8 @@ class GameState:
     player_ids: tuple[str, ...]
     turn_order: tuple[str, ...]
     tactical_secondary_draw_count: int
+    private_rng_seed: str = field(default_factory=new_private_rng_seed, repr=False)
+    tactical_secondary_draw_sequence: int = field(default=0, repr=False)
     rules_overlay_ids: tuple[str, ...] = ()
     setup_step_index: int | None = 0
     battle_phase_index: int | None = None
@@ -1285,6 +1298,8 @@ class GameState:
     )
 
     def __post_init__(self) -> None:
+        validate_private_rng_seed(self.private_rng_seed, game_id=self.game_id)
+        validate_tactical_draw_sequence(self.tactical_secondary_draw_sequence)
         self.game_id = _validate_identifier("GameState game_id", self.game_id)
         self.ruleset_descriptor_hash = _validate_descriptor_hash(
             "GameState ruleset_descriptor_hash",
@@ -1700,6 +1715,7 @@ class GameState:
     def from_config(cls, config: GameConfig) -> Self:
         return cls(
             game_id=config.game_id,
+            private_rng_seed=config.private_rng_seed,
             ruleset_descriptor_hash=config.ruleset_descriptor.descriptor_hash,
             rules_overlay_ids=config.ruleset_descriptor.rules_overlay_ids,
             stage=GameLifecycleStage.SETUP,
@@ -3711,6 +3727,8 @@ class GameState:
         )
         secondary_ids = deterministic_tactical_secondary_draw(
             mission_setup=self.mission_setup,
+            private_rng_seed=self.private_rng_seed,
+            draw_id=f"tactical-draw:{self.tactical_secondary_draw_sequence}",
             player_id=requested_player_id,
             battle_round=self.battle_round,
             draw_count=requested_draw_count,
@@ -3727,6 +3745,7 @@ class GameState:
         )
         for card_state in card_states:
             self.record_secondary_mission_card_state(card_state)
+        self.tactical_secondary_draw_sequence += 1
         return card_states
 
     def record_fixed_secondary_cards_for_choice(self, choice: SecondaryMissionChoice) -> None:
@@ -4661,6 +4680,8 @@ class GameState:
     def to_payload(self) -> GameStatePayload:
         payload: GameStatePayload = {
             "game_id": self.game_id,
+            "private_rng_seed": self.private_rng_seed,
+            "tactical_secondary_draw_sequence": self.tactical_secondary_draw_sequence,
             "ruleset_descriptor_hash": self.ruleset_descriptor_hash,
             "rules_overlay_ids": list(self.rules_overlay_ids),
             "stage": self.stage.value,
@@ -4876,6 +4897,9 @@ class GameState:
             )
 
         payload = cast(dict[str, JsonValue], self.to_payload())
+        del payload["private_rng_seed"]
+        del payload["tactical_secondary_draw_sequence"]
+        del payload["decision_request_count"]
         payload["objective_control_record_authorities"] = []
         payload["model_destruction_cause_authorities"] = []
         payload["primary_scoring_state_evidence_records"] = []
@@ -4991,7 +5015,9 @@ class GameState:
             )
         return cls(
             game_id=payload["game_id"],
+            private_rng_seed=private_rng_seed_from_payload(payload),
             ruleset_descriptor_hash=payload["ruleset_descriptor_hash"],
+            tactical_secondary_draw_sequence=tactical_draw_sequence_from_payload(payload),
             rules_overlay_ids=tuple(payload["rules_overlay_ids"]),
             stage=game_lifecycle_stage_from_token(payload["stage"]),
             setup_sequence=tuple(

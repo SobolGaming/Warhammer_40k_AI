@@ -1,0 +1,2316 @@
+{
+  "allow_legacy_non_strict_rosters": true,
+  "army_catalog": {
+    "army_rules": [
+      {
+        "ability_descriptor_ids": [],
+        "content_scope": "matched_play",
+        "name": "Core Discipline",
+        "rule_id": "core-discipline",
+        "source_id": "army-rule:core-discipline"
+      }
+    ],
+    "catalog_id": "phase9a-canonical",
+    "datasheets": [
+      {
+        "abilities": [],
+        "attachment_eligibilities": [],
+        "composition": [
+          {
+            "max_models": 20,
+            "min_models": 10,
+            "model_profile_id": "core-boyz-like"
+          }
+        ],
+        "content_scope": "matched_play",
+        "damaged_effects": [],
+        "datasheet_id": "core-boyz-like-infantry",
+        "keywords": {
+          "faction_keywords": [
+            "CORE MARINES"
+          ],
+          "keywords": [
+            "INFANTRY"
+          ]
+        },
+        "model_profiles": [
+          {
+            "base_size": {
+              "diameter_mm": 32.0,
+              "kind": "circular",
+              "length_mm": null,
+              "width_mm": null
+            },
+            "characteristics": [
+              {
+                "applied_modifier_ids": [],
+                "base": 5,
+                "characteristic": "ballistic_skill",
+                "final": 5,
+                "raw": 5,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 0,
+                "characteristic": "invulnerable_save",
+                "final": 0,
+                "raw": 0,
+                "value_kind": "source_dash"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 7,
+                "characteristic": "leadership",
+                "final": 7,
+                "raw": 7,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 6,
+                "characteristic": "movement",
+                "final": 6,
+                "raw": 6,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 2,
+                "characteristic": "objective_control",
+                "final": 2,
+                "raw": 2,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 6,
+                "characteristic": "save",
+                "final": 6,
+                "raw": 6,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 5,
+                "characteristic": "toughness",
+                "final": 5,
+                "raw": 5,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 3,
+                "characteristic": "weapon_skill",
+                "final": 3,
+                "raw": 3,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 1,
+                "characteristic": "wounds",
+                "final": 1,
+                "raw": 1,
+                "value_kind": "numeric"
+              }
+            ],
+            "model_profile_id": "core-boyz-like",
+            "name": "CORE Boyz-like Infantry",
+            "source_ids": [
+              "datasheet:core-boyz-like-infantry:profile"
+            ]
+          }
+        ],
+        "mustering_options": [],
+        "name": "CORE Boyz-like Infantry",
+        "source_ids": [
+          "datasheet:core-boyz-like-infantry"
+        ],
+        "wargear_options": [
+          {
+            "allowed_wargear_ids": [
+              "core-mob-shoota"
+            ],
+            "conditions": [],
+            "default_wargear_ids": [
+              "core-mob-shoota"
+            ],
+            "effects": [],
+            "max_selections": 1,
+            "min_selections": 1,
+            "model_profile_id": "core-boyz-like",
+            "option_id": "core-boyz-like-infantry:default-wargear",
+            "source_ids": []
+          }
+        ]
+      },
+      {
+        "abilities": [],
+        "attachment_eligibilities": [
+          {
+            "role": "leader",
+            "targets": [
+              {
+                "bodyguard_datasheet_id": "core-intercessor-like-infantry",
+                "required_wargear_ids": [],
+                "source_ids": [
+                  "datasheet:core-character-leader:attachment:leader"
+                ]
+              }
+            ]
+          }
+        ],
+        "composition": [
+          {
+            "max_models": 1,
+            "min_models": 1,
+            "model_profile_id": "core-character-leader"
+          }
+        ],
+        "content_scope": "matched_play",
+        "damaged_effects": [],
+        "datasheet_id": "core-character-leader",
+        "keywords": {
+          "faction_keywords": [
+            "CORE MARINES"
+          ],
+          "keywords": [
+            "CHARACTER",
+            "INFANTRY",
+            "LEADER"
+          ]
+        },
+        "model_profiles": [
+          {
+            "base_size": {
+              "diameter_mm": 40.0,
+              "kind": "circular",
+              "length_mm": null,
+              "width_mm": null
+            },
+            "characteristics": [
+              {
+                "applied_modifier_ids": [],
+                "base": 2,
+                "characteristic": "ballistic_skill",
+                "final": 2,
+                "raw": 2,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 0,
+                "characteristic": "invulnerable_save",
+                "final": 0,
+                "raw": 0,
+                "value_kind": "source_dash"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 5,
+                "characteristic": "leadership",
+                "final": 5,
+                "raw": 5,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 6,
+                "characteristic": "movement",
+                "final": 6,
+                "raw": 6,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 1,
+                "characteristic": "objective_control",
+                "final": 1,
+                "raw": 1,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 3,
+                "characteristic": "save",
+                "final": 3,
+                "raw": 3,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 4,
+                "characteristic": "toughness",
+                "final": 4,
+                "raw": 4,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 2,
+                "characteristic": "weapon_skill",
+                "final": 2,
+                "raw": 2,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 5,
+                "characteristic": "wounds",
+                "final": 5,
+                "raw": 5,
+                "value_kind": "numeric"
+              }
+            ],
+            "model_profile_id": "core-character-leader",
+            "name": "CORE Character Leader",
+            "source_ids": [
+              "datasheet:core-character-leader:profile"
+            ]
+          }
+        ],
+        "mustering_options": [],
+        "name": "CORE Character Leader",
+        "source_ids": [
+          "datasheet:core-character-leader"
+        ],
+        "wargear_options": [
+          {
+            "allowed_wargear_ids": [
+              "core-leader-blade"
+            ],
+            "conditions": [],
+            "default_wargear_ids": [
+              "core-leader-blade"
+            ],
+            "effects": [],
+            "max_selections": 1,
+            "min_selections": 1,
+            "model_profile_id": "core-character-leader",
+            "option_id": "core-character-leader:default-wargear",
+            "source_ids": []
+          }
+        ]
+      },
+      {
+        "abilities": [],
+        "attachment_eligibilities": [
+          {
+            "role": "support",
+            "targets": [
+              {
+                "bodyguard_datasheet_id": "core-intercessor-like-infantry",
+                "required_wargear_ids": [],
+                "source_ids": [
+                  "datasheet:core-character-support:attachment:support"
+                ]
+              }
+            ]
+          }
+        ],
+        "composition": [
+          {
+            "max_models": 1,
+            "min_models": 1,
+            "model_profile_id": "core-character-support"
+          }
+        ],
+        "content_scope": "matched_play",
+        "damaged_effects": [],
+        "datasheet_id": "core-character-support",
+        "keywords": {
+          "faction_keywords": [
+            "CORE MARINES"
+          ],
+          "keywords": [
+            "CHARACTER",
+            "INFANTRY",
+            "SUPPORT"
+          ]
+        },
+        "model_profiles": [
+          {
+            "base_size": {
+              "diameter_mm": 40.0,
+              "kind": "circular",
+              "length_mm": null,
+              "width_mm": null
+            },
+            "characteristics": [
+              {
+                "applied_modifier_ids": [],
+                "base": 2,
+                "characteristic": "ballistic_skill",
+                "final": 2,
+                "raw": 2,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 0,
+                "characteristic": "invulnerable_save",
+                "final": 0,
+                "raw": 0,
+                "value_kind": "source_dash"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 5,
+                "characteristic": "leadership",
+                "final": 5,
+                "raw": 5,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 6,
+                "characteristic": "movement",
+                "final": 6,
+                "raw": 6,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 1,
+                "characteristic": "objective_control",
+                "final": 1,
+                "raw": 1,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 3,
+                "characteristic": "save",
+                "final": 3,
+                "raw": 3,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 4,
+                "characteristic": "toughness",
+                "final": 4,
+                "raw": 4,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 2,
+                "characteristic": "weapon_skill",
+                "final": 2,
+                "raw": 2,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 4,
+                "characteristic": "wounds",
+                "final": 4,
+                "raw": 4,
+                "value_kind": "numeric"
+              }
+            ],
+            "model_profile_id": "core-character-support",
+            "name": "CORE Character Support",
+            "source_ids": [
+              "datasheet:core-character-support:profile"
+            ]
+          }
+        ],
+        "mustering_options": [],
+        "name": "CORE Character Support",
+        "source_ids": [
+          "datasheet:core-character-support"
+        ],
+        "wargear_options": [
+          {
+            "allowed_wargear_ids": [
+              "core-leader-blade"
+            ],
+            "conditions": [],
+            "default_wargear_ids": [
+              "core-leader-blade"
+            ],
+            "effects": [],
+            "max_selections": 1,
+            "min_selections": 1,
+            "model_profile_id": "core-character-support",
+            "option_id": "core-character-support:default-wargear",
+            "source_ids": []
+          }
+        ]
+      },
+      {
+        "abilities": [
+          {
+            "ability_id": "core-deep-strike",
+            "effect_description": "CORE Deep Strike descriptor.",
+            "name": "CORE Deep Strike",
+            "parameter_tokens": [],
+            "rule_ir_diagnostics": [],
+            "rule_ir_payload": null,
+            "source_id": "datasheet:core-deep-strike-unit:ability:deep-strike",
+            "source_kind": "core",
+            "source_wargear_id": null,
+            "support": "unsupported",
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ]
+          }
+        ],
+        "attachment_eligibilities": [],
+        "composition": [
+          {
+            "max_models": 6,
+            "min_models": 3,
+            "model_profile_id": "core-deep-strike-model"
+          }
+        ],
+        "content_scope": "matched_play",
+        "damaged_effects": [],
+        "datasheet_id": "core-deep-strike-unit",
+        "keywords": {
+          "faction_keywords": [
+            "CORE MARINES"
+          ],
+          "keywords": [
+            "DEEP STRIKE",
+            "INFANTRY"
+          ]
+        },
+        "model_profiles": [
+          {
+            "base_size": {
+              "diameter_mm": 32.0,
+              "kind": "circular",
+              "length_mm": null,
+              "width_mm": null
+            },
+            "characteristics": [
+              {
+                "applied_modifier_ids": [],
+                "base": 3,
+                "characteristic": "ballistic_skill",
+                "final": 3,
+                "raw": 3,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 0,
+                "characteristic": "invulnerable_save",
+                "final": 0,
+                "raw": 0,
+                "value_kind": "source_dash"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 6,
+                "characteristic": "leadership",
+                "final": 6,
+                "raw": 6,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 10,
+                "characteristic": "movement",
+                "final": 10,
+                "raw": 10,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 1,
+                "characteristic": "objective_control",
+                "final": 1,
+                "raw": 1,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 3,
+                "characteristic": "save",
+                "final": 3,
+                "raw": 3,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 4,
+                "characteristic": "toughness",
+                "final": 4,
+                "raw": 4,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 3,
+                "characteristic": "weapon_skill",
+                "final": 3,
+                "raw": 3,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 2,
+                "characteristic": "wounds",
+                "final": 2,
+                "raw": 2,
+                "value_kind": "numeric"
+              }
+            ],
+            "model_profile_id": "core-deep-strike-model",
+            "name": "CORE Deep Strike Model",
+            "source_ids": [
+              "datasheet:core-deep-strike-unit:profile"
+            ]
+          }
+        ],
+        "mustering_options": [],
+        "name": "CORE Deep Strike Unit",
+        "source_ids": [
+          "datasheet:core-deep-strike-unit"
+        ],
+        "wargear_options": [
+          {
+            "allowed_wargear_ids": [
+              "core-drop-carbine"
+            ],
+            "conditions": [],
+            "default_wargear_ids": [
+              "core-drop-carbine"
+            ],
+            "effects": [],
+            "max_selections": 1,
+            "min_selections": 1,
+            "model_profile_id": "core-deep-strike-model",
+            "option_id": "core-deep-strike-unit:default-wargear",
+            "source_ids": []
+          }
+        ]
+      },
+      {
+        "abilities": [],
+        "attachment_eligibilities": [],
+        "composition": [
+          {
+            "max_models": 10,
+            "min_models": 5,
+            "model_profile_id": "core-intercessor-like"
+          }
+        ],
+        "content_scope": "matched_play",
+        "damaged_effects": [],
+        "datasheet_id": "core-intercessor-like-infantry",
+        "keywords": {
+          "faction_keywords": [
+            "CORE MARINES"
+          ],
+          "keywords": [
+            "BATTLELINE",
+            "INFANTRY"
+          ]
+        },
+        "model_profiles": [
+          {
+            "base_size": {
+              "diameter_mm": 32.0,
+              "kind": "circular",
+              "length_mm": null,
+              "width_mm": null
+            },
+            "characteristics": [
+              {
+                "applied_modifier_ids": [],
+                "base": 3,
+                "characteristic": "ballistic_skill",
+                "final": 3,
+                "raw": 3,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 0,
+                "characteristic": "invulnerable_save",
+                "final": 0,
+                "raw": 0,
+                "value_kind": "source_dash"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 6,
+                "characteristic": "leadership",
+                "final": 6,
+                "raw": 6,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 6,
+                "characteristic": "movement",
+                "final": 6,
+                "raw": 6,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 2,
+                "characteristic": "objective_control",
+                "final": 2,
+                "raw": 2,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 3,
+                "characteristic": "save",
+                "final": 3,
+                "raw": 3,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 4,
+                "characteristic": "toughness",
+                "final": 4,
+                "raw": 4,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 3,
+                "characteristic": "weapon_skill",
+                "final": 3,
+                "raw": 3,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 2,
+                "characteristic": "wounds",
+                "final": 2,
+                "raw": 2,
+                "value_kind": "numeric"
+              }
+            ],
+            "model_profile_id": "core-intercessor-like",
+            "name": "CORE Intercessor-like Infantry",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry:profile"
+            ]
+          }
+        ],
+        "mustering_options": [],
+        "name": "CORE Intercessor-like Infantry",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry"
+        ],
+        "wargear_options": [
+          {
+            "allowed_wargear_ids": [
+              "core-bolt-rifle"
+            ],
+            "conditions": [],
+            "default_wargear_ids": [
+              "core-bolt-rifle"
+            ],
+            "effects": [],
+            "max_selections": 1,
+            "min_selections": 1,
+            "model_profile_id": "core-intercessor-like",
+            "option_id": "core-intercessor-like-infantry:default-wargear",
+            "source_ids": []
+          }
+        ]
+      },
+      {
+        "abilities": [
+          {
+            "ability_id": "core-firing-deck",
+            "effect_description": "CORE Firing Deck descriptor.",
+            "name": "CORE Firing Deck",
+            "parameter_tokens": [
+              "2"
+            ],
+            "rule_ir_diagnostics": [],
+            "rule_ir_payload": null,
+            "source_id": "datasheet:core-transport:ability:firing-deck",
+            "source_kind": "core",
+            "source_wargear_id": null,
+            "support": "descriptor_only",
+            "timing_tags": [
+              "shooting"
+            ]
+          }
+        ],
+        "attachment_eligibilities": [],
+        "composition": [
+          {
+            "max_models": 1,
+            "min_models": 1,
+            "model_profile_id": "core-transport"
+          }
+        ],
+        "content_scope": "matched_play",
+        "damaged_effects": [],
+        "datasheet_id": "core-transport",
+        "keywords": {
+          "faction_keywords": [
+            "CORE MARINES"
+          ],
+          "keywords": [
+            "TRANSPORT",
+            "VEHICLE"
+          ]
+        },
+        "model_profiles": [
+          {
+            "base_size": {
+              "diameter_mm": 100.0,
+              "kind": "circular",
+              "length_mm": null,
+              "width_mm": null
+            },
+            "characteristics": [
+              {
+                "applied_modifier_ids": [],
+                "base": 4,
+                "characteristic": "ballistic_skill",
+                "final": 4,
+                "raw": 4,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 0,
+                "characteristic": "invulnerable_save",
+                "final": 0,
+                "raw": 0,
+                "value_kind": "source_dash"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 6,
+                "characteristic": "leadership",
+                "final": 6,
+                "raw": 6,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 12,
+                "characteristic": "movement",
+                "final": 12,
+                "raw": 12,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 2,
+                "characteristic": "objective_control",
+                "final": 2,
+                "raw": 2,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 3,
+                "characteristic": "save",
+                "final": 3,
+                "raw": 3,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 9,
+                "characteristic": "toughness",
+                "final": 9,
+                "raw": 9,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 6,
+                "characteristic": "weapon_skill",
+                "final": 6,
+                "raw": 6,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 10,
+                "characteristic": "wounds",
+                "final": 10,
+                "raw": 10,
+                "value_kind": "numeric"
+              }
+            ],
+            "model_profile_id": "core-transport",
+            "name": "CORE Transport",
+            "source_ids": [
+              "datasheet:core-transport:profile"
+            ]
+          }
+        ],
+        "mustering_options": [],
+        "name": "CORE Transport",
+        "source_ids": [
+          "datasheet:core-transport"
+        ],
+        "wargear_options": [
+          {
+            "allowed_wargear_ids": [
+              "core-transport-array"
+            ],
+            "conditions": [],
+            "default_wargear_ids": [
+              "core-transport-array"
+            ],
+            "effects": [],
+            "max_selections": 1,
+            "min_selections": 1,
+            "model_profile_id": "core-transport",
+            "option_id": "core-transport:default-wargear",
+            "source_ids": []
+          }
+        ]
+      },
+      {
+        "abilities": [],
+        "attachment_eligibilities": [],
+        "composition": [
+          {
+            "max_models": 1,
+            "min_models": 1,
+            "model_profile_id": "core-vehicle-monster"
+          }
+        ],
+        "content_scope": "matched_play",
+        "damaged_effects": [],
+        "datasheet_id": "core-vehicle-monster",
+        "keywords": {
+          "faction_keywords": [
+            "CORE MARINES"
+          ],
+          "keywords": [
+            "MONSTER",
+            "VEHICLE"
+          ]
+        },
+        "model_profiles": [
+          {
+            "base_size": {
+              "diameter_mm": 120.0,
+              "kind": "circular",
+              "length_mm": null,
+              "width_mm": null
+            },
+            "characteristics": [
+              {
+                "applied_modifier_ids": [],
+                "base": 4,
+                "characteristic": "ballistic_skill",
+                "final": 4,
+                "raw": 4,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 0,
+                "characteristic": "invulnerable_save",
+                "final": 0,
+                "raw": 0,
+                "value_kind": "source_dash"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 6,
+                "characteristic": "leadership",
+                "final": 6,
+                "raw": 6,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 10,
+                "characteristic": "movement",
+                "final": 10,
+                "raw": 10,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 4,
+                "characteristic": "objective_control",
+                "final": 4,
+                "raw": 4,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 3,
+                "characteristic": "save",
+                "final": 3,
+                "raw": 3,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 10,
+                "characteristic": "toughness",
+                "final": 10,
+                "raw": 10,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 4,
+                "characteristic": "weapon_skill",
+                "final": 4,
+                "raw": 4,
+                "value_kind": "numeric"
+              },
+              {
+                "applied_modifier_ids": [],
+                "base": 12,
+                "characteristic": "wounds",
+                "final": 12,
+                "raw": 12,
+                "value_kind": "numeric"
+              }
+            ],
+            "model_profile_id": "core-vehicle-monster",
+            "name": "CORE Vehicle Monster",
+            "source_ids": [
+              "datasheet:core-vehicle-monster:profile"
+            ]
+          }
+        ],
+        "mustering_options": [],
+        "name": "CORE Vehicle Monster",
+        "source_ids": [
+          "datasheet:core-vehicle-monster"
+        ],
+        "wargear_options": [
+          {
+            "allowed_wargear_ids": [
+              "core-heavy-cannon"
+            ],
+            "conditions": [],
+            "default_wargear_ids": [
+              "core-heavy-cannon"
+            ],
+            "effects": [],
+            "max_selections": 1,
+            "min_selections": 1,
+            "model_profile_id": "core-vehicle-monster",
+            "option_id": "core-vehicle-monster:default-wargear",
+            "source_ids": []
+          }
+        ]
+      }
+    ],
+    "detachments": [
+      {
+        "canonical_detachment_id": "core-combined-arms",
+        "construction_constraints": [],
+        "content_scope": "matched_play",
+        "detachment_id": "core-combined-arms",
+        "detachment_point_cost": 1,
+        "enhancement_ids": [],
+        "faction_id": "core-marine-force",
+        "force_disposition_ids": [
+          "purge-the-foe",
+          "take-and-hold"
+        ],
+        "name": "CORE Combined Arms",
+        "rule_source_ids": [],
+        "source_ids": [
+          "detachment:core-combined-arms"
+        ],
+        "stratagem_ids": [],
+        "unit_datasheet_ids": [
+          "core-boyz-like-infantry",
+          "core-character-leader",
+          "core-character-support",
+          "core-deep-strike-unit",
+          "core-intercessor-like-infantry",
+          "core-transport",
+          "core-vehicle-monster"
+        ]
+      }
+    ],
+    "enhancements": [],
+    "factions": [
+      {
+        "army_rule_ids": [
+          "core-discipline"
+        ],
+        "content_scope": "matched_play",
+        "faction_id": "core-marine-force",
+        "faction_keywords": [
+          "CORE MARINES"
+        ],
+        "name": "CORE Marine Force",
+        "source_ids": [
+          "faction:core-marine-force"
+        ]
+      }
+    ],
+    "ruleset_id": {
+      "edition": "11e",
+      "game": "warhammer_40000",
+      "version": "core-v2-phase9a"
+    },
+    "source_ids": [
+      "catalog:phase9a-canonical"
+    ],
+    "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
+    "stratagems": [],
+    "wargear": [
+      {
+        "name": "Core bolt rifle",
+        "source_ids": [],
+        "wargear_id": "core-bolt-rifle",
+        "weapon_profiles": [
+          {
+            "abilities": [
+              {
+                "ability_id": "rapid-fire:1",
+                "ability_kind": "rapid_fire",
+                "condition": null,
+                "name": "Rapid Fire 1",
+                "parameters": [
+                  {
+                    "name": "value",
+                    "value": 1
+                  }
+                ],
+                "target_keywords": [],
+                "timing": "attack_sequence"
+              }
+            ],
+            "armor_penetration": {
+              "applied_modifier_ids": [],
+              "base": -1,
+              "characteristic": "armor_penetration",
+              "final": -1,
+              "raw": -1,
+              "value_kind": "numeric"
+            },
+            "attack_profile": {
+              "dice_expression": null,
+              "fixed_attacks": 2
+            },
+            "damage_profile": {
+              "dice_expression": null,
+              "fixed_damage": 1
+            },
+            "keywords": [
+              "Assault",
+              "Rapid Fire"
+            ],
+            "name": "Core bolt rifle",
+            "profile_id": "core-bolt-rifle:standard",
+            "range_profile": {
+              "distance_inches": 24,
+              "kind": "distance"
+            },
+            "skill": {
+              "applied_modifier_ids": [],
+              "base": 3,
+              "characteristic": "ballistic_skill",
+              "final": 3,
+              "raw": 3,
+              "value_kind": "numeric"
+            },
+            "source_ids": [],
+            "strength": {
+              "applied_modifier_ids": [],
+              "base": 4,
+              "characteristic": "strength",
+              "final": 4,
+              "raw": 4,
+              "value_kind": "numeric"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Core drop carbine",
+        "source_ids": [],
+        "wargear_id": "core-drop-carbine",
+        "weapon_profiles": [
+          {
+            "abilities": [],
+            "armor_penetration": {
+              "applied_modifier_ids": [],
+              "base": 0,
+              "characteristic": "armor_penetration",
+              "final": 0,
+              "raw": 0,
+              "value_kind": "numeric"
+            },
+            "attack_profile": {
+              "dice_expression": null,
+              "fixed_attacks": 3
+            },
+            "damage_profile": {
+              "dice_expression": null,
+              "fixed_damage": 1
+            },
+            "keywords": [],
+            "name": "Core drop carbine",
+            "profile_id": "core-drop-carbine:standard",
+            "range_profile": {
+              "distance_inches": 18,
+              "kind": "distance"
+            },
+            "skill": {
+              "applied_modifier_ids": [],
+              "base": 3,
+              "characteristic": "ballistic_skill",
+              "final": 3,
+              "raw": 3,
+              "value_kind": "numeric"
+            },
+            "source_ids": [],
+            "strength": {
+              "applied_modifier_ids": [],
+              "base": 4,
+              "characteristic": "strength",
+              "final": 4,
+              "raw": 4,
+              "value_kind": "numeric"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Core heavy cannon",
+        "source_ids": [],
+        "wargear_id": "core-heavy-cannon",
+        "weapon_profiles": [
+          {
+            "abilities": [
+              {
+                "ability_id": "heavy:stationary-or-policy-defined",
+                "ability_kind": "heavy",
+                "condition": "stationary_or_policy_defined",
+                "name": "Heavy",
+                "parameters": [],
+                "target_keywords": [],
+                "timing": "movement_conditioned"
+              }
+            ],
+            "armor_penetration": {
+              "applied_modifier_ids": [],
+              "base": -2,
+              "characteristic": "armor_penetration",
+              "final": -2,
+              "raw": -2,
+              "value_kind": "numeric"
+            },
+            "attack_profile": {
+              "dice_expression": null,
+              "fixed_attacks": 2
+            },
+            "damage_profile": {
+              "dice_expression": null,
+              "fixed_damage": 3
+            },
+            "keywords": [
+              "Heavy"
+            ],
+            "name": "Core heavy cannon",
+            "profile_id": "core-heavy-cannon:standard",
+            "range_profile": {
+              "distance_inches": 48,
+              "kind": "distance"
+            },
+            "skill": {
+              "applied_modifier_ids": [],
+              "base": 4,
+              "characteristic": "ballistic_skill",
+              "final": 4,
+              "raw": 4,
+              "value_kind": "numeric"
+            },
+            "source_ids": [],
+            "strength": {
+              "applied_modifier_ids": [],
+              "base": 10,
+              "characteristic": "strength",
+              "final": 10,
+              "raw": 10,
+              "value_kind": "numeric"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Core leader blade",
+        "source_ids": [],
+        "wargear_id": "core-leader-blade",
+        "weapon_profiles": [
+          {
+            "abilities": [],
+            "armor_penetration": {
+              "applied_modifier_ids": [],
+              "base": -2,
+              "characteristic": "armor_penetration",
+              "final": -2,
+              "raw": -2,
+              "value_kind": "numeric"
+            },
+            "attack_profile": {
+              "dice_expression": null,
+              "fixed_attacks": 5
+            },
+            "damage_profile": {
+              "dice_expression": null,
+              "fixed_damage": 2
+            },
+            "keywords": [],
+            "name": "Core leader blade",
+            "profile_id": "core-leader-blade:standard",
+            "range_profile": {
+              "distance_inches": null,
+              "kind": "melee"
+            },
+            "skill": {
+              "applied_modifier_ids": [],
+              "base": 2,
+              "characteristic": "weapon_skill",
+              "final": 2,
+              "raw": 2,
+              "value_kind": "numeric"
+            },
+            "source_ids": [],
+            "strength": {
+              "applied_modifier_ids": [],
+              "base": 5,
+              "characteristic": "strength",
+              "final": 5,
+              "raw": 5,
+              "value_kind": "numeric"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Core mob shoota",
+        "source_ids": [],
+        "wargear_id": "core-mob-shoota",
+        "weapon_profiles": [
+          {
+            "abilities": [],
+            "armor_penetration": {
+              "applied_modifier_ids": [],
+              "base": 0,
+              "characteristic": "armor_penetration",
+              "final": 0,
+              "raw": 0,
+              "value_kind": "numeric"
+            },
+            "attack_profile": {
+              "dice_expression": null,
+              "fixed_attacks": 2
+            },
+            "damage_profile": {
+              "dice_expression": null,
+              "fixed_damage": 1
+            },
+            "keywords": [],
+            "name": "Core mob shoota",
+            "profile_id": "core-mob-shoota:standard",
+            "range_profile": {
+              "distance_inches": 18,
+              "kind": "distance"
+            },
+            "skill": {
+              "applied_modifier_ids": [],
+              "base": 5,
+              "characteristic": "ballistic_skill",
+              "final": 5,
+              "raw": 5,
+              "value_kind": "numeric"
+            },
+            "source_ids": [],
+            "strength": {
+              "applied_modifier_ids": [],
+              "base": 4,
+              "characteristic": "strength",
+              "final": 4,
+              "raw": 4,
+              "value_kind": "numeric"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Core transport array",
+        "source_ids": [],
+        "wargear_id": "core-transport-array",
+        "weapon_profiles": [
+          {
+            "abilities": [],
+            "armor_penetration": {
+              "applied_modifier_ids": [],
+              "base": 0,
+              "characteristic": "armor_penetration",
+              "final": 0,
+              "raw": 0,
+              "value_kind": "numeric"
+            },
+            "attack_profile": {
+              "dice_expression": null,
+              "fixed_attacks": 6
+            },
+            "damage_profile": {
+              "dice_expression": null,
+              "fixed_damage": 1
+            },
+            "keywords": [],
+            "name": "Core transport array",
+            "profile_id": "core-transport-array:standard",
+            "range_profile": {
+              "distance_inches": 24,
+              "kind": "distance"
+            },
+            "skill": {
+              "applied_modifier_ids": [],
+              "base": 4,
+              "characteristic": "ballistic_skill",
+              "final": 4,
+              "raw": 4,
+              "value_kind": "numeric"
+            },
+            "source_ids": [],
+            "strength": {
+              "applied_modifier_ids": [],
+              "base": 5,
+              "characteristic": "strength",
+              "final": 5,
+              "raw": 5,
+              "value_kind": "numeric"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "army_muster_requests": [
+    {
+      "army_id": "army-alpha",
+      "attachment_declarations": [],
+      "battle_size": "strike_force",
+      "catalog_id": "phase9a-canonical",
+      "dedicated_transport_manifests": [],
+      "detachment_selection": {
+        "detachment_ids": [
+          "core-combined-arms"
+        ],
+        "enhancement_ids": [],
+        "faction_id": "core-marine-force",
+        "stratagem_ids": []
+      },
+      "enhancement_assignments": [],
+      "enhancement_point_values": [],
+      "force_disposition_id": "take-and-hold",
+      "player_id": "player-a",
+      "points_source_package_id": null,
+      "roster_legality_required": false,
+      "ruleset_id": {
+        "edition": "11e",
+        "game": "warhammer_40000",
+        "version": "core-v2-phase9a"
+      },
+      "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
+      "unit_points": [],
+      "unit_selections": [
+        {
+          "datasheet_id": "core-intercessor-like-infantry",
+          "model_profile_selections": [
+            {
+              "model_count": 5,
+              "model_profile_id": "core-intercessor-like"
+            }
+          ],
+          "mustering_option_selections": [],
+          "unit_selection_id": "intercessor-unit-1",
+          "wargear_selections": []
+        }
+      ],
+      "warlord_selection": null
+    },
+    {
+      "army_id": "army-beta",
+      "attachment_declarations": [],
+      "battle_size": "strike_force",
+      "catalog_id": "phase9a-canonical",
+      "dedicated_transport_manifests": [],
+      "detachment_selection": {
+        "detachment_ids": [
+          "core-combined-arms"
+        ],
+        "enhancement_ids": [],
+        "faction_id": "core-marine-force",
+        "stratagem_ids": []
+      },
+      "enhancement_assignments": [],
+      "enhancement_point_values": [],
+      "force_disposition_id": "purge-the-foe",
+      "player_id": "player-b",
+      "points_source_package_id": null,
+      "roster_legality_required": false,
+      "ruleset_id": {
+        "edition": "11e",
+        "game": "warhammer_40000",
+        "version": "core-v2-phase9a"
+      },
+      "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
+      "unit_points": [],
+      "unit_selections": [
+        {
+          "datasheet_id": "core-intercessor-like-infantry",
+          "model_profile_selections": [
+            {
+              "model_count": 5,
+              "model_profile_id": "core-intercessor-like"
+            }
+          ],
+          "mustering_option_selections": [],
+          "unit_selection_id": "enemy-unit",
+          "wargear_selections": []
+        }
+      ],
+      "warlord_selection": null
+    }
+  ],
+  "fixed_secondary_mission_ids": [
+    "assassination",
+    "bring-it-down",
+    "cleanse"
+  ],
+  "game_id": "phase12c-game",
+  "max_lifecycle_transitions": 128,
+  "mission_setup": {
+    "attacker_battlefield_edge": null,
+    "attacker_player_id": "player-a",
+    "battlefield_depth_inches": 44.0,
+    "battlefield_layout_id": null,
+    "battlefield_regions": [],
+    "battlefield_width_inches": 60.0,
+    "defender_battlefield_edge": null,
+    "defender_player_id": "player-b",
+    "deployment_map_id": "take-and-hold-vs-purge-the-foe-layout-3-deployment",
+    "deployment_zones": [
+      {
+        "deployment_zone_id": "take-and-hold-vs-purge-the-foe-layout-3-attacker",
+        "player_id": "player-a",
+        "shape": {
+          "cutouts": [],
+          "polygons": [
+            {
+              "vertices": [
+                {
+                  "x": 0.0,
+                  "y": 0.0
+                },
+                {
+                  "x": 18.0,
+                  "y": 0.0
+                },
+                {
+                  "x": 18.0,
+                  "y": 44.0
+                },
+                {
+                  "x": 0.0,
+                  "y": 44.0
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "deployment_zone_id": "take-and-hold-vs-purge-the-foe-layout-3-defender",
+        "player_id": "player-b",
+        "shape": {
+          "cutouts": [],
+          "polygons": [
+            {
+              "vertices": [
+                {
+                  "x": 42.0,
+                  "y": 0.0
+                },
+                {
+                  "x": 60.0,
+                  "y": 0.0
+                },
+                {
+                  "x": 60.0,
+                  "y": 44.0
+                },
+                {
+                  "x": 42.0,
+                  "y": 44.0
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "mission_pack_id": "11e-chapter-approved-2026-27",
+    "mission_pool_entry_id": "mission-take-and-hold-vs-purge-the-foe-layout-3",
+    "objective_markers": [
+      {
+        "blocks_movement": false,
+        "blocks_placement": false,
+        "is_flat": true,
+        "marker_diameter_mm": 40.0,
+        "measurement_anchor": "center",
+        "name": "Center Central Objective",
+        "objective_marker_id": "take-and-hold-vs-purge-the-foe-layout-3-center-central",
+        "objective_role": "central",
+        "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-center-central",
+        "x_inches": 30.0,
+        "y_inches": 22.0,
+        "z_inches": 0.0
+      },
+      {
+        "blocks_movement": false,
+        "blocks_placement": false,
+        "is_flat": true,
+        "marker_diameter_mm": 40.0,
+        "measurement_anchor": "center",
+        "name": "Left Home Objective",
+        "objective_marker_id": "take-and-hold-vs-purge-the-foe-layout-3-left-home",
+        "objective_role": "attacker_home",
+        "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-left-home",
+        "x_inches": 9.5,
+        "y_inches": 10.5,
+        "z_inches": 0.0
+      },
+      {
+        "blocks_movement": false,
+        "blocks_placement": false,
+        "is_flat": true,
+        "marker_diameter_mm": 40.0,
+        "measurement_anchor": "center",
+        "name": "Lower Central Objective",
+        "objective_marker_id": "take-and-hold-vs-purge-the-foe-layout-3-lower-central",
+        "objective_role": "central",
+        "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-lower-central",
+        "x_inches": 28.5,
+        "y_inches": 35.5,
+        "z_inches": 0.0
+      },
+      {
+        "blocks_movement": false,
+        "blocks_placement": false,
+        "is_flat": true,
+        "marker_diameter_mm": 40.0,
+        "measurement_anchor": "center",
+        "name": "Right Home Objective",
+        "objective_marker_id": "take-and-hold-vs-purge-the-foe-layout-3-right-home",
+        "objective_role": "defender_home",
+        "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-right-home",
+        "x_inches": 52.5,
+        "y_inches": 34.5,
+        "z_inches": 0.0
+      },
+      {
+        "blocks_movement": false,
+        "blocks_placement": false,
+        "is_flat": true,
+        "marker_diameter_mm": 40.0,
+        "measurement_anchor": "center",
+        "name": "Upper Central Objective",
+        "objective_marker_id": "take-and-hold-vs-purge-the-foe-layout-3-upper-central",
+        "objective_role": "central",
+        "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-upper-central",
+        "x_inches": 28.5,
+        "y_inches": 8.5,
+        "z_inches": 0.0
+      }
+    ],
+    "objective_terrain_areas": [],
+    "primary_mission_assignments": [
+      {
+        "force_disposition_id": "take-and-hold",
+        "player_id": "player-a",
+        "primary_mission_id": "primary-immovable-object"
+      },
+      {
+        "force_disposition_id": "purge-the-foe",
+        "player_id": "player-b",
+        "primary_mission_id": "primary-unstoppable-force"
+      }
+    ],
+    "source_id": "gw-11e-chapter-approved-2026-27",
+    "source_version": "2026-27",
+    "terrain_areas": [],
+    "terrain_features": [],
+    "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
+  },
+  "player_ids": [
+    "player-a",
+    "player-b"
+  ],
+  "private_rng_seed": "a2ef6908914ab682fcae386319e2ae196f5bc5c552f74b960583686bb5c3d67c",
+  "reserve_unit_points": [],
+  "ruleset_descriptor": {
+    "battle_phase_sequence": {
+      "phases": [
+        "command",
+        "movement",
+        "shooting",
+        "charge",
+        "fight"
+      ]
+    },
+    "charge_policy": {
+      "endpoint_requirement": "selected_target_engagement",
+      "forbids_advance": true,
+      "forbids_fall_back": true,
+      "forbids_non_target_engagement": true,
+      "grants_fights_first_until_end_turn": true,
+      "max_declaration_range_inches": 12.0,
+      "max_target_selection_range_inches": 12.0,
+      "must_end_closer_to_selected_targets": true,
+      "must_end_engaged_if_possible": true,
+      "must_end_engaged_with_every_selected_target": true,
+      "must_reach_preferred_target_distance_if_possible": true,
+      "preferred_target_distance_inches": 1.0,
+      "requires_battlefield_presence": true,
+      "requires_unengaged_unit": true,
+      "target_selection_requires_rolled_distance": true,
+      "target_selection_timing": "after_roll"
+    },
+    "coherency_policy": {
+      "large_unit_model_count_threshold": null,
+      "max_all_models_distance_inches": null,
+      "max_horizontal_inches": 2.0,
+      "max_unit_span_inches": 9.0,
+      "max_vertical_inches": 5.0,
+      "policy_kind": "neighbor_count",
+      "required_neighbors_large_unit": null,
+      "required_neighbors_small_unit": 1
+    },
+    "descriptor_hash": "953d6e0173be13ac77777f4cd150415b1d1c81968d00c2a814a7a82a7d282bf1",
+    "descriptor_version": "core-v2-phase12c-test",
+    "engagement_policy": {
+      "horizontal_inches": 2.0,
+      "vertical_inches": 5.0
+    },
+    "fight_policy": {
+      "active_player_consolidates_first": true,
+      "active_player_pile_in_first": true,
+      "consolidation_available_to_both_players": true,
+      "consolidation_modes": [
+        "ongoing",
+        "engaging",
+        "objective"
+      ],
+      "eligibility_kinds": [
+        "charged_this_turn",
+        "currently_engaged",
+        "engaged_at_fight_step_start"
+      ],
+      "eligible_pass_distance_inches": 5.0,
+      "engaging_consolidation_emits_opponent_fight_decision": true,
+      "fight_types": [
+        "normal",
+        "overrun"
+      ],
+      "fights_first_alternates": true,
+      "ordering_bands": [
+        "fights_first",
+        "remaining_combats"
+      ],
+      "pile_in_available_to_both_players": true,
+      "remaining_combats_alternates": true,
+      "steps": [
+        "start",
+        "pile_in",
+        "fight",
+        "consolidate",
+        "end"
+      ]
+    },
+    "fly_policy": {
+      "ignores_vertical_distance": true,
+      "may_move_through_models": true,
+      "may_move_through_terrain": true,
+      "movement_penalty_inches": 2.0,
+      "take_to_the_skies_supported": true
+    },
+    "mission_policy": {
+      "deployment_zone_source": "mission",
+      "fixed_objective_missions_supported": true,
+      "reserve_destruction_battle_round": 3,
+      "reserve_destruction_excludes_during_battle_strategic_reserves": true,
+      "reserve_destruction_only_declare_battle_formations": true,
+      "reserve_destruction_timing": "end_of_battle_round_n",
+      "reserves_arrival_blocked_battle_rounds": [
+        1
+      ],
+      "reserves_arrival_excludes_during_battle_strategic_reserves": true,
+      "terrain_objective_missions_supported": true
+    },
+    "movement_policy": {
+      "movement_modes": [
+        {
+          "ignores_models": false,
+          "ignores_terrain": false,
+          "ignores_vertical_distance": false,
+          "may_end_in_enemy_engagement": false,
+          "may_transit_enemy_engagement": false,
+          "movement_distance_modifier": 0.0,
+          "movement_mode": "advance",
+          "requires_charge_target": false
+        },
+        {
+          "ignores_models": false,
+          "ignores_terrain": false,
+          "ignores_vertical_distance": false,
+          "may_end_in_enemy_engagement": true,
+          "may_transit_enemy_engagement": true,
+          "movement_distance_modifier": 0.0,
+          "movement_mode": "charge",
+          "requires_charge_target": true
+        },
+        {
+          "ignores_models": false,
+          "ignores_terrain": false,
+          "ignores_vertical_distance": false,
+          "may_end_in_enemy_engagement": true,
+          "may_transit_enemy_engagement": true,
+          "movement_distance_modifier": 0.0,
+          "movement_mode": "consolidate",
+          "requires_charge_target": false
+        },
+        {
+          "ignores_models": false,
+          "ignores_terrain": false,
+          "ignores_vertical_distance": false,
+          "may_end_in_enemy_engagement": false,
+          "may_transit_enemy_engagement": true,
+          "movement_distance_modifier": 0.0,
+          "movement_mode": "fall_back",
+          "requires_charge_target": false
+        },
+        {
+          "ignores_models": true,
+          "ignores_terrain": true,
+          "ignores_vertical_distance": true,
+          "may_end_in_enemy_engagement": false,
+          "may_transit_enemy_engagement": true,
+          "movement_distance_modifier": -2.0,
+          "movement_mode": "fly_take_to_skies",
+          "requires_charge_target": false
+        },
+        {
+          "ignores_models": false,
+          "ignores_terrain": false,
+          "ignores_vertical_distance": false,
+          "may_end_in_enemy_engagement": false,
+          "may_transit_enemy_engagement": false,
+          "movement_distance_modifier": 0.0,
+          "movement_mode": "normal",
+          "requires_charge_target": false
+        },
+        {
+          "ignores_models": false,
+          "ignores_terrain": false,
+          "ignores_vertical_distance": false,
+          "may_end_in_enemy_engagement": true,
+          "may_transit_enemy_engagement": true,
+          "movement_distance_modifier": 0.0,
+          "movement_mode": "pile_in",
+          "requires_charge_target": false
+        }
+      ]
+    },
+    "objective_policy": {
+      "default_point_control_radius_inches": 3.0,
+      "supported_anchor_kinds": [
+        "point",
+        "terrain"
+      ],
+      "terrain_objective_control_policy": "terrain_area_occupancy"
+    },
+    "rules_overlay_ids": [],
+    "ruleset_id": {
+      "edition": "11e",
+      "game": "warhammer_40000",
+      "version": "core-v2-phase12c-test"
+    },
+    "setup_sequence": {
+      "steps": [
+        "muster_armies",
+        "select_mission",
+        "create_battlefield",
+        "determine_attacker_defender",
+        "select_secondary_missions",
+        "declare_battle_formations",
+        "deploy_armies",
+        "redeploy_units",
+        "determine_first_turn",
+        "resolve_prebattle_actions"
+      ]
+    },
+    "source_date": "2026-06-01",
+    "terrain_movement_policy": {
+      "climb_vertical_distance_counts": true,
+      "feature_policies": [
+        {
+          "can_move_over": true,
+          "can_move_through": false,
+          "endpoint_support_policy": "allowed_on_top_with_no_overhang",
+          "freely_moved_over_height_inches": 2.0,
+          "ground_floor_only_unless_keyword": false,
+          "no_overhang_required": true,
+          "terrain_feature_kind": "armoured_containers",
+          "through_terrain_allowed_keywords": [],
+          "upper_floor_allowed_keywords": [
+            "BEAST",
+            "FLY",
+            "INFANTRY",
+            "MONSTER",
+            "SWARM"
+          ]
+        },
+        {
+          "can_move_over": true,
+          "can_move_through": false,
+          "endpoint_support_policy": "not_allowed_on_top",
+          "freely_moved_over_height_inches": 2.0,
+          "ground_floor_only_unless_keyword": false,
+          "no_overhang_required": false,
+          "terrain_feature_kind": "barricade_and_fuel_pipes",
+          "through_terrain_allowed_keywords": [],
+          "upper_floor_allowed_keywords": [
+            "BEAST",
+            "FLY",
+            "INFANTRY",
+            "MONSTER",
+            "SWARM"
+          ]
+        },
+        {
+          "can_move_over": true,
+          "can_move_through": false,
+          "endpoint_support_policy": "not_allowed_on_top",
+          "freely_moved_over_height_inches": 2.0,
+          "ground_floor_only_unless_keyword": false,
+          "no_overhang_required": false,
+          "terrain_feature_kind": "battlefield_debris_and_statuary",
+          "through_terrain_allowed_keywords": [],
+          "upper_floor_allowed_keywords": [
+            "BEAST",
+            "FLY",
+            "INFANTRY",
+            "MONSTER",
+            "SWARM"
+          ]
+        },
+        {
+          "can_move_over": true,
+          "can_move_through": false,
+          "endpoint_support_policy": "allowed_on_ground_floor_only",
+          "freely_moved_over_height_inches": 2.0,
+          "ground_floor_only_unless_keyword": false,
+          "no_overhang_required": false,
+          "terrain_feature_kind": "crater_and_rubble",
+          "through_terrain_allowed_keywords": [],
+          "upper_floor_allowed_keywords": [
+            "BEAST",
+            "FLY",
+            "INFANTRY",
+            "MONSTER",
+            "SWARM"
+          ]
+        },
+        {
+          "can_move_over": true,
+          "can_move_through": false,
+          "endpoint_support_policy": "not_allowed_on_top",
+          "freely_moved_over_height_inches": 2.0,
+          "ground_floor_only_unless_keyword": false,
+          "no_overhang_required": false,
+          "terrain_feature_kind": "debris_and_statuary",
+          "through_terrain_allowed_keywords": [],
+          "upper_floor_allowed_keywords": [
+            "BEAST",
+            "FLY",
+            "INFANTRY",
+            "MONSTER",
+            "SWARM"
+          ]
+        },
+        {
+          "can_move_over": true,
+          "can_move_through": false,
+          "endpoint_support_policy": "allowed_on_top_with_no_overhang",
+          "freely_moved_over_height_inches": 2.0,
+          "ground_floor_only_unless_keyword": false,
+          "no_overhang_required": true,
+          "terrain_feature_kind": "hills",
+          "through_terrain_allowed_keywords": [],
+          "upper_floor_allowed_keywords": [
+            "BEAST",
+            "FLY",
+            "INFANTRY",
+            "MONSTER",
+            "SWARM"
+          ]
+        },
+        {
+          "can_move_over": true,
+          "can_move_through": false,
+          "endpoint_support_policy": "allowed_on_top_with_no_overhang",
+          "freely_moved_over_height_inches": 2.0,
+          "ground_floor_only_unless_keyword": false,
+          "no_overhang_required": true,
+          "terrain_feature_kind": "hills_and_sealed_buildings",
+          "through_terrain_allowed_keywords": [],
+          "upper_floor_allowed_keywords": [
+            "BEAST",
+            "FLY",
+            "INFANTRY",
+            "MONSTER",
+            "SWARM"
+          ]
+        },
+        {
+          "can_move_over": true,
+          "can_move_through": false,
+          "endpoint_support_policy": "allowed_on_top_with_no_overhang",
+          "freely_moved_over_height_inches": 2.0,
+          "ground_floor_only_unless_keyword": false,
+          "no_overhang_required": true,
+          "terrain_feature_kind": "industrial_structures",
+          "through_terrain_allowed_keywords": [],
+          "upper_floor_allowed_keywords": [
+            "BEAST",
+            "FLY",
+            "INFANTRY",
+            "MONSTER",
+            "SWARM"
+          ]
+        },
+        {
+          "can_move_over": true,
+          "can_move_through": false,
+          "endpoint_support_policy": "allowed_on_any_floor_with_no_overhang",
+          "freely_moved_over_height_inches": 2.0,
+          "ground_floor_only_unless_keyword": true,
+          "no_overhang_required": true,
+          "terrain_feature_kind": "ruins",
+          "through_terrain_allowed_keywords": [
+            "BEAST",
+            "BELISARIUS_CAWL",
+            "IMPERIUM_PRIMARCH",
+            "INFANTRY",
+            "MOBILE"
+          ],
+          "upper_floor_allowed_keywords": [
+            "BEAST",
+            "BELISARIUS_CAWL",
+            "FLY",
+            "IMPERIUM_PRIMARCH",
+            "INFANTRY",
+            "MONSTER",
+            "SWARM"
+          ]
+        },
+        {
+          "can_move_over": true,
+          "can_move_through": false,
+          "endpoint_support_policy": "allowed_on_top_with_no_overhang",
+          "freely_moved_over_height_inches": 2.0,
+          "ground_floor_only_unless_keyword": false,
+          "no_overhang_required": true,
+          "terrain_feature_kind": "sealed_buildings",
+          "through_terrain_allowed_keywords": [],
+          "upper_floor_allowed_keywords": [
+            "BEAST",
+            "FLY",
+            "INFANTRY",
+            "MONSTER",
+            "SWARM"
+          ]
+        },
+        {
+          "can_move_over": true,
+          "can_move_through": false,
+          "endpoint_support_policy": "allowed_on_ground_floor_only",
+          "freely_moved_over_height_inches": 2.0,
+          "ground_floor_only_unless_keyword": false,
+          "no_overhang_required": false,
+          "terrain_feature_kind": "woods",
+          "through_terrain_allowed_keywords": [],
+          "upper_floor_allowed_keywords": [
+            "BEAST",
+            "FLY",
+            "INFANTRY",
+            "MONSTER",
+            "SWARM"
+          ]
+        }
+      ],
+      "fly_traversal_mode": "air_path",
+      "fly_uses_air_path_measurement": true,
+      "freely_traversable_height_threshold_inches": 2.0,
+      "infantry_beast_ruins_wall_traversal_mode": "through_feature",
+      "may_end_mid_climb": false,
+      "requires_permission_to_move_through_features": true
+    },
+    "terrain_visibility_policy": {
+      "cover_effect": "attacker_bs_modifier",
+      "cover_policy": {
+        "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+        "cover_effect": "attacker_bs_modifier",
+        "grants_benefit_of_cover": true,
+        "non_stacking": true,
+        "requires_not_fully_visible": true,
+        "requires_visible_target": true
+      },
+      "feature_policies": [
+        {
+          "aircraft_uses_true_los_through_feature": false,
+          "blocks_full_visibility_through_footprint": false,
+          "blocks_model_visibility_through_footprint": false,
+          "cover_policy": {
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_not_fully_visible": true,
+            "requires_visible_target": true
+          },
+          "line_of_sight_policy": "true_line_of_sight",
+          "terrain_feature_kind": "armoured_containers",
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false
+        },
+        {
+          "aircraft_uses_true_los_through_feature": false,
+          "blocks_full_visibility_through_footprint": false,
+          "blocks_model_visibility_through_footprint": false,
+          "cover_policy": {
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_not_fully_visible": true,
+            "requires_visible_target": true
+          },
+          "line_of_sight_policy": "true_line_of_sight",
+          "terrain_feature_kind": "barricade_and_fuel_pipes",
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false
+        },
+        {
+          "aircraft_uses_true_los_through_feature": false,
+          "blocks_full_visibility_through_footprint": false,
+          "blocks_model_visibility_through_footprint": false,
+          "cover_policy": {
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_not_fully_visible": true,
+            "requires_visible_target": true
+          },
+          "line_of_sight_policy": "true_line_of_sight",
+          "terrain_feature_kind": "battlefield_debris_and_statuary",
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false
+        },
+        {
+          "aircraft_uses_true_los_through_feature": false,
+          "blocks_full_visibility_through_footprint": false,
+          "blocks_model_visibility_through_footprint": false,
+          "cover_policy": {
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_not_fully_visible": true,
+            "requires_visible_target": true
+          },
+          "line_of_sight_policy": "true_line_of_sight",
+          "terrain_feature_kind": "crater_and_rubble",
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false
+        },
+        {
+          "aircraft_uses_true_los_through_feature": false,
+          "blocks_full_visibility_through_footprint": false,
+          "blocks_model_visibility_through_footprint": false,
+          "cover_policy": {
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_not_fully_visible": true,
+            "requires_visible_target": true
+          },
+          "line_of_sight_policy": "true_line_of_sight",
+          "terrain_feature_kind": "debris_and_statuary",
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false
+        },
+        {
+          "aircraft_uses_true_los_through_feature": false,
+          "blocks_full_visibility_through_footprint": false,
+          "blocks_model_visibility_through_footprint": false,
+          "cover_policy": {
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_not_fully_visible": true,
+            "requires_visible_target": true
+          },
+          "line_of_sight_policy": "true_line_of_sight",
+          "terrain_feature_kind": "hills",
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false
+        },
+        {
+          "aircraft_uses_true_los_through_feature": false,
+          "blocks_full_visibility_through_footprint": false,
+          "blocks_model_visibility_through_footprint": false,
+          "cover_policy": {
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_not_fully_visible": true,
+            "requires_visible_target": true
+          },
+          "line_of_sight_policy": "true_line_of_sight",
+          "terrain_feature_kind": "hills_and_sealed_buildings",
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false
+        },
+        {
+          "aircraft_uses_true_los_through_feature": false,
+          "blocks_full_visibility_through_footprint": false,
+          "blocks_model_visibility_through_footprint": false,
+          "cover_policy": {
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_not_fully_visible": true,
+            "requires_visible_target": true
+          },
+          "line_of_sight_policy": "true_line_of_sight",
+          "terrain_feature_kind": "industrial_structures",
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false
+        },
+        {
+          "aircraft_uses_true_los_through_feature": true,
+          "blocks_full_visibility_through_footprint": true,
+          "blocks_model_visibility_through_footprint": true,
+          "cover_policy": {
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_not_fully_visible": true,
+            "requires_visible_target": true
+          },
+          "line_of_sight_policy": "area_obscuring",
+          "terrain_feature_kind": "ruins",
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": true,
+          "uses_true_los_when_observer_wholly_within_feature": true,
+          "uses_true_los_when_target_intersects_feature": true
+        },
+        {
+          "aircraft_uses_true_los_through_feature": false,
+          "blocks_full_visibility_through_footprint": false,
+          "blocks_model_visibility_through_footprint": false,
+          "cover_policy": {
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_not_fully_visible": true,
+            "requires_visible_target": true
+          },
+          "line_of_sight_policy": "true_line_of_sight",
+          "terrain_feature_kind": "sealed_buildings",
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false
+        },
+        {
+          "aircraft_uses_true_los_through_feature": true,
+          "blocks_full_visibility_through_footprint": true,
+          "blocks_model_visibility_through_footprint": false,
+          "cover_policy": {
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_not_fully_visible": true,
+            "requires_visible_target": true
+          },
+          "line_of_sight_policy": "dense_cover",
+          "terrain_feature_kind": "woods",
+          "towering_uses_true_los_through_feature": true,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "uses_true_los_when_observer_wholly_within_feature": true,
+          "uses_true_los_when_target_intersects_feature": false
+        }
+      ],
+      "hidden_detection_range_inches": 15.0,
+      "hidden_gone_to_ground_detection_penalty_inches": 3.0,
+      "hidden_lost_after_shooting": true,
+      "hidden_requires_keywords": [
+        "BEAST",
+        "INFANTRY",
+        "SWARM"
+      ],
+      "hidden_requires_terrain_area_occupancy": true,
+      "hidden_supported": true
+    }
+  },
+  "tactical_secondary_draw_count": 2,
+  "turn_order": [
+    "player-a",
+    "player-b"
+  ]
+}

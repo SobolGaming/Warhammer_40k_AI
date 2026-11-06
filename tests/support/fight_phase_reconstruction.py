@@ -31,6 +31,7 @@ from tests.phase15c_fight_order_helpers import (
 )
 from tests.sequential_translation_helpers import leading_first_translation_paths
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
+from tests.support.private_randomness import fixture_private_rng_seed
 
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -247,6 +248,7 @@ def _config(
 ) -> GameConfig:
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed(game_id),
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(

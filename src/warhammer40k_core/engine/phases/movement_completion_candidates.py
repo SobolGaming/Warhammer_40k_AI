@@ -141,7 +141,7 @@ def _activate_surge(
         dice_expression = distance_spec.dice_expression
         if dice_expression is None:
             raise GameLifecycleError("Dice movement-end surge distance is missing its expression.")
-        roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
+        roll_state = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).roll(
             reactions._movement_end_surge_distance_roll_spec(
                 source_rule_id=descriptor_source_rule_id,
                 player_id=reacting_player_id,

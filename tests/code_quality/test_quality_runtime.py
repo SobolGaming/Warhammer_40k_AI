@@ -59,7 +59,7 @@ def test_live_workflow_preserves_required_names_and_all_four_producer_controls()
     assert "timeout-minutes: 3" in policy
     assert "timeout-minutes: 10" in policy
     behavior = workflow.split("  behavior-tests:\n")[1].split("  coverage-gate:\n")[0]
-    assert "timeout-minutes: 12" in behavior
+    assert "timeout-minutes: 14" in behavior
     matrix = workflow.split("  quality-shards:\n")[1].split("  semantic-audit-macos:\n")[0]
     assert 'shard: ["1", "3", "4"]' in matrix
     assert "fail-fast: false" in matrix

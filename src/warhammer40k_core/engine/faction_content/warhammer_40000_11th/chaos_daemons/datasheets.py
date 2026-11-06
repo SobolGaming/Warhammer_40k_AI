@@ -585,7 +585,9 @@ def apply_relentless_carnage_fight_phase_end_result(
     ):
         raise GameLifecycleError("Relentless Carnage target is no longer eligible.")
 
-    dice_manager = DiceRollManager(context.state.game_id, event_log=context.decisions.event_log)
+    dice_manager = DiceRollManager(
+        context.state.private_rng_seed, event_log=context.decisions.event_log
+    )
     roll_state = dice_manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=8, sides=6),

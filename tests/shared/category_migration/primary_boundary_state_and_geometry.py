@@ -526,7 +526,7 @@ def _return_destroyed_unit(
 
     pending = state.pending_return_on_death_by_id("p2-return-on-death-pending")
     dice_manager = DiceRollManager(
-        state.game_id,
+        state.private_rng_seed,
         event_log=decisions.event_log,
         injected_results=(
             DiceRollResult.from_values(

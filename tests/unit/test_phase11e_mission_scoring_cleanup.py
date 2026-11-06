@@ -10371,6 +10371,8 @@ def test_mission_policy_and_tactical_draw_are_fail_fast() -> None:
     setup = _mission_setup()
 
     assert deterministic_tactical_secondary_draw(
+        private_rng_seed="f0" * 32,
+        draw_id="fixture-draw",
         mission_setup=setup,
         player_id="player-a",
         battle_round=1,
@@ -10391,6 +10393,8 @@ def test_mission_policy_and_tactical_draw_are_fail_fast() -> None:
         )
     with pytest.raises(GameLifecycleError):
         deterministic_tactical_secondary_draw(
+            private_rng_seed="f0" * 32,
+            draw_id="fixture-draw",
             mission_setup=cast(MissionSetup, object()),
             player_id="player-a",
             battle_round=1,
@@ -10398,6 +10402,8 @@ def test_mission_policy_and_tactical_draw_are_fail_fast() -> None:
         )
     with pytest.raises(GameLifecycleError):
         deterministic_tactical_secondary_draw(
+            private_rng_seed="f0" * 32,
+            draw_id="fixture-draw",
             mission_setup=replace(setup, mission_pack_id="unsupported-pack"),
             player_id="player-a",
             battle_round=1,
@@ -10405,6 +10411,8 @@ def test_mission_policy_and_tactical_draw_are_fail_fast() -> None:
         )
     with pytest.raises(GameLifecycleError):
         deterministic_tactical_secondary_draw(
+            private_rng_seed="f0" * 32,
+            draw_id="fixture-draw",
             mission_setup=setup,
             player_id="player-a",
             battle_round=1,
@@ -10412,6 +10420,8 @@ def test_mission_policy_and_tactical_draw_are_fail_fast() -> None:
         )
     with pytest.raises(GameLifecycleError):
         deterministic_tactical_secondary_draw(
+            private_rng_seed="f0" * 32,
+            draw_id="fixture-draw",
             mission_setup=setup,
             player_id="player-a",
             battle_round=0,
@@ -10419,6 +10429,8 @@ def test_mission_policy_and_tactical_draw_are_fail_fast() -> None:
         )
     with pytest.raises(GameLifecycleError):
         deterministic_tactical_secondary_draw(
+            private_rng_seed="f0" * 32,
+            draw_id="fixture-draw",
             mission_setup=setup,
             player_id="player-a",
             battle_round=1,

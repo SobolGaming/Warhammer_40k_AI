@@ -8,7 +8,7 @@
       "type": "string"
     },
     "schema_version": {
-      "const": "lifecycle-status-v4-phase17n-step4",
+      "const": "lifecycle-status-v5-viewer-identities",
       "type": "string"
     },
     "status": {

@@ -126,6 +126,22 @@ class AdapterGameSession(Protocol):
         """Return the internal authoritative event-log length."""
         ...
 
+    def authoritative_event_page_for_context(
+        self, cursor: EventStreamCursor, *, viewer: ViewerContext, visible_limit: int
+    ) -> EventStreamPagePayload:
+        """Trusted transport paging with private authoritative offsets."""
+        ...
+
+    def authoritative_visible_event_prefix_counts(
+        self, *, viewer: ViewerContext
+    ) -> tuple[int, ...]:
+        """Trusted transport index of visible cardinalities for authoritative prefixes."""
+        ...
+
+    def status_for_context(self, status: LifecycleStatus, *, viewer: ViewerContext) -> JsonValue:
+        """Project status metadata and identities through the shared viewer boundary."""
+        ...
+
     def decision_record_count(self) -> int:
         """Return the monotonic count of authoritative decision records."""
         ...
@@ -137,7 +153,7 @@ class AdapterGameSession(Protocol):
         option_id: str,
         result_id: str,
     ) -> LifecycleStatus:
-        """Submit one finite engine-emitted option."""
+        """Trusted host/replay API: submit an authoritative engine request ID."""
         ...
 
     def submit_parameterized_payload(
@@ -147,7 +163,19 @@ class AdapterGameSession(Protocol):
         payload: JsonValue,
         result_id: str,
     ) -> LifecycleStatus:
-        """Submit a JSON-safe parameterized proposal payload."""
+        """Trusted host/replay API: submit authoritative proposal identities."""
+        ...
+
+    def submit_viewer_option(
+        self, *, viewer: ViewerContext, request_id: str, option_id: str, result_id: str
+    ) -> LifecycleStatus:
+        """Resolve an issued viewer request identity, then use engine validation."""
+        ...
+
+    def submit_viewer_parameterized_payload(
+        self, *, viewer: ViewerContext, request_id: str, payload: JsonValue, result_id: str
+    ) -> LifecycleStatus:
+        """Resolve issued viewer proposal identities before engine validation."""
         ...
 
     def replay_artifact(self, *, artifact_id: str) -> ReplayArtifactPayload:

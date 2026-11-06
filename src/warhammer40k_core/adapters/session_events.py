@@ -13,7 +13,7 @@ from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import EventRecordPayload, JsonValue, canonical_json
 
-CURSOR_TOKEN_VERSION = 1
+CURSOR_TOKEN_VERSION = 2
 CURSOR_IDENTIFIER_BYTES = 32
 CURSOR_AUTHENTICATION_TAG_BYTES = 16
 CURSOR_TOKEN_LENGTH = 64
@@ -264,13 +264,25 @@ class SessionCursorCodec:
         )
         event_floor = _validate_floor("minimum_offset", minimum_offset)
         revision_floor = _validate_floor("minimum_revision", minimum_revision)
-        if cursor.offset < event_floor or cursor.session_revision < revision_floor:
+        if cursor.visible_sequence < event_floor or cursor.session_revision < revision_floor:
             raise SessionEventProtocolError("Cannot issue an already-expired event cursor.")
         self._prune_expired(
             cursor=cursor,
             minimum_offset=event_floor,
             minimum_revision=revision_floor,
         )
+        if not viewer.policy.omniscient:
+            for token, retained in self._cursor_by_token.items():
+                if (
+                    retained.session_id == cursor.session_id
+                    and retained.principal_id == cursor.principal_id
+                    and retained.cursor_scope == cursor.cursor_scope
+                    and retained.visible_sequence == cursor.visible_sequence
+                    and retained.projection_state_hash == cursor.projection_state_hash
+                ):
+                    # Keep the authenticated original anchor. A hidden-only
+                    # transition must not mint a distinguishable public token.
+                    return token
         token = _token_for_cursor(secret=self.secret, cursor=cursor)
         existing = self._cursor_by_token.get(token)
         if existing is not None and existing != cursor:
@@ -370,12 +382,15 @@ class SessionCursorCodec:
             for token, retained in self._cursor_by_token.items()
             if retained.session_id == cursor.session_id
             and (
-                retained.session_revision < minimum_revision
+                (
+                    retained.cursor_scope == cursor.cursor_scope
+                    and retained.session_revision < minimum_revision
+                )
                 or (
                     retained.principal_id == cursor.principal_id
                     and (
                         retained.cursor_scope != cursor.cursor_scope
-                        or retained.offset < minimum_offset
+                        or retained.visible_sequence < minimum_offset
                     )
                 )
             )

@@ -14,6 +14,7 @@ from tests.deployment_submission_helpers import (
     submit_deployment_placement,
     submit_deployment_unit_selection,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.unit_keyword_helpers import with_unit_keywords
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
@@ -399,6 +400,7 @@ def _config(
 ) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase16a-game"),
         game_id="phase16a-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),

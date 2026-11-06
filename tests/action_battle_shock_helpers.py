@@ -209,7 +209,7 @@ def resolve_action_battle_shock_test(session: LocalGameSession, unit_id: str) ->
     result = BattleShockResult.from_roll_state(
         result_id="order110:test-producer:result",
         request=request,
-        roll_state=DiceRollManager(state.game_id).roll_fixed(request.spec, [1, 1]),
+        roll_state=DiceRollManager(state.private_rng_seed).roll_fixed(request.spec, [1, 1]),
     )
     record_precomputed_battle_shock_result_events(
         state=state,

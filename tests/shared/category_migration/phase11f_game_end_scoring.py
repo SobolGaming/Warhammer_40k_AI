@@ -7,6 +7,7 @@ from typing import cast
 import pytest
 
 from tests.setup_completion_helpers import enter_battle_for_fixture
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
@@ -217,6 +218,7 @@ def _config(
         else mission_setup
     )
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase11f-game"),
         game_id="phase11f-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),

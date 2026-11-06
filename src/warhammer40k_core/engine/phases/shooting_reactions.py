@@ -308,7 +308,7 @@ def _resolve_completed_shooting_attack_sequence_continuation(
         AttackSequenceCompletedContext(
             state=state,
             decisions=decisions,
-            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            dice_manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
             runtime_modifier_registry=handler.runtime_modifier_registry,
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=completed_sequence,
@@ -599,7 +599,7 @@ def _request_shooting_end_surge_if_available(
         if not grants:
             continue
         max_distance_bonus_inches = _shooting_end_surge_grant_distance_bonus(grants)
-        roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
+        roll_state = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).roll(
             _shooting_end_surge_distance_roll_spec(
                 source_rule_id=grants[0].source_id,
                 player_id=reacting_player_id,

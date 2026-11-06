@@ -222,7 +222,9 @@ def apply_nomads_of_the_hidden_way(
     if validation.reason is not None:
         return validation
     unit_id = _target_unit_id(context)
-    roll_state = DiceRollManager(context.state.game_id, event_log=context.decisions.event_log).roll(
+    roll_state = DiceRollManager(
+        context.state.private_rng_seed, event_log=context.decisions.event_log
+    ).roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),
             reason=f"Nomads of the Hidden Way move distance for {unit_id}",

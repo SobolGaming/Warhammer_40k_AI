@@ -1091,6 +1091,7 @@ def _config(*, game_id: str, strategic_reserve_unit_id: str | None = None) -> Ga
     )
     return GameConfig(
         game_id=game_id,
+        private_rng_seed="f0" * 32,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
             descriptor_version="core-v2-ui-contract-fixtures"

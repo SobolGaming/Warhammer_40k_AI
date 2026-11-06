@@ -207,7 +207,7 @@ def test_matching_sequence_model_destroyed_event_requires_typed_attribution() ->
         scenario.context,
         decisions=malformed_decisions,
         dice_manager=DiceRollManager(
-            scenario.state.game_id,
+            scenario.state.private_rng_seed,
             event_log=malformed_decisions.event_log,
         ),
     )
@@ -352,7 +352,7 @@ def test_deadly_demise_collateral_finalizes_horror_composition_handoff() -> None
     )
 
     dice_manager = DiceRollManager(
-        scenario.state.game_id,
+        scenario.state.private_rng_seed,
         event_log=scenario.decisions.event_log,
         injected_results=(
             DiceRollResult.from_values(

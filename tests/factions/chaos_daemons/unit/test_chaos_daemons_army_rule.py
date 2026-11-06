@@ -38,7 +38,12 @@ def test_batch04_native_shadow_terror_commits_damage_only_on_failed_test(
         army_rule,
     )
 
-    s = command_scene(faction_definitions, inside=inside, seed=seed)
+    s = command_scene(
+        faction_definitions,
+        inside=inside,
+        seed=seed,
+        rng_seed_label="b04-2:terror:private-0" if seed == 2 else None,
+    )
     assert (
         army_rule.unit_within_shadow_of_chaos(
             state=s.state, player_id="owner", unit_instance_id="foe:target"
@@ -187,7 +192,12 @@ def test_batch04_manifestation_native_healing_consumes_shadow_and_health_boundar
     )
 
     s = command_scene(
-        faction_definitions, manifestation=True, inside=inside, wounded=wounded, seed=2
+        faction_definitions,
+        manifestation=True,
+        inside=inside,
+        wounded=wounded,
+        seed=2,
+        rng_seed_label="b04-2:manifestation:private-11",
     )
     before = health(s.session, "own:daemon")
     status = decline_bravery(s)
@@ -302,6 +312,7 @@ def test_controlled_territory_drives_loaded_manifestation_roll(
         (selection(d, CRUSHERS, "defender"),),
         phase=BattlePhase.COMMAND,
         seed="b04-2",
+        rng_seed_label="b04-2:territory:private-1",
     )
     assert s.state.mission_setup is not None
     mission = s.state.mission_setup

@@ -312,7 +312,7 @@ def apply_destroyed_transport_disembark_proposal_decision(
     ):
         raise GameLifecycleError("Destroyed Transport disembark submission drifted.")
     manager = (
-        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
         if dice_manager is None
         else dice_manager
     )

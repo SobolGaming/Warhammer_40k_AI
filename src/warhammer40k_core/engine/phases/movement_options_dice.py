@@ -391,7 +391,7 @@ def _dice_roll_manager_for_state(
     state: GameState,
     decisions: DecisionController,
 ) -> DiceRollManager:
-    return DiceRollManager(state.game_id, event_log=decisions.event_log)
+    return DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
 
 
 def _advance_reroll_permission_for_unit(

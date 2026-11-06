@@ -215,10 +215,9 @@ class SessionCommandJournalEntry:
             raise SessionCommandProtocolError(
                 "Command journal committed revision must be positive."
             )
-        if self.command_envelope.expected_session_revision + 1 != self.committed_session_revision:
-            raise SessionCommandProtocolError(
-                "Command journal committed revision does not follow its expected revision."
-            )
+        # The wire expectation is viewer-scoped. Its exact relation to this
+        # authoritative revision is validated against the committed from-cursor
+        # and history by validate_command_binding, never inferred arithmetically.
         if type(self.status_code) is not int or not 200 <= self.status_code <= 599:
             raise SessionCommandProtocolError("Command journal status code is invalid.")
         object.__setattr__(

@@ -153,7 +153,7 @@ def test_pilot_public_target_and_move_boundary(section11_definitions: Section02D
 def test_native_double_one_fails_without_moving_and_cannot_declare_again(
     section11_definitions: Section02Definitions,
 ) -> None:
-    state, unit, _ = state_case(section11_definitions, gap=3, seed="section11-failed-10")
+    state, unit, _ = state_case(section11_definitions, gap=3, seed="section11-failed-private-60")
     session = session_for(section11_definitions, state)
     before = state.battlefield_state
     request = select(session, unit)

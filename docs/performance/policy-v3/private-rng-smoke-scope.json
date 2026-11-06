@@ -1,0 +1,309 @@
+{
+  "base": "2b640ffca912f72d74e3b08cec0c0c4b12ce776a",
+  "changes": {
+    "tests/disembark_eligibility_helpers.py": {
+      "before_sha256": "ac98d190d196f7bbfa30b91167715767cec8d856655fa268104b3aa1590a7ba6",
+      "after_sha256": "0ccea51566da65bcd7e8d9d18f341047c57a4ea18f400cc620b3ca8d3d3ff01c",
+      "owners": {
+        "@module": {
+          "before": "d821b1b6e580a7f3e39302c5863795e13299f287438f6f5dc5fb560c8b03635b",
+          "after": "ca4c07c9dae327a1beaf101fbfb00c9cfce0e1b44159a65670a5b80bc5405cd1"
+        },
+        "disembark_session": {
+          "before": "a8a6bcf284b947988f5b56e3ee4695f8cf67f56da7535146e06e2aaae5dc9aba",
+          "after": "0d778ed3294745deb467b738f0da705581568a94de5bd8a5d992f594353da45f"
+        }
+      }
+    },
+    "tests/order63_reserve_transport_helpers.py": {
+      "before_sha256": "4712ff4f47cb9939f11d67298eec960a4373ecbcff3444c526c21209723da3f4",
+      "after_sha256": "f85274548c046aff1fd0669d72059b76930df9c3556c1691309c958ecddc5ccd",
+      "owners": {
+        "@module": {
+          "before": "9712aed66b9d8b67083f21e4cfda44e8bb9bb131335013b5c3a6ac32ded6a1e2",
+          "after": "5e723f408a94dbbb571306991ea6d532367f2e8758108574ce9eff30337f2f40"
+        },
+        "reserve_transport_session": {
+          "before": "2764dcc1e6e490a152dde1bb4e0d99999166632a31ee0bf66f4d1eef898afcab",
+          "after": "82c8edbc3b46ac47f0d63526201c26a9b0dea1ab4c6d3707c75aef57128f0f3f"
+        }
+      }
+    },
+    "contracts/schemas/game-view.schema.json": {
+      "before_sha256": "b24d7550d7e39388f3cb7a951368882fc3e03428d40713c07b11cd2767c6602b",
+      "after_sha256": "b9b16fb9739e57cd8fb5c79f42794f3e913ac19d44eaf82133753f07d58ebdd1",
+      "owners": {
+        "@document": {
+          "before": "b24d7550d7e39388f3cb7a951368882fc3e03428d40713c07b11cd2767c6602b",
+          "after": "b9b16fb9739e57cd8fb5c79f42794f3e913ac19d44eaf82133753f07d58ebdd1"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_completion_triggers.py": {
+      "before_sha256": "c5b438abdbd6dc2bf4d6954fc2af9ad00fafb58325324fa42dc114fcba152554",
+      "after_sha256": "95eb898e378b6ba5610961f8f94ff80be88a64aa1475e6fe0802040d6aee7f65",
+      "owners": {
+        "_model_context_for_trigger": {
+          "before": "45fd6f4b80ba3172da724880525234d9834761cfcd274cb3de6e61cb5e27b2b7",
+          "after": "06f5872ddaa483870d9abaf2e163cce60166512fd5531ed331fb937675f8aa0a"
+        },
+        "attack_context_for_trigger": {
+          "before": "43fa16b860304b9e7ccc5ea8e3d32d757f887224d79a9cc13fd4440837519082",
+          "after": "41450a391bb5a36681cfbc4655e4ab7ce9c66eea3626fa872aa0c705e2491c58"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py": {
+      "before_sha256": "6087b8bc630c374e50bf30b2d2022be03fd5a69f173354d0234ce97d65faa049",
+      "after_sha256": "d763fb03b4aac8d1117d7e6f52148766ac1ea0dfe47ed69f06f78c9cf3908dbd",
+      "owners": {
+        "_request_source_backed_hit_reroll_if_available": {
+          "before": "522d85ad670afce89ee613bf0ef01b39fef95c15aaf10039b90e998a8aa851ca",
+          "after": "0fb92a4ad093d1d7b56f939ad109417ec80c1ef8a4c1eb2d5a8fd98b49a2cc90"
+        },
+        "_request_source_backed_save_reroll_if_available": {
+          "before": "0d32a080e84b18a3be76f65c9674363913a268cc015bfa168cf9d7790dd3e77d",
+          "after": "2a4a90942bc6ee14263e769d7cc7037265d645d8e731636ba213d824a4a1c560"
+        },
+        "apply_source_backed_attack_dice_reroll_decision": {
+          "before": "c9d682d70dc6dac3c8ee3d16ce3aa1ff77313ca121ca2ad4c0977c342b2c938c",
+          "after": "4af7ff5b7074ec4807cc917bab5ee1c9740b77fac41b6ccc763c2fa028de8b35"
+        },
+        "build_source_backed_wound_reroll_request": {
+          "before": "784ec312607a28c30b4127b4bef6fd322ee0a64fafb5bfc15985745088888550",
+          "after": "d58722e20e6d9f485b8a1ac7fcdcf82802b99159c11c687518a09b8204cf18b0"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_setup_reactive_shoot_charge.py": {
+      "before_sha256": "93d57c6a951ee0ad2a736daa497b0465b02571c20ab33ea6f8fe97b4eaa05f17",
+      "after_sha256": "fb6e0497157a3ffd36465155119b6ef0e9f1b27f3be128b795bdc6665fe9a617",
+      "owners": {
+        "_apply_setup_reactive_charge": {
+          "before": "9bdcd538a080fdac2a6d6f596431bc30de917480458ea0b41dc0af155912b18f",
+          "after": "87b4565984e8d0d06b7672291237345db477f8ad5dd28ee04e4eefd4e6a4bdc3"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/desperate_escape_mortal_wounds.py": {
+      "before_sha256": "4957adcfaa38ccfc6dbf955444bdd2919b094f42c4307ba15d1dd853dd7ab4d7",
+      "after_sha256": "8c1e85201145f2c92f06cfd652a8ad3e23283f4586dabf3246281dc1080b5951",
+      "owners": {
+        "begin_escape_mortals": {
+          "before": "911a98dc3e97d5f7173741c1e9f20d33f9a8c6eba08d93883a18b85c72c06644",
+          "after": "acc9ba8d579031dd74b1b42fb77822895c2b373eec8943054f3b43bddd704fbf"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py": {
+      "before_sha256": "ddaa4592ccc685fa6e75a41efd4414b2d57a6eabe551f08b79ddf1de88ce2234",
+      "after_sha256": "c1cc9a2644cab2747ca92384c6b058d0484dfef114af168a9dc00fa8995f9165",
+      "owners": {
+        "_resolve_cabal_ritual_attempt": {
+          "before": "e7d6bc9e9e42f2a3cd2b19aea6ca32e5d69d556ac24d7ec9d84f9c23f3f32100",
+          "after": "20dd265aa6e8f7c306fe58b14fac2f671d91323157b30a58444ebd43c81dab2c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/lifecycle.py": {
+      "before_sha256": "02c74d1d8072fe2e2da6511867b69900e2ea9587d0a216de2091e31688ee7b02",
+      "after_sha256": "ad306763e7956360870a0fff49e6d3cb0b82ad5d8737d6ed024bee5284e24f57",
+      "owners": {
+        "@module": {
+          "before": "dbb1d6771c949d4da5226baab04edfe49b7adf8348927220d2ec4fea79ac8ca1",
+          "after": "238da6d633722975e3749a860d470d7f94dac93c5516ea260baa7a5942269c17"
+        },
+        "GameLifecycle.__post_init__": {
+          "before": "39b6778d7bee85e4030a0eff2871420615599b6fb1bca48bdf09f66984d7c736",
+          "after": "57ee0e398fcecaf4754c2aadc1c2e7ee71589692eac6f5def027014e63ee28c1"
+        },
+        "GameLifecycle._apply_mortal_wound_resolution_decision": {
+          "before": "f72bd1b61fc95a5a8543381d7fa2c3945c957ab01d2e68e78ffacc999d166e8f",
+          "after": "afcbb1ea1653b6cb763e0fa267b910e1cd7a0822ba07a24570be1188e10efde0"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py": {
+      "before_sha256": "6a7db7d460fd0b3cb5e10e333e5ddb5b4fe7d54b926eaa94085f633ae6016571",
+      "after_sha256": "93cbc6c557aae34ca25c317ffcd144f2bc43afe361b43ca8d174f5e9f3df5f10",
+      "owners": {
+        "apply_rules_unit_combat_disembark_feel_no_pain_decision": {
+          "before": "93b778e75ab587987e9173da83233d570580e7c1838db8e0c52bba3e6cc35c4c",
+          "after": "e8b8e152b344d67feec2015a37b1364b7a7028d59c230271b3fc82615f1a5b85"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/shooting_surge_candidates.py": {
+      "before_sha256": "9805a469e32d72ae44a20eeddc147bf5f79d86ae1abce30a5ccffa93a8215b36",
+      "after_sha256": "31227a463f055ecb1468420939cb3d4dec77d457f5cd0f7f17afef3c066b7bcd",
+      "owners": {
+        "_activate": {
+          "before": "3397878b6636f36067a7dbab1b3a1edfbe8506d88b0ee226c82962f71f22bd99",
+          "after": "fe857915a3bd67b6a91c9dc11121193852863f7b71673ea6ad649e0c2b61aafa"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/rule_model_destruction.py": {
+      "before_sha256": "176b33aff2161208a37b400c4d0742d6aa37fb612a21ea51020ebff37d9887ac",
+      "after_sha256": "1b42ffdc959320345f4d38815e3448342ca26cacd177383ba9c4328d45e71545",
+      "owners": {
+        "_active_optional_sources": {
+          "before": "ba29d103c3ff0282281fd6497a3fc725b993bb48d3ef77f6af5b09d8a54e568f",
+          "after": "7daa879fb3cd413fa2c4ee5b5165efc518bb934ff4a3c9b56093e3a6b4842e05"
+        },
+        "_continue_rule_deadly_demise_sources": {
+          "before": "8aca2ecd454b5c2ef428984d10f4f70a85d68554e0f2bbb63152f3dfc4082ad2",
+          "after": "f285878f1603c0be6fcc2c4b2469407755be799115ff233a7670e9b4e890f410"
+        },
+        "_resume_rule_deadly_demise_secondary_continuation": {
+          "before": "65491f767299f848361c7e1bc3b3e337c91e8bb2f12335406b2a79854aff9557",
+          "after": "e0860f1065d22007aedd0820fc4b11d63ef42a1eed05fb83f0347149050bc0eb"
+        },
+        "apply_rule_model_destruction_mortal_wound_decision": {
+          "before": "39d079d30b995a58a0225f02e9b15a5880b252c9dc47a7711645c18692c4860b",
+          "after": "acc3cbd4b83e96623c0007330f1d0bc3db8baa3678958e913bc40244eb6f9e08"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/transports.py": {
+      "before_sha256": "1831eb09c9b7ad012d1b7f0c230fde82fa7a1f476cdb2478005a9d38c0bfe6a8",
+      "after_sha256": "ff2cb907febd003f40cdea2018fe2838a430014d7709d6b1b3e88796e87dfb21",
+      "owners": {
+        "apply_transport_hazard_mortal_wound_feel_no_pain_decision": {
+          "before": "3dd49dba3bc5fc1acd535dd6083270a2b206f1f3103f907b321c35ee97c5584b",
+          "after": "48aab2c889c3b0fab42e04a9f06070847d2d5a212211fb553d4793edebadb3eb"
+        }
+      }
+    },
+    "tests/dice_result_semantics_helpers.py": {
+      "before_sha256": "292d00cf609afd6815d68f7505a05705184964dcffeb1201949a0835f20c8c18",
+      "after_sha256": "7ea29ac02b7d83ba1dbfc9efeaf67993560ba770a43a5e3675190a984ff65bc6",
+      "owners": {
+        "extremum_session": {
+          "before": "7c68d39e054985383762c7171956228ff8fb186be27ab18f4fae6170723b6c85",
+          "after": "e334b9ed96d86a167c8d58b4be6f826ee01c76fa5b4a42c817c498a581228312"
+        }
+      }
+    },
+    "tests/phase11c_command_phase_helpers.py": {
+      "before_sha256": "c37e20ee74053dbe02916b39b5a5ff34da7bbd5a85d574d6ab715d8b6e35ea01",
+      "after_sha256": "cf89fe6970905e0fc779e02f7c8b5f27b468988c738e0ad0b72614516ec8e421",
+      "owners": {
+        "@module": {
+          "before": "21066940fa626fcf3a4755b851d2a5accf7fd1b1e822a2612f504034423a3861",
+          "after": "75f2658f52f40a9fd1403f39045c4d4cb5a19c4163c6e0d3e7bf51d087d85959"
+        },
+        "phase11c_config": {
+          "before": "dbf6c22fbfdaeaac0d2fdb52c46d7707a61cf0c4de1d4da8d872540706d20449",
+          "after": "000eefa33e0b2274051b20df66b803bb8698002db2c9006626efa06d5199b912"
+        }
+      }
+    },
+    "tests/phase13b_shooting_declaration_helpers.py": {
+      "before_sha256": "d8579e5ae8705b7962878c3bbd760fd16e531c63bd8deb2cb8cbfe3dc83847ac",
+      "after_sha256": "b72f14b6736b0dead2f3bd673b9b1e6e8ecd5b7ed93439890a142e3bfd107313",
+      "owners": {
+        "@module": {
+          "before": "4f11ece40f7b426da0aae35cd68ca085cd49b143b6bec0828f50acb6c9d8f7fa",
+          "after": "fb78f93edba77a3f49a618c46b1d652fa4c0587c62c413d88a83870228bc18ca"
+        },
+        "_config": {
+          "before": "c6ad8e1a69eb2b5eb7629a372445f8e5c1f14cde373b3b2370020a65f1656bfd",
+          "after": "0df848762e934e4dfd2956f8d86ce093864d87141480c91fc7821045830b5eb4"
+        }
+      }
+    },
+    "tests/phase15c_fight_order_helpers.py": {
+      "before_sha256": "621bd527693f72bcd47264e92e0cbbc4d1fe95f96d5ffb52533ee8448083aedf",
+      "after_sha256": "cded3fe1bc843f035624743a3969d1034ef4b9ec15b41e664676b61b4d8dce0d",
+      "owners": {
+        "@module": {
+          "before": "d3ce14475d4eb5252848fcd153d0f131fa6074f45de9b9c7b29db50eaa512864",
+          "after": "f1aa9c67ca0e18ae7fb5d24384de3bb5eb429f0c6f2d54c3355840817a745a1e"
+        },
+        "fight_config": {
+          "before": "d7a3d86f49a706ff85e61742cf20b7712644b766a7b4a5828c6a4d3ce33f22b9",
+          "after": "0b2e7b436c50ab438aaadbaf0bb8c009ac1635b962ebead814f034fa835bfdac"
+        }
+      }
+    },
+    "tests/support/fight_phase_reconstruction.py": {
+      "before_sha256": "9da108fc746e8745f692967777c5b8c7d0777d17ef572714010caac7fa42cf1c",
+      "after_sha256": "c7c9ddbdaf635b3db42811300edee4cd3fa316b584b5920ff3a0528cbec9456c",
+      "owners": {
+        "@module": {
+          "before": "ab5c5d9ad614a9756e2f5e872210a30a6f18961b84afc2f9736b0d6274c3207a",
+          "after": "722b3dd0d10951bb3f9082bb0e2d904298e82be9794a2814f67f04a1f273af05"
+        },
+        "_config": {
+          "before": "c970a91c6fb2634d7af9cd9365e97cac2c596d397fed3bd5f0134d786e0864d2",
+          "after": "ec9b059ff1e1931de3d965b928260821b783fd9f4960432b59eed311d67ae9b8"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "tests/disembark_eligibility_helpers.py": [
+      "fixture-reconstruction"
+    ],
+    "tests/order63_reserve_transport_helpers.py": [
+      "fixture-reconstruction",
+      "fixture-setup"
+    ],
+    "contracts/schemas/game-view.schema.json": [
+      "qualification40-exact-9a69b77fc8902bb0"
+    ],
+    "src/warhammer40k_core/engine/attack_completion_triggers.py": [
+      "cumulative-exact-008"
+    ],
+    "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py": [
+      "order135-gathered-attack-steps"
+    ],
+    "src/warhammer40k_core/engine/catalog_setup_reactive_shoot_charge.py": [
+      "ci78-current-owner-closure-f83517431236fc6310408e45339dac64861443343978ac8ee40fe7ae28b8593b"
+    ],
+    "src/warhammer40k_core/engine/desperate_escape_mortal_wounds.py": [
+      "cumulative-exact-020"
+    ],
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py": [
+      "order135-visibility-hot-consumers"
+    ],
+    "src/warhammer40k_core/engine/lifecycle.py": [
+      "d04-combat-lifecycle-continuation",
+      "order135-gathered-attack-steps"
+    ],
+    "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py": [
+      "d04-combat-direct-status",
+      "order135-tactical-exclusion"
+    ],
+    "src/warhammer40k_core/engine/phases/shooting_surge_candidates.py": [
+      "cumulative-exact-034"
+    ],
+    "src/warhammer40k_core/engine/rule_model_destruction.py": [
+      "cumulative-exact-039"
+    ],
+    "src/warhammer40k_core/engine/transports.py": [
+      "order135-grouped-combat-decoding"
+    ],
+    "tests/dice_result_semantics_helpers.py": [
+      "fixture-dice"
+    ],
+    "tests/phase11c_command_phase_helpers.py": [
+      "fixture-objective_control"
+    ],
+    "tests/phase13b_shooting_declaration_helpers.py": [
+      "fixture-visibility"
+    ],
+    "tests/phase15c_fight_order_helpers.py": [
+      "fixture-fight"
+    ],
+    "tests/support/fight_phase_reconstruction.py": [
+      "ci78-cutover-owners-2da5cb2ac2e33579aae933134e54539766dd5c6c28c88a269ec8233e8efe78ce"
+    ]
+  },
+  "module_sha256": "62db9db823b80edcdcfa911ebb9008aa273da65534066292bef8fc183201837d",
+  "policy_before_sha256": "cc2c9c9925ed6bb6487990c026a459181894e81d30989861bad498b3694fdb9a",
+  "policy_after_sha256": "1f08fa40369b152857671482a20772bbbb94fdcb09a3b1f158435de1e649a67a",
+  "source_obligation": "Exact PR2 private-RNG trust boundary: seed-source substitutions, explicit fixture seed inputs, measurement-only native config injection and derived schema identity. No algorithm/search/cache or serializer exemption.",
+  "unchanged_work": "Preserve every mandatory operation, historical report and live semantic/work/cache check. This finite recognition changes only detailed-family applicability for these complete exact rows. Serialization-replay and new HMAC tactical draw comparisons remain required."
+}

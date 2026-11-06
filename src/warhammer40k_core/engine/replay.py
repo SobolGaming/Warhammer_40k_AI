@@ -23,7 +23,7 @@ from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
 
-REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v36-target-aware-attack-groups"
+REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v37-private-rng"
 
 
 class ReplayArtifactError(ValueError):
@@ -1171,7 +1171,9 @@ def _initial_rng_state_payload(lifecycle: GameLifecycle) -> RandomSourcePayload:
     state = lifecycle.state
     if state is None:
         raise ReplayArtifactError("ReplayArtifact initial RNG state requires a started game.")
-    manager = DiceRollManager(state.game_id, event_log=lifecycle.decision_controller.event_log)
+    manager = DiceRollManager(
+        state.private_rng_seed, event_log=lifecycle.decision_controller.event_log
+    )
     return manager.rng.to_payload()
 
 

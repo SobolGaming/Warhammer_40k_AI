@@ -361,7 +361,7 @@ def _roll_reanimation_d3(
 ) -> D3RollResult:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Reanimation Protocols rolling requires decisions.")
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     roll_state = manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),

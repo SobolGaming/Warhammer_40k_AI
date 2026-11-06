@@ -586,7 +586,7 @@ def resolve_faction_resource_refund_roll(
         return None
     descriptor = _faction_resource_refund_roll_descriptor(descriptor_payload)
     roll_state = DiceRollManager(
-        state.game_id,
+        state.private_rng_seed,
         event_log=decisions.event_log,
     ).roll(
         DiceRollSpec(

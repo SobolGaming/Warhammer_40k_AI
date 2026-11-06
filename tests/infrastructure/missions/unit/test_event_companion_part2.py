@@ -1188,6 +1188,8 @@ def test_phase17j_event_pack_resolves_scoring_and_tactical_draw_by_pack_id() -> 
     policies = mission_scoring_policies_from_setup(setup)
     policy = policies.common_policy
     tactical_draw = deterministic_tactical_secondary_draw(
+        draw_id="event-companion:draw-1",
+        private_rng_seed="f0" * 32,
         mission_setup=setup,
         player_id="player-alpha",
         battle_round=1,
