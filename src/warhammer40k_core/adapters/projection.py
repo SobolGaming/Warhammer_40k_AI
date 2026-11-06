@@ -523,19 +523,19 @@ def project_game_view(
     viewer_player_id: str | None = None,
     viewer: ViewerContext | None = None,
 ) -> GameViewPayload:
-    payload, _submission_identities = project_game_view_with_submission_identities(
+    return project_game_view_with_history_identities(
         lifecycle=lifecycle, viewer_player_id=viewer_player_id, viewer=viewer
     )
-    return payload
 
 
-def project_game_view_with_submission_identities(
+def project_game_view_with_history_identities(
     *,
     lifecycle: GameLifecycle,
     viewer_player_id: str | None = None,
     viewer: ViewerContext | None = None,
-) -> tuple[GameViewPayload, ViewerIdentityMap]:
-    """Build the same public view and its narrower pre-projection submission scope."""
+    history_identities: ViewerIdentityMap | None = None,
+) -> GameViewPayload:
+    """Project fresh authority with an optional trusted session-owned history map."""
     if type(lifecycle) is not GameLifecycle:
         raise GameLifecycleError("Game projection requires a GameLifecycle.")
     state = lifecycle.state
@@ -667,16 +667,15 @@ def project_game_view_with_submission_identities(
             else _nested_interaction_request_views(pending_request, viewer=context)
         ),
     }
-    identities = viewer_identity_map(
-        event_log=lifecycle.decision_controller.event_log, viewer=context
+    identities = (
+        viewer_identity_map(event_log=lifecycle.decision_controller.event_log, viewer=context)
+        if history_identities is None
+        else copy.deepcopy(history_identities)
     )
     if pending_request is not None and not decision_request_hidden_from_context(
         request=pending_request, viewer=context
     ):
         identities.project(public_decision_request_payload(pending_request, viewer=context))
-    # Full-view traversal can issue additional display-only identities. They must
-    # never enlarge the identities accepted by the submission resolver.
-    submission_identities = copy.deepcopy(identities)
     original_battlefield = payload["battlefield_view"]
     payload = cast(GameViewPayload, identities.project(cast(JsonValue, payload)))
     public_battlefield = payload["battlefield_view"]
@@ -691,7 +690,7 @@ def project_game_view_with_submission_identities(
                 authoritative=public_battlefield["authoritative"],
             )
     payload["projection_state_hash"] = _projection_state_hash(payload)
-    return payload, submission_identities
+    return payload
 
 
 def _live_display_maps(

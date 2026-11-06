@@ -444,6 +444,7 @@ jobs:
           COVERAGE_FILE: .coverage.${{ matrix.shard_id }}
           SHARD_ID: ${{ matrix.shard_id }}
           SHARD_MANIFEST: ${{ matrix.manifest }}
+          BEHAVIORAL_DISPATCH_PROFILE: ci/test_shards/durations.json
           SELECTED_ARMY_SOURCE_INDEX: ${{ runner.temp }}/selected-source-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard_id }}
         run: |
           mkdir -p reports

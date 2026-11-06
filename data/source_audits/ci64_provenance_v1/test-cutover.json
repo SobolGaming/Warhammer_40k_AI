@@ -235,10 +235,10 @@
       "sha256": "d4f9da68900a559438204bd2fb9500e12900a5441c2d1cab096127fb309aa1f6"
     },
     "tests/infrastructure/decisions/unit/test_physical_proposal_prevalidation.py": {
-      "blob_sha1": "870a78c7303d621bb31c0bfeb9103a2b51e812fa",
-      "bytes": 13009,
+      "blob_sha1": "b97d6a31ed64739e93e7ce9da90851fbfdfc8f69",
+      "bytes": 15778,
       "mode": "100644",
-      "sha256": "b54ccf7f3d689ae79a7f1cccf352bd3ab94f9817b18e49987cc6b1211f01baa1"
+      "sha256": "074b14e2f91c6ce99cc3795c01df99fa6030b2038d7cba02d87c2f6ff5ae4efb"
     },
     "tests/infrastructure/lifecycle/unit/test_battlefield_transitions.py": {
       "blob_sha1": "90bd5fda8d312490031ec7b50555d0515bc15d41",

@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, TypedDict, cast
 
 EVIDENCE = "data/source_audits/private_rng_fixture_preimages_v1.json"
-EVIDENCE_SHA256 = "81dc46071d03bd3ed125e020e2d2aa6dd471cd1cb534acfe05804da6b16e534b"
+EVIDENCE_SHA256 = "c147fb074cc039440adef92e9825f086afe157f28d310e7bc46edd8898b33e99"
 BASE = "2b640ffca912f72d74e3b08cec0c0c4b12ce776a"
 
 

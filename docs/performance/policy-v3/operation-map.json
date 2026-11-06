@@ -34160,20 +34160,20 @@
       "sensitive": true,
       "mandatory": true
     },
-    "viewer-projection-snapshot": {
+    "viewer-history-identity-cache": {
       "paths": [
         "src/warhammer40k_core/adapters/local_session.py",
         "src/warhammer40k_core/adapters/projection.py"
       ],
       "owners": [
         "LocalGameSession",
-        "LocalGameSession._projection_authority_hash",
+        "LocalGameSession._viewer_history_identities",
         "LocalGameSession._viewer_submission_map",
         "LocalGameSession.start",
         "LocalGameSession.view",
         "LocalGameSession.view_for_context",
-        "_ViewerProjectionSnapshot",
-        "project_game_view_with_submission_identities"
+        "_ViewerHistoryIdentitySnapshot",
+        "project_game_view_with_history_identities"
       ],
       "families": [
         "player_boundary",
@@ -34181,6 +34181,20 @@
         "external_contract_source_reuse"
       ],
       "sensitive": true,
+      "mandatory": true
+    },
+    "behavioral-worksteal-dispatch": {
+      "paths": [
+        "scripts/build_test_shards.py",
+        "tests/conftest.py"
+      ],
+      "owners": [
+        "duration_worksteal_order",
+        "pytest_collection_modifyitems",
+        "@imports"
+      ],
+      "families": [],
+      "sensitive": false,
       "mandatory": true
     },
     "private-rng-owner-13093005fda46651": {
@@ -35162,11 +35176,14 @@
       "owners": [
         "_projection_session",
         "_projection_work",
+        "test_immutable_player_observation_hash_uses_its_canonical_json_without_decoding",
+        "test_policy_payload_digest_performs_one_complete_json_validation",
         "test_projection_snapshot_binds_complete_viewer_context",
         "test_projection_snapshot_detects_authoritative_geometry_drift_without_record_progress",
         "test_projection_snapshot_is_not_shared_across_reconstructed_sessions",
         "test_projection_snapshot_reuse_keeps_returns_detached",
-        "test_projection_snapshot_reuses_only_the_narrow_submission_identity_scope"
+        "test_projection_snapshot_reuses_only_the_narrow_submission_identity_scope",
+        "test_viewer_identity_cache_rechecks_history_visibility_without_count_progress"
       ],
       "families": [],
       "sensitive": false,

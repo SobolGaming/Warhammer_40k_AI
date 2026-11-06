@@ -595,6 +595,46 @@ def _literal_partition_nodes(root: Path) -> tuple[str, ...]:
     return nodes
 
 
+def duration_worksteal_order(
+    nodeids: tuple[str, ...], *, workers: int, selector_seconds: dict[str, float]
+) -> tuple[int, ...]:
+    """Balance measured costs across xdist's actual consecutive initial chunks."""
+    if type(workers) is not int or workers < 1 or len(nodeids) != len(set(nodeids)):
+        raise SystemExit("Duration dispatch requires positive workers and unique nodes.")
+    if not isinstance(selector_seconds, dict):
+        raise SystemExit("Duration dispatch requires measured scheduling weights.")
+    file_counts: dict[str, int] = {}
+    for node in nodeids:
+        file = node.split("::", 1)[0]
+        file_counts[file] = file_counts.get(file, 0) + 1
+    costs: list[float] = []
+    for node in nodeids:
+        file = node.split("::", 1)[0]
+        selector = node if node in selector_seconds else file
+        if selector not in selector_seconds:
+            raise SystemExit(f"Missing scheduling weight for {node}.")
+        weight = selector_seconds[selector]
+        if type(weight) not in (int, float) or not math.isfinite(weight) or weight < 0:
+            raise SystemExit(f"Invalid scheduling weight for {selector}.")
+        costs.append(float(weight) / (1 if selector == node else file_counts[file]))
+    capacities: list[int] = []
+    remaining = len(nodeids)
+    for worker in range(workers):
+        capacity = remaining // (workers - worker)
+        capacities.append(capacity)
+        remaining -= capacity
+    buckets: list[list[int]] = [[] for _ in range(workers)]
+    totals = [0.0] * workers
+    for index in sorted(range(len(nodeids)), key=lambda index: (-costs[index], index)):
+        worker = min(
+            (worker for worker in range(workers) if len(buckets[worker]) < capacities[worker]),
+            key=lambda worker: (totals[worker], worker),
+        )
+        buckets[worker].append(index)
+        totals[worker] += costs[index]
+    return tuple(index for bucket in buckets for index in bucket)
+
+
 def worksteal_relevance_order(nodeids: tuple[str, ...], *, workers: int) -> tuple[int, ...]:
     """Start the finite expensive S25 cases on distinct existing worker chunks.
 

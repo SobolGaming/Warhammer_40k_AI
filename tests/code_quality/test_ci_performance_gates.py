@@ -19,6 +19,79 @@ import scripts.build_test_shards as sharding
 from scripts.check_shard_coverage import check_shard_coverage
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_duration_dispatch_balances_actual_initial_worksteal_chunks() -> None:
+    assert sharding.duration_worksteal_order(
+        ("tests/rounded.py::case",), workers=4, selector_seconds={"tests/rounded.py": 0.0}
+    ) == (0,)
+    weights: dict[str, float] = {
+        f"tests/{name}.py": value for name, value in (("a", 240), ("b", 8), ("c", 8), ("d", 8))
+    }
+    all_nodes = tuple(f"tests/{name}.py::case_{index}" for name in "abcd" for index in range(8))
+    for nodes in (all_nodes, all_nodes[:-1]):
+        order = sharding.duration_worksteal_order(nodes, workers=4, selector_seconds=weights)
+        assert sorted(order) == list(range(len(nodes)))
+        counts = {file: sum(node.startswith(file + "::") for node in nodes) for file in weights}
+        totals = []
+        offset = 0
+        for worker in range(4):
+            width = (len(nodes) - offset) // (4 - worker)
+            chunk = [nodes[index] for index in order[offset : offset + width]]
+            costs = [weights[node.split("::")[0]] / counts[node.split("::")[0]] for node in chunk]
+            assert costs == sorted(costs, reverse=True)
+            totals.append(sum(costs))
+            offset += width
+        assert offset == len(nodes)
+        assert max(totals) - min(totals) < 2
+        assert max(totals) < 70  # Alphabetic initial dispatch strands 240 seconds on one worker.
+
+
+@pytest.mark.parametrize("bad_weight", [None, -1, float("nan"), True])
+def test_duration_dispatch_rejects_missing_or_invalid_measurements(bad_weight: object) -> None:
+    weights = {} if bad_weight is None else {"tests/a.py": bad_weight}
+    with pytest.raises(SystemExit, match="scheduling weight"):
+        sharding.duration_worksteal_order(
+            ("tests/a.py::case",), workers=4, selector_seconds=cast(dict[str, float], weights)
+        )
+
+
+def test_duration_dispatch_profile_controls_the_real_worker_hook(
+    tmp_path: Path, pytestconfig: pytest.Config, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tests import conftest as root_hooks
+
+    implementations = pytestconfig.hook.pytest_collection_modifyitems.get_hookimpls()
+    execution = [
+        implementation.function
+        for implementation in reversed(implementations)
+        if not implementation.hookwrapper and not implementation.wrapper
+    ]
+    builtin = next(
+        implementation.function
+        for implementation in implementations
+        if implementation.plugin_name == "main"
+    )
+    assert execution.index(builtin) < execution.index(root_hooks.pytest_collection_modifyitems)
+    weights: dict[str, float] = {
+        f"tests/{name}.py": value for name, value in (("a", 240), ("b", 8), ("c", 8), ("d", 8))
+    }
+    names = tuple(f"tests/{name}.py::case_{index}" for name in "abcd" for index in range(8))
+    profile = tmp_path / "durations.json"
+    profile.write_text(json.dumps({"files": weights}))
+    items = [cast(pytest.Item, SimpleNamespace(nodeid=name)) for name in names]
+    expected = sharding.duration_worksteal_order(names, workers=4, selector_seconds=weights)
+    monkeypatch.setattr(pytestconfig, "workerinput", {"s25_scheduler": "worksteal"}, raising=False)
+    monkeypatch.setenv("SHARD_ID", "duration-dispatch-control")
+    monkeypatch.setenv("PYTEST_XDIST_WORKER_COUNT", "4")
+    monkeypatch.setenv("BEHAVIORAL_DISPATCH_PROFILE", str(profile))
+    root_hooks.pytest_collection_modifyitems(pytestconfig, items)
+    assert [item.nodeid for item in items] == [names[index] for index in expected]
+    profile.write_text(json.dumps({"files": {}}))
+    with pytest.raises(SystemExit, match="scheduling weight"):
+        root_hooks.pytest_collection_modifyitems(pytestconfig, items)
+
+
 WORKFLOW_PATH = ROOT / ".github" / "workflows" / "ci.yml"
 
 

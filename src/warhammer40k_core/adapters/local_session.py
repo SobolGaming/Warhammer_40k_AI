@@ -20,7 +20,7 @@ from warhammer40k_core.adapters.event_stream import (
 from warhammer40k_core.adapters.projection import (
     GameViewPayload,
     RulesCatalogViewPayload,
-    project_game_view_with_submission_identities,
+    project_game_view_with_history_identities,
     project_rules_catalog_view,
 )
 from warhammer40k_core.adapters.redaction import (
@@ -81,11 +81,10 @@ def _new_parameterized_lifecycle() -> GameLifecycle:
 
 
 @dataclass(frozen=True, slots=True)
-class _ViewerProjectionSnapshot:
-    lifecycle_hash: str
+class _ViewerHistoryIdentitySnapshot:
+    history_hash: str
     viewer: ViewerContext
-    payload: GameViewPayload
-    submission_identities: ViewerIdentityMap
+    identities: ViewerIdentityMap
 
 
 @dataclass(slots=True)
@@ -101,7 +100,7 @@ class LocalGameSession(AdapterGameSession):
         init=False,
         repr=False,
     )
-    _viewer_projection_snapshot: _ViewerProjectionSnapshot | None = field(
+    _viewer_identity_snapshot: _ViewerHistoryIdentitySnapshot | None = field(
         default=None, init=False, repr=False, compare=False
     )
 
@@ -376,7 +375,7 @@ class LocalGameSession(AdapterGameSession):
         if type(config) is not GameConfig:
             raise GameLifecycleError("LocalGameSession config must be a GameConfig.")
         self._persistence_payload_cache = None
-        self._viewer_projection_snapshot = None
+        self._viewer_identity_snapshot = None
         status = self.lifecycle.start(config)
         self._initial_replay_lifecycle_payload = None
         return status
@@ -418,10 +417,19 @@ class LocalGameSession(AdapterGameSession):
         )
         return self.view_for_context(viewer=ViewerContext.for_player(player))
 
-    def _projection_authority_hash(self) -> str:
-        # Recompute from all authority, including mutable nested state, catalog,
-        # requests and history. Record counts or a public view hash are not keys.
-        return _payload_sha256(cast(JsonValue, self.lifecycle.to_payload()))
+    def _viewer_history_identities(self, *, viewer: ViewerContext) -> ViewerIdentityMap:
+        # This map depends only on complete event history and viewer. Recheck
+        # content, including visibility changes without record-count progress.
+        event_log = self.lifecycle.decision_controller.event_log
+        history_hash = _payload_sha256(cast(JsonValue, event_log.to_payload()))
+        cached = self._viewer_identity_snapshot
+        if cached is None or cached.viewer != viewer or cached.history_hash != history_hash:
+            cached = _ViewerHistoryIdentitySnapshot(
+                history_hash, viewer, viewer_identity_map(event_log=event_log, viewer=viewer)
+            )
+            self._viewer_identity_snapshot = cached
+        # Pending-request and display issuance must never mutate the history map.
+        return copy.deepcopy(cached.identities)
 
     def _viewer_submission_map(
         self, *, viewer: ViewerContext, request_id: str
@@ -433,17 +441,7 @@ class LocalGameSession(AdapterGameSession):
             raise GameLifecycleError("Viewer does not own the pending decision.")
         if decision_request_hidden_from_context(request=request, viewer=viewer):
             raise GameLifecycleError("Pending decision is hidden from this viewer.")
-        cached = self._viewer_projection_snapshot
-        if (
-            cached is not None
-            and cached.viewer == viewer
-            and cached.lifecycle_hash == self._projection_authority_hash()
-        ):
-            identities = copy.deepcopy(cached.submission_identities)
-        else:
-            identities = viewer_identity_map(
-                event_log=self.lifecycle.decision_controller.event_log, viewer=viewer
-            )
+        identities = self._viewer_history_identities(viewer=viewer)
         public = identities.project(public_decision_request_payload(request, viewer=viewer))
         if not isinstance(public, dict) or public["request_id"] != request_id:
             raise GameLifecycleError("Viewer submission request is stale or unissued.")
@@ -486,17 +484,13 @@ class LocalGameSession(AdapterGameSession):
     def view_for_context(self, *, viewer: ViewerContext) -> GameViewPayload:
         if type(viewer) is not ViewerContext:
             raise GameLifecycleError("LocalGameSession view requires a ViewerContext.")
-        lifecycle_hash = self._projection_authority_hash()
-        cached = self._viewer_projection_snapshot
-        if cached is None or cached.viewer != viewer or cached.lifecycle_hash != lifecycle_hash:
-            payload, identities = project_game_view_with_submission_identities(
-                lifecycle=self.lifecycle, viewer=viewer
-            )
-            cached = _ViewerProjectionSnapshot(lifecycle_hash, viewer, payload, identities)
-            self._viewer_projection_snapshot = cached
-        # Keep only one owned snapshot. Callers, forks and restored sessions must
-        # never share its mutable containers or identity-issuance state.
-        return copy.deepcopy(cached.payload)
+        # Always project current authority. Only history-derived identities are
+        # reused; geometry, requests and all other state remain freshly observed.
+        return project_game_view_with_history_identities(
+            lifecycle=self.lifecycle,
+            viewer=viewer,
+            history_identities=self._viewer_history_identities(viewer=viewer),
+        )
 
     def rules_catalog_view(self) -> RulesCatalogViewPayload:
         return project_rules_catalog_view(catalog=self.lifecycle.config.army_catalog)

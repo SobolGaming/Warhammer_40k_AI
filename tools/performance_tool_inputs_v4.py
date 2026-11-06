@@ -300,8 +300,8 @@ _SCOPES = (
     ReviewedScope(
         PR2_BASE,
         PR2_SPEC_PATH,
-        "55d5ca3b608a39fe413f09289986fb51c1dfbf3de961226b8882a29449775b61",
-        "addaf7b48946f5cf9ff50ea802037da2ee95d4312e6188bed1150d9e3d47761e",
+        "5105d92bfc418f1224ef35b28a92c1cc23cba4e2beac1bec009777539371b6ef",
+        "8a076686b461f0efd49250e8bd77a1ea0851fd6ac6a7d60889caed0f6a88c360",
         PR2_REPORT_PATH,
         frozenset(
             [
@@ -481,6 +481,7 @@ _SCOPES = (
             [
                 "ci/quality_shards/all.txt",
                 "ci/quality_shards/shard-1.txt",
+                "ci/quality_shards/shard-3.txt",
                 "ci/quality_shards/shard-4.txt",
                 "data/source_audits/ci64_provenance_v1/test-cutover.json",
                 "data/source_audits/private_rng_fixture_preimages_v1.json",
@@ -495,12 +496,14 @@ _SCOPES = (
                 "tests/category_migration_preservation.py",
                 "tests/code_quality/test_adapter_decision_contract.py",
                 "tests/code_quality/test_category_migration_preservation.py",
+                "tests/code_quality/test_ci_performance_gates.py",
                 "tests/code_quality/test_order84_dice_authority.py",
                 "tests/code_quality/test_performance_policy.py",
                 "tests/code_quality/test_performance_reconstruction_campaign.py",
                 "tests/code_quality/test_phase18e_server_network_audit.py",
                 "tests/code_quality/test_registered_source_scopes.py",
                 "tests/code_quality/test_starfang_source_policy.py",
+                "tests/conftest.py",
                 "tests/core_stratagem_helpers.py",
                 "tests/daemons_native_source_helpers.py",
                 "tests/daemons_native_source_preservation.py",

@@ -343,6 +343,13 @@ require a fresh complete profile; timings are never filled with zero. `durations
 Historical profiles measure their recorded case inventory; changed cases within an
 existing file require refreshed successful CI reports to reflect their new cost.
 
+Four-worker behavioral CI uses `BEHAVIORAL_DISPATCH_PROFILE` to distribute measured
+costs across xdist's initial worker chunks after deselection. Exact node weights
+remain exact; file totals are divided across their collected cases. This changes
+only execution order. Missing, negative, nonfinite or boolean weights fail closed;
+existing measurements rounded to zero remain valid. Finite S25 case validation,
+the complete selected inventory and the twelve-minute deadline remain mandatory.
+
 Both Python CI lanes upload JUnit, slowest-test output, and per-worker JSON timing
 artifacts containing collection node IDs, collection time, setup/call/teardown times,
 outcomes, Python/platform/CPU/memory metadata, and commit/run IDs. Enable the same

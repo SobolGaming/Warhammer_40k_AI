@@ -20,7 +20,7 @@ from warhammer40k_core.ai.player_policy import (
 )
 from warhammer40k_core.build_identity import current_engine_build_id
 from warhammer40k_core.engine.decision_request import DecisionError
-from warhammer40k_core.engine.event_log import EventLogError, canonical_json, validate_json_value
+from warhammer40k_core.engine.event_log import EventLogError, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
 
 
@@ -163,8 +163,6 @@ class BoundedPolicyRunner:
                 actor_id = request.actor_id
                 assert actor_id is not None
                 view = self._session.view(viewer_player_id=actor_id)
-                if private_seed in canonical_json(view):
-                    raise self._fail("Private RNG authority appears in the player projection.")
                 pending_view = view["pending_decision"]
                 if pending_view is None:
                     raise self._fail("Player observation has no pending decision.")
@@ -181,6 +179,8 @@ class BoundedPolicyRunner:
                     view,
                     choice_seed=int(choice_identity, 16),
                 )
+                if private_seed in context.observation_json:
+                    raise self._fail("Private RNG authority appears in the player projection.")
                 if (
                     context.route.actor_id != actor_id
                     or context.route.decision_type != request.decision_type
@@ -267,11 +267,12 @@ class BoundedPolicyRunner:
     def _validate_action(self, action: PolicyAction, context: PlayerDecisionContext) -> None:
         if type(action) is not PolicyAction:
             raise self._fail("Policy returned a malformed action.")
+        request = context.request
         if (
             action.actor_id != context.route.actor_id
-            or action.request_id != context.request["request_id"]
+            or action.request_id != request["request_id"]
             or action.observation_hash != context.observation_hash
         ):
             raise self._fail("Policy action actor, request or observation binding drifted.")
-        if context.request["is_parameterized"] != (action.proposal_json is not None):
+        if request["is_parameterized"] != (action.proposal_json is not None):
             raise self._fail("Policy action submission kind does not match request.")

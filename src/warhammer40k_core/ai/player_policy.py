@@ -24,7 +24,7 @@ class CandidateExhaustedError(PolicyError):
 
 
 def payload_digest(value: object) -> str:
-    return hashlib.sha256(canonical_json(validate_json_value(value)).encode()).hexdigest()
+    return hashlib.sha256(canonical_json(value).encode()).hexdigest()
 
 
 @dataclass(frozen=True, slots=True)
@@ -102,12 +102,13 @@ class PlayerDecisionContext:
             raise PolicyError("Policy context route does not match its observation.")
         if type(self.choice_seed) is not int or self.choice_seed < 0:
             raise PolicyError("Policy choice seed must be a nonnegative integer.")
+        # Normalize direct construction too. Hashing this immutable, validated
+        # representation needs neither another parse nor another validation walk.
+        object.__setattr__(self, "observation_json", canonical_json(view))
 
     @classmethod
     def from_view(cls, view: GameViewPayload, *, choice_seed: int) -> PlayerDecisionContext:
-        return cls(
-            PolicyRoute.from_view(view), canonical_json(validate_json_value(view)), choice_seed
-        )
+        return cls(PolicyRoute.from_view(view), canonical_json(view), choice_seed)
 
     @property
     def observation(self) -> GameViewPayload:
@@ -122,7 +123,7 @@ class PlayerDecisionContext:
 
     @property
     def observation_hash(self) -> str:
-        return payload_digest(self.observation)
+        return hashlib.sha256(self.observation_json.encode()).hexdigest()
 
     def select_option(self, option_id: str) -> PolicyAction:
         return PolicyAction(

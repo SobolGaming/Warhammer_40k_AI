@@ -424,7 +424,7 @@
       "junit_sha256": [
         "4c519e535919f4a4db417ce4cae57963b0aa1bddf591cfe3a9c9ea2d8ef02338"
       ],
-      "source": "Complete successful local covered run59e80e358f5a3e3cd8d00a41887ad4b13600f1b4; engine8c7330fa;5589cases; UbuntuWSL/Python3.14.5/Node24.18.0;4xdistworkstealworkers; same behavioral file inventory; six new cache cases await current hosted timing before merge",
+      "source": "Complete successful local covered run59e80e358f5a3e3cd8d00a41887ad4b13600f1b4; engine8c7330fa;5589cases; UbuntuWSL/Python3.14.5/Node24.18.0;4xdistworkstealworkers; same behavioral file inventory; ten new cache/policy cases await current complete hosted timing before merge",
       "test_cases": 5589,
       "test_files": 399
     }
