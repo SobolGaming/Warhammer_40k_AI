@@ -168,7 +168,7 @@ def attack_context_for_trigger(
     return AttackSequenceCompletedContext(
         state=state,
         decisions=decisions,
-        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        dice_manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
         runtime_modifier_registry=runtime_modifiers,
         source_phase=phase,
         attack_sequence=sequence,
@@ -267,7 +267,7 @@ def _model_context_for_trigger(
     return AttackSequenceCompletedContext(
         state=state,
         decisions=decisions,
-        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        dice_manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
         runtime_modifier_registry=runtime_modifiers,
         source_phase=sequence.source_phase,
         attack_sequence=sequence,

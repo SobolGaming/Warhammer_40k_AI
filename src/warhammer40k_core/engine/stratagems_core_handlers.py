@@ -385,7 +385,7 @@ def _apply_command_reroll_handler(
         context=context,
         roll_state=roll_state,
     )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     request = manager.build_reroll_request(
         roll_state,
         request_id=f"{use_record.use_id}:command-reroll-request",
@@ -482,7 +482,7 @@ def apply_command_reroll_decision(
     decisions: DecisionController,
 ) -> None:
     context, use_record, roll_state = _command_reroll_request_context(request)
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     updated_state = manager.resolve_reroll(
         roll_state,
         request=request,

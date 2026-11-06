@@ -243,7 +243,7 @@ def _apply_triggered_movement_unit_selection_decision(  # pyright: ignore[report
         if roll_state is None:
             raise GameLifecycleError("Triggered movement reroll distance roll is missing.")
         reroll_request = DiceRollManager(
-            state.game_id,
+            state.private_rng_seed,
             event_log=decisions.event_log,
         ).build_reroll_request(
             roll_state,
@@ -421,7 +421,7 @@ def apply_triggered_movement_distance_reroll_decision(
     if initial_roll_state is None or selected_unit.distance_reroll_permission is None:
         raise GameLifecycleError("Triggered movement reroll source context is missing.")
     rerolled_state = DiceRollManager(
-        state.game_id,
+        state.private_rng_seed,
         event_log=decisions.event_log,
     ).resolve_reroll(
         initial_roll_state,

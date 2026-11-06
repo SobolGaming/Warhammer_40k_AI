@@ -1,11 +1,18 @@
 # CORE V2 external contract
 
-The current language-neutral bundle is Contract **45.0.0**. Start with
+The current language-neutral bundle is Contract **46.0.0**. Start with
 `openapi.yaml`, the canonical schemas and schema-validated examples. The
 [adapter decision contract](../docs/ADAPTER_DECISION_CONTRACT.md) defines current
 choice, projection, visibility and replay semantics. The
 [compatibility policy](compatibility-policy.md) preserves released baselines and
 all deployment-retention obligations.
+
+Contract 46 adds required operator-only `private_rng_seed` to game configuration
+and authoritative saved state. Creation clients must supply private 256-bit
+hexadecimal entropy; fixed example seeds are for tests. Player projections do not
+carry that seed. Old saves/replays need their original runtime; new loaders reject
+missing private authority rather than deriving it from the public game ID. See
+the [adapter contract](../docs/ADAPTER_DECISION_CONTRACT.md#private-game-randomness-contract-46).
 
 ## Integrating a client
 

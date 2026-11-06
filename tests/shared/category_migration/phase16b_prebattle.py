@@ -9,6 +9,7 @@ import pytest
 
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 from tests.sequential_translation_helpers import leading_first_translation_paths
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
@@ -601,11 +602,11 @@ def _assert_redeploy_replay_rejected_without_mutation(
         roll_type="setup_sequencing_rejection_audit",
     )
     before_future_roll = DiceRollManager(
-        state.game_id,
+        state.private_rng_seed,
         event_log=before_decisions.event_log,
     ).roll(future_roll_spec)
     after_future_roll = DiceRollManager(
-        state.game_id,
+        state.private_rng_seed,
         event_log=after_decisions.event_log,
     ).roll(future_roll_spec)
     assert after_future_roll == before_future_roll
@@ -680,6 +681,7 @@ def _config(
 ) -> GameConfig:
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase16b-game"),
         game_id="phase16b-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),

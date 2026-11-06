@@ -46,7 +46,7 @@
       ]
     },
     "schema_version": {
-      "const": "session-command-envelope-v2-weapon-instances",
+      "const": "session-command-envelope-v3-viewer-identities",
       "type": "string"
     },
     "session_id": {"minLength": 1, "type": "string"},

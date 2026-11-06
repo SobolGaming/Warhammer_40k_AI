@@ -138,7 +138,7 @@ def continue_retained_destruction_cleanup(
             updated_sequence, status = resolve_pending_attack_destruction_until_blocked(
                 state=state,
                 decisions=decisions,
-                manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+                manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
                 attack_sequence=sequence,
                 hooks=AttackSequenceHooks.empty(),
             )
@@ -205,7 +205,7 @@ def continue_retained_transport_cleanup(
         state=state,
         decisions=decisions,
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
-        manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
         attack_sequence=sequence,
         allocated_model_ids=(),
         hooks=AttackSequenceHooks.empty(),

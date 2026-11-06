@@ -5729,6 +5729,7 @@
         "player-a",
         "player-b"
       ],
+      "private_rng_seed": "f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0",
       "reserve_unit_points": [
         {
           "points": 300,
@@ -12397,6 +12398,7 @@
           "player-a",
           "player-b"
         ],
+        "private_rng_seed": "f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0",
         "reserve_unit_points": [
           {
             "points": 300,
@@ -17350,6 +17352,7 @@
         "primary_scoring_state_evidence_records": [],
         "primary_terrain_trap_states": [],
         "primary_unit_destruction_states": [],
+        "private_rng_seed": "f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0",
         "ranged_attack_history_records": [],
         "reserve_states": [],
         "return_on_death_consumed_keys": [],
@@ -17384,6 +17387,7 @@
         "tactical_secondary_achievement_contexts": [],
         "tactical_secondary_discard_cp_reward_window_ids": [],
         "tactical_secondary_draw_count": 2,
+        "tactical_secondary_draw_sequence": 0,
         "tactical_secondary_draws": [],
         "tactical_secondary_replacement_player_ids": [],
         "tracked_target_records": [],
@@ -26688,6 +26692,7 @@
       "primary_scoring_state_evidence_records": [],
       "primary_terrain_trap_states": [],
       "primary_unit_destruction_states": [],
+      "private_rng_seed": "f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0",
       "ranged_attack_history_records": [],
       "reserve_states": [],
       "return_on_death_consumed_keys": [],
@@ -26751,6 +26756,7 @@
       "tactical_secondary_achievement_contexts": [],
       "tactical_secondary_discard_cp_reward_window_ids": [],
       "tactical_secondary_draw_count": 2,
+      "tactical_secondary_draw_sequence": 0,
       "tactical_secondary_draws": [],
       "tactical_secondary_replacement_player_ids": [],
       "tracked_target_records": [],
@@ -26788,14 +26794,14 @@
       "{\"actor_id\":\"player-a\",\"decision_type\":\"select_secondary_missions\",\"options\":[{\"label\":\"Fixed assassination bring_it_down\",\"option_id\":\"fixed:assassination:bring_it_down\",\"payload\":{\"fixed_mission_ids\":[\"assassination\",\"bring_it_down\"],\"mode\":\"fixed\"}},{\"label\":\"Fixed assassination cleanse\",\"option_id\":\"fixed:assassination:cleanse\",\"payload\":{\"fixed_mission_ids\":[\"assassination\",\"cleanse\"],\"mode\":\"fixed\"}},{\"label\":\"Fixed bring_it_down cleanse\",\"option_id\":\"fixed:bring_it_down:cleanse\",\"payload\":{\"fixed_mission_ids\":[\"bring_it_down\",\"cleanse\"],\"mode\":\"fixed\"}},{\"label\":\"Tactical\",\"option_id\":\"tactical\",\"payload\":{\"fixed_mission_ids\":[],\"mode\":\"tactical\"}}],\"payload\":{\"fixed_choices_required\":2,\"game_id\":\"phase18d-contract-session\",\"secret\":true,\"setup_step\":\"select_secondary_missions\"},\"request_id\":\"decision-request-000001\"}",
       "{\"event_id\":\"event-000009\",\"event_type\":\"decision_requested\",\"payload\":{\"actor_id\":\"player-a\",\"decision_type\":\"select_secondary_missions\",\"options\":[{\"label\":\"Fixed assassination bring_it_down\",\"option_id\":\"fixed:assassination:bring_it_down\",\"payload\":{\"fixed_mission_ids\":[\"assassination\",\"bring_it_down\"],\"mode\":\"fixed\"}},{\"label\":\"Fixed assassination cleanse\",\"option_id\":\"fixed:assassination:cleanse\",\"payload\":{\"fixed_mission_ids\":[\"assassination\",\"cleanse\"],\"mode\":\"fixed\"}},{\"label\":\"Fixed bring_it_down cleanse\",\"option_id\":\"fixed:bring_it_down:cleanse\",\"payload\":{\"fixed_mission_ids\":[\"bring_it_down\",\"cleanse\"],\"mode\":\"fixed\"}},{\"label\":\"Tactical\",\"option_id\":\"tactical\",\"payload\":{\"fixed_mission_ids\":[],\"mode\":\"tactical\"}}],\"payload\":{\"fixed_choices_required\":2,\"game_id\":\"phase18d-contract-session\",\"secret\":true,\"setup_step\":\"select_secondary_missions\"},\"request_id\":\"decision-request-000001\"}}"
     ],
-    "seed": "phase18d-contract-session"
+    "seed": "f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v36-target-aware-attack-groups",
+  "schema_version": "replay-artifact-v37-private-rng",
   "source_identity": {
     "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
     "catalog_id": "phase9a-canonical",
-    "game_config_hash": "d6da0e733cdbbbd2bc3c4c66b59db607335e87cd01bfc57a3a04c15d44b3e01c",
+    "game_config_hash": "ea3a78d7afb8d60265e5cb6ab04db00b1057a9e96a7848dbad38347b4cfad3cd",
     "game_id": "phase18d-contract-session",
     "mission_pack_id": "11e-warhammer-event-companion-2026-07",
     "mission_source_package_hash": "4832f73e470caa4d0906fef06af3f05f53b00a68bbfdbb3d2c639eec6e323fb0",

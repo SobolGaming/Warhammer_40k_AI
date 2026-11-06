@@ -5725,6 +5725,7 @@
       "player-a",
       "player-b"
     ],
+    "private_rng_seed": "f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0",
     "reserve_unit_points": [
       {
         "points": 300,
@@ -6379,5 +6380,5 @@
       "player-b"
     ]
   },
-  "schema_version": "create-session-v3"
+  "schema_version": "create-session-v4-private-rng"
 }

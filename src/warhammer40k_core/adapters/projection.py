@@ -32,6 +32,7 @@ from warhammer40k_core.adapters.redaction import (
     public_primary_rules_unit_turn_start_snapshots,
     public_victory_point_ledger_payload,
     redacted_decision_type_for_hidden_viewer,
+    viewer_identity_map,
     visible_army_units,
 )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -77,7 +78,7 @@ from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_total,
 )
 
-PROJECTION_SCHEMA_VERSION = "game-view-v13-random-profiles"
+PROJECTION_SCHEMA_VERSION = "game-view-v14-viewer-identities"
 RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"
 
 _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (
@@ -650,6 +651,14 @@ def project_game_view(
             else _nested_interaction_request_views(pending_request, viewer=context)
         ),
     }
+    identities = viewer_identity_map(
+        event_log=lifecycle.decision_controller.event_log, viewer=context
+    )
+    if pending_request is not None and not decision_request_hidden_from_context(
+        request=pending_request, viewer=context
+    ):
+        identities.project(public_decision_request_payload(pending_request, viewer=context))
+    payload = cast(GameViewPayload, identities.project(cast(JsonValue, payload)))
     payload["projection_state_hash"] = _projection_state_hash(payload)
     return payload
 

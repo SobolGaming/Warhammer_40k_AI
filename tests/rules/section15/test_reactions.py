@@ -157,7 +157,11 @@ def test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll(
     section15_definitions: Section02Definitions, mode: str, cp: int
 ) -> None:
     session, state, unit, enemy = checkpoint(
-        section15_definitions, phase=BattlePhase.CHARGE, active="opponent", distance=5
+        section15_definitions,
+        phase=BattlePhase.CHARGE,
+        active="opponent",
+        distance=5,
+        seed="section15:heroic:private-0",
     )
     # Explicit completed enemy Charge checkpoint; no earlier charge is certified.
     state.charge_phase_state = ChargePhaseState(

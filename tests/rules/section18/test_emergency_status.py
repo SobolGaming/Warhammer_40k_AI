@@ -3,6 +3,7 @@
 from dataclasses import replace
 from typing import cast
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section03_fixtures import native_state
 from tests.support.section04_fixtures import choose, pending, weapon_rows
@@ -54,6 +55,7 @@ def test_native_emergency_survivors_become_actually_battle_shocked(
     # October layout markers change the native deterministic history fingerprint.
     # Current source: hit 2, wound 5, failed save 1, then five surviving passengers.
     state.game_id = "section18:emergency:october-22"
+    state.private_rng_seed = fixture_private_rng_seed("section18:emergency:private-3631709")
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     state.army_definitions[:] = [
         replace(a, units=(*a.units, passenger)) if a.player_id == "opponent" else a

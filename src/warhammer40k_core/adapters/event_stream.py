@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TypedDict
+from typing import TypedDict, cast
 
 from warhammer40k_core.adapters.access_control import ViewerContext
-from warhammer40k_core.adapters.redaction import public_event_record_payload
-from warhammer40k_core.engine.event_log import EventLog, EventRecordPayload
+from warhammer40k_core.adapters.redaction import (
+    public_event_record_payload,
+    viewer_event_records,
+    viewer_identity_map,
+)
+from warhammer40k_core.engine.event_log import EventLog, EventRecordPayload, JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 
-ADAPTER_EVENT_STREAM_DELTA_SCHEMA_VERSION = "event-delta-v4-phase17n-step4"
+ADAPTER_EVENT_STREAM_DELTA_SCHEMA_VERSION = "event-delta-v5-viewer-identities"
 
 
 class EventStreamDeltaPayload(TypedDict):
@@ -63,22 +67,10 @@ class EventStreamCursor:
             raise GameLifecycleError("EventStreamCursor requires an EventLog.")
         if type(viewer) is not ViewerContext:
             raise GameLifecycleError("EventStreamCursor requires a ViewerContext.")
-        records = event_log.records
+        records = viewer_event_records(event_log=event_log, viewer=viewer)
         if self.value > len(records):
             raise GameLifecycleError("EventStreamCursor is ahead of the event log.")
-        events = [
-            public
-            for record in records[self.value :]
-            if (
-                public := public_event_record_payload(
-                    event_id=record.event_id,
-                    event_type=record.event_type,
-                    payload=record.payload,
-                    viewer=viewer,
-                )
-            )
-            is not None
-        ]
+        events = records[self.value :]
         return {
             "schema_version": ADAPTER_EVENT_STREAM_DELTA_SCHEMA_VERSION,
             "viewer_player_id": (
@@ -96,6 +88,22 @@ class EventStreamCursor:
         viewer: ViewerContext,
         visible_limit: int,
     ) -> EventStreamPagePayload:
+        if type(visible_limit) is not int or visible_limit < 1:
+            raise GameLifecycleError("Visible event page limit must be positive.")
+        delta = self.events_since_for_context(event_log, viewer=viewer)
+        events = delta["events"][:visible_limit]
+        next_cursor = self.value + len(events)
+        return {
+            **delta,
+            "events": events,
+            "next_cursor": next_cursor,
+            "has_more": next_cursor < delta["next_cursor"],
+        }
+
+    def authoritative_page_for_context(
+        self, event_log: EventLog, *, viewer: ViewerContext, visible_limit: int
+    ) -> EventStreamPagePayload:
+        """Trusted server paging: offsets stay private inside opaque cursors."""
         if type(event_log) is not EventLog:
             raise GameLifecycleError("EventStreamCursor requires an EventLog.")
         if type(viewer) is not ViewerContext:
@@ -106,6 +114,7 @@ class EventStreamCursor:
         if self.value > len(records):
             raise GameLifecycleError("EventStreamCursor is ahead of the event log.")
         events: list[EventRecordPayload] = []
+        identities = viewer_identity_map(event_log=event_log, viewer=viewer)
         next_cursor = self.value
         for index, record in enumerate(records[self.value :], start=self.value):
             public = public_event_record_payload(
@@ -116,7 +125,7 @@ class EventStreamCursor:
             )
             next_cursor = index + 1
             if public is not None:
-                events.append(public)
+                events.append(cast(EventRecordPayload, identities.project(cast(JsonValue, public))))
             if len(events) == visible_limit:
                 break
         has_more = False

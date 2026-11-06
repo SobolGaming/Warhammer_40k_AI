@@ -56,7 +56,7 @@ def request_for(
         )
         dice_count = _rules.BLESSINGS_DICE_COUNT + bloodshed_points
         roll_state = DiceRollManager(
-            context.state.game_id, event_log=context.decisions.event_log
+            context.state.private_rng_seed, event_log=context.decisions.event_log
         ).roll(
             DiceRollSpec(
                 expression=DiceExpression(quantity=dice_count, sides=6),

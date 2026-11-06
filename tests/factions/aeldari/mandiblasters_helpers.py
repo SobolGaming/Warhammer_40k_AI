@@ -30,6 +30,7 @@ def scorpion_scene(
     leader_equipment: tuple[str, ...] = (),
     perform_charge: bool = True,
     one_bodyguard: bool = False,
+    seed: str = "independent-mandiblasters-charge",
 ) -> Scene:
     from warhammer40k_core.engine.list_validation import AttachmentDeclaration
 
@@ -43,7 +44,7 @@ def scorpion_scene(
         own,
         (selection(d, WALKERS, "walkers"),),
         phase=BattlePhase.CHARGE if charged else BattlePhase.FIGHT,
-        seed="independent-mandiblasters-charge",
+        seed=seed,
         attachments=(AttachmentDeclaration("autarch", "scorpions"),) if attached else (),
     )
     radius = (60 + 28.5) / 50.8

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import DatasheetKeywordSet
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -74,6 +75,7 @@ def order59_empty_transport_config(
             )
         )
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed(game_id),
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(

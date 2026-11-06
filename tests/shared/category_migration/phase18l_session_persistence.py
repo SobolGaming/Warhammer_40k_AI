@@ -993,7 +993,7 @@ def _rng_payload(session: LocalGameSession) -> JsonValue:
     state = session.lifecycle.state
     assert state is not None
     manager = DiceRollManager(
-        state.game_id,
+        state.private_rng_seed,
         event_log=session.lifecycle.decision_controller.event_log,
     )
     return cast(JsonValue, manager.rng.to_payload())

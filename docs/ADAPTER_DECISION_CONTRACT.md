@@ -1,11 +1,74 @@
 # Adapter Decision Contract
 
+## Private game randomness (Contract 46)
+
+Administrator game creation requires `config.private_rng_seed`, a private 256-bit
+hexadecimal seed. Fresh Python `GameConfig` construction generates it unless an
+operator explicitly supplies a reproducible seed. `GameState.from_config` copies
+that authority; direct state/config pairs and restored payloads must agree.
+All gameplay dice and tactical-card draws use it, including historical prefix
+validation, saved-game continuation and replay. Player projections, event deltas,
+redacted statuses and public state payloads omit the seed. Live full replay export
+remains administrator-only; ordinary player policies receive neither the artifact
+nor persistence. Test fixtures' published fixed seeds are deliberately test-only.
+
+Current creation/checkpoint/replay family versions reject legacy payloads lacking
+private seed authority. Use the matching retained runtime to inspect those
+artifacts. There is no silent public-ID seed fallback or implicit reseeding.
+
 ## Player-scoped policy consumers
 
 The [AI policy interface](AI_POLICY_INTERFACE.md) consumes detached player views
-and submits bound finite/proposal actions through the existing session facade.
-It adds no decision family, proposal kind or wire payload. Engine validation,
+and submits bound finite/proposal actions through the session facade.
+It adds no decision family or proposal kind. Engine validation,
 accepted decision records, player redaction and replay remain authoritative.
+
+## Viewer identities and metadata (Contract 46)
+
+Live projections, nested proposal requests, status metadata and visible events
+carry viewer-scoped identities. The map is built in redacted-history order and
+scoped by game, role and player. Hidden opponent work does not advance it.
+Request/result/event/decision-record/dice-roll reference fields use the corresponding
+identity domain, including plural references; stable catalog record IDs retain
+their catalog meaning. Context and opportunity authority tokens are opaque
+viewer bindings. Entity IDs and arbitrary text are never rewritten. An undeclared
+authoritative ordinal reference fails closed instead of publishing its counter.
+
+Player-facing facade submissions use `submit_viewer_option` or
+`submit_viewer_parameterized_payload`. The host validates the current viewer,
+request and issued bindings, resolves them, then calls the same authoritative
+engine decision path. Invalid proposal identities return an explicit invalid
+status without queue pop or mutation. Wrong outer request IDs and wrong actors
+raise domain errors. Authoritative IDs are never accepted as a fallback in this
+namespace. The separate `submit_option` / `submit_parameterized_payload` methods
+remain trusted host/replay APIs; they are not policy inputs or wire interfaces.
+Local UI/CLI helpers bind the issued request capability to its projected owner;
+remote authentication and actor authorization remain server-owned. Headless
+callbacks receive a detached player-projected request.
+
+Direct event cursors count only visible events. Opaque server cursors retain
+authenticated private anchors, and reuse an existing token when visible events
+and the projected state have not changed. Hidden work neither advances a public
+revision nor expires a viewer cursor. For non-omniscient viewers,
+`session_revision` / `from_revision` / `to_revision` are visible-event counts,
+not authoritative command ordinals; clients copy the current value into
+`expected_session_revision` and must not increment it arithmetically.
+Administrator revisions retain their authoritative meaning. Player/coach/
+spectator `last_activity_at` is `null`; private activity timestamps are not public.
+
+Event retention is bounded by both advertised retention limits in visible
+events. Snapshot retention preserves the first anchor of the last declared
+number of visible boundaries for each player and the shared spectator stream,
+in addition to the administrator's bounded authoritative suffix. Delayed
+spectators advance by visible boundaries. Restore validates this exact retained
+inventory against the complete committed history. A genuinely expired visible
+cursor still requires explicit resynchronization. Durable journal checks bind
+the original wire aliases and viewer revision back to the exact authoritative
+decision, payload and authenticated cursor evidence.
+
+These semantics require the new Contract 46 payload-family versions. Retained
+older clients/checkpoints use their matching runtime; there is no automatic
+identifier conversion on ordinary restore.
 
 ## Provisional model geometry (45.1)
 
@@ -8035,15 +8098,22 @@ No player choice, proposal envelope, option family or visibility policy changes.
 The separately authorized offline profile documented in
 [A32 historical checkpoint reconstruction](A32_HISTORICAL_CHECKPOINT_RECONSTRUCTION.md)
 admits exactly one retained source digest. Its new
-`local-checkpoint-reconstruction-v2-mission-scope` package is tooling provenance plus an ordinary
+`local-checkpoint-reconstruction-v3-audit-rng` package is tooling provenance plus an ordinary
 strict local checkpoint, not a replacement server/session persistence envelope.
 The operator explicitly selects the recipe and preserves the original. Regenerated
-completion evidence is identified as new; every original event, choice, RNG state
-and gameplay field is matched under the declared event-ID mapping. Verification
+completion evidence is identified as new; every original event, choice, RNG history,
+draw count and gameplay outcome is matched under the declared event-ID mapping.
+The v3 recipe explicitly adds a calibrated known audit seed and zero tactical draw
+sequence at the finite config/state anchors, maps the replay schema and config hash,
+and preserves all five recorded natural dice faces. Three pinned setup state hashes
+change solely for the added seed/counter; every other event field remains exact.
+It records the changed RNG
+metadata and labels the reconstruction unsuitable for secret competitive RNG.
+Verification
 uses ordinary strict restore and exact replay of the reconstructed representation.
 The required explicit Chapter player-turn scope has one registered old/new import
 hash mapping for that same original digest/profile. Deterministic versioned
-provenance identifies it; the other nine identity fields remain exact. Ordinary
+provenance identifies both mappings; the other eight identity fields remain exact. Ordinary
 loaders continue to reject the original bytes, and older output schemas receive
 no fallback.
 No automatic fallback, original-byte cross-version replay claim, player-visible
@@ -8090,3 +8160,14 @@ current-runtime persistence/replay artifacts; no compatibility shim is provided.
 The current Secondary source rules do not expose end-of-battle scoring. The final
 ordinary turn remains capped, and authenticated Primary end-of-battle treatment
 is unchanged.
+
+Viewer identity projection also covers typed runtime reference fields whose values
+contain engine request, record, event or roll ordinals, including derived window,
+descriptor, occurrence, effect and finite option IDs. Stable catalog IDs stay
+unchanged. Ordinal-bearing entity IDs and their typed display-map keys share the
+same reversible alias. Declared label/message/reason text renders embedded engine
+ordinal tokens through the same issued reference map; arbitrary other strings and
+public unit/model display names are preserved. Viewer finite
+option submissions and durable command journals resolve these issued aliases
+before the same canonical engine validation, while trusted replay keeps the
+authoritative identifiers. Undeclared ordinal references fail explicitly.

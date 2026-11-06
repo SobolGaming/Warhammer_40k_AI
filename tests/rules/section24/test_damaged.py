@@ -106,7 +106,7 @@ def test_native_belakor_damage_generated_threshold_and_restoration(
 
 @pytest.mark.parametrize(
     ("phase_name", "ignore", "seed"),
-    [("fight", False, 1), ("shooting", False, 0), ("shooting", True, 1)],
+    [("fight", False, 0), ("shooting", False, 0), ("shooting", True, 1)],
 )
 def test_native_belakor_actual_attack_damaged_psychic_choice_component_restore(
     selected_army_source_index: Path | None,
@@ -143,9 +143,11 @@ def test_native_belakor_actual_attack_damaged_psychic_choice_component_restore(
     assert dice
     assert all(roll.source == "rng" for roll in dice)
     assert len({roll.roll_id for roll in dice}) == len(dice)
-    assert DiceRollManager(state.game_id, event_log=decisions.event_log).rng.to_payload() == (
+    assert DiceRollManager(
+        state.private_rng_seed, event_log=decisions.event_log
+    ).rng.to_payload() == (
         DiceRollManager(
-            uninterrupted_state.game_id, event_log=uninterrupted_decisions.event_log
+            uninterrupted_state.private_rng_seed, event_log=uninterrupted_decisions.event_log
         ).rng.to_payload()
     )
     hits = [

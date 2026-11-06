@@ -99,7 +99,7 @@ def test_return_on_death_failed_roll_resolves_without_restoring_target() -> None
     state.record_pending_return_on_death(pending)
     decisions = DecisionController()
     manager = DiceRollManager(
-        state.game_id,
+        state.private_rng_seed,
         event_log=decisions.event_log,
         injected_results=(_roll_result(pending=pending, value=1),),
     )

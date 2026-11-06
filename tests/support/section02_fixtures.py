@@ -11,6 +11,7 @@ from pathlib import Path
 from time import perf_counter
 
 import pytest
+from tests.support.private_randomness import fixture_private_rng_seed
 from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
@@ -64,6 +65,7 @@ def health_state(definitions: Section02Definitions, unit: UnitInstance) -> GameS
         units=(unit,),
     )
     return GameState(
+        private_rng_seed=fixture_private_rng_seed("section02-health"),
         game_id="section02-health",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,

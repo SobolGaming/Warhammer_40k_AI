@@ -182,7 +182,7 @@ def resolve_phase_command_point_gain(
         else:
             raise GameLifecycleError("Catalog CP phase gain roll_type is unsupported.")
         roll = DiceRollManager(
-            context.state.game_id,
+            context.state.private_rng_seed,
             event_log=context.decisions.event_log,
         ).roll(
             DiceRollSpec(

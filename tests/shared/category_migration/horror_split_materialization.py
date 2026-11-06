@@ -534,7 +534,7 @@ def _split_scenario(
         else ()
     )
     dice_manager = DiceRollManager(
-        state.game_id,
+        state.private_rng_seed,
         event_log=decisions.event_log,
         injected_results=hazard_rolls
         + tuple(
@@ -1109,7 +1109,7 @@ def _record_successful_materialization_rolls(scenario: _SplitScenario) -> None:
     parent_battle_phase = scenario.state.current_battle_phase
     assert parent_battle_phase is not None
     manager = DiceRollManager(
-        scenario.state.game_id,
+        scenario.state.private_rng_seed,
         event_log=scenario.decisions.event_log,
     )
     for model_instance_id in scenario.destroyed_model_instance_ids:
@@ -1239,6 +1239,7 @@ def _game_config(scenario: _SplitScenario) -> GameConfig:
         for army in (scenario.source_army, scenario.enemy_army)
     )
     return GameConfig(
+        private_rng_seed=scenario.state.private_rng_seed,
         game_id=scenario.state.game_id,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         army_catalog=scenario.package.army_catalog,

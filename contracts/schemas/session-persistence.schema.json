@@ -13,14 +13,14 @@
     },
     "engine_version": {"minLength": 1, "type": "string"},
     "event_retention_limit": {"minimum": 1, "type": "integer"},
-    "external_contract_version": {"const": "45.0.0", "type": "string"},
+    "external_contract_version": {"const": "46.0.0", "type": "string"},
     "game_session_index": {
       "items": {"$ref": "#/$defs/game_session_index_entry"},
       "type": "array",
       "uniqueItems": true
     },
     "schema_version": {
-      "const": "session-persistence-v36-contract45",
+      "const": "session-persistence-v37-contract46",
       "type": "string"
     },
     "sessions": {
@@ -207,7 +207,7 @@
         "q": {"minimum": 0, "type": "integer"},
         "r": {"minimum": 0, "type": "integer"},
         "s": {"minLength": 1, "type": "string"},
-        "v": {"const": 1, "type": "integer"}
+        "v": {"const": 2, "type": "integer"}
       },
       "required": ["v", "s", "p", "c", "o", "q", "r", "h"],
       "type": "object"
@@ -316,7 +316,7 @@
       "additionalProperties": true,
       "properties": {
         "config": {
-          "$ref": "https://warhammer40k-core.local/contracts/v3/create-session.schema.json#/properties/config"
+          "$ref": "https://warhammer40k-core.local/contracts/v4/create-session.schema.json#/properties/config"
         },
         "state": {"type": ["object", "null"]}
       },
@@ -343,7 +343,7 @@
         "rng_state": {"$ref": "#/$defs/rng_state"},
         "rng_state_hash": {"$ref": "#/$defs/sha256"},
         "schema_version": {
-          "const": "local-game-session-persistence-v1",
+          "const": "local-game-session-persistence-v2-private-rng",
           "type": "string"
         },
         "source_identity": {
@@ -491,7 +491,7 @@
         "rng_history_hash": {"$ref": "#/$defs/sha256"},
         "rng_state_hash": {"$ref": "#/$defs/sha256"},
         "schema_version": {
-          "const": "session-revision-commitment-v2",
+          "const": "session-revision-commitment-v3-viewer-identities",
           "type": "string"
         },
         "session_id": {"minLength": 1, "type": "string"},

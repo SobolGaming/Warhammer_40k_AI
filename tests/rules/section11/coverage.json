@@ -336,7 +336,7 @@
             },
             {
               "node": "tests/rules/section11/test_selection.py::test_native_double_one_fails_without_moving_and_cannot_declare_again",
-              "function_ast_sha256": "ea0ca83d035b5852ee9755dd2624738dbc3a58f6a1e63a123346c38302827e17",
+              "function_ast_sha256": "51cf1e64bd8ee4762a5287ff588010f4433b52f99ee89cfd8b6997ac5266ddbf",
               "assertions": [
                 "assert result.roll_state.original_result.values == (1, 1)",
                 "assert result.value == 2",
@@ -500,7 +500,7 @@
             },
             {
               "node": "tests/rules/section11/test_selection.py::test_native_double_one_fails_without_moving_and_cannot_declare_again",
-              "function_ast_sha256": "ea0ca83d035b5852ee9755dd2624738dbc3a58f6a1e63a123346c38302827e17",
+              "function_ast_sha256": "51cf1e64bd8ee4762a5287ff588010f4433b52f99ee89cfd8b6997ac5266ddbf",
               "assertions": [
                 "assert result.roll_state.original_result.values == (1, 1)",
                 "assert result.value == 2",
@@ -722,7 +722,7 @@
             },
             {
               "node": "tests/rules/section11/test_selection.py::test_native_double_one_fails_without_moving_and_cannot_declare_again",
-              "function_ast_sha256": "ea0ca83d035b5852ee9755dd2624738dbc3a58f6a1e63a123346c38302827e17",
+              "function_ast_sha256": "51cf1e64bd8ee4762a5287ff588010f4433b52f99ee89cfd8b6997ac5266ddbf",
               "assertions": [
                 "assert result.roll_state.original_result.values == (1, 1)",
                 "assert result.value == 2",

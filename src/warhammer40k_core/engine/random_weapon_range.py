@@ -139,7 +139,7 @@ def evaluate_weapon_ranges(
         if any(record.scope_id == scope for record in state.random_weapon_ranges):
             continue
         if manager is None:
-            manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+            manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
         roll = manager.roll_random_characteristic(
             characteristic=Characteristic.RANGE,
             timing=RandomCharacteristicTiming.PER_WEAPON,

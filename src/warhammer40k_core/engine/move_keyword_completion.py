@@ -219,7 +219,7 @@ def _resolve(
     state, decisions = context.state, context.decisions
     if decisions is None or not isinstance(participant.payload, dict):
         raise GameLifecycleError("Movement keyword completion requires its participant payload.")
-    roll = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
+    roll = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).roll(
         completion_roll_spec(
             descriptor,
             source_event_id=context.trigger_event_id,
@@ -339,7 +339,7 @@ def validate_completion_roll_event(
     ):
         raise GameLifecycleError("Movement keyword completion lost its exact dice event.")
     prefix = EventLog.from_payload([row.to_payload() for row in event_records[: event_index - 1]])
-    expected_roll = DiceRollManager(state.game_id, event_log=prefix).roll(expected_spec)
+    expected_roll = DiceRollManager(state.private_rng_seed, event_log=prefix).roll(expected_spec)
     if roll != expected_roll:
         raise GameLifecycleError(
             "Movement keyword completion dice differs from deterministic history."

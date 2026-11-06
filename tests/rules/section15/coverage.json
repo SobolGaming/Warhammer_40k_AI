@@ -2023,7 +2023,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -2383,7 +2383,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section15/test_reroll.py::test_every_adopted_command_reroll_class_resolves_the_recorded_roll",
-              "function_ast_sha256": "744c69fefa01c79f3e620dca18cd8ad4c9034db441037924ca75fd5a6d7f9217",
+              "function_ast_sha256": "1032265ca0ff716d65ce57bd8653f9bda3d63d838902440b57f5eb0d5fc94d0a",
               "assertions": [
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
                 "assert updated['original_result'] == roll.to_payload()['original_result']",
@@ -2395,7 +2395,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_non_charge_multiple_dice_rerolls_only_selected_component",
-              "function_ast_sha256": "1d4a1138367a05e40b8cd0421267b08cab18e0175b34fc9bc717081373ca4e31",
+              "function_ast_sha256": "9ba212c1b1049a769041e59a25e4159e69c297c461c72345f6a58514fb62eb7a",
               "assertions": [
                 "assert tuple((o.option_id for o in reroll.options)) == ('decline', 'reroll:0', 'reroll:1')",
                 "assert updated['rerolls'][0]['selected_indices'] == [selected]",
@@ -2405,7 +2405,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend",
-              "function_ast_sha256": "49f1d86100a868e46944f213a53dcf5252c45eea27bdac199edd455209c2861b",
+              "function_ast_sha256": "1e9f353af21fef16a8ca02cf2f116cc4b48ebcff61c56a0de68ed27b0f32784e",
               "assertions": [
                 "assert options == ()",
                 "assert state.to_payload() == before"
@@ -2421,7 +2421,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section15/test_reroll.py::test_every_adopted_command_reroll_class_resolves_the_recorded_roll",
-              "function_ast_sha256": "744c69fefa01c79f3e620dca18cd8ad4c9034db441037924ca75fd5a6d7f9217",
+              "function_ast_sha256": "1032265ca0ff716d65ce57bd8653f9bda3d63d838902440b57f5eb0d5fc94d0a",
               "assertions": [
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
                 "assert updated['original_result'] == roll.to_payload()['original_result']",
@@ -2433,7 +2433,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_non_charge_multiple_dice_rerolls_only_selected_component",
-              "function_ast_sha256": "1d4a1138367a05e40b8cd0421267b08cab18e0175b34fc9bc717081373ca4e31",
+              "function_ast_sha256": "9ba212c1b1049a769041e59a25e4159e69c297c461c72345f6a58514fb62eb7a",
               "assertions": [
                 "assert tuple((o.option_id for o in reroll.options)) == ('decline', 'reroll:0', 'reroll:1')",
                 "assert updated['rerolls'][0]['selected_indices'] == [selected]",
@@ -2443,7 +2443,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend",
-              "function_ast_sha256": "49f1d86100a868e46944f213a53dcf5252c45eea27bdac199edd455209c2861b",
+              "function_ast_sha256": "1e9f353af21fef16a8ca02cf2f116cc4b48ebcff61c56a0de68ed27b0f32784e",
               "assertions": [
                 "assert options == ()",
                 "assert state.to_payload() == before"
@@ -2459,7 +2459,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section15/test_reroll.py::test_every_adopted_command_reroll_class_resolves_the_recorded_roll",
-              "function_ast_sha256": "744c69fefa01c79f3e620dca18cd8ad4c9034db441037924ca75fd5a6d7f9217",
+              "function_ast_sha256": "1032265ca0ff716d65ce57bd8653f9bda3d63d838902440b57f5eb0d5fc94d0a",
               "assertions": [
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
                 "assert updated['original_result'] == roll.to_payload()['original_result']",
@@ -2471,7 +2471,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_non_charge_multiple_dice_rerolls_only_selected_component",
-              "function_ast_sha256": "1d4a1138367a05e40b8cd0421267b08cab18e0175b34fc9bc717081373ca4e31",
+              "function_ast_sha256": "9ba212c1b1049a769041e59a25e4159e69c297c461c72345f6a58514fb62eb7a",
               "assertions": [
                 "assert tuple((o.option_id for o in reroll.options)) == ('decline', 'reroll:0', 'reroll:1')",
                 "assert updated['rerolls'][0]['selected_indices'] == [selected]",
@@ -2481,7 +2481,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend",
-              "function_ast_sha256": "49f1d86100a868e46944f213a53dcf5252c45eea27bdac199edd455209c2861b",
+              "function_ast_sha256": "1e9f353af21fef16a8ca02cf2f116cc4b48ebcff61c56a0de68ed27b0f32784e",
               "assertions": [
                 "assert options == ()",
                 "assert state.to_payload() == before"
@@ -2497,7 +2497,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section15/test_reroll.py::test_every_adopted_command_reroll_class_resolves_the_recorded_roll",
-              "function_ast_sha256": "744c69fefa01c79f3e620dca18cd8ad4c9034db441037924ca75fd5a6d7f9217",
+              "function_ast_sha256": "1032265ca0ff716d65ce57bd8653f9bda3d63d838902440b57f5eb0d5fc94d0a",
               "assertions": [
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
                 "assert updated['original_result'] == roll.to_payload()['original_result']",
@@ -2509,7 +2509,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_non_charge_multiple_dice_rerolls_only_selected_component",
-              "function_ast_sha256": "1d4a1138367a05e40b8cd0421267b08cab18e0175b34fc9bc717081373ca4e31",
+              "function_ast_sha256": "9ba212c1b1049a769041e59a25e4159e69c297c461c72345f6a58514fb62eb7a",
               "assertions": [
                 "assert tuple((o.option_id for o in reroll.options)) == ('decline', 'reroll:0', 'reroll:1')",
                 "assert updated['rerolls'][0]['selected_indices'] == [selected]",
@@ -2519,7 +2519,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend",
-              "function_ast_sha256": "49f1d86100a868e46944f213a53dcf5252c45eea27bdac199edd455209c2861b",
+              "function_ast_sha256": "1e9f353af21fef16a8ca02cf2f116cc4b48ebcff61c56a0de68ed27b0f32784e",
               "assertions": [
                 "assert options == ()",
                 "assert state.to_payload() == before"
@@ -2535,7 +2535,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section15/test_reroll.py::test_every_adopted_command_reroll_class_resolves_the_recorded_roll",
-              "function_ast_sha256": "744c69fefa01c79f3e620dca18cd8ad4c9034db441037924ca75fd5a6d7f9217",
+              "function_ast_sha256": "1032265ca0ff716d65ce57bd8653f9bda3d63d838902440b57f5eb0d5fc94d0a",
               "assertions": [
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
                 "assert updated['original_result'] == roll.to_payload()['original_result']",
@@ -2547,7 +2547,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_non_charge_multiple_dice_rerolls_only_selected_component",
-              "function_ast_sha256": "1d4a1138367a05e40b8cd0421267b08cab18e0175b34fc9bc717081373ca4e31",
+              "function_ast_sha256": "9ba212c1b1049a769041e59a25e4159e69c297c461c72345f6a58514fb62eb7a",
               "assertions": [
                 "assert tuple((o.option_id for o in reroll.options)) == ('decline', 'reroll:0', 'reroll:1')",
                 "assert updated['rerolls'][0]['selected_indices'] == [selected]",
@@ -2557,7 +2557,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend",
-              "function_ast_sha256": "49f1d86100a868e46944f213a53dcf5252c45eea27bdac199edd455209c2861b",
+              "function_ast_sha256": "1e9f353af21fef16a8ca02cf2f116cc4b48ebcff61c56a0de68ed27b0f32784e",
               "assertions": [
                 "assert options == ()",
                 "assert state.to_payload() == before"
@@ -2573,7 +2573,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section15/test_reroll.py::test_every_adopted_command_reroll_class_resolves_the_recorded_roll",
-              "function_ast_sha256": "744c69fefa01c79f3e620dca18cd8ad4c9034db441037924ca75fd5a6d7f9217",
+              "function_ast_sha256": "1032265ca0ff716d65ce57bd8653f9bda3d63d838902440b57f5eb0d5fc94d0a",
               "assertions": [
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
                 "assert updated['original_result'] == roll.to_payload()['original_result']",
@@ -2585,7 +2585,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_non_charge_multiple_dice_rerolls_only_selected_component",
-              "function_ast_sha256": "1d4a1138367a05e40b8cd0421267b08cab18e0175b34fc9bc717081373ca4e31",
+              "function_ast_sha256": "9ba212c1b1049a769041e59a25e4159e69c297c461c72345f6a58514fb62eb7a",
               "assertions": [
                 "assert tuple((o.option_id for o in reroll.options)) == ('decline', 'reroll:0', 'reroll:1')",
                 "assert updated['rerolls'][0]['selected_indices'] == [selected]",
@@ -2595,7 +2595,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend",
-              "function_ast_sha256": "49f1d86100a868e46944f213a53dcf5252c45eea27bdac199edd455209c2861b",
+              "function_ast_sha256": "1e9f353af21fef16a8ca02cf2f116cc4b48ebcff61c56a0de68ed27b0f32784e",
               "assertions": [
                 "assert options == ()",
                 "assert state.to_payload() == before"
@@ -2611,7 +2611,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section15/test_reroll.py::test_every_adopted_command_reroll_class_resolves_the_recorded_roll",
-              "function_ast_sha256": "744c69fefa01c79f3e620dca18cd8ad4c9034db441037924ca75fd5a6d7f9217",
+              "function_ast_sha256": "1032265ca0ff716d65ce57bd8653f9bda3d63d838902440b57f5eb0d5fc94d0a",
               "assertions": [
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
                 "assert updated['original_result'] == roll.to_payload()['original_result']",
@@ -2623,7 +2623,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_non_charge_multiple_dice_rerolls_only_selected_component",
-              "function_ast_sha256": "1d4a1138367a05e40b8cd0421267b08cab18e0175b34fc9bc717081373ca4e31",
+              "function_ast_sha256": "9ba212c1b1049a769041e59a25e4159e69c297c461c72345f6a58514fb62eb7a",
               "assertions": [
                 "assert tuple((o.option_id for o in reroll.options)) == ('decline', 'reroll:0', 'reroll:1')",
                 "assert updated['rerolls'][0]['selected_indices'] == [selected]",
@@ -2633,7 +2633,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend",
-              "function_ast_sha256": "49f1d86100a868e46944f213a53dcf5252c45eea27bdac199edd455209c2861b",
+              "function_ast_sha256": "1e9f353af21fef16a8ca02cf2f116cc4b48ebcff61c56a0de68ed27b0f32784e",
               "assertions": [
                 "assert options == ()",
                 "assert state.to_payload() == before"
@@ -2649,7 +2649,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section15/test_reroll.py::test_every_adopted_command_reroll_class_resolves_the_recorded_roll",
-              "function_ast_sha256": "744c69fefa01c79f3e620dca18cd8ad4c9034db441037924ca75fd5a6d7f9217",
+              "function_ast_sha256": "1032265ca0ff716d65ce57bd8653f9bda3d63d838902440b57f5eb0d5fc94d0a",
               "assertions": [
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
                 "assert updated['original_result'] == roll.to_payload()['original_result']",
@@ -2661,7 +2661,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_non_charge_multiple_dice_rerolls_only_selected_component",
-              "function_ast_sha256": "1d4a1138367a05e40b8cd0421267b08cab18e0175b34fc9bc717081373ca4e31",
+              "function_ast_sha256": "9ba212c1b1049a769041e59a25e4159e69c297c461c72345f6a58514fb62eb7a",
               "assertions": [
                 "assert tuple((o.option_id for o in reroll.options)) == ('decline', 'reroll:0', 'reroll:1')",
                 "assert updated['rerolls'][0]['selected_indices'] == [selected]",
@@ -2671,7 +2671,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend",
-              "function_ast_sha256": "49f1d86100a868e46944f213a53dcf5252c45eea27bdac199edd455209c2861b",
+              "function_ast_sha256": "1e9f353af21fef16a8ca02cf2f116cc4b48ebcff61c56a0de68ed27b0f32784e",
               "assertions": [
                 "assert options == ()",
                 "assert state.to_payload() == before"
@@ -2687,7 +2687,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section15/test_reroll.py::test_every_adopted_command_reroll_class_resolves_the_recorded_roll",
-              "function_ast_sha256": "744c69fefa01c79f3e620dca18cd8ad4c9034db441037924ca75fd5a6d7f9217",
+              "function_ast_sha256": "1032265ca0ff716d65ce57bd8653f9bda3d63d838902440b57f5eb0d5fc94d0a",
               "assertions": [
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
                 "assert updated['original_result'] == roll.to_payload()['original_result']",
@@ -2699,7 +2699,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_non_charge_multiple_dice_rerolls_only_selected_component",
-              "function_ast_sha256": "1d4a1138367a05e40b8cd0421267b08cab18e0175b34fc9bc717081373ca4e31",
+              "function_ast_sha256": "9ba212c1b1049a769041e59a25e4159e69c297c461c72345f6a58514fb62eb7a",
               "assertions": [
                 "assert tuple((o.option_id for o in reroll.options)) == ('decline', 'reroll:0', 'reroll:1')",
                 "assert updated['rerolls'][0]['selected_indices'] == [selected]",
@@ -2709,7 +2709,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend",
-              "function_ast_sha256": "49f1d86100a868e46944f213a53dcf5252c45eea27bdac199edd455209c2861b",
+              "function_ast_sha256": "1e9f353af21fef16a8ca02cf2f116cc4b48ebcff61c56a0de68ed27b0f32784e",
               "assertions": [
                 "assert options == ()",
                 "assert state.to_payload() == before"
@@ -2725,7 +2725,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section15/test_reroll.py::test_every_adopted_command_reroll_class_resolves_the_recorded_roll",
-              "function_ast_sha256": "744c69fefa01c79f3e620dca18cd8ad4c9034db441037924ca75fd5a6d7f9217",
+              "function_ast_sha256": "1032265ca0ff716d65ce57bd8653f9bda3d63d838902440b57f5eb0d5fc94d0a",
               "assertions": [
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
                 "assert updated['original_result'] == roll.to_payload()['original_result']",
@@ -2737,7 +2737,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_non_charge_multiple_dice_rerolls_only_selected_component",
-              "function_ast_sha256": "1d4a1138367a05e40b8cd0421267b08cab18e0175b34fc9bc717081373ca4e31",
+              "function_ast_sha256": "9ba212c1b1049a769041e59a25e4159e69c297c461c72345f6a58514fb62eb7a",
               "assertions": [
                 "assert tuple((o.option_id for o in reroll.options)) == ('decline', 'reroll:0', 'reroll:1')",
                 "assert updated['rerolls'][0]['selected_indices'] == [selected]",
@@ -2747,7 +2747,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend",
-              "function_ast_sha256": "49f1d86100a868e46944f213a53dcf5252c45eea27bdac199edd455209c2861b",
+              "function_ast_sha256": "1e9f353af21fef16a8ca02cf2f116cc4b48ebcff61c56a0de68ed27b0f32784e",
               "assertions": [
                 "assert options == ()",
                 "assert state.to_payload() == before"
@@ -2763,7 +2763,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section15/test_reroll.py::test_every_adopted_command_reroll_class_resolves_the_recorded_roll",
-              "function_ast_sha256": "744c69fefa01c79f3e620dca18cd8ad4c9034db441037924ca75fd5a6d7f9217",
+              "function_ast_sha256": "1032265ca0ff716d65ce57bd8653f9bda3d63d838902440b57f5eb0d5fc94d0a",
               "assertions": [
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
                 "assert updated['original_result'] == roll.to_payload()['original_result']",
@@ -2775,7 +2775,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_non_charge_multiple_dice_rerolls_only_selected_component",
-              "function_ast_sha256": "1d4a1138367a05e40b8cd0421267b08cab18e0175b34fc9bc717081373ca4e31",
+              "function_ast_sha256": "9ba212c1b1049a769041e59a25e4159e69c297c461c72345f6a58514fb62eb7a",
               "assertions": [
                 "assert tuple((o.option_id for o in reroll.options)) == ('decline', 'reroll:0', 'reroll:1')",
                 "assert updated['rerolls'][0]['selected_indices'] == [selected]",
@@ -2785,7 +2785,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend",
-              "function_ast_sha256": "49f1d86100a868e46944f213a53dcf5252c45eea27bdac199edd455209c2861b",
+              "function_ast_sha256": "1e9f353af21fef16a8ca02cf2f116cc4b48ebcff61c56a0de68ed27b0f32784e",
               "assertions": [
                 "assert options == ()",
                 "assert state.to_payload() == before"
@@ -2801,7 +2801,7 @@
           "semantic_assertions": [
             {
               "node": "tests/rules/section15/test_reroll.py::test_every_adopted_command_reroll_class_resolves_the_recorded_roll",
-              "function_ast_sha256": "744c69fefa01c79f3e620dca18cd8ad4c9034db441037924ca75fd5a6d7f9217",
+              "function_ast_sha256": "1032265ca0ff716d65ce57bd8653f9bda3d63d838902440b57f5eb0d5fc94d0a",
               "assertions": [
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
                 "assert updated['original_result'] == roll.to_payload()['original_result']",
@@ -2813,7 +2813,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_non_charge_multiple_dice_rerolls_only_selected_component",
-              "function_ast_sha256": "1d4a1138367a05e40b8cd0421267b08cab18e0175b34fc9bc717081373ca4e31",
+              "function_ast_sha256": "9ba212c1b1049a769041e59a25e4159e69c297c461c72345f6a58514fb62eb7a",
               "assertions": [
                 "assert tuple((o.option_id for o in reroll.options)) == ('decline', 'reroll:0', 'reroll:1')",
                 "assert updated['rerolls'][0]['selected_indices'] == [selected]",
@@ -2823,7 +2823,7 @@
             },
             {
               "node": "tests/rules/section15/test_reroll.py::test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend",
-              "function_ast_sha256": "49f1d86100a868e46944f213a53dcf5252c45eea27bdac199edd455209c2861b",
+              "function_ast_sha256": "1e9f353af21fef16a8ca02cf2f116cc4b48ebcff61c56a0de68ed27b0f32784e",
               "assertions": [
                 "assert options == ()",
                 "assert state.to_payload() == before"
@@ -3583,7 +3583,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -3682,7 +3682,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -3781,7 +3781,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -3880,7 +3880,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -3979,7 +3979,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -4078,7 +4078,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -4266,7 +4266,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -4365,7 +4365,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -4464,7 +4464,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -4563,7 +4563,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -4662,7 +4662,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -4761,7 +4761,7 @@
             },
             {
               "node": "tests/rules/section15/test_mortals.py::test_explosives_advance_restriction_applies_even_with_a_shooting_permission",
-              "function_ast_sha256": "42a2b0325a7daa52d6c9b4307f3ef529cbfa09c03c6ba6fe724c4b98804bae8f",
+              "function_ast_sha256": "041f11e99dba90afd4361708d331b9451ed96675d145bd5ea91aefd931b4a349",
               "assertions": [
                 "assert explosives_effect_selections(state=state, context=context(state, TimingTriggerKind.DURING_PHASE), target_binding=binding(unit)) == ()",
                 "assert state.to_payload() == before"
@@ -4923,7 +4923,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -5005,7 +5005,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -5128,7 +5128,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -5210,7 +5210,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -5309,7 +5309,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-              "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+              "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
               "assertions": [
                 "assert hit.successful is (face == 6 if snap else face >= 4)",
                 "assert hit.critical is (False if snap else face >= 4)",
@@ -5320,7 +5320,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-              "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+              "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
               "assertions": [
                 "assert hit.successful is successful",
                 "assert hit.critical is False",
@@ -5387,7 +5387,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-              "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+              "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
               "assertions": [
                 "assert hit.successful is (face == 6 if snap else face >= 4)",
                 "assert hit.critical is (False if snap else face >= 4)",
@@ -5398,7 +5398,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-              "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+              "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
               "assertions": [
                 "assert hit.successful is successful",
                 "assert hit.critical is False",
@@ -5492,7 +5492,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-              "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+              "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
               "assertions": [
                 "assert hit.successful is (face == 6 if snap else face >= 4)",
                 "assert hit.critical is (False if snap else face >= 4)",
@@ -5503,7 +5503,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-              "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+              "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
               "assertions": [
                 "assert hit.successful is successful",
                 "assert hit.critical is False",
@@ -5640,7 +5640,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-              "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+              "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
               "assertions": [
                 "assert hit.successful is (face == 6 if snap else face >= 4)",
                 "assert hit.critical is (False if snap else face >= 4)",
@@ -5651,7 +5651,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-              "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+              "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
               "assertions": [
                 "assert hit.successful is successful",
                 "assert hit.critical is False",
@@ -5708,7 +5708,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-              "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+              "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
               "assertions": [
                 "assert hit.successful is (face == 6 if snap else face >= 4)",
                 "assert hit.critical is (False if snap else face >= 4)",
@@ -5719,7 +5719,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-              "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+              "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
               "assertions": [
                 "assert hit.successful is successful",
                 "assert hit.critical is False",
@@ -5776,7 +5776,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-              "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+              "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
               "assertions": [
                 "assert hit.successful is (face == 6 if snap else face >= 4)",
                 "assert hit.critical is (False if snap else face >= 4)",
@@ -5787,7 +5787,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-              "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+              "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
               "assertions": [
                 "assert hit.successful is successful",
                 "assert hit.critical is False",
@@ -5877,7 +5877,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-              "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+              "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
               "assertions": [
                 "assert hit.successful is (face == 6 if snap else face >= 4)",
                 "assert hit.critical is (False if snap else face >= 4)",
@@ -5888,7 +5888,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-              "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+              "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
               "assertions": [
                 "assert hit.successful is successful",
                 "assert hit.critical is False",
@@ -5945,7 +5945,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-              "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+              "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
               "assertions": [
                 "assert hit.successful is (face == 6 if snap else face >= 4)",
                 "assert hit.critical is (False if snap else face >= 4)",
@@ -5956,7 +5956,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-              "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+              "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
               "assertions": [
                 "assert hit.successful is successful",
                 "assert hit.critical is False",
@@ -6013,7 +6013,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-              "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+              "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
               "assertions": [
                 "assert hit.successful is (face == 6 if snap else face >= 4)",
                 "assert hit.critical is (False if snap else face >= 4)",
@@ -6024,7 +6024,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-              "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+              "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
               "assertions": [
                 "assert hit.successful is successful",
                 "assert hit.critical is False",
@@ -6081,7 +6081,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-              "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+              "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
               "assertions": [
                 "assert hit.successful is (face == 6 if snap else face >= 4)",
                 "assert hit.critical is (False if snap else face >= 4)",
@@ -6092,7 +6092,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-              "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+              "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
               "assertions": [
                 "assert hit.successful is successful",
                 "assert hit.critical is False",
@@ -6149,7 +6149,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-              "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+              "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
               "assertions": [
                 "assert hit.successful is (face == 6 if snap else face >= 4)",
                 "assert hit.critical is (False if snap else face >= 4)",
@@ -6160,7 +6160,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-              "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+              "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
               "assertions": [
                 "assert hit.successful is successful",
                 "assert hit.critical is False",
@@ -6217,7 +6217,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-              "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+              "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
               "assertions": [
                 "assert hit.successful is (face == 6 if snap else face >= 4)",
                 "assert hit.critical is (False if snap else face >= 4)",
@@ -6228,7 +6228,7 @@
             },
             {
               "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-              "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+              "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
               "assertions": [
                 "assert hit.successful is successful",
                 "assert hit.critical is False",
@@ -6566,7 +6566,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -6698,7 +6698,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -6830,7 +6830,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -6962,7 +6962,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -7094,7 +7094,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -7226,7 +7226,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -7358,7 +7358,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -7490,7 +7490,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -7656,7 +7656,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -7738,7 +7738,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -7820,7 +7820,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -7902,7 +7902,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_heroic_intervention_enters_real_charge_with_mode_chosen_before_roll",
-              "function_ast_sha256": "885a13fd69663f6e94b01f429a2967c4361ebdc588ee99260040d9542b453fea",
+              "function_ast_sha256": "d0e1c2d2f02be65f22cd6cfd44edb9dbacffe78983c0e764f8933820ce72f5f7",
               "assertions": [
                 "assert selection.decision_type == 'select_charging_unit'",
                 "assert unit in {o.option_id for o in selection.options}",
@@ -8167,7 +8167,7 @@
         },
         {
           "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-          "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+          "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
           "assertions": [
             "assert hit.successful is (face == 6 if snap else face >= 4)",
             "assert hit.critical is (False if snap else face >= 4)",
@@ -8178,7 +8178,7 @@
         },
         {
           "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-          "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+          "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
           "assertions": [
             "assert hit.successful is successful",
             "assert hit.critical is False",
@@ -8227,7 +8227,7 @@
         },
         {
           "node": "tests/rules/section15/test_snap_faqs.py::test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals",
-          "function_ast_sha256": "37eeb1a36902a024c04b17f5605ace6b1c1b3d66a748afcd8427131a7a8bace9",
+          "function_ast_sha256": "1166d526b67ab32f4519c5580b8582871be850339b4d3520030319d1b6413cdb",
           "assertions": [
             "assert hit.successful is (face == 6 if snap else face >= 4)",
             "assert hit.critical is (False if snap else face >= 4)",
@@ -8238,7 +8238,7 @@
         },
         {
           "node": "tests/rules/section15/test_snap_faqs.py::test_snap_unmodified_six_is_independent_of_roll_modifiers",
-          "function_ast_sha256": "93e5204c192997f15f14fde144e499ad4d21fb9b948a6464edd2572864c99157",
+          "function_ast_sha256": "94369fe2e9b78500957be7e36899c77b95c693204edfe21492d67a5b9a339160",
           "assertions": [
             "assert hit.successful is successful",
             "assert hit.critical is False",

@@ -176,7 +176,7 @@ def _resolve_denial(
     if evaluation.pending_status is not None:
         return evaluation.pending_status
     leadership = evaluation.leadership_target
-    roll = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
+    roll = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=2, sides=6),
             reason=f"Fall Back Leadership test for {target.unit_instance_id}",

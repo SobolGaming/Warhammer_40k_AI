@@ -15,6 +15,7 @@ from tests.phase11c_command_phase_helpers import (
     phase11c_config,
     unit_selection,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.detachment import DetachmentDefinition
@@ -85,6 +86,7 @@ def redeploy_session(
         for selection_id, datasheet_id, count in (("rangers", RANGERS, 5), ("yriel", YRIEL, 1))
     )
     config = GameConfig(
+        private_rng_seed=fixture_private_rng_seed("order127-catalog-redeploy"),
         game_id="order127-catalog-redeploy",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=runtime_ruleset_descriptor_for_mission_setup(

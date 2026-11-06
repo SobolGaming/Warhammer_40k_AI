@@ -30,7 +30,7 @@ def test_every_adopted_command_reroll_class_resolves_the_recorded_roll(
     session, state, unit, _ = checkpoint(section15_definitions, phase=BattlePhase.SHOOTING)
     decisions = session.lifecycle.decision_controller
     quantity = 2 if roll_type == "charge_roll" else 1
-    roll = DiceRollManager(state.game_id, event_log=decisions.event_log).roll_fixed(
+    roll = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).roll_fixed(
         DiceRollSpec(
             DiceExpression(quantity, 6),
             "constructed:s15:roll-boundary",
@@ -70,7 +70,7 @@ def test_non_charge_multiple_dice_rerolls_only_selected_component(
 ) -> None:
     session, state, unit, _ = checkpoint(section15_definitions, phase=BattlePhase.SHOOTING)
     roll = DiceRollManager(
-        state.game_id, event_log=session.lifecycle.decision_controller.event_log
+        state.private_rng_seed, event_log=session.lifecycle.decision_controller.event_log
     ).roll_fixed(
         DiceRollSpec(
             DiceExpression(2, 6),
@@ -126,7 +126,7 @@ def test_unlisted_enemy_and_snap_forbidden_rolls_have_no_offer_or_spend(
 
     session, state, unit, _ = checkpoint(section15_definitions)
     roll = DiceRollManager(
-        state.game_id, event_log=session.lifecycle.decision_controller.event_log
+        state.private_rng_seed, event_log=session.lifecycle.decision_controller.event_log
     ).roll_fixed(
         DiceRollSpec(
             DiceExpression(1, 6),

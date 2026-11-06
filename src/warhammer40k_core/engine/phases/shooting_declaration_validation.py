@@ -248,7 +248,7 @@ def _attack_pools_for_proposal(
         proposal=proposal,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
-        attack_count_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        attack_count_manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
         attack_count_scope_prefix=result_id,
         shooting_player_id=shooting_player_id,
         out_of_phase_state=out_of_phase_state,

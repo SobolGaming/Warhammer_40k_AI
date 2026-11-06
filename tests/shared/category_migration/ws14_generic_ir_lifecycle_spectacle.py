@@ -45,11 +45,13 @@ from tests.shared.category_migration.ws14_generic_ir_lifecycle_shared_lifecycle 
     _runtime_content_bundle,
     _state,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 
 
 def _spectacle_lifecycle_config() -> GameConfig:
     catalog = _spectacle_catalog()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("ws14-spectacle-of-slaughter-generic-ir-game"),
         game_id="ws14-spectacle-of-slaughter-generic-ir-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),

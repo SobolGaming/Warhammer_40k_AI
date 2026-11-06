@@ -37,6 +37,7 @@ from warhammer40k_core.engine import physical_proposal_context as _physical_cont
 from warhammer40k_core.engine import primary_mission_pending_request_integrity as _pmpri
 from warhammer40k_core.engine import primary_mission_restore_integrity as _pmri
 from warhammer40k_core.engine import primary_reserve_entry_lifecycle_integrity as _preli
+from warhammer40k_core.engine import private_randomness as _private_randomness
 from warhammer40k_core.engine import psychic_modifier_history_origin as _pmh
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine import target_replacement_dispatch as _target_replacement_dispatch
@@ -581,6 +582,10 @@ class GameLifecycle:
     _decision_dispatch_registry: DecisionDispatchRegistry = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
+        if self.state is not None and self._config is not None:
+            _private_randomness.validate_private_rng_seed_pair(
+                state_seed=self.state.private_rng_seed, config_seed=self._config.private_rng_seed
+            )
         if type(self.parameterized_movement_proposals) is not bool:
             raise GameLifecycleError(
                 "GameLifecycle parameterized_movement_proposals must be a bool."
@@ -2032,7 +2037,7 @@ class GameLifecycle:
                     result=result,
                     source_context=source_context,
                     dice_manager=DiceRollManager(
-                        state.game_id,
+                        state.private_rng_seed,
                         event_log=self.decision_controller.event_log,
                     ),
                     runtime_modifier_registry=runtime_bundle.runtime_modifier_registry,

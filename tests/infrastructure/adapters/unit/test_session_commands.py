@@ -272,7 +272,7 @@ def test_phase18f_well_formed_illegal_proposal_is_uncommitted_and_retryable() ->
     legal_payload = _deployment_payload_from_proposal(_field_object(projection, "pending_proposal"))
     illegal_payload = dict(legal_payload)
     illegal_payload["proposal_request_id"] = "phase18f-drifted-proposal-request"
-    revision = _session_revision(server, session_id=session_id)
+    revision = _session_revision(server, session_id=session_id, player_id=player_id)
     before = _authoritative_snapshot(server, session_id=session_id)
     command_id = "phase18f-illegal-proposal-submit"
 
@@ -364,7 +364,8 @@ def test_phase18f_recorded_invalid_retry_is_atomically_journaled() -> None:
         query={"viewer_player_id": player_id},
     )
     proposal = _field_object(proposal_view, "pending_proposal")
-    revision_before = _session_revision(server, session_id=session_id)
+    revision_before = _session_revision(server, session_id=session_id, player_id=player_id)
+    authority_revision_before = _session_revision(server, session_id=session_id)
     replay_before = _request(server, "GET", f"/sessions/{session_id}/replay")
     before_record_count = len(_field_list(replay_before, "decision_records"))
     envelope = _command_envelope(
@@ -408,10 +409,15 @@ def test_phase18f_recorded_invalid_retry_is_atomically_journaled() -> None:
     assert outcome["outcome_code"] == "proposal_invalid"
     assert outcome["committed"] is True
     assert outcome["accepted"] is False
+    assert _session_revision(server, session_id=session_id) == authority_revision_before + 1
     assert _field_int(_field_object(outcome, "session"), "session_revision") == (
-        revision_before + 1
+        _session_revision(server, session_id=session_id, player_id=player_id)
     )
+    assert _field_int(_field_object(outcome, "session"), "session_revision") > revision_before
     event_range = _field_object(outcome, "event_range")
+    assert _field_int(_field_object(outcome, "session"), "session_revision") == (
+        server.cursor_codec.decode(_field_string(event_range, "to_cursor")).visible_sequence
+    )
     assert _cursor_offset(server, _field_string(event_range, "to_cursor")) > _cursor_offset(
         server,
         _field_string(event_range, "from_cursor"),
@@ -602,7 +608,7 @@ def test_authenticated_http_movement_inventory_rejection_preserves_diagnostics_a
     proposal = _field_object(proposal_view, "pending_proposal")
 
     request_id = _field_string(proposal_request, "request_id")
-    revision = _session_revision(server, session_id=session_id)
+    revision = _session_revision(server, session_id=session_id, player_id=player_id)
     legal_witness = _invalid_distance_witness(
         projection=proposal_view, unit_instance_id=_field_string(proposal, "unit_instance_id")
     )
@@ -632,6 +638,7 @@ def test_authenticated_http_movement_inventory_rejection_preserves_diagnostics_a
     token = DEV_PLAYER_A_TOKEN if player_id == PLAYER_A else DEV_PLAYER_B_TOKEN
     before = _request(server, "GET", f"/sessions/{session_id}/replay")
     snapshot = _authoritative_snapshot(server, session_id=session_id)
+    authority_revision_before = _session_revision(server, session_id=session_id)
     http_server = _http_server(server)
     host, port = cast(tuple[str, int], http_server.server_address)
     thread = Thread(target=http_server.serve_forever, daemon=True)
@@ -685,7 +692,16 @@ def test_authenticated_http_movement_inventory_rejection_preserves_diagnostics_a
         assert status == 200
         assert accepted["accepted"] is True
         assert accepted["committed"] is True
-        assert _field_int(_field_object(accepted, "session"), "session_revision") == revision + 1
+        assert _session_revision(server, session_id=session_id) == (authority_revision_before + 1)
+        public_revision = _field_int(_field_object(accepted, "session"), "session_revision")
+        assert public_revision == _session_revision(
+            server, session_id=session_id, player_id=player_id
+        )
+        event_range = _field_object(accepted, "event_range")
+        before_cursor = server.cursor_codec.decode(_field_string(event_range, "from_cursor"))
+        after_cursor = server.cursor_codec.decode(_field_string(event_range, "to_cursor"))
+        assert before_cursor.visible_sequence == revision
+        assert public_revision == after_cursor.visible_sequence > revision
         after = _request(server, "GET", f"/sessions/{session_id}/replay")
         server.principal_registry = replace(
             server.principal_registry,
@@ -832,7 +848,8 @@ def test_command_fork_isolates_live_owners_without_reexporting_retained_history(
         assert fork.command_journal[command_id] is entry
 
     pending = _pending_decision_for_any_player(server, session_id=session_id)
-    fork.adapter_session.submit_option(
+    fork.adapter_session.submit_viewer_option(
+        viewer=ViewerContext.for_player(_field_string(pending, "actor_id")),
         request_id=_field_string(pending, "request_id"),
         option_id=_first_option_id(pending),
         result_id="trusted-command-fork-result",

@@ -7121,7 +7121,7 @@
       ],
       "measurement_overlays": [],
       "path_overlays": [],
-      "request_id": "decision-request-000007",
+      "request_id": "view-request-df438bd51d50b1b79010d1873ac47ccd25e2f0dc60b656c3fa412f6b1e7dac8b",
       "selected_or_acting_entity_ids": []
     },
     "render": {
@@ -15080,8 +15080,8 @@
       "phase": "movement",
       "source_rule_id": "gw-11e-core-rules:movement-phase:move-units-step"
     },
-    "request_id": "decision-request-000007",
-    "schema_version": "decision-request-view-v5-phase17n-step4"
+    "request_id": "view-request-df438bd51d50b1b79010d1873ac47ccd25e2f0dc60b656c3fa412f6b1e7dac8b",
+    "schema_version": "decision-request-view-v6-viewer-identities"
   },
   "pending_proposal": null,
   "player_ids": [
@@ -15138,8 +15138,8 @@
       "source_id": "ui-contract-post-deployment:primary-rules-unit-turn-start:round-01:player-a"
     }
   ],
-  "projection_schema": "game-view-v13-random-profiles",
-  "projection_state_hash": "b315aff3d402f507b3fffd59a3860c5104611533e593bef22066050d8a5b2093",
+  "projection_schema": "game-view-v14-viewer-identities",
+  "projection_state_hash": "b757b789059c94d8f0d942752f447f2d59141bdcf0a38d07a1482da2a922120e",
   "public_army_rosters": [
     {
       "army_id": "army-alpha",

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+from tests.support.private_randomness import fixture_private_rng_seed
+
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, WarlordSelection
 from warhammer40k_core.engine.army_points import calculate_mfm_army_points
@@ -110,6 +112,7 @@ def native_session(
         defender_force_disposition_id="purge-the-foe",
     )
     config = GameConfig(
+        private_rng_seed=fixture_private_rng_seed(seed),
         game_id=seed,
         ruleset_descriptor=runtime_ruleset_descriptor_for_mission_setup(
             mission, rules_overlay_ids=()

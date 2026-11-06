@@ -5,6 +5,7 @@ from typing import cast
 
 import pytest
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine import (
@@ -196,6 +197,7 @@ def _battle_state_with_scenario(
     )
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     state = GameState(
+        private_rng_seed=fixture_private_rng_seed("tracked-target-game"),
         game_id="tracked-target-game",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,

@@ -356,7 +356,7 @@ def prepare_melee_commitment(
             decision_request=request,
             payload={"phase": "fight", "phase_body_status": "melee_weapon_commitment_required"},
         )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     budgets: list[MeleeAttackBudget] = []
     for row in chosen_rows(rows, records):
         profile = weapon_profile(row)

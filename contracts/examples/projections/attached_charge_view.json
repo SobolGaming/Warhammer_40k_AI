@@ -1209,7 +1209,7 @@
       "legal_candidate_refs": [],
       "measurement_overlays": [],
       "path_overlays": [],
-      "request_id": "decision-request-000004",
+      "request_id": "view-request-252c954675486175a80422e69ec189a9f0af6e6b29f87a9dca59ff3ec85872a7",
       "selected_or_acting_entity_ids": [
         "attached-unit:army-alpha:source"
       ]
@@ -5593,7 +5593,7 @@
               ],
               "final_value": 12,
               "intrinsic_offset": 0,
-              "modified_value": 21,
+              "modified_value": 13,
               "modifiers": [
                 {
                   "modifier_id": "attached-roll-bonus",
@@ -5603,16 +5603,16 @@
                   "source_id": "source:attached-roll-bonus:clause:attached-roll-bonus:modify_dice_roll"
                 }
               ],
-              "unbounded_value": 21,
+              "unbounded_value": 13,
               "unmodified": {
                 "component_values": [
-                  5,
-                  6
+                  1,
+                  2
                 ],
                 "result_override": null,
-                "roll_id": "roll-000001",
+                "roll_id": "view-roll-8c10720cd31bc0bbe02726ba4877ae4262f7a73c7ae41e2c5b2178ea25312473",
                 "roll_type": "charge_roll",
-                "value": 11
+                "value": 3
               }
             },
             "move_available": true,
@@ -5625,7 +5625,7 @@
                 ],
                 "final_value": 12,
                 "intrinsic_offset": 0,
-                "modified_value": 21,
+                "modified_value": 13,
                 "modifiers": [
                   {
                     "modifier_id": "attached-roll-bonus",
@@ -5635,16 +5635,16 @@
                     "source_id": "source:attached-roll-bonus:clause:attached-roll-bonus:modify_dice_roll"
                   }
                 ],
-                "unbounded_value": 21,
+                "unbounded_value": 13,
                 "unmodified": {
                   "component_values": [
-                    5,
-                    6
+                    1,
+                    2
                   ],
                   "result_override": null,
-                  "roll_id": "roll-000001",
+                  "roll_id": "view-roll-8c10720cd31bc0bbe02726ba4877ae4262f7a73c7ae41e2c5b2178ea25312473",
                   "roll_type": "charge_roll",
-                  "value": 11
+                  "value": 3
                 }
               },
               "roll_limit": null
@@ -5656,7 +5656,7 @@
               "battle_round": 1,
               "game_id": "order47-attached",
               "player_id": "player-a",
-              "request_id": "charge-roll:order47-attached-select",
+              "request_id": "view-request-2c668be9aa22a6f14bb5e12a326aac41823c6c2491801c839e2949d0998c3685",
               "roll_modifiers": [
                 {
                   "modifier_id": "attached-roll-bonus",
@@ -5666,8 +5666,8 @@
                   "source_id": "source:attached-roll-bonus:clause:attached-roll-bonus:modify_dice_roll"
                 }
               ],
-              "source_decision_request_id": "decision-request-000001",
-              "source_decision_result_id": "order47-attached-select",
+              "source_decision_request_id": "view-request-4c06766b89fc19fc768493aba8e6b1f123c91e609b8b8c0d9d7740a4a44a7a8c",
+              "source_decision_result_id": "view-result-235a99875292d016d15e3701e98b10c84cbe2e790e1d8d3cf118d440ead19022",
               "spec": {
                 "actor_id": "player-a",
                 "expression": {
@@ -5683,13 +5683,13 @@
               "unit_instance_id": "attached-unit:army-alpha:source"
             },
             "roll_state": {
-              "current_total": 11,
+              "current_total": 3,
               "current_values": [
-                5,
-                6
+                1,
+                2
               ],
               "original_result": {
-                "roll_id": "roll-000001",
+                "roll_id": "view-roll-8c10720cd31bc0bbe02726ba4877ae4262f7a73c7ae41e2c5b2178ea25312473",
                 "source": "rng",
                 "spec": {
                   "actor_id": "player-a",
@@ -5702,10 +5702,10 @@
                   "reroll_forbidden_rule_ids": [],
                   "roll_type": "charge_roll"
                 },
-                "total": 11,
+                "total": 3,
                 "values": [
-                  5,
-                  6
+                  1,
+                  2
                 ]
               },
               "rerolls": [],
@@ -5724,7 +5724,7 @@
               ],
               "final_value": 12,
               "intrinsic_offset": 0,
-              "modified_value": 21,
+              "modified_value": 13,
               "modifiers": [
                 {
                   "modifier_id": "attached-roll-bonus",
@@ -5734,16 +5734,16 @@
                   "source_id": "source:attached-roll-bonus:clause:attached-roll-bonus:modify_dice_roll"
                 }
               ],
-              "unbounded_value": 21,
+              "unbounded_value": 13,
               "unmodified": {
                 "component_values": [
-                  5,
-                  6
+                  1,
+                  2
                 ],
                 "result_override": null,
-                "roll_id": "roll-000001",
+                "roll_id": "view-roll-8c10720cd31bc0bbe02726ba4877ae4262f7a73c7ae41e2c5b2178ea25312473",
                 "roll_type": "charge_roll",
-                "value": 11
+                "value": 3
               }
             },
             "roll_limit": null
@@ -5757,8 +5757,8 @@
           ],
           "source_selected_option_id": "attached-unit:army-alpha:source",
           "target_selection": {
-            "request_id": "decision-request-000003",
-            "result_id": "order46-targets",
+            "request_id": "view-request-edcdf6f4c2895d3921f23559167444a2bbf6a5afc156489b3ef99327cd09b1fe",
+            "result_id": "view-result-98af1c9daf686c4bd0ff47299b9559c95e0d4c702fca9f01b7df86733ab81afa",
             "target_ids": [
               "army-beta:enemy"
             ],
@@ -5771,15 +5771,15 @@
         "phase": "charge",
         "placement_kinds": [],
         "proposal_kind": "charge_move",
-        "request_id": "decision-request-000004",
-        "source_decision_request_id": "decision-request-000001",
-        "source_decision_result_id": "order47-attached-select",
+        "request_id": "view-request-252c954675486175a80422e69ec189a9f0af6e6b29f87a9dca59ff3ec85872a7",
+        "source_decision_request_id": "view-request-4c06766b89fc19fc768493aba8e6b1f123c91e609b8b8c0d9d7740a4a44a7a8c",
+        "source_decision_result_id": "view-result-235a99875292d016d15e3701e98b10c84cbe2e790e1d8d3cf118d440ead19022",
         "spatial_context_hash": "93f683e750aec0e897c7d87da773eddb7fa7f8f376206065f577ef4bc7cc2181",
         "unit_instance_id": "attached-unit:army-alpha:source"
       }
     },
-    "request_id": "decision-request-000004",
-    "schema_version": "decision-request-view-v5-phase17n-step4"
+    "request_id": "view-request-252c954675486175a80422e69ec189a9f0af6e6b29f87a9dca59ff3ec85872a7",
+    "schema_version": "decision-request-view-v6-viewer-identities"
   },
   "pending_proposal": {
     "actor_id": "player-a",
@@ -5793,7 +5793,7 @@
           ],
           "final_value": 12,
           "intrinsic_offset": 0,
-          "modified_value": 21,
+          "modified_value": 13,
           "modifiers": [
             {
               "modifier_id": "attached-roll-bonus",
@@ -5803,16 +5803,16 @@
               "source_id": "source:attached-roll-bonus:clause:attached-roll-bonus:modify_dice_roll"
             }
           ],
-          "unbounded_value": 21,
+          "unbounded_value": 13,
           "unmodified": {
             "component_values": [
-              5,
-              6
+              1,
+              2
             ],
             "result_override": null,
-            "roll_id": "roll-000001",
+            "roll_id": "view-roll-8c10720cd31bc0bbe02726ba4877ae4262f7a73c7ae41e2c5b2178ea25312473",
             "roll_type": "charge_roll",
-            "value": 11
+            "value": 3
           }
         },
         "move_available": true,
@@ -5825,7 +5825,7 @@
             ],
             "final_value": 12,
             "intrinsic_offset": 0,
-            "modified_value": 21,
+            "modified_value": 13,
             "modifiers": [
               {
                 "modifier_id": "attached-roll-bonus",
@@ -5835,16 +5835,16 @@
                 "source_id": "source:attached-roll-bonus:clause:attached-roll-bonus:modify_dice_roll"
               }
             ],
-            "unbounded_value": 21,
+            "unbounded_value": 13,
             "unmodified": {
               "component_values": [
-                5,
-                6
+                1,
+                2
               ],
               "result_override": null,
-              "roll_id": "roll-000001",
+              "roll_id": "view-roll-8c10720cd31bc0bbe02726ba4877ae4262f7a73c7ae41e2c5b2178ea25312473",
               "roll_type": "charge_roll",
-              "value": 11
+              "value": 3
             }
           },
           "roll_limit": null
@@ -5856,7 +5856,7 @@
           "battle_round": 1,
           "game_id": "order47-attached",
           "player_id": "player-a",
-          "request_id": "charge-roll:order47-attached-select",
+          "request_id": "view-request-2c668be9aa22a6f14bb5e12a326aac41823c6c2491801c839e2949d0998c3685",
           "roll_modifiers": [
             {
               "modifier_id": "attached-roll-bonus",
@@ -5866,8 +5866,8 @@
               "source_id": "source:attached-roll-bonus:clause:attached-roll-bonus:modify_dice_roll"
             }
           ],
-          "source_decision_request_id": "decision-request-000001",
-          "source_decision_result_id": "order47-attached-select",
+          "source_decision_request_id": "view-request-4c06766b89fc19fc768493aba8e6b1f123c91e609b8b8c0d9d7740a4a44a7a8c",
+          "source_decision_result_id": "view-result-235a99875292d016d15e3701e98b10c84cbe2e790e1d8d3cf118d440ead19022",
           "spec": {
             "actor_id": "player-a",
             "expression": {
@@ -5883,13 +5883,13 @@
           "unit_instance_id": "attached-unit:army-alpha:source"
         },
         "roll_state": {
-          "current_total": 11,
+          "current_total": 3,
           "current_values": [
-            5,
-            6
+            1,
+            2
           ],
           "original_result": {
-            "roll_id": "roll-000001",
+            "roll_id": "view-roll-8c10720cd31bc0bbe02726ba4877ae4262f7a73c7ae41e2c5b2178ea25312473",
             "source": "rng",
             "spec": {
               "actor_id": "player-a",
@@ -5902,10 +5902,10 @@
               "reroll_forbidden_rule_ids": [],
               "roll_type": "charge_roll"
             },
-            "total": 11,
+            "total": 3,
             "values": [
-              5,
-              6
+              1,
+              2
             ]
           },
           "rerolls": [],
@@ -5924,7 +5924,7 @@
           ],
           "final_value": 12,
           "intrinsic_offset": 0,
-          "modified_value": 21,
+          "modified_value": 13,
           "modifiers": [
             {
               "modifier_id": "attached-roll-bonus",
@@ -5934,16 +5934,16 @@
               "source_id": "source:attached-roll-bonus:clause:attached-roll-bonus:modify_dice_roll"
             }
           ],
-          "unbounded_value": 21,
+          "unbounded_value": 13,
           "unmodified": {
             "component_values": [
-              5,
-              6
+              1,
+              2
             ],
             "result_override": null,
-            "roll_id": "roll-000001",
+            "roll_id": "view-roll-8c10720cd31bc0bbe02726ba4877ae4262f7a73c7ae41e2c5b2178ea25312473",
             "roll_type": "charge_roll",
-            "value": 11
+            "value": 3
           }
         },
         "roll_limit": null
@@ -5957,8 +5957,8 @@
       ],
       "source_selected_option_id": "attached-unit:army-alpha:source",
       "target_selection": {
-        "request_id": "decision-request-000003",
-        "result_id": "order46-targets",
+        "request_id": "view-request-edcdf6f4c2895d3921f23559167444a2bbf6a5afc156489b3ef99327cd09b1fe",
+        "result_id": "view-result-98af1c9daf686c4bd0ff47299b9559c95e0d4c702fca9f01b7df86733ab81afa",
         "target_ids": [
           "army-beta:enemy"
         ],
@@ -5971,9 +5971,9 @@
     "phase": "charge",
     "placement_kinds": [],
     "proposal_kind": "charge_move",
-    "request_id": "decision-request-000004",
-    "source_decision_request_id": "decision-request-000001",
-    "source_decision_result_id": "order47-attached-select",
+    "request_id": "view-request-252c954675486175a80422e69ec189a9f0af6e6b29f87a9dca59ff3ec85872a7",
+    "source_decision_request_id": "view-request-4c06766b89fc19fc768493aba8e6b1f123c91e609b8b8c0d9d7740a4a44a7a8c",
+    "source_decision_result_id": "view-result-235a99875292d016d15e3701e98b10c84cbe2e790e1d8d3cf118d440ead19022",
     "spatial_context_hash": "93f683e750aec0e897c7d87da773eddb7fa7f8f376206065f577ef4bc7cc2181",
     "unit_instance_id": "attached-unit:army-alpha:source"
   },
@@ -5987,8 +5987,8 @@
     "markers": []
   },
   "primary_rules_unit_turn_start_snapshots": [],
-  "projection_schema": "game-view-v13-random-profiles",
-  "projection_state_hash": "f2b19727e449870e8dab084c712ab0a2699d302aa0ca0bf94d97c095542863bd",
+  "projection_schema": "game-view-v14-viewer-identities",
+  "projection_state_hash": "6afb186105fbb6fe7b80b4c869e8c8c20bac0faaa7e4a3c863994c973f73db67",
   "public_army_rosters": [
     {
       "army_id": "army-alpha",

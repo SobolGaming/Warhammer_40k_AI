@@ -1884,7 +1884,7 @@ def apply_transport_hazard_mortal_wound_feel_no_pain_decision(
         raise GameLifecycleError("Transport hazard Feel No Pain requires mortal wound context.")
     source_context = mortal_wound_resolution_source_context(request)
     disembark = _transport_hazard_disembark_from_source_context(source_context)
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     routed = resolve_mortal_wound_decision(
         state=state,
         decisions=decisions,

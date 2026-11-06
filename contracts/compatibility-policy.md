@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`45.1.0`, declared in `openapi.yaml`, `manifest.json`, and
+`46.0.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -27,8 +27,8 @@ The pull-request contract audit performs three independent checks:
    contract requires a major increase. This preserves compatible additions
    made anywhere in the current major line.
 2. The proposed contract is compared with the oldest committed baseline for
-   its current major, currently `compatibility/45.0.0-shape.json`. Breaking
-   changes are rejected while the bundle major remains `45`, preserving the
+   its current major, currently `compatibility/46.0.0-shape.json`. Breaking
+   changes are rejected while the bundle major remains `46`, preserving the
    original clients for the full supported major. The immutable 1.0.0,
    2.0.0, 3.0.0, 4.0.0, 5.0.0, 6.0.0, 7.0.0, 8.0.0, 9.0.0, 10.0.0, 11.0.0, 12.0.0,
    13.0.0, 14.0.0, 15.0.0, 16.0.0, 17.0.0, 18.0.0, 19.0.0 and 20.0.0 baselines
@@ -47,6 +47,15 @@ payload-family version changes, migration notes, and old-client support window
 must be reviewed in the same change.
 
 ## Support window
+
+Contract 46 also scopes request/reference identities, revisions, activity metadata
+and cursor retention to each viewer. See [migration 45 to 46](migrations/45-to-46.md).
+Contract 46 separates private game randomness from public identity. The required
+operator seed is a breaking creation/persistence change; dice and tactical-card
+draws now use it. Retain 45.x deployments through at least 2027-11-06 and one
+released 46.x minor line, whichever is later. Legacy saves/replays remain bound
+to their matching runtime. There is no automatic reseeding migration: a missing
+private seed is rejected, and existing artifacts are not rewritten or deleted.
 
 Contract 45 publishes `error-envelope-v2-diagnostics`, a closed error union with
 optional owner-only diagnostic codes and fields. This is a major release because

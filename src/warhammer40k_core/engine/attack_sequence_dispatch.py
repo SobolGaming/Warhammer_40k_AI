@@ -79,7 +79,7 @@ def resolve_attack_sequence_until_blocked(
     allocated_model_ids = already_allocated_model_ids
     current = attack_sequence
     manager = (
-        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
         if dice_manager is None
         else dice_manager
     )

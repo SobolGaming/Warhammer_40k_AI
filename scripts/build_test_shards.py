@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import stat
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
@@ -354,6 +355,23 @@ def validate_acts_inactive_source(root: Path) -> None:
             raise SystemExit("Acts inactive API successor/preimage changed.")
 
 
+def validate_private_rng_inactive_source(root: Path, before: dict[str, object]) -> None:
+    """Permit six fixture seed/draw pairs; preserve every native source byte."""
+    path = root / "tests/unit/test_phase11e_mission_scoring_cleanup.py"
+    _selection_no_links(root, path)
+    raw, count = re.subn(
+        rb'(?m)^([ ]+)private_rng_seed="f0" \* 32,\r?\n\1draw_id="fixture-draw",\r?\n',
+        b"",
+        path.read_bytes(),
+    )
+    if (
+        count != 6
+        or len(raw) != before["bytes"]
+        or hashlib.sha256(raw).hexdigest() != before["sha256"]
+    ):
+        raise SystemExit("Private RNG inactive API maintenance changed native test semantics.")
+
+
 def behavioral_selection(root: Path) -> BehavioralSelection:
     """Fresh finite cutover admission shared by pytest and shard discovery."""
     root = root.resolve(strict=True)
@@ -426,6 +444,9 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     retained = _selection_members(value["retained_active_files"], root)
     updates = value["inactive_updates"]
     allowed_updates = {
+        "tests/unit/test_phase11e_mission_scoring_cleanup.py": (
+            "explicit-private-tactical-draw-seed-v1"
+        ),
         "tests/unit/test_phase17g_adepta_sororitas_army_rule.py": "acts-turn-api-maintenance-v1",
         "tests/unit/test_phase15c_fight_order.py": "add-pending-decision-requests-v1",
         "tests/unit/test_phase13b_shooting_declarations.py": "add-pending-decision-requests-v1",
@@ -445,6 +466,8 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
         ):
             raise SystemExit("Inactive update native preimage/recipe changed.")
         current.update(_selection_members({name: update["after"]}, root))
+        if update["recipe"] == "explicit-private-tactical-draw-seed-v1":
+            validate_private_rng_inactive_source(root, update["before"])
     if "tests/unit/test_phase17g_adepta_sororitas_army_rule.py" in current:
         validate_acts_inactive_source(root)
     retired = _selection_retirements(root, value["retirements"], value["inactive_legacy_files"])

@@ -22,6 +22,27 @@ ROOT = Path(__file__).resolve().parents[2]
 ORIGINAL = "tests/unit/test_phase11e_mission_scoring_cleanup.py"
 
 
+def test_private_seed_inactive_api_maintenance_preserves_native_source(tmp_path: Path) -> None:
+    from scripts.build_test_shards import validate_private_rng_inactive_source
+
+    native = b"native_test_body = 1\r\n"
+    added = b'        private_rng_seed="f0" * 32,\r\n        draw_id="fixture-draw",\r\n'
+    target = tmp_path / ORIGINAL
+    target.parent.mkdir(parents=True)
+    before: dict[str, object] = {
+        "bytes": len(native),
+        "sha256": hashlib.sha256(native).hexdigest(),
+    }
+    target.write_bytes(added * 6 + native)
+    validate_private_rng_inactive_source(tmp_path, before)
+    target.write_bytes(added * 6 + native.replace(b"= 1", b"= 2"))
+    with pytest.raises(SystemExit, match="native test semantics"):
+        validate_private_rng_inactive_source(tmp_path, before)
+    target.write_bytes(added.replace(b'"f0"', b'"f1"') * 6 + native)
+    with pytest.raises(SystemExit, match="native test semantics"):
+        validate_private_rng_inactive_source(tmp_path, before)
+
+
 def _manifest() -> migration.MigrationManifest:
     return cast(migration.MigrationManifest, json.loads((ROOT / migration.MANIFEST).read_bytes()))
 

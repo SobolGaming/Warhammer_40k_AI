@@ -171,6 +171,28 @@ measurements and the separate Order103 numerical recognition remain unchanged.
 Future orders cannot inherit this exact-base authentication; assess their own
 scope under the owner's direction and carry that maintenance into the handoff.
 
+### Private RNG boundary applicability
+
+`private-rng-smoke-scope.json` authenticates the complete changed files and owners
+against base `2b640ffca912f72d74e3b08cec0c0c4b12ce776a`. Under the standing bounded
+rule-repair policy, only its exact seed-source substitutions, deterministic fixture
+inputs, measurement configuration injection and derived schema identity use smoke
+in place of unrelated detailed families. Mandatory registrations, historical
+evidence and every live semantic/work/cache check remain required. Base, file,
+owner, hash or category drift restores the original selectors. Cache and
+serialization operations receive no exemption.
+
+Serializer reconstruction retains all six original checkpoints/operations and
+seven samples through `measure_private_rng_reconstruction.py`. Both arms load the
+same explicit configuration bytes through their native loaders: the baseline
+ignores the new private seed field and the current runtime consumes it. No dice
+are rolled in this workload. The original driver and historical measurements
+remain unchanged. Tactical keyed-HMAC draws and occurrence sequencing have their
+own matched native-operation workload, with single-card, two-card and full-deck
+cases. This new family has no prior historical timing report; its driver reference
+identifies workload provenance only. Neither workload establishes full-game
+coverage or performance.
+
 ### Single owner-approved Order103 failure
 
 On 2026-10-02 at 11:20:34 UTC the owner approved delivery recognition of
@@ -379,3 +401,13 @@ The 260-case list remains finite and code-pinned. These include adversarial chec
 of retained historical helpers; they are not passing results. Keep helper code,
 active production and preflight/postflight validators, 1,848 active quality checks
 and all 4,886 selected gameplay cases. No additional omission is authorized.
+
+The current `native-player-boundary-v1` matched workload measures player
+projection, visible event export, metadata, finite command submission, full strict
+server restoration and retained cursor requests on identical native config bytes.
+It includes the actual public roster projection; this replaces the current
+projection owner's earlier indirect roster/source-reuse family selection. Retained
+historical reports and their original applicability are unchanged. The seven
+samples per case use the existing relative budget and record native outcomes;
+the older base's hidden-choice behavior is a cost comparison, not a privacy oracle.
+This is component evidence and does not certify complete games.

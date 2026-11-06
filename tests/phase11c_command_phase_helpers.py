@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -445,6 +446,7 @@ def phase11c_config(
 ) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed(game_id),
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=ruleset(),

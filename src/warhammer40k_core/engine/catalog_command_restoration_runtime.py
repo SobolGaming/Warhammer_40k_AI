@@ -562,7 +562,7 @@ def _roll_restoration_d3(
 
     if type(state) is not GameState:
         raise GameLifecycleError("Catalog command restoration roll requires GameState.")
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     roll_state = manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),

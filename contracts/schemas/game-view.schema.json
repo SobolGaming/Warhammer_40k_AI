@@ -869,7 +869,7 @@
       "type": "string"
     },
     "mission_setup": {
-      "$ref": "https://warhammer40k-core.local/contracts/v3/create-session.schema.json#/properties/config/properties/mission_setup"
+      "$ref": "https://warhammer40k-core.local/contracts/v4/create-session.schema.json#/properties/config/properties/mission_setup"
     },
     "model_display_by_id": {
       "additionalProperties": {
@@ -915,7 +915,7 @@
       "uniqueItems": true
     },
     "projection_schema": {
-      "const": "game-view-v13-random-profiles",
+      "const": "game-view-v14-viewer-identities",
       "minLength": 1,
       "type": "string"
     },

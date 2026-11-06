@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 from pathlib import Path
 
@@ -589,3 +590,43 @@ def test_aeldari_source_smoke_scope_requires_exact_bindings_and_fails_closed(
                     ValueError, match=r"performance fields|JSON object|exact file|sole exact"
                 ):
                     recognize(base=base, path=path, category="rule_semantics", change=change)
+
+
+def test_private_rng_smoke_scope_is_exact_and_preserves_serializer_and_cache_gates() -> None:
+    from tools import performance_private_randomness as scope
+
+    record = scope._scope()  # pyright: ignore[reportPrivateUsage]
+    for path, operations in scope.OPERATIONS.items():
+        change = record["changes"][path]
+        expected = frozenset(operations)
+        recognize = scope.private_randomness_smoke_operations
+        assert (
+            recognize(base=scope.BASE, path=path, category="rule_semantics", change=change)
+            == expected
+        )
+        assert not any("serialization" in key or "cache" in key for key in expected)
+        for base, requested_path, category in (
+            ("0" * 40, path, "rule_semantics"),
+            (scope.BASE, "unreviewed.py", "rule_semantics"),
+            (scope.BASE, path, "cache_policy"),
+            (scope.BASE, path, "serialization_or_replay_work"),
+        ):
+            assert not recognize(base=base, path=requested_path, category=category, change=change)
+        for field in ("before_sha256", "after_sha256", "owners"):
+            drift = {**change, field: None}
+            assert not recognize(
+                base=scope.BASE, path=path, category="rule_semantics", change=drift
+            )
+        owners = dict(change["owners"])
+        owners["unreviewed-owner"] = {"before": None, "after": "0" * 64}
+        assert not recognize(
+            base=scope.BASE,
+            path=path,
+            category="rule_semantics",
+            change={**change, "owners": owners},
+        )
+    policy = (Path(scope.__file__).with_name("performance_policy.py")).read_bytes()
+    predecessor = scope.private_randomness_policy_predecessor(policy)
+    assert hashlib.sha256(predecessor).hexdigest() == scope.PRIOR_POLICY_SHA256
+    with pytest.raises(ValueError, match="successor drifted"):
+        scope.private_randomness_policy_predecessor(policy + b"# unrelated change\n")

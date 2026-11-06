@@ -100,7 +100,7 @@ def continue_completed_fight_attack_sequence(
         AttackSequenceCompletedContext(
             state=state,
             decisions=decisions,
-            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            dice_manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
             runtime_modifier_registry=runtime_modifier_registry,
             source_phase=BattlePhase.FIGHT,
             attack_sequence=completed_sequence,

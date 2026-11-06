@@ -42,7 +42,7 @@ def test_native_torrent_hits_without_damage_require_target_choice(
             selection(native_definitions, "000000612", "other"),
         ),
         phase=BattlePhase.SHOOTING,
-        seed="mandiblasters-lhykhis-control",
+        seed="mandiblasters-lhykhis-control-private-6",
     )
     locate(s, "foe:walkers", (Pose.at(19, 10),))
     anchor(s)
@@ -362,7 +362,12 @@ def test_native_source_last_killed_target_has_no_selection(
     from tests.factions.aeldari.lhykhis_helpers import declare_web, drive_to, web_scene
     from tests.support.faction_batch01 import events
 
-    s = web_scene(native_definitions, attached=True, seed="native-web-attached")
+    s = web_scene(
+        native_definitions,
+        attached=True,
+        seed="native-web-attached",
+        rng_seed_label="native-web-attached-private-screen-1526",
+    )
     declare_web(s, attached=True)
     r = drive_to(s, {CHOICE, "select_shooting_unit"}, source_first=False)
     assert r.decision_type == "select_shooting_unit"
@@ -506,7 +511,7 @@ def test_native_source_death_does_not_revoke_existing_turn_grant(
 ) -> None:
     from tests.factions.aeldari.lhykhis_helpers import assert_native_source_loss
 
-    assert_native_source_loss(native_definitions, seed="native-web-charge-4")
+    assert_native_source_loss(native_definitions, seed="native-web-charge-4-private-4")
 
 
 @pytest.mark.parametrize(
@@ -567,7 +572,7 @@ def test_final_model_and_unit_candidates_share_core_sequencing(
     context = AttackSequenceCompletedContext(
         s.state,
         decisions,
-        DiceRollManager(s.state.game_id, event_log=decisions.event_log),
+        DiceRollManager(s.state.private_rng_seed, event_log=decisions.event_log),
         bundle.runtime_modifier_registry,
         BattlePhase.SHOOTING,
         sequence,

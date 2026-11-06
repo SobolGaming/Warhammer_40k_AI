@@ -76,7 +76,13 @@ def validate_surge_history(*, state: GameState, decisions: DecisionController) -
             cast(TriggeredMovementDescriptorPayload, context["descriptor"])
         )
         if is_triggered_movement_proposal_request(record.request):
-            validate_surge_selection_chain(decisions, context, descriptor, request=record.request)
+            validate_surge_selection_chain(
+                decisions,
+                context,
+                descriptor,
+                request=record.request,
+                private_rng_seed=state.private_rng_seed,
+            )
         if (
             payload.get("source_rule_id") != descriptor.source_rule_id
             or payload.get("trigger_timing") != descriptor.trigger_timing.to_payload()

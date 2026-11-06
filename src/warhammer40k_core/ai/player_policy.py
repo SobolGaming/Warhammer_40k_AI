@@ -7,7 +7,11 @@ import json
 from dataclasses import dataclass
 from typing import Protocol, cast
 
-from warhammer40k_core.adapters.projection import DecisionRequestViewPayload, GameViewPayload
+from warhammer40k_core.adapters.projection import (
+    PROJECTION_SCHEMA_VERSION,
+    DecisionRequestViewPayload,
+    GameViewPayload,
+)
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 
 
@@ -86,6 +90,14 @@ class PlayerDecisionContext:
 
     def __post_init__(self) -> None:
         view = self.observation
+        if (
+            set(view) - set(GameViewPayload.__annotations__)
+            or view["projection_schema"] != PROJECTION_SCHEMA_VERSION
+        ):
+            raise PolicyError("Policy context contains an unknown projection shape or field.")
+        pending = view["pending_decision"]
+        if pending is not None and set(pending) - set(DecisionRequestViewPayload.__annotations__):
+            raise PolicyError("Policy context contains an unknown request view field.")
         if PolicyRoute.from_view(view) != self.route:
             raise PolicyError("Policy context route does not match its observation.")
         if type(self.choice_seed) is not int or self.choice_seed < 0:

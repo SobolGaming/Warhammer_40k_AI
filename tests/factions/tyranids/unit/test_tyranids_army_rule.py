@@ -562,7 +562,7 @@ def test_restore_rejects_omitted_mandatory_shadow_modifier_application() -> None
     lifecycle = _resolved_shadow_lifecycle(
         game_id="phase17g-tyranids-omitted-modifier-authority:d07:8",
         # This identity rolls 5+5: the mandatory -1 still passes Leadership 6.
-        result_id="phase17g-tyranids-omitted-modifier-authority:d07:8:unleash:d07-vector:18",
+        result_id="phase17g-tyranids-omitted-modifier-authority:d07:8:unleash:d07-vector:18:private-1",
     )
     forged = _mutable_lifecycle_payload(lifecycle)
     events = _mutable_lifecycle_events(forged)

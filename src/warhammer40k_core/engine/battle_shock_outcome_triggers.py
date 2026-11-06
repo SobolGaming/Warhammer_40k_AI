@@ -132,7 +132,7 @@ def battle_shock_context_for_trigger(
     return BattleShockOutcomeContext(
         state=state,
         decisions=decisions,
-        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        dice_manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
         result=parsed,
         active_player_id=active,
         phase=phase,

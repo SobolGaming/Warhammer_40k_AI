@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TypedDict
 
 from warhammer40k_core.adapters.contracts import AdapterGameSession
+from warhammer40k_core.adapters.decisions import viewer_for_issued_request
 from warhammer40k_core.adapters.event_stream import EventStreamCursor, EventStreamDeltaPayload
 from warhammer40k_core.adapters.projection import GameViewPayload, RulesCatalogViewPayload
 from warhammer40k_core.engine.event_log import JsonValue
@@ -22,6 +23,10 @@ class NetworkParameterizedSubmissionPayload(TypedDict):
 
 
 def network_status_payload(status: LifecycleStatus) -> LifecycleStatusPayload:
+    """Serialize an authoritative host/replay status, never a player response.
+
+    Live transports must use AdapterGameSession.status_for_context instead.
+    """
     return status.to_payload()
 
 
@@ -50,7 +55,8 @@ def submit_network_option(
     session: AdapterGameSession,
     submission: NetworkFiniteSubmissionPayload,
 ) -> LifecycleStatus:
-    return session.submit_option(
+    return session.submit_viewer_option(
+        viewer=viewer_for_issued_request(session=session, request_id=submission["request_id"]),
         request_id=submission["request_id"],
         option_id=submission["option_id"],
         result_id=submission["result_id"],
@@ -61,7 +67,8 @@ def submit_network_parameterized_payload(
     session: AdapterGameSession,
     submission: NetworkParameterizedSubmissionPayload,
 ) -> LifecycleStatus:
-    return session.submit_parameterized_payload(
+    return session.submit_viewer_parameterized_payload(
+        viewer=viewer_for_issued_request(session=session, request_id=submission["request_id"]),
         request_id=submission["request_id"],
         payload=submission["payload"],
         result_id=submission["result_id"],

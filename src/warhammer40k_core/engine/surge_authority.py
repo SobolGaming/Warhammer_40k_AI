@@ -122,7 +122,13 @@ def validate_surge_request(
     selections: tuple[dict[str, JsonValue], ...]
     if proposal or request.decision_type != SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE:
         selections = (
-            validate_surge_selection_chain(decisions, payload, descriptor, request=request),
+            validate_surge_selection_chain(
+                decisions,
+                payload,
+                descriptor,
+                request=request,
+                private_rng_seed=state.private_rng_seed,
+            ),
         )
     elif result is not None:
         result.validate_for_request(request)
@@ -157,6 +163,7 @@ def validate_surge_selection_chain(
     descriptor: TriggeredMovementDescriptor,
     *,
     request: DecisionRequest,
+    private_rng_seed: str,
 ) -> dict[str, JsonValue]:
     matches = tuple(
         record
@@ -172,6 +179,7 @@ def validate_surge_selection_chain(
     if selected_surge_target(context, descriptor) != selected_surge_target(selected, descriptor):
         raise GameLifecycleError("Surge target differs from its original finite choice.")
     _validate_surge_granted_descriptor(
+        private_rng_seed=private_rng_seed,
         decisions=decisions,
         selection=matches[0],
         request=request,
@@ -183,6 +191,7 @@ def validate_surge_selection_chain(
 
 def _validate_surge_granted_descriptor(
     *,
+    private_rng_seed: str,
     decisions: DecisionController,
     selection: DecisionRecord,
     request: DecisionRequest,
@@ -251,7 +260,7 @@ def _validate_surge_granted_descriptor(
         # No proposal-supplied total or roll-state copy can enlarge the grant.
         boundary = reroll_index + 1
         manager = DiceRollManager(
-            game_id,
+            private_rng_seed,
             event_log=EventLog.from_payload([event.to_payload() for event in events[:boundary]]),
         )
         rolled = manager.resolve_reroll(

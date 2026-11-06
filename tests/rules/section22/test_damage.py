@@ -78,7 +78,7 @@ def test_psychic_ability_wounds_reach_psychic_only_protection(
             destruction_evidence=evidence,
             target_unit_instance_id=target.unit_instance_id,
             mortal_wounds=1,
-            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            dice_manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
             defender_player_id="opponent",
         )
 

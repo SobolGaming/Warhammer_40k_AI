@@ -49,8 +49,8 @@ from warhammer40k_core.geometry.pose import Pose
 @pytest.mark.parametrize(
     ("seed", "expected_passed", "capped"),
     [
-        ("faction-batch01-ec-fight-2", True, False),
-        ("faction-batch01-ec-fight-3", False, False),
+        ("faction-batch01-ec-fight-2-private-1", True, False),
+        ("faction-batch01-ec-fight-3-private-13", False, False),
         ("faction-batch01-ec-fight-3", True, True),
     ],
 )
@@ -142,7 +142,7 @@ def test_infractors_native_melee_rerolls_destroy_enemy_then_icon_uses_own_bearer
         if e["target_unit_instance_id"] == target.unit_instance_id
     ]
     assert len(deaths) == 5
-    if seed == "faction-batch01-ec-fight-2":
+    if seed == "faction-batch01-ec-fight-2-private-1":
         # Regression: subsequent declared physical pools cancel after the last casualty.
         cancelled = events(s.session, "attack_pool_not_allocated")
         assert cancelled
@@ -1119,7 +1119,10 @@ def test_sorcerer_native_shooting_cover_wracking_and_exact_replay(
 
     session = LocalGameSession.from_persistence_payload(sorcerer_native_shooting_checkpoint)
     seen = native_fire(
-        session, profile_id=f"000004085:agonising-energies:{profile}", ignore_psychic=ignore
+        session,
+        profile_id=f"000004085:agonising-energies:{profile}",
+        ignore_psychic=ignore,
+        result_id="native:energies-private-1",
     )
     assert "select_psychic_attack_modifier_ignores" in seen
     assert "select_catalog_post_shoot_hit_target_effect" in seen
@@ -1212,7 +1215,7 @@ def test_sorcerer_native_misses_do_not_offer_wracking(
     seen = native_fire(
         session,
         profile_id="000004085:agonising-energies:witchfire",
-        result_id="ec-miss-0",
+        result_id="ec-miss-0-private-6",
     )
     assert "select_catalog_post_shoot_hit_target_effect" not in seen
     hits = [p["payload"] for p in events(session, "attack_sequence_step") if p["step"] == "hit"]
@@ -1422,7 +1425,7 @@ def test_sorcerer_native_bolt_pistol_hits_do_not_offer_wracking(
     native_declaration(session, "attached-unit:owner:bodyguard")
     before = len(events(session, "attack_sequence_step"))
     seen = native_fire(
-        session, profile_id="000004085:bolt-pistol:standard", result_id="native:pistol"
+        session, profile_id="000004085:bolt-pistol:standard", result_id="native:pistol-private-2"
     )
     assert "select_catalog_post_shoot_hit_target_effect" not in seen
     attacks = events(session, "attack_sequence_step")[before:]
@@ -1550,11 +1553,12 @@ def test_icon_native_either_players_fight_restores_real_destruction_boundary(
         (selection(d, RANGERS, "target"),),
         phase=BattlePhase.FIGHT,
         active=active,
-        seed=(
-            "faction-batch01-ec-fight-3"
-            if sheet == INFRACTORS and active == "opponent"
-            else "faction-batch01-ec-fight-2"
-        ),
+        seed={
+            ("owner", INFRACTORS): "faction-batch01-ec-fight-2-private-1",
+            ("owner", TORMENTORS): "faction-batch01-ec-fight-2-private-3",
+            ("opponent", INFRACTORS): "faction-batch01-ec-fight-3",
+            ("opponent", TORMENTORS): "faction-batch01-ec-fight-2-private-5",
+        }[(active, sheet)],
     )
     unit, target = s.units["own:infractors"], s.units["foe:target"]
     assert s.state.mission_setup is not None

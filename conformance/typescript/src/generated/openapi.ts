@@ -237,7 +237,8 @@ export interface components {
         config: {
             allow_legacy_non_strict_rosters: boolean; army_catalog: Record<string, never>;
             army_muster_requests: Record<string, never>[]; fixed_secondary_mission_ids: string[]; game_id: string;
-            max_lifecycle_transitions: number;
+            /** @description Operator-only private entropy; never publish in player views. */
+            private_rng_seed: string; max_lifecycle_transitions: number;
             mission_setup: {
                 /** @enum {unknown} */
                 attacker_battlefield_edge: "north" | "south" | "east" | "west" | "north_west_corner" | "north_east_corner" | "south_west_corner" | "south_east_corner" | null;
@@ -258,7 +259,7 @@ export interface components {
         "session-create.schema": {
             config: components["schemas"]["config"];
             /** @constant */
-            schema_version: "session-create-v4";
+            schema_version: "session-create-v5-private-rng";
         };
         "lifecycle-status--json_value.schema": null | boolean | number | string | components["schemas"]["lifecycle-status--json_value.schema"][] | {
             [key: string]: components["schemas"]["lifecycle-status--json_value.schema"];
@@ -287,11 +288,11 @@ export interface components {
             /** Format: date-time */
             created_at: string; engine_build_id: string; engine_version: string; event_cursor: string; game_id: string;
             /** Format: date-time */
-            last_activity_at: string; lifecycle_status: components["schemas"]["lifecycle-status--status.schema"];
+            last_activity_at: string | null; lifecycle_status: components["schemas"]["lifecycle-status--status.schema"];
             projection_state_hash: string; rules_overlay_ids: string[]; ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v45-contract"; server_contract_version: string; session_id: string;
+            schema_version: "session-metadata-v46-contract"; server_contract_version: string; session_id: string;
             session_revision: number;
             /** @enum {string} */
             session_state: "created" | "active" | "terminal" | "closed"; source_hash: string; source_package_id: string;
@@ -677,7 +678,7 @@ export interface components {
         "session-command-envelope.schema": {
             command_id: string; expected_session_revision: number; request_id: string | null; result_id: string | null;
             /** @constant */
-            schema_version: "session-command-envelope-v2-weapon-instances"; session_id: string;
+            schema_version: "session-command-envelope-v3-viewer-identities"; session_id: string;
             submission: components["schemas"]["session-command-envelope--start_submission.schema"] | components["schemas"]["session-command-envelope--advance_submission.schema"] | components["schemas"]["session-command-envelope--close_submission.schema"] | components["schemas"]["session-command-envelope--finite_submission.schema"] | components["schemas"]["session-command-envelope--parameterized_submission.schema"];
         } & unknown;
         "session-command-outcome--checkpoint.schema": {
@@ -698,7 +699,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v45-contract"; session: components["schemas"]["session-metadata.schema"];
+            schema_version: "session-command-outcome-v46-contract"; session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
             accepted?: true;
@@ -978,7 +979,7 @@ export interface components {
         /** CORE V2 DecisionRequestViewPayload */
         "decision-request-view.schema": {
             /** @constant */
-            schema_version: "decision-request-view-v5-phase17n-step4"; actor_id: string | null; decision_type: string;
+            schema_version: "decision-request-view-v6-viewer-identities"; actor_id: string | null; decision_type: string;
             is_parameterized: boolean; interaction: components["schemas"]["interaction-descriptor.schema"] | null;
             options: components["schemas"]["decision-request-view--decision_option.schema"][];
             payload: components["schemas"]["decision-request-view--json_value.schema"]; request_id: string;
@@ -1090,7 +1091,7 @@ export interface components {
             primary_mission_progress_state: components["schemas"]["game-view--primary_mission_progress_state.schema"];
             primary_rules_unit_turn_start_snapshots: components["schemas"]["game-view--primary_rules_unit_turn_start_snapshot.schema"][];
             /** @constant */
-            projection_schema: "game-view-v13-random-profiles"; projection_state_hash: string;
+            projection_schema: "game-view-v14-viewer-identities"; projection_state_hash: string;
             public_army_rosters?: {
                 army_id: components["schemas"]["game-view--json_value.schema"];
                 attachment_declarations: components["schemas"]["game-view--json_value.schema"];
@@ -1127,7 +1128,7 @@ export interface components {
             event_cursor: string; game_id: string; projection: components["schemas"]["game-view.schema"];
             projection_state_hash: string; retention_limit: number; revision_retention_limit: number;
             /** @constant */
-            schema_version: "session-projection-v9-random-profiles"; session_id: string; session_revision: number;
+            schema_version: "session-projection-v10-viewer-identities"; session_id: string; session_revision: number;
             /** @enum {string} */
             visibility_role: "player" | "coach" | "delayed_spectator" | "administrator";
         };
@@ -1146,7 +1147,8 @@ export interface components {
             resync_reason: null | "malformed" | "expired" | "ahead" | "wrong_session" | "wrong_viewer" | "revision_mismatch" | "projection_hash_mismatch";
             resync_required: boolean; retention_limit: number; revision_retention_limit: number;
             /** @constant */
-            schema_version: "event-delta-v5-phase17n-step4"; session_id: string; supplied_cursor: string; to_revision: number;
+            schema_version: "event-delta-v6-viewer-identities"; session_id: string; supplied_cursor: string;
+            to_revision: number;
             /** @enum {string} */
             visibility_role: "player" | "coach" | "delayed_spectator" | "administrator";
         };
@@ -1372,7 +1374,7 @@ export interface components {
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v36-target-aware-attack-groups";
+            schema_version: "replay-artifact-v37-private-rng";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
         };
         /** CORE V2 FiniteOptionSubmissionPayload */

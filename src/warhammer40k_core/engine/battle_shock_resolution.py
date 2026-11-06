@@ -268,7 +268,7 @@ def apply_battle_shock_reroll_resolution_decision(
         context_payload,
         key=ADDITIONAL_MODIFIER_APPLICATIONS_CONTEXT_KEY,
     )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     rerolled_state = manager.resolve_reroll(
         initial_roll_state,
         request=record.request,

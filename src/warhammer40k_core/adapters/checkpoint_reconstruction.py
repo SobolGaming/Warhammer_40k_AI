@@ -37,8 +37,41 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 
 PROFILE_ID = "local-checkpoint:legacy-model-completion:2026-10-14"
-RECOVERY_SCHEMA = "local-checkpoint-reconstruction-v2-mission-scope"
-_RECIPE_VERSION = "recorded-decision-reconstruction-v2-mission-scope"
+RECOVERY_SCHEMA = "local-checkpoint-reconstruction-v3-audit-rng"
+_RECIPE_VERSION = "recorded-decision-reconstruction-v3-audit-rng"
+_SOURCE_REPLAY_SCHEMA = "replay-artifact-v36-target-aware-attack-groups"
+_DESTINATION_REPLAY_SCHEMA = "replay-artifact-v37-private-rng"
+_SOURCE_RNG_SEED = "audit-d04-native-emergency-1"
+# Public, reproducible audit entropy, calibrated through all 18 recorded choices.
+# This reconstruction is not suitable for secret competitive randomness.
+_AUDIT_RNG_LABEL = "a32-exact-artifact-reconstruction-v3:3223"
+_AUDIT_RNG_SEED = "6ba138bd8d5aeb37661f9d0aa6c6377ef433beefc39b43ed5f8943424e8d16a0"
+_INITIAL_RNG_ANCHORS = ((), ("modifier_evaluation_history_origin",))
+_FINAL_RNG_ANCHORS = (
+    *_INITIAL_RNG_ANCHORS,
+    ("psychic_modifier_history_origin",),
+    ("psychic_modifier_history_origin", "modifier_evaluation_history_origin"),
+)
+_SETUP_HASH_MAPPINGS = (
+    (
+        "event-000038",
+        "pre_battle_checkpoint",
+        "110cd81f42c70af2cb17d66be61b7801685231760fac812a34cfab094d7ba9b4",
+        "995d3bcaa86cb70be1ee62e106fd847257cd083718ea31cda4db674ad2a95640",
+    ),
+    (
+        "event-000039",
+        "pre_battle_checkpoint",
+        "110cd81f42c70af2cb17d66be61b7801685231760fac812a34cfab094d7ba9b4",
+        "995d3bcaa86cb70be1ee62e106fd847257cd083718ea31cda4db674ad2a95640",
+    ),
+    (
+        "event-000039",
+        "post_battle_start_checkpoint",
+        "1a3d13c716702a6e08ff5e7d34091a9e48b06dcaed9bb40674b9293b2c86f057",
+        "30b25e7df9cbf541a5838a49b2bf0cf7dfaed74accd9238060dd726d578f43d6",
+    ),
+)
 _MISSION_PACK_ID = "11e-chapter-approved-2026-27"
 _OLD_MISSION_HASH = "009a47e19b7e619f6a9bcd75a5294497ac1becb2aee4c320ffcd0a393c57399d"
 _CURRENT_MISSION_HASH = "8f76fcf275397bd2ffabf16d3e127f059fb476e0144654bd54e550f5dd16faa1"
@@ -70,9 +103,16 @@ def reconstruct_local_checkpoint(source_bytes: bytes, *, profile_id: str) -> dic
         raise CheckpointReconstructionError("Unsupported checkpoint reconstruction profile.")
     original = _source_payload(source_bytes)
     replay_input = copy.deepcopy(_object(original["replay_artifact"]))
-    replay_input["source_identity"] = _mapped_mission_source_identity(original["source_identity"])
-    artifact = ReplayArtifact.from_payload(cast(ReplayArtifactPayload, replay_input))
+    if replay_input["schema_version"] != _SOURCE_REPLAY_SCHEMA:
+        raise CheckpointReconstructionError("Historical replay schema drifted.")
+    replay_input["schema_version"] = _DESTINATION_REPLAY_SCHEMA
+    replay_input["initial_lifecycle"] = _mapped_rng_anchors(
+        replay_input["initial_lifecycle"], final=False
+    )
+    replay_input["initial_rng_state"] = _mapped_rng_state(replay_input["initial_rng_state"])
+    replay_input["source_identity"] = _mapped_source_identity(original)
     try:
+        artifact = ReplayArtifact.from_payload(cast(ReplayArtifactPayload, replay_input))
         lifecycle = GameLifecycle.from_payload(artifact.initial_lifecycle_payload)
         session = LocalGameSession(lifecycle=lifecycle)
         session.advance_until_decision_or_terminal()
@@ -97,7 +137,7 @@ def reconstruct_local_checkpoint(source_bytes: bytes, *, profile_id: str) -> dic
                     "Historical automatic decision does not reproduce exactly."
                 )
         checkpoint = _object(session.to_persistence_payload())
-    except (DecisionError, GameLifecycleError) as exc:
+    except (DecisionError, GameLifecycleError, ReplayArtifactError) as exc:
         raise CheckpointReconstructionError(
             "Recorded checkpoint reconstruction failed through the engine."
         ) from exc
@@ -232,10 +272,11 @@ def _validate_mapping(
     if (
         len(bindings) != len(old_events)
         or len(set(bindings.values())) != len(bindings)
-        or canonical_json(_rebind(old_decisions["event_log"], bindings)) != canonical_json(retained)
+        or canonical_json(_rebind(_mapped_setup_hashes(old_decisions["event_log"]), bindings))
+        != canonical_json(retained)
     ):
         raise CheckpointReconstructionError("Checkpoint reconstruction changed an original event.")
-    expected = _object(_rebind(old, bindings))
+    expected = _mapped_rng_anchors(_rebind(old, bindings), final=True)
     actual = copy.deepcopy(new)
     _object(actual["decisions"])["event_log"] = cast(list[JsonValue], retained)
     audits: list[JsonValue] = []
@@ -255,21 +296,59 @@ def _validate_mapping(
         raise CheckpointReconstructionError(
             "Checkpoint reconstruction changed original gameplay state."
         )
-    if canonical_json(original["rng_state"]) != canonical_json(checkpoint["rng_state"]) or (
-        canonical_json(_mapped_mission_source_identity(original["source_identity"]))
+    if canonical_json(_mapped_rng_state(original["rng_state"])) != canonical_json(
+        checkpoint["rng_state"]
+    ) or (
+        canonical_json(_mapped_source_identity(original))
         != canonical_json(checkpoint["source_identity"])
     ):
         raise CheckpointReconstructionError(
             "Checkpoint reconstruction changed original RNG/source."
         )
     initial = _object(original["initial_replay_lifecycle"])
-    mapped_initial = copy.deepcopy(initial)
+    mapped_initial = _mapped_rng_anchors(initial, final=False)
     new_initial = _object(checkpoint["initial_replay_lifecycle"])
     mapped_initial["runtime_content_audit"] = new_initial["runtime_content_audit"]
     if canonical_json(mapped_initial) != canonical_json(new_initial):
         raise CheckpointReconstructionError("Checkpoint reconstruction initial anchor drifted.")
     return {
         "recipe_version": _RECIPE_VERSION,
+        "rng_metadata_mapping": {
+            "original_seed": _SOURCE_RNG_SEED,
+            "reconstructed_seed": _AUDIT_RNG_SEED,
+            "audit_seed_derivation": f"sha256(utf8({_AUDIT_RNG_LABEL}))",
+            "initial_lifecycle_anchor_paths": ["/" + "/".join(p) for p in _INITIAL_RNG_ANCHORS],
+            "final_lifecycle_anchor_paths": ["/" + "/".join(p) for p in _FINAL_RNG_ANCHORS],
+            "added_seed_paths_at_each_anchor": [
+                "/config/private_rng_seed",
+                "/state/private_rng_seed",
+            ],
+            "added_counter_path_at_each_anchor": "/state/tactical_secondary_draw_sequence",
+            "tactical_secondary_draw_sequence": 0,
+            "rng_history_and_draw_count_preserved": True,
+            "preserved_dice_faces": [4, 4, 2, 1, 2],
+            "reason": "Known audit entropy preserves this finite recorded sequence only.",
+        },
+        "replay_schema_mapping": {
+            "original": _SOURCE_REPLAY_SCHEMA,
+            "reconstructed": _DESTINATION_REPLAY_SCHEMA,
+        },
+        "game_config_hash_mapping": {
+            "path": "/source_identity/game_config_hash",
+            "original": _object(original["source_identity"])["game_config_hash"],
+            "reconstructed": _object(checkpoint["source_identity"])["game_config_hash"],
+            "reason": "Explicit audit seed added to the recorded config.",
+        },
+        "setup_checkpoint_state_hash_mappings": [
+            {
+                "event_id": event_id,
+                "path": f"/payload/{field}/state_hash",
+                "original": before,
+                "reconstructed": after,
+                "reason": "State gains only private_rng_seed and tactical_secondary_draw_sequence.",
+            }
+            for event_id, field, before, after in _SETUP_HASH_MAPPINGS
+        ],
         "mission_source_identity_mapping": {
             "path": "/source_identity/mission_source_package_hash",
             "mission_pack_id": _MISSION_PACK_ID,
@@ -294,8 +373,62 @@ def _validate_mapping(
         "event_id_mapping": cast(dict[str, JsonValue], bindings),
         "engine_regenerated_evidence": cast(list[JsonValue], additions),
         "derived_runtime_audits": audits,
-        "original_decisions_rng_and_gameplay_preserved": True,
+        "original_decisions_and_gameplay_outcomes_preserved": True,
+        "original_rng_metadata_preserved": False,
+        "secret_competitive_rng_suitable": False,
         "original_byte_replay_claimed": False,
+    }
+
+
+def _mapped_rng_anchors(value: JsonValue, *, final: bool) -> dict[str, JsonValue]:
+    """Add RNG metadata only at this authenticated artifact's declared anchors."""
+    mapped = copy.deepcopy(_object(value))
+    for path in _FINAL_RNG_ANCHORS if final else _INITIAL_RNG_ANCHORS:
+        anchor = mapped
+        for key in path:
+            anchor = _object(anchor[key])
+        config, state = _object(anchor["config"]), _object(anchor["state"])
+        if (
+            config["game_id"] != _SOURCE_RNG_SEED
+            or state["game_id"] != _SOURCE_RNG_SEED
+            or "private_rng_seed" in config
+            or "private_rng_seed" in state
+            or "tactical_secondary_draw_sequence" in state
+        ):
+            raise CheckpointReconstructionError("Historical RNG anchor drifted.")
+        config["private_rng_seed"] = _AUDIT_RNG_SEED
+        state["private_rng_seed"] = _AUDIT_RNG_SEED
+        state["tactical_secondary_draw_sequence"] = 0
+        decisions = _object(anchor["decisions"])
+        decisions["event_log"] = _mapped_setup_hashes(decisions["event_log"])
+    return mapped
+
+
+def _mapped_setup_hashes(value: JsonValue) -> list[JsonValue]:
+    events = copy.deepcopy(_array(value))
+    for event_value in events:
+        event = _object(event_value)
+        for event_id, field, before, after in _SETUP_HASH_MAPPINGS:
+            if event["event_id"] == event_id:
+                checkpoint = _object(_object(event["payload"])[field])
+                if checkpoint["state_hash"] != before:
+                    raise CheckpointReconstructionError("Historical setup state hash drifted.")
+                checkpoint["state_hash"] = after
+    return events
+
+
+def _mapped_rng_state(value: JsonValue) -> dict[str, JsonValue]:
+    rng = _object(value)
+    if rng["seed"] != _SOURCE_RNG_SEED:
+        raise CheckpointReconstructionError("Historical RNG seed drifted.")
+    return {**rng, "seed": _AUDIT_RNG_SEED}
+
+
+def _mapped_source_identity(original: dict[str, JsonValue]) -> dict[str, JsonValue]:
+    initial = _mapped_rng_anchors(original["initial_replay_lifecycle"], final=False)
+    return {
+        **_mapped_mission_source_identity(original["source_identity"]),
+        "game_config_hash": _hash(initial["config"]),
     }
 
 

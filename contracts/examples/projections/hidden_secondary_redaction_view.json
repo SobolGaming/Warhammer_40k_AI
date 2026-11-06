@@ -6859,7 +6859,7 @@
       "legal_candidate_refs": [],
       "measurement_overlays": [],
       "path_overlays": [],
-      "request_id": "decision-request-000002",
+      "request_id": "view-request-d5f450912a041d49557e1ea33da8069ee2d0183f365b83e88bd4b17ed40988d1",
       "selected_or_acting_entity_ids": []
     },
     "render": {
@@ -14841,8 +14841,8 @@
       "secret": true,
       "setup_step": "select_secondary_missions"
     },
-    "request_id": "decision-request-000002",
-    "schema_version": "decision-request-view-v5-phase17n-step4"
+    "request_id": "view-request-d5f450912a041d49557e1ea33da8069ee2d0183f365b83e88bd4b17ed40988d1",
+    "schema_version": "decision-request-view-v6-viewer-identities"
   },
   "pending_proposal": null,
   "player_ids": [
@@ -14855,8 +14855,8 @@
     "markers": []
   },
   "primary_rules_unit_turn_start_snapshots": [],
-  "projection_schema": "game-view-v13-random-profiles",
-  "projection_state_hash": "72d7a813a8aa11912e431118908b6b71eee154fc972431f0d2f8ce0c6ad57d6a",
+  "projection_schema": "game-view-v14-viewer-identities",
+  "projection_state_hash": "c054efbe29ab1f993d0ae42a694752e28c7ce15a8a1824f2bac4417d86491267",
   "public_army_rosters": [
     {
       "army_id": "army-alpha",

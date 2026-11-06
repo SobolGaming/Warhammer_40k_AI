@@ -129,7 +129,7 @@ export async function runCertifiedScenario(
   const firstFinite = finiteEnvelope(
     sessionId,
     "phase18m-finite-a-000001",
-    1,
+    ownerProjection.session_revision,
     firstRequest,
   );
   const firstFiniteResponse = await clients.playerA.executeCommand(
@@ -153,7 +153,6 @@ export async function runCertifiedScenario(
     clients,
     sessionId,
     firstRequest,
-    firstFiniteOutcome.session.session_revision,
     registry,
     assertions,
   );
@@ -163,7 +162,7 @@ export async function runCertifiedScenario(
   const secondFinite = finiteEnvelope(
     sessionId,
     "phase18m-finite-b-000001",
-    firstFiniteOutcome.session.session_revision,
+    secondProjection.session_revision,
     secondRequest,
   );
   const secondFiniteOutcome = validateOutcome(
@@ -172,7 +171,6 @@ export async function runCertifiedScenario(
   );
   assertCommittedAccepted(secondFiniteOutcome, "second player finite decision", assertions);
 
-  let setupRevision = secondFiniteOutcome.session.session_revision;
   let setupFiniteCount = 0;
   let placementProjection = await visiblePendingProjection(clients, sessionId, registry);
   while (!pendingDecision(placementProjection).is_parameterized) {
@@ -185,14 +183,13 @@ export async function runCertifiedScenario(
         finiteEnvelope(
           sessionId,
           `phase18m-setup-finite-${String(setupFiniteCount).padStart(6, "0")}`,
-          setupRevision,
+          placementProjection.session_revision,
           setupRequest,
         ),
       ),
       registry,
     );
     assertCommittedAccepted(setupOutcome, "setup finite decision", assertions);
-    setupRevision = setupOutcome.session.session_revision;
     if (setupFiniteCount > 20) {
       throw new Error("Certified setup exceeded finite-decision safety bound.");
     }
@@ -218,7 +215,7 @@ export async function runCertifiedScenario(
   const placementEnvelope = parameterizedEnvelope(
     sessionId,
     "phase18m-deployment-placement-000001",
-    setupRevision,
+    placementProjection.session_revision,
     placementRequest,
     proposalPayload,
   );
@@ -261,7 +258,7 @@ export async function runCertifiedScenario(
   const closeEnvelope = lifecycleEnvelope(
     sessionId,
     "phase18m-close-000001",
-    placementOutcome.session.session_revision,
+    (await metadataFor(clients.administrator, sessionId, registry)).session_revision,
     "close_session",
   );
   const closeResponse = await clients.administrator.executeCommand(
@@ -316,7 +313,7 @@ function lifecycleEnvelope(
   submissionKind: "start_session" | "advance_session" | "close_session",
 ): SessionCommandEnvelope {
   return {
-    schema_version: "session-command-envelope-v2-weapon-instances",
+    schema_version: "session-command-envelope-v3-viewer-identities",
     command_id: commandId,
     session_id: sessionId,
     expected_session_revision: expectedRevision,
@@ -337,7 +334,7 @@ function finiteEnvelope(
     throw new Error("Finite request did not publish an option.");
   }
   return {
-    schema_version: "session-command-envelope-v2-weapon-instances",
+    schema_version: "session-command-envelope-v3-viewer-identities",
     command_id: commandId,
     session_id: sessionId,
     expected_session_revision: expectedRevision,
@@ -355,7 +352,7 @@ function parameterizedEnvelope(
   payload: DeploymentPlacementPayload,
 ): SessionCommandEnvelope {
   return {
-    schema_version: "session-command-envelope-v2-weapon-instances",
+    schema_version: "session-command-envelope-v3-viewer-identities",
     command_id: commandId,
     session_id: sessionId,
     expected_session_revision: expectedRevision,
@@ -384,7 +381,7 @@ async function assertMalformedCommand(
 ): Promise<void> {
   const response = await clients.administrator.probeMalformedSessionCommand(
     sessionParameters(sessionId),
-    { schema_version: "session-command-envelope-v2-weapon-instances", unexpected: true },
+    { schema_version: "session-command-envelope-v3-viewer-identities", unexpected: true },
   );
   equal(response.status, 400, "malformed command is rejected before mutation", assertions);
   const error = registry.validate<ErrorEnvelope>("error-envelope.schema.json", response.body);
@@ -555,7 +552,6 @@ async function assertStaleRequest(
   clients: ScenarioClients,
   sessionId: string,
   request: ReturnType<typeof pendingDecision>,
-  revision: number,
   registry: ContractRegistry,
   assertions: MutableAssertionCounter,
 ): Promise<void> {
@@ -564,7 +560,7 @@ async function assertStaleRequest(
   const client = clientForActor(clients, currentRequest.actor_id);
   const response = await client.executeCommand(
     sessionParameters(sessionId),
-    finiteEnvelope(sessionId, "phase18m-stale-request", revision, request),
+    finiteEnvelope(sessionId, "phase18m-stale-request", currentProjection.session_revision, request),
   );
   equal(response.status, 409, "consumed request is rejected", assertions);
   const error = registry.validate<ErrorEnvelope>("error-envelope.schema.json", response.body);
@@ -795,12 +791,12 @@ async function visiblePendingProjection(
 ): Promise<SessionProjection> {
   const playerA = await projection(clients.playerA, sessionId, registry);
   const playerADecision = playerA.projection.pending_decision;
-  if (playerADecision !== null && playerADecision.decision_type !== "hidden_decision") {
+  if (playerADecision !== null && playerADecision.actor_id === "player-a") {
     return playerA;
   }
   const playerB = await projection(clients.playerB, sessionId, registry);
   const playerBDecision = playerB.projection.pending_decision;
-  if (playerBDecision !== null && playerBDecision.decision_type !== "hidden_decision") {
+  if (playerBDecision !== null && playerBDecision.actor_id === "player-b") {
     return playerB;
   }
   throw new Error("No player-visible pending decision was published.");

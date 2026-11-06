@@ -35,7 +35,7 @@ def extremum_session(
     decisions = lifecycle.decision_controller
     open_phase(lifecycle)
     start = len(decisions.event_log.records)
-    roll = DiceRollManager(state.game_id, event_log=decisions.event_log).roll_fixed(
+    roll = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).roll_fixed(
         DiceRollSpec(
             DiceExpression(3, 6),
             reason="Core highest/lowest physical-die reference",

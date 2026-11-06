@@ -43,6 +43,7 @@ from tests.shared.category_migration.primary_boundary_state_and_geometry import 
     _return_destroyed_unit,
     _set_unit_starting_wounds,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 
 
 def _pending_command_boundary_lifecycle() -> GameLifecycle:
@@ -202,6 +203,7 @@ def _two_model_battlefield_dominance_lifecycle(
         ),
     )
     config = GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase17n-partial-return-game"),
         game_id="phase17n-partial-return-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=ruleset(),
@@ -287,6 +289,7 @@ def _two_defender_battlefield_dominance_lifecycle(
     )
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     config = GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase11c-game"),
         game_id="phase11c-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=ruleset(),

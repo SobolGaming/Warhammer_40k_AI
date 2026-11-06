@@ -229,7 +229,7 @@ def test_native_pistol_shooting_is_not_critical_five_and_replays(
         (selection(native_definitions, SCORPIONS, "scorpions"),),
         (selection(native_definitions, WALKERS, "walkers"),),
         phase=BattlePhase.SHOOTING,
-        seed="independent-mandiblasters-probe",
+        seed="independent-mandiblasters-probe-private-1",
     )
     locate(s, "foe:walkers", (Pose.at(19, 10),))
     anchor(s)
@@ -580,7 +580,12 @@ def test_last_bodyguard_destroyed_by_real_attack_retains_only_source_semantics(
     from warhammer40k_core.engine.hit_thresholds import resolve_hit_thresholds
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
-    s = scorpion_scene(native_definitions, attached=True, one_bodyguard=True)
+    s = scorpion_scene(
+        native_definitions,
+        attached=True,
+        one_bodyguard=True,
+        seed="independent-mandiblasters-charge-private-4",
+    )
     source_model_id = s.units["own:scorpions"].own_model_ids()[2]
     leader_model_id = s.units["own:autarch"].own_model_ids()[0]
     context = hit_context(s, native_definitions.weapon("000000577:star-glaive"), leader_model_id)

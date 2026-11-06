@@ -531,7 +531,7 @@ def _apply_setup_reactive_charge(
         roll_modifiers=roll_modifiers,
         take_to_the_skies=flight_selection(payload),
     )
-    roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
+    roll_state = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).roll(
         roll_request.spec
     )
     budget = current_charge_movement_budget(

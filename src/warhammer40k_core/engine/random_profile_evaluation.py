@@ -170,7 +170,7 @@ def evaluate_model_profile_inventory(
                 raise GameLifecycleError("Random profile history identity is invalid.")
             historical[identity] = row
     manager = (
-        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
         if dice_manager is None
         else dice_manager
     )

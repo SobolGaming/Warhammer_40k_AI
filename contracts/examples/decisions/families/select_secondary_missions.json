@@ -95,6 +95,6 @@
     "secret": true,
     "setup_step": "select_secondary_missions"
   },
-  "request_id": "decision-request-000001",
-  "schema_version": "decision-request-view-v5-phase17n-step4"
+  "request_id": "view-request-31199ada34afad38ceaddf26527522e9a291012afa0a9fe9ef2e74611d20facb",
+  "schema_version": "decision-request-view-v6-viewer-identities"
 }

@@ -315,7 +315,9 @@ def apply_malice_made_manifest_fight_phase_start_result(
     ):
         raise GameLifecycleError("Malice Made Manifest target is no longer eligible.")
 
-    dice_manager = DiceRollManager(context.state.game_id, event_log=context.decisions.event_log)
+    dice_manager = DiceRollManager(
+        context.state.private_rng_seed, event_log=context.decisions.event_log
+    )
     d6_result = dice_manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),

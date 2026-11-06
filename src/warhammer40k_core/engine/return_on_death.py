@@ -325,7 +325,7 @@ def resolve_return_on_death_occurrence(
     ):
         raise GameLifecycleError("Return-on-death occurrence escaped its source boundary.")
     manager = (
-        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
         if dice_manager is None
         else dice_manager
     )

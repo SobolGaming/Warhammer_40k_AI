@@ -11,6 +11,7 @@ from fractions import Fraction
 
 import pytest
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.support.section01_fixtures import core_rule, minimal_state
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section03_fixtures import (
@@ -238,6 +239,7 @@ def test_repair_hazard_lethal_wound_uses_native_casualty_authority_before_moveme
 ) -> None:
     _old, state, unit = movement_case(section09_definitions, engaged=True)
     state.game_id = "focused-hazard-wounded-october-0"
+    state.private_rng_seed = fixture_private_rng_seed("focused-hazard-wounded-october-0:private-0")
     unit = replace(
         unit, own_models=(replace(unit.own_models[0], wounds_remaining=1), unit.own_models[1])
     )
@@ -384,6 +386,7 @@ def test_repair_hazard_survivor_coherency_retry_keeps_the_completed_packet(
         enemy_poses=(Pose.at(10, 12), Pose.at(12.5, 12)),
     )
     state.game_id = "focused-survivor-coherency-1"
+    state.private_rng_seed = fixture_private_rng_seed("focused-survivor-coherency-1:private-1")
     state.battle_shocked_unit_ids.append(unit.unit_instance_id)
     attach_mission(state)
     add_unit(state, section09_definitions.unit("000004078", identity="spare"), (Pose.at(35, 30),))

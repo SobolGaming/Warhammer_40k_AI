@@ -74,7 +74,7 @@ def test_worked_surge_example_uses_survivors_and_active_players_real_d6(
     )
     s.unit = unit
     rolled = DiceRollManager(
-        state.game_id, event_log=session.lifecycle.decision_controller.event_log
+        state.private_rng_seed, event_log=session.lifecycle.decision_controller.event_log
     ).roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),

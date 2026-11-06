@@ -59,7 +59,7 @@ def _request_source_backed_damage_reroll_if_available(
         source_id=permission.source_id,
     ):
         return None
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     request = manager.build_reroll_request(
         roll_state,
         request_id=state.next_decision_request_id(),

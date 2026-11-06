@@ -23,6 +23,10 @@ def test_malformed_physical_proposal_is_typed_and_leaves_all_authority_unchanged
     change: str,
 ) -> None:
     session, request, payload = proposal_session(family)
+    assert request.actor_id is not None
+    public_request = session.view(viewer_player_id=request.actor_id)["pending_decision"]
+    assert public_request is not None
+    payload = {**payload, "proposal_request_id": public_request["request_id"]}
     malformed: JsonValue = copy.deepcopy(payload)
     assert isinstance(malformed, dict)
     if change == "empty":
@@ -48,7 +52,7 @@ def test_malformed_physical_proposal_is_typed_and_leaves_all_authority_unchanged
     outcome = submit_network_parameterized_payload(
         session,
         {
-            "request_id": request.request_id,
+            "request_id": public_request["request_id"],
             "result_id": "order76-malformed",
             "payload": malformed,
         },

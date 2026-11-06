@@ -12,6 +12,7 @@ from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.support.section02_consumers import attack_pool
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section03_fixtures import geometry, placement
@@ -133,6 +134,7 @@ def attack_component(
     # authoritative serialized order before declaring this component origin.
     state.starting_strength_records.sort(key=lambda record: record.unit_instance_id)
     state.game_id = f"daemons-native:damaged:{phase.value}:seed-{seed}"
+    state.private_rng_seed = fixture_private_rng_seed(state.game_id)
     own = unit_by_id(state=state, unit_instance_id="section02:subject")
     profile_id = BELAKOR + (
         ":the-blade-of-shadows:strike"
@@ -179,7 +181,9 @@ def resolve_native_attack(
 
     def roundtrip() -> None:
         nonlocal state, sequence, decisions, allocated
-        rng_before = DiceRollManager(state.game_id, event_log=decisions.event_log).rng.to_payload()
+        rng_before = DiceRollManager(
+            state.private_rng_seed, event_log=decisions.event_log
+        ).rng.to_payload()
         before = (
             state.to_payload(),
             decisions.to_payload(),
@@ -206,7 +210,7 @@ def resolve_native_attack(
         # The production manager reconstructs seed/history/draw position from
         # the complete event journal; it has no separate persistence payload.
         assert (
-            DiceRollManager(state.game_id, event_log=decisions.event_log).rng.to_payload()
+            DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).rng.to_payload()
             == rng_before
         )
 
@@ -225,7 +229,7 @@ def resolve_native_attack(
                 attack_sequence=sequence,
                 already_allocated_model_ids=allocated,
                 runtime_modifier_registry=registry,
-                dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+                dice_manager=DiceRollManager(state.private_rng_seed, event_log=decisions.event_log),
             )
             if sequence is None:
                 assert status is None

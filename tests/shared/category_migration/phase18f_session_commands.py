@@ -22,6 +22,7 @@ from tests.phase18f_command_helpers import (
     recorded_unsupported_session,
 )
 from tests.shared.repository_root import REPOSITORY_ROOT
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.adapters.access_control import (
     DEV_ADMIN_TOKEN,
     DEV_PLAYER_A_TOKEN,
@@ -137,6 +138,7 @@ def _compact_terminal_config(*, game_id: str) -> GameConfig:
         ),
     )
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed(game_id),
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=compact_descriptor,
@@ -320,7 +322,7 @@ def _pending_decision_for_any_player(
 ) -> dict[str, JsonValue]:
     for player_id in (PLAYER_A, PLAYER_B):
         pending = _pending_decision(server, session_id=session_id, player_id=player_id)
-        if pending["decision_type"] != "hidden_decision":
+        if pending["decision_type"] != "hidden_decision" and pending["actor_id"] == player_id:
             return pending
     raise AssertionError("No actor-visible protocol decision found.")
 
@@ -361,7 +363,9 @@ def _advance_to_deployment_placement(
         else:
             assert decision_type in {"select_reserve_declaration", SELECT_DEPLOYMENT_UNIT}
             option_id = _first_option_id(pending)
-        revision = _session_revision(server, session_id=session_id)
+        revision = _session_revision(
+            server, session_id=session_id, player_id=_field_string(pending, "actor_id")
+        )
         _submit_command(
             server,
             participant_id=_participant_for_player(_field_string(pending, "actor_id")),
@@ -401,7 +405,9 @@ def _advance_to_movement_selection(
                 envelope=_command_envelope(
                     session_id=session_id,
                     command_id=f"phase18f-movement-{_field_string(pending, 'request_id')}",
-                    expected_revision=_session_revision(server, session_id=session_id),
+                    expected_revision=_session_revision(
+                        server, session_id=session_id, player_id=player_id
+                    ),
                     submission_kind="parameterized_payload",
                     request_id=_field_string(pending, "request_id"),
                     result_id=f"phase18f-movement-result-{_field_string(pending, 'request_id')}",
@@ -440,7 +446,7 @@ def _submit_visible_option_command(
         envelope=_command_envelope(
             session_id=session_id,
             command_id=command_id,
-            expected_revision=_session_revision(server, session_id=session_id),
+            expected_revision=_session_revision(server, session_id=session_id, player_id=player_id),
             submission_kind="finite_option",
             request_id=_field_string(request, "request_id"),
             result_id=f"{command_id}-result",
@@ -562,8 +568,15 @@ def _cursor_offset(server: AdapterGameServer, token: str) -> int:
     return server.cursor_codec.decode(token).offset
 
 
-def _session_revision(server: AdapterGameServer, *, session_id: str) -> int:
-    metadata = _request(server, "GET", f"/sessions/{session_id}")
+def _session_revision(
+    server: AdapterGameServer, *, session_id: str, player_id: str | None = None
+) -> int:
+    metadata = _request(
+        server,
+        "GET",
+        f"/sessions/{session_id}",
+        query=None if player_id is None else {"viewer_player_id": player_id},
+    )
     return _field_int(metadata, "session_revision")
 
 

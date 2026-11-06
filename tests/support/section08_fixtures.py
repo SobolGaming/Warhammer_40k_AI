@@ -133,7 +133,7 @@ def mark_shocked(state: GameState) -> str:
         BattleShockResult.from_roll_state(
             result_id="constructed:s08:prior-failure",
             request=request,
-            roll_state=DiceRollManager(state.game_id).roll_fixed(request.spec, [1, 1]),
+            roll_state=DiceRollManager(state.private_rng_seed).roll_fixed(request.spec, [1, 1]),
         )
     )
     return unit.unit_instance_id

@@ -11,6 +11,7 @@ from tests.movement_submission_helpers import (
     submit_action_and_movement_proposal,
     submit_default_movement_proposal_if_pending,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
@@ -196,6 +197,7 @@ def _transition_batch_from_event_payload(
 def _config() -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase10d-game"),
         game_id="phase10d-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(

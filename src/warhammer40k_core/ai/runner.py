@@ -7,6 +7,7 @@ import math
 from dataclasses import dataclass
 from time import perf_counter
 
+from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.projection import GameViewPayload
 from warhammer40k_core.ai.player_policy import (
@@ -19,7 +20,7 @@ from warhammer40k_core.ai.player_policy import (
 )
 from warhammer40k_core.build_identity import current_engine_build_id
 from warhammer40k_core.engine.decision_request import DecisionError
-from warhammer40k_core.engine.event_log import EventLogError, validate_json_value
+from warhammer40k_core.engine.event_log import EventLogError, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
 
 
@@ -127,11 +128,21 @@ class BoundedPolicyRunner:
             # The checkpoint commitment includes initial engine seed/state, but is
             # operator-only. Policies receive only their separate choice seed.
             identity = self._session.authoritative_identity_payload()
+            checkpoint = self._session.to_persistence_payload()
+            if not isinstance(checkpoint, dict) or not isinstance(
+                checkpoint.get("rng_state"), dict
+            ):
+                raise self._fail("Runner requires authoritative private RNG checkpoint identity.")
+            rng_state = checkpoint["rng_state"]
+            assert isinstance(rng_state, dict)
+            private_seed = rng_state.get("seed")
+            if type(private_seed) is not str or len(private_seed) != 64:
+                raise self._fail("Runner requires current private RNG authority.")
             self._run_id = payload_digest(
                 {
                     "schema": "bounded-player-policy-run-v1",
                     "engine_build_id": current_engine_build_id(),
-                    "initial_checkpoint": payload_digest(self._session.to_persistence_payload()),
+                    "initial_checkpoint": payload_digest(checkpoint),
                     "session_identity": identity,
                     "router_identity": self._router.identity,
                     "policy_seed": self._limits.policy_seed,
@@ -152,23 +163,26 @@ class BoundedPolicyRunner:
                 actor_id = request.actor_id
                 assert actor_id is not None
                 view = self._session.view(viewer_player_id=actor_id)
+                if private_seed in canonical_json(view):
+                    raise self._fail("Private RNG authority appears in the player projection.")
+                pending_view = view["pending_decision"]
+                if pending_view is None:
+                    raise self._fail("Player observation has no pending decision.")
+                choice_identity = payload_digest(
+                    [
+                        "player-policy-choice-v1",
+                        self._limits.policy_seed,
+                        view["game_id"],
+                        actor_id,
+                        pending_view["request_id"],
+                    ]
+                )
                 context = PlayerDecisionContext.from_view(
                     view,
-                    choice_seed=int(
-                        payload_digest(
-                            [
-                                self._limits.policy_seed,
-                                len(self._timings),
-                                actor_id,
-                                request.request_id,
-                            ]
-                        ),
-                        16,
-                    ),
+                    choice_seed=int(choice_identity, 16),
                 )
                 if (
-                    context.request["request_id"] != request.request_id
-                    or context.route.actor_id != actor_id
+                    context.route.actor_id != actor_id
                     or context.route.decision_type != request.decision_type
                     or context.request["is_parameterized"]
                     != request.is_parameterized_submission_request()
@@ -198,16 +212,18 @@ class BoundedPolicyRunner:
                     before = self._session.decision_record_count()
                     submit_started = perf_counter()
                     try:
-                        result_id = f"ai:{self._run_id}:{len(self._timings)}"
+                        result_id = f"ai:{choice_identity}"
                         if action.option_id is not None:
-                            status = self._session.submit_option(
+                            status = self._session.submit_viewer_option(
+                                viewer=ViewerContext.for_player(actor_id),
                                 request_id=action.request_id,
                                 option_id=action.option_id,
                                 result_id=result_id,
                             )
                         else:
                             assert action.proposal_json is not None
-                            status = self._session.submit_parameterized_payload(
+                            status = self._session.submit_viewer_parameterized_payload(
+                                viewer=ViewerContext.for_player(actor_id),
                                 request_id=action.request_id,
                                 payload=validate_json_value(json.loads(action.proposal_json)),
                                 result_id=result_id,

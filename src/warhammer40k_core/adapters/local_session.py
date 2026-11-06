@@ -23,8 +23,16 @@ from warhammer40k_core.adapters.projection import (
     project_game_view,
     project_rules_catalog_view,
 )
+from warhammer40k_core.adapters.redaction import (
+    authoritative_visible_event_prefix_counts,
+    decision_request_hidden_from_context,
+    public_decision_request_payload,
+    redacted_lifecycle_status,
+    viewer_identity_map,
+)
 from warhammer40k_core.adapters.replay import submit_replay_record
 from warhammer40k_core.adapters.support_profile import SupportProfilePayload, build_support_profile
+from warhammer40k_core.adapters.viewer_identity import ViewerIdentityError, ViewerIdentityMap
 from warhammer40k_core.core.rng import RandomSource, RandomSourceError, RandomSourcePayload
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_record import DecisionRecord
@@ -47,7 +55,7 @@ from warhammer40k_core.engine.replay import (
     replay_event_log_hash,
 )
 
-LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION = "local-game-session-persistence-v1"
+LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION = "local-game-session-persistence-v2-private-rng"
 
 
 class LocalGameSessionPersistencePayload(TypedDict):
@@ -391,6 +399,58 @@ class LocalGameSession(AdapterGameSession):
             viewer_player_id=viewer_player_id,
         )
 
+    def _viewer_submission_map(
+        self, *, viewer: ViewerContext, request_id: str
+    ) -> tuple[str, ViewerIdentityMap]:
+        if type(viewer) is not ViewerContext or not viewer.policy.may_submit_decision:
+            raise GameLifecycleError("Viewer is not permitted to submit a decision.")
+        request = self.lifecycle.pending_decision_request()
+        if request is None or request.actor_id != viewer.viewer_player_id:
+            raise GameLifecycleError("Viewer does not own the pending decision.")
+        if decision_request_hidden_from_context(request=request, viewer=viewer):
+            raise GameLifecycleError("Pending decision is hidden from this viewer.")
+        identities = viewer_identity_map(
+            event_log=self.lifecycle.decision_controller.event_log, viewer=viewer
+        )
+        public = identities.project(public_decision_request_payload(request, viewer=viewer))
+        if not isinstance(public, dict) or public["request_id"] != request_id:
+            raise GameLifecycleError("Viewer submission request is stale or unissued.")
+        return request.request_id, identities
+
+    def submit_viewer_option(
+        self, *, viewer: ViewerContext, request_id: str, option_id: str, result_id: str
+    ) -> LifecycleStatus:
+        authoritative_id, identities = self._viewer_submission_map(
+            viewer=viewer, request_id=request_id
+        )
+        authoritative_option = identities.resolve(option_id, key="option_id")
+        if not isinstance(authoritative_option, str):
+            raise GameLifecycleError("Viewer option identity must remain a string.")
+        return self.submit_option(
+            request_id=authoritative_id, option_id=authoritative_option, result_id=result_id
+        )
+
+    def submit_viewer_parameterized_payload(
+        self, *, viewer: ViewerContext, request_id: str, payload: JsonValue, result_id: str
+    ) -> LifecycleStatus:
+        authoritative_id, identities = self._viewer_submission_map(
+            viewer=viewer, request_id=request_id
+        )
+        try:
+            authoritative_payload = identities.resolve(payload)
+        except ViewerIdentityError as exc:
+            state = self.lifecycle.state
+            if state is None:
+                raise GameLifecycleError("Viewer submission requires a started game.") from exc
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message=str(exc),
+                payload={"viewer_identity_validation": "unissued_or_stale_identity"},
+            )
+        return self.submit_parameterized_payload(
+            request_id=authoritative_id, payload=authoritative_payload, result_id=result_id
+        )
+
     def view_for_context(self, *, viewer: ViewerContext) -> GameViewPayload:
         if type(viewer) is not ViewerContext:
             raise GameLifecycleError("LocalGameSession view requires a ViewerContext.")
@@ -452,6 +512,33 @@ class LocalGameSession(AdapterGameSession):
             viewer=viewer,
             visible_limit=visible_limit,
         )
+
+    def authoritative_event_page_for_context(
+        self, cursor: EventStreamCursor, *, viewer: ViewerContext, visible_limit: int
+    ) -> EventStreamPagePayload:
+        self._validate_event_context(cursor=cursor, viewer=viewer)
+        return cursor.authoritative_page_for_context(
+            self.lifecycle.decision_controller.event_log, viewer=viewer, visible_limit=visible_limit
+        )
+
+    def authoritative_visible_event_prefix_counts(
+        self, *, viewer: ViewerContext
+    ) -> tuple[int, ...]:
+        self._validate_event_context(cursor=EventStreamCursor(), viewer=viewer)
+        return authoritative_visible_event_prefix_counts(
+            event_log=self.lifecycle.decision_controller.event_log, viewer=viewer
+        )
+
+    def status_for_context(self, status: LifecycleStatus, *, viewer: ViewerContext) -> JsonValue:
+        identities = viewer_identity_map(
+            event_log=self.lifecycle.decision_controller.event_log, viewer=viewer
+        )
+        request = status.decision_request
+        if request is not None and not decision_request_hidden_from_context(
+            request=request, viewer=viewer
+        ):
+            identities.project(public_decision_request_payload(request, viewer=viewer))
+        return identities.project(cast(JsonValue, redacted_lifecycle_status(status, viewer=viewer)))
 
     def visible_event_count_for_context(
         self,
@@ -567,7 +654,7 @@ def _current_rng_state(lifecycle: GameLifecycle) -> RandomSourcePayload:
         )
     try:
         manager = DiceRollManager(
-            lifecycle.state.game_id,
+            lifecycle.state.private_rng_seed,
             event_log=lifecycle.decision_controller.event_log,
         )
     except (DecisionError, EventLogError) as exc:

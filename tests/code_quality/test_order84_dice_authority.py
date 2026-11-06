@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import hashlib
 from pathlib import Path
 
@@ -19,6 +20,39 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_dice_resu
 )
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_game_dice_never_initialize_from_public_identity() -> None:
+    """Every game draw, including prefix reconstruction, uses private authority."""
+    paths = [*(ROOT / "src/warhammer40k_core/engine").rglob("*.py")]
+    paths.append(ROOT / "src/warhammer40k_core/adapters/local_session.py")
+    violations: list[str] = []
+    for path in paths:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        parents = {
+            child: parent for parent in ast.walk(tree) for child in ast.iter_child_nodes(parent)
+        }
+        for call in ast.walk(tree):
+            if not (
+                isinstance(call, ast.Call)
+                and isinstance(call.func, ast.Name)
+                and call.func.id == "DiceRollManager"
+            ):
+                continue
+            assert len(call.args) == 1, (path, call.lineno)
+            source = call.args[0]
+            if isinstance(source, ast.Constant) and source.value == 0:
+                # This pure request-shape builder never draws or exposes RNG.
+                owner = parents[call]
+                assert isinstance(owner, ast.Attribute)
+                assert owner.attr == "build_reroll_request"
+                continue
+            private_source = (
+                isinstance(source, ast.Attribute) and source.attr == "private_rng_seed"
+            ) or (isinstance(source, ast.Name) and source.id == "private_rng_seed")
+            if not private_source or not any(k.arg == "event_log" for k in call.keywords):
+                violations.append(f"{path.relative_to(ROOT)}:{call.lineno}")
+    assert not violations, "Public or implicit game RNG source: " + ", ".join(violations)
 
 
 def test_dice_result_source_artifacts_and_dispatch_remain_authoritative() -> None:

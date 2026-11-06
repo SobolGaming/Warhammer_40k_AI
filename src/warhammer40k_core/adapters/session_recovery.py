@@ -18,7 +18,10 @@ from warhammer40k_core.adapters.external_contract import (
     SESSION_PERSISTENCE_CONTRACT_VERSION,
     SESSION_PERSISTENCE_SCHEMA_VERSION,
 )
-from warhammer40k_core.adapters.server_sync import validate_cursor_position
+from warhammer40k_core.adapters.server_sync import (
+    validate_cursor_position,
+    validate_cursor_projection_anchor,
+)
 from warhammer40k_core.adapters.session_events import (
     CursorResyncReason,
     CursorValidationError,
@@ -262,7 +265,6 @@ def _validate_recovered_authority(
                 entry=entry,
                 cursor_codec=cursor_codec,
                 viewer=viewer,
-                event_retention_limit=event_retention_limit,
             )
     for _token, cursor in cursor_codec.retained_entries():
         cursor_record = sessions.get(cursor.session_id)
@@ -300,7 +302,6 @@ def _validate_committed_command_cursors(
     entry: SessionCommandJournalEntry,
     cursor_codec: SessionCursorCodec,
     viewer: ViewerContext,
-    event_retention_limit: int,
 ) -> None:
     if commitment.from_cursor is None or commitment.to_cursor is None:
         raise SessionRecoveryError("Command revision cursor commitments are missing.")
@@ -313,11 +314,24 @@ def _validate_committed_command_cursors(
     previous = record.revision_history.get(commitment.session_revision - 1)
     if previous is None:
         raise SessionRecoveryError("Command revision predecessor is missing.")
+    before_position_matches = (
+        before.cursor.session_revision == previous.session_revision
+        and before.cursor.offset == previous.event_count
+    )
+    prefix_counts = record.adapter_session.authoritative_visible_event_prefix_counts(viewer=viewer)
+    if not viewer.policy.omniscient:
+        before_position_matches = (
+            before.cursor.session_revision <= previous.session_revision
+            and before.cursor.offset <= previous.event_count
+            and prefix_counts[before.cursor.offset] == prefix_counts[previous.event_count]
+            and before.cursor.visible_sequence == prefix_counts[previous.event_count]
+        )
     if (
-        before.cursor.session_revision != previous.session_revision
-        or before.cursor.offset != previous.event_count
+        not before_position_matches
         or after.cursor.session_revision != commitment.session_revision
         or after.cursor.offset != commitment.event_count
+        or before.cursor.visible_sequence != prefix_counts[previous.event_count]
+        or after.cursor.visible_sequence != prefix_counts[commitment.event_count]
     ):
         raise SessionRecoveryError("Command revision cursor position drifted.")
     response = entry.response_payload
@@ -333,23 +347,19 @@ def _validate_committed_command_cursors(
         or projection_hash != after.cursor.projection_state_hash
     ):
         raise SessionRecoveryError("Command revision projection commitment drifted.")
-    before_snapshot = record.revision_snapshots.get(previous.session_revision)
-    after_snapshot = record.revision_snapshots.get(commitment.session_revision)
+    before_snapshot = record.revision_snapshots.get(before.cursor.session_revision)
+    after_snapshot = record.revision_snapshots.get(after.cursor.session_revision)
     if before_snapshot is not None:
-        validate_cursor_position(
+        validate_cursor_projection_anchor(
             record=record,
             viewer=viewer,
             cursor=before.cursor,
-            target=before_snapshot,
-            retention_limit=event_retention_limit,
         )
     if after_snapshot is not None:
-        validate_cursor_position(
+        validate_cursor_projection_anchor(
             record=record,
             viewer=viewer,
             cursor=after.cursor,
-            target=after_snapshot,
-            retention_limit=event_retention_limit,
         )
 
 

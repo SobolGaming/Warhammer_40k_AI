@@ -6,18 +6,33 @@ from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from typing import TypedDict, cast
 
+from warhammer40k_core.adapters.access_control import ROLE_POLICY_BY_ROLE, ViewerContext
 from warhammer40k_core.adapters.command_protocol import (
     SessionCommandEnvelope,
     SessionCommandJournalEntry,
     SessionCommandSubmissionKind,
 )
 from warhammer40k_core.adapters.contracts import AdapterSessionHistoryPayload
+from warhammer40k_core.adapters.redaction import (
+    public_decision_request_payload,
+    viewer_identity_map,
+)
 from warhammer40k_core.adapters.session_events import SessionCursor
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.decision_request import PARAMETERIZED_DECISION_OPTION_ID
-from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+    DecisionRequestPayload,
+)
+from warhammer40k_core.engine.event_log import (
+    EventLog,
+    EventRecordPayload,
+    JsonValue,
+    canonical_json,
+    validate_json_value,
+)
 
-SESSION_REVISION_COMMITMENT_SCHEMA_VERSION = "session-revision-commitment-v2"
+SESSION_REVISION_COMMITMENT_SCHEMA_VERSION = "session-revision-commitment-v3-viewer-identities"
 
 
 class SessionRevisionIntegrityError(ValueError):
@@ -560,6 +575,7 @@ def validate_command_binding(
     previous: SessionRevisionCommitment,
     entry: SessionCommandJournalEntry,
     decision_records: list[JsonValue],
+    event_records: list[JsonValue],
 ) -> None:
     envelope = commitment.origin.envelope
     if envelope is None or envelope != entry.command_envelope:
@@ -602,6 +618,21 @@ def validate_command_binding(
         or event_range["to_cursor"] != commitment.to_cursor.token
     ):
         raise SessionRevisionIntegrityError("Revision response cursor commitment drifted.")
+    authorization = entry.authorization_context
+    viewer = ViewerContext(
+        principal_id=authorization.principal_id,
+        role=authorization.role,
+        viewer_player_id=authorization.player_id,
+        policy=ROLE_POLICY_BY_ROLE[authorization.role],
+        authorization_epoch=authorization.authorization_epoch,
+    )
+    expected_revision = (
+        previous.session_revision
+        if viewer.policy.omniscient
+        else commitment.from_cursor.cursor.visible_sequence
+    )
+    if envelope.expected_session_revision != expected_revision:
+        raise SessionRevisionIntegrityError("Revision command viewer expectation drifted.")
     delta = decision_records[previous.decision_count : commitment.decision_count]
     kind = envelope.submission_kind
     if kind in {
@@ -619,17 +650,33 @@ def validate_command_binding(
             "Decision command must commit exactly one authoritative decision record."
         )
     result = _decision_result(delta)
+    identities = viewer_identity_map(
+        event_log=EventLog.from_payload(
+            cast(list[EventRecordPayload], event_records[: previous.event_count])
+        ),
+        viewer=viewer,
+    )
+    record = delta[0]
+    if not isinstance(record, dict) or not isinstance(record["request"], dict):
+        raise SessionRevisionIntegrityError("Revision decision request is invalid.")
+    request = DecisionRequest.from_payload(cast(DecisionRequestPayload, record["request"]))
+    public_request = identities.project(public_decision_request_payload(request, viewer=viewer))
+    if not isinstance(public_request, dict) or type(public_request["request_id"]) is not str:
+        raise SessionRevisionIntegrityError("Revision public request identity is invalid.")
     if (
-        result["request_id"] != envelope.request_id
+        identities.project(result["request_id"], key="request_id") != envelope.request_id
         or result["result_id"] != envelope.result_id
         or result["actor_id"] != entry.authorization_context.player_id
     ):
         raise SessionRevisionIntegrityError("Revision command decision identity drifted.")
     if kind is SessionCommandSubmissionKind.FINITE_OPTION:
-        if result["selected_option_id"] != envelope.option_id():
+        if (
+            identities.project(result["selected_option_id"], key="option_id")
+            != envelope.option_id()
+        ):
             raise SessionRevisionIntegrityError("Revision finite option drifted.")
     elif result["selected_option_id"] != PARAMETERIZED_DECISION_OPTION_ID or canonical_json(
-        result["payload"]
+        identities.project(result["payload"], scope=public_request["request_id"])
     ) != canonical_json(envelope.parameterized_payload()):
         raise SessionRevisionIntegrityError("Revision parameterized payload drifted.")
 

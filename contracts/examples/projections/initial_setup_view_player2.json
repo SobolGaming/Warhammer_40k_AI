@@ -14755,7 +14755,7 @@
       "secret": true
     },
     "request_id": "hidden-request",
-    "schema_version": "decision-request-view-v5-phase17n-step4"
+    "schema_version": "decision-request-view-v6-viewer-identities"
   },
   "pending_proposal": null,
   "player_ids": [
@@ -14768,8 +14768,8 @@
     "markers": []
   },
   "primary_rules_unit_turn_start_snapshots": [],
-  "projection_schema": "game-view-v13-random-profiles",
-  "projection_state_hash": "3779c6e4834602019a86ec69924df642687ff12a3f48bd8a0c30df2c204f7fdd",
+  "projection_schema": "game-view-v14-viewer-identities",
+  "projection_state_hash": "3341619b5b94080d5b6b2b66c9246b67c9d964b3659bd2f41e8e0da415900b04",
   "public_army_rosters": [
     {
       "army_id": "army-alpha",

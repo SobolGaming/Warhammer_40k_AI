@@ -152,7 +152,7 @@ def apply_movement_phase_end_mortal_wound_feel_no_pain_decision(
         MOVEMENT_PHASE_END_MORTAL_WOUNDS_SOURCE_KIND
     ):
         raise GameLifecycleError("Movement phase-end Feel No Pain source context is invalid.")
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     routed = resolve_mortal_wound_decision(
         state=state,
         decisions=decisions,
@@ -235,7 +235,7 @@ def _resolve_effect(
         or phase_end_payload.get("roll_count_scope") != "each_model_in_this_unit_at_phase_end"
     ):
         raise GameLifecycleError("Movement phase-end mortal wound roll semantics drifted.")
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     trigger_roll_payload: JsonValue = None
     success_count = 0
     if model_ids:

@@ -1134,7 +1134,9 @@ def _roll_code_chivalric_d6(
     reason: str,
     roll_type: str,
 ) -> DiceRollState:
-    return DiceRollManager(context.state.game_id, event_log=context.decisions.event_log).roll(
+    return DiceRollManager(
+        context.state.private_rng_seed, event_log=context.decisions.event_log
+    ).roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),
             reason=reason,

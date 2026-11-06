@@ -61,7 +61,7 @@ def test_icon_killing_attack_credits_one_point_then_next_blessings_spends_once()
 
 @pytest.mark.parametrize("icon", [True, False])
 def test_attached_leader_kill_credits_bodyguard_icon_once_and_spends(icon: bool) -> None:
-    session = attached_gameplay_session(game_id="we-attached-icon-1", icon=icon)
+    session = attached_gameplay_session(game_id="we-attached-icon-1:private-0", icon=icon)
     source_id = "attached-unit:army-alpha:bodyguard"
     complete_activation(session, source_id)
     assert_completed_melee(session.lifecycle, unit_instance_id=source_id)
@@ -109,7 +109,9 @@ def test_icon_credit_preserves_casualty_order_after_bodyguard_destruction(
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
     session = attached_gameplay_session(
-        game_id="we-attached-icon-before-0" if destroy_before_kill else "we-attached-icon-1"
+        game_id="we-attached-icon-before-0"
+        if destroy_before_kill
+        else "we-attached-icon-1:private-0"
     )
     state = session.lifecycle.state
     assert state is not None

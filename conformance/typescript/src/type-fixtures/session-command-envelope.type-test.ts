@@ -1,7 +1,7 @@
 import type { ParameterizedPayload, SessionCommandEnvelope } from "../contract.js";
 
 const validFiniteCommand = {
-  schema_version: "session-command-envelope-v2-weapon-instances",
+  schema_version: "session-command-envelope-v3-viewer-identities",
   command_id: "command-valid",
   session_id: "session-valid",
   expected_session_revision: 4,
@@ -13,7 +13,7 @@ void validFiniteCommand;
 
 // @ts-expect-error command_id is required by the generated operation request body.
 const missingRequiredField: SessionCommandEnvelope = {
-  schema_version: "session-command-envelope-v2-weapon-instances",
+  schema_version: "session-command-envelope-v3-viewer-identities",
   session_id: "session-missing",
   expected_session_revision: 0,
   request_id: null,
@@ -23,7 +23,7 @@ const missingRequiredField: SessionCommandEnvelope = {
 void missingRequiredField;
 
 const extraRequestField = {
-  schema_version: "session-command-envelope-v2-weapon-instances",
+  schema_version: "session-command-envelope-v3-viewer-identities",
   command_id: "command-extra",
   session_id: "session-extra",
   expected_session_revision: 0,
@@ -36,7 +36,7 @@ const extraRequestField = {
 void extraRequestField;
 
 const invalidSubmissionCombination = {
-  schema_version: "session-command-envelope-v2-weapon-instances",
+  schema_version: "session-command-envelope-v3-viewer-identities",
   command_id: "command-invalid-combination",
   session_id: "session-invalid-combination",
   expected_session_revision: 2,

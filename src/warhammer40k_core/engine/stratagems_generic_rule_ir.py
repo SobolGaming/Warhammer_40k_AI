@@ -1123,7 +1123,7 @@ def _generic_triggered_move_distance_roll(
 ) -> tuple[JsonValue, int]:
     roll_sides = _optional_rule_effect_int_parameter(effect_payload, "roll_sides")
     if roll_sides is None:
-        d3_result = DiceRollManager(state.game_id, event_log=decisions.event_log).roll_d3(
+        d3_result = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).roll_d3(
             reason=f"{definition.stratagem_id} triggered normal move for {moving_unit_id}",
             roll_type="generic_rule_ir_triggered_normal_move_d3",
             actor_id=use_record.player_id,
@@ -1135,7 +1135,7 @@ def _generic_triggered_move_distance_roll(
     distance_bonus = 0 if distance_bonus is None else distance_bonus
     roll_type = _optional_rule_effect_string_parameter(effect_payload, "roll_type")
     roll_type = "generic_rule_ir_triggered_normal_move" if roll_type is None else roll_type
-    roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
+    roll_state = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=quantity, sides=roll_sides),
             reason=f"{definition.stratagem_id} triggered normal move for {moving_unit_id}",

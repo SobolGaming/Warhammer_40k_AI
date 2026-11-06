@@ -141,7 +141,7 @@ def test_rage_fuelled_invigoration_keeps_overrun_core_distance_and_expires() -> 
 
 @pytest.mark.parametrize("choice", ["auto-wound", "roll-to-wound"])
 def test_martial_excellence_warp_blades_resolve_chosen_wounds_and_damage(choice: str) -> None:
-    session = gameplay_session(game_id="we-blessings-outcome-13")
+    session = gameplay_session(game_id="we-blessings-outcome-13:private-16")
     select_blessings(
         session,
         army_rule.BlessingOfKhorne.MARTIAL_EXCELLENCE,
@@ -246,7 +246,7 @@ def test_attached_blessing_selection_targets_one_rules_unit_and_all_component_mo
     blessing: army_rule.BlessingOfKhorne,
 ) -> None:
     game_id = (
-        "we-attached-native-1"
+        "we-attached-native-1:private-0"
         if blessing
         in {
             army_rule.BlessingOfKhorne.WARP_BLADES,

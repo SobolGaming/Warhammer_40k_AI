@@ -35,6 +35,7 @@ from tests.shared.category_migration.phase11e_mission_scoring_cleanup_state_prim
     _record_active_tactical_secondary,
     _secondary_choice,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 
 
 def _battle_state(
@@ -139,6 +140,7 @@ def _config(*, mission_setup: MissionSetup | None = None) -> GameConfig:
     catalog = _catalog_with_directional_force_dispositions()
     resolved_mission_setup = _mission_setup() if mission_setup is None else mission_setup
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase11e-game"),
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
@@ -186,6 +188,7 @@ def _config_for_primary(
 def _config_with_player_a_vehicle() -> GameConfig:
     catalog = _catalog_with_directional_force_dispositions()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase11e-game"),
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
@@ -234,6 +237,7 @@ def _config_with_player_a_vehicle() -> GameConfig:
 def _config_with_two_player_a_infantry_units() -> GameConfig:
     catalog = _catalog_with_directional_force_dispositions()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase11e-game"),
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
@@ -267,6 +271,7 @@ def _config_with_player_a_attached_unit(
     catalog = _catalog_with_directional_force_dispositions()
     resolved_mission_setup = _mission_setup() if mission_setup is None else mission_setup
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase11e-game"),
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
@@ -338,6 +343,7 @@ def _config_with_player_a_attached_unit(
 def _config_with_player_a_transport() -> GameConfig:
     catalog = _catalog_with_directional_force_dispositions()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase11e-game"),
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
@@ -386,6 +392,7 @@ def _config_with_player_a_transport() -> GameConfig:
 def _config_with_player_b_character(*, mission_setup: MissionSetup) -> GameConfig:
     catalog = _catalog_with_directional_force_dispositions()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase11e-game"),
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
@@ -434,6 +441,7 @@ def _config_with_player_b_vehicles(
     catalog = _catalog_with_directional_force_dispositions()
     resolved_mission_setup = _mission_setup() if mission_setup is None else mission_setup
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase11e-game"),
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
@@ -482,6 +490,7 @@ def _config_with_player_b_vehicles(
 def _config_with_player_b_horde_units(unit_ids: tuple[str, ...]) -> GameConfig:
     catalog = _catalog_with_directional_force_dispositions()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase11e-game"),
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),

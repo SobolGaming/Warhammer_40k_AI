@@ -8,7 +8,6 @@ from warhammer40k_core.adapters.external_contract import (
     EVENT_STREAM_DELTA_SCHEMA_VERSION,
     SESSION_PROJECTION_SCHEMA_VERSION,
 )
-from warhammer40k_core.adapters.redaction import redacted_lifecycle_status
 from warhammer40k_core.adapters.session_events import (
     CursorResyncReason,
     CursorValidationError,
@@ -60,7 +59,7 @@ def session_projection_payload(
         "schema_version": SESSION_PROJECTION_SCHEMA_VERSION,
         "session_id": record.session_id,
         "game_id": record.game_id,
-        "session_revision": snapshot.session_revision,
+        "session_revision": record.viewer_revision(viewer=viewer, snapshot=snapshot),
         "visibility_role": viewer.role.value,
         "projection_state_hash": projection_hash,
         "event_cursor": cursor,
@@ -84,7 +83,7 @@ def session_checkpoint(
     return {
         "visibility_role": viewer.role.value,
         "viewer_player_id": viewer.viewer_player_id,
-        "session_revision": snapshot.session_revision,
+        "session_revision": record.viewer_revision(viewer=viewer, snapshot=snapshot),
         "projection_state_hash": projection_hash,
         "event_cursor": _issue_cursor(
             record=record,
@@ -110,9 +109,8 @@ def session_metadata_payload(
     return record.metadata_payload(
         snapshot=snapshot,
         viewer=viewer,
-        lifecycle_status=cast(
-            JsonValue,
-            redacted_lifecycle_status(snapshot.lifecycle_status, viewer=viewer),
+        lifecycle_status=snapshot.adapter_session.status_for_context(
+            snapshot.lifecycle_status, viewer=viewer
         ),
         projection_state_hash=checkpoint["projection_state_hash"],
         event_cursor=checkpoint["event_cursor"],
@@ -177,7 +175,7 @@ def session_event_delta_payload(
                 cursor_codec=cursor_codec,
                 retention_limit=retained,
             )
-    internal_delta = target.adapter_session.event_page_for_context(
+    internal_delta = target.adapter_session.authoritative_event_page_for_context(
         EventStreamCursor(cursor.offset),
         viewer=viewer,
         visible_limit=limit,
@@ -205,8 +203,10 @@ def session_event_delta_payload(
         "session_id": record.session_id,
         "game_id": record.game_id,
         "visibility_role": viewer.role.value,
-        "from_revision": cursor.session_revision,
-        "to_revision": boundary.session_revision,
+        "from_revision": cursor.session_revision
+        if viewer.policy.omniscient
+        else cursor.visible_sequence,
+        "to_revision": record.viewer_revision(viewer=viewer, snapshot=boundary),
         "projection_state_hash": boundary_hash,
         "supplied_cursor": supplied_cursor,
         "next_cursor": next_cursor,
@@ -234,12 +234,12 @@ def validate_cursor_position(
     retention_limit: int,
 ) -> None:
     floor = retention_floor(
-        event_count=target.event_count,
-        retention_limit=retention_limit,
+        event_count=_visible_event_count(target, viewer=viewer),
+        retention_limit=min(retention_limit, record.revision_retention_limit),
     )
-    if cursor.offset < floor:
+    if cursor.visible_sequence < floor:
         raise CursorValidationError(CursorResyncReason.EXPIRED)
-    if cursor.session_revision < record.minimum_retained_revision:
+    if viewer.policy.omniscient and cursor.session_revision < record.minimum_retained_revision:
         raise CursorValidationError(CursorResyncReason.EXPIRED)
     if cursor.offset > target.event_count or cursor.session_revision > target.session_revision:
         raise CursorValidationError(CursorResyncReason.AHEAD)
@@ -249,8 +249,21 @@ def validate_cursor_position(
     )
     if cursor.visible_sequence != visible_sequence:
         raise CursorValidationError(CursorResyncReason.PROJECTION_HASH_MISMATCH)
+    validate_cursor_projection_anchor(record=record, viewer=viewer, cursor=cursor)
+
+
+def validate_cursor_projection_anchor(
+    *, record: AuthoritativeSession, viewer: ViewerContext, cursor: SessionCursor
+) -> None:
+    """Check a retained anchor independently of live polling expiry.
+
+    Durable callers first authenticate the cursor and bind its exact position
+    to committed history. Historical command evidence does not expire.
+    """
     try:
-        cursor_snapshot = record.snapshot(cursor.session_revision)
+        cursor_snapshot = record.snapshot_at_event_offset(
+            offset=cursor.offset, maximum_revision=cursor.session_revision
+        )
     except SessionProtocolError as exc:
         raise CursorValidationError(CursorResyncReason.EXPIRED) from exc
     cursor_view = cursor_snapshot.adapter_session.view_for_context(viewer=viewer)
@@ -284,8 +297,8 @@ def _resync_payload(
         "session_id": record.session_id,
         "game_id": record.game_id,
         "visibility_role": viewer.role.value,
-        "from_revision": target.session_revision,
-        "to_revision": target.session_revision,
+        "from_revision": record.viewer_revision(viewer=viewer, snapshot=target),
+        "to_revision": record.viewer_revision(viewer=viewer, snapshot=target),
         "projection_state_hash": target_hash,
         "supplied_cursor": (
             REDACTED_INVALID_CURSOR if reason is CursorResyncReason.MALFORMED else supplied_cursor
@@ -338,10 +351,10 @@ def _issue_cursor(
         session_revision=cursor_snapshot.session_revision,
         projection_state_hash=projection_state_hash,
         minimum_offset=retention_floor(
-            event_count=retention_target.event_count,
-            retention_limit=record.event_retention_limit,
+            event_count=_visible_event_count(retention_target, viewer=viewer),
+            retention_limit=min(record.event_retention_limit, record.revision_retention_limit),
         ),
-        minimum_revision=record.minimum_retained_revision,
+        minimum_revision=record.minimum_retained_revision if viewer.policy.omniscient else 0,
     )
 
 

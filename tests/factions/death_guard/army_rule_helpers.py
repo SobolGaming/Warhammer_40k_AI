@@ -8,6 +8,7 @@ from tests.phase11c_command_phase_helpers import (
     battle_state_with_center_objective_positions,
     default_unit_selection,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.unit_keyword_helpers import with_unit_keywords
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -454,6 +455,7 @@ def _advance_through_secondary_choices(lifecycle: GameLifecycle) -> LifecycleSta
 def _death_guard_config() -> GameConfig:
     catalog = _death_guard_catalog()
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase17g-death-guard-lifecycle-game"),
         game_id="phase17g-death-guard-lifecycle-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(

@@ -208,7 +208,7 @@ def _resolve_poisoned_target(
     effects: tuple[PersistingEffect, ...],
 ) -> LifecycleStatus | None:
     state = context.state
-    manager = DiceRollManager(state.game_id, event_log=context.decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=context.decisions.event_log)
     trigger_roll = manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),

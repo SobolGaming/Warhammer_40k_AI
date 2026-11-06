@@ -16,6 +16,7 @@ SESSION_PRODUCER_PATHS = (
     ROOT / "src" / "warhammer40k_core" / "adapters" / "network.py",
     ROOT / "src" / "warhammer40k_core" / "adapters" / "headless.py",
     ROOT / "src" / "warhammer40k_core" / "adapters" / "replay.py",
+    ROOT / "src" / "warhammer40k_core" / "ai" / "runner.py",
 )
 SESSION_PROTOCOL_PATH = ROOT / "src" / "warhammer40k_core" / "adapters" / "contracts.py"
 
@@ -31,6 +32,8 @@ ADAPTER_FACING_NAMES = frozenset(
         "result_for_parameterized_payload",
         "submit_option",
         "submit_parameterized_payload",
+        "submit_viewer_option",
+        "submit_viewer_parameterized_payload",
     )
 )
 ADAPTER_FACING_METHODS = frozenset(
@@ -38,6 +41,8 @@ ADAPTER_FACING_METHODS = frozenset(
         "events_since",
         "submit_option",
         "submit_parameterized_payload",
+        "submit_viewer_option",
+        "submit_viewer_parameterized_payload",
         "view",
     )
 )
@@ -80,6 +85,8 @@ SESSION_PROTOCOL_METHODS = frozenset(
         "advance_until_decision_or_terminal",
         "authoritative_history_payload",
         "authoritative_identity_payload",
+        "authoritative_event_page_for_context",
+        "authoritative_visible_event_prefix_counts",
         "decision_record_count",
         "event_page_for_context",
         "event_record_count",
@@ -89,8 +96,11 @@ SESSION_PROTOCOL_METHODS = frozenset(
         "replay_artifact",
         "rules_catalog_view",
         "start",
+        "status_for_context",
         "submit_option",
         "submit_parameterized_payload",
+        "submit_viewer_option",
+        "submit_viewer_parameterized_payload",
         "support_profile",
         "to_persistence_payload",
         "view",
@@ -178,6 +188,8 @@ def bypass(session: object) -> None:
     session.lifecycle._pending_decision_request()
     session.decision_controller
     session.submit_decision(None)
+    session.submit_option(request_id="raw")
+    session.submit_parameterized_payload(request_id="raw")
 """
     )
 
@@ -186,12 +198,41 @@ def bypass(session: object) -> None:
         tree=tree,
     )
 
-    assert len(violations) == 8
+    assert len(violations) == 10
     assert any("warhammer40k_core.engine.lifecycle" in violation for violation in violations)
     assert any("GameLifecycle" in violation for violation in violations)
     assert sum("lifecycle" in violation for violation in violations) == 5
     assert any("decision_controller" in violation for violation in violations)
     assert any("submit_decision" in violation for violation in violations)
+    assert any("submit_option" in violation for violation in violations)
+    assert any("submit_parameterized_payload" in violation for violation in violations)
+
+
+def test_engine_decision_labels_do_not_embed_authoritative_ordinals() -> None:
+    def references(tree: ast.AST) -> list[int]:
+        fields = {"request_id", "event_id", "record_id", "roll_id", "decision_request_count"}
+        return [
+            node.lineno
+            for node in ast.walk(tree)
+            if isinstance(node, ast.keyword)
+            and node.arg == "label"
+            and any(
+                (isinstance(part, ast.Name) and part.id in fields)
+                or (isinstance(part, ast.Attribute) and part.attr in fields)
+                for part in ast.walk(node.value)
+            )
+        ]
+
+    assert references(ast.parse('DecisionOption(label=f"{request.request_id}")'))
+    assert not references(ast.parse('DecisionOption(label=f"{unit.unit_instance_id}")'))
+    violations = [
+        f"{path.relative_to(ROOT)}:{line}"
+        for path in (ROOT / "src/warhammer40k_core/engine").rglob("*.py")
+        for line in references(ast.parse(path.read_text(encoding="utf-8")))
+    ]
+    assert not violations, "Decision labels expose authoritative ordinals:\n" + "\n".join(
+        violations
+    )
 
 
 def _test_paths() -> tuple[Path, ...]:
@@ -211,6 +252,15 @@ def _class_node(*, tree: ast.Module, class_name: str) -> ast.ClassDef:
 def _session_producer_bypass_violations(*, path: Path, tree: ast.Module) -> list[str]:
     violations: list[str] = []
     for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr in {"submit_option", "submit_parameterized_payload"}
+            and path.name != "replay.py"
+        ):
+            violations.append(
+                _format_violation(path=path, line_number=node.lineno, call_name=node.func.attr)
+            )
         if isinstance(node, ast.ImportFrom):
             if node.module in SESSION_PRODUCER_FORBIDDEN_IMPORT_MODULES:
                 violations.append(

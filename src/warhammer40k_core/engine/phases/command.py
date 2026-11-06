@@ -1263,7 +1263,7 @@ def _resolve_battle_shock_step(
     )
     command_state = _command_step_state(state)
     phase_start_battle_shocked_unit_ids = command_state.battle_shock_phase_start_unit_ids
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     runtime = BattleShockTestRuntime(
         ability_indexes_by_player_id={active_player_id: ability_index},
         runtime_modifier_registry=runtime_modifier_registry,

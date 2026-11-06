@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v3/create-session.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v4/create-session.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -294,6 +294,7 @@
           "type": "array"
         },
         "game_id": {"minLength": 1, "type": "string"},
+        "private_rng_seed": {"type": "string", "pattern": "^[0-9a-f]{64}$", "description": "Operator-only private entropy; never publish in player views."},
         "max_lifecycle_transitions": {"minimum": 1, "type": "integer"},
         "mission_setup": {
           "oneOf": [
@@ -377,6 +378,7 @@
       },
       "required": [
         "game_id",
+        "private_rng_seed",
         "ruleset_descriptor",
         "army_catalog",
         "army_muster_requests",
@@ -392,7 +394,7 @@
       "type": "object"
     },
     "schema_version": {
-      "const": "create-session-v3",
+      "const": "create-session-v4-private-rng",
       "type": "string"
     }
   },

@@ -454,25 +454,85 @@ def test_a32_oct14_explicit_recovery_restores_continues_forks_and_replays() -> N
     assert historical_checkpoint_bytes() == raw
 
 
-def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes() -> None:
+def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import hashlib
+
     from tests.support.a32_recovery import historical_checkpoint_bytes, recovered_payload
     from warhammer40k_core.adapters.checkpoint_reconstruction import (
         PROFILE_ID,
         reconstruct_local_checkpoint,
     )
     from warhammer40k_core.engine.event_log import canonical_json
+    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.setup_completion import SetupReplayCheckpoint
 
     raw = historical_checkpoint_bytes()
     first = recovered_payload()
+    original = json.loads(raw)
+    old_start = original["lifecycle"]["decisions"]["event_log"][38]["payload"]
+    original_capture = SetupReplayCheckpoint.from_state
+    observed: set[str] = set()
+
+    def observe_checkpoint(*, state: GameState, checkpoint_kind: str) -> SetupReplayCheckpoint:
+        # Passive observation: the real engine result is returned unchanged.
+        checkpoint = original_capture(state=state, checkpoint_kind=checkpoint_kind)
+        payload = validate_json_value(state.to_payload())
+        assert isinstance(payload, dict)
+        assert hashlib.sha256(canonical_json(payload).encode()).hexdigest() == checkpoint.state_hash
+        assert (
+            payload.pop("private_rng_seed")
+            == hashlib.sha256(b"a32-exact-artifact-reconstruction-v3:3223").hexdigest()
+        )
+        assert payload.pop("tactical_secondary_draw_sequence") == 0
+        field = (
+            "pre_battle_checkpoint"
+            if checkpoint_kind == "pre_battle_start"
+            else "post_battle_start_checkpoint"
+        )
+        assert (
+            hashlib.sha256(canonical_json(payload).encode()).hexdigest()
+            == old_start[field]["state_hash"]
+        )
+        observed.add(checkpoint_kind)
+        return checkpoint
+
+    monkeypatch.setattr(SetupReplayCheckpoint, "from_state", observe_checkpoint)
     second = reconstruct_local_checkpoint(raw, profile_id=PROFILE_ID)
+    assert observed == {"pre_battle_start", "post_battle_start"}
     assert canonical_json(first) == canonical_json(second)
     assert isinstance(second, dict)
     checkpoint = second["checkpoint"]
     assert isinstance(checkpoint, dict)
-    original = json.loads(raw)
-    assert checkpoint["rng_state"] == original["rng_state"]
+    rng = checkpoint["rng_state"]
+    assert isinstance(rng, dict)
+    assert rng["history"] == original["rng_state"]["history"]
+    assert rng["draw_count"] == original["rng_state"]["draw_count"] == 5
+    assert rng["seed"] != original["rng_state"]["seed"]
+    assert rng["seed"] == hashlib.sha256(b"a32-exact-artifact-reconstruction-v3:3223").hexdigest()
+    lifecycle = checkpoint["lifecycle"]
+    assert isinstance(lifecycle, dict)
+    config = lifecycle["config"]
+    assert isinstance(config, dict)
+    state = lifecycle["state"]
+    assert isinstance(state, dict)
+    assert config["private_rng_seed"] == state["private_rng_seed"] == rng["seed"]
+    assert state["tactical_secondary_draw_sequence"] == 0
+    decisions = lifecycle["decisions"]
+    assert isinstance(decisions, dict)
+    events = decisions["event_log"]
+    assert isinstance(events, list)
+    assert [
+        event["payload"]["values"]
+        for event in events
+        if isinstance(event, dict)
+        and event["event_type"] == "dice_rolled"
+        and isinstance(event["payload"], dict)
+    ] == [[4], [4], [2], [1], [2]]
     assert checkpoint["source_identity"] == {
         **original["source_identity"],
+        "game_config_hash": hashlib.sha256(canonical_json(config).encode()).hexdigest(),
         "mission_source_package_hash": (
             "8f76fcf275397bd2ffabf16d3e127f059fb476e0144654bd54e550f5dd16faa1"
         ),
@@ -483,7 +543,19 @@ def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes()
     assert provenance["reconstructed_event_count"] == 138
     assert provenance["decision_count"] == 18
     assert provenance["original_byte_replay_claimed"] is False
-    assert provenance["recipe_version"] == "recorded-decision-reconstruction-v2-mission-scope"
+    assert provenance["recipe_version"] == "recorded-decision-reconstruction-v3-audit-rng"
+    assert provenance["original_decisions_and_gameplay_outcomes_preserved"] is True
+    assert provenance["original_rng_metadata_preserved"] is False
+    assert provenance["secret_competitive_rng_suitable"] is False
+    rng_mapping = provenance["rng_metadata_mapping"]
+    assert isinstance(rng_mapping, dict)
+    assert rng_mapping["original_seed"] == original["rng_state"]["seed"]
+    assert rng_mapping["reconstructed_seed"] == rng["seed"]
+    assert rng_mapping["preserved_dice_faces"] == [4, 4, 2, 1, 2]
+    assert rng_mapping["tactical_secondary_draw_sequence"] == 0
+    hash_mappings = provenance["setup_checkpoint_state_hash_mappings"]
+    assert isinstance(hash_mappings, list)
+    assert len(hash_mappings) == 3
     mapping = provenance["mission_source_identity_mapping"]
     assert isinstance(mapping, dict)
     assert mapping["original"] == original["source_identity"]["mission_source_package_hash"]
@@ -491,7 +563,7 @@ def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes()
     assert isinstance(reconstructed_identity, dict)
     assert mapping["reconstructed"] == reconstructed_identity["mission_source_package_hash"]
     assert mapping["added_scoring_value"] == "player_turn"
-    assert second["schema_version"] == "local-checkpoint-reconstruction-v2-mission-scope"
+    assert second["schema_version"] == "local-checkpoint-reconstruction-v3-audit-rng"
 
 
 @pytest.mark.parametrize(
@@ -509,6 +581,13 @@ def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes()
         "changed_other_source_identity",
         "changed_identity_mapping",
         "old_reconstruction_schema",
+        "changed_rng_seed",
+        "changed_rng_history",
+        "changed_rng_draw_count",
+        "changed_draw_sequence",
+        "missing_history_seed",
+        "changed_rng_mapping",
+        "changed_setup_checkpoint_hash",
     ],
 )
 def test_a32_oct14_recovery_rejects_inconsistent_reconstructions(change: str) -> None:
@@ -542,6 +621,14 @@ def test_a32_oct14_recovery_rejects_inconsistent_reconstructions(change: str) ->
         event = events[-1]
         assert isinstance(event, dict)
         event["event_type"] = "unexplained_event"
+    elif change == "changed_setup_checkpoint_hash":
+        event = events[38]
+        assert isinstance(event, dict)
+        payload = event["payload"]
+        assert isinstance(payload, dict)
+        checkpoint_state = payload["pre_battle_checkpoint"]
+        assert isinstance(checkpoint_state, dict)
+        checkpoint_state["state_hash"] = "0" * 64
     elif change == "changed_state":
         state = lifecycle["state"]
         assert isinstance(state, dict)
@@ -566,7 +653,32 @@ def test_a32_oct14_recovery_rejects_inconsistent_reconstructions(change: str) ->
         }[change]
         identity[field] = "unregistered" if field == "mission_pack_id" else "0" * 64
     elif change == "old_reconstruction_schema":
-        package["schema_version"] = "local-checkpoint-reconstruction-v1"
+        package["schema_version"] = "local-checkpoint-reconstruction-v2-mission-scope"
+    elif change in {"changed_rng_seed", "changed_rng_history", "changed_rng_draw_count"}:
+        rng = checkpoint["rng_state"]
+        assert isinstance(rng, dict)
+        if change == "changed_rng_seed":
+            rng["seed"] = "0" * 64
+        elif change == "changed_rng_history":
+            rng["history"] = []
+        else:
+            rng["draw_count"] = 6
+    elif change == "changed_draw_sequence":
+        state = lifecycle["state"]
+        assert isinstance(state, dict)
+        state["tactical_secondary_draw_sequence"] = 1
+    elif change == "missing_history_seed":
+        origin = lifecycle["psychic_modifier_history_origin"]
+        assert isinstance(origin, dict)
+        state = origin["state"]
+        assert isinstance(state, dict)
+        del state["private_rng_seed"]
+    elif change == "changed_rng_mapping":
+        provenance = package["provenance"]
+        assert isinstance(provenance, dict)
+        rng_mapping = provenance["rng_metadata_mapping"]
+        assert isinstance(rng_mapping, dict)
+        rng_mapping["reconstructed_seed"] = "0" * 64
     elif change == "changed_identity_mapping":
         provenance = package["provenance"]
         assert isinstance(provenance, dict)

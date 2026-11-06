@@ -13,6 +13,15 @@ copy. The context contains an exact route and a policy-only deterministic choice
 seed. It contains no session, lifecycle, authoritative state, persistence payload,
 opponent-private request, engine RNG seed/state, or raw lifecycle status.
 
+New games generate 256 bits of private entropy independently of `game_id`.
+Operators can set `GameConfig.private_rng_seed` explicitly for reproducible runs.
+The same seed is copied into authoritative state and retained by persistence and
+replay. Dice and tactical-card draws consume that private authority. Tactical
+draws also persist an engine-owned occurrence sequence; reusing a caller's result
+ID does not reuse a previous card ranking. Public state serialization excludes
+both private fields. Public game IDs remain unchanged. Published
+smoke fixtures use explicit fixed test seeds and are not competitive game seeds.
+
 This is a cooperative Python API boundary, not an isolation sandbox for hostile
 code. Callers must not capture an authoritative session in their policy, reuse
 the engine seed as the policy seed, or mutate the session concurrently. A future
@@ -29,10 +38,20 @@ policies must begin in the declared initial state for reproducible execution.
 `PlayerPolicy.choose(context)` returns `context.select_option(option_id)` or
 `context.propose(payload)`. Both bind actor, request ID and observation hash.
 The runner rejects binding drift and rechecks the current player projection
-before committing through the existing adapter submission methods. The engine
+before committing through the viewer-scoped adapter submission methods. The engine
 retains all rules validation, mutation, accepted records and replay authority.
 The existing [adapter decision contract](ADAPTER_DECISION_CONTRACT.md) and wire
-submission families are unchanged.
+finite and parameterized submission families remain the decision authority.
+
+Player-facing requests, nested proposals and event references use identities
+assigned from the viewer's redacted history. Additional hidden opponent choices
+do not change these identities or the player observation hash. The trusted host
+resolves an issued viewer identity before submitting the original authoritative
+request to the engine. Wrong actors, unissued identities and stale bindings fail
+before mutation. The host/replay methods `submit_option` and
+`submit_parameterized_payload` use authoritative identities; policies and wire
+clients use `submit_viewer_option` and `submit_viewer_parameterized_payload`.
+There is no automatic acceptance of the other identity namespace.
 
 Missing routes, wrong actors, stale/malformed choices, engine invalid/unsupported
 results and `CandidateExhaustedError` stop execution. There is no first-legal,
@@ -66,6 +85,18 @@ policy configuration, separate policy seed, limits and requested boundary.
 Wall-clock timings are diagnostics, not part of deterministic decisions.
 Keep the existing session replay artifact as the authoritative execution record.
 
+Choice seeds and submitted result IDs use only the separate policy seed and the
+player-visible game, actor and pending-request identities. They do not use another
+actor's policy-call count or the operator-only run ID.
+
+Contract 46 requires the private seed in operator game-config and saved-state
+payloads, and a nonnegative tactical draw sequence in saved state. Old
+public-identity-seeded checkpoints/replays require their original
+runtime; current loaders reject them explicitly. The engine never invents a seed
+for a missing saved value, silently changes an existing game's future draws, or
+infers a private seed from a public ID. Fresh Python construction may generate
+entropy; restoring an existing game must preserve its recorded seed exactly.
+
 ## Exact v995 Daemons mirror inventory
 
 Workload: [the 2,000-point app roster](../data/army_lists/cavalcade-shadow-bloodthirster.json),
@@ -87,7 +118,7 @@ profile and capability manifest.
 |---|---|---|
 | Strict roster, points, geometry, layout | Engine-owned mustering and configured mission setup | Supported by real admission tests; no policy choice is synthesized. |
 | Secret secondary selection | `select_secondary_missions`, setup `select_secondary_missions` | Both player routes exercised; explicit fixed Assassination + Bring It Down; opponent's unresolved selection stays hidden. Tactical mode is unverified here. |
-| Reserve declarations | `select_reserve_declaration`, setup `declare_battle_formations` | Explicitly complete declarations with all units deploying. Selecting reserves, attachments or transport branches is unverified here. |
+| Reserve declarations | `select_reserve_declaration`, setup `declare_battle_formations` | The full setup recipe completes declarations with all units deploying. A separate real-session isolation regression selects Nurglings for Deep Strike and verifies that the extra hidden choice does not change the opponent's observation or events. Subsequent arrival, attachments and transport branches remain unverified here. |
 | Alternate unit selection | `select_deployment_unit`, setup `deploy_armies` | Both actors follow the committed deployment recipe. Other deployment orders are unverified here. |
 | Legal model placement / Infiltrators | `submit_deployment_placement`, proposal `deployment_placement`, setup `deploy_armies` | All 78 models use the committed source-layout recipe through engine validation. No general placement solver is supplied. |
 | Scouts / prebattle actions | `select_prebattle_action`, setup `resolve_prebattle_actions` | Explicitly decline Scout moves. Actual Scout movement proposals and their path witnesses are unverified here. |

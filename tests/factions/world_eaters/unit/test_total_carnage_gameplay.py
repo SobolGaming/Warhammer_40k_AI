@@ -84,7 +84,9 @@ def test_total_carnage_ineligible_or_failed_trigger_completes_killing_attack(bra
 
 @pytest.mark.parametrize("accept", [False, True])
 def test_total_carnage_real_kill_decline_or_retained_fight_and_single_cleanup(accept: bool) -> None:
-    session = gameplay_session(game_id="we-carnage-outcome-3", lethal=True, enemy_first=True)
+    session = gameplay_session(
+        game_id="we-carnage-outcome-3:private-1", lethal=True, enemy_first=True
+    )
     select_blessings(session, army_rule.BlessingOfKhorne.TOTAL_CARNAGE)
     request = reach(session, "select_destruction_reaction")
     state = session.lifecycle.state

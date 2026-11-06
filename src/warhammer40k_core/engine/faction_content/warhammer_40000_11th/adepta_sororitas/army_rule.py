@@ -699,7 +699,7 @@ def gain_miracle_die(
     if current_phase is None:
         raise GameLifecycleError("Acts of Faith Miracle dice gain requires a battle phase.")
 
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    manager = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log)
     roll_state = manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),

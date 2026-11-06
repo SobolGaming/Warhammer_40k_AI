@@ -96,6 +96,8 @@ from tests.shared.category_migration.phase9b_lifecycle import (
     seed_completed_fight_phase,
     submit_all_deployments_if_pending,
 )
+from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.engine.replay import ReplayRunner
 
 
 def test_game_state_replace_army_definitions_sorts_and_validates() -> None:
@@ -496,3 +498,33 @@ __all__ += ["_state_battle_phase", "chapter_approved_2026_27_mission_pack"]
 __all__ += ["create_deterministic_battlefield_scenario"]
 __all__ += ["ensure_army_mustered_events_for_fixture", "inspect", "replace"]
 __all__ += ["seed_completed_fight_phase", "submit_all_deployments_if_pending"]
+
+
+def test_tactical_draw_private_sequence_survives_facade_persistence_and_replay() -> None:
+    session = LocalGameSession(lifecycle=GameLifecycle())
+    session.start(_config())
+    session.advance_until_decision_or_terminal()
+    lifecycle = session.lifecycle
+    _advance_to_battle(lifecycle)
+    request = session.advance_until_decision_or_terminal().decision_request
+    assert request is not None
+    assert request.decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE
+    outcome = session.submit_option(
+        request_id=request.request_id,
+        result_id="private-tactical-draw",
+        option_id="draw",
+    )
+    assert outcome.status_kind is not LifecycleStatusKind.INVALID, outcome
+    assert lifecycle.state is not None
+    assert lifecycle.state.tactical_secondary_draw_sequence > 0
+    assert lifecycle.state.secondary_mission_card_states
+    checkpoint = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(checkpoint)
+    assert restored.to_persistence_payload() == checkpoint
+    assert restored.lifecycle.state is not None
+    assert (
+        restored.lifecycle.state.tactical_secondary_draw_sequence
+        == lifecycle.state.tactical_secondary_draw_sequence
+    )
+    replay = ReplayRunner.from_payload(session.replay_artifact(artifact_id="private-tactical-draw"))
+    assert replay.run().reproduced_exactly

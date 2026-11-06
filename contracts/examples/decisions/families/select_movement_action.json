@@ -86,6 +86,6 @@
     "source_rule_id": "gw-11e-core-rules:movement-phase:move-units-step",
     "unit_instance_id": "army-alpha:intercessor-unit-1"
   },
-  "request_id": "decision-request-000008",
-  "schema_version": "decision-request-view-v5-phase17n-step4"
+  "request_id": "view-request-6f3783f11b8f64f32c02806912c2cfa18df4485cffafbb42d2afad62d54119be",
+  "schema_version": "decision-request-view-v6-viewer-identities"
 }

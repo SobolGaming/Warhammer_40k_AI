@@ -7,6 +7,7 @@ from typing import cast
 import pytest
 
 from tests.parameterized_projection_helpers import assert_parameterized_projection
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -374,6 +375,7 @@ def _battle_state_with_scenario() -> GameState:
     )
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     state = GameState(
+        private_rng_seed=fixture_private_rng_seed("return-on-death-game"),
         game_id="return-on-death-game",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,

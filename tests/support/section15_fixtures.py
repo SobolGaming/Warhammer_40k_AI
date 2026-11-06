@@ -15,6 +15,7 @@ from time import perf_counter
 from typing import Any, cast
 
 import pytest
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section03_fixtures import native_state
 from tests.support.section07_fixtures import boundary_session
@@ -86,6 +87,7 @@ def checkpoint(
     distance: float = 8,
     cp: int = 4,
     materialize: bool = True,
+    seed: str | None = None,
 ) -> tuple[LocalGameSession, GameState, str, str]:
     unit = d.unit(sheet)
     enemy = d.unit("000004078", identity="target", army_id="enemy")
@@ -96,6 +98,8 @@ def checkpoint(
         enemy=enemy,
         enemy_poses=(Pose.at(10 + distance, 10),),
     )
+    if seed is not None:
+        state.private_rng_seed = fixture_private_rng_seed(seed)
     state.battle_phase_index = state.battle_phase_sequence.index(phase)
     state.active_player_id = active
     # Facade continuation needs mission identity. This cached immutable Companion

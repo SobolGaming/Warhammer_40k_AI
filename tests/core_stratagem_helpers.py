@@ -5,6 +5,7 @@ from dataclasses import replace
 from tests.setup_completion_helpers import (
     enter_battle_for_fixture,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.unit_keyword_helpers import with_unit_keywords
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -417,6 +418,7 @@ def _config(
 ) -> GameConfig:
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase12c-game"),
         game_id="phase12c-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(

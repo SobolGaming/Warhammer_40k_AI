@@ -4,7 +4,7 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "decision-request-view-v5-phase17n-step4",
+      "const": "decision-request-view-v6-viewer-identities",
       "type": "string"
     },
     "actor_id": {

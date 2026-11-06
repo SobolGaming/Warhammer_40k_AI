@@ -141,10 +141,10 @@ def test_faq55_56_critical_four_plus_grant_cannot_create_snap_hits_or_criticals(
         attacker_player_id="owner",
         reroll_forbidden_rule_ids=(SNAP_SHOOTING_RULE_ID,) if snap else (),
     )
-    original = DiceRollManager(state.game_id).roll_fixed(spec, (face,)).original_result
+    original = DiceRollManager(state.private_rng_seed).roll_fixed(spec, (face,)).original_result
     hit = _roll_hit(
         state=state,
-        manager=DiceRollManager(state.game_id, injected_results=(original,)),
+        manager=DiceRollManager(state.private_rng_seed, injected_results=(original,)),
         pool=pool,
         attacker_player_id="owner",
         attack_context_id="s15:hit",
@@ -182,10 +182,10 @@ def test_snap_unmodified_six_is_independent_of_roll_modifiers(
         attacker_player_id="owner",
         reroll_forbidden_rule_ids=(SNAP_SHOOTING_RULE_ID,),
     )
-    original = DiceRollManager(state.game_id).roll_fixed(spec, (face,)).original_result
+    original = DiceRollManager(state.private_rng_seed).roll_fixed(spec, (face,)).original_result
     hit = _roll_hit(
         state=state,
-        manager=DiceRollManager(state.game_id, injected_results=(original,)),
+        manager=DiceRollManager(state.private_rng_seed, injected_results=(original,)),
         pool=pool,
         attacker_player_id="owner",
         attack_context_id="s15:modified-hit",

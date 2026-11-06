@@ -337,7 +337,7 @@ def apply_harbingers_selection_result(context: BattleRoundStartResultContext) ->
         _validate_manual_selection(selected=selected, active=active)
     elif selection_mode == "roll_2d6":
         roll_state = DiceRollManager(
-            context.state.game_id,
+            context.state.private_rng_seed,
             event_log=context.decisions.event_log,
         ).roll(
             DiceRollSpec(

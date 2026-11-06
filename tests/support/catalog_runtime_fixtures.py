@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+from tests.support.private_randomness import fixture_private_rng_seed
+
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -81,6 +83,7 @@ def battle_state_with_army(
 ) -> GameState:
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     state = GameState(
+        private_rng_seed=fixture_private_rng_seed("phase17k-game"),
         game_id="phase17k-game",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,
@@ -111,6 +114,7 @@ def battle_state_with_armies(
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     battle_phase_sequence = tuple(descriptor.battle_phase_sequence.phases)
     state = GameState(
+        private_rng_seed=fixture_private_rng_seed("phase17k-game"),
         game_id="phase17k-game",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,

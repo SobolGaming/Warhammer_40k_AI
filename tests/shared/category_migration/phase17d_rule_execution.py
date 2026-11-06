@@ -12,6 +12,7 @@ from tests.setup_completion_helpers import (
     ensure_army_mustered_events_for_fixture,
     place_attached_components_coherently_for_fixture,
 )
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.unit_keyword_helpers import with_unit_keywords
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -824,6 +825,7 @@ def _setup_reactive_lifecycle(*, state: GameState, catalog: ArmyCatalog) -> Game
 
 def _setup_reactive_config(catalog: ArmyCatalog) -> GameConfig:
     return GameConfig(
+        private_rng_seed=fixture_private_rng_seed("phase17d-game"),
         game_id="phase17d-game",
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
@@ -992,6 +994,7 @@ def _event_payloads(
 def _battle_state() -> GameState:
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     return GameState(
+        private_rng_seed=fixture_private_rng_seed("phase17d-game"),
         game_id="phase17d-game",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,

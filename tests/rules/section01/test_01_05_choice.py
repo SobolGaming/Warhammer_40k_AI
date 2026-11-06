@@ -28,7 +28,7 @@ def test_01_05_07_active_player_chooses_tied_physical_die(
         completed=False,
     )
     values = (5, 5, 2) if extremum is DiceExtremum.HIGHEST else (2, 2, 5)
-    roll = DiceRollManager(state.game_id, event_log=decisions.event_log).roll_fixed(
+    roll = DiceRollManager(state.private_rng_seed, event_log=decisions.event_log).roll_fixed(
         DiceRollSpec(
             DiceExpression(3, 6),
             reason="Core extreme",
