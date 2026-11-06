@@ -666,41 +666,61 @@
     },
     "docs/performance/current/pr2-player_boundary.json": {
       "before_sha256": null,
-      "after_sha256": "098fb48f88c18e6f355c2fe136b2ffb652e5449114306415a778f2b6567ba772",
+      "after_sha256": "073a172cdd739683208bc6bd40a9c59ea792f43149c510d1585926401eead098",
       "owners": {
         "@document": {
           "before": null,
-          "after": "098fb48f88c18e6f355c2fe136b2ffb652e5449114306415a778f2b6567ba772"
+          "after": "073a172cdd739683208bc6bd40a9c59ea792f43149c510d1585926401eead098"
         }
       }
     },
     "docs/performance/current/pr2-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "d7ea3b02293bb87c18e33a4b0590afcb52596a52744a8d9f9f39d46b4d2fe5d7",
+      "after_sha256": "a34203f7b4061df321281210ca3de4d139fce6a6f6ee7fb80a9a90bedc20961d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d7ea3b02293bb87c18e33a4b0590afcb52596a52744a8d9f9f39d46b4d2fe5d7"
+          "after": "a34203f7b4061df321281210ca3de4d139fce6a6f6ee7fb80a9a90bedc20961d"
+        }
+      }
+    },
+    "docs/performance/current/pr2-roster.json": {
+      "before_sha256": null,
+      "after_sha256": "ccbd48ab8ff699ccab91d9d26afa921a54ad9110ba5ad1eef2a0a598fc45b461",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ccbd48ab8ff699ccab91d9d26afa921a54ad9110ba5ad1eef2a0a598fc45b461"
         }
       }
     },
     "docs/performance/current/pr2-session_command_fork.json": {
       "before_sha256": null,
-      "after_sha256": "87c0b4d47c9747ac91e3df8605d6f919cec2c2042c6cb49f2f14cd7bbc4c233b",
+      "after_sha256": "d17bbcd4a94c90942a0ce3467968e8af1b6cbfc2853b422887b80f472354fa38",
       "owners": {
         "@document": {
           "before": null,
-          "after": "87c0b4d47c9747ac91e3df8605d6f919cec2c2042c6cb49f2f14cd7bbc4c233b"
+          "after": "d17bbcd4a94c90942a0ce3467968e8af1b6cbfc2853b422887b80f472354fa38"
+        }
+      }
+    },
+    "docs/performance/current/pr2-source-reuse-2b640-v4.json": {
+      "before_sha256": null,
+      "after_sha256": "4560e0ed90b7671b3ec6af405cc1c6775d56b802609ba3d1215fc34899717a47",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4560e0ed90b7671b3ec6af405cc1c6775d56b802609ba3d1215fc34899717a47"
         }
       }
     },
     "docs/performance/current/pr2-tactical_draw.json": {
       "before_sha256": null,
-      "after_sha256": "46f932bd6a02f7592b7128a3cf58c1afb68e4975b11b3e5056237f8f66af63ea",
+      "after_sha256": "15508f36d5f57f50e436f49ef97f94c2e35e407a87629ab0cb17e4cb58041d73",
       "owners": {
         "@document": {
           "before": null,
-          "after": "46f932bd6a02f7592b7128a3cf58c1afb68e4975b11b3e5056237f8f66af63ea"
+          "after": "15508f36d5f57f50e436f49ef97f94c2e35e407a87629ab0cb17e4cb58041d73"
         }
       }
     },
@@ -5212,7 +5232,23 @@
       "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
       "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
     },
+    "docs/performance/current/pr2-roster.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
     "docs/performance/current/pr2-session_command_fork.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, and historical controls remain unchanged. Player serialization, bounded retention, session-cache ownership/copying and restoration deliberately change under the measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
+    "docs/performance/current/pr2-source-reuse-2b640-v4.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
