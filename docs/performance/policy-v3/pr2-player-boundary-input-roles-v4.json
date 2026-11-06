@@ -251,6 +251,7 @@
     "tests/rules/section22/coverage.json": "Untimed quality or behavioral fixture control; outside the native contract builder and its statically resolved charge-fixture imports.",
     "tests/rules/section22/test_damage.py": "Untimed quality or behavioral fixture control; outside the native contract builder and its statically resolved charge-fixture imports.",
     "tests/rules/section24/test_damaged.py": "Untimed quality or behavioral fixture control; outside the native contract builder and its statically resolved charge-fixture imports.",
+    "tests/rules/section25/coverage.json": "Live assertion-binding inventory updated solely for explicit private fixture seeds; not imported or read by the timed contract generator.",
     "tests/rules/section25/test_facade.py": "Canonical active test fixture with an explicit private seed; not imported or read by the timed contract generator.",
     "tests/shared/category_migration/generic_rule_ability_registry.py": "Untimed quality or behavioral fixture control; outside the native contract builder and its statically resolved charge-fixture imports.",
     "tests/shared/category_migration/horror_split_materialization.py": "Untimed quality or behavioral fixture control; outside the native contract builder and its statically resolved charge-fixture imports.",

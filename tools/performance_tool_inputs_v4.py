@@ -300,8 +300,8 @@ _SCOPES = (
     ReviewedScope(
         PR2_BASE,
         PR2_SPEC_PATH,
-        "d51cb62d64a67e036064de2c0abb0b0a45c4016c3bc0ad137b4ef0cab5f0b8de",
-        "cd14556658a23c9481cf66289298f1824893d518fd5f4da0ba4f0b7d5e918d34",
+        "55d5ca3b608a39fe413f09289986fb51c1dfbf3de961226b8882a29449775b61",
+        "addaf7b48946f5cf9ff50ea802037da2ee95d4312e6188bed1150d9e3d47761e",
         PR2_REPORT_PATH,
         frozenset(
             [
@@ -567,6 +567,7 @@ _SCOPES = (
                 "tests/rules/section22/coverage.json",
                 "tests/rules/section22/test_damage.py",
                 "tests/rules/section24/test_damaged.py",
+                "tests/rules/section25/coverage.json",
                 "tests/rules/section25/test_facade.py",
                 "tests/shared/category_migration/generic_rule_ability_registry.py",
                 "tests/shared/category_migration/horror_split_materialization.py",

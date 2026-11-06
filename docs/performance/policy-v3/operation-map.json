@@ -34160,6 +34160,29 @@
       "sensitive": true,
       "mandatory": true
     },
+    "viewer-projection-snapshot": {
+      "paths": [
+        "src/warhammer40k_core/adapters/local_session.py",
+        "src/warhammer40k_core/adapters/projection.py"
+      ],
+      "owners": [
+        "LocalGameSession",
+        "LocalGameSession._projection_authority_hash",
+        "LocalGameSession._viewer_submission_map",
+        "LocalGameSession.start",
+        "LocalGameSession.view",
+        "LocalGameSession.view_for_context",
+        "_ViewerProjectionSnapshot",
+        "project_game_view_with_submission_identities"
+      ],
+      "families": [
+        "player_boundary",
+        "roster",
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
     "private-rng-owner-13093005fda46651": {
       "paths": [
         "conformance/typescript/src/scenario.ts"
@@ -35127,6 +35150,23 @@
       ],
       "owners": [
         "before_pr2_comparison_provenance"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-6e28e64e600b6796": {
+      "paths": [
+        "tests/infrastructure/decisions/unit/test_physical_proposal_prevalidation.py"
+      ],
+      "owners": [
+        "_projection_session",
+        "_projection_work",
+        "test_projection_snapshot_binds_complete_viewer_context",
+        "test_projection_snapshot_detects_authoritative_geometry_drift_without_record_progress",
+        "test_projection_snapshot_is_not_shared_across_reconstructed_sessions",
+        "test_projection_snapshot_reuse_keeps_returns_detached",
+        "test_projection_snapshot_reuses_only_the_narrow_submission_identity_scope"
       ],
       "families": [],
       "sensitive": false,

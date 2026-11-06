@@ -85,6 +85,13 @@ policy configuration, separate policy seed, limits and requested boundary.
 Wall-clock timings are diagnostics, not part of deterministic decisions.
 Keep the existing session replay artifact as the authoritative execution record.
 
+The local adapter owns at most one cached viewer projection, keyed by a freshly
+computed full lifecycle hash and the complete viewer context. Returned payloads
+are detached, and forks and restored sessions start with no projection cache.
+The runner still checks a fresh observation before submission. Reused submission
+identities come from the narrower history/request scope captured before the full
+display projection; display-only aliases never enlarge submission authority.
+
 Choice seeds and submitted result IDs use only the separate policy seed and the
 player-visible game, actor and pending-request identities. They do not use another
 actor's policy-call count or the operator-only run ID.
