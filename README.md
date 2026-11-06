@@ -350,12 +350,6 @@ only execution order. Missing, negative, nonfinite or boolean weights fail close
 existing measurements rounded to zero remain valid. Finite S25 case validation,
 the complete selected inventory and the twelve-minute deadline remain mandatory.
 
-Behavioral CI reuses selected-source indexes only under an exact key containing
-the Python identity and every authoritative builder input hash. The normal loader
-still verifies current input bytes and selected partition integrity on cache hits;
-invalid indexes fail without rebuilding. Cache misses run the full builder within
-the same deadline. A cold-cache run is not evidence that this deadline is met.
-
 Both Python CI lanes upload JUnit, slowest-test output, and per-worker JSON timing
 artifacts containing collection node IDs, collection time, setup/call/teardown times,
 outcomes, Python/platform/CPU/memory metadata, and commit/run IDs. Enable the same
