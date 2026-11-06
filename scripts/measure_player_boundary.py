@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/support/fixtures/player_boundary_config.json"
-WORKLOAD_ID = "native-player-boundary-v1"
+WORKLOAD_ID = "native-player-boundary-v2"
 CASES = (
     "projection",
     "visible_events",
@@ -34,6 +34,7 @@ CASES = (
     "finite_command",
     "server_restore",
     "retained_cursor",
+    "ordinal_identity_projection",
 )
 FROZEN_TIME = datetime(2026, 11, 6, 12, tzinfo=UTC)
 
@@ -212,6 +213,8 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     _select_runtime_src(args.runtime_src)
+    from tests.support.viewer_identity_fixtures import ordinal_identity_config_payload
+
     from warhammer40k_core.adapters.access_control import DEV_PLAYER_A_TOKEN, DEV_PLAYER_B_TOKEN
     from warhammer40k_core.adapters.event_stream import EventStreamCursor
     from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -225,6 +228,9 @@ def main() -> None:
     times: dict[str, list[float]] = {case: [] for case in CASES}
     outcomes: dict[str, list[dict[str, JsonValue]]] = {case: [] for case in CASES}
     config_bytes = FIXTURE.read_bytes()
+    ordinal_bytes = json.dumps(
+        ordinal_identity_config_payload(json.loads(config_bytes)), sort_keys=True
+    ).encode()
     for sample in range(7):
         server, session_id = _prepare(config_bytes)
         record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
@@ -329,6 +335,29 @@ def main() -> None:
                 "resync_reason": retained["resync_reason"],
             }
         )
+        ordinal_server, ordinal_session_id = _prepare(ordinal_bytes)
+        started = perf_counter()
+        ordinal_response = _projection(ordinal_server, ordinal_session_id, DEV_PLAYER_B_TOKEN)
+        times["ordinal_identity_projection"].append(perf_counter() - started)
+        ordinal_view = _object(_ok(ordinal_response)["projection"])
+        battlefield = _object(ordinal_view["battlefield_view"])
+        authoritative = _object(battlefield["authoritative"])
+        models = _object(authoritative["models_by_id"])
+        assert models
+        assert all(key == _object(model)["model_instance_id"] for key, model in models.items())
+        from warhammer40k_core.adapters.battlefield_projection import (
+            BattlefieldAuthoritativeEntitiesPayload,
+            BattlefieldBoundsPayload,
+            authoritative_geometry_hash,
+        )
+
+        assert battlefield["authoritative_geometry_hash"] == authoritative_geometry_hash(
+            bounds=cast("BattlefieldBoundsPayload", battlefield["bounds"]),
+            authoritative=cast("BattlefieldAuthoritativeEntitiesPayload", authoritative),
+        )
+        outcomes["ordinal_identity_projection"].append(
+            {"status_code": 200, "model_count": len(models), "public_hash_matches": True}
+        )
         print(f"Completed player-boundary sample {sample + 1}/7", flush=True)
     cpu, memory = _host_inventory()
     report = {
@@ -336,6 +365,7 @@ def main() -> None:
         "revision": args.revision,
         "runtime_build_id": verified_engine_build_identity().build_id,
         "fixture_sha256": hashlib.sha256(config_bytes).hexdigest(),
+        "ordinal_fixture_sha256": hashlib.sha256(ordinal_bytes).hexdigest(),
         "driver_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "cpu": cpu,
         "memory_bytes": memory,

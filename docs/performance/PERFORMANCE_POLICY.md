@@ -402,7 +402,7 @@ of retained historical helpers; they are not passing results. Keep helper code,
 active production and preflight/postflight validators, 1,848 active quality checks
 and all 4,886 selected gameplay cases. No additional omission is authorized.
 
-The current `native-player-boundary-v1` matched workload measures player
+The current `native-player-boundary-v2` matched workload measures player
 projection, visible event export, metadata, finite command submission, full strict
 server restoration and retained cursor requests on identical native config bytes.
 It includes the actual public roster projection; this replaces the current
@@ -411,3 +411,11 @@ historical reports and their original applicability are unchanged. The seven
 samples per case use the existing relative budget and record native outcomes;
 the older base's hidden-choice behavior is a cost comparison, not a privacy oracle.
 This is component evidence and does not certify complete games.
+
+The v2 workload retains all six original cases and adds a projection whose native
+configuration uses ordinal-like unit identifiers. Both runtimes decode identical
+transformed bytes; the shared fixture transform also drives the real sorted-JSON
+restore regression. The extra case verifies model key/identifier joins and the
+emitted public geometry commitment, exercising identity translation and its
+conditional hash reconstruction. Original v1 diagnostics retain their original
+meaning and are not reclassified as completed timing reports.

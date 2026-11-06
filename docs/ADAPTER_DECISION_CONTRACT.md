@@ -8171,3 +8171,13 @@ public unit/model display names are preserved. Viewer finite
 option submissions and durable command journals resolve these issued aliases
 before the same canonical engine validation, while trusted replay keeps the
 authoritative identifiers. Undeclared ordinal references fail explicitly.
+
+JSON object member order does not affect viewer identity assignment: object fields
+and typed entity-map keys are traversed canonically. Event and list chronology
+remain significant. Re-encoding an ordinary checkpoint with sorted object keys
+must preserve its player projections, issued aliases and legal submission joins.
+
+Battlefield typed entity-map keys and contained identifiers share the issued
+viewer namespace. The battlefield geometry commitment is computed from the
+emitted public bounds and authoritative entity payload; an identity translation
+must not leave a commitment to different, unprojected identifiers.

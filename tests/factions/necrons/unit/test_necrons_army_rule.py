@@ -10,6 +10,7 @@ from typing import cast
 import pytest
 
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+from tests.support.private_randomness import fixture_private_rng_seed
 from tests.unit_keyword_helpers import with_unit_keywords
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -719,6 +720,7 @@ def _config(
     )
     return GameConfig(
         game_id="phase17g-necrons-lifecycle-game",
+        private_rng_seed=fixture_private_rng_seed("phase17g-necrons-lifecycle-game"),
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
             descriptor_version="core-v2-phase17g-necrons-test",

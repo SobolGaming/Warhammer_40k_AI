@@ -6,6 +6,7 @@ from typing import NotRequired, TypedDict, cast
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.battlefield_projection import (
     BattlefieldViewPayload,
+    authoritative_geometry_hash,
     project_battlefield_view,
 )
 from warhammer40k_core.adapters.characteristic_projection import (
@@ -658,7 +659,19 @@ def project_game_view(
         request=pending_request, viewer=context
     ):
         identities.project(public_decision_request_payload(pending_request, viewer=context))
+    original_battlefield = payload["battlefield_view"]
     payload = cast(GameViewPayload, identities.project(cast(JsonValue, payload)))
+    public_battlefield = payload["battlefield_view"]
+    if public_battlefield is not None:
+        assert original_battlefield is not None
+        if (
+            public_battlefield["bounds"] != original_battlefield["bounds"]
+            or public_battlefield["authoritative"] != original_battlefield["authoritative"]
+        ):
+            public_battlefield["authoritative_geometry_hash"] = authoritative_geometry_hash(
+                bounds=public_battlefield["bounds"],
+                authoritative=public_battlefield["authoritative"],
+            )
     payload["projection_state_hash"] = _projection_state_hash(payload)
     return payload
 

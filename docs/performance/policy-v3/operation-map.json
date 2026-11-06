@@ -233,11 +233,12 @@
         "metadata",
         "finite_command",
         "server_restore",
-        "retained_cursor"
+        "retained_cursor",
+        "ordinal_identity_projection"
       ],
       "samples_per_case": 7,
       "budget_profile": "current-change-relative-v1",
-      "workload_id": "native-player-boundary-v1"
+      "workload_id": "native-player-boundary-v2"
     }
   },
   "operations": {
@@ -34146,7 +34147,8 @@
     "player-visible-boundary-workload": {
       "paths": [
         "scripts/measure_player_boundary.py",
-        "tests/support/fixtures/player_boundary_config.json"
+        "tests/support/fixtures/player_boundary_config.json",
+        "tests/support/viewer_identity_fixtures.py"
       ],
       "owners": [
         "*"
@@ -35162,6 +35164,18 @@
       "owners": [
         "@module",
         "charge_config"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "private-rng-owner-1500588970a32351": {
+      "paths": [
+        "tests/phase17n_step5g_pairing_certification_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "assert_pairing_scores_through_lifecycle_restore_views_and_replay"
       ],
       "families": [],
       "sensitive": false,

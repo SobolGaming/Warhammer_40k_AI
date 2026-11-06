@@ -42,6 +42,8 @@ _IDENTITY_FIELDS = {
     "legal_action_fingerprint": "legal-action",
     "source_context_id": "source-context",
 }
+_REFERENCE_FIELD = re.compile(r"(?:^|_)(request|record|event|result|roll|window|opportunity)_ids?$")
+_DYNAMIC_REFERENCE_KEYS = frozenset({"source_key", "completion_key", "effect_key"})
 _REFERENCE_TEXT_FIELDS = frozenset({"label", "message", "reason"})
 _VISIBLE_REFERENCE = re.compile(r"view-(request|record|event|roll)-[a-f0-9]{64}")
 _SEQUENCE_FIELDS = frozenset({"sequence_number", "created_sequence_number"})
@@ -56,7 +58,18 @@ _CATALOG_RECORD_FIELDS = frozenset(
     }
 )
 _PUBLIC_TEXT_FIELDS = frozenset({"label", "message", "unit_display_name", "model_display_name"})
-_ENTITY_MAP_FIELDS = frozenset({"unit_display_by_id", "model_display_by_id"})
+_ENTITY_MAP_FIELDS = {
+    "unit_display_by_id": "unit_instance_id",
+    "model_display_by_id": "model_instance_id",
+    "models_by_id": "model_instance_id",
+    "terrain_features_by_id": "terrain_feature_id",
+    "terrain_areas_by_id": "terrain_area_id",
+    "objectives_by_id": "objective_id",
+    "deployment_zones_by_id": "deployment_zone_id",
+    "battlefield_regions_by_id": "region_id",
+    "hit_regions_by_entity_id": "entity_id",
+    "hints_by_entity_id": "entity_id",
+}
 
 
 def _stable_entity_field(key: str) -> bool:
@@ -97,24 +110,19 @@ def _entity_field(key: str) -> bool:
     )
 
 
-def _identity_family(key: str, value: JsonValue) -> str | None:
-    if _stable_entity_field(key):
+def _identity_family(key: str, value: str) -> str | None:
+    if _stable_entity_field(key) or key in _CATALOG_RECORD_FIELDS:
         return None
-    if key in _CATALOG_RECORD_FIELDS:
-        return None
-    for family in ("request", "record", "event", "result", "roll", "window", "opportunity"):
-        if key in {f"{family}_id", f"{family}_ids"} or key.endswith(
-            (f"_{family}_id", f"_{family}_ids")
-        ):
-            return family
     explicit = _IDENTITY_FIELDS.get(key)
     if explicit is not None:
         return explicit
-    if (
-        isinstance(value, str)
-        and (key.endswith(("_id", "_ids")) or key in {"source_key", "completion_key"})
-        and (_AUTHORITATIVE_ORDINAL_ID.search(value) or value.startswith("view-derived-"))
-    ):
+    if key.endswith(("_id", "_ids")):
+        reference = _REFERENCE_FIELD.search(key)
+        if reference is not None:
+            return reference.group(1)
+    elif key not in _DYNAMIC_REFERENCE_KEYS:
+        return None
+    if _AUTHORITATIVE_ORDINAL_ID.search(value) or value.startswith("view-derived-"):
         return "derived"
     return None
 
@@ -155,23 +163,26 @@ class ViewerIdentityMap:
                 assert isinstance(projected_event, str)
                 scope = projected_event
             if key in _ENTITY_MAP_FIELDS:
-                entity_key = (
-                    "unit_instance_id" if key == "unit_display_by_id" else "model_instance_id"
-                )
+                entity_key = _ENTITY_MAP_FIELDS[key]
                 return {
                     str(self.project(name, key=entity_key)): self.project(item, scope=scope)
-                    for name, item in value.items()
+                    for name, item in sorted(value.items())
                 }
             if any(_AUTHORITATIVE_ORDINAL_ID.search(name) for name in value):
                 raise ViewerIdentityError(
-                    "Public payload has an undeclared identity-keyed mapping."
+                    f"Public payload has an undeclared identity-keyed mapping: {key}."
                 )
-            return {name: self.project(item, key=name, scope=scope) for name, item in value.items()}
+            # JSON object order is not identity. Re-encoding a saved event with
+            # sorted keys must preserve exactly the same issued aliases.
+            return {
+                name: self.project(item, key=name, scope=scope)
+                for name, item in sorted(value.items())
+            }
         if isinstance(value, list):
             return [self.project(item, key=key, scope=scope) for item in value]
         if key in _REFERENCE_TEXT_FIELDS and isinstance(value, str):
             return _AUTHORITATIVE_ORDINAL_ID.sub(self._project_text_reference, value)
-        family = _identity_family(key, value)
+        family = _identity_family(key, value) if isinstance(value, str) else None
         if (
             family is not None
             and isinstance(value, str)
@@ -218,9 +229,7 @@ class ViewerIdentityMap:
     def resolve(self, value: JsonValue, *, key: str = "") -> JsonValue:
         if isinstance(value, dict):
             if key in _ENTITY_MAP_FIELDS:
-                entity_key = (
-                    "unit_instance_id" if key == "unit_display_by_id" else "model_instance_id"
-                )
+                entity_key = _ENTITY_MAP_FIELDS[key]
                 return {
                     str(self.resolve(name, key=entity_key)): self.resolve(item)
                     for name, item in value.items()
@@ -230,7 +239,7 @@ class ViewerIdentityMap:
             return [self.resolve(item, key=key) for item in value]
         if key in _REFERENCE_TEXT_FIELDS and isinstance(value, str):
             return _VISIBLE_REFERENCE.sub(self._resolve_text_reference, value)
-        family = _identity_family(key, value)
+        family = _identity_family(key, value) if isinstance(value, str) else None
         if family is not None and isinstance(value, str):
             binding = (family, value)
             if binding not in self._reverse:

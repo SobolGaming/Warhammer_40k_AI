@@ -15,6 +15,7 @@ from tests.phase13b_shooting_declaration_helpers import (
 )
 from tests.setup_completion_helpers import enter_battle_for_fixture
 from tests.support.faction_batch01 import unit_placement
+from tests.support.viewer_identity_fixtures import ordinal_identity_config_payload
 from warhammer40k_core.adapters.access_control import (
     DEV_ADMIN_TOKEN,
     DEV_PLAYER_A_TOKEN,
@@ -22,6 +23,7 @@ from warhammer40k_core.adapters.access_control import (
     ViewerContext,
     bearer_authorization,
 )
+from warhammer40k_core.adapters.battlefield_projection import authoritative_geometry_hash
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.external_contract import (
     CREATE_SESSION_SCHEMA_VERSION,
@@ -1293,6 +1295,7 @@ def test_viewer_identity_map_preserves_entities_and_rejects_unissued_references(
         "player_id": "public-player:event-000007",
         "player_ids": ["public-player:event-000007", "player-b"],
         "option_id": "roll-000007:component-0",
+        "effect_key": "effect:event-000012",
         "unit_display_by_id": {"unit-a:event-000007": {"unit_instance_id": "unit-a:event-000007"}},
         "context_hash": "a" * 64,
         "metadata": {"label": "unchanged event-000012 text"},
@@ -1313,6 +1316,8 @@ def test_viewer_identity_map_preserves_entities_and_rejects_unissued_references(
     assert public["request_id"] != "decision-request-000007"
     assert public["decision_id"] == public["resolving_decision_id"] == public["source_result_id"]
     assert identities.resolve(public) == payload
+    reordered = json.loads(json.dumps(payload, sort_keys=True))
+    assert ViewerIdentityMap("game-a:player-a").project(reordered) == public
     other_ordinals = ViewerIdentityMap("game-a:player-a")
     assert (
         other_ordinals.project(
@@ -1323,6 +1328,7 @@ def test_viewer_identity_map_preserves_entities_and_rejects_unissued_references(
                 "reason": "Surge from event-000999 after roll-000099",
                 "unit_instance_id": "unit-a:event-000099",
                 "option_id": "roll-000099:component-0",
+                "effect_key": "effect:event-000999",
                 "unit_display_by_id": {
                     "unit-a:event-000099": {"unit_instance_id": "unit-a:event-000099"}
                 },
@@ -1411,18 +1417,11 @@ def test_hidden_dice_count_does_not_advance_public_roll_or_event_identities() ->
 
 def test_player_route_preserves_configured_ordinal_like_public_identity() -> None:
     player = "player-event-000001"
-
-    def rename(value: JsonValue) -> JsonValue:
-        if isinstance(value, dict):
-            return {key: rename(item) for key, item in value.items()}
-        if isinstance(value, list):
-            return [rename(item) for item in value]
-        return player if value == "player-a" else value
-
-    raw = validate_json_value(canonical_setup_prebattle_smoke_config().to_payload())
-    payload = rename(raw)
-    assert isinstance(payload, dict)
-    payload["game_id"] = "game-event-000001"
+    payload = ordinal_identity_config_payload(
+        validate_json_value(canonical_setup_prebattle_smoke_config().to_payload()),
+        player_a_id=player,
+        game_id="game-event-000001",
+    )
     session = LocalGameSession()
     session.start(GameConfig.from_payload(cast(GameConfigPayload, payload)))
     session.advance_until_decision_or_terminal()
@@ -1431,3 +1430,17 @@ def test_player_route_preserves_configured_ordinal_like_public_identity() -> Non
     assert view["player_ids"] == [player, "player-b"]
     assert PolicyRoute.from_view(view).actor_id == player
     assert PlayerDecisionContext.from_view(view, choice_seed=1).route.actor_id == player
+
+    stored = json.loads(json.dumps(session.to_persistence_payload(), sort_keys=True))
+    restored = LocalGameSession.from_persistence_payload(stored)
+    assert restored.view(viewer_player_id=player) == view
+
+    battlefield = view["battlefield_view"]
+    assert battlefield is not None
+    assert battlefield["authoritative_geometry_hash"] == authoritative_geometry_hash(
+        bounds=battlefield["bounds"], authoritative=battlefield["authoritative"]
+    )
+    assert all(
+        key == model["model_instance_id"]
+        for key, model in battlefield["authoritative"]["models_by_id"].items()
+    )

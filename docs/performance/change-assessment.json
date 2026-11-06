@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "2b640ffca912f72d74e3b08cec0c0c4b12ce776a",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d2dadd1aa0c090561a953a313eeb3849ea45f2d8d09096a5f6a12832d5e0bedb",
-  "operation_map_sha256": "f422e1fabcca612403be761ec81d89695ea72e70aedf37987df658a36cf96c11",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c19ce7e497adf9f7d14594287db0b191c19a8093ecd623c1f33bdb3df3fb330d",
+  "operation_map_sha256": "ca540f5edb6512b5291a230f331c65f46f0bc2c4e6636a203cf8ad5a8dbe0c50",
   "changes": {
     "ci/quality_shards/all.txt": {
       "before_sha256": "4aa209b3aaaa50b36ca2d4d6497cfecbeb5c67e8b7f04e4582924c69418f77e0",
@@ -86,11 +86,11 @@
     },
     "contracts/compatibility-policy.md": {
       "before_sha256": "ec59edf8d1326389106422b91d4f3edb9e840f6b7bc5c27767cb1b75b0d92a50",
-      "after_sha256": "55a69cbc8113c8e1f725655d94776ffb7a7e6d239fa7ebfee295538657f14fd7",
+      "after_sha256": "f2a68ee3ddc3244bdaddc8f3e550c94fd2797ffa242aadee995363db50abf8b3",
       "owners": {
         "@document": {
           "before": "ec59edf8d1326389106422b91d4f3edb9e840f6b7bc5c27767cb1b75b0d92a50",
-          "after": "55a69cbc8113c8e1f725655d94776ffb7a7e6d239fa7ebfee295538657f14fd7"
+          "after": "f2a68ee3ddc3244bdaddc8f3e550c94fd2797ffa242aadee995363db50abf8b3"
         }
       }
     },
@@ -176,11 +176,11 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "40dc408b712998a94219db95e6783d59497ab46e28b547ea23024365ef79b9f1",
-      "after_sha256": "02d76fc0f68c33892868fc0254b34e7b65ffa50ad6ccb8334010fb42e3f58675",
+      "after_sha256": "4a20f444ba4301b414ab610cf4aa743596e8c84add817aa598fcf0626d20967e",
       "owners": {
         "@document": {
           "before": "40dc408b712998a94219db95e6783d59497ab46e28b547ea23024365ef79b9f1",
-          "after": "02d76fc0f68c33892868fc0254b34e7b65ffa50ad6ccb8334010fb42e3f58675"
+          "after": "4a20f444ba4301b414ab610cf4aa743596e8c84add817aa598fcf0626d20967e"
         }
       }
     },
@@ -296,21 +296,21 @@
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "3d7de4ec9048b4d8072992ebac3b7eb5a29faaf09687f04f281ab65927ca1c3e",
-      "after_sha256": "9df3d00eb40a62a9ff4e21b6fe940d59825887e89899250ff0abbd5cd7de9daf",
+      "after_sha256": "86002f9e0302211057732174c86fe8df3c8128323de5ba827b40d04085c7bb72",
       "owners": {
         "@document": {
           "before": "3d7de4ec9048b4d8072992ebac3b7eb5a29faaf09687f04f281ab65927ca1c3e",
-          "after": "9df3d00eb40a62a9ff4e21b6fe940d59825887e89899250ff0abbd5cd7de9daf"
+          "after": "86002f9e0302211057732174c86fe8df3c8128323de5ba827b40d04085c7bb72"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "461a0b8a7b4dc66c5bce1fde5de76dee942fa9ad461ba9e865a625e844c28693",
-      "after_sha256": "ff6f40f109edf1407d3a700c8439e5f496a4c7194f20090d3bcc8dd9bb7dd49d",
+      "after_sha256": "ad3cc6bdd0f59df56a43b7d4b4abe32d0874eae71304d55c875ca51cd9fea73a",
       "owners": {
         "@document": {
           "before": "461a0b8a7b4dc66c5bce1fde5de76dee942fa9ad461ba9e865a625e844c28693",
-          "after": "ff6f40f109edf1407d3a700c8439e5f496a4c7194f20090d3bcc8dd9bb7dd49d"
+          "after": "ad3cc6bdd0f59df56a43b7d4b4abe32d0874eae71304d55c875ca51cd9fea73a"
         }
       }
     },
@@ -326,11 +326,11 @@
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "c3bac16b1ebe673b2807543f8dda06e05f4bf8a9e885a3638ae6ab2aa4948d31",
-      "after_sha256": "9a4935aeefa7611a059ce7b0fbcae4012508a0fdd85a96c0ffbfab64f0a5ef9b",
+      "after_sha256": "4613834bb9a82566e11acd6d501cf894b7e195fd97cf018e26264326f02cbaba",
       "owners": {
         "@document": {
           "before": "c3bac16b1ebe673b2807543f8dda06e05f4bf8a9e885a3638ae6ab2aa4948d31",
-          "after": "9a4935aeefa7611a059ce7b0fbcae4012508a0fdd85a96c0ffbfab64f0a5ef9b"
+          "after": "4613834bb9a82566e11acd6d501cf894b7e195fd97cf018e26264326f02cbaba"
         }
       }
     },
@@ -386,41 +386,41 @@
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "f674b1523e9c185d799d17401ae710da9a95d47acf7dcc0c6d96f1396036db60",
-      "after_sha256": "597c8dce3c4e4e9f873229e8d3ef3c70e94f02a0d63c2903372cbf075065f4eb",
+      "after_sha256": "af57718f9650caac40e543cfd9653c8d5a20519884f69fc220bd6fc59cf57c66",
       "owners": {
         "@document": {
           "before": "f674b1523e9c185d799d17401ae710da9a95d47acf7dcc0c6d96f1396036db60",
-          "after": "597c8dce3c4e4e9f873229e8d3ef3c70e94f02a0d63c2903372cbf075065f4eb"
+          "after": "af57718f9650caac40e543cfd9653c8d5a20519884f69fc220bd6fc59cf57c66"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "2d81f7f9f5036a57f8c0212ef4f8b418ff706a8009cfe67298f67eed0c6f5470",
-      "after_sha256": "4336ddc4034a88669f3cd9ad9c281a0450bed415b85155561102102f984f4fdc",
+      "after_sha256": "02f8adca2bb7d78e2fa59639542f3f22aec517399c2a1eb57c0d701363a31a54",
       "owners": {
         "@document": {
           "before": "2d81f7f9f5036a57f8c0212ef4f8b418ff706a8009cfe67298f67eed0c6f5470",
-          "after": "4336ddc4034a88669f3cd9ad9c281a0450bed415b85155561102102f984f4fdc"
+          "after": "02f8adca2bb7d78e2fa59639542f3f22aec517399c2a1eb57c0d701363a31a54"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "4ea80881a2ef860c22b15ff3f923cab3b1a790bb0ba4fc6e0ccafa268c2b503f",
-      "after_sha256": "d5701058047ec9652f73286a4c2089ce9794d7f8ab926b0607ee042e30fadec9",
+      "after_sha256": "5d67adf364bee63c4a7f0240e479f0789fe0db8415b42e03e78dd129a13f974a",
       "owners": {
         "@document": {
           "before": "4ea80881a2ef860c22b15ff3f923cab3b1a790bb0ba4fc6e0ccafa268c2b503f",
-          "after": "d5701058047ec9652f73286a4c2089ce9794d7f8ab926b0607ee042e30fadec9"
+          "after": "5d67adf364bee63c4a7f0240e479f0789fe0db8415b42e03e78dd129a13f974a"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "51bbb80707299c865de44e1329d1e0b68eaabcd87ee01437738d841d28c60696",
-      "after_sha256": "9d258077f4f58622490a194a0a3a39de16ca4ef0d20abc1baaded6ca1f33290f",
+      "after_sha256": "65117593cea5721d3a81e7648eff3c88b21b72d20596cc13405c66f61bbb4f1f",
       "owners": {
         "@document": {
           "before": "51bbb80707299c865de44e1329d1e0b68eaabcd87ee01437738d841d28c60696",
-          "after": "9d258077f4f58622490a194a0a3a39de16ca4ef0d20abc1baaded6ca1f33290f"
+          "after": "65117593cea5721d3a81e7648eff3c88b21b72d20596cc13405c66f61bbb4f1f"
         }
       }
     },
@@ -576,11 +576,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "2dec09b5ad5abec792d4fbf3b2d5ebc67b212df3c0a5391c3c378041db0aef59",
-      "after_sha256": "3c702c4150d28a1c024990a95f23ce6313855fd31524166722c8c8d12eff8929",
+      "after_sha256": "50c4c1be05ae83c24b0f39698756a1fb5ce7e74c017fb1e2491969c04e5676dd",
       "owners": {
         "@document": {
           "before": "2dec09b5ad5abec792d4fbf3b2d5ebc67b212df3c0a5391c3c378041db0aef59",
-          "after": "3c702c4150d28a1c024990a95f23ce6313855fd31524166722c8c8d12eff8929"
+          "after": "50c4c1be05ae83c24b0f39698756a1fb5ce7e74c017fb1e2491969c04e5676dd"
         }
       }
     },
@@ -596,11 +596,11 @@
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "before_sha256": "90c18a7f9febfd95bb752f7e58373e58c140a1ecf704e2a72f22171e34ee1592",
-      "after_sha256": "6bc85d0c4720df86c70e6190cb7d58a51da4389b3ead9fd0270cf5c0474235fc",
+      "after_sha256": "00ccaa72fc0139ea0bbbb40df66242c5335b81d0b55b61fde4e92e5c066d59f4",
       "owners": {
         "@document": {
           "before": "90c18a7f9febfd95bb752f7e58373e58c140a1ecf704e2a72f22171e34ee1592",
-          "after": "6bc85d0c4720df86c70e6190cb7d58a51da4389b3ead9fd0270cf5c0474235fc"
+          "after": "00ccaa72fc0139ea0bbbb40df66242c5335b81d0b55b61fde4e92e5c066d59f4"
         }
       }
     },
@@ -626,21 +626,21 @@
     },
     "docs/README.md": {
       "before_sha256": "792a719796e21c7b56c5b4233882923c0c6786edc73515bb5dd45023db81886e",
-      "after_sha256": "67b71d15f65b0a722b1f0c7bfb9142364c6ff7d18724665a6f5bf4d096f632a6",
+      "after_sha256": "d500f29c8c28f2c5def8bcdf1876f05cce707e9becdc572d8cd41d3d322bc4a9",
       "owners": {
         "@document": {
           "before": "792a719796e21c7b56c5b4233882923c0c6786edc73515bb5dd45023db81886e",
-          "after": "67b71d15f65b0a722b1f0c7bfb9142364c6ff7d18724665a6f5bf4d096f632a6"
+          "after": "d500f29c8c28f2c5def8bcdf1876f05cce707e9becdc572d8cd41d3d322bc4a9"
         }
       }
     },
     "docs/performance/PERFORMANCE_POLICY.md": {
       "before_sha256": "b0f5b44580f1a87e8252cd9a206fa05de38d5d6a9b4ab2e9cb8e160a4f79b851",
-      "after_sha256": "5ddb484ad150d1fba4ad6adefbdd548efae3f762f82abd4e66b719e9301ca125",
+      "after_sha256": "0f7685378c58fba81db09a5b66e525f03ea55f3cbf05e4ed10da76d937cf5514",
       "owners": {
         "@document": {
           "before": "b0f5b44580f1a87e8252cd9a206fa05de38d5d6a9b4ab2e9cb8e160a4f79b851",
-          "after": "5ddb484ad150d1fba4ad6adefbdd548efae3f762f82abd4e66b719e9301ca125"
+          "after": "0f7685378c58fba81db09a5b66e525f03ea55f3cbf05e4ed10da76d937cf5514"
         }
       }
     },
@@ -666,11 +666,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "75fb3b56d96fb86b452afaf9c12d528fa2841756c96360648cb1a802f5257356",
-      "after_sha256": "da5e15fd84ced258b398cc2d332dec5344e9ac536eef149f0fc60eca74d02e58",
+      "after_sha256": "5d14b3215b6e72b7c8a0bc996434ce185cc44b8c8865fcc55d016ba546a9cb52",
       "owners": {
         "@document": {
           "before": "75fb3b56d96fb86b452afaf9c12d528fa2841756c96360648cb1a802f5257356",
-          "after": "da5e15fd84ced258b398cc2d332dec5344e9ac536eef149f0fc60eca74d02e58"
+          "after": "5d14b3215b6e72b7c8a0bc996434ce185cc44b8c8865fcc55d016ba546a9cb52"
         }
       }
     },
@@ -714,11 +714,11 @@
     },
     "scripts/measure_player_boundary.py": {
       "before_sha256": null,
-      "after_sha256": "c30daa28508a19220f0dfe927cff0dc3d320d459056c29aa3b882cf059ed914e",
+      "after_sha256": "d965d156d6836f568420111b1de845afdd6cc84c0dcc7951cab714ed36ca7f79",
       "owners": {
         "@module": {
           "before": null,
-          "after": "934157b47f62a42f18f88cccdf4d91e1d72ae619114f9483b080bb8defc53b0c"
+          "after": "5ec3c03377118886d4fd02b03205fa9aeea222fc21d18460312334afde724a62"
         },
         "_command": {
           "before": null,
@@ -762,7 +762,7 @@
         },
         "main": {
           "before": null,
-          "after": "d2e32a9be297c6a2f35b7a742eb286c3a96e27b20c8671f58d49b941f4dc4434"
+          "after": "4f0d782546ab31c34166290f522bfd45afbccf5daed1a84c6b67867c14c61a71"
         }
       }
     },
@@ -806,11 +806,11 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "832529c53d39608779a32bc42b56f2a19907cc35acad086bf09996cfa066153b",
-      "after_sha256": "1153e7db14aa204ca65c7528660c1cc6cb900cd41d56e6f9765655a6e6047a34",
+      "after_sha256": "385c684c79a86890f349358ed677ae60a8d90f50e7689efcc6d9b702b8bcb4ee",
       "owners": {
         "@document": {
           "before": "832529c53d39608779a32bc42b56f2a19907cc35acad086bf09996cfa066153b",
-          "after": "1153e7db14aa204ca65c7528660c1cc6cb900cd41d56e6f9765655a6e6047a34"
+          "after": "385c684c79a86890f349358ed677ae60a8d90f50e7689efcc6d9b702b8bcb4ee"
         }
       }
     },
@@ -1014,15 +1014,15 @@
     },
     "src/warhammer40k_core/adapters/projection.py": {
       "before_sha256": "9d1f067b7b8388c275db4e6260c29faec6a37c93a0123f0203ea94bfe13fb0fe",
-      "after_sha256": "5b228dee153a42e443fa54f021615db272a8c031716b49209215030225e9e3f0",
+      "after_sha256": "a44526b59c6565e0a548258ebec7ebbb9c4435b2063166d4af4fd731472f9a0a",
       "owners": {
         "@module": {
           "before": "2fc8cab233f5902118f819b53de42a08239de966cd75c4e0db89f6797b492bec",
-          "after": "3f659c7828bd9f091c557fda4dbc7ee77a59c3e8bd42dfabcb52437a307a5a20"
+          "after": "7152d083b51cc8ee43901a31817d062d514266b1113144cab9ff2254005cf3f3"
         },
         "project_game_view": {
           "before": "95accc5ad9eba11e67962497c6d17f5750d2fb3fbbf0981592c49614d6d4c67f",
-          "after": "f864938805a20355d4fa9e08b1e9fc5730f630cad50f095a346e43527c822265"
+          "after": "8373055f47331e74e19ef9f4d84ea5963f571489219ab4f5c79a042cece81d8d"
         }
       }
     },
@@ -1304,11 +1304,11 @@
     },
     "src/warhammer40k_core/adapters/viewer_identity.py": {
       "before_sha256": null,
-      "after_sha256": "7ca4dc21c28a9307ef7141f99aedbb30a8a83eb7dea8aaf9ea6d50fd345db4f8",
+      "after_sha256": "ce5d0198caa098994cc427dccd51cc94f7e3703d4e8c5d5a6a71aa9d4dedc6ae",
       "owners": {
         "@module": {
           "before": null,
-          "after": "ac8a6d54e2beb4235dba78641b122e03f68030602ab6107d867e7267dbf197eb"
+          "after": "d00a0957a4c4c303d219c422e324921f287994aba858bc202b08d9809ab50294"
         },
         "ViewerIdentityError": {
           "before": null,
@@ -1332,11 +1332,11 @@
         },
         "ViewerIdentityMap.project": {
           "before": null,
-          "after": "f37912ae42cc9957d2d958057f39b7e2dedbae1c0ae9c7522981cdcd3546f3e1"
+          "after": "8fdcf81a459ff12eeb3a60b0e24b3754da7fef049ed5110c233c3d565f1fba32"
         },
         "ViewerIdentityMap.resolve": {
           "before": null,
-          "after": "2da821e611ff36d3c7829afc8959b096313f8e3260058183d7d549e5ea06042d"
+          "after": "e0b017a3be5cfbd2758a43602cb1d9c20682a893007109d5070f20498d54bc85"
         },
         "_entity_field": {
           "before": null,
@@ -1344,7 +1344,7 @@
         },
         "_identity_family": {
           "before": null,
-          "after": "49b2b74ade2a1e010e8e8b47db2613863712e7ed38da875d6ca0c6110b7309bc"
+          "after": "7b9508e836582d4aa8ef0818139709e5df3f811b85e7a39a2bccf38475054de5"
         },
         "_stable_entity_field": {
           "before": null,
@@ -2748,11 +2748,11 @@
     },
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
       "before_sha256": "65aa8236412d5577aa614d48830fbf91e1ad254446759164f5433bcab648e464",
-      "after_sha256": "4ef171dec5c6ec179e3d44ad6b933d0e3dc6f36cb9c04f24f2ea285fa6e93476",
+      "after_sha256": "017bc3708ed8be1be85e8396329aed7f4c179416827a88f9e3944d117a3a06c5",
       "owners": {
         "@module": {
           "before": "64f989e4e0b1abc01be6bbb87b077d89403d6c59210d1482e8e43932ec6a10c3",
-          "after": "f0b1ab7a5ddf1eec0f7c5f881f2421a82cf92ec6fc4b2cfedbcb3228623c9239"
+          "after": "976ffcc6c25a6e20192a0ea14c93757c46394daa2281251d31d3cc5ff558ca8e"
         },
         "_InvalidPlacementPolicy": {
           "before": null,
@@ -2832,7 +2832,7 @@
         },
         "test_player_route_preserves_configured_ordinal_like_public_identity": {
           "before": null,
-          "after": "db43daa10fb0906b5684e2f3f90c27285f0f8dab5c4b58a4816ebbdaff52812a"
+          "after": "5de93e663f411d4732aa254f8ba92a20286c193e4a40af9dfd40a97db1558447"
         },
         "test_player_routes_distinguish_battle_phase_and_reject_duplicates": {
           "before": null,
@@ -2900,7 +2900,7 @@
         },
         "test_viewer_identity_map_preserves_entities_and_rejects_unissued_references": {
           "before": null,
-          "after": "5e8db3c8026cc33396663499d7aadf34c4d5e261b63a0ca83b0128ef36b639e6"
+          "after": "7aed2bada66ed9667c731ffd2e0f4dd8bec4954f78b055bee497da76e4b9242c"
         }
       }
     },
@@ -2973,6 +2973,20 @@
         "test_sorcerer_native_shooting_cover_wracking_and_exact_replay": {
           "before": "2f116dea7326811bf4d6593d80db9a9961f3a47c42b477efcbcf45c8a155d2cd",
           "after": "20de8724bf30d3101ee248b10ac0540747c02678c33c7815d2d66aa7f357c27a"
+        }
+      }
+    },
+    "tests/factions/necrons/unit/test_necrons_army_rule.py": {
+      "before_sha256": "d0fef481241bc77912b8105bd763561d8f551005c010b230c9c52bc99939e827",
+      "after_sha256": "b8b520cdfb0f829bcabb3906158e58f6ee524c667e3d0f0d16fe69e4c1186283",
+      "owners": {
+        "@module": {
+          "before": "e8c577b1d2d693b55de25cac58133f55cc83c989506eee35abb986fdcae05b43",
+          "after": "80d2d14aba4d1331a65fbd277a10216f75c0f6c105b0a238f1c74134b57e3312"
+        },
+        "_config": {
+          "before": "2b03ed981c8cf8082e01071bae38f170a213826ba8f9830111582d0956b6b1b4",
+          "after": "337bcfeedca9dddbe9904c53d9cf317d8f1fafaa011ed03336726c4b50cd852a"
         }
       }
     },
@@ -3100,7 +3114,7 @@
     },
     "tests/infrastructure/lifecycle/unit/test_lifecycle.py": {
       "before_sha256": "290ba7617a5a256464cb02fb86b4834ccc1d9f5a54a5b40a2f17c26ddab82cb5",
-      "after_sha256": "870aa93ab3597652f082e54ab3f27173da806eb1f80c8b113b8a2f51c5495aa1",
+      "after_sha256": "b40dfbbafbb98d758a0549b56304291347720c2e562ac743e0d4f72168efa0dd",
       "owners": {
         "@module": {
           "before": "6223135ca2b2f10120bec9c25d159b4bb345498f9a1d7c39d6f3a507e00937c3",
@@ -3114,11 +3128,25 @@
     },
     "tests/infrastructure/missions/unit/test_event_companion_part2.py": {
       "before_sha256": "4c607413c811d417fae5af23c1df1ac525f1597f47448a58a1dcc7b7774531ec",
-      "after_sha256": "952b3fd0cda812ae696c9e8d21d43f6a006fa20c54ee118708d3da37f3b64b27",
+      "after_sha256": "97b8ff3702145d1f7141e3af86b17c160f8898274e2f669dbfb5b9f27be33d74",
       "owners": {
         "test_phase17j_event_pack_resolves_scoring_and_tactical_draw_by_pack_id": {
           "before": "ea4705cec092ff95ea77a842f96d8887e0cec867f6324f7516419cb50b8f1c2e",
           "after": "009ccb284be53abe636f3043aba8dd7e6161f9e6d243c1495bf527bfd5ed5dc5"
+        }
+      }
+    },
+    "tests/infrastructure/rule_execution/unit/test_rule_execution.py": {
+      "before_sha256": "4e4d834ad9703805623bf269433f2fde33b563eb994ea65d8a9503fdefc61172",
+      "after_sha256": "11d85d1c0afe0c4eb5dcb846bb9ecb2ec7a8e1f09253b0b9ea564fe371fca179",
+      "owners": {
+        "@module": {
+          "before": "7a1d4317a795f9f1ebb404b9ca8bff6a1d0090f18725029df2c9b52eb7586f6a",
+          "after": "af3534dec62d03f95703051b0112dd5a6ba1ba3cbc8e8203c8cbe26a96bf93d0"
+        },
+        "test_phase17d_once_per_battle_activation_submits_through_local_session_and_replays": {
+          "before": "d83e9231dc74a337a696f3f6e96d340f237ae396c0f34a501a178f48ebb6fb96",
+          "after": "6638c2e0d54eba87a5712bb24d19462eb1bae5698ca5a7130ded045aae29cc26"
         }
       }
     },
@@ -3272,6 +3300,20 @@
         }
       }
     },
+    "tests/phase17n_step5g_pairing_certification_helpers.py": {
+      "before_sha256": "8f0cb5be0cef51209ef8f56bafe9b7a96e0a7e7874647886b9d8c57e43380ce6",
+      "after_sha256": "9392166a5177691609c75cb542d174651cffb39535d64de7ab048691c673f9d7",
+      "owners": {
+        "@module": {
+          "before": "d2c3c1a864a8df06c96cd78e50e257c08e5b8ef96730a723b344a91c7505d1fb",
+          "after": "3cabaf0163e192d19ce7ca08d88387c7f5ab805b19a1270ecbe5ae8dfc5ce195"
+        },
+        "assert_pairing_scores_through_lifecycle_restore_views_and_replay": {
+          "before": "bc91a6f3a4e48f9f44f661459b5970baf74b6fa4fa41745ed0044b0be8c7d481",
+          "after": "5076ff0377f46e9c7511e039d5a8613deaf7b9a5652a2debf22e26dc52e85b9d"
+        }
+      }
+    },
     "tests/rules/rules24/unit/test_return_on_death.py": {
       "before_sha256": "2bcfa5c248da8049a0075dfbb56443d0393f94f9fef106e985a7088ccfc1afea",
       "after_sha256": "487139621a8b063f7f4665f57c2fc7de8a97745f521f77b212fef222a6abd74e",
@@ -3332,7 +3374,7 @@
     },
     "tests/rules/section09/test_fall_back.py": {
       "before_sha256": "b649dd8619fdd612a1f13b9effd3e200982b5d97ca0dba4a2303b52edc91c611",
-      "after_sha256": "037226e0f60e894ee39eb954c3252b7bb606a1e153b1f1390df4a9b39cfb27c4",
+      "after_sha256": "96ec07a79af0e61a6b5c9665a8cb4a80963d7a9fde16c9d18f5cc00e59ee1798",
       "owners": {
         "@module": {
           "before": "355d4e85382b9aaa7053a34b44c38154af862381ebe819988544138ecde5640c",
@@ -3450,11 +3492,11 @@
     },
     "tests/rules/section18/coverage.json": {
       "before_sha256": "2b85b9a2369abb558b0a2916a9dfaac527c71c4e5ac48c96e552ab898c95fef3",
-      "after_sha256": "1a53248bdc51e606427371d18428e787e326e24ea6b55e6206517487cb170b18",
+      "after_sha256": "1423a4a0a1592c1bb0a961392e105bf66d12f49fb0cc878f825e294d31585b97",
       "owners": {
         "@document": {
           "before": "2b85b9a2369abb558b0a2916a9dfaac527c71c4e5ac48c96e552ab898c95fef3",
-          "after": "1a53248bdc51e606427371d18428e787e326e24ea6b55e6206517487cb170b18"
+          "after": "1423a4a0a1592c1bb0a961392e105bf66d12f49fb0cc878f825e294d31585b97"
         }
       }
     },
@@ -3538,7 +3580,7 @@
     },
     "tests/shared/category_migration/generic_rule_ability_registry.py": {
       "before_sha256": "a4b6ac2bc8e0941d236a6828528ba342586505e6dccec96d22931f90b7dd4a52",
-      "after_sha256": "af3616221c8e67b61a908f5f38ad2487836981507de3cf71d4bc44cc39874257",
+      "after_sha256": "e9073314c4607883198dc9133b75983f5e7e27349a2b2b8f17568978a7a1d3ef",
       "owners": {
         "@module": {
           "before": "11ae6aedbb4cd8ea4fed75ddb1f557facd2ff7f9d9a48b0fbb62d45516806718",
@@ -3560,7 +3602,7 @@
     },
     "tests/shared/category_migration/horror_split_materialization.py": {
       "before_sha256": "2c1294f23367ea6ba88e1a1caed88de039599b42519c061dd96eedbed314ec47",
-      "after_sha256": "d235e8860f21d1409eef93a7a300f75ded075bd62fc36ce4f429b572af0c71ce",
+      "after_sha256": "b5eb2f2958aa9b7a52c7d5bbfccad29d91d96e0e43e4010fc9cabf88f633c2a7",
       "owners": {
         "_game_config": {
           "before": "0c7fd26c90af3a35e765d628d9e6a8fbddb5191bc285d89c7a72ad0e5e6b3d73",
@@ -3578,7 +3620,7 @@
     },
     "tests/shared/category_migration/phase10d_battlefield_transitions.py": {
       "before_sha256": "38b7a71d57f0be1198c0d6f872481a560bfb586ff68246e72495f5c7c4eb0b59",
-      "after_sha256": "27ec7185c6d6c1fabbaa6abc2ff78b1a4d8d66a46e3d4418681a262f3aa00dc3",
+      "after_sha256": "ed6cfd2e8bf5c0e6a16b3bd9c8ceb91c4957400e406f91c499f12a0c47922635",
       "owners": {
         "@module": {
           "before": "a28a2fa69024d7cb04e5bcf33b0b9b93b841e57770683f823ca253e5997fff0b",
@@ -3592,7 +3634,7 @@
     },
     "tests/shared/category_migration/phase11a_mission_pack.py": {
       "before_sha256": "d2531aa9bfc6ae9295532bbeba4b53ac49d8f99afd2bcd5a7f2f85d655009c45",
-      "after_sha256": "d14844128836f142eb0a4cca33c894cfdfe3c7f2ad241717ce8bfc5e39c3c49f",
+      "after_sha256": "7708eeacd0e6488a486885f8443c932c4b3014c1209bdb18520d359b8f45bf38",
       "owners": {
         "@module": {
           "before": "0ede288c653c7a3fa35e69758e47785aa3e42150d47d9728308af2676d7644a6",
@@ -3606,7 +3648,7 @@
     },
     "tests/shared/category_migration/phase11e_mission_scoring_cleanup_configuration.py": {
       "before_sha256": "4d985f3b277590588dfce7cf86cf0d7912865b1243a7320be12614574469c22e",
-      "after_sha256": "7e442d349c4d8d78449d54cb448e926eeea2db0a8d0b1d069cfb86a437341883",
+      "after_sha256": "452c04874194814ab28b64e4b92b38cb8db14eab0f0c46e7e1a9ff805b3adebf",
       "owners": {
         "@module": {
           "before": "922e6ec961dcabff1db2a73eb223f075ee7e1a2bf54264112ee3e9fcfa3abab1",
@@ -3648,7 +3690,7 @@
     },
     "tests/shared/category_migration/phase11f_game_end_scoring.py": {
       "before_sha256": "bf0e02cceb9186b1e29feda915ed702496a49c39ff57f9f5745715bc5c056e9e",
-      "after_sha256": "9131ebaa7977b02087a45079b9f5a576de9caeb284649b6f9448d0abce7407e7",
+      "after_sha256": "e75d09b7f17f647cdfcfe16aaac67c40a7b1d9704b9be3aa658f03ba49daf789",
       "owners": {
         "@module": {
           "before": "87e742d290075ee6121aa3c037df27de988d6b619162ba29045688c25e9cca4f",
@@ -3662,7 +3704,7 @@
     },
     "tests/shared/category_migration/phase16a_deployment.py": {
       "before_sha256": "271376170fc7f022f10e6c2bd939beaf607a1b6229c88d645145ae9e8c7f35b0",
-      "after_sha256": "d43fd3a42e8b7df01f50b0f95803fccdc2a559a2e2a8148b2ac8a3d4a7175d9c",
+      "after_sha256": "443bdf01d952cffbf9c9841732c7549dd4df6d02189897303dafda4f1223d93e",
       "owners": {
         "@module": {
           "before": "cd94b42f14a09e483defa4c6257f17b189231416b777222e5d530e6af4b4c338",
@@ -3676,7 +3718,7 @@
     },
     "tests/shared/category_migration/phase16b_prebattle.py": {
       "before_sha256": "271033e15c945cebdc9848cbb25bdf6331c2a91ca9dba7d45d433e3fc091958f",
-      "after_sha256": "95407a81fff0a82cef0673ea526cc09d0230abab05ea9354078cbdf6d4a5fb73",
+      "after_sha256": "c464286660205ae4917abda62f4d69affeec221f9bd5a5ef5fd4eb5a748bb287",
       "owners": {
         "@module": {
           "before": "9d3a4a2af0bce3b40e30e65e1a53120358d0574749e78165d4b5893ba4e1b96d",
@@ -3694,7 +3736,7 @@
     },
     "tests/shared/category_migration/phase16e_setup_completion.py": {
       "before_sha256": "db5f0610faa5a6f1c80a0938e89b2e74cb9055beabd19795a5176b989a2bb5da",
-      "after_sha256": "fb0dd8bee2abd5c208ff9ccbd8f5f6fb5c401771fe26377b0aac9c5c97698998",
+      "after_sha256": "edc1d52158911718711dfd6a543d2ade936095e05588a57222abaf08831eea34",
       "owners": {
         "@module": {
           "before": "b5d2c66c65b4543fd10332d86f90a8245d4ea3a3eb63dc1f9cb4aa57fb49b878",
@@ -3716,7 +3758,7 @@
     },
     "tests/shared/category_migration/phase17d_rule_execution.py": {
       "before_sha256": "486e031fa7bcbc7661e4e901974ca4a4a1f69916c5f9c9ccb1785393f46a1ba7",
-      "after_sha256": "2d547f37afd809250c326c71827b0ccf50cddf3892bdb58ecc531b8fc16ce18e",
+      "after_sha256": "d5245b7322b0750aabc3fbec6a7aebfa9c2119b5a9940c5cb8c57f9ba592c812",
       "owners": {
         "@module": {
           "before": "4259325ef37b9a495b3d9cafb041263aef497de94834764973d1429519b3f269",
@@ -3734,7 +3776,7 @@
     },
     "tests/shared/category_migration/phase17g_black_templars_army_rule.py": {
       "before_sha256": "bfd2ffd3e4cbc2e2f4485318faf8799ef276cd95c02e06e79698730e918e5c13",
-      "after_sha256": "3c61a3f66327e3e288bf7d5ebf3abd86cf4ec66a5fd6e335b99565096d012026",
+      "after_sha256": "5f541bc5208f6421c4fc46c133c600321ef2cec238c203e29ce61c4f840ab7ef",
       "owners": {
         "@module": {
           "before": "65c5f144d502391f1736f623495ee6ad349959bfcb2f1c82b7baa2f037818fc6",
@@ -3748,7 +3790,7 @@
     },
     "tests/shared/category_migration/phase17g_runtime_content.py": {
       "before_sha256": "db1297ac648ad8c683d5f279ce6981661e3e3f4fbc338486cc21799af7d64d62",
-      "after_sha256": "341966449d4d58f97879381c451a26ebfcd1af9ee0aa1e8cb0db0897d0d27998",
+      "after_sha256": "9914999dcdeef2380cedef6e7c1287ecf6f92bc2453faac463b683af5f307143",
       "owners": {
         "@module": {
           "before": "db47bac64451d7401b3b388e398bc0640fd984643e591f6b67480813815d5ff3",
@@ -3766,7 +3808,7 @@
     },
     "tests/shared/category_migration/phase17n_primary_scoring_grammar.py": {
       "before_sha256": "5bafe3bfade2b915d81df1d173a71eea9ad7a708cbe7fcfdc1ceb5a94b6861f1",
-      "after_sha256": "12c252f1eaaa1eeca0b44b2b55b6e381e9e20a95d9273e06e667d39083793b75",
+      "after_sha256": "856bbb31196d5b3336a3cc7f7073920cd56d887bbc1e7ac159d47461f4aa5368",
       "owners": {
         "@module": {
           "before": "560319701a98a4894be09e7f46278c73ec3da29141618908c649565ef2a74bfe",
@@ -3780,7 +3822,7 @@
     },
     "tests/shared/category_migration/phase17n_primary_scoring_spatial_evidence.py": {
       "before_sha256": "42a471ff039047296773e53884d95fd0082553f430b2008efb25b1cfc3334461",
-      "after_sha256": "72f95d8a66981514a2e94b306992d778e3f1ad0fbcc53a76677eccb6495310aa",
+      "after_sha256": "059cb52147f86c7b23f6725dec08a5747ac5f554ac7152762ad08242236d96c8",
       "owners": {
         "@module": {
           "before": "adb3cc05fd029214943588d38a758b1f51c22e34d7e0c2e8b1889b8efe074fd7",
@@ -3794,7 +3836,7 @@
     },
     "tests/shared/category_migration/phase18f_session_commands.py": {
       "before_sha256": "8e465a1d1afb9a628aacccfc2f8ad46ac5b107df0ce978600cc29285ae513f69",
-      "after_sha256": "eff4d14606f916e18246d4357dcd87c54b17c23dd8961f94ca638f6e364a5c25",
+      "after_sha256": "5d63c68c6bd91fca2ef80148bf80769e2ceaee871fbb90f199e1718688c910ff",
       "owners": {
         "@module": {
           "before": "8b3b661ebd975490351846bcb48d39f9a05867f67de9e8801ab5f31a9f1a39ff",
@@ -3838,7 +3880,7 @@
     },
     "tests/shared/category_migration/phase9b_lifecycle.py": {
       "before_sha256": "ed3bb0ca207481b8977d01b61723ffc7030f4b692e6d0840ead2ad499f2d7373",
-      "after_sha256": "f4e2e3b6c9ea8ea893acaec739f7ecadcbf9ef14fdd36eb86fa8fde4f63976d5",
+      "after_sha256": "4d2f3256b9ae63a8eff20afed308582407d668a1ff2fcd5ae420ae65817f841e",
       "owners": {
         "@module": {
           "before": "fb86e9a8ae2d22dc397f1777baab16edfad78ca9fba823033afed576ce6588a2",
@@ -3852,7 +3894,7 @@
     },
     "tests/shared/category_migration/primary_boundary_scoring_builders.py": {
       "before_sha256": "03517bb22971ba4e9eaef16d70c6f52657c3ec50a55f2ec370fede0e239cabe4",
-      "after_sha256": "bdd5fe9113def32ed7240b8957f3766462b571e13a104123bb04d85fc2074c0b",
+      "after_sha256": "5768d95387d3790a21aba6ff63ceb8dce29894f4ddaebc4d454b2820abf83920",
       "owners": {
         "@module": {
           "before": "b124fb812cf0bce5171211a3e79acb40738f11993d86c6527401d0e6f6c207a1",
@@ -3880,7 +3922,7 @@
     },
     "tests/shared/category_migration/return_on_death.py": {
       "before_sha256": "d2bbf0ce05f7429fb3359c17f131f0c60b3e6659a82b5890b451d0c365cc368f",
-      "after_sha256": "d4c7d226af0086dd6c44e4f0eb0dfbc4965b7b7276cf560e2337754ef904cf65",
+      "after_sha256": "e1c133c280ad0e378c8fc4a540b015fc5ca030f35aee3dccc9760180de2fb9c4",
       "owners": {
         "@module": {
           "before": "848f5491a63cd8978a3b46d2fb89bc188b7d8fb1c67424cb65a26ae5e30312af",
@@ -3894,7 +3936,7 @@
     },
     "tests/shared/category_migration/tracked_targets.py": {
       "before_sha256": "4d5d33609eef3c637dc42c4b38883bc768986f289c98a0ef27f11dea1aa6bfeb",
-      "after_sha256": "5f14d4c477b24713b83c440ebdcf0f77202be09854c9a235ac648a18e6457727",
+      "after_sha256": "afdafaa1c026e5f881781a37a5db0527fe5ecad1f769f15a381c5af6bb3f22ba",
       "owners": {
         "@module": {
           "before": "8738c3c3699e197b80b30b4113aa57b4b59d3f02c11cf03750a68ff2f37728cf",
@@ -3908,7 +3950,7 @@
     },
     "tests/shared/category_migration/ws14_generic_ir_lifecycle_court.py": {
       "before_sha256": "76eefc5dd3220cf1084aeebf2d8c89d883af0c1d5fd5483ca2a57089ff180371",
-      "after_sha256": "44dfd3c17cd5db7ba985b612a30bee8115c794e697f19d93c4b92843b6c9a2f9",
+      "after_sha256": "f6ecdec051cfdc8da06a0d9b54121ff66554145456552d44f74a33c98e53f3e4",
       "owners": {
         "@module": {
           "before": "3428e1516b3e7b545f60853713f73f12288d5a69257d76ccf2f428ed0643f498",
@@ -3922,7 +3964,7 @@
     },
     "tests/shared/category_migration/ws14_generic_ir_lifecycle_more_dakka.py": {
       "before_sha256": "4ee7c0fb1e21de9f228d0a7e5a56fb1e00ad944f7cdaee829704e3132719a861",
-      "after_sha256": "11964948bad7144e177c7df73b4ba24ff56e18d3c78a9ab4fa5a27983fde4319",
+      "after_sha256": "27f3faa1d703ef3708ff76fb5be868142fc649061440295447b9d15723b7f490",
       "owners": {
         "@module": {
           "before": "94a57d38219d64c282818cea215f0d059ecf230a4e8639617dcc28700de9ea41",
@@ -3936,7 +3978,7 @@
     },
     "tests/shared/category_migration/ws14_generic_ir_lifecycle_spectacle.py": {
       "before_sha256": "b796b2dd11bdd9f3eec1edc2e12d0817a04611a4da7cd33a8a0a223a2e85f901",
-      "after_sha256": "421eccb4a7d62ac5effbd36ee61a1b23f2bfa78860a7c8125c1ee5bb5f109ef0",
+      "after_sha256": "33143266ff72974cfa19bb5fc329340f290cfc804762381d12b70cb98b435112",
       "owners": {
         "@module": {
           "before": "cc26c19786dd563803882a8905c19de30ddfdc5e8e01d7262a62c56d92eec927",
@@ -3996,7 +4038,7 @@
     },
     "tests/support/faction_batch01.py": {
       "before_sha256": "a18bddf57f940ee2b94202e3cdfaa8225e9082d029682f612f8e4c05a2424b85",
-      "after_sha256": "01dd29ac82154e6b3fd0c0f1234ba5bf178b9c5760a382dbc8753a6b68a812f8",
+      "after_sha256": "935524823a7f9bdf3f5e9025a70121ab5d180ae83dced14bae304870114816ea",
       "owners": {
         "@module": {
           "before": "fc6c3afb06bfadbb98afe10f5d8e98766cc6d1178d0f08977e9c5298a9bd8c1c",
@@ -4058,7 +4100,7 @@
     },
     "tests/support/section02_fixtures.py": {
       "before_sha256": "8e00bcb96be94235b1a4f88e1984f3bb1f0a87875b0df8af98f45df99d0d64e2",
-      "after_sha256": "27c6b8cd8b2e9bc7ea603c74d4442327d3f63bbfa81812a6f5ba4263c4c0d8dd",
+      "after_sha256": "d0a49ec28e8a6133009d8b69572bcb4b69ac11a428ca004d8d817e8e4af7375c",
       "owners": {
         "@module": {
           "before": "1028e6255a1aa34ee4bafcfdfe512f0841fd117d65b490a0447c1bcd1592d813",
@@ -4102,7 +4144,7 @@
     },
     "tests/support/section11_fixtures.py": {
       "before_sha256": "87fe29690637aed058071d612056077592dc98347a750bf3ba32c4a0ea897b59",
-      "after_sha256": "4aad67890f487cb682074bf154d0b76545c4a10d841a5b210a550dd53cd2d9db",
+      "after_sha256": "d35a6fa820bbf0a207159d04b856793006423fa3141a1928afe26899bf957bce",
       "owners": {
         "@module": {
           "before": "4191ce4698799c7a6d03a9dc3b0c99b90091de96d79f665e1febe1d594c71fa0",
@@ -4116,7 +4158,7 @@
     },
     "tests/support/section12_fixtures.py": {
       "before_sha256": "cf20e12f70542fbf0dd1831f82b183f79c8b40ea9dc1fc05f2054a76b83025c6",
-      "after_sha256": "03be36d5c34d626fe48cb5e59b5b51f777980c7b5520214ba8b4bfc2d6f4348b",
+      "after_sha256": "6cba44aae1bbe8fd4a79053025c41901a09c96c4ba62d2384c7d9f82cbf80fa5",
       "owners": {
         "@module": {
           "before": "f0338158787457c731e9307784293ebc7c1e1224302801ff8a65956c470ecc32",
@@ -4153,6 +4195,20 @@
         "native_session": {
           "before": "ed17263f6a1575ad17ef39419f78fd85ffd8dda6097ad263925499a1e5b3b981",
           "after": "c1cd3c552c16a18f515c7df6989b2b137c8e1d8ea9c32e64d44f04bd4907ade0"
+        }
+      }
+    },
+    "tests/support/viewer_identity_fixtures.py": {
+      "before_sha256": null,
+      "after_sha256": "03b049e8628f215473cc9aa56542dca9e243b4a03f43753ee8a8bf10b6c98dd4",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "15cd5fe00e93d8b0a9a98966e54d4480d5e62c3930dd8eca67c00aa1b3dbecd9"
+        },
+        "ordinal_identity_config_payload": {
+          "before": null,
+          "after": "9d61982827981686741067208bbfc3715658da005b4300090db858ae2cd72b38"
         }
       }
     },
@@ -5041,7 +5097,7 @@
       "unchanged_work": "Existing dice stream/history algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, caches and historical controls remain unchanged. Player serialization and retention deliberately change under the new measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
     },
     "src/warhammer40k_core/adapters/projection.py": {
-      "category": "rule_semantics",
+      "category": "serialization_or_replay_work",
       "operations": [
         "cumulative-exact-002",
         "player-visible-boundary"
@@ -5199,7 +5255,7 @@
       "unchanged_work": "Existing dice stream/history algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, caches and historical controls remain unchanged. Player serialization and retention deliberately change under the new measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
     },
     "src/warhammer40k_core/adapters/viewer_identity.py": {
-      "category": "rule_semantics",
+      "category": "hot_query_or_data_structure",
       "operations": [
         "player-visible-boundary"
       ],
@@ -5641,7 +5697,7 @@
       "unchanged_work": "Existing dice stream/history algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, caches and historical controls remain unchanged. Player serialization and retention deliberately change under the new measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
     },
     "src/warhammer40k_core/engine/missions.py": {
-      "category": "rule_semantics",
+      "category": "algorithm_or_search",
       "operations": [
         "private-rng-owner-24b1c81407a6c901",
         "private-rng-tactical-draw"
@@ -6205,6 +6261,16 @@
       "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
       "unchanged_work": "Existing dice stream/history algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, caches and historical controls remain unchanged. Player serialization and retention deliberately change under the new measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
     },
+    "tests/factions/necrons/unit/test_necrons_army_rule.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-93f45edb85f7ce25"
+      ],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream/history algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, caches and historical controls remain unchanged. Player serialization and retention deliberately change under the new measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
     "tests/factions/tyranids/unit/test_tyranids_army_rule.py": {
       "category": "rule_semantics",
       "operations": [
@@ -6320,6 +6386,16 @@
       "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
       "unchanged_work": "Existing dice stream/history algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, caches and historical controls remain unchanged. Player serialization and retention deliberately change under the new measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
     },
+    "tests/infrastructure/rule_execution/unit/test_rule_execution.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci-restructure-tests-infrastructure-rule_execution-unit-test_rule_execution.py"
+      ],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream/history algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, caches and historical controls remain unchanged. Player serialization and retention deliberately change under the new measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
     "tests/order127_helpers.py": {
       "category": "rule_semantics",
       "operations": [
@@ -6425,6 +6501,16 @@
       "category": "rule_semantics",
       "operations": [
         "fixture-fight"
+      ],
+      "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream/history algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, caches and historical controls remain unchanged. Player serialization and retention deliberately change under the new measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
+    "tests/phase17n_step5g_pairing_certification_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "private-rng-owner-1500588970a32351"
       ],
       "selected_families": [],
       "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
@@ -7055,6 +7141,18 @@
         "sorcerer-admission-exact-23"
       ],
       "selected_families": [],
+      "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
+      "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
+      "unchanged_work": "Existing dice stream/history algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, caches and historical controls remain unchanged. Player serialization and retention deliberately change under the new measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."
+    },
+    "tests/support/viewer_identity_fixtures.py": {
+      "category": "measured_workload",
+      "operations": [
+        "player-visible-boundary-workload"
+      ],
+      "selected_families": [
+        "player_boundary"
+      ],
       "rationale": "Implement the strict player-scoped policy boundary and private RNG authority. Existing gameplay dice consumers change only their seed source. Tactical draws deliberately replace public deterministic ranking with secret keyed HMAC and a persisted engine-owned occurrence sequence; its real native operation is measured separately. Serializer reconstruction and the real viewer projection, event, metadata, finite-command, bounded retention and full server restoration paths are measured. Player hashes and identifiers are projected from the already redacted stream; historical A32 outcomes retain an explicit audited seed metadata migration.",
       "source_obligation": "PR2 requires detached player-only observations, exact actor/request/phase/proposal routing, no silent fallback, engine-owned legal decisions and replay. Public game identity must not reveal future dice or tactical card draws; player-visible ordinals, revision and timing metadata must not reveal hidden opponent choices. Save/load must preserve seed and draw occurrence and reject missing or mismatched private authority.",
       "unchanged_work": "Existing dice stream/history algorithms, attack and movement algorithms, geometry solvers, legality and mutation paths, caches and historical controls remain unchanged. Player serialization and retention deliberately change under the new measured contract. Deterministic fixture seed initialization preserves explicit assertions; optional measurement config injection uses real native loaders on identical bytes. Mirror evidence ends at Command; no complete-game performance claim is made."

@@ -15,8 +15,10 @@ from tests.phase17n_primary_mission_helpers import (
     phase17n_state_with_setup,
 )
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
+from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.adapters.redaction import viewer_identity_map
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_order import (
     ELIGIBLE_TO_FIGHT_PASS_OPTION_ID,
@@ -130,7 +132,11 @@ def assert_pairing_scores_through_lifecycle_restore_views_and_replay(
         view = session.view(viewer_player_id=viewer_player_id)
         assert "primary_scoring_state_evidence_records" not in view
         assert view["viewer_player_id"] == viewer_player_id
-        assert view["primary_mission_progress_state"] == (
+        identities = viewer_identity_map(
+            event_log=session.lifecycle.decision_controller.event_log,
+            viewer=ViewerContext.for_player(viewer_player_id),
+        )
+        assert identities.resolve(validate_json_value(view["primary_mission_progress_state"])) == (
             state.primary_mission_progress_state.to_payload()
         )
         assert_public_primary_commitments_are_opaque(

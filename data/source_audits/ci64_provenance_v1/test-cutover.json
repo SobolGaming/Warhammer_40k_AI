@@ -55,10 +55,10 @@
       "sha256": "caade7cea6dae7b304efb346fb466dfe433dad6f94484a1ed3e1bb5f546443d0"
     },
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
-      "blob_sha1": "80346b0f1798112f4ff5a8bb3760e3bc5ba7560b",
-      "bytes": 61259,
+      "blob_sha1": "0aec24d177b010ad0a13c5d6a7f4cdb9deda9b6e",
+      "bytes": 61986,
       "mode": "100644",
-      "sha256": "4ef171dec5c6ec179e3d44ad6b933d0e3dc6f36cb9c04f24f2ea285fa6e93476"
+      "sha256": "017bc3708ed8be1be85e8396329aed7f4c179416827a88f9e3944d117a3a06c5"
     },
     "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py": {
       "blob_sha1": "0de58f2c39866b2b342b65cec198a732cad24d3d",
@@ -157,10 +157,10 @@
       "sha256": "115a75dd94f9c1b0e006c6ef8cc90ebf27432ab85b64a6840288935ac9e5d53e"
     },
     "tests/factions/necrons/unit/test_necrons_army_rule.py": {
-      "blob_sha1": "3981ec2448fae5f63dcdc085efaed50b056a258a",
-      "bytes": 55195,
+      "blob_sha1": "a5e382786fcdd7924c3540e100b60e1f0ee8fb02",
+      "bytes": 55351,
       "mode": "100644",
-      "sha256": "d0fef481241bc77912b8105bd763561d8f551005c010b230c9c52bc99939e827"
+      "sha256": "b8b520cdfb0f829bcabb3906158e58f6ee524c667e3d0f0d16fe69e4c1186283"
     },
     "tests/factions/orks/integration/test_ws14_generic_ir_lifecycle.py": {
       "blob_sha1": "b0ba83950f3ae212965decadb5691620e1378fa4",
@@ -247,10 +247,10 @@
       "sha256": "f4634a690fb11943947ee09407fe16fb75bb8c5e9372d025d6c41fd92b5f8065"
     },
     "tests/infrastructure/lifecycle/unit/test_lifecycle.py": {
-      "blob_sha1": "d81764877203d5cdf49069104ccce6d73e60b3f0",
-      "bytes": 21205,
+      "blob_sha1": "9f64336ab3a1f7229344a91389d2c98fa1589fc8",
+      "bytes": 21735,
       "mode": "100644",
-      "sha256": "870aa93ab3597652f082e54ab3f27173da806eb1f80c8b113b8a2f51c5495aa1"
+      "sha256": "b40dfbbafbb98d758a0549b56304291347720c2e562ac743e0d4f72168efa0dd"
     },
     "tests/infrastructure/lifecycle/unit/test_prebattle.py": {
       "blob_sha1": "b1d7e3281f5941589f5d7b8e0c0a284fd88c7111",
@@ -277,10 +277,10 @@
       "sha256": "09b4a1539de437c4ae175113326eb438f16ea074e4b1df6287957a9d48cba691"
     },
     "tests/infrastructure/missions/unit/test_event_companion_part2.py": {
-      "blob_sha1": "17a3b6f7dcd7f3229d420ebf8b38dec67a937bee",
-      "bytes": 64063,
+      "blob_sha1": "7996621cdf11b959990a2d34e343de4c8a3a717b",
+      "bytes": 65512,
       "mode": "100644",
-      "sha256": "952b3fd0cda812ae696c9e8d21d43f6a006fa20c54ee118708d3da37f3b64b27"
+      "sha256": "97b8ff3702145d1f7141e3af86b17c160f8898274e2f669dbfb5b9f27be33d74"
     },
     "tests/infrastructure/missions/unit/test_game_end_scoring.py": {
       "blob_sha1": "d05354290dca05fecdd35496a649d0ca29a00a04",
@@ -421,10 +421,10 @@
       "sha256": "b83719d03f7e9f95127842d429208450ad481ca40b165d14a89c98a59e08ff4f"
     },
     "tests/infrastructure/rule_execution/unit/test_rule_execution.py": {
-      "blob_sha1": "69517cd862cd5b7e698d2e7e661f0679779414a7",
-      "bytes": 57959,
+      "blob_sha1": "1c2b6cee51f1e1074cbf0f8aeb4333fe5b991c7c",
+      "bytes": 58801,
       "mode": "100644",
-      "sha256": "4e4d834ad9703805623bf269433f2fde33b563eb994ea65d8a9503fdefc61172"
+      "sha256": "11d85d1c0afe0c4eb5dcb846bb9ecb2ec7a8e1f09253b0b9ea564fe371fca179"
     },
     "tests/infrastructure/rule_execution/unit/test_rule_execution_part2.py": {
       "blob_sha1": "9043b502eb304138661672f9258ec33039fcc981",
@@ -1435,10 +1435,10 @@
       "sha256": "f55b4b360bdb91df763701749de6c0db3cc945a0c264db915c7959806c29fc39"
     },
     "tests/rules/section09/test_fall_back.py": {
-      "blob_sha1": "c0e9201755c845f3381ff6f6f4d4e0f4be38037c",
-      "bytes": 13039,
+      "blob_sha1": "c8d4a498af2713e0223bba6ff1d4b6c9278c1758",
+      "bytes": 13357,
       "mode": "100644",
-      "sha256": "037226e0f60e894ee39eb954c3252b7bb606a1e153b1f1390df4a9b39cfb27c4"
+      "sha256": "96ec07a79af0e61a6b5c9665a8cb4a80963d7a9fde16c9d18f5cc00e59ee1798"
     },
     "tests/rules/section09/test_focused_checkpoint.py": {
       "blob_sha1": "d7cbc932bb13a7f20990adac5dd2a5c89feb9648",
