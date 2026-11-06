@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/shard-1.txt": {
       "before_sha256": "fe0f5d82a1f9df7de3367f5d221a9aee331c0ae03a505b1f3cef6d558f448748",
-      "after_sha256": "d2011e5680e658849a83ad59ae46a7e49fae3a47d00ea5fc157db657b615b619",
+      "after_sha256": "1beea62732fef6568882b2579a582233bc08854a42d360150b529161bbf6065d",
       "owners": {
         "@document": {
           "before": "fe0f5d82a1f9df7de3367f5d221a9aee331c0ae03a505b1f3cef6d558f448748",
-          "after": "d2011e5680e658849a83ad59ae46a7e49fae3a47d00ea5fc157db657b615b619"
+          "after": "1beea62732fef6568882b2579a582233bc08854a42d360150b529161bbf6065d"
         }
       }
     },
