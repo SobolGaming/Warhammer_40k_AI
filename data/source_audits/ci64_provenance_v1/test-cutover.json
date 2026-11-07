@@ -222,6 +222,12 @@
       "mode": "100644",
       "sha256": "e8548335a237455fce0e5888c15f192a278620aaad31ff2a13139755492e3c56"
     },
+    "tests/infrastructure/adapters/test_finite_candidates.py": {
+      "blob_sha1": "01aeb949b0e2802bb8d6a63f453c565cc3b80f5a",
+      "bytes": 8091,
+      "mode": "100644",
+      "sha256": "19a4f9d19e800668e07f81a5a5823621c42c4bd80c0bfa59d23005b7b25da281"
+    },
     "tests/infrastructure/adapters/unit/test_session_commands.py": {
       "blob_sha1": "6232e501f8011b78ac9e99b91792c579baec5694",
       "bytes": 39577,
