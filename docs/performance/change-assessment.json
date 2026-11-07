@@ -1,228 +1,46 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "f2bb7aa724a1bc637590b9bbbff63c846fa46454",
+  "base": "fc9cd82f4c2f557b4597cd8edffb343404825dea",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:450d1d846e14cddd239cf38e2951589488e86fc55bc99f6c413cdb5aee274802",
   "operation_map_sha256": "5bc5390ccb66aabc85d4e953b3830ee742eb13a6b4506fc36ac457a7658eb198",
   "changes": {
-    ".github/workflows/ci.yml": {
-      "before_sha256": "ac7cd14bf51780082b846b350a2b3b48d189c8ca3cd1a99d7b74737260348e6a",
-      "after_sha256": "7d102576d14ed3e45cdb66681b98e565b46215083a6e5eec729137a3a017bbd1",
-      "owners": {
-        "@document": {
-          "before": "ac7cd14bf51780082b846b350a2b3b48d189c8ca3cd1a99d7b74737260348e6a",
-          "after": "7d102576d14ed3e45cdb66681b98e565b46215083a6e5eec729137a3a017bbd1"
-        }
-      }
-    },
-    "README.md": {
-      "before_sha256": "2635a84ff8de5e1696c2e4ac1fa23d9f2d5bf848d02675109dea20f46e4f6ed6",
-      "after_sha256": "4c0075d7337d161d6b58d11ff6c3da7a6c35e29852f7a077754c4689d7ad16d4",
-      "owners": {
-        "@document": {
-          "before": "2635a84ff8de5e1696c2e4ac1fa23d9f2d5bf848d02675109dea20f46e4f6ed6",
-          "after": "4c0075d7337d161d6b58d11ff6c3da7a6c35e29852f7a077754c4689d7ad16d4"
-        }
-      }
-    },
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "5e2925ff235bc936312151c9bba430e810bd9ce48a98193c445b9012ddd42648",
-      "after_sha256": "8f712b4f80dcd8efb4d32d53686ee4ba143ee5d43763b3369dc29ea847f2d123",
-      "owners": {
-        "@document": {
-          "before": "5e2925ff235bc936312151c9bba430e810bd9ce48a98193c445b9012ddd42648",
-          "after": "8f712b4f80dcd8efb4d32d53686ee4ba143ee5d43763b3369dc29ea847f2d123"
-        }
-      }
-    },
-    "ci/quality_shards/shard-3.txt": {
-      "before_sha256": "94be0b01d10dac455539fc091bff4cd7380c2f2f29f24d9fd88fa0441da17daa",
-      "after_sha256": "3337e01d277c898ce4e3badde52d97307bf643ca9f39c936a5b0f81df1a8b52a",
-      "owners": {
-        "@document": {
-          "before": "94be0b01d10dac455539fc091bff4cd7380c2f2f29f24d9fd88fa0441da17daa",
-          "after": "3337e01d277c898ce4e3badde52d97307bf643ca9f39c936a5b0f81df1a8b52a"
-        }
-      }
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "fc18fe150ad611a2ff4cbc8eaeb67675e15b8ba901cf67746f8593db54c26479",
-      "after_sha256": "8135e0fdf9aec389e3ed483bb8c411c683e0aca6f6ae6147903e5a42580d5cf4",
-      "owners": {
-        "@document": {
-          "before": "fc18fe150ad611a2ff4cbc8eaeb67675e15b8ba901cf67746f8593db54c26479",
-          "after": "8135e0fdf9aec389e3ed483bb8c411c683e0aca6f6ae6147903e5a42580d5cf4"
-        }
-      }
-    },
-    "scripts/ci_source_index.py": {
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "2be0b1d2aea94ac7ab4e681806262d7981256c6ba3d5251ac9dc3a89d0af0eac",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "37f5f19ac90d4801bde0346049fa5bb640d1dc924bd800f4e96a115d30cb6838"
-        },
-        "BuildGate": {
-          "before": null,
-          "after": "a73527b75507bc8db3e20bc5d82d594de55ed9e292953e41cf6f805dcb00344a"
-        },
-        "BuildGate.wait": {
-          "before": null,
-          "after": "ec9fce4f13d6ad82cdde8dd954c08724b5e2897b37d288180fa3d8641b5ddb71"
-        },
-        "CollectionNode": {
-          "before": null,
-          "after": "0bc2629d88ea65656521768eff4dbd34b7a493b263bc79a7f74da67d9201d81d"
-        },
-        "build": {
-          "before": null,
-          "after": "1bc651564d1d5a3111e998a31d3159dfe68fe7c4cc0953c8085cc242d4319e13"
-        },
-        "main": {
-          "before": null,
-          "after": "c6fa4de80750b71b541f5b998d6732c29659d4d91e85ec5338dda57184b6f9d5"
-        },
-        "pytest_addoption": {
-          "before": null,
-          "after": "931ded419063d528928cc6235c8a7f12a61cec0e538f30188dba2ff13b2c22f5"
-        },
-        "pytest_collection_finish": {
-          "before": null,
-          "after": "2beed95d11bfa0d6a9d16a2e4b5708ccdcc717869a08e66552f014b640641d1b"
-        },
-        "pytest_configure": {
-          "before": null,
-          "after": "d49aa162196151f80703908681381aac7fec95956d4ed06412c8bb3fb1dc7cfa"
-        },
-        "pytest_xdist_node_collection_finished": {
-          "before": null,
-          "after": "fbffd18eb4293771f2eafee0c927324302dfe7e9bccf75b04a13d69e947600d1"
-        },
-        "validate_input_key": {
-          "before": null,
-          "after": "21711d999a6a4180573cfd2c358cf4367509bc50c9272f3d85168c33c12e54d3"
-        }
-      }
-    },
-    "tests/code_quality/test_ci_performance_gates.py": {
-      "before_sha256": "87f29e3331d1c97bce02c5dc3ea1b8f07c26c43384d2bec19f1ed85f8c472297",
-      "after_sha256": "e0a728e3aa474d64e9e67f78dc71c140bcbd7ff5815e1fd808a33166dc0149ce",
-      "owners": {
-        "test_cold_source_index_overlaps_startup_inside_the_unchanged_deadline": {
-          "before": null,
-          "after": "dd94157cf973a32f263880b1f10846bc6731bde91ff7542ba72f1d3e8ec13ecc"
-        },
-        "test_failed_real_source_builder_stops_pytest_before_dispatch": {
-          "before": null,
-          "after": "08cb1c83cd6f5b181f61991708e34f564dfc03429a60d161f4235401ce52d115"
-        },
-        "test_source_index_completion_is_bound_to_successful_current_construction": {
-          "before": null,
-          "after": "f2217cd97baf51e8dee40eee5d8832c08ef57a8ad5bb79335c46d3467e8d9907"
-        },
-        "test_source_index_gate_rejects_missing_completion_and_expired_deadline": {
-          "before": null,
-          "after": "4b8fd6e9cb234fb09f96eb427a07cc564cf2700fe348171860eb08912384ce68"
-        }
-      }
-    },
-    "tests/code_quality/test_section08_native_mission_source.py": {
-      "before_sha256": "fb04693e3347bddef3902d349f4e3c41eb3137582f174ad287236e1347cb158a",
-      "after_sha256": "3f72650fcb6bf11bbd80f67c58a9e0d0a75ee1074e1c9bd4b619b0eb094a138e",
-      "owners": {
-        "test_source_history_guard_precedes_index_and_covered_pytest": {
-          "before": "f9134cf66ec96d09bf9827e24d29e6b015f6289cce761c405dc1eeb2e01d8582",
-          "after": "674e57cacbbd90fa0a1cc05d91b802c584776a9c23bd2f04105f59c5a160054b"
-        }
-      }
-    },
-    "tests/rules/section07/coverage.json": {
-      "before_sha256": "8cee90739592fad5698f91d0532888962503df1e6df3dfa84fe2d0752cc251ac",
-      "after_sha256": "6c790b11507259aa6da498331946fe1ddcb440030dedbed429f7777c5c75ca6c",
+      "after_sha256": "864865a896729d2c378ae23aab3c149bbf126e77f3f1c6bd0ff11bf1839999c9",
       "owners": {
         "@document": {
-          "before": "8cee90739592fad5698f91d0532888962503df1e6df3dfa84fe2d0752cc251ac",
-          "after": "6c790b11507259aa6da498331946fe1ddcb440030dedbed429f7777c5c75ca6c"
+          "before": null,
+          "after": "864865a896729d2c378ae23aab3c149bbf126e77f3f1c6bd0ff11bf1839999c9"
+        }
+      }
+    },
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "795a4542cfc925953913bb684f0e60096944e4858abd8825db9eb277c18225d4",
+      "after_sha256": "bd99940b45846bfc6b6d8d81d6524dd332a87b3e7bd427da05fa36d21f11f87e",
+      "owners": {
+        "@document": {
+          "before": "795a4542cfc925953913bb684f0e60096944e4858abd8825db9eb277c18225d4",
+          "after": "bd99940b45846bfc6b6d8d81d6524dd332a87b3e7bd427da05fa36d21f11f87e"
         }
       }
     }
   },
   "rows": {
-    ".github/workflows/ci.yml": {
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "CI-only process scheduling overlaps unchanged cold source-index construction with pytest startup/collection. A controller barrier admits tests only after a successful atomic completion bound to input key, target path and the original shared fourteen-minute deadline. Shard1 deliberately stays cold so both PR and post-merge CI verify the repaired path.",
-      "source_obligation": "Retain all5599 behavioral cases, worksteal dispatch, exact source validation and fail-closed construction/receipt errors. Keep fourteen-minute setup/test cutoff,66.5percent full-package branch floor,120-second mirror,180-second serial smoke,600-second quality lanes and the exact260 deferrals. No test runs against a partial index and no invalid index is rebuilt as recovery.",
-      "unchanged_work": "No src package, engine algorithm, cache-loader policy, rules, decisions, RNG, replay, catalog, contract, dependency or measured engine workload changes. The existing public builder and normal authoritative loaders retain every source and partition hash check. No engine detailed-comparison family is affected; required serial smoke and real forced-cold CI are current evidence. Existing reports retain their original bases and outcomes."
+      "rationale": "Documentation-only AI roadmap revision grounded in current contracts, performance evidence and readiness gates; adds no runtime behavior.",
+      "source_obligation": "Preserve engine authority, strict policy routing, source-qualified readiness, current CI limits and all tests. Separate proposed experiments from verified capabilities.",
+      "unchanged_work": "No runtime, algorithm, source data, schemas, dependencies, tests, CI configuration or measured workload changes. Only maintained Markdown documentation and this required exact-base assessment change; no detailed comparison family is affected."
     },
-    "README.md": {
+    "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "CI-only process scheduling overlaps unchanged cold source-index construction with pytest startup/collection. A controller barrier admits tests only after a successful atomic completion bound to input key, target path and the original shared fourteen-minute deadline. Shard1 deliberately stays cold so both PR and post-merge CI verify the repaired path.",
-      "source_obligation": "Retain all5599 behavioral cases, worksteal dispatch, exact source validation and fail-closed construction/receipt errors. Keep fourteen-minute setup/test cutoff,66.5percent full-package branch floor,120-second mirror,180-second serial smoke,600-second quality lanes and the exact260 deferrals. No test runs against a partial index and no invalid index is rebuilt as recovery.",
-      "unchanged_work": "No src package, engine algorithm, cache-loader policy, rules, decisions, RNG, replay, catalog, contract, dependency or measured engine workload changes. The existing public builder and normal authoritative loaders retain every source and partition hash check. No engine detailed-comparison family is affected; required serial smoke and real forced-cold CI are current evidence. Existing reports retain their original bases and outcomes."
-    },
-    "ci/quality_shards/all.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "CI-only process scheduling overlaps unchanged cold source-index construction with pytest startup/collection. A controller barrier admits tests only after a successful atomic completion bound to input key, target path and the original shared fourteen-minute deadline. Shard1 deliberately stays cold so both PR and post-merge CI verify the repaired path.",
-      "source_obligation": "Retain all5599 behavioral cases, worksteal dispatch, exact source validation and fail-closed construction/receipt errors. Keep fourteen-minute setup/test cutoff,66.5percent full-package branch floor,120-second mirror,180-second serial smoke,600-second quality lanes and the exact260 deferrals. No test runs against a partial index and no invalid index is rebuilt as recovery.",
-      "unchanged_work": "No src package, engine algorithm, cache-loader policy, rules, decisions, RNG, replay, catalog, contract, dependency or measured engine workload changes. The existing public builder and normal authoritative loaders retain every source and partition hash check. No engine detailed-comparison family is affected; required serial smoke and real forced-cold CI are current evidence. Existing reports retain their original bases and outcomes."
-    },
-    "ci/quality_shards/shard-3.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "CI-only process scheduling overlaps unchanged cold source-index construction with pytest startup/collection. A controller barrier admits tests only after a successful atomic completion bound to input key, target path and the original shared fourteen-minute deadline. Shard1 deliberately stays cold so both PR and post-merge CI verify the repaired path.",
-      "source_obligation": "Retain all5599 behavioral cases, worksteal dispatch, exact source validation and fail-closed construction/receipt errors. Keep fourteen-minute setup/test cutoff,66.5percent full-package branch floor,120-second mirror,180-second serial smoke,600-second quality lanes and the exact260 deferrals. No test runs against a partial index and no invalid index is rebuilt as recovery.",
-      "unchanged_work": "No src package, engine algorithm, cache-loader policy, rules, decisions, RNG, replay, catalog, contract, dependency or measured engine workload changes. The existing public builder and normal authoritative loaders retain every source and partition hash check. No engine detailed-comparison family is affected; required serial smoke and real forced-cold CI are current evidence. Existing reports retain their original bases and outcomes."
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "CI-only process scheduling overlaps unchanged cold source-index construction with pytest startup/collection. A controller barrier admits tests only after a successful atomic completion bound to input key, target path and the original shared fourteen-minute deadline. Shard1 deliberately stays cold so both PR and post-merge CI verify the repaired path.",
-      "source_obligation": "Retain all5599 behavioral cases, worksteal dispatch, exact source validation and fail-closed construction/receipt errors. Keep fourteen-minute setup/test cutoff,66.5percent full-package branch floor,120-second mirror,180-second serial smoke,600-second quality lanes and the exact260 deferrals. No test runs against a partial index and no invalid index is rebuilt as recovery.",
-      "unchanged_work": "No src package, engine algorithm, cache-loader policy, rules, decisions, RNG, replay, catalog, contract, dependency or measured engine workload changes. The existing public builder and normal authoritative loaders retain every source and partition hash check. No engine detailed-comparison family is affected; required serial smoke and real forced-cold CI are current evidence. Existing reports retain their original bases and outcomes."
-    },
-    "scripts/ci_source_index.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "ci-source-index-startup"
-      ],
-      "selected_families": [],
-      "rationale": "CI-only process scheduling overlaps unchanged cold source-index construction with pytest startup/collection. A controller barrier admits tests only after a successful atomic completion bound to input key, target path and the original shared fourteen-minute deadline. Shard1 deliberately stays cold so both PR and post-merge CI verify the repaired path.",
-      "source_obligation": "Retain all5599 behavioral cases, worksteal dispatch, exact source validation and fail-closed construction/receipt errors. Keep fourteen-minute setup/test cutoff,66.5percent full-package branch floor,120-second mirror,180-second serial smoke,600-second quality lanes and the exact260 deferrals. No test runs against a partial index and no invalid index is rebuilt as recovery.",
-      "unchanged_work": "No src package, engine algorithm, cache-loader policy, rules, decisions, RNG, replay, catalog, contract, dependency or measured engine workload changes. The existing public builder and normal authoritative loaders retain every source and partition hash check. No engine detailed-comparison family is affected; required serial smoke and real forced-cold CI are current evidence. Existing reports retain their original bases and outcomes."
-    },
-    "tests/code_quality/test_ci_performance_gates.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "CI-only process scheduling overlaps unchanged cold source-index construction with pytest startup/collection. A controller barrier admits tests only after a successful atomic completion bound to input key, target path and the original shared fourteen-minute deadline. Shard1 deliberately stays cold so both PR and post-merge CI verify the repaired path.",
-      "source_obligation": "Retain all5599 behavioral cases, worksteal dispatch, exact source validation and fail-closed construction/receipt errors. Keep fourteen-minute setup/test cutoff,66.5percent full-package branch floor,120-second mirror,180-second serial smoke,600-second quality lanes and the exact260 deferrals. No test runs against a partial index and no invalid index is rebuilt as recovery.",
-      "unchanged_work": "No src package, engine algorithm, cache-loader policy, rules, decisions, RNG, replay, catalog, contract, dependency or measured engine workload changes. The existing public builder and normal authoritative loaders retain every source and partition hash check. No engine detailed-comparison family is affected; required serial smoke and real forced-cold CI are current evidence. Existing reports retain their original bases and outcomes."
-    },
-    "tests/code_quality/test_section08_native_mission_source.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "CI-only process scheduling overlaps unchanged cold source-index construction with pytest startup/collection. A controller barrier admits tests only after a successful atomic completion bound to input key, target path and the original shared fourteen-minute deadline. Shard1 deliberately stays cold so both PR and post-merge CI verify the repaired path.",
-      "source_obligation": "Retain all5599 behavioral cases, worksteal dispatch, exact source validation and fail-closed construction/receipt errors. Keep fourteen-minute setup/test cutoff,66.5percent full-package branch floor,120-second mirror,180-second serial smoke,600-second quality lanes and the exact260 deferrals. No test runs against a partial index and no invalid index is rebuilt as recovery.",
-      "unchanged_work": "No src package, engine algorithm, cache-loader policy, rules, decisions, RNG, replay, catalog, contract, dependency or measured engine workload changes. The existing public builder and normal authoritative loaders retain every source and partition hash check. No engine detailed-comparison family is affected; required serial smoke and real forced-cold CI are current evidence. Existing reports retain their original bases and outcomes."
-    },
-    "tests/rules/section07/coverage.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-b6886d3bc2fb1ca4"
-      ],
-      "selected_families": [],
-      "rationale": "CI-only process scheduling overlaps unchanged cold source-index construction with pytest startup/collection. A controller barrier admits tests only after a successful atomic completion bound to input key, target path and the original shared fourteen-minute deadline. Shard1 deliberately stays cold so both PR and post-merge CI verify the repaired path.",
-      "source_obligation": "Retain all5599 behavioral cases, worksteal dispatch, exact source validation and fail-closed construction/receipt errors. Keep fourteen-minute setup/test cutoff,66.5percent full-package branch floor,120-second mirror,180-second serial smoke,600-second quality lanes and the exact260 deferrals. No test runs against a partial index and no invalid index is rebuilt as recovery.",
-      "unchanged_work": "No src package, engine algorithm, cache-loader policy, rules, decisions, RNG, replay, catalog, contract, dependency or measured engine workload changes. The existing public builder and normal authoritative loaders retain every source and partition hash check. No engine detailed-comparison family is affected; required serial smoke and real forced-cold CI are current evidence. Existing reports retain their original bases and outcomes."
+      "rationale": "Documentation-only AI roadmap revision grounded in current contracts, performance evidence and readiness gates; adds no runtime behavior.",
+      "source_obligation": "Preserve engine authority, strict policy routing, source-qualified readiness, current CI limits and all tests. Separate proposed experiments from verified capabilities.",
+      "unchanged_work": "No runtime, algorithm, source data, schemas, dependencies, tests, CI configuration or measured workload changes. Only maintained Markdown documentation and this required exact-base assessment change; no detailed comparison family is affected."
     }
   },
   "milestone": "ordinary",

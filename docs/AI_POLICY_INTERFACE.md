@@ -1,5 +1,14 @@
 # Player policy interface
 
+The maintained [AI implementation and learning plan](AI_IMPLEMENTATION_PLAN.md)
+separates the implemented contracts below from proposed candidate generation,
+information-safe simulation, experiments and full-game qualification.
+
+Exact player-scoped routing and Phase 19E provenance/training contracts exist;
+autonomous battle policies, training and full-game qualification are not established.
+The historical grouped Phase 19/20 row is not an assertion that those foundations
+are absent, nor an individual mapping of every 19A-19F subphase.
+
 `ai.player_policy` and `ai.runner` provide a strict, synchronous foundation for
 policies over `AdapterGameSession`. They do not implement autonomous battle play,
 training, a strategic hierarchy, an evaluator, or hypothetical search.
