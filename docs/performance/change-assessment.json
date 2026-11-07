@@ -358,6 +358,20 @@
         }
       }
     },
+    "tests/code_quality/test_quality_runtime_process.py": {
+      "before_sha256": "a7b1c7694ff923ed1714aa857d8f7334530058e63d7375ddaa50aa2ebdad48a2",
+      "after_sha256": "85983adf995327d62d50680f9c68beaf6834987b9795bf42b4fc684346f1be9b",
+      "owners": {
+        "@module": {
+          "before": "379ba2d5118c42c3531734eac18e47169475649a074b45177079b89443a1e725",
+          "after": "5666e1af5914a0e20b1b469a697c0244f434ba49969670c772a81b449d2a1276"
+        },
+        "test_real_outer_group_cancel_and_parent_loss_cannot_release_unowned_work": {
+          "before": "df15b685507d104ee361dd4369279f3e57f80006fccb0f7c049177c30901a296",
+          "after": "549c4655a67338e064a62ddb7ea33f8b74244a7cdf2972172637794abb7e0c4f"
+        }
+      }
+    },
     "tests/infrastructure/adapters/test_finite_candidates.py": {
       "before_sha256": "460fe562bcc7f05ca513513c799245bbb53f3a5c4f913e36dc9c7b5a5fda5d96",
       "after_sha256": "b4a13ab933a2c539fe2c072aa0ac6a00a5d0ce861e19f8099b30df437e1868e7",
@@ -1061,6 +1075,14 @@
       "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
       "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
       "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
+    },
+    "tests/code_quality/test_quality_runtime_process.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Repair the CI-observed OS-test marker publication race using the existing durable atomic evidence writer for both process identities and requiring both complete publications before consuming PIDs.",
+      "source_obligation": "A readiness filename must never expose an empty or partial PID payload. Keep real supervisor process ownership, cancellation and orphan checks fail-closed; require typed positive identities with no empty/default PID fallback.",
+      "unchanged_work": "Only the OS test harness publication changes. The production supervisor and atomic evidence writer, all AI target contracts and engine behavior remain byte-identical. Existing deadlines, child control worker counts, hosted quality shards and all tests remain enabled."
     },
     "tests/infrastructure/adapters/test_finite_candidates.py": {
       "category": "rule_semantics",

@@ -9,6 +9,7 @@ import sys
 import threading
 import time
 from pathlib import Path
+from typing import cast
 
 from scripts import quality_evidence as evidence
 from scripts import quality_runner as runner
@@ -270,13 +271,14 @@ def test_real_outer_group_cancel_and_parent_loss_cannot_release_unowned_work(
     code = """import os, signal, subprocess, sys
 from pathlib import Path
 from scripts import quality_runner as runner
+from scripts.quality_evidence import atomic_json
 folder = Path(sys.argv[1])
 scenario = sys.argv[2]
 folder.mkdir()
 original = subprocess.Popen
 def observed(*args, **kwargs):
     process = original(*args, **kwargs)
-    (folder / 'gated-pid.txt').write_text(str(process.pid))
+    atomic_json(folder / 'gated-pid.txt', process.pid)
     if scenario == 'before_registration':
         os.kill(os.getpid(), signal.SIGKILL)
     return process
@@ -284,11 +286,12 @@ runner.subprocess.Popen = observed
 supervisor = runner.Supervisor(folder, 'isolated-caller', runner.Deadlines(5, 6, 7, 8))
 work = (
     "import os,signal,subprocess,sys,time; from pathlib import Path; "
+    "from scripts.quality_evidence import atomic_json; "
     "signal.signal(signal.SIGINT, signal.SIG_IGN); signal.signal(signal.SIGTERM, signal.SIG_IGN); "
     "child=subprocess.Popen([sys.executable,'-B','-c',"
     "'import signal,time; signal.signal(signal.SIGINT,signal.SIG_IGN); "
     "signal.signal(signal.SIGTERM,signal.SIG_IGN); time.sleep(60)']); "
-    "Path(sys.argv[1]).write_text(str(os.getpid())+' '+str(child.pid)); time.sleep(60)"
+    "atomic_json(Path(sys.argv[1]), [os.getpid(), child.pid]); time.sleep(60)"
 )
 try:
     supervisor.run([sys.executable, '-B', '-c', work, str(folder / 'work-started.txt')],
@@ -319,13 +322,29 @@ finally:
             marker = directory / (
                 "work-started.txt" if scenario == "outer_group" else "gated-pid.txt"
             )
-            while not marker.is_file() and time.monotonic() < deadline and process.poll() is None:
+            gated_pid = directory / "gated-pid.txt"
+            # Existence signals readiness only after complete atomic publication.
+            # Require both identities before consuming either process tree.
+            while (
+                not (gated_pid.is_file() and marker.is_file())
+                and time.monotonic() < deadline
+                and process.poll() is None
+            ):
                 time.sleep(0.01)
+            assert gated_pid.is_file()
             assert marker.is_file()
-            child_pid = int((directory / "gated-pid.txt").read_text())
+            child_pid = evidence.read_json(gated_pid)
+            assert type(child_pid) is int
+            assert child_pid > 0
             descendants = [child_pid]
             if scenario == "outer_group":
-                descendants = [int(value) for value in marker.read_text().split()]
+                published: object = evidence.read_json(marker)
+                assert type(published) is list
+                values = cast(list[object], published)
+                assert len(values) == 2
+                assert all(type(pid) is int and pid > 0 for pid in values)
+                descendants = cast(list[int], values)
+                assert descendants[0] == child_pid
                 os.killpg(process.pid, signal.SIGTERM)
                 time.sleep(0.1)
                 if process.poll() is None:
