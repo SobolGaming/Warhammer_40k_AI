@@ -4,8 +4,8 @@ The maintained [AI implementation and learning plan](AI_IMPLEMENTATION_PLAN.md)
 separates the implemented contracts below from proposed candidate generation,
 information-safe simulation, experiments and full-game qualification.
 
-Exact player-scoped routing, finite candidate sets, finite training linkage and
-Phase 19E provenance/training contracts exist;
+Exact player-scoped routing, finite candidate sets, finite training linkage,
+named target declarations and Phase 19E provenance/training contracts exist;
 autonomous battle policies, training and full-game qualification are not established.
 The historical grouped Phase 19/20 row is not an assertion that those foundations
 are absent, nor an individual mapping of every 19A-19F subphase.
@@ -131,6 +131,50 @@ identity joins, permitted semantic features, meaningful targets and experiment
 provenance. A decision-record reference alone does not prove an accepted outcome.
 The existing scalar target keeps its original semantics. This contract introduces
 no training run, learner, outcome label or player-facing/wire contract change.
+
+## Named training target declarations
+
+`ai.training_targets.NamedTrainingTarget` is the independently versioned
+`named-training-target-v1` producer declaration. It carries a versioned target ID,
+meaning, player perspective, horizon, episode end, observed/missing validity,
+value and units, missing reason, producer version, evidence SHA-256 and reward
+profile version. It never infers a label from `TrainingRow.target_value`; that
+historical scalar remains unchanged.
+
+The closed v1 meanings are:
+
+- `match_utility`: terminal win 1, draw 0.5 or loss 0 from the stated player's
+  perspective, with `unit_interval` units;
+- `vp_margin`: own minus opponent terminal VP, an integer in `victory_points`;
+- `local_reference`: an externally defined, versioned reference target ID with
+  explicit units and a positive horizon measured in accepted engine decision
+  records, including accepted automatic selections. Recorded rejected attempts
+  do not advance it. Admission must verify that index; this declaration cannot.
+
+All v1 targets are undiscounted. Match targets require the complete-match horizon.
+An observed match target requires a declared terminal episode; truncation cannot
+supply a fabricated match outcome. Missing targets have `value=null` and a required
+reason. Aborted and unsupported episodes require missing targets. A declared local
+reference may be observed at its bounded horizon while the episode is truncated;
+it does not become match utility. Booleans, non-finite numbers, lossy integer
+conversion, unknown meanings/fields and inconsistent units/horizons fail explicitly.
+
+`LinkedTrainingTarget.from_link(link, row=row, context=before, target=target)`
+binds the complete declaration to the SHA-256 of an exact
+`FiniteTrainingCandidateLink`. Its `named-training-target-link-v1` loader requires
+the original link, row and historical context, rechecks their complete join,
+requires the same reward profile, and checks that the value perspective names an
+actual observation player. That player may differ from the decision actor.
+Each named target is independently linked and immutable; payloads are detached.
+
+These are offline integrity/declaration contracts. An evidence hash is a
+commitment, not authentication or a loaded evidence validator. Neither a declared
+terminal flag nor a syntactically valid target proves an engine outcome, complete
+trajectory, accepted transition, correct reference calculation, compatible source
+build, permitted features or dataset eligibility. A producer/admission stage must
+verify those facts and the local reference definition before learning. No
+conversion of old scalars, training data producer, learner, tactical result or
+player-facing/wire change is introduced.
 
 ## Running and diagnosing
 
