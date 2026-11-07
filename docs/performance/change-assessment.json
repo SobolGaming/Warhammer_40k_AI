@@ -1,374 +1,406 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "0b01afb13971510298e39dffd7456e02a1cf1ab0",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4174d19991124649d2d2a51c100cadeff899c674903345dd8aad74271bb43439",
-  "operation_map_sha256": "90c9cdd8c45621ec5eb847501d56556c96b9c795ce009a0d6c3778dfb48428ce",
+  "base": "124357294b118b40672188371fb2776694c64b7a",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a8d9599ef0aa2e43430ccbc22e547219c3df24b09c83c68836fec2ea8bf43c88",
+  "operation_map_sha256": "134e832745a0cee7dba0c26dfd24f6990ec237de7d40ec356650bf7b338ddf23",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "4be337e3d32fd9681de89eeab44fb23ee0b6c6ab576aadae5827398506429148",
-      "after_sha256": "6a27074c2f277fd75013bfa0811a5e4f333eff37fb3809237c837e81a73c76d4",
+      "before_sha256": "6a27074c2f277fd75013bfa0811a5e4f333eff37fb3809237c837e81a73c76d4",
+      "after_sha256": "85c6840fa6889ce19b40cd58966ddf97fb5ae54d5a2074495e819e3fc3691acc",
       "owners": {
         "@document": {
-          "before": "4be337e3d32fd9681de89eeab44fb23ee0b6c6ab576aadae5827398506429148",
-          "after": "6a27074c2f277fd75013bfa0811a5e4f333eff37fb3809237c837e81a73c76d4"
+          "before": "6a27074c2f277fd75013bfa0811a5e4f333eff37fb3809237c837e81a73c76d4",
+          "after": "85c6840fa6889ce19b40cd58966ddf97fb5ae54d5a2074495e819e3fc3691acc"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "a8d1a97e21764d9020c6d8b220142327f0b7ac83bb73d9a4e4ebc8f8990ef6aa",
-      "after_sha256": "2fa7e4ebf876450cc6463ffcb0fb64cda0604b2cc21836f272cd4693de34313d",
+      "before_sha256": "2fa7e4ebf876450cc6463ffcb0fb64cda0604b2cc21836f272cd4693de34313d",
+      "after_sha256": "c8a4400decfec5e32d9688640db7796ad84872b61323e26c273affda25c6d48d",
       "owners": {
         "@document": {
-          "before": "a8d1a97e21764d9020c6d8b220142327f0b7ac83bb73d9a4e4ebc8f8990ef6aa",
-          "after": "2fa7e4ebf876450cc6463ffcb0fb64cda0604b2cc21836f272cd4693de34313d"
+          "before": "2fa7e4ebf876450cc6463ffcb0fb64cda0604b2cc21836f272cd4693de34313d",
+          "after": "c8a4400decfec5e32d9688640db7796ad84872b61323e26c273affda25c6d48d"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "968fdc1aa3a6433e26a10ef168564a8b4f7ab4c023749d5907fa155ad24797ca",
-      "after_sha256": "67a69cf2e28bcabe1c8e8dff903186ce4a448a7cb4ca13421c67126254951d43",
+      "before_sha256": "67a69cf2e28bcabe1c8e8dff903186ce4a448a7cb4ca13421c67126254951d43",
+      "after_sha256": "324ed62c784661c8f48e9f55a16bc5a91b65a814209f3ce29da6d004a2c0e0b8",
       "owners": {
         "@document": {
-          "before": "968fdc1aa3a6433e26a10ef168564a8b4f7ab4c023749d5907fa155ad24797ca",
-          "after": "67a69cf2e28bcabe1c8e8dff903186ce4a448a7cb4ca13421c67126254951d43"
+          "before": "67a69cf2e28bcabe1c8e8dff903186ce4a448a7cb4ca13421c67126254951d43",
+          "after": "324ed62c784661c8f48e9f55a16bc5a91b65a814209f3ce29da6d004a2c0e0b8"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "4a858f6a5a3e014470b1fec7df69a5d9abd83ed092befd45f81b166ae8c8f8af",
-      "after_sha256": "233678528745e1add9acad9fe979b5d49de0528f2dada3ca867c216bb2464ce5",
+      "before_sha256": "233678528745e1add9acad9fe979b5d49de0528f2dada3ca867c216bb2464ce5",
+      "after_sha256": "4808e1fea1f48c47d2437906c91fbb51e54183275fe7e36248b039a5aeb2b3de",
       "owners": {
         "@document": {
-          "before": "4a858f6a5a3e014470b1fec7df69a5d9abd83ed092befd45f81b166ae8c8f8af",
-          "after": "233678528745e1add9acad9fe979b5d49de0528f2dada3ca867c216bb2464ce5"
+          "before": "233678528745e1add9acad9fe979b5d49de0528f2dada3ca867c216bb2464ce5",
+          "after": "4808e1fea1f48c47d2437906c91fbb51e54183275fe7e36248b039a5aeb2b3de"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "e76134841439e5c34630a250687b2e526949e7acae4bf312e97ad2093b94c015",
-      "after_sha256": "e91c4d2a699247d6b4705bd05b47ed6399f06e49a75253f423df9631011c2ed2",
+      "before_sha256": "e91c4d2a699247d6b4705bd05b47ed6399f06e49a75253f423df9631011c2ed2",
+      "after_sha256": "3a19855ff13fe606c417b6ea49d0102b0003ce17a98b0bb87820bbd5ef237712",
       "owners": {
         "@document": {
-          "before": "e76134841439e5c34630a250687b2e526949e7acae4bf312e97ad2093b94c015",
-          "after": "e91c4d2a699247d6b4705bd05b47ed6399f06e49a75253f423df9631011c2ed2"
+          "before": "e91c4d2a699247d6b4705bd05b47ed6399f06e49a75253f423df9631011c2ed2",
+          "after": "3a19855ff13fe606c417b6ea49d0102b0003ce17a98b0bb87820bbd5ef237712"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "9a9ceb5b22d365520d84e13deeec9b6f48b680237bacad850a7db52cacbda246",
-      "after_sha256": "ee7252beb1d63f2a0a44ec6a358caefeee3d66dfacc5d0b9deb2ca543d1c7e75",
+      "before_sha256": "ee7252beb1d63f2a0a44ec6a358caefeee3d66dfacc5d0b9deb2ca543d1c7e75",
+      "after_sha256": "c3fa8ccc8fea66f7af57340df09a152951b249ac3f86d563dc1b063130a3ed0a",
       "owners": {
         "@document": {
-          "before": "9a9ceb5b22d365520d84e13deeec9b6f48b680237bacad850a7db52cacbda246",
-          "after": "ee7252beb1d63f2a0a44ec6a358caefeee3d66dfacc5d0b9deb2ca543d1c7e75"
+          "before": "ee7252beb1d63f2a0a44ec6a358caefeee3d66dfacc5d0b9deb2ca543d1c7e75",
+          "after": "c3fa8ccc8fea66f7af57340df09a152951b249ac3f86d563dc1b063130a3ed0a"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "b7e6b7da16b254f495e53a326cde934dd6155518ef7b15cec7f4209651a782e4",
-      "after_sha256": "a1ccbc121851d4715667ccd231a0634a977b762b1a26cf795c05e9539d0d8cb9",
+      "before_sha256": "a1ccbc121851d4715667ccd231a0634a977b762b1a26cf795c05e9539d0d8cb9",
+      "after_sha256": "484ae91cefbf04e323d44b00d74f0c408233119f139172f2c7ad746c3091be6e",
       "owners": {
         "@document": {
-          "before": "b7e6b7da16b254f495e53a326cde934dd6155518ef7b15cec7f4209651a782e4",
-          "after": "a1ccbc121851d4715667ccd231a0634a977b762b1a26cf795c05e9539d0d8cb9"
+          "before": "a1ccbc121851d4715667ccd231a0634a977b762b1a26cf795c05e9539d0d8cb9",
+          "after": "484ae91cefbf04e323d44b00d74f0c408233119f139172f2c7ad746c3091be6e"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "81d34c41688a6ad97e72877b6cf3c1cf8ccaa8c85fe13b544c30f60551941a5e",
-      "after_sha256": "9e111c920cb8c4702f741a7be5b201046d3b61be7a658811cdc8f4235ad7889a",
+      "before_sha256": "9e111c920cb8c4702f741a7be5b201046d3b61be7a658811cdc8f4235ad7889a",
+      "after_sha256": "b214a13ab1299a2b15104825f45d46f1933190bb6ab56f59eb4ecaf86d3d2484",
       "owners": {
         "@document": {
-          "before": "81d34c41688a6ad97e72877b6cf3c1cf8ccaa8c85fe13b544c30f60551941a5e",
-          "after": "9e111c920cb8c4702f741a7be5b201046d3b61be7a658811cdc8f4235ad7889a"
+          "before": "9e111c920cb8c4702f741a7be5b201046d3b61be7a658811cdc8f4235ad7889a",
+          "after": "b214a13ab1299a2b15104825f45d46f1933190bb6ab56f59eb4ecaf86d3d2484"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "58994b75abe1862d7e727c0eb89c34944bd91c06c839ada4ac33aece1021083e",
-      "after_sha256": "88de0216117ab2be1b688a914718e89dea84bc72e864de1fe1e6e4048d204f35",
+      "before_sha256": "88de0216117ab2be1b688a914718e89dea84bc72e864de1fe1e6e4048d204f35",
+      "after_sha256": "7075e2587e67584cad7d0a114eb216d43d8886282bf908ee77c34818fe4cab63",
       "owners": {
         "@document": {
-          "before": "58994b75abe1862d7e727c0eb89c34944bd91c06c839ada4ac33aece1021083e",
-          "after": "88de0216117ab2be1b688a914718e89dea84bc72e864de1fe1e6e4048d204f35"
+          "before": "88de0216117ab2be1b688a914718e89dea84bc72e864de1fe1e6e4048d204f35",
+          "after": "7075e2587e67584cad7d0a114eb216d43d8886282bf908ee77c34818fe4cab63"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "cdae9eff2f4b1ade5c942840bc4f2ac5e7a74bfbcba6e7fd88871767c0f78148",
-      "after_sha256": "08d7be21195d389e22d8af125e324c7b2af0a65caf5cf1053e96775b97e1718a",
+      "before_sha256": "08d7be21195d389e22d8af125e324c7b2af0a65caf5cf1053e96775b97e1718a",
+      "after_sha256": "6108157365e170d04ca2f15b30f2310cfe1ddb10325b8dc3c286213a078ff0ed",
       "owners": {
         "@document": {
-          "before": "cdae9eff2f4b1ade5c942840bc4f2ac5e7a74bfbcba6e7fd88871767c0f78148",
-          "after": "08d7be21195d389e22d8af125e324c7b2af0a65caf5cf1053e96775b97e1718a"
+          "before": "08d7be21195d389e22d8af125e324c7b2af0a65caf5cf1053e96775b97e1718a",
+          "after": "6108157365e170d04ca2f15b30f2310cfe1ddb10325b8dc3c286213a078ff0ed"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "a2db161ff6dc4fd9222345b340718eaf7828d29e1c3e4e0fbfd8618642a240f2",
-      "after_sha256": "fe2d77fd2efae847d98a0444a7df7b43854644ea039449b139addf9e9634e423",
+      "before_sha256": "fe2d77fd2efae847d98a0444a7df7b43854644ea039449b139addf9e9634e423",
+      "after_sha256": "50c6da9892158fc5574490a455798d0b4642d60a8bfae88322ab1775d2fab996",
       "owners": {
         "@document": {
-          "before": "a2db161ff6dc4fd9222345b340718eaf7828d29e1c3e4e0fbfd8618642a240f2",
-          "after": "fe2d77fd2efae847d98a0444a7df7b43854644ea039449b139addf9e9634e423"
+          "before": "fe2d77fd2efae847d98a0444a7df7b43854644ea039449b139addf9e9634e423",
+          "after": "50c6da9892158fc5574490a455798d0b4642d60a8bfae88322ab1775d2fab996"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "973f7bbf11e33ae22a12c247e433759b217e4add3a6d90bca268f2e319bf11d6",
-      "after_sha256": "ad6539a335a46de7b973d66f8a25968795d42106479a569337f9cd3fdb82355a",
+      "before_sha256": "ad6539a335a46de7b973d66f8a25968795d42106479a569337f9cd3fdb82355a",
+      "after_sha256": "240440530e3b55c788e5bf4427b2c090450b6e9036536ec489a85a8906f7c9d9",
       "owners": {
         "@document": {
-          "before": "973f7bbf11e33ae22a12c247e433759b217e4add3a6d90bca268f2e319bf11d6",
-          "after": "ad6539a335a46de7b973d66f8a25968795d42106479a569337f9cd3fdb82355a"
+          "before": "ad6539a335a46de7b973d66f8a25968795d42106479a569337f9cd3fdb82355a",
+          "after": "240440530e3b55c788e5bf4427b2c090450b6e9036536ec489a85a8906f7c9d9"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "bac2219d66db6186f2f80bfdb87327a24c0b357a18cf8428d913d7f316deda72",
-      "after_sha256": "9c41c5532f13330ced0860e4bda07ee7aad1ad5becebb655778ad119948782e4",
+      "before_sha256": "9c41c5532f13330ced0860e4bda07ee7aad1ad5becebb655778ad119948782e4",
+      "after_sha256": "4eaaf81b551fd092196ed832fe4dea2c15f086499410a756b363f16b400e5a4e",
       "owners": {
         "@document": {
-          "before": "bac2219d66db6186f2f80bfdb87327a24c0b357a18cf8428d913d7f316deda72",
-          "after": "9c41c5532f13330ced0860e4bda07ee7aad1ad5becebb655778ad119948782e4"
+          "before": "9c41c5532f13330ced0860e4bda07ee7aad1ad5becebb655778ad119948782e4",
+          "after": "4eaaf81b551fd092196ed832fe4dea2c15f086499410a756b363f16b400e5a4e"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "07147118ba1336217af7b566c01dcb096228db89a3d5bc9e427d059dfcbb4ae7",
-      "after_sha256": "0da7a84784455e90891b7180fd7cfcf99b3284260379dd8233eb9897f08e62a4",
+      "before_sha256": "0da7a84784455e90891b7180fd7cfcf99b3284260379dd8233eb9897f08e62a4",
+      "after_sha256": "8fb44899eddd880bd91df97da79e3906cd4682a2761e1ccfbb5a9658cf8e4891",
       "owners": {
         "@document": {
-          "before": "07147118ba1336217af7b566c01dcb096228db89a3d5bc9e427d059dfcbb4ae7",
-          "after": "0da7a84784455e90891b7180fd7cfcf99b3284260379dd8233eb9897f08e62a4"
+          "before": "0da7a84784455e90891b7180fd7cfcf99b3284260379dd8233eb9897f08e62a4",
+          "after": "8fb44899eddd880bd91df97da79e3906cd4682a2761e1ccfbb5a9658cf8e4891"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "7b60541799a00c274e774c1ae47969b9248c1e8d954dd100dadfecde6bc834d5",
-      "after_sha256": "3b24ec285cdb1f17a83ed17d58db2199877372826f66e46caa3ff6d281fd9665",
+      "before_sha256": "3b24ec285cdb1f17a83ed17d58db2199877372826f66e46caa3ff6d281fd9665",
+      "after_sha256": "0bcc1d571cb8165475612a586f9e110139a7c2a885daa70bd85ee8dd979fe8d6",
       "owners": {
         "@document": {
-          "before": "7b60541799a00c274e774c1ae47969b9248c1e8d954dd100dadfecde6bc834d5",
-          "after": "3b24ec285cdb1f17a83ed17d58db2199877372826f66e46caa3ff6d281fd9665"
+          "before": "3b24ec285cdb1f17a83ed17d58db2199877372826f66e46caa3ff6d281fd9665",
+          "after": "0bcc1d571cb8165475612a586f9e110139a7c2a885daa70bd85ee8dd979fe8d6"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "afc0600c3d46ac2061b1028d05818df23920e43682a8e64dbff7ca2288492d7e",
-      "after_sha256": "ab7a53a7772d470b4fd09020ff56ec3efef8471785b8e58e2e476dd7936a2460",
+      "before_sha256": "ab7a53a7772d470b4fd09020ff56ec3efef8471785b8e58e2e476dd7936a2460",
+      "after_sha256": "2071847edc294cc182c211e3e080e03e6bcd5f43369f52b869c6a805e2078aa1",
       "owners": {
         "@document": {
-          "before": "afc0600c3d46ac2061b1028d05818df23920e43682a8e64dbff7ca2288492d7e",
-          "after": "ab7a53a7772d470b4fd09020ff56ec3efef8471785b8e58e2e476dd7936a2460"
+          "before": "ab7a53a7772d470b4fd09020ff56ec3efef8471785b8e58e2e476dd7936a2460",
+          "after": "2071847edc294cc182c211e3e080e03e6bcd5f43369f52b869c6a805e2078aa1"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "b6fee8d9d2d521af7011297ff06d7751bcd0bf5100a7d438c8cfc780fea54870",
-      "after_sha256": "efd6674500f6f972a249b3626438e4628039f2faafc693ad8e2ff1943d9d8354",
+      "before_sha256": "efd6674500f6f972a249b3626438e4628039f2faafc693ad8e2ff1943d9d8354",
+      "after_sha256": "f9d9995907809d4acf40f5c599a658b43d4df109bb85e994fc3047d5ae6a8d5b",
       "owners": {
         "@document": {
-          "before": "b6fee8d9d2d521af7011297ff06d7751bcd0bf5100a7d438c8cfc780fea54870",
-          "after": "efd6674500f6f972a249b3626438e4628039f2faafc693ad8e2ff1943d9d8354"
+          "before": "efd6674500f6f972a249b3626438e4628039f2faafc693ad8e2ff1943d9d8354",
+          "after": "f9d9995907809d4acf40f5c599a658b43d4df109bb85e994fc3047d5ae6a8d5b"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "565badf3a42861d8ad5ad613bd7a3c0b5d0d290bc1638d51cc7efecd2fec8134",
-      "after_sha256": "abe871dd02a5cc21fac5931f78fa7acd6604ad41147d656eefdb2947e222b029",
+      "before_sha256": "abe871dd02a5cc21fac5931f78fa7acd6604ad41147d656eefdb2947e222b029",
+      "after_sha256": "42655fdcb71cba4dcd9c81818b73f7fdc9c2d38c0da197a5c1b5155d4ca2ea63",
       "owners": {
         "@document": {
-          "before": "565badf3a42861d8ad5ad613bd7a3c0b5d0d290bc1638d51cc7efecd2fec8134",
-          "after": "abe871dd02a5cc21fac5931f78fa7acd6604ad41147d656eefdb2947e222b029"
+          "before": "abe871dd02a5cc21fac5931f78fa7acd6604ad41147d656eefdb2947e222b029",
+          "after": "42655fdcb71cba4dcd9c81818b73f7fdc9c2d38c0da197a5c1b5155d4ca2ea63"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "64cacbd71600251e6e7fda4cb8fa28a7e51465b4a06c23b896195c96cc5d17b3",
-      "after_sha256": "d5039b1d8fa3f18f9c4036dbd3a64f000facc4ce5de68ae7e5a3baba68ae2e61",
+      "before_sha256": "d5039b1d8fa3f18f9c4036dbd3a64f000facc4ce5de68ae7e5a3baba68ae2e61",
+      "after_sha256": "6d3c7ea70c6211c637810c3ab4b860c77b5b7364e7c20285af1cb847bb7fe7b2",
       "owners": {
         "@document": {
-          "before": "64cacbd71600251e6e7fda4cb8fa28a7e51465b4a06c23b896195c96cc5d17b3",
-          "after": "d5039b1d8fa3f18f9c4036dbd3a64f000facc4ce5de68ae7e5a3baba68ae2e61"
+          "before": "d5039b1d8fa3f18f9c4036dbd3a64f000facc4ce5de68ae7e5a3baba68ae2e61",
+          "after": "6d3c7ea70c6211c637810c3ab4b860c77b5b7364e7c20285af1cb847bb7fe7b2"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "d4c3614dab6f531120b9ff4d120efdeec7dacaff2a28849567ef1ddf86008f6b",
-      "after_sha256": "5ccb6f4caafa46623b9e775fbc01b04b0bd085401f54d98dcdf1c40a9b75d717",
+      "before_sha256": "5ccb6f4caafa46623b9e775fbc01b04b0bd085401f54d98dcdf1c40a9b75d717",
+      "after_sha256": "9aa9a8eae55369ac8053dc0b0bd0073ea9ea35be6cbf03be1fc3f7ce1f8b16ff",
       "owners": {
         "@document": {
-          "before": "d4c3614dab6f531120b9ff4d120efdeec7dacaff2a28849567ef1ddf86008f6b",
-          "after": "5ccb6f4caafa46623b9e775fbc01b04b0bd085401f54d98dcdf1c40a9b75d717"
+          "before": "5ccb6f4caafa46623b9e775fbc01b04b0bd085401f54d98dcdf1c40a9b75d717",
+          "after": "9aa9a8eae55369ac8053dc0b0bd0073ea9ea35be6cbf03be1fc3f7ce1f8b16ff"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "774808483b8aea02b28c2072433abc76cbd0744a561d3ed8d48811265e6ec58a",
-      "after_sha256": "e21a67ef523ffe638ef30ad82969647f9a1554c60de2b7abd0f2eecd29d11fe0",
+      "before_sha256": "e21a67ef523ffe638ef30ad82969647f9a1554c60de2b7abd0f2eecd29d11fe0",
+      "after_sha256": "071d505d16dc80528216a6802232ccd30632155ca196b84339746c9be4141603",
       "owners": {
         "@document": {
-          "before": "774808483b8aea02b28c2072433abc76cbd0744a561d3ed8d48811265e6ec58a",
-          "after": "e21a67ef523ffe638ef30ad82969647f9a1554c60de2b7abd0f2eecd29d11fe0"
+          "before": "e21a67ef523ffe638ef30ad82969647f9a1554c60de2b7abd0f2eecd29d11fe0",
+          "after": "071d505d16dc80528216a6802232ccd30632155ca196b84339746c9be4141603"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "274def1e4a036fecaa69c3a0f97104a53924fc15a0aa6ce988f2d522e655f76c",
-      "after_sha256": "83cc866d68c9b2e6caf829b9ae7c363208873ce9817b98a154693da55504de7d",
+      "before_sha256": "83cc866d68c9b2e6caf829b9ae7c363208873ce9817b98a154693da55504de7d",
+      "after_sha256": "f1aea1c8a8fd47fb44342ff7586bc9d5e3c95a2d953037f3caa8d4217d31cc41",
       "owners": {
         "@document": {
-          "before": "274def1e4a036fecaa69c3a0f97104a53924fc15a0aa6ce988f2d522e655f76c",
-          "after": "83cc866d68c9b2e6caf829b9ae7c363208873ce9817b98a154693da55504de7d"
+          "before": "83cc866d68c9b2e6caf829b9ae7c363208873ce9817b98a154693da55504de7d",
+          "after": "f1aea1c8a8fd47fb44342ff7586bc9d5e3c95a2d953037f3caa8d4217d31cc41"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "bbdb640f36f698adc066d78c48abef5ce961b4c80b67dae12c2b06206d637d28",
-      "after_sha256": "488b956afccc1e898d5043a46367ba730287581acffb072c80665bf994647182",
+      "before_sha256": "488b956afccc1e898d5043a46367ba730287581acffb072c80665bf994647182",
+      "after_sha256": "9938328cc2914ec64bb6cd9703d3bbbf29978ce62ad5a02d5c3ea5a7fda41bc9",
       "owners": {
         "@document": {
-          "before": "bbdb640f36f698adc066d78c48abef5ce961b4c80b67dae12c2b06206d637d28",
-          "after": "488b956afccc1e898d5043a46367ba730287581acffb072c80665bf994647182"
+          "before": "488b956afccc1e898d5043a46367ba730287581acffb072c80665bf994647182",
+          "after": "9938328cc2914ec64bb6cd9703d3bbbf29978ce62ad5a02d5c3ea5a7fda41bc9"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "00ba9abfb377e0e4a32641dfce936f649c3be411ecb41ab104d7f41f50b84889",
-      "after_sha256": "60149864abfbbd8418ceed1a84bdd4e183e3d92dc83118e483f3948429c96d76",
+      "before_sha256": "60149864abfbbd8418ceed1a84bdd4e183e3d92dc83118e483f3948429c96d76",
+      "after_sha256": "bba6a88639c02a26fd862b71ba7f9c6c06b308f3bced14c258d7343e8c21ef36",
       "owners": {
         "@document": {
-          "before": "00ba9abfb377e0e4a32641dfce936f649c3be411ecb41ab104d7f41f50b84889",
-          "after": "60149864abfbbd8418ceed1a84bdd4e183e3d92dc83118e483f3948429c96d76"
+          "before": "60149864abfbbd8418ceed1a84bdd4e183e3d92dc83118e483f3948429c96d76",
+          "after": "bba6a88639c02a26fd862b71ba7f9c6c06b308f3bced14c258d7343e8c21ef36"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "dc1d1ff67b68765a57791c5a24f4a1bab63f473d0eb06f571839c00f94791ea1",
-      "after_sha256": "29e4cc046bc10efc1aa481b1243ba3d9d69d294f39df6c57ceaed7399e8459ea",
+      "before_sha256": "29e4cc046bc10efc1aa481b1243ba3d9d69d294f39df6c57ceaed7399e8459ea",
+      "after_sha256": "4670e6d9a976bc7f9882a9015805119afc3d09d4ecef600d39d7c578397deaff",
       "owners": {
         "@document": {
-          "before": "dc1d1ff67b68765a57791c5a24f4a1bab63f473d0eb06f571839c00f94791ea1",
-          "after": "29e4cc046bc10efc1aa481b1243ba3d9d69d294f39df6c57ceaed7399e8459ea"
+          "before": "29e4cc046bc10efc1aa481b1243ba3d9d69d294f39df6c57ceaed7399e8459ea",
+          "after": "4670e6d9a976bc7f9882a9015805119afc3d09d4ecef600d39d7c578397deaff"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "af7474155bd40562ec40f47759f4cf2f02c6b691e2d5080b79ed4e55695f1549",
-      "after_sha256": "a94a89ee8148ef1ee2c7e8597a8d75f39eb41652ef01d160f0831ba79ca5d44b",
+      "before_sha256": "a94a89ee8148ef1ee2c7e8597a8d75f39eb41652ef01d160f0831ba79ca5d44b",
+      "after_sha256": "36d995e5daa4f5d741efdef866f33d6a1bf801046f9bc33eee6817beebd32002",
       "owners": {
         "@document": {
-          "before": "af7474155bd40562ec40f47759f4cf2f02c6b691e2d5080b79ed4e55695f1549",
-          "after": "a94a89ee8148ef1ee2c7e8597a8d75f39eb41652ef01d160f0831ba79ca5d44b"
+          "before": "a94a89ee8148ef1ee2c7e8597a8d75f39eb41652ef01d160f0831ba79ca5d44b",
+          "after": "36d995e5daa4f5d741efdef866f33d6a1bf801046f9bc33eee6817beebd32002"
         }
       }
     },
-    "src/warhammer40k_core/ai/training_candidates.py": {
+    "src/warhammer40k_core/ai/training_targets.py": {
       "before_sha256": null,
-      "after_sha256": "94ea4a0ea4c4102f53b487bffc5380ddf553ab56b59865e796d3ef6a99b14b1d",
+      "after_sha256": "ec9521511002bfcb0ecfc1f10c337ca9681a121f65d0f03b64e165583883fad9",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a7bad7a3c9e923cfe22af1912d646cc3affa083a8e5fed2a74a6ff4d3b3de0bf"
+          "after": "fb980d20a43e9fadcbbc5afde233bfed7dfebb4ab5db63c0c066c9fc304836e2"
         },
-        "FiniteTrainingCandidateLink": {
+        "LinkedTrainingTarget": {
           "before": null,
-          "after": "0095bea4c735b0e2c910f3483a819e9988e3a9c9498e9ff9711dcd9d20dca0d2"
+          "after": "ac7d8ecab785ec66856b788f3715de97d6dcd0a2e79952fb3bfa0bf5d14426bf"
         },
-        "FiniteTrainingCandidateLink.__post_init__": {
+        "LinkedTrainingTarget.__post_init__": {
           "before": null,
-          "after": "7e4631200e64254e1fb546b3ed5e974f4fc498c001bd2ac511352949693d7d82"
+          "after": "4c7a3295db8019c309da8d32a28de5e47437cbc028a629d1bf690fedc1ba7dd2"
         },
-        "FiniteTrainingCandidateLink.chosen_action_index": {
+        "LinkedTrainingTarget.content_hash": {
           "before": null,
-          "after": "c4f79f4154f46279eb600b65ad66ab173642dfcc658b92fefd2f9ca0a79d0a35"
+          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
         },
-        "FiniteTrainingCandidateLink.from_payload": {
+        "LinkedTrainingTarget.from_link": {
           "before": null,
-          "after": "24e229e4daa9c1613d3324f0d61b559138008facfdea4a0bbea51c208fdd9cff"
+          "after": "6e37340cf3cfdf750630cfac98cb8b3fc1373d930cc29474ee12e09126208983"
         },
-        "FiniteTrainingCandidateLink.from_row": {
+        "LinkedTrainingTarget.from_payload": {
           "before": null,
-          "after": "96b98b58d04c66a4174298361ce311410a465a87433f38a2eb49c59cbbda593c"
+          "after": "492e5813d5f92e5a9fabed3344eb17caec57baf9cd2144738abc1cebf5fcccde"
         },
-        "FiniteTrainingCandidateLink.require_matches": {
+        "LinkedTrainingTarget.require_matches": {
           "before": null,
-          "after": "048b7163768b020c49bf5a56efb07ed8ee315cbe551a05dcc10a7625440a0b20"
+          "after": "adf859e1a0a0fb28370f55cc856e71a8306eab29793f8b01f1133dfc224d2821"
         },
-        "FiniteTrainingCandidateLink.to_payload": {
+        "LinkedTrainingTarget.to_payload": {
           "before": null,
-          "after": "8ca8eaeb59c92844ea701fce7ff93aceb52a6082dfc9578f01eb6728ef8975f7"
+          "after": "94d3c922e8c547afb969e277349556545c95e2e0163671d119f0e6391a3824fc"
         },
-        "FiniteTrainingCandidateLinkPayload": {
+        "LinkedTrainingTargetPayload": {
           "before": null,
-          "after": "0df1f00bc69616305d28d439fbb259913ccb10ec77ef41734e449ef012fbe5fe"
+          "after": "1aa5c1fe8d85e86a4f87ff63e58cd3bb8c419f0eed02396532ce121c8d817064"
         },
-        "TrainingCandidateLinkError": {
+        "NamedTrainingTarget": {
           "before": null,
-          "after": "a1f4dcee50bd875fc10c6efd85d206f3bd90c3f9dfc277afc9af07ff1dba766f"
+          "after": "7537b75bdb469b017f3d567eb32183d2cb63aaa3c4371cfa87626e0219dc2874"
         },
-        "_row_hash": {
+        "NamedTrainingTarget.__post_init__": {
           "before": null,
-          "after": "bb558a1cd6254d691eb9179ddb0a34493699ff94495327e55d99427ed78f1f8a"
+          "after": "f01794590d6167a8faf47086815aaf77f3b6c41afacea8fdd21bf43b3c4e7738"
+        },
+        "NamedTrainingTarget.from_payload": {
+          "before": null,
+          "after": "b8a9f0b4f7112ebd08c66570a4cdab097e188d2a01872b10f680171644fc801c"
+        },
+        "NamedTrainingTarget.to_payload": {
+          "before": null,
+          "after": "e646f1b13afd923624def30a0dec784ed790efb495165c1149b9e93fa836f726"
+        },
+        "NamedTrainingTargetPayload": {
+          "before": null,
+          "after": "99bd1434c9f8ad635970373bbf7f027ea4ad7020dfdcc61aca17db527970d1af"
+        },
+        "TargetEpisodeEnd": {
+          "before": null,
+          "after": "a392b66936bcdbece6a0f37073c99d80a13375680d7709cc51a6d431777a65ab"
+        },
+        "TargetHorizon": {
+          "before": null,
+          "after": "1660f2b5aa15ff8dc27d54a4fcbcfcda22b98454a33c58a593b43b4e33edac76"
+        },
+        "TargetMeaning": {
+          "before": null,
+          "after": "917b4b5afa6c5fe7722e87210a53b0c4c3621a9478f792434ee40a665c4bd2ab"
+        },
+        "TargetValidity": {
+          "before": null,
+          "after": "9507fe11835c79110837980011d21976a5ad4601b04d29a2fe0bbd03be03c0be"
+        },
+        "TrainingTargetError": {
+          "before": null,
+          "after": "f316e3504b55bc19b28257c977b6b1aa3ea6584d9570eaf7c71580d999f394fc"
+        },
+        "_object": {
+          "before": null,
+          "after": "74c95d627e5706d43378edb45cd859e9d665195ad619e9955b83198daeab03e2"
+        },
+        "_require_link": {
+          "before": null,
+          "after": "737ec525d2d3f61c6080ff79e1d50eb655d83592996b96d73b70b43e1ced6df0"
         },
         "_sha256": {
           "before": null,
-          "after": "98503c32918c11d7de5e470ab894d2674ecdabcb81223a27a0a2a6a0210623a3"
+          "after": "b0fe06fa8999adefda6a99318d198369bbd9f5d153dbd2c58bcc3be3280fcc36"
         }
       }
     },
     "tests/infrastructure/adapters/test_finite_candidates.py": {
-      "before_sha256": "19a4f9d19e800668e07f81a5a5823621c42c4bd80c0bfa59d23005b7b25da281",
-      "after_sha256": "460fe562bcc7f05ca513513c799245bbb53f3a5c4f913e36dc9c7b5a5fda5d96",
+      "before_sha256": "460fe562bcc7f05ca513513c799245bbb53f3a5c4f913e36dc9c7b5a5fda5d96",
+      "after_sha256": "b4a13ab933a2c539fe2c072aa0ac6a00a5d0ce861e19f8099b30df437e1868e7",
       "owners": {
         "@module": {
-          "before": "9b3f1d2ce84148ba0c0acd82dbaf410140a691ce225214677915417e5ba141d4",
-          "after": "105db0b42e6c629a911e4d1649533f016ea82213c824de15af93ed78fee38409"
+          "before": "105db0b42e6c629a911e4d1649533f016ea82213c824de15af93ed78fee38409",
+          "after": "f0b9595be370b686f713c11f79c7d867ea14eb243ebfa2d4074dd03bf034d8d8"
         },
-        "_training_fixture": {
+        "_declared_local_target": {
           "before": null,
-          "after": "7ed18aedaea98151bcf64449c014ab7b9e8945b007f6b0080bc239948060b5a8"
+          "after": "01b9518febbd695117d83240b1efc0b7b85adb4345f4b02e1484c57b260fe224"
         },
-        "test_training_candidate_link_commits_to_complete_row_payload": {
+        "test_named_match_target_can_be_explicitly_missing": {
           "before": null,
-          "after": "5dbdbaaed35028548ca5c6fcb72daf21b9f0890efeb1012d7a75e945eae31fd3"
+          "after": "57fe9272c7a6781c9a507e430b0d345096ca92f00dc5e847abec5f3239984cf9"
         },
-        "test_training_candidate_link_is_detached_immutable_and_strict_about_missing_fields": {
+        "test_named_match_target_declared_semantics_round_trip": {
           "before": null,
-          "after": "fca7a11176090a23d68b9dfad607cdac63955dcc4f81d3ac9f5df6c4f7e20420"
+          "after": "a37087e4419be6148f10606d5fac6cc9298c5360339e35c506d7d640c1d2e5b5"
         },
-        "test_training_candidate_link_loader_rejects_malformed_or_drifted_fields": {
+        "test_named_match_target_rejects_inconsistent_semantics": {
           "before": null,
-          "after": "a76bcde1e767e042d613e77116398d353742eef839bdcf03e9693afc536e7096"
+          "after": "b8d87fe7be4e1938c34b275f54e75ebd192f6d99fe56be41d04640717559fb25"
         },
-        "test_training_candidate_link_rejects_inconsistent_legacy_row": {
+        "test_named_target_direct_construction_requires_typed_entries": {
           "before": null,
-          "after": "0f530e105681c3574e3e21b3695fb4c8ac95cc3302025666167cc10d300e07a4"
+          "after": "75c2bfdb291a9ac13eb0b432e70b9e4e11592491e2872285a58e1bde5952496a"
         },
-        "test_training_candidate_link_rejects_non_json_safe_row": {
+        "test_named_target_link_loader_rejects_malformed_payload": {
           "before": null,
-          "after": "a01e6561acad8adb69b705dc707f643ffb0afa0c11b765bc15003a5ade1d98da"
+          "after": "7c0fba48e527d4425930f817598a1f6c41e890f9031af4c5a4782845507d0e81"
         },
-        "test_training_candidate_link_rejects_parameterized_context": {
+        "test_named_target_link_preserves_row_engine_perspective_and_detachment": {
           "before": null,
-          "after": "bfa4c18d1fdf6fac4a76a58606090052ec504626866d79076fd157202e0d3d09"
+          "after": "18a5c322d32ba42fc1e3aef6c5e6c4ad57f3a91362b71cef2618f238e3b7c33e"
         },
-        "test_training_candidate_link_rejects_rehashed_candidate_binding_drift": {
+        "test_named_target_link_rejects_inconsistent_join": {
           "before": null,
-          "after": "e7dd21f723af4381f30a9f89e659ac378f1828111adb4824e24e62645cd02ba1"
+          "after": "27d9384444755d8e54427225769e89c9416f611a1c61361560e82b87df4bca43"
         },
-        "test_training_candidate_link_rejects_wrong_payload_shape": {
+        "test_named_target_loader_rejects_malformed_declarations": {
           "before": null,
-          "after": "32c161f0976fb6a483e9b853060ebf09e807a04968c09a9de03477f8b099a9bb"
-        },
-        "test_training_candidate_link_requires_real_typed_inputs": {
-          "before": null,
-          "after": "d41e30ab8f06fe85b98e45ddce3b8ff76dba8b338ee6b64d08f1d822bf85ee2c"
-        },
-        "test_training_candidate_link_round_trips_without_changing_row_or_engine": {
-          "before": null,
-          "after": "58dc0902600fba600acd8e21aec9ac3d9978412becbe1a0dfc9886366d4ad1ad"
+          "after": "3fe9ca524d783e2891b1cc3753ab9d21d537aa865597341e46528c7b6074b8f2"
         }
       }
     }
@@ -377,212 +409,601 @@
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -590,64 +1011,68 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "source-record",
+        "order108-terrain-semantics",
+        "order109-unit-control-semantics",
+        "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
-    "src/warhammer40k_core/ai/training_candidates.py": {
+    "src/warhammer40k_core/ai/training_targets.py": {
       "category": "serialization_or_replay_work",
       "operations": [
-        "finite-training-candidate-linkage"
+        "named-training-targets"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     },
     "tests/infrastructure/adapters/test_finite_candidates.py": {
       "category": "rule_semantics",
       "operations": [
         "player-policy-boundary",
-        "finite-training-candidate-linkage"
+        "finite-training-candidate-linkage",
+        "named-training-targets"
       ],
       "selected_families": [],
-      "rationale": "Add a versioned offline finite candidate/training-row integrity join, directly scoped regressions, and required generated identities and measured test manifests.",
-      "source_obligation": "Preserve engine decision/replay authority and player information boundaries. Require exact row, game, mask/order, chosen-slot and candidate snapshot consistency without changing historical TrainingRow semantics or claiming accepted outcomes.",
-      "unchanged_work": "Existing engine, adapter, runner, source data, dependencies, search, geometry algorithms, caches and measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime callers; declared operation ownership, serial current-runtime smoke and all live semantic/source/cache controls remain required. Generated examples only refresh identity; shard data records the complete measured local test inventory."
+      "rationale": "Add independent, immutable offline named-target declarations and exact finite training linkage, directly scoped regressions, and required generated identities and measured test manifests.",
+      "source_obligation": "Preserve engine/replay authority, original TrainingRow scalar and player observation boundaries. Explicitly declare meaning, perspective, horizon, end state, missingness, units and producer/evidence; reject inconsistent/non-finite declarations and exact row/link drift without claiming authenticated outcomes.",
+      "unchanged_work": "Engine, adapters, runner, source mechanics, dependencies, search, geometry algorithms, caches and existing measured benchmark operations are unchanged. The new offline serializer has no existing benchmark driver or live-runtime caller. Explicit operation ownership, required serial current-runtime smoke and all live semantic/source/cache controls remain mandatory; generated examples refresh build identity and shard data records one complete measured local test inventory."
     }
   },
   "milestone": "ordinary",

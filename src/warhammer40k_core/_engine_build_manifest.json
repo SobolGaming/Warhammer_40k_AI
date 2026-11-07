@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4174d19991124649d2d2a51c100cadeff899c674903345dd8aad74271bb43439",
-  "fingerprint": "4174d19991124649d2d2a51c100cadeff899c674903345dd8aad74271bb43439",
-  "resource_count": 3225,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a8d9599ef0aa2e43430ccbc22e547219c3df24b09c83c68836fec2ea8bf43c88",
+  "fingerprint": "a8d9599ef0aa2e43430ccbc22e547219c3df24b09c83c68836fec2ea8bf43c88",
+  "resource_count": 3226,
   "resources": [
     {
       "byte_length": 113,
@@ -218,6 +218,11 @@
       "byte_length": 7173,
       "path": "warhammer40k_core/ai/training_candidates.py",
       "sha256": "94ea4a0ea4c4102f53b487bffc5380ddf553ab56b59865e796d3ef6a99b14b1d"
+    },
+    {
+      "byte_length": 12597,
+      "path": "warhammer40k_core/ai/training_targets.py",
+      "sha256": "ec9521511002bfcb0ecfc1f10c337ca9681a121f65d0f03b64e165583883fad9"
     },
     {
       "byte_length": 13335,

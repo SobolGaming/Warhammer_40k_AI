@@ -28,6 +28,15 @@ from warhammer40k_core.ai.training_candidates import (
     FiniteTrainingCandidateLink,
     TrainingCandidateLinkError,
 )
+from warhammer40k_core.ai.training_targets import (
+    LinkedTrainingTarget,
+    NamedTrainingTarget,
+    TargetEpisodeEnd,
+    TargetHorizon,
+    TargetMeaning,
+    TargetValidity,
+    TrainingTargetError,
+)
 from warhammer40k_core.engine.event_log import canonical_json
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.replay import ReplayRunner
@@ -434,3 +443,238 @@ def test_training_candidate_link_rejects_wrong_payload_shape(payload: object) ->
     _, before, row = _training_fixture()
     with pytest.raises(TrainingCandidateLinkError, match="fields"):
         FiniteTrainingCandidateLink.from_payload(payload, row=row, context=before)
+
+
+def _declared_local_target(row: TrainingRow) -> NamedTrainingTarget:
+    # Deliberately synthetic contract value, never a learned or match-outcome label.
+    return NamedTrainingTarget(
+        target_id="synthetic-local-reference-v1",
+        meaning=TargetMeaning.LOCAL_REFERENCE,
+        perspective_player_id="player-b",
+        horizon=TargetHorizon.DECISION_COUNT,
+        horizon_decisions=1,
+        episode_end=TargetEpisodeEnd.TRUNCATED,
+        validity=TargetValidity.OBSERVED,
+        value=2.0,
+        value_unit="reference_points",
+        missing_reason=None,
+        producer_id="contract-test-producer-v1",
+        evidence_hash=payload_digest({"fixture": "synthetic-target-declaration"}),
+        reward_profile_version=row.reward_profile_version,
+    )
+
+
+def test_named_target_link_preserves_row_engine_perspective_and_detachment() -> None:
+    session, context, row = _training_fixture()
+    original_row = row.to_payload()
+    original_engine = session.to_persistence_payload()
+    link = FiniteTrainingCandidateLink.from_row(row, context=context)
+    target = _declared_local_target(row)
+    linked = LinkedTrainingTarget.from_link(link, row=row, context=context, target=target)
+    payload = linked.to_payload()
+    loaded = LinkedTrainingTarget.from_payload(
+        json.loads(canonical_json(payload)), link=link, row=row, context=context
+    )
+    assert loaded == linked
+    assert linked.content_hash == payload_digest(payload)
+    assert payload["training_candidate_link_hash"] == payload_digest(link.to_payload())
+    assert target.perspective_player_id != context.route.actor_id
+    assert target.value != row.target_value
+    assert row.to_payload() == original_row
+    assert session.to_persistence_payload() == original_engine
+    payload["target"]["value"] = 7.0
+    assert linked.target.value == 2.0
+    with pytest.raises(FrozenInstanceError):
+        target.value = 4.0  # type: ignore[misc]
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="target-contract"))
+        .run()
+        .reproduced_exactly
+    )
+
+
+@pytest.mark.parametrize(
+    ("meaning", "unit", "value"),
+    [
+        (TargetMeaning.MATCH_UTILITY, "unit_interval", 0),
+        (TargetMeaning.MATCH_UTILITY, "unit_interval", 0.5),
+        (TargetMeaning.MATCH_UTILITY, "unit_interval", 1),
+        (TargetMeaning.VP_MARGIN, "victory_points", -17),
+        (TargetMeaning.VP_MARGIN, "victory_points", 0),
+        (TargetMeaning.VP_MARGIN, "victory_points", 23),
+    ],
+)
+def test_named_match_target_declared_semantics_round_trip(
+    meaning: TargetMeaning, unit: str, value: float
+) -> None:
+    _, _, row = _training_fixture()
+    # A producer assertion only: this setup fixture does not establish a terminal result.
+    target = replace(
+        _declared_local_target(row),
+        meaning=meaning,
+        value_unit=unit,
+        value=value,
+        horizon=TargetHorizon.MATCH_END,
+        horizon_decisions=None,
+        episode_end=TargetEpisodeEnd.TERMINAL,
+    )
+    assert NamedTrainingTarget.from_payload(target.to_payload()) == target
+    assert target.value == float(value)
+
+
+@pytest.mark.parametrize("end", list(TargetEpisodeEnd))
+def test_named_match_target_can_be_explicitly_missing(end: TargetEpisodeEnd) -> None:
+    _, context, row = _training_fixture()
+    target = replace(
+        _declared_local_target(row),
+        meaning=TargetMeaning.MATCH_UTILITY,
+        value_unit="unit_interval",
+        horizon=TargetHorizon.MATCH_END,
+        horizon_decisions=None,
+        episode_end=end,
+        validity=TargetValidity.MISSING,
+        value=None,
+        missing_reason="ordinary-terminal-result-unavailable",
+    )
+    link = FiniteTrainingCandidateLink.from_row(row, context=context)
+    linked = LinkedTrainingTarget.from_link(link, row=row, context=context, target=target)
+    assert linked.to_payload()["target"]["value"] is None
+    assert NamedTrainingTarget.from_payload(target.to_payload()) == target
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("schema_version", "future"),
+        ("discount_convention", "gamma-0.99-per-request"),
+        ("meaning", "win_probability"),
+        ("horizon", "implicit"),
+        ("episode_end", "complete"),
+        ("validity", "assumed"),
+        ("target_id", ""),
+        ("perspective_player_id", None),
+        ("producer_id", ""),
+        ("reward_profile_version", ""),
+        ("evidence_hash", "bad"),
+        ("value_unit", ""),
+        ("horizon_decisions", None),
+        ("horizon_decisions", True),
+        ("horizon_decisions", 0),
+        ("horizon_decisions", -1),
+        ("value", None),
+        ("value", True),
+        ("value", "2"),
+        ("value", float("nan")),
+        ("value", float("inf")),
+        ("value", float("-inf")),
+        ("value", 10**400),
+        ("value", 2**60 + 1),
+        ("missing_reason", "observed-but-missing"),
+        ("episode_end", "aborted"),
+        ("episode_end", "unsupported"),
+        ("extra", "unvalidated-semantics"),
+    ],
+)
+def test_named_target_loader_rejects_malformed_declarations(field: str, value: object) -> None:
+    _, _, row = _training_fixture()
+    payload: dict[str, object] = dict(_declared_local_target(row).to_payload())
+    payload[field] = value
+    with pytest.raises(TrainingTargetError):
+        NamedTrainingTarget.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    "change",
+    ["truncated", "utility", "margin", "units", "horizon", "missing-number", "missing-reason"],
+)
+def test_named_match_target_rejects_inconsistent_semantics(change: str) -> None:
+    _, _, row = _training_fixture()
+    payload: dict[str, object] = dict(_declared_local_target(row).to_payload())
+    payload.update(
+        meaning="match_utility",
+        horizon="match_end",
+        horizon_decisions=None,
+        value_unit="unit_interval",
+        value=1.0,
+        episode_end="terminal",
+    )
+    if change == "truncated":
+        payload["episode_end"] = "truncated"
+    elif change == "utility":
+        payload["value"] = 0.25
+    elif change == "margin":
+        payload.update(meaning="vp_margin", value_unit="victory_points", value=0.5)
+    elif change == "units":
+        payload["value_unit"] = "victory_points"
+    elif change == "horizon":
+        payload["horizon_decisions"] = 1
+    elif change == "missing-number":
+        payload.update(validity="missing", missing_reason="not-terminal")
+    else:
+        payload.update(validity="missing", value=None, missing_reason="")
+    with pytest.raises(TrainingTargetError):
+        NamedTrainingTarget.from_payload(payload)
+
+
+@pytest.mark.parametrize("change", ["row", "context", "reward", "perspective", "link"])
+def test_named_target_link_rejects_inconsistent_join(change: str) -> None:
+    _, context, row = _training_fixture()
+    link = FiniteTrainingCandidateLink.from_row(row, context=context)
+    target = _declared_local_target(row)
+    linked = LinkedTrainingTarget.from_link(link, row=row, context=context, target=target)
+    if change == "row":
+        row = replace(row, target_value=99)
+    elif change == "context":
+        view = context.observation
+        view["game_id"] = "different-game"
+        context = PlayerDecisionContext.from_view(view, choice_seed=7)
+    elif change == "reward":
+        linked = replace(linked, target=replace(target, reward_profile_version="different-reward"))
+    elif change == "perspective":
+        linked = replace(linked, target=replace(target, perspective_player_id="not-a-player"))
+    else:
+        linked = replace(linked, training_candidate_link_hash="0" * 64)
+    with pytest.raises(TrainingTargetError):
+        LinkedTrainingTarget.from_payload(linked.to_payload(), link=link, row=row, context=context)
+
+
+@pytest.mark.parametrize("change", ["schema", "hash", "target", "missing", "extra", "root"])
+def test_named_target_link_loader_rejects_malformed_payload(change: str) -> None:
+    _, context, row = _training_fixture()
+    link = FiniteTrainingCandidateLink.from_row(row, context=context)
+    linked = LinkedTrainingTarget.from_link(
+        link, row=row, context=context, target=_declared_local_target(row)
+    )
+    payload: object = cast(dict[str, object], linked.to_payload())
+    assert isinstance(payload, dict)
+    if change == "schema":
+        payload["schema_version"] = "future"
+    elif change == "hash":
+        payload["training_candidate_link_hash"] = "bad"
+    elif change == "target":
+        payload["target"] = []
+    elif change == "missing":
+        del payload["target"]
+    elif change == "extra":
+        payload["extra"] = None
+    else:
+        payload = []
+    with pytest.raises(TrainingTargetError):
+        LinkedTrainingTarget.from_payload(payload, link=link, row=row, context=context)
+
+
+def test_named_target_direct_construction_requires_typed_entries() -> None:
+    _, context, row = _training_fixture()
+    target = _declared_local_target(row)
+    with pytest.raises(TrainingTargetError, match="typed enum"):
+        replace(target, meaning=cast(TargetMeaning, "local_reference"))
+    with pytest.raises(TrainingTargetError, match="typed named"):
+        LinkedTrainingTarget("0" * 64, cast(NamedTrainingTarget, {}))
+    with pytest.raises(TrainingTargetError, match="finite training"):
+        LinkedTrainingTarget.from_link(
+            cast(FiniteTrainingCandidateLink, None), row=row, context=context, target=target
+        )
+    payload: dict[str, object] = dict(target.to_payload())
+    del payload["meaning"]
+    with pytest.raises(TrainingTargetError, match="missing or unknown"):
+        NamedTrainingTarget.from_payload(payload)
