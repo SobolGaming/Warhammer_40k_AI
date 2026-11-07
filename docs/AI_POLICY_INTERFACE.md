@@ -4,7 +4,8 @@ The maintained [AI implementation and learning plan](AI_IMPLEMENTATION_PLAN.md)
 separates the implemented contracts below from proposed candidate generation,
 information-safe simulation, experiments and full-game qualification.
 
-Exact player-scoped routing, finite candidate sets and Phase 19E provenance/training contracts exist;
+Exact player-scoped routing, finite candidate sets, finite training linkage and
+Phase 19E provenance/training contracts exist;
 autonomous battle policies, training and full-game qualification are not established.
 The historical grouped Phase 19/20 row is not an assertion that those foundations
 are absent, nor an individual mapping of every 19A-19F subphase.
@@ -96,9 +97,40 @@ action; no player-facing request, option, wire schema or validation path changes
 
 Parameterized requests fail explicitly: their submit marker is not a generated
 legal proposal. Empty finite requests raise `CandidateExhaustedError` without a
-substitute action. This first contract does not change `TrainingRow`, introduce
-training masks/targets, or implement proposal search. Candidate hashes and IDs
+substitute action. `TrainingRow` remains independently versioned; the companion
+contract below checks its finite candidate linkage. Candidate hashes and IDs
 are linkage metadata, not semantic policy features.
+
+## Finite training candidate linkage
+
+`ai.training_candidates.FiniteTrainingCandidateLink.from_row(row, context=before)`
+creates the versioned `finite-training-candidate-link-v1` offline companion for an
+existing `TrainingRow` and its historical `PlayerDecisionContext`. It owns the
+immutable complete candidate snapshot, a SHA-256 commitment to the full canonical
+row payload, and the chosen candidate ID. Serialized records include the candidate
+set hash and the derived zero-based chosen index.
+
+The mask has exactly one slot per candidate in the engine's order. Every slot is
+`True` because this finite set contains all engine-emitted legal options; a global
+action dictionary or policy pruning mask has different semantics. The chosen action
+ID must be an issued candidate, and the row's game must match the observation.
+Existing rows remain readable under their existing schema; incompatible finite
+joins fail explicitly rather than inventing a mapping or changing a mask.
+
+`from_payload(payload, row=row, context=before)` requires both original inputs and
+checks the closed schema, both content hashes, slot/index consistency, and the
+complete actor/request/observation/option binding. `require_matches(...)` repeats
+the row/context join checks for an existing link. It detects later changes to
+row features, provenance, targets, record references or mutable diagnostic metadata. The link
+retains no mutable row, session, private RNG authority or authoritative state.
+Reading its payload returns detached candidate data.
+
+These are offline linkage records, not actor features. Training admission still
+requires source/rules compatibility, accepted-transition and viewer/authoritative
+identity joins, permitted semantic features, meaningful targets and experiment
+provenance. A decision-record reference alone does not prove an accepted outcome.
+The existing scalar target keeps its original semantics. This contract introduces
+no training run, learner, outcome label or player-facing/wire contract change.
 
 ## Running and diagnosing
 
