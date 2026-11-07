@@ -34053,7 +34053,9 @@
     "player-policy-boundary": {
       "paths": [
         "src/warhammer40k_core/ai/player_policy.py",
-        "src/warhammer40k_core/ai/runner.py"
+        "src/warhammer40k_core/ai/runner.py",
+        "src/warhammer40k_core/ai/finite_candidates.py",
+        "tests/infrastructure/adapters/test_finite_candidates.py"
       ],
       "owners": [
         "*"

@@ -4,9 +4,9 @@ This is the maintained forward plan for the Phase 19 AI work and its Phase 20 qu
 
 ## Scope and evidence baseline
 
-This revision is documentation only. No runtime implementation, schema migration, faction implementation, training or CI change is included. Publishing this documentation does not authorize the future implementation stages.
+The original planning revision was documentation only. Later implementation is tracked in the current evidence below and the maintained AI interface. Publishing the original plan did not authorize its implementation stages.
 
-Inspected local branch: `codex/pr2-strict-player-ai`, commit `b2d6fef219dca22d482fe29937914fbdf1415240`. It was clean before this work. GitHub main was independently read as `fc9cd82f4c2f557b4597cd8edffb343404825dea`; both commits have source tree `2dea72d3a12ff0e9225865ae48f153cfd89c145c`. They are different commits with identical tracked contents, not interchangeable provenance IDs. This documentation is isolated on local branch `docs/ai-plan-20261107`. For publication, the branch is based on the verified main commit. The scoped changes are this plan, links/status qualifications in `AI_POLICY_INTERFACE.md` and and the required exact-base performance assessment. Runtime and policy settings remain unchanged.
+Inspected local branch: `codex/pr2-strict-player-ai`, commit `b2d6fef219dca22d482fe29937914fbdf1415240`. It was clean before this work. GitHub main was independently read as `fc9cd82f4c2f557b4597cd8edffb343404825dea`; both commits have source tree `2dea72d3a12ff0e9225865ae48f153cfd89c145c`. They are different commits with identical tracked contents, not interchangeable provenance IDs. The original documentation was isolated on local branch `docs/ai-plan-20261107`. For publication, the branch is based on the verified main commit. That original revision changed this plan, links/status qualifications in `AI_POLICY_INTERFACE.md` and the required exact-base performance assessment. It left runtime and policy settings unchanged.
 
 Read this plan with [AGENTS.md](../AGENTS.md), [architecture](../ARCHITECTURE_V2.md), [AI interface](AI_POLICY_INTERFACE.md), [adapter decision contract](ADAPTER_DECISION_CONTRACT.md), [performance policy](performance/PERFORMANCE_POLICY.md), [Core roadmap](CORE_RULES_REMEDIATION_ROADMAP.md) and [faction roadmap](FACTION_RULES_REMEDIATION_ROADMAP.md). Their binding rules are preserved. Historical roadmap headlines do not override later scoped implementation evidence or establish certification.
 
@@ -15,6 +15,7 @@ Read this plan with [AGENTS.md](../AGENTS.md), [architecture](../ARCHITECTURE_V2
 | Topic | Verified current evidence | Consequence / remaining uncertainty |
 |---|---|---|
 | Strict player controller | `ai/player_policy.py`, `ai/runner.py`, and `AI_POLICY_INTERFACE.md` supply detached player snapshots, exact routes, bound choices and explicit failures. | PR2 foundation exists. It is not autonomous battle play, search, training or a full-game opponent. Earlier claims that this boundary still needed initial construction are historical. |
+| Finite candidates | `ai/finite_candidates.py` captures immutable ordered option payloads and hashes bound to the actor, request and observation; active regressions are in `tests/infrastructure/adapters/test_finite_candidates.py`. | Finite choices return the existing bound `PolicyAction` and use ordinary engine commits/replay. Parameterized proposal candidates, semantic feature contracts and training linkage remain open. |
 | Decisions | `GameLifecycle.decision_dispatch_contracts` in `engine/lifecycle.py`: 88 registered contracts, 75 finite and 13 parameterized. `DecisionRequest.decision_type` is a validated string, not a DecisionType enum. `contracts/schemas/proposal-payload.schema.json` has 12 proposal shapes. | Counts have different denominators. The documented nested weapon-ability choice is not a registered top-level contract; see `tests/code_quality/test_ws6_decision_dispatch_registry.py`. Recompute inventory at implementation time. Registry size is not a reachable-policy coverage result. |
 | Training contracts | `ai/policy_contracts.py` defines TrainingFeature, TrainingRow, PolicyProvenance and four PolicyArtifactKind roles; tests are in `tests/unit/test_phase19_policy_contracts.py`. | Contracts exist; no verified populated training dataset or human replay corpus was found. A role enum does not prescribe four separate neural networks. |
 | Replay vs planning | `LocalGameSession.fork()` and persistence in `adapters/local_session.py` preserve authoritative lifecycle/RNG state. Contract 46 keeps private seed and draw authority out of player views. | Exact replay is useful and trusted. Forking alone is not information-safe planning or independent future dice. |
@@ -59,7 +60,7 @@ Use undiscounted finite-game utility initially. Do not apply 0.99 (or another co
 
 Finite choices select current engine-emitted option IDs. Parameterized choices require a bounded variable-size candidate set, not a fixed global action dictionary. Inventory each supported family using the adapter contract, including deployment/setup poses, movement/charge/fight/reactive paths, attack target/weapon allocations and nested proposal contexts. Do not confuse request families with wire shape counts.
 
-The planned trusted candidate service returns:
+The finite set contract now preserves engine-emitted options and exact view bindings; see [the AI interface](AI_POLICY_INTERFACE.md#finite-candidate-contract). The broader planned trusted candidate service returns:
 - opaque candidate ID; actor/request/view binding; state/observation version and relevant rules/config identity;
 - full typed ordinary payload, target/entity links, model poses/paths/witnesses required by that family;
 - generator version/config/seed, proposal ordering, validation result/diagnostic and cost;
@@ -117,12 +118,12 @@ Proposed research ceiling, not a purchase or hardware allocation: a first profil
 
 ### Schema gap analysis
 
-All extensions below are proposals only. Keep existing schema/version semantics and strict loaders until a separately authorized migration.
+The remaining extensions below are proposals. Keep existing schema/version semantics and strict loaders until a separately authorized migration. The finite candidate set is an independent versioned contract; it does not migrate `TrainingRow`.
 
 | Need | Existing support | Smallest justified extension / rejection rule |
 |---|---|---|
 | Semantic features and references | TrainingFeature has feature ID, source-kind, JSON value and source descriptor IDs; identity-name checks exist. | Version a typed feature registry, dimensions/units, categorical vocabularies and information scope. Keep opaque linkage separately; JSON permissiveness alone does not prevent leakage. Reject unsupported required semantic operators, not merely unfamiliar entity names. |
-| Candidate linkage | TrainingRow stores legal-action mask and chosen_action_id. | Add a versioned candidate-set sidecar with ordered IDs, canonical payload/hash, request/view binding, generator and validation identity. Enforce mask/order/selection consistency. A mask without the candidate payload mapping is insufficient. |
+| Candidate linkage | TrainingRow stores legal-action mask and chosen_action_id. The independent finite candidate set supplies ordered payloads, hashes and actor/request/view binding. | Add a versioned candidate-set sidecar with ordered IDs, canonical payload/hash, request/view binding, generator and validation identity. Enforce mask/order/selection consistency. A mask without the candidate payload mapping is insufficient. |
 | Temporal trajectory | game_id and decision_record_id exist. | Typed trajectory header/index links accepted records, before/after observations, actor/active-turn/perspective, phase/round/time convention, chance boundary, next linkage and terminal/truncated/aborted/unsupported status. Reject missing or inconsistent links. |
 | Targets | One scalar target_value and reward_profile_version exist. | A versioned named-target record with meaning, perspective, horizon, validity/missingness and provenance; keep match utility distinct from margin/other auxiliaries. Do not repurpose a historical scalar silently. |
 | Behavior and search | policy_artifact_id and debug_metadata are available; runner captures policy registration/configuration. | Typed behavior distribution/log-probability where required, deterministic behavior marker, model/config version, candidate/search budgets, seed derivation and tie-break. Debug metadata is not a validated contract for required learner inputs. |
@@ -147,7 +148,7 @@ Version operator schemas and categorical vocabularies. A novel identifier entire
 
 ## 5. Dependency-ordered delivery roadmap
 
-Stage labels below are work-package names within existing phases, not new product-phase IDs. Individual mappings beyond verified 19E are deliberately not invented. Every implementation stage requires later authorization; this revision performs none.
+Stage labels below are work-package names within existing phases, not new product-phase IDs. Individual mappings beyond verified 19E are deliberately not invented. Implementation stages require explicit authorization; the original planning revision authorized none.
 
 | Order / existing ownership | Entry | Work and exit evidence |
 |---|---|---|
@@ -234,4 +235,4 @@ Dispositions apply to the supplied requirements and identifiable claims in the r
 | Human corpus, full-game Daemons readiness or competitive strength already exist | Unverified / not claimed | Verified fixture inventory and explicit readiness/admission gates only. |
 | Old phase numbers/counts can be copied from review | Rejected | Registry and maintained roadmap audited; ambiguous subphase mappings remain explicit. |
 
-Revision changes: verified post-PR2 state; moved performance/data admission earlier; replaced mandatory hierarchy and live-retry assumptions; added candidate, information-safe simulation, learning/provenance and semantic-change contracts; defined a bounded delayed-tradeoff experiment; retained actual gates and targets. Updated files: this maintained plan, `AI_POLICY_INTERFACE.md`, and the required `performance/change-assessment.json` for publication. No code, schema, tests, CI, faction data or generated support files are changed.
+Original planning revision: verified post-PR2 state; moved performance/data admission earlier; replaced mandatory hierarchy and live-retry assumptions; added candidate, information-safe simulation, learning/provenance and semantic-change contracts; defined a bounded delayed-tradeoff experiment; retained actual gates and targets. Its updated files were this maintained plan, `AI_POLICY_INTERFACE.md`, and the required `performance/change-assessment.json` for publication. That planning revision changed no code, schema, tests, CI, faction data or generated support files.

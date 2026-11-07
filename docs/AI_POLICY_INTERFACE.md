@@ -4,7 +4,7 @@ The maintained [AI implementation and learning plan](AI_IMPLEMENTATION_PLAN.md)
 separates the implemented contracts below from proposed candidate generation,
 information-safe simulation, experiments and full-game qualification.
 
-Exact player-scoped routing and Phase 19E provenance/training contracts exist;
+Exact player-scoped routing, finite candidate sets and Phase 19E provenance/training contracts exist;
 autonomous battle policies, training and full-game qualification are not established.
 The historical grouped Phase 19/20 row is not an assertion that those foundations
 are absent, nor an individual mapping of every 19A-19F subphase.
@@ -68,6 +68,37 @@ random, alternative-policy or automatic-pass recovery. A fixture's explicitly
 chosen decline/completion option is still an ordinary validated player choice.
 Rejected hypothetical candidates belong inside a declared search; a rejected
 committed action cannot be reinterpreted as a candidate to retry.
+
+## Finite candidate contract
+
+`ai.finite_candidates.FiniteCandidateSet.from_context(context)` captures every
+engine-enumerated finite option in its original order from the actor's detached
+observation. Each immutable `FiniteCandidate` owns the complete canonical option
+JSON (ID, label and payload), returns detached copies, and exposes a SHA-256
+content hash. Candidate IDs are the issued viewer option IDs, used for linkage.
+
+The versioned set payload records schema `finite-candidate-set-v1`, generator
+`player-view-finite-options-v1`, validation identity
+`engine-enumerated-options-v1`, actor, request, observation hash and ordered
+options. Its content hash commits to that complete payload. Loading rejects
+unknown or missing fields, unsupported identities, invalid option shapes,
+duplicate IDs, malformed bindings and empty sets. The validation identity means
+the options came from an engine request; loading alone does not establish current
+legality or authenticate an external producer.
+
+Call `candidates.select(context, candidate_id)` to produce the existing
+`PolicyAction`. Selection first reconstructs the complete set from the supplied
+context and rejects actor/request/observation, option-content or order drift.
+The runner still checks a fresh player projection and commits through the
+ordinary adapter/engine authority. The existing finite submission contract in
+[ADAPTER_DECISION_CONTRACT.md](ADAPTER_DECISION_CONTRACT.md) already covers that
+action; no player-facing request, option, wire schema or validation path changes.
+
+Parameterized requests fail explicitly: their submit marker is not a generated
+legal proposal. Empty finite requests raise `CandidateExhaustedError` without a
+substitute action. This first contract does not change `TrainingRow`, introduce
+training masks/targets, or implement proposal search. Candidate hashes and IDs
+are linkage metadata, not semantic policy features.
 
 ## Running and diagnosing
 
