@@ -1076,3 +1076,161 @@ def test_retired_selection_rejects_reappearance_and_archive_drift(
     target.write_text(json.dumps(value))
     with pytest.raises(SystemExit):
         sharding.behavioral_selection(retired_cutover_root)
+
+
+@pytest.mark.parametrize(
+    "invalid",
+    [None, "schema", "index", "key", "exit", "boolean", "extra", "missing", "array", "json"],
+)
+def test_source_index_completion_is_bound_to_successful_current_construction(
+    tmp_path: Path, invalid: str | None
+) -> None:
+    import time
+
+    from scripts.ci_source_index import SCHEMA, BuildGate
+
+    index = tmp_path / "index"
+    result = tmp_path / "completion.json"
+    key = "selected-source-index-v1-" + "a" * 64
+    payload: dict[str, object] = {
+        "schema": SCHEMA,
+        "index": str(index.resolve()),
+        "input_key": key,
+        "exit_code": 0,
+    }
+    if invalid == "schema":
+        payload["schema"] = "old"
+    elif invalid == "index":
+        payload["index"] = str(tmp_path / "other")
+    elif invalid == "key":
+        payload["input_key"] = "selected-source-index-v1-" + "b" * 64
+    elif invalid == "exit":
+        payload["exit_code"] = 7
+    elif invalid == "boolean":
+        payload["exit_code"] = False
+    elif invalid == "extra":
+        payload["unexpected"] = True
+    elif invalid == "missing":
+        del payload["exit_code"]
+    encoded = "[]" if invalid == "array" else json.dumps(payload)
+    result.write_text("{" if invalid == "json" else encoded, encoding="utf-8")
+    gate = BuildGate(result, index, key, time.time() + 30)
+    if invalid is None:
+        gate.wait()
+    else:
+        with pytest.raises(pytest.UsageError):
+            gate.wait()
+
+
+def test_source_index_gate_rejects_missing_completion_and_expired_deadline(tmp_path: Path) -> None:
+    import time
+
+    from scripts.ci_source_index import BuildGate
+
+    gate = BuildGate(
+        tmp_path / "missing.json",
+        tmp_path / "index",
+        "selected-source-index-v1-" + "a" * 64,
+        time.time() - 1,
+    )
+    with pytest.raises(pytest.UsageError, match="did not complete"):
+        gate.wait()
+    with pytest.raises(pytest.UsageError, match="finite"):
+        BuildGate(gate.result, gate.index, gate.input_key, float("nan")).wait()
+
+
+@pytest.mark.parametrize("workers", [0, 2])
+def test_failed_real_source_builder_stops_pytest_before_dispatch(
+    tmp_path: Path, workers: int
+) -> None:
+    import time
+
+    # This is a real public-builder failure and real pytest dispatch, not an engine stub.
+    result = tmp_path / "completion.json"
+    index = tmp_path / "index"
+    key = "selected-source-index-v1-" + "a" * 64
+    environment = _collection_environment(ROOT)
+    environment.pop("PYTHONPATH", None)
+    environment["GITHUB_OUTPUT"] = str(tmp_path / "github-output")
+    built = subprocess.run(
+        [
+            sys.executable,
+            "-B",
+            "-m",
+            "scripts.ci_source_index",
+            str(tmp_path / "missing-sources"),
+            str(index),
+            str(result),
+            key,
+        ],
+        cwd=ROOT,
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=30,
+    )
+    assert built.returncode != 0
+    assert json.loads(result.read_text(encoding="utf-8"))["exit_code"] != 0
+    assert not (tmp_path / "github-output").exists()
+    probe = tmp_path / "test_probe.py"
+    ran = tmp_path / "ran"
+    probe.write_text(
+        "from pathlib import Path\ndef test_probe():\n"
+        f"    Path({str(ran)!r}).write_text('must not run')\n",
+        encoding="utf-8",
+    )
+    config = tmp_path / "pytest.ini"
+    config.write_text("[pytest]\n", encoding="utf-8")
+    stopped = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-c",
+            str(config),
+            str(probe),
+            "-p",
+            "scripts.ci_source_index",
+            "-n",
+            str(workers),
+            "--dist=worksteal",
+            "--ci-source-index-result",
+            str(result),
+            "--ci-source-index-target",
+            str(index),
+            "--ci-source-index-key",
+            key,
+            "--ci-source-index-deadline",
+            str(time.time() + 30),
+        ],
+        cwd=ROOT,
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=40,
+    )
+    assert stopped.returncode != 0
+    assert "Source-index construction failed" in stopped.stdout + stopped.stderr
+    assert not ran.exists()
+
+
+def test_cold_source_index_overlaps_startup_inside_the_unchanged_deadline() -> None:
+    workflow = WORKFLOW_PATH.read_text(encoding="utf-8")
+    restore = workflow.split("- name: Restore exact selected-source index", 1)[1].split(
+        "- name: Run behavioral coverage shard", 1
+    )[0]
+    assert "if: ${{ matrix.shard_id != '1' }}" in restore
+    step = workflow.split("- name: Run behavioral coverage shard", 1)[1].split(
+        "- name: Save completed selected-source index", 1
+    )[0]
+    assert "timeout-minutes: 14" in step
+    assert "source_index_deadline=$(( $(date +%s) + 14 * 60 ))" in step
+    assert step.index("scripts.validate_source_history") < step.index("scripts.ci_source_index")
+    assert '"$SELECTED_INDEX_INPUT_KEY" &' in step
+    assert "completion_dir=$(mktemp -d " in step
+    assert step.count('"${source_index_args[@]}"') == 2
+    assert step.index("source_index_pid=$!") < step.index("uv run --no-sync python -m pytest")
+    assert "finish_source_index_build" in step
+    assert "coverage report --fail-under=66.5" in workflow

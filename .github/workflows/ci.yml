@@ -452,6 +452,8 @@ jobs:
           PY
 
       - name: Restore exact selected-source index
+        # Keep one real shard cold on PRs and main; a warm retry is not cold qualification.
+        if: ${{ matrix.shard_id != '1' }}
         id: source-index-cache
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
@@ -470,15 +472,36 @@ jobs:
           BEHAVIORAL_DISPATCH_PROFILE: ci/test_shards/durations.json
           SELECTED_ARMY_SOURCE_INDEX: ${{ runner.temp }}/selected-army-source-index
           SELECTED_INDEX_CACHE_HIT: ${{ steps.source-index-cache.outputs.cache-hit }}
+          SELECTED_INDEX_INPUT_KEY: ${{ steps.source-inputs.outputs.key }}
         run: |
           mkdir -p reports
           mapfile -t shard_paths < "$SHARD_MANIFEST"
+          source_index_deadline=$(( $(date +%s) + 14 * 60 ))
           uv run --no-sync python -B -m scripts.validate_source_history
+          source_index_pid=""
+          source_index_args=()
+          finish_source_index_build() {
+            if [[ -n "$source_index_pid" ]]; then
+              if wait "$source_index_pid"; then
+                source_index_pid=""
+              else
+                source_index_status=$?
+                exit "$source_index_status"
+              fi
+            fi
+          }
           if [[ "$SELECTED_INDEX_CACHE_HIT" != "true" ]]; then
-            uv run --no-sync python -B -m tools.ability_support_sources \
+            completion_dir=$(mktemp -d "$RUNNER_TEMP/source-index-completion.XXXXXX")
+            uv run --no-sync python -B -m scripts.ci_source_index \
               data/source_snapshots/wahapedia/10th-edition/2026-06-14/json \
-              "$SELECTED_ARMY_SOURCE_INDEX"
-            echo "source_index_built=true" >> "$GITHUB_OUTPUT"
+              "$SELECTED_ARMY_SOURCE_INDEX" "$completion_dir/result.json" \
+              "$SELECTED_INDEX_INPUT_KEY" &
+            source_index_pid=$!
+            source_index_args=(-p scripts.ci_source_index
+              --ci-source-index-result "$completion_dir/result.json"
+              --ci-source-index-target "$SELECTED_ARMY_SOURCE_INDEX"
+              --ci-source-index-key "$SELECTED_INDEX_INPUT_KEY"
+              --ci-source-index-deadline "$source_index_deadline")
           fi
           isolated_status=0
           parallel_timing_dir="$TEST_TIMING_DIR"
@@ -488,7 +511,8 @@ jobs:
             # Keep the bounded success fixture separate from concurrent coverage
             # work, including when refreshed costs move it to another shard.
             if TEST_TIMING_DIR="$TEST_TIMING_DIR/isolated-mirror" \
-              uv run --no-sync pytest "$isolated_case" \
+              uv run --no-sync python -m pytest "$isolated_case" \
+                  "${source_index_args[@]}" \
                 -n 1 \
                 --dist=worksteal \
                 --selected-army-source-index="$SELECTED_ARMY_SOURCE_INDEX" \
@@ -504,10 +528,12 @@ jobs:
             fi
             isolation_args=(--deselect "$isolated_case" --cov-append)
             parallel_timing_dir="$TEST_TIMING_DIR/remainder"
+            finish_source_index_build
           fi
           parallel_status=0
           if TEST_TIMING_DIR="$parallel_timing_dir" \
-            uv run --no-sync pytest "${shard_paths[@]}" "${isolation_args[@]}" \
+            uv run --no-sync python -m pytest "${shard_paths[@]}" "${isolation_args[@]}" \
+            "${source_index_args[@]}" \
             -n auto \
             --dist=worksteal \
             --selected-army-source-index="$SELECTED_ARMY_SOURCE_INDEX" \
@@ -521,12 +547,13 @@ jobs:
           else
             parallel_status=$?
           fi
+          finish_source_index_build
           if (( isolated_status != 0 || parallel_status != 0 )); then
             exit 1
           fi
 
       - name: Save completed selected-source index
-        if: ${{ always() && steps.behavior.outputs.source_index_built == 'true' }}
+        if: ${{ always() && matrix.shard_id != '1' && steps.behavior.outputs.source_index_built == 'true' }}
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ${{ runner.temp }}/selected-army-source-index

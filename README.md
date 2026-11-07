@@ -336,6 +336,14 @@ separately. Weight totals are planning inputs, not job wall times or proof of th
 temporary fourteen-minute CI goal. Existing observation-based estimates do not
 relax the complete-profile validation below.
 
+Cold selected-source construction stays inside that same fourteen-minute step and
+overlaps pytest startup and collection. The controller admits no test execution
+until construction succeeds with a completion record bound to the exact input key
+and index path. Failure, malformed completion and deadline expiry stop dispatch.
+Shard 1 deliberately bypasses source-index cache restore/save on PRs and main so
+every run verifies this cold path. Other shards retain exact-key reuse and the
+normal source/partition validation; a warm-cache retry is not cold qualification.
+
 A single complete local JUnit XML is also accepted; label its host accurately and
 do not mix local and hosted-runner timings in one representative CI profile.
 Every supplied run must cover the current behavioral file inventory. Missing files,
