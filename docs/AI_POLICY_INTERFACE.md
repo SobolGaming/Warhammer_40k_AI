@@ -132,6 +132,45 @@ provenance. A decision-record reference alone does not prove an accepted outcome
 The existing scalar target keeps its original semantics. This contract introduces
 no training run, learner, outcome label or player-facing/wire contract change.
 
+## Semantic finite observations
+
+`ai.semantic_features` defines the independent registry
+`finite-semantic-features-v1`, observation
+`finite-semantic-observation-v1` and row companion
+`finite-training-observation-v1`. The closed initial registry contains the
+existing `decision-option-count`: a positive integer, count units, scalar tensor
+dimensions `()`, `decision_context` source, and `actor_view` information scope.
+It counts the complete ordered engine-emitted finite options in the detached
+player context. Parameterized markers and empty sets are rejected. There is no
+categorical vocabulary in v1; `vocabulary_version` must be null. Additional
+required features/operators need an explicit registry version and encoder.
+
+`SemanticObservation.from_context(context)` derives the value from that view.
+Its closed loader requires the original context and recomputes the complete
+observation, rejecting changed bindings, definitions, units, dimensions, scope,
+vocabulary and values. `model_inputs` exposes only the numeric tuple in registry
+order. Actor/request identities and observation hashes are separate linkage
+fields; option IDs, labels, payloads, entity/source references, arbitrary names,
+choice seeds, raw observations and row diagnostics never enter that tuple.
+Actor-view scope includes the actor's own permitted private choices; it does not
+certify their option count as public to opponents or authorize sharing the
+companion with another viewer. Existing adapter redaction remains authoritative.
+
+`FiniteTrainingObservation.from_link(link, row=row, context=before)` binds the
+observation to the full `FiniteTrainingCandidateLink` hash and rechecks the exact
+row/context/candidate join. Every legacy input must match the registered
+definition, integer value and decision source descriptor; missing, extra,
+unregistered or inconsistent features fail explicitly. The closed loader and
+`require_matches` repeat those checks. Existing `TrainingRow` bytes, schema,
+scalars and readers are unchanged; this is an opt-in companion, with no inferred
+conversion or automatic feature filling.
+
+These checks establish a bounded encoding and offline integrity join. They do
+not authenticate an external projection, prove accepted transitions, admit a
+dataset, provide complete unit/weapon/geometry/scoring semantics, or add a learner.
+The ordinary finite adapter submission and wire contract already cover the
+unchanged decision path.
+
 ## Named training target declarations
 
 `ai.training_targets.NamedTrainingTarget` is the independently versioned
