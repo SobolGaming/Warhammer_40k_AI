@@ -242,10 +242,13 @@ def test_source_history_guard_precedes_index_and_covered_pytest() -> None:
     )[0]
     assert (
         step.index("scripts.validate_source_history")
-        < step.index("tools.ability_support_sources")
+        < step.index("scripts.ci_source_index")
         < step.index("--cov=warhammer40k_core")
     )
     assert "timeout-minutes: 14" in step
+    builder = (ROOT / "scripts/ci_source_index.py").read_text(encoding="utf-8")
+    assert '"tools.ability_support_sources"' in builder
+    assert '"-m"' in builder
 
 
 def test_source_history_rejects_optimized_interpreter() -> None:
