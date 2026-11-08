@@ -1,382 +1,482 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "53b4783e38f7dc7f4903947c405469e05e84d59b",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0973a83001b35bf10c1c6bed090c58bc1c74db80394d30e6e1e476ecfc1e6fae",
-  "operation_map_sha256": "574ea716e1b64c85b79c1f7456fa093fe421c6e18e914b7295148b88b118f654",
+  "base": "95d6c2ac76955a4cf5e772a6650350d69f289516",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a65294bb4b13d3d55ce3f5d413960c0b97ebeb0cb41465dc8576637d19cfe374",
+  "operation_map_sha256": "0576f3e9b745013d6a2276f65304143bf2adc783336c72834289d70c3569051a",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "e5591e0f6cddada1d6f8340c56ab5f6e70b50fc0c80e5f414683b1a208629046",
-      "after_sha256": "8062e2cc8a7868f7fac424ec7c685414cc279ddda3f939202d75f1d816d44545",
+      "before_sha256": "8062e2cc8a7868f7fac424ec7c685414cc279ddda3f939202d75f1d816d44545",
+      "after_sha256": "42893c884baa57752d60b2fda828f64e2818fe008e79d50c4d3b11fd29482097",
       "owners": {
         "@document": {
-          "before": "e5591e0f6cddada1d6f8340c56ab5f6e70b50fc0c80e5f414683b1a208629046",
-          "after": "8062e2cc8a7868f7fac424ec7c685414cc279ddda3f939202d75f1d816d44545"
+          "before": "8062e2cc8a7868f7fac424ec7c685414cc279ddda3f939202d75f1d816d44545",
+          "after": "42893c884baa57752d60b2fda828f64e2818fe008e79d50c4d3b11fd29482097"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "ee3b07b2ff2803bc9ccca42bac2a28bc34328b98838ad97a211d854ad92f478a",
-      "after_sha256": "4f6cbcb8064139a60d0542f7c15f356002d85a04fd0ebe6a3b363665ef853831",
+      "before_sha256": "4f6cbcb8064139a60d0542f7c15f356002d85a04fd0ebe6a3b363665ef853831",
+      "after_sha256": "212bd1b06974464f69f116d4fdc0609e706ef00f5461e784b1d88aca9aa7b6c0",
       "owners": {
         "@document": {
-          "before": "ee3b07b2ff2803bc9ccca42bac2a28bc34328b98838ad97a211d854ad92f478a",
-          "after": "4f6cbcb8064139a60d0542f7c15f356002d85a04fd0ebe6a3b363665ef853831"
+          "before": "4f6cbcb8064139a60d0542f7c15f356002d85a04fd0ebe6a3b363665ef853831",
+          "after": "212bd1b06974464f69f116d4fdc0609e706ef00f5461e784b1d88aca9aa7b6c0"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "e130c682391b4d968735b913bbccf14512c759eb5b5546f24595d2000ff6d4ee",
-      "after_sha256": "bb513f2a436119f1bcf7c1c2d060077fb4ea04655fe968f3ea4ae1d5e2dd3eb0",
+      "before_sha256": "bb513f2a436119f1bcf7c1c2d060077fb4ea04655fe968f3ea4ae1d5e2dd3eb0",
+      "after_sha256": "5bfdbcb0958a1b38466f65bb4778e86ae2e9dc6b1819e62c4169d43ed9f31a39",
       "owners": {
         "@document": {
-          "before": "e130c682391b4d968735b913bbccf14512c759eb5b5546f24595d2000ff6d4ee",
-          "after": "bb513f2a436119f1bcf7c1c2d060077fb4ea04655fe968f3ea4ae1d5e2dd3eb0"
+          "before": "bb513f2a436119f1bcf7c1c2d060077fb4ea04655fe968f3ea4ae1d5e2dd3eb0",
+          "after": "5bfdbcb0958a1b38466f65bb4778e86ae2e9dc6b1819e62c4169d43ed9f31a39"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "5e44942c0ae7dae3e0cb01e7d42fff99c6c9f7842aa489037dc24d58b55bfcc0",
-      "after_sha256": "32d9a3156e8888f336612e263cde31e6a2577551dfdd6561f591ae7c70b27b37",
+      "before_sha256": "32d9a3156e8888f336612e263cde31e6a2577551dfdd6561f591ae7c70b27b37",
+      "after_sha256": "1280f39d443d93fa2ee3e1c19be4812e41a6419dc445cf49564b8296971255a1",
       "owners": {
         "@document": {
-          "before": "5e44942c0ae7dae3e0cb01e7d42fff99c6c9f7842aa489037dc24d58b55bfcc0",
-          "after": "32d9a3156e8888f336612e263cde31e6a2577551dfdd6561f591ae7c70b27b37"
+          "before": "32d9a3156e8888f336612e263cde31e6a2577551dfdd6561f591ae7c70b27b37",
+          "after": "1280f39d443d93fa2ee3e1c19be4812e41a6419dc445cf49564b8296971255a1"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "4aaf702b0060d0ed8e3c885395c77ac3a21df9599af471db31004e9fe4d85393",
-      "after_sha256": "888b7f4424a42daa501ddf713ae574495e53a20cf828bd24825f62550b504540",
+      "before_sha256": "888b7f4424a42daa501ddf713ae574495e53a20cf828bd24825f62550b504540",
+      "after_sha256": "dacc0fe1321d3cdd68be9726940be7a7d993b0ad18009295958750bece2b7df9",
       "owners": {
         "@document": {
-          "before": "4aaf702b0060d0ed8e3c885395c77ac3a21df9599af471db31004e9fe4d85393",
-          "after": "888b7f4424a42daa501ddf713ae574495e53a20cf828bd24825f62550b504540"
+          "before": "888b7f4424a42daa501ddf713ae574495e53a20cf828bd24825f62550b504540",
+          "after": "dacc0fe1321d3cdd68be9726940be7a7d993b0ad18009295958750bece2b7df9"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "179c47dd572c41609b1614a984232ba822e47b5c44735f0a25becd31056836c7",
-      "after_sha256": "36cb4acdc3303e6b8fd4d50e5f0da7e253289cb9733d73a2771364569e002985",
+      "before_sha256": "36cb4acdc3303e6b8fd4d50e5f0da7e253289cb9733d73a2771364569e002985",
+      "after_sha256": "701c247103b2ca73198ce7129ec969fd4a9a7e3ca8172c6408889cf3e22d2fd4",
       "owners": {
         "@document": {
-          "before": "179c47dd572c41609b1614a984232ba822e47b5c44735f0a25becd31056836c7",
-          "after": "36cb4acdc3303e6b8fd4d50e5f0da7e253289cb9733d73a2771364569e002985"
+          "before": "36cb4acdc3303e6b8fd4d50e5f0da7e253289cb9733d73a2771364569e002985",
+          "after": "701c247103b2ca73198ce7129ec969fd4a9a7e3ca8172c6408889cf3e22d2fd4"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "1ab09bba3484955e0d665fd901b8846c84b7a1f4243bc31b047e7ee901c20513",
-      "after_sha256": "1904a271fb299882e8ab7e184a101f706b3b33ea7fe87219d062123369ccdd2c",
+      "before_sha256": "1904a271fb299882e8ab7e184a101f706b3b33ea7fe87219d062123369ccdd2c",
+      "after_sha256": "807cc66eaa1403cc1ec1d907cda926d8ff41e24b74803fac0cef8e485e49bf49",
       "owners": {
         "@document": {
-          "before": "1ab09bba3484955e0d665fd901b8846c84b7a1f4243bc31b047e7ee901c20513",
-          "after": "1904a271fb299882e8ab7e184a101f706b3b33ea7fe87219d062123369ccdd2c"
+          "before": "1904a271fb299882e8ab7e184a101f706b3b33ea7fe87219d062123369ccdd2c",
+          "after": "807cc66eaa1403cc1ec1d907cda926d8ff41e24b74803fac0cef8e485e49bf49"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "fb48fc645efcadef24999d0e4b0b24cf9b6ba43194c9037e5564cb0a984ede77",
-      "after_sha256": "63b3ee41b99ab806d140d32b40609747ec319146b4ad604b696adf173f00a201",
+      "before_sha256": "63b3ee41b99ab806d140d32b40609747ec319146b4ad604b696adf173f00a201",
+      "after_sha256": "c2d31729c93a7c2a1863fb949f25dd954be4ba00f17c5423242da4fc166043b3",
       "owners": {
         "@document": {
-          "before": "fb48fc645efcadef24999d0e4b0b24cf9b6ba43194c9037e5564cb0a984ede77",
-          "after": "63b3ee41b99ab806d140d32b40609747ec319146b4ad604b696adf173f00a201"
+          "before": "63b3ee41b99ab806d140d32b40609747ec319146b4ad604b696adf173f00a201",
+          "after": "c2d31729c93a7c2a1863fb949f25dd954be4ba00f17c5423242da4fc166043b3"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "35812c917d010083a9ecbacfdbe35f306907597fedb119ad04bf97dd3249d3f8",
-      "after_sha256": "379be9e12290bebe301cd340f3103f1288428f79c149bbabe0451f9046a88e45",
+      "before_sha256": "379be9e12290bebe301cd340f3103f1288428f79c149bbabe0451f9046a88e45",
+      "after_sha256": "514099f23320289aab92dc48769a655da1895b389edf9bf1295ed1ec3c72914e",
       "owners": {
         "@document": {
-          "before": "35812c917d010083a9ecbacfdbe35f306907597fedb119ad04bf97dd3249d3f8",
-          "after": "379be9e12290bebe301cd340f3103f1288428f79c149bbabe0451f9046a88e45"
+          "before": "379be9e12290bebe301cd340f3103f1288428f79c149bbabe0451f9046a88e45",
+          "after": "514099f23320289aab92dc48769a655da1895b389edf9bf1295ed1ec3c72914e"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "94a68d0ecd068c39463481310c06753ac2acba5bf71316308255e22dcb53ce85",
-      "after_sha256": "202b9de9451d398b71b925b4bcba6196d014b7095409321ba32034f09a5d05f3",
+      "before_sha256": "202b9de9451d398b71b925b4bcba6196d014b7095409321ba32034f09a5d05f3",
+      "after_sha256": "8852fad93fd5900bd2725d0735b0625f214ba9ef81e0c8582a668b40cfa0e03e",
       "owners": {
         "@document": {
-          "before": "94a68d0ecd068c39463481310c06753ac2acba5bf71316308255e22dcb53ce85",
-          "after": "202b9de9451d398b71b925b4bcba6196d014b7095409321ba32034f09a5d05f3"
+          "before": "202b9de9451d398b71b925b4bcba6196d014b7095409321ba32034f09a5d05f3",
+          "after": "8852fad93fd5900bd2725d0735b0625f214ba9ef81e0c8582a668b40cfa0e03e"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "5094b415c3680a209d36e846e2eb96264e3b8c6b27022b87a0710615046c055d",
-      "after_sha256": "2eed82fcca6105679b0ec14b278abf1783d7bb55cbef7c4f3062c68f3f6d2a39",
+      "before_sha256": "2eed82fcca6105679b0ec14b278abf1783d7bb55cbef7c4f3062c68f3f6d2a39",
+      "after_sha256": "b83dccc0fc81d4ddf2ce87fbe8943e539893ca401df4d2a9e3c2b9188a2d9e93",
       "owners": {
         "@document": {
-          "before": "5094b415c3680a209d36e846e2eb96264e3b8c6b27022b87a0710615046c055d",
-          "after": "2eed82fcca6105679b0ec14b278abf1783d7bb55cbef7c4f3062c68f3f6d2a39"
+          "before": "2eed82fcca6105679b0ec14b278abf1783d7bb55cbef7c4f3062c68f3f6d2a39",
+          "after": "b83dccc0fc81d4ddf2ce87fbe8943e539893ca401df4d2a9e3c2b9188a2d9e93"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "182d052c56cf9612d24af5c73749f0cd750c945fb908b9e2a9d2180b1354ab03",
-      "after_sha256": "69e21fa5c32708ad32e3daae68992ba49c140ba223c87b9599955dc21b316673",
+      "before_sha256": "69e21fa5c32708ad32e3daae68992ba49c140ba223c87b9599955dc21b316673",
+      "after_sha256": "9b437588e9b5a4e1a5bce97aec5f900abf838581856cc57aab4978259a546576",
       "owners": {
         "@document": {
-          "before": "182d052c56cf9612d24af5c73749f0cd750c945fb908b9e2a9d2180b1354ab03",
-          "after": "69e21fa5c32708ad32e3daae68992ba49c140ba223c87b9599955dc21b316673"
+          "before": "69e21fa5c32708ad32e3daae68992ba49c140ba223c87b9599955dc21b316673",
+          "after": "9b437588e9b5a4e1a5bce97aec5f900abf838581856cc57aab4978259a546576"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "4522fd8ab634f54b05977edfdb155b97c0195be3df775905ac93d0292656a85f",
-      "after_sha256": "cbb75e72635546fcd74e08253580d3a5b573d61953ed88e9b803afd6c314a8bd",
+      "before_sha256": "cbb75e72635546fcd74e08253580d3a5b573d61953ed88e9b803afd6c314a8bd",
+      "after_sha256": "b74ba296608d169a6605cb124473cebfa2947f80c4d07509a800163243a617df",
       "owners": {
         "@document": {
-          "before": "4522fd8ab634f54b05977edfdb155b97c0195be3df775905ac93d0292656a85f",
-          "after": "cbb75e72635546fcd74e08253580d3a5b573d61953ed88e9b803afd6c314a8bd"
+          "before": "cbb75e72635546fcd74e08253580d3a5b573d61953ed88e9b803afd6c314a8bd",
+          "after": "b74ba296608d169a6605cb124473cebfa2947f80c4d07509a800163243a617df"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "a6c704324e25c763a4fa5150eb54cf9670ebef34732ad5ceacb1f333a8ffe9f3",
-      "after_sha256": "1bab83b5867369300ab4a91fc338387de1d7a0002d78e1fc0df9b4c39dbf945f",
+      "before_sha256": "1bab83b5867369300ab4a91fc338387de1d7a0002d78e1fc0df9b4c39dbf945f",
+      "after_sha256": "2a6f89fb271633e3d6fad96c18633dd19c68e5e69615720315f3d235efb7de75",
       "owners": {
         "@document": {
-          "before": "a6c704324e25c763a4fa5150eb54cf9670ebef34732ad5ceacb1f333a8ffe9f3",
-          "after": "1bab83b5867369300ab4a91fc338387de1d7a0002d78e1fc0df9b4c39dbf945f"
+          "before": "1bab83b5867369300ab4a91fc338387de1d7a0002d78e1fc0df9b4c39dbf945f",
+          "after": "2a6f89fb271633e3d6fad96c18633dd19c68e5e69615720315f3d235efb7de75"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "bef86d6c13175ce7d855b6e8be079df219f485849055c45ce809bca1ed34f6f5",
-      "after_sha256": "ed6216b6347349147d93aff851fee0d1d5fc4d80f4b64be2bbeb9d2cc0806ce7",
+      "before_sha256": "ed6216b6347349147d93aff851fee0d1d5fc4d80f4b64be2bbeb9d2cc0806ce7",
+      "after_sha256": "fe4c6292477b36da43f44c79731f05ee8ca72d49ed10d522c8b7cbc2eea4e583",
       "owners": {
         "@document": {
-          "before": "bef86d6c13175ce7d855b6e8be079df219f485849055c45ce809bca1ed34f6f5",
-          "after": "ed6216b6347349147d93aff851fee0d1d5fc4d80f4b64be2bbeb9d2cc0806ce7"
+          "before": "ed6216b6347349147d93aff851fee0d1d5fc4d80f4b64be2bbeb9d2cc0806ce7",
+          "after": "fe4c6292477b36da43f44c79731f05ee8ca72d49ed10d522c8b7cbc2eea4e583"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "dec899364c318075d3286911eb47b2dc46fb9d9675e2be24dc1277b9725ca910",
-      "after_sha256": "b0c476119252115ef10963e6225ce46934402d5810c1731a92e8c494e062c83c",
+      "before_sha256": "b0c476119252115ef10963e6225ce46934402d5810c1731a92e8c494e062c83c",
+      "after_sha256": "5b5551b35570d58241b0be75a9e1dab84111a613f29a3dbcedc4c23394ea524d",
       "owners": {
         "@document": {
-          "before": "dec899364c318075d3286911eb47b2dc46fb9d9675e2be24dc1277b9725ca910",
-          "after": "b0c476119252115ef10963e6225ce46934402d5810c1731a92e8c494e062c83c"
+          "before": "b0c476119252115ef10963e6225ce46934402d5810c1731a92e8c494e062c83c",
+          "after": "5b5551b35570d58241b0be75a9e1dab84111a613f29a3dbcedc4c23394ea524d"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "97885d35850224bd9f0e1f16edc27b89d35be24f1a50dd50617c09c74a9c965b",
-      "after_sha256": "3cc8acd62e935fbae869be740c9f283e3884b509266f87bb2381112fe3e85c95",
+      "before_sha256": "3cc8acd62e935fbae869be740c9f283e3884b509266f87bb2381112fe3e85c95",
+      "after_sha256": "7a561dc3fa4f85d5276253775a4d9032839d2055f2aa15984af69ed4276ce511",
       "owners": {
         "@document": {
-          "before": "97885d35850224bd9f0e1f16edc27b89d35be24f1a50dd50617c09c74a9c965b",
-          "after": "3cc8acd62e935fbae869be740c9f283e3884b509266f87bb2381112fe3e85c95"
+          "before": "3cc8acd62e935fbae869be740c9f283e3884b509266f87bb2381112fe3e85c95",
+          "after": "7a561dc3fa4f85d5276253775a4d9032839d2055f2aa15984af69ed4276ce511"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "f417f093337350f4073175847ec691664803548c91cbf531b1720876039382c1",
-      "after_sha256": "8e3e435ae4faa35af2dab9e00a8b26ce2ddc5ed19d8dac56cd6ac15c6d5f23a4",
+      "before_sha256": "8e3e435ae4faa35af2dab9e00a8b26ce2ddc5ed19d8dac56cd6ac15c6d5f23a4",
+      "after_sha256": "51d2a069e33c534220af1ebeaa73c4a6e11a8dffeea2f659e8576741e48c8632",
       "owners": {
         "@document": {
-          "before": "f417f093337350f4073175847ec691664803548c91cbf531b1720876039382c1",
-          "after": "8e3e435ae4faa35af2dab9e00a8b26ce2ddc5ed19d8dac56cd6ac15c6d5f23a4"
+          "before": "8e3e435ae4faa35af2dab9e00a8b26ce2ddc5ed19d8dac56cd6ac15c6d5f23a4",
+          "after": "51d2a069e33c534220af1ebeaa73c4a6e11a8dffeea2f659e8576741e48c8632"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "aca566b59640f5d61dc21ff95ed91b251440b8620d4beaefe9b28de6f0d71211",
-      "after_sha256": "f0dc59d919906b954dbecf03680ca14abb8703284606cf0522eb656af2f0b56f",
+      "before_sha256": "f0dc59d919906b954dbecf03680ca14abb8703284606cf0522eb656af2f0b56f",
+      "after_sha256": "93e1710dd90591949b5b73dd7972d734ef0ac3879b0369dd7504463f51fc107a",
       "owners": {
         "@document": {
-          "before": "aca566b59640f5d61dc21ff95ed91b251440b8620d4beaefe9b28de6f0d71211",
-          "after": "f0dc59d919906b954dbecf03680ca14abb8703284606cf0522eb656af2f0b56f"
+          "before": "f0dc59d919906b954dbecf03680ca14abb8703284606cf0522eb656af2f0b56f",
+          "after": "93e1710dd90591949b5b73dd7972d734ef0ac3879b0369dd7504463f51fc107a"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "a8078e4f16891f25dbd153d18f4178540002b2b814d6e716187e027065ad5919",
-      "after_sha256": "a8debf3c323fd12c54e14b4eed2e49c54f63b4fe3c5625053dfed898738d72f1",
+      "before_sha256": "a8debf3c323fd12c54e14b4eed2e49c54f63b4fe3c5625053dfed898738d72f1",
+      "after_sha256": "5a9d15579958dc4c9b7391fa1fbd34e2e562a715121e301c7e30e1bdf23fff6a",
       "owners": {
         "@document": {
-          "before": "a8078e4f16891f25dbd153d18f4178540002b2b814d6e716187e027065ad5919",
-          "after": "a8debf3c323fd12c54e14b4eed2e49c54f63b4fe3c5625053dfed898738d72f1"
+          "before": "a8debf3c323fd12c54e14b4eed2e49c54f63b4fe3c5625053dfed898738d72f1",
+          "after": "5a9d15579958dc4c9b7391fa1fbd34e2e562a715121e301c7e30e1bdf23fff6a"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "17a729c7aec855b777f6392e2093aa5c1621a98d651efa1af2f1ce97758a9833",
-      "after_sha256": "811947b62fe25c752872c81a5e8eb7e973f06820d8000c3f24f8aeb18ef85638",
+      "before_sha256": "811947b62fe25c752872c81a5e8eb7e973f06820d8000c3f24f8aeb18ef85638",
+      "after_sha256": "4a4d796039708fbc6f812396c3de7cd34a17836a8a6d0ca799a514a3342e21e2",
       "owners": {
         "@document": {
-          "before": "17a729c7aec855b777f6392e2093aa5c1621a98d651efa1af2f1ce97758a9833",
-          "after": "811947b62fe25c752872c81a5e8eb7e973f06820d8000c3f24f8aeb18ef85638"
+          "before": "811947b62fe25c752872c81a5e8eb7e973f06820d8000c3f24f8aeb18ef85638",
+          "after": "4a4d796039708fbc6f812396c3de7cd34a17836a8a6d0ca799a514a3342e21e2"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "aa750d26575aec7146c501c055052a19d90e94d3447fde09f270fdaf82d0e5ed",
-      "after_sha256": "6ee48a5000a36d896de2675e2ce85f193d389b6dae59ea54d6489a8cc6d8ac17",
+      "before_sha256": "6ee48a5000a36d896de2675e2ce85f193d389b6dae59ea54d6489a8cc6d8ac17",
+      "after_sha256": "26ba0c7aa78d9cceceef45aee44d9e9f262284d979bd6163cc8cdc710040a79f",
       "owners": {
         "@document": {
-          "before": "aa750d26575aec7146c501c055052a19d90e94d3447fde09f270fdaf82d0e5ed",
-          "after": "6ee48a5000a36d896de2675e2ce85f193d389b6dae59ea54d6489a8cc6d8ac17"
+          "before": "6ee48a5000a36d896de2675e2ce85f193d389b6dae59ea54d6489a8cc6d8ac17",
+          "after": "26ba0c7aa78d9cceceef45aee44d9e9f262284d979bd6163cc8cdc710040a79f"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "2c3702db58bf68f103fe2fdef24f31e0779fd37941257ced951b4dfde13c84eb",
-      "after_sha256": "bf4debcf74a86cefa716681281c7923dc348e866b60588b0db47b8e677758cdf",
+      "before_sha256": "bf4debcf74a86cefa716681281c7923dc348e866b60588b0db47b8e677758cdf",
+      "after_sha256": "1d37be356be797db867a1fd524eeb69dc4d8362780fe8fd1fbd1f0abce5369c1",
       "owners": {
         "@document": {
-          "before": "2c3702db58bf68f103fe2fdef24f31e0779fd37941257ced951b4dfde13c84eb",
-          "after": "bf4debcf74a86cefa716681281c7923dc348e866b60588b0db47b8e677758cdf"
+          "before": "bf4debcf74a86cefa716681281c7923dc348e866b60588b0db47b8e677758cdf",
+          "after": "1d37be356be797db867a1fd524eeb69dc4d8362780fe8fd1fbd1f0abce5369c1"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "02404b3c4e72e1285015d46cbb788b66c018fe1559bf9702eb9bdb74d895a530",
-      "after_sha256": "fd9784f945031dbb20ebbfb80cab23fcc30852fbb2c0ce7c7a44ccb1455804f8",
+      "before_sha256": "fd9784f945031dbb20ebbfb80cab23fcc30852fbb2c0ce7c7a44ccb1455804f8",
+      "after_sha256": "04d03229447ce537c82e6aaa9fb8a611763891ed269410eb2deee091dd116507",
       "owners": {
         "@document": {
-          "before": "02404b3c4e72e1285015d46cbb788b66c018fe1559bf9702eb9bdb74d895a530",
-          "after": "fd9784f945031dbb20ebbfb80cab23fcc30852fbb2c0ce7c7a44ccb1455804f8"
+          "before": "fd9784f945031dbb20ebbfb80cab23fcc30852fbb2c0ce7c7a44ccb1455804f8",
+          "after": "04d03229447ce537c82e6aaa9fb8a611763891ed269410eb2deee091dd116507"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "05f6fe2c901f1ddc41629cbb080c7672cdaccead8117a67881565f2bb5a70bb4",
-      "after_sha256": "ee1195a88a32cfb9d911820562166d079bfc2242556d6470fe159bace0f90725",
+      "before_sha256": "ee1195a88a32cfb9d911820562166d079bfc2242556d6470fe159bace0f90725",
+      "after_sha256": "e7f1da1540c60d30952c6526933264f7b32dcb2a5d6d414bff08b1e5fdf148d4",
       "owners": {
         "@document": {
-          "before": "05f6fe2c901f1ddc41629cbb080c7672cdaccead8117a67881565f2bb5a70bb4",
-          "after": "ee1195a88a32cfb9d911820562166d079bfc2242556d6470fe159bace0f90725"
+          "before": "ee1195a88a32cfb9d911820562166d079bfc2242556d6470fe159bace0f90725",
+          "after": "e7f1da1540c60d30952c6526933264f7b32dcb2a5d6d414bff08b1e5fdf148d4"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "9a58eb27b4952e5fba82db796e55a015b65a65a3ee8ffdc49ee782653962dd81",
-      "after_sha256": "deac0ca0714e76b2cd407498770450d3b53c90ba5a03728f7d220853e0145640",
+      "before_sha256": "deac0ca0714e76b2cd407498770450d3b53c90ba5a03728f7d220853e0145640",
+      "after_sha256": "6da277d39cb7022067b8d2e0d7bb0691d8a55a9c5649b8798b55835d48456a7b",
       "owners": {
         "@document": {
-          "before": "9a58eb27b4952e5fba82db796e55a015b65a65a3ee8ffdc49ee782653962dd81",
-          "after": "deac0ca0714e76b2cd407498770450d3b53c90ba5a03728f7d220853e0145640"
+          "before": "deac0ca0714e76b2cd407498770450d3b53c90ba5a03728f7d220853e0145640",
+          "after": "6da277d39cb7022067b8d2e0d7bb0691d8a55a9c5649b8798b55835d48456a7b"
         }
       }
     },
-    "src/warhammer40k_core/ai/training_transitions.py": {
+    "src/warhammer40k_core/ai/training_admission.py": {
       "before_sha256": null,
-      "after_sha256": "96233c7bf8981d6c5432b54c7d14f2dc7a1a75f81d82768377c32c64a0e8dd24",
+      "after_sha256": "50972f65a8472d1456cf8f4777be443f713bb3267944f82a1a2a8eb95fbd9e32",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e06fea680f83b2f4b2ba7748167ea84a3135042cd9348b3fedba56456af475ab"
+          "after": "c65c00cdc2172b30506c2b0b8aae164dfa0ece186a9a8ac2cfc508f2595fcf22"
         },
-        "FiniteAcceptedTransition": {
+        "AdmittedTargetPayload": {
           "before": null,
-          "after": "96c803d3e6603472c09731d76e924ed54c83da7e69776cf95a6dd4d8bc68e52d"
+          "after": "0d602f5523928801d36d26961eb09f8d54db5bd38d1cd59198f3383c0fce44af"
         },
-        "FiniteAcceptedTransition.__init__": {
+        "AdmittedTrainingTarget": {
           "before": null,
-          "after": "fe8d5028fad461786fe1194d1f555f6a91218fc229381f96a9aeacb8fa2f42d0"
+          "after": "7fea16dbf8bcaa17c5946534c7408746f8a866e44421ae5c6620d1996e625b81"
         },
-        "FiniteAcceptedTransition.accepted_record_start": {
+        "AdmittedTrainingTarget.__init__": {
           "before": null,
-          "after": "c91dfae9130762a1521950c92ebf024402e6adcaec8b7d6349e37749fc210ca7"
+          "after": "ecc8e31ffdd498e8105d677ca703a021d6c3c6372c6d01d2db252e9fc42ea75a"
         },
-        "FiniteAcceptedTransition.accepted_record_stop": {
-          "before": null,
-          "after": "493c52e92c5f1b7caf36a2c435564b9c7108ebfe72824881a3400bed9038f9df"
-        },
-        "FiniteAcceptedTransition.actor_id": {
-          "before": null,
-          "after": "333380e616030b44dbbb4727aea5d71f2d45167c3b4def253640380bb7368f99"
-        },
-        "FiniteAcceptedTransition.authoritative_record_id": {
-          "before": null,
-          "after": "57be5ae4705ebd3705d61bc2ec06d4a18043d65b3f2d83923cba39a0b71abec5"
-        },
-        "FiniteAcceptedTransition.authoritative_request_id": {
-          "before": null,
-          "after": "87e797fdb0d08be8cd2132650867283d95fb05c1ce57b44bd1a052371a685e49"
-        },
-        "FiniteAcceptedTransition.content_hash": {
+        "AdmittedTrainingTarget.content_hash": {
           "before": null,
           "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
         },
-        "FiniteAcceptedTransition.from_payload": {
+        "AdmittedTrainingTarget.from_episode": {
           "before": null,
-          "after": "053a63ecd2a6015e2fba1b68b67445d9f8fa2afdb11de7bc58d01ee60a3f3896"
+          "after": "0badb6e84f509f0a1a47869f783b26c602fc92e3dfe0dcb4e53739b70c66e28f"
         },
-        "FiniteAcceptedTransition.from_sessions": {
+        "AdmittedTrainingTarget.from_payload": {
           "before": null,
-          "after": "1d8b8321ceb248038826a2048c49f499248938cbadc5bbb835f0f72dc43c6ed5"
+          "after": "48199f673f9684159cf728d6de2d527b121adfbb65edb81cf9631ca8a528c029"
         },
-        "FiniteAcceptedTransition.perspective_player_id": {
+        "AdmittedTrainingTarget.to_payload": {
           "before": null,
-          "after": "ab2cfc7b2361ce6bc5748c913238b63be178e87ce4d4b220f9c2187b52e1a560"
+          "after": "3dd444ab6b8c022228d72b6e2e7c046c17c3d5ad1b37ec76c6c80d418819719d"
         },
-        "FiniteAcceptedTransition.to_payload": {
+        "EpisodeOriginPayload": {
           "before": null,
-          "after": "30f48050164c2810b52ee01452f41a2b977e46e099db285038c214a1ab3fd9b8"
+          "after": "8ba3056beb4162db096974f08ca13215296d7bfb539fbf543c368b12e5f66900"
         },
-        "FiniteAcceptedTransitionPayload": {
+        "FiniteEpisodeAdmission": {
           "before": null,
-          "after": "2ff0535b0fd6ac60080f8e9a8b4f175d6cf983fed81afe0244ffcf31f61505bd"
+          "after": "d766d68fd49149a60ac5ad8983b75b09b5caadd8a0fc3db3da349c75254eb89c"
         },
-        "TrainingTransitionError": {
+        "FiniteEpisodeAdmission.__init__": {
           "before": null,
-          "after": "2750fc321112ad8dd954d161c6c134e6fe49a963d5074595131484e789d43276"
+          "after": "3402173ada13af9dc7658caf33df482659a80ebdd04b76c0859a73099a3d6b95"
         },
-        "TransitionPositionPayload": {
+        "FiniteEpisodeAdmission.content_hash": {
           "before": null,
-          "after": "2804a1473f029118c5e75f7509498af4aa1e38bd31608e61e53ea35d569c1115"
+          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
         },
-        "_position": {
+        "FiniteEpisodeAdmission.from_payload": {
           "before": null,
-          "after": "6363786ede36b5feb81f9521c4f4637eb0ceccfe3d35c3b82f1b18ddfa955a29"
+          "after": "733da9c78200306329e55fe6d37de525d411bbc67c90afb0a508e81b16888d98"
+        },
+        "FiniteEpisodeAdmission.from_transitions": {
+          "before": null,
+          "after": "e82bee558f84d6f35201e5b0b146a28133a9ae1d32d1cdffe288401d7283abf6"
+        },
+        "FiniteEpisodeAdmission.to_payload": {
+          "before": null,
+          "after": "a1219eabdb6c7df380340f912baa66833068114ca30ad9ffba9bb5c619e85946"
+        },
+        "FiniteEpisodePayload": {
+          "before": null,
+          "after": "63d34f79eee78ad4011fab4380100df918b0300f94ee0d00713d56ae634dbf8c"
+        },
+        "TrainingAdmissionError": {
+          "before": null,
+          "after": "4132050871a82c8fe8d3a301eeea94053d540d0cc2659cca03f6b312bc467a7f"
+        },
+        "VerifiedEpisodeOrigin": {
+          "before": null,
+          "after": "e213eafbc2b696699d8c9d0532a13439b71d2bc8e544289a483d0714c20c5095"
+        },
+        "VerifiedEpisodeOrigin.__init__": {
+          "before": null,
+          "after": "24ac5d9ce2e7a7229c510fed160c87778c99cf4be4243c2a05d03e56199278ef"
+        },
+        "VerifiedEpisodeOrigin.content_hash": {
+          "before": null,
+          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
+        },
+        "VerifiedEpisodeOrigin.from_payload": {
+          "before": null,
+          "after": "cd23eb4afa7e154ec1beb1a5735387dbf5e45c928a66a9f1b5101b70d6e232a2"
+        },
+        "VerifiedEpisodeOrigin.from_session": {
+          "before": null,
+          "after": "b001edf80156dbf171359ecce0904efc6b46bfb6370d677b658c7ce72e22a725"
+        },
+        "VerifiedEpisodeOrigin.to_payload": {
+          "before": null,
+          "after": "bfa2db29665da4b55d7e4743a50afadecf0b63f82822179b54344111beec41e3"
+        },
+        "_json": {
+          "before": null,
+          "after": "55cdc102fa0025a2dd3e0c00671a05d078d897aeaa9c0c13f219d24c52ca5fdc"
+        },
+        "_require_exact": {
+          "before": null,
+          "after": "1e54da124c000f8f926a93d78201999fab84768642d890b4bb488634bba5d131"
         }
       }
     },
-    "tests/infrastructure/adapters/test_finite_candidates.py": {
-      "before_sha256": "12b0c83d61fc33f59ca1bf475a7e86993462989a710ac7f4c0cacda38a3e34fc",
-      "after_sha256": "06b0ce55d6a8c5492d54c6920725ea092615f4240e406f4061dd1d244eeba4a7",
+    "tests/infrastructure/adapters/test_training_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "a8dc39b97c5491fc9a23165cdf08acbd2899ab56e53c928706409cd65f836db0",
       "owners": {
         "@module": {
-          "before": "2ea81bfb8173965016fa349fa714bbeea41fc2a2c17b82ab07258ef06c7fee6a",
-          "after": "4852743a22980066472b3c42dffd3ebeda0aa508faf34337ba5ce48600b74005"
-        },
-        "test_finite_accepted_transition_reproduces_commit_without_mutating_inputs": {
           "before": null,
-          "after": "b8bba6cae9ddac3bb87b0b8f1a5ac3792256b48d448e999ecf6da5f04d822348"
+          "after": "ad862f13422dc2ca62f5fd408465d077578646035d76a2c83c9c24fafa5ceb63"
         },
-        "test_finite_transition_links_consecutive_actors_and_rejects_gaps": {
+        "AdmissionCase": {
           "before": null,
-          "after": "7d095dcb887d1a3e723b6fdb2d89895c8185757be4265fc4be538873c6dbf2c9"
+          "after": "202f6095f6645e9cb079ead563034e321ff70a84e788ba1a5da0e9f4ddf311fb"
         },
-        "test_finite_transition_loader_rejects_tampered_evidence": {
+        "AdmissionCase.episode": {
           "before": null,
-          "after": "4c43f3d7648457439f455c3a989c6cc8da467ea1e6f6b31304d74c137548d5c7"
+          "after": "95412858f7f5d255e678ca32c7bc4bc4e5103a749561270357dc3df926ada9dc"
         },
-        "test_finite_transition_rejects_a_record_without_engine_application": {
+        "AdmissionCase.transition": {
           "before": null,
-          "after": "ed31d5a500fc65bdcec332f41ee2c1ee6ffa71f541744a4d289b52a95fbe816b"
+          "after": "436ea5f0a6d68cd422408f11008627b067595e2665cdf37af12b07fd63477b30"
         },
-        "test_finite_transition_rejects_invalid_engine_joins": {
+        "_admit": {
           "before": null,
-          "after": "e0cbf84b84f98d8bf52eb82060b63fdbdccff3dbfaf86b85f64840ce9ce16c66"
+          "after": "568cfa1d38b102bf779fb2e541db2d7eba39df061745e6adfd68797e7ca0da1b"
         },
-        "test_finite_transition_rejects_lossy_temporal_indices": {
+        "_row": {
           "before": null,
-          "after": "ffae8595124c91a3e216dae238b3ab7645a2cbb96a8be766e64a336b783c8f90"
+          "after": "5520746f32b0932ef90b61186f13bf134acf5a1d8cb6245cf571fc6a9e3a70e5"
         },
-        "test_finite_transition_reproduces_an_ordinary_terminal_boundary": {
+        "_step": {
           "before": null,
-          "after": "0dbd707f3b1db7860eeefba7a473d06782edaf3b2f99360ea3582c3958fdd994"
+          "after": "d6b56bde65a33bc31ff8c2c71d7d43621403b48f3ddf3276cc50fecba688295d"
         },
-        "test_finite_transition_requires_verifying_factories": {
+        "_target": {
           "before": null,
-          "after": "852ce0cb8fdd4e37b4884527629f30fe7b33f20ce1986a12ed0ae04d6d52a9d8"
+          "after": "4e350ea033bd1e4f755106ae16efa0400b25d9d8b015ab17a1bbf82d855947bd"
+        },
+        "continuing": {
+          "before": null,
+          "after": "214338fb1b1733ce5cc2e2e16b5fe0dfb15915777217a303c71b2e9d5702c6b2"
+        },
+        "terminal": {
+          "before": null,
+          "after": "8eedf2be6a4dbe63fe9ff2548de4dd68f1029577dcadec9fb55d341c4f3d627e"
+        },
+        "test_admission_factories_are_required": {
+          "before": null,
+          "after": "fd6cc9485aab9b3fae591086bec049fcf4bfa3835cba9fcde9e19b3b411e6e06"
+        },
+        "test_admission_rejects_source_drift_even_with_rebuilt_valid_links": {
+          "before": null,
+          "after": "42ba050a11af27d1b06ca8b9f952377807f4c46211243d8a3ab62cc8bcee5bb4"
+        },
+        "test_contiguous_horizon_counts_engine_records_and_survives_roundtrip": {
+          "before": null,
+          "after": "3aad19eb1f0622e80fa436c19719b60da5849429082b61c433fbbd86d6436b51"
+        },
+        "test_episode_loader_rejects_a_changed_horizon": {
+          "before": null,
+          "after": "fe267dedb2f8cf00905b6bb92fea505da5ea2ab5643166e211e532169ed2ec38"
+        },
+        "test_episode_rejects_chain_or_endpoint_drift": {
+          "before": null,
+          "after": "c50c61c9ac1c90f3f7312a70ed5a61e1941a5d9ff1104fba5e0efc73ce17c451"
+        },
+        "test_episode_rejects_false_terminal_and_unexplained_stop": {
+          "before": null,
+          "after": "3b1f8671b791c5bfa65f4ad2ea8a94d6bdc2fdf1080902e38b61c78b027821dd"
+        },
+        "test_missing_local_horizon_is_unobserved_and_never_eligible": {
+          "before": null,
+          "after": "b97b6a366ffe26ea2c7b6e74f31de1c2ce04aad35bcce98b20b60249797e6f67"
+        },
+        "test_missing_target_must_match_explicit_boundary": {
+          "before": null,
+          "after": "c35a18755862b8733ffc799fffdba35c7d22955a3b26b8d2b484d3f55cf0126c"
+        },
+        "test_nonterminal_classifications_retain_missing_but_exclude_learning": {
+          "before": null,
+          "after": "a7a830a78b1b84d834d8b81991509593946388759e7642625534f8f4cdd0dca3"
+        },
+        "test_origin_loader_rejects_resigned_or_unknown_metadata": {
+          "before": null,
+          "after": "aa6849a5f8d2b6f454a860038409047fdac7a16371ec42a0c0d8da3439038540"
+        },
+        "test_origin_rejects_self_consistent_but_unreachable_state": {
+          "before": null,
+          "after": "3d9d500a41febf65816bf9bd2c94fde4d30537a6a3715a040ed157f06dcf7d84"
+        },
+        "test_origin_replays_prefix_and_round_trips_without_mutation": {
+          "before": null,
+          "after": "170dd8e045d660b93ba93cf8546a5a1ee45652ef9b6d368105f1e0b64f72c508"
+        },
+        "test_target_loader_rechecks_evidence_and_rejects_field_drift": {
+          "before": null,
+          "after": "de0062c7cb5216d5c5d78581219d99be3da0a821b9f31b7f93d0339d543c3caf"
+        },
+        "test_target_rejects_unverified_value_evidence_producer_and_horizon": {
+          "before": null,
+          "after": "cd3065a35d06d3b9861404837aad00378818d3529d52f15caab7aa42ef9972ab"
+        },
+        "test_terminal_boundary_cannot_be_reclassified": {
+          "before": null,
+          "after": "217c9884dd1dff636565fe820d38ba5dca6b34a0bb6160f36c0f32c29692f609"
+        },
+        "test_terminal_labels_match_engine_scoring_from_both_perspectives": {
+          "before": null,
+          "after": "6f38a8a05ac5c82afa533d5160a77f1b587c4e506f1658e8d7dc66ec48ff0a37"
         }
       }
     }
@@ -397,9 +497,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -416,9 +516,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -435,9 +535,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -454,9 +554,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -473,9 +573,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -492,9 +592,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -511,9 +611,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -530,9 +630,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -549,9 +649,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -568,9 +668,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -587,9 +687,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -606,9 +706,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -625,9 +725,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -669,9 +769,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -713,9 +813,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -757,9 +857,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -801,9 +901,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -845,9 +945,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -889,9 +989,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -933,9 +1033,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -977,9 +1077,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -987,33 +1087,33 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -1024,33 +1124,29 @@
         "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
-    "src/warhammer40k_core/ai/training_transitions.py": {
+    "src/warhammer40k_core/ai/training_admission.py": {
       "category": "serialization_or_replay_work",
       "operations": [
-        "finite-accepted-transition-linkage"
+        "finite-episode-target-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     },
-    "tests/infrastructure/adapters/test_finite_candidates.py": {
+    "tests/infrastructure/adapters/test_training_admission.py": {
       "category": "rule_semantics",
       "operations": [
-        "player-policy-boundary",
-        "finite-training-candidate-linkage",
-        "named-training-targets",
-        "semantic-finite-observations",
-        "finite-accepted-transition-linkage"
+        "finite-episode-target-admission"
       ],
       "selected_families": [],
-      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
-      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
-      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
+      "rationale": "Add opt-in operator-only episode-origin, finite-chain, strict source and terminal-target admission; refresh required generated identities and test inventories only.",
+      "source_obligation": "A replay rooted in an arbitrary state and a target declaration are insufficient. Reproduce ordinary startup and prefix, join contiguous accepted records, require exact source/build/reward identity, verify actual engine terminal scoring, and exclude declared missing outcomes from learning.",
+      "unchanged_work": "Existing engine, adapter, runner, replay/persistence implementations, algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The new offline owner calls existing exact APIs on isolated sessions and has no existing measured baseline or detailed family. Serial current-runtime smoke, fresh postflight and all live controls remain mandatory. Full-game performance is unqualified."
     }
   },
   "milestone": "ordinary",
