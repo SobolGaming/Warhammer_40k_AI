@@ -34201,13 +34201,7 @@
         "_write_manifests",
         "duration_worksteal_order",
         "pytest_collection_modifyitems",
-        "summary_case_seconds",
-        "_check_current_partition_shares",
-        "_check_manifests",
-        "_current_partition_weights",
-        "_finite_scheduling_seconds",
-        "_partitioned_durations",
-        "_scaled_partition_weights"
+        "summary_case_seconds"
       ],
       "families": [],
       "sensitive": false,
@@ -35511,17 +35505,6 @@
     "deployment-candidate-ranking": {
       "paths": [
         "src/warhammer40k_core/ai/deployment_candidate_ranking.py"
-      ],
-      "owners": [
-        "*"
-      ],
-      "families": [],
-      "sensitive": false,
-      "mandatory": true
-    },
-    "ci-worker-timing-progress": {
-      "paths": [
-        "tests/timing_plugin.py"
       ],
       "owners": [
         "*"

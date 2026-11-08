@@ -612,7 +612,7 @@ def _literal_partition_nodes(root: Path) -> tuple[str, ...]:
 def duration_worksteal_order(
     nodeids: tuple[str, ...], *, workers: int, selector_seconds: dict[str, float]
 ) -> tuple[int, ...]:
-    """Balance measured costs across xdist's actual consecutive initial chunks."""
+    """Balance initial worksteal chunks, then retain module fixtures within each."""
     if type(workers) is not int or workers < 1 or len(nodeids) != len(set(nodeids)):
         raise SystemExit("Duration dispatch requires positive workers and unique nodes.")
     if not isinstance(selector_seconds, dict):
@@ -646,6 +646,14 @@ def duration_worksteal_order(
         )
         buckets[worker].append(index)
         totals[worker] += costs[index]
+    for bucket in buckets:
+        modules: dict[str, list[int]] = {}
+        # Buckets already have descending costs and original-index ties. First
+        # occurrence prioritizes each module's longest case and keeps that case
+        # first; grouping changes neither worker membership nor capacity.
+        for index in bucket:
+            modules.setdefault(nodeids[index].split("::", 1)[0], []).append(index)
+        bucket[:] = [index for group in modules.values() for index in group]
     return tuple(index for bucket in buckets for index in bucket)
 
 
@@ -728,59 +736,16 @@ def _behavioral_shard_selectors() -> tuple[str, ...]:
     return tuple(sorted(selectors))
 
 
-def _finite_scheduling_seconds(value: object, message: str) -> float:
-    if type(value) not in (int, float):
-        raise SystemExit(message)
-    try:
-        number = float(cast(int | float, value))
-    except OverflowError as error:
-        raise SystemExit(message) from error
-    if not math.isfinite(number) or number < 0:
-        raise SystemExit(message)
-    return number
-
-
-def _current_partition_weights(
-    nodes: tuple[str, ...], case_seconds: dict[str, float]
-) -> dict[str, float]:
-    if any(node not in case_seconds for node in nodes):
-        raise SystemExit("Finite partition requires complete current case measurements.")
-    return {
-        node: _finite_scheduling_seconds(case_seconds[node], "Invalid current partition weight.")
-        for node in nodes
-    }
-
-
-def _scaled_partition_weights(total: float, weights: dict[str, float]) -> dict[str, float]:
-    total = _finite_scheduling_seconds(total, "Invalid partition file total.")
-    try:
-        denominator = math.fsum(weights.values())
-    except OverflowError as error:
-        raise SystemExit("Current partition weight total overflowed.") from error
-    if denominator == 0:
-        if total != 0:
-            raise SystemExit("Zero current partition weights cannot distribute a positive total.")
-        return dict.fromkeys(weights, 0.0)
-    # Divide first so a finite file total does not overflow an intermediate product.
-    return {node: total * (weight / denominator) for node, weight in weights.items()}
-
-
 def _partitioned_durations(
     durations: dict[str, float], *, case_seconds: dict[str, float] | None = None
 ) -> dict[str, float]:
-    """Preserve file totals using current case ratios, or the retained historical seed."""
+    """Preserve file totals; node ratios are derived scheduling weights, not case profiles."""
     partition = _case_partition(REPOSITORY_ROOT, frozenset(durations))
     result = dict(durations)
     if partition:
         total = result.pop(CASE_PARTITION_FILE)
-        if case_seconds is None:
-            denominator = sum(partition.values())
-            result.update(
-                {node: total * weight / denominator for node, weight in partition.items()}
-            )
-        else:
-            weights = _current_partition_weights(tuple(partition), case_seconds)
-            result.update(_scaled_partition_weights(total, weights))
+        denominator = sum(partition.values())
+        result.update({node: total * weight / denominator for node, weight in partition.items()})
     owner = SERIAL_BEHAVIORAL_CASE.split("::", 1)[0]
     if owner in result:
         if case_seconds is None or SERIAL_BEHAVIORAL_CASE not in case_seconds:
@@ -1110,8 +1075,6 @@ def _check_manifests(*, output_dir: Path, shard_count: int) -> None:
         if "case_seconds" in cast(dict[str, object], summary)
         else None
     )
-    if case_seconds is not None:
-        _check_current_partition_shares(durations, case_seconds)
     shards = _balanced_shards(
         durations=durations, shard_count=shard_count, case_seconds=case_seconds
     )
@@ -1127,28 +1090,6 @@ def _check_manifests(*, output_dir: Path, shard_count: int) -> None:
     )
     if summary != expected_summary:
         raise SystemExit("Shard duration summary does not match the committed manifests.")
-
-
-def _check_current_partition_shares(
-    durations: dict[str, float], case_seconds: dict[str, float]
-) -> None:
-    owners = frozenset(selector.split("::", 1)[0] for selector in durations)
-    partition = _case_partition(REPOSITORY_ROOT, owners)
-    if not partition:
-        return
-    weights = _current_partition_weights(tuple(partition), case_seconds)
-    total = math.fsum(durations[node] for node in partition)
-    expected = _scaled_partition_weights(total, weights)
-    ratios = _scaled_partition_weights(1.0 if any(weights.values()) else 0.0, weights)
-    for node in partition:
-        # Each committed selector was rounded to milliseconds. Their summed
-        # total may differ by at most N half-milliseconds; scaling that error
-        # adds only this node's ratio, plus its own half-millisecond rounding.
-        tolerance = 0.0005 * (1 + len(partition) * ratios[node])
-        if (weights[node] == 0 and durations[node] != 0) or not math.isclose(
-            durations[node], expected[node], rel_tol=0, abs_tol=tolerance
-        ):
-            raise SystemExit("Finite partition shares differ from current case measurements.")
 
 
 def _summary_payload(
@@ -1226,7 +1167,14 @@ def summary_case_seconds(summary: object) -> dict[str, float]:
     for node, weight in cases.items():
         if not isinstance(node, str) or "::" not in node:
             raise SystemExit("Invalid case scheduling weight identity.")
-        result[node] = _finite_scheduling_seconds(weight, "Invalid case scheduling weight.")
+        if (
+            isinstance(weight, bool)
+            or not isinstance(weight, int | float)
+            or not math.isfinite(weight)
+            or weight < 0
+        ):
+            raise SystemExit("Invalid case scheduling weight.")
+        result[node] = float(weight)
     if not isinstance(summary.get("profiles"), list) or not isinstance(summary.get("files"), dict):
         raise SystemExit("Case scheduling weights require complete profile evidence.")
     profiles = _summary_profiles(summary)

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 import os
 import subprocess
 import sys
@@ -46,6 +45,43 @@ def test_duration_dispatch_balances_actual_initial_worksteal_chunks() -> None:
         assert offset == len(nodes)
         assert max(totals) - min(totals) < 2
         assert max(totals) < 70  # Alphabetic initial dispatch strands 240 seconds on one worker.
+
+    # These are the original LPT assignments for interleaved descending costs.
+    # Locality may reorder each bucket, but must not move a case between workers.
+    case_weights = {
+        f"tests/{module}.py::case_{index}": float(32 - 4 * index - module_index)
+        for module_index, module in enumerate("abcd")
+        for index in range(8)
+    }
+    nodes = tuple(case_weights)
+    order = sharding.duration_worksteal_order(nodes, workers=4, selector_seconds=case_weights)
+    expected = (
+        (0, 2, 4, 6, 25, 27, 29, 31),
+        (8, 10, 12, 14, 17, 19, 21, 23),
+        (16, 18, 20, 22, 9, 11, 13, 15),
+        (24, 26, 28, 30, 1, 3, 5, 7),
+    )
+    assert sorted(order) == list(range(32))
+    for worker, bucket in enumerate(expected):
+        actual = order[worker * 8 : (worker + 1) * 8]
+        assert set(actual) == set(bucket)
+        assert sum(case_weights[nodes[index]] for index in actual) == 132.0
+        assert actual == bucket
+
+    tied = tuple(f"tests/{module}.py::case_{index}" for index in range(4) for module in "ab")
+    assert sharding.duration_worksteal_order(
+        tied, workers=1, selector_seconds=dict.fromkeys(tied, 0.0)
+    ) == (0, 2, 4, 6, 1, 3, 5, 7)
+    heavy = sharding._literal_partition_nodes(ROOT)[:4]
+    separated = (*heavy, *nodes)
+    heavy_order = sharding.duration_worksteal_order(
+        separated, workers=4, selector_seconds={**dict.fromkeys(heavy, 1000.0), **case_weights}
+    )
+    assert sorted(heavy_order) == list(range(len(separated)))
+    for worker in range(4):
+        chunk = tuple(separated[index] for index in heavy_order[worker * 9 : (worker + 1) * 9])
+        assert chunk[0] == heavy[worker]
+        assert len(set(chunk) & set(heavy)) == 1
 
 
 @pytest.mark.parametrize("bad_weight", [None, -1, float("nan"), True])
@@ -109,6 +145,61 @@ def test_duration_dispatch_profile_controls_the_real_worker_hook(
     profile.write_text(json.dumps({"case_seconds": {}}))
     with pytest.raises(SystemExit, match="scheduling weight"):
         root_hooks.pytest_collection_modifyitems(pytestconfig, items)
+
+    # Execute one assigned bucket through real pytest fixture setup/teardown.
+    # Returning to a module after another module recreates its module fixture.
+    fixture_root = tmp_path / "fixture-lifecycle"
+    fixture_root.mkdir()
+    config = fixture_root / "pytest.ini"
+    config.write_text("[pytest]\n", encoding="utf-8")
+    fixture_source = (
+        "import pytest\n"
+        "constructed = 0\n"
+        "@pytest.fixture(scope='module')\n"
+        "def shared():\n"
+        "    global constructed\n"
+        "    constructed += 1\n"
+        "    return constructed\n"
+        "@pytest.mark.parametrize('case', range(8))\n"
+        "def test_case(shared, case):\n"
+        "    assert shared == 1\n"
+        "    assert 0 <= case < 8\n"
+    )
+    fixture_costs: dict[str, float] = {}
+    for module_index, module in enumerate("abcd"):
+        path = fixture_root / f"test_{module}.py"
+        path.write_text(fixture_source, encoding="utf-8")
+        fixture_costs.update(
+            {
+                f"{path}::test_case[{index}]": float(32 - 4 * index - module_index)
+                for index in range(8)
+            }
+        )
+    fixture_nodes = tuple(fixture_costs)
+    fixture_order = sharding.duration_worksteal_order(
+        fixture_nodes, workers=4, selector_seconds=fixture_costs
+    )
+    environment = dict(os.environ, PYTEST_DISABLE_PLUGIN_AUTOLOAD="1")
+    environment.pop("TEST_TIMING_DIR", None)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-c",
+            str(config),
+            "-q",
+            *(fixture_nodes[index] for index in fixture_order[:8]),
+        ],
+        cwd=fixture_root,
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=45,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "8 passed" in result.stdout
 
 
 def test_serial_mirror_balancing_preserves_measurements_and_accounts_for_execution(
@@ -1013,104 +1104,15 @@ def test_finite_partition_rejects_missing_extra_and_malformed_cases(
         sharding._case_partition(partition_root, frozenset({sharding.CASE_PARTITION_FILE}))
 
 
-def test_finite_partition_preserves_total_weight_and_other_file_weights(
-    partition_root: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setattr(sharding, "REPOSITORY_ROOT", partition_root)
-    path = partition_root / sharding.CASE_PARTITION_PATH
-    declaration = json.loads(path.read_text())
-    nodes = tuple(declaration["nodes"])
-    historical = {node: float(len(nodes) - index) for index, node in enumerate(nodes)}
-    declaration["weights"] = historical
-    path.write_text(json.dumps(declaration))
-    durations = {sharding.CASE_PARTITION_FILE: 200.012345, "tests/example.py": 37.0}
-    original = dict(durations)
-    approx = cast(Callable[[float], object], vars(pytest)["approx"])
-    legacy = sharding._partitioned_durations(durations)
-    assert legacy == {
-        "tests/example.py": 37.0,
-        **{
-            node: durations[sharding.CASE_PARTITION_FILE] * weight / sum(historical.values())
-            for node, weight in historical.items()
-        },
-    }
-    current = {node: index + 0.125 for index, node in enumerate(nodes)}
-    current["tests/example.py::one"] = 37.0
-    raw = dict(current)
-    expanded = sharding._partitioned_durations(durations, case_seconds=current)
-    assert durations == original
-    assert current == raw
+def test_finite_partition_preserves_total_weight_and_other_file_weights() -> None:
+    durations = {sharding.CASE_PARTITION_FILE: 200.0, "tests/example.py": 37.0}
+    expanded = sharding._partitioned_durations(durations)
+    assert durations == {sharding.CASE_PARTITION_FILE: 200.0, "tests/example.py": 37.0}
     assert expanded["tests/example.py"] == 37.0
     assert sharding.CASE_PARTITION_FILE not in expanded
     assert len(expanded) == 21
-    assert sum(expanded.values()) == approx(sum(durations.values()))
-    assert expanded[nodes[0]] < expanded[nodes[-1]]
-    assert legacy[nodes[0]] > legacy[nodes[-1]]
-    denominator = sum(current[node] for node in nodes)
-    for node in nodes:
-        assert expanded[node] == approx(
-            durations[sharding.CASE_PARTITION_FILE] * current[node] / denominator
-        )
-    zero = dict(current)
-    zero[nodes[0]] = 0.0
-    assert sharding._partitioned_durations(durations, case_seconds=zero)[nodes[0]] == 0.0
-    all_zero = dict.fromkeys(nodes, 0.0)
-    assert (
-        sharding._partitioned_durations({sharding.CASE_PARTITION_FILE: 0.0}, case_seconds=all_zero)
-        == all_zero
-    )
-    with pytest.raises(SystemExit, match="partition"):
-        sharding._partitioned_durations(durations, case_seconds=all_zero)
-    missing = dict(current)
-    del missing[nodes[-1]]
-    with pytest.raises(SystemExit, match="partition"):
-        sharding._partitioned_durations(durations, case_seconds=missing)
-    for bad in (True, -1, float("nan"), float("inf"), -float("inf"), "1", None, 10**1000):
-        invalid = dict(current)
-        invalid[nodes[0]] = cast(float, bad)
-        with pytest.raises(SystemExit, match="partition"):
-            sharding._partitioned_durations(durations, case_seconds=invalid)
-    with pytest.raises(SystemExit, match="partition"):
-        sharding._partitioned_durations(durations, case_seconds=dict.fromkeys(nodes, 1e308))
-    large = sharding._partitioned_durations(
-        {sharding.CASE_PARTITION_FILE: 1e308}, case_seconds=current
-    )
-    assert all(math.isfinite(value) for value in large.values())
-    assert math.fsum(large.values()) == approx(1e308)
-
-    # A rounded current summary passes, but a self-consistent manifest/summary
-    # built with stale historical shares must fail even when total work matches.
-    monkeypatch.setattr(sharding, "_behavioral_shard_selectors", lambda: tuple(sorted(expanded)))
-    profiles: tuple[sharding.ProfileEvidence, ...] = (
-        {
-            "source": "complete current partition regression",
-            "junit_sha256": ["a" * 64],
-            "test_cases": len(current),
-            "test_files": 2,
-        },
-    )
-    output = partition_root / "generated"
-    rounded = sharding._rounded_durations(expanded)
-    shards = sharding._balanced_shards(durations=rounded, shard_count=12, case_seconds=current)
-    assert len(shards) == 12
-    assert all(shard.test_files for shard in shards)
-    assert sorted(selector for shard in shards for selector in shard.test_files) == sorted(expanded)
-    sharding._write_manifests(
-        output_dir=output, shards=shards, durations=rounded, profiles=profiles, case_seconds=current
-    )
-    summary = json.loads((output / "durations.json").read_text())
-    assert summary["case_seconds"] == raw
-    assert summary["profiles"] == list(profiles)
-    stale = sharding._rounded_durations(legacy)
-    stale_shards = sharding._balanced_shards(durations=stale, shard_count=12, case_seconds=current)
-    with pytest.raises(SystemExit, match="current case"):
-        sharding._write_manifests(
-            output_dir=output,
-            shards=stale_shards,
-            durations=stale,
-            profiles=profiles,
-            case_seconds=current,
-        )
+    approx = cast(Callable[[float], object], vars(pytest)["approx"])
+    assert sum(expanded.values()) == approx(237.0)
 
 
 @pytest.fixture

@@ -6068,16 +6068,16 @@
     "assignment_wall_lower_bound_seconds": {
       "1": 245.282,
       "10": 245.282,
-      "11": 245.283,
-      "12": 245.284,
+      "11": 245.284,
+      "12": 255.279,
       "2": 245.282,
-      "3": 245.284,
-      "4": 255.279,
+      "3": 245.283,
+      "4": 245.283,
       "5": 245.283,
       "6": 245.283,
       "7": 245.284,
-      "8": 245.284,
-      "9": 245.282
+      "8": 245.283,
+      "9": 245.284
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6087,17 +6087,17 @@
     ],
     "shard_worker_seconds": {
       "1": 981.129,
-      "10": 981.129,
-      "11": 981.131,
-      "12": 981.135,
+      "10": 981.13,
+      "11": 981.134,
+      "12": 1021.116,
       "2": 981.13,
-      "3": 981.135,
-      "4": 1021.116,
-      "5": 981.132,
-      "6": 981.132,
+      "3": 981.133,
+      "4": 981.133,
+      "5": 981.131,
+      "6": 981.131,
       "7": 981.134,
-      "8": 981.134,
-      "9": 981.129
+      "8": 981.131,
+      "9": 981.134
     }
   },
   "files": {
@@ -6205,26 +6205,26 @@
     "tests/rules/rules03/unit/test_deployment.py": 3.175,
     "tests/rules/rules03/unit/test_setup.py": 0.11,
     "tests/rules/rules03/unit/test_unit_rule_effects.py": 0.018,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[duplicate-rapid-fire-player-a]": 145.501,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[duplicate-rapid-fire-player-b]": 151.947,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-characteristics-one-player-a]": 149.077,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-characteristics-one-player-b]": 135.258,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-characteristics-player-a]": 146.28,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-characteristics-player-b]": 144.459,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-one-player-a]": 144.366,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-one-player-b]": 152.41,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-player-a]": 148.856,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-player-b]": 142.732,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-characteristics-player-a]": 142.308,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-characteristics-player-b]": 155.68,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-save-with-inv-provider-player-a]": 142.316,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-save-with-inv-provider-player-b]": 152.686,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-zero-ap-save-roll-player-a]": 140.837,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-zero-ap-save-roll-player-b]": 140.147,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-one-player-a]": 143.885,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-one-player-b]": 147.523,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-player-a]": 147.934,
-    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-player-b]": 145.946,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[duplicate-rapid-fire-player-a]": 160.551,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[duplicate-rapid-fire-player-b]": 159.312,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-characteristics-one-player-a]": 154.788,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-characteristics-one-player-b]": 106.624,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-characteristics-player-a]": 139.059,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-characteristics-player-b]": 166.93,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-one-player-a]": 163.248,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-one-player-b]": 112.236,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-player-a]": 139.395,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-player-b]": 150.409,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-characteristics-player-a]": 158.844,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-characteristics-player-b]": 165.137,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-save-with-inv-provider-player-a]": 161.849,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-save-with-inv-provider-player-b]": 162.21,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-zero-ap-save-roll-player-a]": 111.946,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-zero-ap-save-roll-player-b]": 131.872,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-one-player-a]": 163.339,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-one-player-b]": 112.781,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-player-a]": 163.754,
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-player-b]": 135.864,
     "tests/rules/rules07/unit/test_lifecycle.py": 0.295,
     "tests/rules/rules18/unit/test_tactical_setup_proof.py": 0.283,
     "tests/rules/rules24/unit/test_facade_evidence.py": 410.491,
@@ -6540,7 +6540,7 @@
     {
       "duration_seconds": 981.129,
       "shard_id": 1,
-      "test_file_count": 39
+      "test_file_count": 40
     },
     {
       "duration_seconds": 981.13,
@@ -6548,22 +6548,22 @@
       "test_file_count": 36
     },
     {
-      "duration_seconds": 486.468,
+      "duration_seconds": 486.466,
       "shard_id": 3,
       "test_file_count": 36
     },
     {
-      "duration_seconds": 1021.116,
+      "duration_seconds": 981.133,
       "shard_id": 4,
-      "test_file_count": 1
+      "test_file_count": 38
     },
     {
-      "duration_seconds": 981.132,
+      "duration_seconds": 981.131,
       "shard_id": 5,
       "test_file_count": 38
     },
     {
-      "duration_seconds": 981.132,
+      "duration_seconds": 981.131,
       "shard_id": 6,
       "test_file_count": 38
     },
@@ -6573,29 +6573,29 @@
       "test_file_count": 39
     },
     {
-      "duration_seconds": 981.134,
+      "duration_seconds": 981.131,
       "shard_id": 8,
       "test_file_count": 39
     },
     {
-      "duration_seconds": 981.129,
+      "duration_seconds": 981.134,
       "shard_id": 9,
-      "test_file_count": 38
+      "test_file_count": 39
     },
     {
-      "duration_seconds": 981.129,
+      "duration_seconds": 981.13,
       "shard_id": 10,
       "test_file_count": 39
     },
     {
-      "duration_seconds": 981.131,
+      "duration_seconds": 981.134,
       "shard_id": 11,
       "test_file_count": 39
     },
     {
-      "duration_seconds": 981.135,
+      "duration_seconds": 1021.116,
       "shard_id": 12,
-      "test_file_count": 40
+      "test_file_count": 1
     }
   ],
   "strategy": "largest-processing-time-by-derived-selector-weight",

@@ -2,145 +2,145 @@
   "policy": "rules-engine-performance-v3",
   "base": "b20ef88d2ef5ab87500ccc1f13d61aeb7c29f59b",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b5aa998fb3e387e794b2f1482ae12cad55f68059461a88617fdb9b5bf40fe96f",
-  "operation_map_sha256": "580ad86719324ddc96a96bd28a5169c9ef349724353c2fea2f8d809b3cc53577",
+  "operation_map_sha256": "609ab19b1a15b2d1560c81f7c484482b06d547c426c2b690a5b78f92e20fcc9b",
   "changes": {
     "README.md": {
       "before_sha256": "8dfbe7f6072c9ea7892bf03031310a8fbd934ff70c0c1228078ae73e3cd8d2b2",
-      "after_sha256": "f685da8256d150c92785ae57dd95ffda5e35f1fb368795755884aa5fc7f1e8d9",
+      "after_sha256": "a341c31eb1bc425edb92824001889119ef4bc31b56bfb46190504f5fc84b4c4e",
       "owners": {
         "@document": {
           "before": "8dfbe7f6072c9ea7892bf03031310a8fbd934ff70c0c1228078ae73e3cd8d2b2",
-          "after": "f685da8256d150c92785ae57dd95ffda5e35f1fb368795755884aa5fc7f1e8d9"
+          "after": "a341c31eb1bc425edb92824001889119ef4bc31b56bfb46190504f5fc84b4c4e"
         }
       }
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "23f14e7d0459328eb61c9d5a0bb25bfc3a73e3de1cd442925926ee954ba98f39",
-      "after_sha256": "7524804ef354b15c4f11b65858b0ff7e9bf43f933cd9a07d59338b286e485812",
+      "after_sha256": "a8f3993ca3e0e5d67f68f99fff2926904b7887901a9db49bb5dbae57c07a63c6",
       "owners": {
         "@document": {
           "before": "23f14e7d0459328eb61c9d5a0bb25bfc3a73e3de1cd442925926ee954ba98f39",
-          "after": "7524804ef354b15c4f11b65858b0ff7e9bf43f933cd9a07d59338b286e485812"
+          "after": "a8f3993ca3e0e5d67f68f99fff2926904b7887901a9db49bb5dbae57c07a63c6"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "dc0bf792a278a699a6b01ea01e066240be323c65f5fc0dbda213812027a8989b",
-      "after_sha256": "02b714944743ec046850ac63b6e4cb318fbc12d177aad0c9cb3b33892eb4ed92",
+      "after_sha256": "22fc21e0a63211b097de09f65ace21776e3f862a2442e41ef351a319df7f3e8f",
       "owners": {
         "@document": {
           "before": "dc0bf792a278a699a6b01ea01e066240be323c65f5fc0dbda213812027a8989b",
-          "after": "02b714944743ec046850ac63b6e4cb318fbc12d177aad0c9cb3b33892eb4ed92"
+          "after": "22fc21e0a63211b097de09f65ace21776e3f862a2442e41ef351a319df7f3e8f"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "3422bf622448ba714e29da669b0efaf55a3131480b212746dcfa8867a6c1cfd7",
-      "after_sha256": "fc006f1a35b569eccbc5a424a6a6e543a92ed2da599505a60fe0f0aa80fb1cfd",
+      "after_sha256": "c259344f32c10b50142ffbd6fc28a80280e8c9e2f13a0fdd247853236c28a3b1",
       "owners": {
         "@document": {
           "before": "3422bf622448ba714e29da669b0efaf55a3131480b212746dcfa8867a6c1cfd7",
-          "after": "fc006f1a35b569eccbc5a424a6a6e543a92ed2da599505a60fe0f0aa80fb1cfd"
+          "after": "c259344f32c10b50142ffbd6fc28a80280e8c9e2f13a0fdd247853236c28a3b1"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "fca4cf55436d1e4561864cebcbb26d893458caa979530312692651506589c987",
-      "after_sha256": "16ad3490e85441e9413ddd5343a6aa0009bbacef17be214336572f18bd18a018",
+      "after_sha256": "0128e335b1b8ee9106051a094692ddddf458c00434e4417700273c45ad80585b",
       "owners": {
         "@document": {
           "before": "fca4cf55436d1e4561864cebcbb26d893458caa979530312692651506589c987",
-          "after": "16ad3490e85441e9413ddd5343a6aa0009bbacef17be214336572f18bd18a018"
+          "after": "0128e335b1b8ee9106051a094692ddddf458c00434e4417700273c45ad80585b"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "da4fe3dab6e38c6977c84f5cce84e4891d2ef8096db8bfc517df692382594c19",
-      "after_sha256": "b464bc4db5cf616116b54588bd03d07b8ceaef1cf3d36c5272616600768dd15b",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
       "owners": {
         "@document": {
           "before": "da4fe3dab6e38c6977c84f5cce84e4891d2ef8096db8bfc517df692382594c19",
-          "after": "b464bc4db5cf616116b54588bd03d07b8ceaef1cf3d36c5272616600768dd15b"
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "81bb6045eede3fc0cafcd76d8d4b0f1c6fb8b9e1c565689e4e00022ef9b9a3f7",
-      "after_sha256": "7f3ef94c254c8e21f28d42f8d32a0d395bf9913d4f5866074b003aab73209112",
+      "after_sha256": "d69b988abd9ba8abeae53c5a02d0ce911d337198d793a2bd530d0471942bc01c",
       "owners": {
         "@document": {
           "before": "81bb6045eede3fc0cafcd76d8d4b0f1c6fb8b9e1c565689e4e00022ef9b9a3f7",
-          "after": "7f3ef94c254c8e21f28d42f8d32a0d395bf9913d4f5866074b003aab73209112"
+          "after": "d69b988abd9ba8abeae53c5a02d0ce911d337198d793a2bd530d0471942bc01c"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "1174df5684308a4f56c8c85e265bd60d6168e8a2032aae37f2d6804088e63874",
-      "after_sha256": "d6d5c31a6ede2072d88d46c9a74b38a9a420377fecd0f40388c4e3dd626b80f2",
+      "after_sha256": "85f4173c6adb845693e20959795c94df67091ee7a5021c606ee0402a61dacb8b",
       "owners": {
         "@document": {
           "before": "1174df5684308a4f56c8c85e265bd60d6168e8a2032aae37f2d6804088e63874",
-          "after": "d6d5c31a6ede2072d88d46c9a74b38a9a420377fecd0f40388c4e3dd626b80f2"
+          "after": "85f4173c6adb845693e20959795c94df67091ee7a5021c606ee0402a61dacb8b"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "b5c8f54d4633e61088c0975297559ade271065052b0de45bae047b685472abcd",
-      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "dc17b0d48d683da7bd35cc3426ce0191b0f5dec455261056e68d6e9fd42a8921",
       "owners": {
         "@document": {
           "before": "b5c8f54d4633e61088c0975297559ade271065052b0de45bae047b685472abcd",
-          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
+          "after": "dc17b0d48d683da7bd35cc3426ce0191b0f5dec455261056e68d6e9fd42a8921"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "fec34e9ba21471c536ad6a0796f89bbf157685e78e158daf3a274f047e2e260c",
-      "after_sha256": "2fc92f9565605082669b9b127d6fcd1b129875afcf9ca91eab87d4351b05079a",
+      "after_sha256": "58567bfa1e07decde80fab91a980a1555cf4222af9f3211f998c7c43829cb54d",
       "owners": {
         "@document": {
           "before": "fec34e9ba21471c536ad6a0796f89bbf157685e78e158daf3a274f047e2e260c",
-          "after": "2fc92f9565605082669b9b127d6fcd1b129875afcf9ca91eab87d4351b05079a"
+          "after": "58567bfa1e07decde80fab91a980a1555cf4222af9f3211f998c7c43829cb54d"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "b7c0be8c4eea2c6a2c00fe2bafd107c8c0b7b0cbf6bb21fe36884e61296c5edf",
-      "after_sha256": "88c6f61c1ea99c04802eaadeca4a8ca94e16093186f490c974d1e1b2c5ef4825",
+      "after_sha256": "fca6f8d79c34d1c9fbb3d40780d6e8322f6008383864ada3a468458581b2cf05",
       "owners": {
         "@document": {
           "before": "b7c0be8c4eea2c6a2c00fe2bafd107c8c0b7b0cbf6bb21fe36884e61296c5edf",
-          "after": "88c6f61c1ea99c04802eaadeca4a8ca94e16093186f490c974d1e1b2c5ef4825"
+          "after": "fca6f8d79c34d1c9fbb3d40780d6e8322f6008383864ada3a468458581b2cf05"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "58f8a7ea2fe5f84d57fe60c1a77a0ca884435eb0b0ef96bd63e49abc051e317f",
-      "after_sha256": "6c551dbf837d15e3ed7cf2b8e777bb88222da59c389d6abb03c9f65ac4642f7f",
+      "after_sha256": "5f48795e320fea2e9fcb9bbcad7b88463570d30e5f6e5c4b34bfdabb8441c02f",
       "owners": {
         "@document": {
           "before": "58f8a7ea2fe5f84d57fe60c1a77a0ca884435eb0b0ef96bd63e49abc051e317f",
-          "after": "6c551dbf837d15e3ed7cf2b8e777bb88222da59c389d6abb03c9f65ac4642f7f"
+          "after": "5f48795e320fea2e9fcb9bbcad7b88463570d30e5f6e5c4b34bfdabb8441c02f"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "29abfa14c0106e409c9fb18f462bb928b2656e6b33622ca5e8cf50188e65379d",
+      "after_sha256": "3916137f6da388ed619f65d7f0c782dec7803a792159e823a5781aedd41e35c0",
       "owners": {
         "@document": {
           "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "29abfa14c0106e409c9fb18f462bb928b2656e6b33622ca5e8cf50188e65379d"
+          "after": "3916137f6da388ed619f65d7f0c782dec7803a792159e823a5781aedd41e35c0"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "c52e85cf8291ce3dc783c1809863bc488f906346dfa304836bfade0117961f45",
-      "after_sha256": "ebe275195f8e5c5bf569f1dcfffe65c040e608bc9c963b9bde06d0d3df61c71e",
+      "after_sha256": "75ccbf42a4e42b7e7da91b350dced5a1d47c962f8f0f589d54b4c7183ada647a",
       "owners": {
         "@document": {
           "before": "c52e85cf8291ce3dc783c1809863bc488f906346dfa304836bfade0117961f45",
-          "after": "ebe275195f8e5c5bf569f1dcfffe65c040e608bc9c963b9bde06d0d3df61c71e"
+          "after": "75ccbf42a4e42b7e7da91b350dced5a1d47c962f8f0f589d54b4c7183ada647a"
         }
       }
     },
@@ -266,45 +266,21 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "65afa253eb9c8cadfba6430a609c16530aea915db0604c65c5a65a567f4a703b",
-      "after_sha256": "f88455c8395f814b64f36b6a0af92fec32827f9c7183729130c346f2fde204a8",
+      "after_sha256": "6939ce5c3065e031e7317bef457c3a68d63e7ede48c585054098f28785ef569d",
       "owners": {
         "@document": {
           "before": "65afa253eb9c8cadfba6430a609c16530aea915db0604c65c5a65a567f4a703b",
-          "after": "f88455c8395f814b64f36b6a0af92fec32827f9c7183729130c346f2fde204a8"
+          "after": "6939ce5c3065e031e7317bef457c3a68d63e7ede48c585054098f28785ef569d"
         }
       }
     },
     "scripts/build_test_shards.py": {
       "before_sha256": "e7d1f5ff29bf5c43675461f3dcbe85baad4f69692b6679ff0deb28bbd3946169",
-      "after_sha256": "c9aafd770a0ba1aef22bdc8dc5564521f6452b635e39010439911c915df73f83",
+      "after_sha256": "f56450d628e4a79cce2d2cb1b86e6ff76b81e7303e979a42464d7360ef09d47b",
       "owners": {
-        "_check_current_partition_shares": {
-          "before": null,
-          "after": "c2718500b8e39d14624b3e7f5e7c405fb4a3346061839bfc7134a8ce7df1efa1"
-        },
-        "_check_manifests": {
-          "before": "168e9490868e82c9af2d6190f61dab30fc1f7860fe72185a258d9f10eb589b1c",
-          "after": "9b6b3d84a76934f58751bf87b98c345724cfc39c36d75b1c49e7b3233523d7ac"
-        },
-        "_current_partition_weights": {
-          "before": null,
-          "after": "5d870a2b875e79a3771d667cd71082bc670ed321f1f740a44c85fc7cb213dda9"
-        },
-        "_finite_scheduling_seconds": {
-          "before": null,
-          "after": "ef4e39bbecca1bc401e81cd860576202a0b91f242ee852f01cefca15736748a7"
-        },
-        "_partitioned_durations": {
-          "before": "89fa0ab9931f5350dd233546b6e3f3ed7033dde3423fcfef1b4663d61462f5e7",
-          "after": "6d1d573a71c8a5809bb39d8904757ff2b040a9fc421e40d5e2dc037108032216"
-        },
-        "_scaled_partition_weights": {
-          "before": null,
-          "after": "b9915fcf93d28f2e44c658dbb47dc28def1c1ab132f3feec3ace2b18e8b11e78"
-        },
-        "summary_case_seconds": {
-          "before": "1ebdd7834ede7c505a32cf65ebe0806017fcb09928c742d3b03cd95194f1e134",
-          "after": "b88adfb81ff9a863c959b70ccc18c9567b4924c309227f68f0213890ac40e7a4"
+        "duration_worksteal_order": {
+          "before": "b693fd1492b3a419a387e6eda1eeffbf47eac78e4c949581c9d06b65b9f44aff",
+          "after": "e3bfbb628bcaad3d38635995462c39933595c835d7066c6cafdf091c26581665"
         }
       }
     },
@@ -378,15 +354,15 @@
     },
     "tests/code_quality/test_ci_performance_gates.py": {
       "before_sha256": "f57f5c7163552d715af35f05efbf027333a66cf2abe467b902b5d95b16e1f9c5",
-      "after_sha256": "767ba00fb3c1a48e30513b0bf3582aeca7f245adb7ea8fbc2ebd8118fdfbbe4f",
+      "after_sha256": "8e2ebfd97c575c06b86a0a668a8bce6d082eb4c626d09c3152c404e1162c37cd",
       "owners": {
-        "@module": {
-          "before": "452dd03a7e7032f7fd81a730aa98ab7cbb63e130e0d6886c47228fc520d1e4e2",
-          "after": "46e7bb7d532989d9ffbfb4084bbfce80a2d794a7b3ee7c9764fe2aa777513f18"
+        "test_duration_dispatch_balances_actual_initial_worksteal_chunks": {
+          "before": "8f44a1c260eb4307087c12e459ab6f8d9e589635967defade89c354788e4b463",
+          "after": "2f7b87deeb8bdb8235af94a29f106bc6c778799f690bea2f7a4ac705616af3d3"
         },
-        "test_finite_partition_preserves_total_weight_and_other_file_weights": {
-          "before": "ec5f9b824d1d5b4ff96ae2ae800cc3baa12a436aadf05cc375a7bb89a6bc5ce7",
-          "after": "45f8aa155c373f0a61b8bc1ad82eb53848a34b6b149a5f1d932768fef34e9c75"
+        "test_duration_dispatch_profile_controls_the_real_worker_hook": {
+          "before": "332a6832254803bd4a0887a796e8b7ad53d0c29a3d956ca13cd7a59018086134",
+          "after": "fbbfe85b08bfead95805be29b11ca671ed84c1743a3755d85a313e06d32bd3ef"
         }
       }
     },
@@ -454,53 +430,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "e55080c29061047c6578383b6f707c1ed01767e0a26d076de1478a626a510307",
-      "after_sha256": "5851c3c92c9f2cbfec7346d293c944398708e6ef71278747ce51839e0e6ba215",
+      "after_sha256": "703d938c75fc75e27b50632b2e5070c0944cde2fd0a2fddb9a7e225eea99fe3c",
       "owners": {
         "@document": {
           "before": "e55080c29061047c6578383b6f707c1ed01767e0a26d076de1478a626a510307",
-          "after": "5851c3c92c9f2cbfec7346d293c944398708e6ef71278747ce51839e0e6ba215"
-        }
-      }
-    },
-    "tests/timing_plugin.py": {
-      "before_sha256": "69387b39047c641ea0a4f96eb29a56b834242d1c2cd34a5fa7797e0c01ec4d59",
-      "after_sha256": "a856dc037c43a738968ba9e266d775183fdecaf3aa64faa1c618a38c00152346",
-      "owners": {
-        "@module": {
-          "before": "b61ba653b3fd47c6bb3fa7e1ce09b92f22d8965c99c18e5d267714610bdb72e2",
-          "after": "25f2c62dfd830c61b8025720891ddeba208ee63af479f525a5d135938c55d6bd"
-        },
-        "_append_progress": {
-          "before": null,
-          "after": "bb18a2e66d2a0a109b77488925ad9f17b8adf0293556fe8dd8119510ab166d39"
-        },
-        "_optional_linux_text": {
-          "before": null,
-          "after": "4e8f524934917a3ea142bb3db0e191bca5e1a345f61f030eb8fd475c7f129f28"
-        },
-        "_resource_snapshot": {
-          "before": null,
-          "after": "d942347fbbd0681aa1a67c3604468f1b7c6c0cb953137a8d732ad2893105b006"
-        },
-        "pytest_collection_finish": {
-          "before": "a6055096fc4e231d5de00b6f12e3526d2dea8d4ec49e37da860bf59f7980bd29",
-          "after": "d0013d9b9af0addc8f4a93bf69118dfe69938a60cd10e7b5ec27b3e05242f8b5"
-        },
-        "pytest_runtest_logreport": {
-          "before": "f4c1fe74791d519d658b5319b2063a6edf3748bd41ed5f9f044f82637b111d14",
-          "after": "9e700b145386477d74549633a38bad4dedb71edfbefa157c6712fc09d780ccf3"
-        },
-        "pytest_runtest_logstart": {
-          "before": null,
-          "after": "bb816bfef591f6e4a520c143d61afa6402f8f1428880f4ab8a01b450157cbca4"
-        },
-        "pytest_sessionfinish": {
-          "before": "3a643a6311d12f664254ec287128d928185a0a8f92e34e39040539ff19098f1c",
-          "after": "a57a2d2e115e42896e1c4bba9c554f0bf77a9f03b0dad24b2a897b054d62a4b7"
-        },
-        "pytest_sessionstart": {
-          "before": "3ac1d2ab651f64a20a0a71cd13e117bee10aa8c96adb0cfed7fde79755711080",
-          "after": "7c2cb2b110be28476aab3ba8d80b8b24de6c00adf6b3ad8d3c2e73d0e2b315b7"
+          "after": "703d938c75fc75e27b50632b2e5070c0944cde2fd0a2fddb9a7e225eea99fe3c"
         }
       }
     }
@@ -510,9 +444,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -529,9 +463,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -548,9 +482,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -567,9 +501,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -586,9 +520,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -605,9 +539,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -624,9 +558,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -643,9 +577,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -662,9 +596,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -681,9 +615,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -700,9 +634,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -719,9 +653,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -738,9 +672,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -757,9 +691,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -801,9 +735,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -845,9 +779,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -889,9 +823,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -933,9 +867,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -977,9 +911,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -1021,9 +955,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -1065,9 +999,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -1109,9 +1043,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -1119,52 +1053,51 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "scripts/build_test_shards.py": {
-      "category": "rule_semantics",
+      "category": "algorithm_or_search",
       "operations": [
-        "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f",
         "behavioral-worksteal-dispatch"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -1175,9 +1108,9 @@
         "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "src/warhammer40k_core/ai/deployment_candidate_ranking.py": {
       "category": "algorithm_or_search",
@@ -1185,19 +1118,19 @@
         "deployment-candidate-ranking"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "tests/code_quality/test_ci_performance_gates.py": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
-        "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453"
+        "behavioral-worksteal-dispatch-tests"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "tests/infrastructure/adapters/test_deployment_candidates.py": {
       "category": "measured_workload",
@@ -1205,9 +1138,9 @@
         "deployment-bounded-candidates"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
-      "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -1215,19 +1148,9 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Refresh the live README byte authentication after the intentional CI measurement guidance change.",
+      "rationale": "Refresh the live README byte authentication after documenting worker-local fixture reuse.",
       "source_obligation": "Authenticate the maintained current README while retaining all historical governance hashes, source clauses, semantic assertions and qualifications.",
       "unchanged_work": "Only authenticated_inputs.README.md changes. No engine, runtime identity, source content, test body, requirement, historical input, case inventory, coverage or timing limit changes."
-    },
-    "tests/timing_plugin.py": {
-      "category": "measured_workload",
-      "operations": [
-        "ci-worker-timing-progress"
-      ],
-      "selected_families": [],
-      "rationale": "Append opt-in per-process timing progress before session finish so CI timeout diagnosis retains actual execution evidence.",
-      "source_obligation": "Keep diagnostic records separate from the existing final timing receipt; preserve selection, order, test bodies, outcomes, coverage and every timeout.",
-      "unchanged_work": "Observation-only test tooling adds no engine, ranking, rule-source content, runtime identity, scheduler, profile weight or workload change. No timing cure or speedup is claimed. Existing legacy timing JSON remains unchanged."
     }
   },
   "milestone": "ordinary",

@@ -331,17 +331,12 @@ That later run failed; it is not a passing profile. Its 277 failed or unreported
 cases retained authentic older measurements. The exact derivation and timing hashes
 are recorded in `ci/test_shards/case-partitions.json` under `evidence.weight_refresh`.
 
-That partition file remains the historical seed and exact twenty-node declaration.
-When complete current JUnit case timings are supplied, S25 selector shares use those
-current case ratios, normalized to preserve the unrounded measured file total.
-Raw `case_seconds` and complete-profile hashes/provenance remain unchanged. Zero
-measurements receive zero weight; an all-zero case profile cannot distribute a
-positive file total. Missing, boolean, negative, nonfinite and overflowing current
-weights fail explicitly. Only callers without current case data use the historical
-ratios. `--check` also checks current S25 selector shares against current case data,
-allowing only the accumulated three-decimal rounding error in stored selector totals.
-This corrects assignment inputs; it does not certify that hosted runs meet the
-fourteen-minute goal.
+Within each worker's initial duration-balanced bucket, cases from the same module
+run together so pytest can reuse module-scoped fixtures. Worker assignments and
+capacities remain unchanged. Modules start in descending order of their longest
+case, with descending case costs inside each module and original collection order
+breaking ties. Later work stealing can still split a module group. This scheduling
+change preserves every case and does not certify the fourteen-minute CI goal.
 
 Session startup, source-index setup, reporting and runner queues are assessed
 separately. Weight totals are planning inputs, not job wall times or proof of the
