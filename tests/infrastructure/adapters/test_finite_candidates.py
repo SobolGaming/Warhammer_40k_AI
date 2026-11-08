@@ -24,6 +24,16 @@ from warhammer40k_core.ai.policy_contracts import (
     TrainingFeatureSourceKind,
     TrainingRow,
 )
+from warhammer40k_core.ai.semantic_features import (
+    FINITE_FEATURE_REGISTRY,
+    FeatureInformationScope,
+    FeatureUnit,
+    FiniteTrainingObservation,
+    SemanticFeatureDefinition,
+    SemanticFeatureError,
+    SemanticFeatureValue,
+    SemanticObservation,
+)
 from warhammer40k_core.ai.training_candidates import (
     FiniteTrainingCandidateLink,
     TrainingCandidateLinkError,
@@ -678,3 +688,177 @@ def test_named_target_direct_construction_requires_typed_entries() -> None:
     del payload["meaning"]
     with pytest.raises(TrainingTargetError, match="missing or unknown"):
         NamedTrainingTarget.from_payload(payload)
+
+
+# Semantic inputs are a closed numeric surface; identity/provenance stays in joins.
+@pytest.mark.parametrize("position", [0, -1])
+def test_semantic_observation_round_trip_preserves_legacy_row_and_engine(position: int) -> None:
+    session, context, row = _training_fixture(position)
+    original = row.to_payload()
+    state = session.to_persistence_payload()
+    link = FiniteTrainingCandidateLink.from_row(row, context=context)
+    semantic = FiniteTrainingObservation.from_link(link, row=row, context=context)
+    observation = semantic.observation
+    assert observation.model_inputs == (len(context.request["options"]),)
+    assert observation.features[0].definition == FINITE_FEATURE_REGISTRY[0]
+    assert observation.features[0].definition.unit is FeatureUnit.COUNT
+    assert observation.features[0].definition.dimensions == ()
+    assert (
+        observation.features[0].definition.information_scope is FeatureInformationScope.ACTOR_VIEW
+    )
+    payload = json.loads(canonical_json(semantic.to_payload()))
+    assert (
+        FiniteTrainingObservation.from_payload(payload, link=link, row=row, context=context)
+        == semantic
+    )
+    assert semantic.content_hash == payload_digest(semantic.to_payload())
+    payload["observation"]["features"][0]["value"] = 0
+    assert observation.model_inputs == (len(context.request["options"]),)
+    assert row.to_payload() == original
+    assert session.to_persistence_payload() == state
+    assert TrainingRow.from_payload(original).schema_version == TRAINING_ROW_SCHEMA_VERSION
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("feature_id", "unit_id"),
+        ("feature_id", "new-required-operator"),
+        ("source_kind", "board_state"),
+        ("value_kind", "string"),
+        ("unit", "inches"),
+        ("dimensions", [1]),
+        ("dimensions", None),
+        ("information_scope", "omniscient"),
+        ("vocabulary_version", "arbitrary-names"),
+        ("extra", "private_rng_seed"),
+    ],
+)
+def test_semantic_feature_rejects_definition_drift(field: str, value: object) -> None:
+    payload: dict[str, object] = dict(FINITE_FEATURE_REGISTRY[0].to_payload())
+    payload[field] = value
+    with pytest.raises(SemanticFeatureError):
+        SemanticFeatureDefinition.from_payload(payload)
+
+
+@pytest.mark.parametrize("value", [True, 1.0, -1, float("nan"), float("inf"), "opaque-id", {}, []])
+def test_semantic_count_rejects_wrong_type_or_range(value: object) -> None:
+    with pytest.raises(SemanticFeatureError):
+        SemanticFeatureValue(FINITE_FEATURE_REGISTRY[0], cast(int, value))
+
+
+@pytest.mark.parametrize(
+    "field",
+    ["schema_version", "registry_version", "actor_id", "request_id", "observation_hash", "extra"],
+)
+def test_semantic_observation_rejects_shape_version_and_binding_drift(field: str) -> None:
+    _, context = _finite_context()
+    payload: dict[str, object] = dict(SemanticObservation.from_context(context).to_payload())
+    payload[field] = "drift"
+    with pytest.raises(SemanticFeatureError):
+        SemanticObservation.from_payload(payload, context=context)
+
+
+@pytest.mark.parametrize("change", ["empty", "duplicate", "value", "unknown", "missing-definition"])
+def test_semantic_observation_rejects_feature_drift(change: str) -> None:
+    _, context = _finite_context()
+    payload = SemanticObservation.from_context(context).to_payload()
+    if change == "empty":
+        payload["features"] = []
+    elif change == "duplicate":
+        payload["features"].append(payload["features"][0])
+    elif change == "value":
+        payload["features"][0]["value"] += 1
+    elif change == "unknown":
+        payload["features"][0]["definition"]["feature_id"] = "faction-name"
+    else:
+        del cast(dict[str, object], payload["features"][0])["definition"]
+    with pytest.raises(SemanticFeatureError):
+        SemanticObservation.from_payload(payload, context=context)
+
+
+@pytest.mark.parametrize("change", ["feature-id", "source", "value", "descriptors", "extra"])
+def test_semantic_training_join_rejects_inconsistent_legacy_inputs(change: str) -> None:
+    _, context, row = _training_fixture()
+    feature = row.input_features[0]
+    if change == "feature-id":
+        feature = replace(feature, feature_id="opaque-token")
+    elif change == "source":
+        feature = replace(feature, source_kind=TrainingFeatureSourceKind.BOARD_STATE)
+    elif change == "value":
+        feature = replace(feature, value=cast(int, feature.value) + 1)
+    elif change == "descriptors":
+        feature = replace(feature, source_descriptor_ids=("private-source",))
+    features: tuple[TrainingFeature, ...] = () if change == "empty" else (feature,)
+    if change == "extra":
+        features += (replace(feature, feature_id="display-name"),)
+    drifted = replace(row, input_features=features)
+    link = FiniteTrainingCandidateLink.from_row(drifted, context=context)
+    with pytest.raises(SemanticFeatureError):
+        FiniteTrainingObservation.from_link(link, row=drifted, context=context)
+
+
+@pytest.mark.parametrize("field", ["schema_version", "training_candidate_link_hash", "extra"])
+def test_semantic_training_loader_rejects_link_drift(field: str) -> None:
+    _, context, row = _training_fixture()
+    link = FiniteTrainingCandidateLink.from_row(row, context=context)
+    semantic = FiniteTrainingObservation.from_link(link, row=row, context=context)
+    payload: dict[str, object] = dict(semantic.to_payload())
+    payload[field] = "0" * 64
+    with pytest.raises(SemanticFeatureError):
+        FiniteTrainingObservation.from_payload(payload, link=link, row=row, context=context)
+
+
+def test_semantic_inputs_ignore_opaque_option_ids_labels_and_choice_seed() -> None:
+    _, context = _finite_context()
+    original = SemanticObservation.from_context(context)
+    view = context.observation
+    request = view["pending_decision"]
+    assert request is not None
+    request["request_id"] = "different-request"
+    for index, option in enumerate(request["options"]):
+        option["option_id"] = f"opaque-{index}"
+        option["label"] = f"new display name {index}"
+        option["payload"] = {"unit_id": f"arbitrary-{index}"}
+    changed = SemanticObservation.from_context(
+        PlayerDecisionContext.from_view(view, choice_seed=99)
+    )
+    assert original.model_inputs == changed.model_inputs
+    assert original.observation_hash != changed.observation_hash
+    assert original.to_payload() != changed.to_payload()
+
+
+def test_semantic_inputs_ignore_hidden_opponent_selection_and_future_rng() -> None:
+    observations: list[SemanticObservation] = []
+    for index, selected in enumerate(
+        ("fixed:assassination:bring_it_down", "fixed:assassination:cleanse")
+    ):
+        config = replace(
+            canonical_setup_prebattle_smoke_config(), private_rng_seed=f"{index + 11:064x}"
+        )
+        session = LocalGameSession()
+        session.start(config)
+        session.advance_until_decision_or_terminal()
+        context = PlayerDecisionContext.from_view(
+            session.view(viewer_player_id="player-a"), choice_seed=7
+        )
+        session.submit_viewer_option(
+            viewer=ViewerContext.for_player("player-a"),
+            request_id=context.request["request_id"],
+            option_id=selected,
+            result_id="hidden-selection",
+        )
+        session.advance_until_decision_or_terminal()
+        other = PlayerDecisionContext.from_view(
+            session.view(viewer_player_id="player-b"), choice_seed=9
+        )
+        observations.append(SemanticObservation.from_context(other))
+    assert observations[0] == observations[1]
+
+
+@pytest.mark.parametrize("bad", [[], ("bad",)])
+def test_semantic_observation_requires_immutable_typed_features(bad: object) -> None:
+    _, context = _finite_context()
+    original = SemanticObservation.from_context(context)
+    with pytest.raises(SemanticFeatureError):
+        replace(original, features=cast(tuple[SemanticFeatureValue, ...], bad))
