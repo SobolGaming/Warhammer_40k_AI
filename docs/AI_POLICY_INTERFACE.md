@@ -1,11 +1,12 @@
 # Player policy interface
 
 The maintained [AI implementation and learning plan](AI_IMPLEMENTATION_PLAN.md)
-separates the implemented contracts below from proposed candidate generation,
+separates the implemented contracts below from broader proposed candidate generation,
 information-safe simulation, experiments and full-game qualification.
 
 Exact player-scoped routing, finite candidate sets, finite training linkage,
-accepted deployment candidate/row linkage, named targets and Phase 19E contracts exist;
+bounded deployment translations and fork validation, accepted deployment candidate/row
+linkage, named targets and Phase 19E contracts exist;
 autonomous battle policies, training and full-game qualification are not established.
 The historical grouped Phase 19/20 row is not an assertion that those foundations
 are absent, nor an individual mapping of every 19A-19F subphase.
@@ -354,8 +355,8 @@ loaders revalidate the complete chain; payloads are detached and immutable.
 transitions. Its unchanged `command-point-balance-v1` calculator requires the exact
 endpoint and accepted-record horizon, including automatic selections. This proves
 bounded endpoint CP evidence. The separate accepted deployment row companion below
-now joins that evidence to named/admitted targets; broader proposal families and
-candidate-search sets remain unsupported.
+now joins that evidence to named/admitted targets. Multi-candidate training joins
+and broader proposal families remain unsupported.
 
 Evidence is operator-only: checkpoint commitments, complete proposal payloads,
 authoritative identities and source/build information never become model inputs
@@ -363,9 +364,9 @@ or player projections. Existing viewer secrecy and wire schemas are unchanged;
 the existing [adapter decision contract](ADAPTER_DECISION_CONTRACT.md) already
 covers the reused deployment path. The ordinary setup regression certifies this
 bounded proposal family, not movement, charge, shooting, fight, reactions, reserves
-or other parameterized mechanics. Candidate generation, nonmutating bulk legality,
-broader local references, semantic features, search, dataset admission and runner
-timing remain follow-ups.
+or other parameterized mechanics. The bounded deployment generator/validator below
+adds formation alternatives; general bulk legality, broader local references,
+semantic features, search, dataset admission and runner timing remain follow-ups.
 
 ## Accepted deployment candidate and row linkage
 
@@ -417,8 +418,66 @@ full-game workload qualification.
 This adds no actor-facing or wire shape: ordinary deployment submission,
 engine validation, replay and viewer redaction remain governed by
 [ADAPTER_DECISION_CONTRACT.md](ADAPTER_DECISION_CONTRACT.md). Multi-candidate
-generation/ranking, other proposal families, semantic deployment encoders,
+training/ranking, other proposal families, semantic deployment encoders,
 broader references, dataset admission and runner progress accounting remain open.
+
+## Bounded deployment alternatives and validation
+
+`ai.deployment_candidate_search.DeploymentCandidateSet.generate(seed, context=...)`
+creates `deployment-translation-set-v1` from an existing actor-bound singleton.
+The versioned `actor-formation-xy-translations-v1` generator translates every
+supplied model by the same XY offset in inches, retaining relative formation,
+height, facing and proposal context. Its default ordered offsets are the original
+formation, +X, -X, +Y and -Y by one inch. Explicit ordered offsets are supported,
+up to 64 pairs. This supplies real alternative positions, not a general placement
+solver or a guarantee of valid, useful or complete tactical coverage.
+
+Generation receives only the detached player context, seed and public configuration.
+It does not receive a session, hidden opponent state, RNG or validation receipts.
+The immutable set retains ordered singleton candidates, the seed, offsets, raw
+budget, attempted count, duplicate count and completion reason. Canonical numeric
+positions collapse repeated resulting proposals to their first occurrence;
+duplicates still consume raw budget. Loading regenerates and compares the complete
+payload against the supplied actor context. Candidate IDs retain the existing
+singleton meaning and are not engine option IDs or learned semantic features.
+
+`ai.deployment_candidate_validation.ValidatedDeploymentCandidates.validate(...)`
+is a separate **operator-only** service. It verifies the live actor observation,
+binds the authoritative persistence checkpoint and submits each unique candidate
+through `LocalGameSession.submit_viewer_parameterized_payload` on a fresh fork of
+that same checkpoint. Accepted and ordinary invalid results are recorded. An
+unsupported result or engine error stops validation. No proposal is submitted to
+the live session; internal failures create no live retry request, record, event,
+placement or RNG change. The supplied deployment validator remains the only rules
+authority; this adds no engine method or wire contract.
+
+The raw proposal cap is 64, validation-attempt cap is 64 and accepted-candidate
+cap is 16; callers may lower each to zero. These bound proposal/submission counts,
+not wall time or individual geometry-solver work. Results stop at the first reached
+limit and record attempted, accepted, rejected and unvalidated counts, plus
+`complete`, `validation_budget` or `accepted_limit`. Generation separately records
+`complete` or `raw_budget`. A partial nonempty accepted set is a deliberate result.
+An empty generated or accepted set raises `DeploymentCandidateExhaustedError` with
+the stop reason, raw attempts, duplicates and validation attempts. Exhaustion
+never proves that no legal placement exists.
+
+Validation receipts include authoritative checkpoint commitments and diagnostics;
+they must never be supplied as player/model observations. `from_payload` repeats
+engine validation and compares the complete receipt. `select(context, candidate_id,
+session=...)` permits only accepted IDs and requires the same current checkpoint;
+it returns the ordinary bound `PolicyAction`. The eventual live commit still uses
+the ordinary viewer adapter and revalidates legality. Validation alone proves no
+executed live transition or training eligibility. The existing accepted-singleton
+row contract, `(True,)` mask, slot zero and legacy `TrainingRow` are unchanged.
+Multi-set training, ranking, other proposal families and a generic information-safe
+simulation API remain follow-ups.
+
+The ordinary compact setup regressions in
+`tests/infrastructure/adapters/test_deployment_candidates.py` exercise distinct
+accepted positions, internal invalid proposals, drift, budgets, duplicates,
+hidden-history/private-RNG isolation, immutable roundtrips and actual selection/commit/save/load/
+replay. They establish this bounded deployment path, not faction or full-game
+qualification.
 
 ## Named training target declarations
 
