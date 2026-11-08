@@ -33,6 +33,9 @@ EPISODE_ADMISSION_SCHEMA_VERSION = "finite-episode-admission-v1"
 TARGET_ADMISSION_SCHEMA_VERSION = "finite-target-admission-v1"
 TERMINAL_TARGET_PRODUCER = "engine-final-scoring-v1"
 MISSING_TARGET_PRODUCER = "episode-boundary-v1"
+LOCAL_REFERENCE_SCHEMA_VERSION = "verified-local-reference-v1"
+COMMAND_POINT_BALANCE_TARGET = "command-point-balance-v1"
+LOCAL_REFERENCE_PRODUCER = "engine-command-point-balance-v1"
 
 
 class TrainingAdmissionError(PolicyProvenanceError):
@@ -275,9 +278,136 @@ class FiniteEpisodeAdmission:
         return payload_digest(self.to_payload())
 
 
+class LocalReferencePayload(TypedDict):
+    schema_version: str
+    target_id: str
+    producer_id: str
+    episode_hash: str
+    transition_hash: str
+    endpoint_checkpoint_hash: str
+    time_convention: str
+    accepted_record_start: int
+    accepted_record_stop: int
+    horizon_decisions: int
+    perspective_player_id: str
+    value: int
+    value_unit: str
+
+
+@dataclass(frozen=True, slots=True, init=False)
+class VerifiedLocalReference:
+    """Recomputed operator evidence for one bounded engine resource observation.
+
+    The CP balance is the perspective player's remaining command points at the
+    exact admitted endpoint. It is neither match utility nor a tactical evaluator.
+    Episode commitments retain the verified source/build and accepted trajectory.
+    """
+
+    _evidence_json: str
+
+    def __init__(self) -> None:
+        raise TrainingAdmissionError("Calculate local references from an admitted endpoint.")
+
+    @classmethod
+    def from_episode(
+        cls,
+        episode: FiniteEpisodeAdmission,
+        *,
+        transition: FiniteAcceptedTransition,
+        final_session: LocalGameSession,
+        target_id: str,
+        horizon_decisions: int,
+    ) -> VerifiedLocalReference:
+        if (
+            type(episode) is not FiniteEpisodeAdmission
+            or type(transition) is not FiniteAcceptedTransition
+            or type(final_session) is not LocalGameSession
+        ):
+            raise TrainingAdmissionError("Local references require typed episode evidence.")
+        if target_id != COMMAND_POINT_BALANCE_TARGET:
+            raise TrainingAdmissionError("Unknown local reference calculator.")
+        if type(horizon_decisions) is not int or horizon_decisions < 1:
+            raise TrainingAdmissionError("Local references require a positive decision horizon.")
+        boundary = episode.to_payload()
+        item = transition.to_payload()
+        if (
+            boundary["origin"]["engine_build_id"] != current_engine_build_id()
+            or boundary["origin"]["source_identity"]["game_config_hash"]
+            != payload_digest(final_session.lifecycle.config.to_payload())
+            or transition.content_hash not in boundary["transition_hashes"]
+            or boundary["perspective_player_id"] != item["perspective_player_id"]
+            or boundary["final_checkpoint_hash"]
+            != payload_digest(final_session.to_persistence_payload())
+        ):
+            raise TrainingAdmissionError("Local reference endpoint, source or transition drifted.")
+        if boundary["episode_end"] not in (
+            TargetEpisodeEnd.TERMINAL.value,
+            TargetEpisodeEnd.TRUNCATED.value,
+        ):
+            raise TrainingAdmissionError("Aborted or unsupported local references are unobserved.")
+        # An atomic transition may contain automatic selections. There is no
+        # supported checkpoint inside it, and terminal arrival never shortens a
+        # declared horizon. The supplied endpoint must match the exact record count.
+        if horizon_decisions != boundary["accepted_record_stop"] - item["accepted_record_start"]:
+            raise TrainingAdmissionError("Local reference horizon must reach the exact endpoint.")
+        state = final_session.lifecycle.state
+        if state is None:
+            raise TrainingAdmissionError("Local reference endpoint requires an engine state.")
+        try:
+            value = state.command_point_total(boundary["perspective_player_id"])
+        except GameLifecycleError as exc:
+            raise TrainingAdmissionError("Local reference resource calculation failed.") from exc
+        payload: LocalReferencePayload = {
+            "schema_version": LOCAL_REFERENCE_SCHEMA_VERSION,
+            "target_id": COMMAND_POINT_BALANCE_TARGET,
+            "producer_id": LOCAL_REFERENCE_PRODUCER,
+            "episode_hash": episode.content_hash,
+            "transition_hash": transition.content_hash,
+            "endpoint_checkpoint_hash": boundary["final_checkpoint_hash"],
+            "time_convention": ACCEPTED_RECORD_TIME_CONVENTION,
+            "accepted_record_start": item["accepted_record_start"],
+            "accepted_record_stop": boundary["accepted_record_stop"],
+            "horizon_decisions": horizon_decisions,
+            "perspective_player_id": boundary["perspective_player_id"],
+            "value": value,
+            "value_unit": "command_points",
+        }
+        result = object.__new__(cls)
+        object.__setattr__(result, "_evidence_json", _json(payload))
+        return result
+
+    @classmethod
+    def from_payload(
+        cls,
+        payload: object,
+        *,
+        episode: FiniteEpisodeAdmission,
+        transition: FiniteAcceptedTransition,
+        final_session: LocalGameSession,
+        target_id: str,
+        horizon_decisions: int,
+    ) -> VerifiedLocalReference:
+        expected = cls.from_episode(
+            episode,
+            transition=transition,
+            final_session=final_session,
+            target_id=target_id,
+            horizon_decisions=horizon_decisions,
+        )
+        _require_exact(payload, expected.to_payload())
+        return expected
+
+    def to_payload(self) -> LocalReferencePayload:
+        return cast(LocalReferencePayload, json.loads(self._evidence_json))
+
+    @property
+    def content_hash(self) -> str:
+        return payload_digest(self.to_payload())
+
+
 @dataclass(frozen=True, slots=True, init=False)
 class AdmittedTrainingTarget:
-    """Exact row/source/time join plus a verified terminal value or excluded missingness."""
+    """Exact row/source/time join plus verified terminal/local value or excluded missingness."""
 
     _evidence_json: str
 
@@ -296,6 +426,7 @@ class AdmittedTrainingTarget:
         context: PlayerDecisionContext,
         config: GameConfig,
         reward_profile_version: str,
+        final_session: LocalGameSession | None = None,
     ) -> AdmittedTrainingTarget:
         if (
             type(linked) is not LinkedTrainingTarget
@@ -341,11 +472,25 @@ class AdmittedTrainingTarget:
                 raise TrainingAdmissionError(
                     "Missing target requires the declared nonterminal boundary."
                 )
+        elif target.meaning is TargetMeaning.LOCAL_REFERENCE:
+            if final_session is None:
+                raise TrainingAdmissionError("Observed local references require the endpoint.")
+            reference = VerifiedLocalReference.from_episode(
+                episode,
+                transition=transition,
+                final_session=final_session,
+                target_id=target.target_id,
+                horizon_decisions=cast(int, target.horizon_decisions),
+            )
+            evidence = reference.to_payload()
+            if (
+                target.producer_id != evidence["producer_id"]
+                or target.value_unit != evidence["value_unit"]
+                or target.value != evidence["value"]
+                or target.evidence_hash != reference.content_hash
+            ):
+                raise TrainingAdmissionError("Observed local target contradicts its calculator.")
         else:
-            if target.meaning is TargetMeaning.LOCAL_REFERENCE:
-                raise TrainingAdmissionError(
-                    "Observed local references require a verified calculator."
-                )
             result_payload = boundary["final_result"]
             if (
                 result_payload is None
@@ -404,6 +549,7 @@ class AdmittedTrainingTarget:
         context: PlayerDecisionContext,
         config: GameConfig,
         reward_profile_version: str,
+        final_session: LocalGameSession | None = None,
     ) -> AdmittedTrainingTarget:
         expected = cls.from_episode(
             linked,
@@ -414,6 +560,7 @@ class AdmittedTrainingTarget:
             context=context,
             config=config,
             reward_profile_version=reward_profile_version,
+            final_session=final_session,
         )
         _require_exact(payload, expected.to_payload())
         return expected

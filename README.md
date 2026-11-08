@@ -343,6 +343,14 @@ and index path. Failure, malformed completion and deadline expiry stop dispatch.
 Shard 1 deliberately bypasses source-index cache restore/save on PRs and main so
 every run verifies this cold path. Other shards retain exact-key reuse and the
 normal source/partition validation; a warm-cache retry is not cold qualification.
+After balancing, the generator swaps the bucket with the lowest unrounded modeled
+test load into shard 1, breaking ties by its original bucket number. This final
+permutation preserves every bucket's selectors and all measured case/selector
+weights, while avoiding assigning the cold role by largest-first insertion order.
+The execution metadata records this policy. Startup and report finalization are
+not test timings or added scheduling reserves; the model does not guarantee a
+hosted wall time. Empty buckets and committed manifests fail validation, because
+an empty pytest selector list would run the default suite.
 
 A single complete local JUnit XML is also accepted; label its host accurately and
 do not mix local and hosted-runner timings in one representative CI profile.
@@ -361,6 +369,10 @@ accounts for the mirror's serial execution, retaining measured times unchanged
 and recording the four-worker execution model. Missing, negative, nonfinite or
 boolean weights fail closed; measurements rounded to zero remain valid. Finite S25 case validation,
 the complete selected inventory and the fourteen-minute deadline remain mandatory.
+
+Behavioral lanes log keyed cold-index start/completion and elapsed construction time.
+A case exceeding three minutes emits thread stacks and continues under the existing
+fourteen-minute step cutoff.
 
 Both Python CI lanes upload JUnit, slowest-test output, and per-worker JSON timing
 artifacts containing collection node IDs, collection time, setup/call/teardown times,

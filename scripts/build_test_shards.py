@@ -947,6 +947,25 @@ def _balanced_shards(
         else:
             parallel_totals[shard_index] += cost
             largest_cases[shard_index] = max(largest_cases[shard_index], peaks[test_file])
+    if not assignments or any(not entries for entries in assignments):
+        raise SystemExit("Every behavioral shard must be nonempty.")
+    # Preserve the balanced buckets and give the sole cold-index role the
+    # smallest modeled test load. Compare full precision, before JSON rounding.
+    cold_index = min(
+        range(shard_count),
+        key=lambda index: (
+            serial_totals[index]
+            + max(
+                math.fsum(
+                    durations[name] for name in assignments[index] if name != SERIAL_BEHAVIORAL_CASE
+                )
+                / BEHAVIORAL_CI_WORKERS,
+                largest_cases[index],
+            ),
+            index,
+        ),
+    )
+    assignments[0], assignments[cold_index] = assignments[cold_index], assignments[0]
     return tuple(
         Shard(
             shard_id=index + 1,
@@ -985,6 +1004,8 @@ def _write_manifests(
     profiles: tuple[ProfileEvidence, ...] = (),
     case_seconds: dict[str, float] | None = None,
 ) -> None:
+    if not shards or any(not shard.test_files for shard in shards):
+        raise SystemExit("Every behavioral shard must be nonempty.")
     output_dir.mkdir(parents=True, exist_ok=True)
     for stale_manifest in output_dir.glob("shard-*.txt"):
         stale_manifest.unlink()
@@ -1091,6 +1112,8 @@ def _summary_payload(
         peaks = _selector_case_peaks(durations, case_seconds)
         summary["execution_model"] = {
             "parallel_workers": BEHAVIORAL_CI_WORKERS,
+            "cold_shard_id": 1,
+            "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
             "serial_cases": [SERIAL_BEHAVIORAL_CASE],
             "shard_worker_seconds": {
                 str(shard.shard_id): round(sum(weights[name] for name in shard.test_files), 3)
@@ -1104,7 +1127,7 @@ def _summary_payload(
                         else 0
                     )
                     + max(
-                        sum(
+                        math.fsum(
                             durations[name]
                             for name in shard.test_files
                             if name != SERIAL_BEHAVIORAL_CASE

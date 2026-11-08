@@ -81,6 +81,17 @@ def build(source: Path, index: Path, result: Path, input_key: str) -> int:
     validate_input_key(input_key)
     if result.exists() or result.with_suffix(".tmp").exists():
         raise ValueError("Source-index completion requires a fresh result path.")
+    started = time.monotonic()
+    print(
+        json.dumps(
+            {
+                "event": "source_index_build_started",
+                "index": str(index.resolve()),
+                "input_key": input_key,
+            }
+        ),
+        flush=True,
+    )
     command = [sys.executable, "-B", "-m", "tools.ability_support_sources", str(source), str(index)]
     status = subprocess.run(command, check=False).returncode
     payload = {
@@ -95,6 +106,18 @@ def build(source: Path, index: Path, result: Path, input_key: str) -> int:
     if status == 0 and "GITHUB_OUTPUT" in os.environ:
         with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
             output.write("source_index_built=true\n")
+    print(
+        json.dumps(
+            {
+                "event": "source_index_build_completed",
+                "index": payload["index"],
+                "input_key": input_key,
+                "exit_code": status,
+                "elapsed_seconds": round(time.monotonic() - started, 3),
+            }
+        ),
+        flush=True,
+    )
     return status
 
 

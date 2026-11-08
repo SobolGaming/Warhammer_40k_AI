@@ -110,7 +110,9 @@ def test_duration_dispatch_profile_controls_the_real_worker_hook(
         root_hooks.pytest_collection_modifyitems(pytestconfig, items)
 
 
-def test_serial_mirror_balancing_preserves_measurements_and_accounts_for_execution() -> None:
+def test_serial_mirror_balancing_preserves_measurements_and_accounts_for_execution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     mirror = sharding.SERIAL_BEHAVIORAL_CASE.split("::", 1)[0]
     durations = {
         mirror: 20.0,
@@ -129,9 +131,33 @@ def test_serial_mirror_balancing_preserves_measurements_and_accounts_for_executi
         "tests/fourth.py::one": 50.0,
         "tests/fourth.py::two": 50.0,
     }
+    original_durations = dict(durations)
+    original_cases = dict(case_seconds)
     shards = sharding._balanced_shards(
         durations=durations, shard_count=2, case_seconds=case_seconds
     )
+    assert durations == original_durations
+    assert case_seconds == original_cases
+    assert shards == sharding._balanced_shards(
+        durations=dict(reversed(tuple(durations.items()))),
+        shard_count=2,
+        case_seconds=dict(reversed(tuple(case_seconds.items()))),
+    )
+    assert shards[0].test_files == ("tests/fourth.py", "tests/second.py", "tests/third.py")
+    assert sorted(name for shard in shards for name in shard.test_files) == sorted(durations)
+    summary = sharding._summary_payload(
+        shards=shards, durations=durations, case_seconds=case_seconds
+    )
+    assert summary["case_seconds"] == original_cases
+    assert summary["files"] == original_durations
+    execution = cast(dict[str, object], summary["execution_model"])
+    assert execution["cold_shard_id"] == 1
+    assert execution["cold_shard_assignment"] == (
+        "minimum-unrounded-modeled-test-load-existing-bucket-v1"
+    )
+    modeled = cast(dict[str, float], execution["assignment_wall_lower_bound_seconds"])
+    assert modeled == {"1": 197.5, "2": 200.0}
+    assert modeled["1"] == min(modeled.values())
     isolated = next(shard for shard in shards if mirror in shard.test_files)
     assert isolated.test_files == (mirror, sharding.SERIAL_BEHAVIORAL_CASE)
     assert isolated.duration_seconds == 200.0
@@ -170,6 +196,34 @@ def test_serial_mirror_balancing_preserves_measurements_and_accounts_for_executi
     )
     assert "tests/heavy.py" not in serial_shard.test_files
     assert "tests/light.py" in serial_shard.test_files
+    tied = {"tests/b.py": 4.0, "tests/a.py": 4.0}
+    tied_shards = sharding._balanced_shards(durations=tied, shard_count=2)
+    assert tied_shards[0].test_files == ("tests/a.py",)
+    assert tied_shards == sharding._balanced_shards(
+        durations=dict(reversed(tuple(tied.items()))), shard_count=2
+    )
+    close = sharding._balanced_shards(
+        durations={"tests/a.py": 4.0004, "tests/b.py": 4.0}, shard_count=2
+    )
+    assert close[0].test_files == ("tests/b.py",)
+    for sparse in ({}, {"tests/a.py": 1.0}, {"tests/a.py": 0.0, "tests/b.py": 0.0}):
+        with pytest.raises(SystemExit, match="nonempty"):
+            sharding._balanced_shards(durations=sparse, shard_count=2)
+    output_dir = _write_sample_shards(tmp_path=tmp_path, monkeypatch=monkeypatch)
+    shard_one = output_dir / "shard-1.txt"
+    shard_two = output_dir / "shard-2.txt"
+    entries = sorted((shard_one.read_text(encoding="utf-8"), shard_two.read_text(encoding="utf-8")))
+    shard_one.write_text("", encoding="utf-8")
+    shard_two.write_text("".join(entries), encoding="utf-8")
+    # Inventory remains exact and sorted, but an empty committed bucket still
+    # fails the original deterministic-assignment check before pytest can run it.
+    with pytest.raises(SystemExit, match="duration-balanced assignment"):
+        sharding._check_manifests(output_dir=output_dir, shard_count=2)
+    before = {path.name: path.read_bytes() for path in output_dir.iterdir()}
+    for empty_shards in ((), (sharding.Shard(1, 0.0, ()),)):
+        with pytest.raises(SystemExit, match="nonempty"):
+            sharding._write_manifests(output_dir=output_dir, shards=empty_shards, durations={})
+        assert {path.name: path.read_bytes() for path in output_dir.iterdir()} == before
 
 
 @pytest.mark.stubbed
@@ -1171,7 +1225,16 @@ def test_failed_real_source_builder_stops_pytest_before_dispatch(
         timeout=30,
     )
     assert built.returncode != 0
-    assert json.loads(result.read_text(encoding="utf-8"))["exit_code"] != 0
+    completion = json.loads(result.read_text(encoding="utf-8"))
+    assert completion["exit_code"] != 0
+    messages = [json.loads(line) for line in built.stdout.splitlines()]
+    assert messages[0]["event"] == "source_index_build_started"
+    diagnostic = messages[-1]
+    assert diagnostic["event"] == "source_index_build_completed"
+    assert diagnostic["index"] == completion["index"]
+    assert diagnostic["input_key"] == completion["input_key"]
+    assert diagnostic["exit_code"] == completion["exit_code"]
+    assert diagnostic["elapsed_seconds"] >= 0
     assert not (tmp_path / "github-output").exists()
     probe = tmp_path / "test_probe.py"
     ran = tmp_path / "ran"
