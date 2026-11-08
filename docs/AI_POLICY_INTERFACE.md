@@ -218,9 +218,69 @@ not authenticate that origin, prove its reachability, classify an entire episode
 as truncated/aborted/unsupported, validate target calculations or source-policy
 compatibility, or admit a dataset by itself. Admission must combine these checks
 with permitted semantic features, target/evidence validation and provenance.
-Parameterized transitions and a complete trajectory/episode admission service
-remain follow-up work. Legacy rows, targets, runner behavior, replay and the
-ordinary adapter/wire decision contract remain unchanged.
+The separate episode/target admission companion below verifies origin reachability,
+finite slice continuity and a bounded set of target calculations. Parameterized
+transitions and complete dataset admission remain follow-up work. Legacy rows,
+targets, runner behavior, replay and the ordinary adapter/wire decision contract
+remain unchanged.
+
+## Episode and target admission
+
+`ai.training_admission` is an opt-in operator-only companion. It does not change
+legacy rows, the runner, player observations or the adapter/wire contract.
+
+`VerifiedEpisodeOrigin.from_session(session, config=...)` takes a separately
+trusted exact `GameConfig`, creates a fresh ordinary `LocalGameSession`, starts
+and advances it, and compares the recorded initial lifecycle to that startup.
+It then restores the supplied checkpoint through the existing exact persistence
+replay, checking the full lifecycle, decisions, events and private RNG. A hash or
+an internally consistent replay rooted at an arbitrary altered state is rejected.
+The admitted origin must be a pending decision boundary. Ordinary finite and
+parameterized replay may occur in the prefix; this does not admit parameterized
+training transitions. Configuration/source correctness and workload support still
+need independent qualification. Directly altered fixtures are design inputs.
+
+`FiniteEpisodeAdmission.from_transitions(...)` requires that verified origin, a
+nonempty immutable tuple of accepted finite transitions, and the exact final
+session. It checks origin/predecessor/checkpoint commitments, ordered record hashes,
+trajectory and perspective, and contiguous accepted-record start/stop indices.
+Every transition from the origin to the endpoint must be included. The clock is
+`accepted-engine-records-from-origin-v1`, including automatic engine selections;
+it is independent of actor alternation, elapsed turns and runner timing.
+
+`terminal` requires an actual complete engine state and its validated final-scoring
+result. `truncated`, `aborted` and `unsupported` require an explicit nonempty stop
+reason and a nonterminal endpoint. Those reasons are operator declarations, not
+proof of an infrastructure diagnosis or mechanic support. They retain attempted
+episode evidence without inventing terminal results.
+
+`AdmittedTrainingTarget.from_episode(...)` takes the exact linked target, row,
+candidate link, historical context, admitted transition/episode, trusted config and
+independently supplied experiment `reward_profile_version`. Source/catalog/rules
+and engine-version compatibility is strict, with no cross-version override.
+The current engine build is pinned separately. Perspective and episode end must
+match; the transition must belong to that episode and link exactly to that row.
+
+Observed `match_utility` and `vp_margin` require producer `engine-final-scoring-v1`
+and `evidence_hash=payload_digest(episode.to_payload()["final_result"])`. Utility is
+checked against the actual engine winners (win 1, draw 0.5, loss 0); VP margin is
+own minus opponent terminal capped VP. The match horizon must reach that exact
+terminal endpoint. Observed local references are rejected until a verified
+reference calculator exists. No arbitrary producer ID or hash authenticates one.
+
+Missing targets require producer `episode-boundary-v1`, the episode content hash,
+and its exact declared nonterminal stop reason. Their receipt always sets
+`eligible_for_learning=false`. Future decision horizons on missing local targets
+are declarations of unobserved work, not achieved horizon or value evidence.
+Receipts bind the target/row link, transition, episode and actual accepted-record
+start/stop. They never reinterpret the original scalar `target_value`.
+
+All three companions are immutable and return detached JSON payloads. Their
+closed loaders require the same trusted inputs and repeat verification before
+comparing every field. Keep checkpoints, source/build identities, scoring audit
+and admission receipts outside model inputs and player projections. This bounded
+finite-slice/terminal-target admission does not qualify a dataset, broader semantic
+features, hidden-state planning, a full-game workload or playing strength.
 
 ## Named training target declarations
 
