@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e7df8e38688392c69ee7ea51469044bc7d96002da39e0c87b3a67b56bbe0f3ad",
   "operation_map_sha256": "0576f3e9b745013d6a2276f65304143bf2adc783336c72834289d70c3569051a",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "42893c884baa57752d60b2fda828f64e2818fe008e79d50c4d3b11fd29482097",
+      "after_sha256": "b24071dd22b71c35e5c10d294e2b9dcb7aaaa6a0985c0c8d07dc81e49606fd08",
+      "owners": {
+        "@document": {
+          "before": "42893c884baa57752d60b2fda828f64e2818fe008e79d50c4d3b11fd29482097",
+          "after": "b24071dd22b71c35e5c10d294e2b9dcb7aaaa6a0985c0c8d07dc81e49606fd08"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "212bd1b06974464f69f116d4fdc0609e706ef00f5461e784b1d88aca9aa7b6c0",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "owners": {
+        "@document": {
+          "before": "212bd1b06974464f69f116d4fdc0609e706ef00f5461e784b1d88aca9aa7b6c0",
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "5bfdbcb0958a1b38466f65bb4778e86ae2e9dc6b1819e62c4169d43ed9f31a39",
+      "after_sha256": "9b0d1224d1735ae4a82b54311c6a858ee7d4d71a3f78738dbb82139ffeb01294",
+      "owners": {
+        "@document": {
+          "before": "5bfdbcb0958a1b38466f65bb4778e86ae2e9dc6b1819e62c4169d43ed9f31a39",
+          "after": "9b0d1224d1735ae4a82b54311c6a858ee7d4d71a3f78738dbb82139ffeb01294"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "1280f39d443d93fa2ee3e1c19be4812e41a6419dc445cf49564b8296971255a1",
+      "after_sha256": "7c09425262d9494d915ae539fd4cd9af0ba1460745acc0234ebc352ddf9fd79f",
+      "owners": {
+        "@document": {
+          "before": "1280f39d443d93fa2ee3e1c19be4812e41a6419dc445cf49564b8296971255a1",
+          "after": "7c09425262d9494d915ae539fd4cd9af0ba1460745acc0234ebc352ddf9fd79f"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "dacc0fe1321d3cdd68be9726940be7a7d993b0ad18009295958750bece2b7df9",
+      "after_sha256": "b220d334d9b2db32a351c16d1373c944085286d26b837306adf31c9a1aa49237",
+      "owners": {
+        "@document": {
+          "before": "dacc0fe1321d3cdd68be9726940be7a7d993b0ad18009295958750bece2b7df9",
+          "after": "b220d334d9b2db32a351c16d1373c944085286d26b837306adf31c9a1aa49237"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "701c247103b2ca73198ce7129ec969fd4a9a7e3ca8172c6408889cf3e22d2fd4",
+      "after_sha256": "31f003c40d6f69cd41f73927f1de593d584cc608088a92a141342bc633bd5678",
+      "owners": {
+        "@document": {
+          "before": "701c247103b2ca73198ce7129ec969fd4a9a7e3ca8172c6408889cf3e22d2fd4",
+          "after": "31f003c40d6f69cd41f73927f1de593d584cc608088a92a141342bc633bd5678"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "807cc66eaa1403cc1ec1d907cda926d8ff41e24b74803fac0cef8e485e49bf49",
+      "after_sha256": "0503d8d701d58848c7a366a0951397127f170e95efad50f05e24601c44c92bdc",
+      "owners": {
+        "@document": {
+          "before": "807cc66eaa1403cc1ec1d907cda926d8ff41e24b74803fac0cef8e485e49bf49",
+          "after": "0503d8d701d58848c7a366a0951397127f170e95efad50f05e24601c44c92bdc"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "c2d31729c93a7c2a1863fb949f25dd954be4ba00f17c5423242da4fc166043b3",
+      "after_sha256": "a78e5226f8fa1dca34f20a731d8887c25391e4cba8f836f391437013818c572b",
+      "owners": {
+        "@document": {
+          "before": "c2d31729c93a7c2a1863fb949f25dd954be4ba00f17c5423242da4fc166043b3",
+          "after": "a78e5226f8fa1dca34f20a731d8887c25391e4cba8f836f391437013818c572b"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "514099f23320289aab92dc48769a655da1895b389edf9bf1295ed1ec3c72914e",
+      "after_sha256": "dab65332e7626c4f13655094688d46c729fabfa773511e801fe63e1006e4a80f",
+      "owners": {
+        "@document": {
+          "before": "514099f23320289aab92dc48769a655da1895b389edf9bf1295ed1ec3c72914e",
+          "after": "dab65332e7626c4f13655094688d46c729fabfa773511e801fe63e1006e4a80f"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "8852fad93fd5900bd2725d0735b0625f214ba9ef81e0c8582a668b40cfa0e03e",
+      "after_sha256": "5771d8ea55dbc64e381c4601e5a142e48c1a0a17618d6cb0c8a00279a7c98239",
+      "owners": {
+        "@document": {
+          "before": "8852fad93fd5900bd2725d0735b0625f214ba9ef81e0c8582a668b40cfa0e03e",
+          "after": "5771d8ea55dbc64e381c4601e5a142e48c1a0a17618d6cb0c8a00279a7c98239"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "b83dccc0fc81d4ddf2ce87fbe8943e539893ca401df4d2a9e3c2b9188a2d9e93",
+      "after_sha256": "f27bf6ad6347d44b05f75e40e870df1e8971d644e36acaae40f1e2141b772382",
+      "owners": {
+        "@document": {
+          "before": "b83dccc0fc81d4ddf2ce87fbe8943e539893ca401df4d2a9e3c2b9188a2d9e93",
+          "after": "f27bf6ad6347d44b05f75e40e870df1e8971d644e36acaae40f1e2141b772382"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "9b437588e9b5a4e1a5bce97aec5f900abf838581856cc57aab4978259a546576",
+      "after_sha256": "f4b500b7d596f169f0d105d39d166985f50e193683fc2b36d7fad88272955068",
+      "owners": {
+        "@document": {
+          "before": "9b437588e9b5a4e1a5bce97aec5f900abf838581856cc57aab4978259a546576",
+          "after": "f4b500b7d596f169f0d105d39d166985f50e193683fc2b36d7fad88272955068"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "b74ba296608d169a6605cb124473cebfa2947f80c4d07509a800163243a617df",
+      "after_sha256": "beda37bd91912af76d1f36fbf488c3accf7cde750ce360d52d73ba886bc3402c",
+      "owners": {
+        "@document": {
+          "before": "b74ba296608d169a6605cb124473cebfa2947f80c4d07509a800163243a617df",
+          "after": "beda37bd91912af76d1f36fbf488c3accf7cde750ce360d52d73ba886bc3402c"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "2a6f89fb271633e3d6fad96c18633dd19c68e5e69615720315f3d235efb7de75",
       "after_sha256": "5a1da78667ff5cac53953177c63c46cc97e27c0bde075b1bf9006af71857df5f",
@@ -248,6 +378,253 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
+      "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
+      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
