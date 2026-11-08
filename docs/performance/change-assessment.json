@@ -451,6 +451,16 @@
           "after": "5b3aa5cf8478caa839416ce8ccae151673741b0704835fc517e29a75c05ffe2a"
         }
       }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "e55080c29061047c6578383b6f707c1ed01767e0a26d076de1478a626a510307",
+      "after_sha256": "5851c3c92c9f2cbfec7346d293c944398708e6ef71278747ce51839e0e6ba215",
+      "owners": {
+        "@document": {
+          "before": "e55080c29061047c6578383b6f707c1ed01767e0a26d076de1478a626a510307",
+          "after": "5851c3c92c9f2cbfec7346d293c944398708e6ef71278747ce51839e0e6ba215"
+        }
+      }
     }
   },
   "rows": {
@@ -1156,6 +1166,16 @@
       "rationale": "Add a separately versioned accepted-only deployment ranking boundary with exact numeric ordering and ordinary engine submission. Correct the CI generator so S25 shard-assignment shares use the complete current measurements already used by worker dispatch, rather than retained historical ratios.",
       "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding. Operator receipts keep privileged validation evidence. Preserve the complete measured file total, raw current case measurements, JUnit hashes, every selector and twelve nonempty shards. Supplied current partition data fails closed on missing/invalid values and inconsistent zero totals; the historical-only path and archived evidence remain unchanged. No test, coverage or timing limit is relaxed.",
       "unchanged_work": "The ranking contract and bounded CI current-input/validation correction change no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache, runtime dependency, measured driver, LPT balancing or worker dispatch. Both mandatory CI mappings remain, including the non-sensitive external_contract_source_reuse family mapping. Independent reviewers judged the concrete correction rule_semantics; this existing category selects no detailed family for these non-sensitive routes. Required serial current-runtime smoke and live semantic/work/cache controls remain mandatory. No timeout cure, speedup, tactical quality, dataset admission or full-game qualification is claimed."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the live README byte authentication after the intentional CI measurement guidance change.",
+      "source_obligation": "Authenticate the maintained current README while retaining all historical governance hashes, source clauses, semantic assertions and qualifications.",
+      "unchanged_work": "Only authenticated_inputs.README.md changes. No engine, runtime identity, source content, test body, requirement, historical input, case inventory, coverage or timing limit changes."
     }
   },
   "milestone": "ordinary",
