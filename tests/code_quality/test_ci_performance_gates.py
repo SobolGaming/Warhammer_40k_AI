@@ -79,7 +79,9 @@ def test_duration_dispatch_balances_actual_initial_worksteal_chunks() -> None:
     )
     assert sorted(heavy_order) == list(range(len(separated)))
     for worker in range(4):
-        heavy_chunk = tuple(separated[index] for index in heavy_order[worker * 9 : (worker + 1) * 9])
+        heavy_chunk = tuple(
+            separated[index] for index in heavy_order[worker * 9 : (worker + 1) * 9]
+        )
         assert heavy_chunk[0] == heavy[worker]
         assert len(set(heavy_chunk) & set(heavy)) == 1
 

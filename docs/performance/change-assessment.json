@@ -354,7 +354,7 @@
     },
     "tests/code_quality/test_ci_performance_gates.py": {
       "before_sha256": "f57f5c7163552d715af35f05efbf027333a66cf2abe467b902b5d95b16e1f9c5",
-      "after_sha256": "5788d91d02385f2b84841899e94939f564fe46c1f65623d8775b863d5033e9d1",
+      "after_sha256": "43f4137f35f412f6eb3a74a36616bf69f7bcfc5f2a99392f930800693fa8d573",
       "owners": {
         "test_duration_dispatch_balances_actual_initial_worksteal_chunks": {
           "before": "8f44a1c260eb4307087c12e459ab6f8d9e589635967defade89c354788e4b463",
