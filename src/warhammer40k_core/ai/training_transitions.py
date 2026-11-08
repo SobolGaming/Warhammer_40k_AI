@@ -438,7 +438,7 @@ def _require_exact(payload: object, expected: AcceptedTransition) -> None:
         observed = canonical_json(validate_json_value(payload))
     except EventLogError as exc:
         raise TrainingTransitionError("Transition evidence must be JSON-safe.") from exc
-    if observed != expected._evidence_json:
+    if observed != canonical_json(expected.to_payload()):
         raise TrainingTransitionError("Transition evidence drifted from engine reproduction.")
 
 

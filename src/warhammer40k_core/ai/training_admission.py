@@ -261,7 +261,7 @@ class _EpisodeAdmission[Transition: AcceptedTransition]:
         }
         result = object.__new__(cls)
         object.__setattr__(result, "_evidence_json", _json(payload))
-        return result
+        return cast(Self, result)
 
     @classmethod
     def from_payload(
