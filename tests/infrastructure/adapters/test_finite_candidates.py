@@ -6,6 +6,11 @@ from typing import cast
 
 import pytest
 
+from tests.shared.category_migration.phase18f_session_commands import (
+    _compact_terminal_config,
+    _deployment_payload_from_proposal,
+    _terminal_progress_option_id,
+)
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
@@ -47,7 +52,16 @@ from warhammer40k_core.ai.training_targets import (
     TargetValidity,
     TrainingTargetError,
 )
-from warhammer40k_core.engine.event_log import canonical_json
+from warhammer40k_core.ai.training_transitions import (
+    FiniteAcceptedTransition,
+    TrainingTransitionError,
+)
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    BattlePhaseSequenceDescriptor,
+)
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.replay import ReplayRunner
 
@@ -862,3 +876,413 @@ def test_semantic_observation_requires_immutable_typed_features(bad: object) -> 
     original = SemanticObservation.from_context(context)
     with pytest.raises(SemanticFeatureError):
         replace(original, features=cast(tuple[SemanticFeatureValue, ...], bad))
+
+
+def test_finite_accepted_transition_reproduces_commit_without_mutating_inputs() -> None:
+    origin, _ = _finite_context()
+    session, context, row = _training_fixture()
+    before = origin.to_persistence_payload()
+    after = session.to_persistence_payload()
+    link = FiniteTrainingCandidateLink.from_row(row, context=context)
+    transition = FiniteAcceptedTransition.from_sessions(
+        link,
+        row=row,
+        context=context,
+        before=origin,
+        after=session,
+        trajectory_id="finite-trajectory-v1",
+        perspective_player_id="player-b",
+    )
+    assert transition.accepted_record_start == 0
+    assert transition.accepted_record_stop == 1
+    assert transition.actor_id == "player-a"
+    assert transition.perspective_player_id == "player-b"
+    assert transition.authoritative_record_id == row.decision_record_id
+    assert transition.authoritative_request_id != context.request["request_id"]
+    assert transition.to_payload()["outcome"] == "continuing"
+    assert transition.content_hash == payload_digest(transition.to_payload())
+    assert (
+        FiniteAcceptedTransition.from_payload(
+            json.loads(canonical_json(transition.to_payload())),
+            link=link,
+            row=row,
+            context=context,
+            before=origin,
+            after=session,
+            trajectory_id="finite-trajectory-v1",
+            perspective_player_id="player-b",
+        )
+        == transition
+    )
+    assert before == origin.to_persistence_payload()
+    assert after == session.to_persistence_payload()
+    assert row.to_payload() == TrainingRow.from_payload(row.to_payload()).to_payload()
+
+
+@pytest.mark.parametrize("change", ["record", "after", "context", "perspective", "row"])
+def test_finite_transition_rejects_invalid_engine_joins(change: str) -> None:
+    origin, _ = _finite_context()
+    session, context, row = _training_fixture()
+    if change == "record":
+        row = replace(row, decision_record_id="decision-record-999999")
+    elif change == "after":
+        session = origin.fork()
+    elif change == "context":
+        view = context.observation
+        view["battle_round"] += 1
+        context = PlayerDecisionContext.from_view(view, choice_seed=7)
+    elif change == "row":
+        row = replace(row, game_id="different-game")
+    link = FiniteTrainingCandidateLink.from_row(row, context=context) if change != "row" else None
+    with pytest.raises(TrainingTransitionError):
+        FiniteAcceptedTransition.from_sessions(
+            cast(FiniteTrainingCandidateLink, link),
+            row=row,
+            context=context,
+            before=origin,
+            after=session,
+            trajectory_id="finite-trajectory-v1",
+            perspective_player_id="outsider" if change == "perspective" else "player-a",
+        )
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "schema_version",
+        "time_convention",
+        "trajectory_id",
+        "accepted_record_start",
+        "accepted_record_stop",
+        "previous_transition_hash",
+        "training_candidate_link_hash",
+        "before_checkpoint_hash",
+        "after_checkpoint_hash",
+        "before_observation_hash",
+        "after_observation_hash",
+        "actor_id",
+        "perspective_player_id",
+        "authoritative_record_id",
+        "authoritative_request_id",
+        "authoritative_option_id",
+        "result_id",
+        "record_hashes",
+        "before_position",
+        "after_position",
+        "outcome",
+        "extra",
+    ],
+)
+def test_finite_transition_loader_rejects_tampered_evidence(field: str) -> None:
+    origin, _ = _finite_context()
+    session, context, row = _training_fixture()
+    link = FiniteTrainingCandidateLink.from_row(row, context=context)
+    transition = FiniteAcceptedTransition.from_sessions(
+        link,
+        row=row,
+        context=context,
+        before=origin,
+        after=session,
+        trajectory_id="finite-trajectory-v1",
+        perspective_player_id="player-b",
+    )
+    payload: dict[str, object] = dict(transition.to_payload())
+    payload[field] = "tampered"
+    with pytest.raises(TrainingTransitionError):
+        FiniteAcceptedTransition.from_payload(
+            payload,
+            link=link,
+            row=row,
+            context=context,
+            before=origin,
+            after=session,
+            trajectory_id="finite-trajectory-v1",
+            perspective_player_id="player-b",
+        )
+
+
+def test_finite_transition_links_consecutive_actors_and_rejects_gaps() -> None:
+    origin, _ = _finite_context()
+    session, context, row = _training_fixture()
+    first_link = FiniteTrainingCandidateLink.from_row(row, context=context)
+    first = FiniteAcceptedTransition.from_sessions(
+        first_link,
+        row=row,
+        context=context,
+        before=origin,
+        after=session,
+        trajectory_id="consecutive-trajectory-v1",
+        perspective_player_id="player-a",
+    )
+    middle = session.fork()
+    other = PlayerDecisionContext.from_view(
+        session.view(viewer_player_id="player-b"), choice_seed=9
+    )
+    candidates = FiniteCandidateSet.from_context(other)
+    status = session.submit_viewer_option(
+        viewer=ViewerContext.for_player("player-b"),
+        request_id=other.request["request_id"],
+        option_id=candidates.candidate_ids[-1],
+        result_id="second-transition",
+    )
+    if status.status_kind is LifecycleStatusKind.ADVANCED:
+        session.advance_until_decision_or_terminal()
+    second_row = replace(
+        row,
+        row_id="second-row",
+        chosen_action_id=candidates.candidate_ids[-1],
+        decision_record_id=session.lifecycle.decision_controller.records[
+            middle.decision_record_count()
+        ].record_id,
+        input_features=(
+            replace(
+                row.input_features[0],
+                value=len(candidates.candidates),
+                source_descriptor_ids=("decision:" + other.route.decision_type,),
+            ),
+        ),
+        legal_action_mask=tuple(True for _ in candidates.candidates),
+    )
+    second_link = FiniteTrainingCandidateLink.from_row(second_row, context=other)
+    second = FiniteAcceptedTransition.from_sessions(
+        second_link,
+        row=second_row,
+        context=other,
+        before=middle,
+        after=session,
+        trajectory_id="consecutive-trajectory-v1",
+        perspective_player_id="player-a",
+        previous=first,
+    )
+    assert second.actor_id != first.actor_id
+    assert second.accepted_record_start == first.accepted_record_stop
+    assert second.accepted_record_stop == second.accepted_record_start + len(
+        second.to_payload()["record_hashes"]
+    )
+    assert second.to_payload()["previous_transition_hash"] == first.content_hash
+    assert (
+        second.to_payload()["origin_checkpoint_hash"]
+        == first.to_payload()["before_checkpoint_hash"]
+    )
+    assert (
+        FiniteAcceptedTransition.from_payload(
+            second.to_payload(),
+            link=second_link,
+            row=second_row,
+            context=other,
+            before=middle,
+            after=session,
+            trajectory_id="consecutive-trajectory-v1",
+            perspective_player_id="player-a",
+            previous=first,
+        )
+        == second
+    )
+    for predecessor in (None, second):
+        with pytest.raises(TrainingTransitionError):
+            FiniteAcceptedTransition.from_payload(
+                second.to_payload(),
+                link=second_link,
+                row=second_row,
+                context=other,
+                before=middle,
+                after=session,
+                trajectory_id="consecutive-trajectory-v1",
+                perspective_player_id="player-a",
+                previous=predecessor,
+            )
+    with pytest.raises(TrainingTransitionError, match="continuity"):
+        FiniteAcceptedTransition.from_sessions(
+            second_link,
+            row=second_row,
+            context=other,
+            before=middle,
+            after=session,
+            trajectory_id="different-trajectory-v1",
+            perspective_player_id="player-a",
+            previous=first,
+        )
+    detached = second.to_payload()
+    detached["record_hashes"].clear()
+    detached["before_position"]["battle_round"] = 999
+    assert second.to_payload()["record_hashes"]
+    assert second.to_payload()["before_position"]["battle_round"] != 999
+    with pytest.raises(FrozenInstanceError):
+        second._evidence_json = "{}"  # type: ignore[misc]
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="transition-chain"))
+        .run()
+        .reproduced_exactly
+    )
+
+
+def test_finite_transition_rejects_a_record_without_engine_application() -> None:
+    origin, context = _finite_context()
+    _, _, row = _training_fixture()
+    recorded = origin.fork()
+    request = recorded.lifecycle.pending_decision_request()
+    assert request is not None
+    # A structural DecisionRecord is deliberately insufficient evidence. This
+    # invokes no engine applier; ordinary re-execution must reject the join.
+    result = DecisionResult.for_request(
+        result_id="record-only",
+        request=request,
+        selected_option_id=row.chosen_action_id,
+    )
+    record = recorded.lifecycle.decision_controller.submit_result(result)
+    row = replace(row, decision_record_id=record.record_id)
+    link = FiniteTrainingCandidateLink.from_row(row, context=context)
+    assert link.chosen_action_id == row.chosen_action_id
+    with pytest.raises(TrainingTransitionError):
+        FiniteAcceptedTransition.from_sessions(
+            link,
+            row=row,
+            context=context,
+            before=origin,
+            after=recorded,
+            trajectory_id="record-only-v1",
+            perspective_player_id="player-a",
+        )
+
+
+@pytest.mark.parametrize("value", [True, 1.0, -1, None])
+def test_finite_transition_rejects_lossy_temporal_indices(value: object) -> None:
+    origin, _ = _finite_context()
+    session, context, row = _training_fixture()
+    link = FiniteTrainingCandidateLink.from_row(row, context=context)
+    transition = FiniteAcceptedTransition.from_sessions(
+        link,
+        row=row,
+        context=context,
+        before=origin,
+        after=session,
+        trajectory_id="finite-trajectory-v1",
+        perspective_player_id="player-a",
+    )
+    payload: dict[str, object] = dict(transition.to_payload())
+    payload["accepted_record_stop"] = value
+    with pytest.raises(TrainingTransitionError):
+        FiniteAcceptedTransition.from_payload(
+            payload,
+            link=link,
+            row=row,
+            context=context,
+            before=origin,
+            after=session,
+            trajectory_id="finite-trajectory-v1",
+            perspective_player_id="player-a",
+        )
+
+
+def test_finite_transition_reproduces_an_ordinary_terminal_boundary() -> None:
+    # This compact canonical configuration uses Command/Shooting/Fight phases. It
+    # verifies a boundary contract; it is not a competitive full-game workload.
+    session = LocalGameSession()
+    compact = _compact_terminal_config(game_id="finite-transition-terminal")
+    config = replace(
+        compact,
+        ruleset_descriptor=replace(
+            compact.ruleset_descriptor,
+            descriptor_hash="",
+            battle_phase_sequence=BattlePhaseSequenceDescriptor(
+                phases=(BattlePhaseKind.COMMAND, BattlePhaseKind.SHOOTING, BattlePhaseKind.FIGHT)
+            ),
+        ),
+    )
+    session.start(config)
+    status = session.advance_until_decision_or_terminal()
+    last_finite: tuple[LocalGameSession, FiniteCandidateSet, str, PlayerDecisionContext] | None = (
+        None
+    )
+    for index in range(100):
+        request = status.decision_request
+        assert request is not None
+        assert request.actor_id is not None
+        view = session.view(viewer_player_id=request.actor_id)
+        context = PlayerDecisionContext.from_view(view, choice_seed=7)
+        if request.is_parameterized_submission_request():
+            assert request.decision_type == "submit_deployment_placement"
+            status = session.submit_viewer_parameterized_payload(
+                viewer=ViewerContext.for_player(request.actor_id),
+                request_id=context.request["request_id"],
+                payload=_deployment_payload_from_proposal(view["pending_proposal"]),
+                result_id=f"terminal-placement-{index}",
+            )
+        else:
+            origin = session.fork()
+            candidates = FiniteCandidateSet.from_context(context)
+            chosen = _terminal_progress_option_id(cast(dict[str, JsonValue], context.request))
+            assert chosen in candidates.candidate_ids
+            last_finite = origin, candidates, chosen, context
+            status = session.submit_viewer_option(
+                viewer=ViewerContext.for_player(request.actor_id),
+                request_id=context.request["request_id"],
+                option_id=chosen,
+                result_id=f"terminal-finite-{index}",
+            )
+        if status.status_kind is LifecycleStatusKind.ADVANCED:
+            status = session.advance_until_decision_or_terminal()
+        assert status.status_kind in (
+            LifecycleStatusKind.WAITING_FOR_DECISION,
+            LifecycleStatusKind.TERMINAL,
+        )
+        if status.status_kind is LifecycleStatusKind.TERMINAL:
+            break
+    else:
+        pytest.fail("Compact terminal fixture exceeded its explicit decision budget.")
+    assert not request.is_parameterized_submission_request()
+    assert last_finite is not None
+    origin, candidates, chosen, context = last_finite
+    provenance = PolicyProvenance.from_game_config(
+        artifact_id="terminal-contract-v1",
+        artifact_kind=PolicyArtifactKind.RANKER,
+        game_config=config,
+        reward_profile_version="terminal-contract-reward-v1",
+    )
+    row = TrainingRow(
+        row_id="terminal-row",
+        game_id=config.game_id,
+        decision_record_id=session.lifecycle.decision_controller.records[
+            origin.decision_record_count()
+        ].record_id,
+        policy_artifact_id=provenance.artifact_id,
+        policy_provenance=provenance,
+        reward_profile_version=provenance.reward_profile_version,
+        input_features=(
+            TrainingFeature(
+                feature_id="decision-option-count",
+                source_kind=TrainingFeatureSourceKind.DECISION_CONTEXT,
+                value=len(candidates.candidates),
+                source_descriptor_ids=("decision:" + context.route.decision_type,),
+            ),
+        ),
+        legal_action_mask=tuple(True for _ in candidates.candidates),
+        chosen_action_id=chosen,
+        target_value=0.25,
+        debug_metadata={"fixture": "compact-terminal-contract"},
+    )
+    link = FiniteTrainingCandidateLink.from_row(row, context=context)
+    transition = FiniteAcceptedTransition.from_sessions(
+        link,
+        row=row,
+        context=context,
+        before=origin,
+        after=session,
+        trajectory_id="terminal-contract-v1",
+        perspective_player_id="player-a",
+    )
+    assert transition.to_payload()["outcome"] == "terminal"
+    assert transition.to_payload()["after_position"]["stage"] == "complete"
+    assert transition.accepted_record_stop == (
+        session.decision_record_count() - origin.decision_record_count()
+    )
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="finite-terminal"))
+        .run()
+        .reproduced_exactly
+    )
+
+
+def test_finite_transition_requires_verifying_factories() -> None:
+    with pytest.raises(TrainingTransitionError, match="reproduction"):
+        FiniteAcceptedTransition()
