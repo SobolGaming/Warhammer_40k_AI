@@ -216,11 +216,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "26ba0c7aa78d9cceceef45aee44d9e9f262284d979bd6163cc8cdc710040a79f",
-      "after_sha256": "4636a4b363414b11b6b9a3f573d35af9837dcaace8a98a0c6d3f75a60f3a8741",
+      "after_sha256": "b65aa59fad6fc6cb278f3ea7135fe97358e00b953a55bce45d47712c908fbdc5",
       "owners": {
         "@document": {
           "before": "26ba0c7aa78d9cceceef45aee44d9e9f262284d979bd6163cc8cdc710040a79f",
-          "after": "4636a4b363414b11b6b9a3f573d35af9837dcaace8a98a0c6d3f75a60f3a8741"
+          "after": "b65aa59fad6fc6cb278f3ea7135fe97358e00b953a55bce45d47712c908fbdc5"
         }
       }
     },
@@ -316,7 +316,7 @@
     },
     "tests/infrastructure/adapters/test_training_admission.py": {
       "before_sha256": "a8dc39b97c5491fc9a23165cdf08acbd2899ab56e53c928706409cd65f836db0",
-      "after_sha256": "9c65c4fa9eb6145c54cae24affabab6c100818a1db0dee08f2e446ed7fb23164",
+      "after_sha256": "5ee24779bdba576acca76f77d6fac6a47428a7bce1f4ce09b5d3efbdc3712862",
       "owners": {
         "@module": {
           "before": "ad862f13422dc2ca62f5fd408465d077578646035d76a2c83c9c24fafa5ceb63",
@@ -333,6 +333,10 @@
         "_local_target": {
           "before": null,
           "after": "6593488fe15b27567880da7f1950da32fcca50b236c28449eb32640834b94b26"
+        },
+        "terminal": {
+          "before": "8eedf2be6a4dbe63fe9ff2548de4dd68f1029577dcadec9fb55d341c4f3d627e",
+          "after": "0769c86d8dbbcfedde5850f9e8145c74e66468d82f964185dd74005f48d0efc5"
         },
         "test_admission_factories_are_required": {
           "before": "fd6cc9485aab9b3fae591086bec049fcf4bfa3835cba9fcde9e19b3b411e6e06",
@@ -395,7 +399,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -414,7 +418,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -433,7 +437,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -452,7 +456,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -471,7 +475,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -490,7 +494,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -509,7 +513,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -528,7 +532,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -547,7 +551,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -566,7 +570,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -585,7 +589,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -604,7 +608,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -623,7 +627,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "Only measured scheduling inputs and their deterministic shard assignments change. The scheduler algorithm, runtime, behavioral tests, selected-case inventory, dependencies, benchmark drivers and budgets are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and all applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -667,7 +671,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -711,7 +715,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -755,7 +759,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -799,7 +803,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -843,7 +847,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -887,7 +891,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -931,7 +935,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -975,7 +979,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -985,7 +989,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
@@ -993,7 +997,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
@@ -1001,7 +1005,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
@@ -1009,7 +1013,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -1022,7 +1026,7 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "src/warhammer40k_core/ai/training_admission.py": {
       "category": "serialization_or_replay_work",
@@ -1032,17 +1036,17 @@
       "selected_families": [],
       "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "tests/infrastructure/adapters/test_training_admission.py": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "finite-episode-target-admission"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
-      "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies, measured workloads and benchmark drivers are unchanged. The offline calculator uses existing exact session evidence and adds no measured baseline or detailed family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "rationale": "Exercise verified CP targets and horizons; construct the terminal fixture through direct ordinary prefix submissions, eliminating discarded per-decision lifecycle reconstructions and training rows.",
+      "source_obligation": "Preserve the same ordinary configuration, terrain, phase sequence, five rounds, terminal CP balance, engine scoring, selected cases and every assertion. Restore and verify the saved final before boundary once; all admission and loader replay verification remains exercised.",
+      "unchanged_work": "Only test-fixture assembly work changes; engine algorithms, authoritative decision paths, actual replay checks, benchmark drivers, case inventory and timing budgets are unchanged. No engine or full-game speedup is claimed. Full covered behavior, exact measured scheduling data, fresh serial smoke and quality checks qualify the final inputs."
     }
   },
   "milestone": "ordinary",

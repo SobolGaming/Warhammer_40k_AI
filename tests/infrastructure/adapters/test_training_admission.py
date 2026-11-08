@@ -199,11 +199,22 @@ def terminal() -> AdmissionCase:
         else:
             context = PlayerDecisionContext.from_view(view, choice_seed=7)
             chosen = _terminal_progress_option_id(cast(dict[str, JsonValue], context.request))
-            case = _step(session.fork(), chosen)
-            session = case.after
-            status = session.advance_until_decision_or_terminal()
+            # Prefix choices need ordinary commits, not two full lifecycle
+            # reconstructions and a discarded training row per decision.
+            before_checkpoint = session.to_persistence_payload()
+            status = session.submit_viewer_option(
+                viewer=ViewerContext.for_player(request.actor_id),
+                request_id=context.request["request_id"],
+                option_id=chosen,
+                result_id=f"admission-{session.decision_record_count()}",
+            )
+            if status.status_kind is LifecycleStatusKind.ADVANCED:
+                status = session.advance_until_decision_or_terminal()
             if status.status_kind is LifecycleStatusKind.TERMINAL:
-                return case
+                before = LocalGameSession.from_persistence_payload(before_checkpoint)
+                return AdmissionCase(
+                    before, session, context, _row(before, session, context, chosen)
+                )
         if status.status_kind is LifecycleStatusKind.ADVANCED:
             status = session.advance_until_decision_or_terminal()
         assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
