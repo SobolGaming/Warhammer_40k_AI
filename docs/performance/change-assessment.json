@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "aac70775c1a1a05971a9fbd7d6e6f435a255d7f9",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e7df8e38688392c69ee7ea51469044bc7d96002da39e0c87b3a67b56bbe0f3ad",
-  "operation_map_sha256": "0576f3e9b745013d6a2276f65304143bf2adc783336c72834289d70c3569051a",
+  "operation_map_sha256": "1fb1ab7dabd68cc29f3d6d84e2ed4454fd7383d22c5c4cb6be6ccbb8dfd480da",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "7d102576d14ed3e45cdb66681b98e565b46215083a6e5eec729137a3a017bbd1",
@@ -16,31 +16,31 @@
     },
     "README.md": {
       "before_sha256": "4c0075d7337d161d6b58d11ff6c3da7a6c35e29852f7a077754c4689d7ad16d4",
-      "after_sha256": "a8798b2edcfe68650704f3d6486b8a3aba0147d48dc3e355374331e214f69ff2",
+      "after_sha256": "8dfbe7f6072c9ea7892bf03031310a8fbd934ff70c0c1228078ae73e3cd8d2b2",
       "owners": {
         "@document": {
           "before": "4c0075d7337d161d6b58d11ff6c3da7a6c35e29852f7a077754c4689d7ad16d4",
-          "after": "a8798b2edcfe68650704f3d6486b8a3aba0147d48dc3e355374331e214f69ff2"
+          "after": "8dfbe7f6072c9ea7892bf03031310a8fbd934ff70c0c1228078ae73e3cd8d2b2"
         }
       }
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "42893c884baa57752d60b2fda828f64e2818fe008e79d50c4d3b11fd29482097",
-      "after_sha256": "e31fefd2f73db41e7934e42beadfbd147ca7fd87916e3f8ecd7729937c7c4641",
+      "after_sha256": "0054bf61b143c2f11d55a6c028696ac7854a16da85b534598e30b11908b8a85f",
       "owners": {
         "@document": {
           "before": "42893c884baa57752d60b2fda828f64e2818fe008e79d50c4d3b11fd29482097",
-          "after": "e31fefd2f73db41e7934e42beadfbd147ca7fd87916e3f8ecd7729937c7c4641"
+          "after": "0054bf61b143c2f11d55a6c028696ac7854a16da85b534598e30b11908b8a85f"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "212bd1b06974464f69f116d4fdc0609e706ef00f5461e784b1d88aca9aa7b6c0",
-      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "92547855def7226568eadd1aade4f7c2ee5bb866d2e18639e8b505a51a8fadd7",
       "owners": {
         "@document": {
           "before": "212bd1b06974464f69f116d4fdc0609e706ef00f5461e784b1d88aca9aa7b6c0",
-          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
+          "after": "92547855def7226568eadd1aade4f7c2ee5bb866d2e18639e8b505a51a8fadd7"
         }
       }
     },
@@ -106,11 +106,11 @@
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "514099f23320289aab92dc48769a655da1895b389edf9bf1295ed1ec3c72914e",
-      "after_sha256": "92547855def7226568eadd1aade4f7c2ee5bb866d2e18639e8b505a51a8fadd7",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
       "owners": {
         "@document": {
           "before": "514099f23320289aab92dc48769a655da1895b389edf9bf1295ed1ec3c72914e",
-          "after": "92547855def7226568eadd1aade4f7c2ee5bb866d2e18639e8b505a51a8fadd7"
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
         }
       }
     },
@@ -274,6 +274,34 @@
         }
       }
     },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "e7f1da1540c60d30952c6526933264f7b32dcb2a5d6d414bff08b1e5fdf148d4",
+      "after_sha256": "7f42f6676a9eb50823b610062d49d708d847c2249d94f25580457329b230508a",
+      "owners": {
+        "@document": {
+          "before": "e7f1da1540c60d30952c6526933264f7b32dcb2a5d6d414bff08b1e5fdf148d4",
+          "after": "7f42f6676a9eb50823b610062d49d708d847c2249d94f25580457329b230508a"
+        }
+      }
+    },
+    "scripts/build_test_shards.py": {
+      "before_sha256": "123fc177e5662c41bb2b9f375920d9f912568d056f657549c494b97e28f4f0d4",
+      "after_sha256": "e7d1f5ff29bf5c43675461f3dcbe85baad4f69692b6679ff0deb28bbd3946169",
+      "owners": {
+        "_balanced_shards": {
+          "before": "07b27934792a7e94b8c09390e9b71ecf3a78c6e2e467f1e170a056784d964bcb",
+          "after": "1a336f3a25c003d29a031edcfec29ee932a35ee3b2160f675bb54a91abbba815"
+        },
+        "_summary_payload": {
+          "before": "0e3093b5c365c33ff78f15d65eaa884602763daf5900a8fef35b720910bbf159",
+          "after": "d2d469291d8c4c20a76dbdf470c5e21a9f6cd7d9b5a3ba0ee484555ec20e5544"
+        },
+        "_write_manifests": {
+          "before": "ae90bbb2b9fedaf2159c0e9be11d3ada7bfdaf050aab2f68c5920e62819ae55e",
+          "after": "174610fd5b1c4ad55ee4afc7012aa2012f420948a134891f989ff79b2ef6b8e2"
+        }
+      }
+    },
     "scripts/ci_source_index.py": {
       "before_sha256": "2be0b1d2aea94ac7ab4e681806262d7981256c6ba3d5251ac9dc3a89d0af0eac",
       "after_sha256": "8a8d7c4cde41ecbc9d575c1a44b47a4c7690e197a197535d1547bdfc63ef1a33",
@@ -346,11 +374,15 @@
     },
     "tests/code_quality/test_ci_performance_gates.py": {
       "before_sha256": "e0a728e3aa474d64e9e67f78dc71c140bcbd7ff5815e1fd808a33166dc0149ce",
-      "after_sha256": "689d9c28fc023536ec854ec7335ae32d7804ce31d1483e291c0b6b078b7f3aad",
+      "after_sha256": "f57f5c7163552d715af35f05efbf027333a66cf2abe467b902b5d95b16e1f9c5",
       "owners": {
         "test_failed_real_source_builder_stops_pytest_before_dispatch": {
           "before": "08cb1c83cd6f5b181f61991708e34f564dfc03429a60d161f4235401ce52d115",
           "after": "0a5bbbcbcd8cf524196183114783a0bfcf8284f1ab26ad77eed5744a56dcc6a2"
+        },
+        "test_serial_mirror_balancing_preserves_measurements_and_accounts_for_execution": {
+          "before": "0f8ca7bdceda87a5cacb370c312dad5ebbf8c218154b480e5695065acfe67758",
+          "after": "33b57346574e108e6934368c4c8865f4276b1ba3e31cb0b3a7b6e544d0ff396a"
         }
       }
     },
@@ -435,6 +467,16 @@
           "after": "03553198c96e5edf41410bd37322aec1ef54eb0b331341d679a475d07cef8c71"
         }
       }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "6c790b11507259aa6da498331946fe1ddcb440030dedbed429f7777c5c75ca6c",
+      "after_sha256": "e55080c29061047c6578383b6f707c1ed01767e0a26d076de1478a626a510307",
+      "owners": {
+        "@document": {
+          "before": "6c790b11507259aa6da498331946fe1ddcb440030dedbed429f7777c5c75ca6c",
+          "after": "e55080c29061047c6578383b6f707c1ed01767e0a26d076de1478a626a510307"
+        }
+      }
     }
   },
   "rows": {
@@ -442,17 +484,17 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
-      "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "rationale": "Document the actual cold source-index and minimum-load shard-role policy; enable supported pytest stack dumps after 180 seconds without exiting the test process.",
+      "source_obligation": "Distinguish cold builder waits from slow test/finalization work through keyed lifecycle diagnostics and dump-only stacks. Preserve the 840-second behavioral setup/test cutoff, four hosted workers, twelve shards, 600-second quality and 180-second serial performance budgets, all selected cases and coverage thresholds.",
+      "unchanged_work": "Only workflow diagnostics and operator documentation change. No deadline, assertion, cache admission rule, production decision path or worker count is weakened. The separately assessed bucket permutation preserves fixed bucket contents and all measured scheduling weights; fresh hosted CI must qualify actual wall time."
     },
     "README.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
-      "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "rationale": "Document the actual cold source-index and minimum-load shard-role policy; enable supported pytest stack dumps after 180 seconds without exiting the test process.",
+      "source_obligation": "Distinguish cold builder waits from slow test/finalization work through keyed lifecycle diagnostics and dump-only stacks. Preserve the 840-second behavioral setup/test cutoff, four hosted workers, twelve shards, 600-second quality and 180-second serial performance budgets, all selected cases and coverage thresholds.",
+      "unchanged_work": "Only workflow diagnostics and operator documentation change. No deadline, assertion, cache admission rule, production decision path or worker count is weakened. The separately assessed bucket permutation preserves fixed bucket contents and all measured scheduling weights; fresh hosted CI must qualify actual wall time."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -471,7 +513,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -490,7 +532,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -509,7 +551,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -528,7 +570,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -547,7 +589,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -566,7 +608,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -585,7 +627,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -604,7 +646,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -623,7 +665,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -642,7 +684,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -661,7 +703,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -680,7 +722,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -699,7 +741,7 @@
       "selected_families": [],
       "rationale": "Refresh complete per-case scheduling weights and twelve-shard assignments from the successful full covered local JUnit profile; all selected tests and timing budgets are preserved.",
       "source_obligation": "Every current collected case requires a genuine measured scheduling weight. The complete 5881-case successful WSL CPython 3.14.5 profile supplies current cases without synthesized or missing durations; no selected case is dropped.",
-      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments, without changing the scheduler algorithm, selected-case inventory or budgets. Test-fixture assembly changes are assessed separately. Engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
+      "unchanged_work": "This regeneration changes measured scheduling inputs and deterministic assignments. The separately assessed scheduler changes only the cold-role bucket permutation and nonempty validation; test-fixture assembly is also assessed separately. Selected cases, budgets, engine algorithms, dependencies and registered benchmark drivers are unchanged. No CI speedup is claimed. Serial current-runtime smoke, fresh postflight and applicable live quality checks remain required."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -1087,6 +1129,24 @@
       "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
       "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Explicitly map the existing failed-real-source-builder diagnostic control to the CI startup operation with no detailed benchmark family.",
+      "source_obligation": "Cover every changed test owner while preserving all existing operation mappings, mandatory flags, sensitivity and benchmark-family requirements.",
+      "unchanged_work": "One test-only operation registration is added. No existing mapping or comparison requirement is removed or relaxed; source/runtime performance smoke and live controls remain required."
+    },
+    "scripts/build_test_shards.py": {
+      "category": "algorithm_or_search",
+      "operations": [
+        "behavioral-worksteal-dispatch"
+      ],
+      "selected_families": [],
+      "rationale": "After unchanged greedy balancing, deterministically assign the bucket with the smallest unrounded modeled test load to the sole cold source-index shard. Reject empty buckets and manifests before overwriting any output.",
+      "source_obligation": "The cold role must not be assigned by largest-first insertion order. Preserve all fixed bucket contents, measured case and selector weights, serial mirror isolation and exact-once selection. Canonical full-precision summation and original bucket index break ties. A nonnegative cold penalty cannot worsen the fixed-bucket maximum when assigned to the minimum-load bucket.",
+      "unchanged_work": "No scheduling reserve, timing constant, case omission, deadline increase, shard-count change or CI worker-count change is introduced. Startup and finalization are not test-duration measurements. Only existing behavioral-worksteal-dispatch owners change and that mapped operation has no detailed family. Serial runtime smoke, live scheduling controls, a complete passing local profile and fresh hosted CI remain required; no hosted wall-time guarantee is claimed."
+    },
     "scripts/ci_source_index.py": {
       "category": "measured_workload",
       "operations": [
@@ -1121,12 +1181,15 @@
       "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
     },
     "tests/code_quality/test_ci_performance_gates.py": {
-      "category": "governance",
-      "operations": [],
+      "category": "measured_workload",
+      "operations": [
+        "behavioral-worksteal-dispatch-tests",
+        "ci-source-index-startup-tests"
+      ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only command-point reference verification and exact accepted-record horizon admission; refresh the mandatory generated identities only.",
-      "source_obligation": "A local target declaration cannot prove its calculation or horizon. Recompute the perspective command-point balance from the admitted endpoint checkpoint and require exact accepted-record distance from the linked row, counting automatic choices and excluding rejected attempts.",
-      "unchanged_work": "Existing engine, adapter, runner, persistence and replay algorithms, caches, dependencies and registered benchmark drivers are unchanged. The separately assessed test-fixture assembly repair retains ordinary authority and replay checks. The offline calculator adds no existing benchmark family. Serial current-runtime smoke and fresh postflight remain required; full-game performance remains unqualified."
+      "rationale": "Extend existing controls to verify actual keyed builder diagnostics, deterministic minimum-load cold-role assignment, unchanged measurements and fail-closed empty generated or committed buckets.",
+      "source_obligation": "Preserve all original assertions and collected test identities. Test canonical unrounded ties, exact-once membership, serial mirror preservation and rejection before output mutation. Diagnostics must match actual subprocess completion; committed-manifest checks retain the existing exact inventory and deterministic assignment validator.",
+      "unchanged_work": "No test is dropped or deferred, and no assertion, worker requirement or deadline is relaxed. These are live controls for the bounded CI repair; normal suites retain at least twelve local workers. Only already mapped worksteal-dispatch test owners change beyond diagnostics."
     },
     "tests/infrastructure/adapters/test_training_admission.py": {
       "category": "measured_workload",
@@ -1137,6 +1200,16 @@
       "rationale": "Exercise verified CP targets and horizons; use ordinary terminal prefix commits and module-scoped genuinely verified immutable terminal evidence for label-only cases, eliminating discarded or repeated positive proof preparation.",
       "source_obligation": "Preserve ordinary configuration, terrain, phases, five rounds, CP balance, engine scoring, every selected case and assertion. Restore the final before boundary through persistence. Keep dedicated origin, transition, loader, drift and boundary tests fresh; label cases still execute their target/calculator checks against verified immutable inputs.",
       "unchanged_work": "Only test-fixture assembly and positive-input reuse change. Engine algorithms, authoritative decision paths, actual replay checks, benchmark drivers, case inventory and timing budgets are unchanged. No engine or full-game speedup is claimed. Full covered behavior, measured scheduling data, serial smoke and quality checks qualify final inputs."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the single current authenticated README digest after documenting CI diagnostics and cold-role scheduling.",
+      "source_obligation": "Authenticate the actual reviewed README bytes. Preserve every historical digest, literal raw-rule capture, gameplay binding and authentication assertion.",
+      "unchanged_work": "Only the current README metadata digest changes. This binding refresh claims no semantic qualification or performance result. All source authentication tests, full covered behavior and required quality checks remain required."
     }
   },
   "milestone": "ordinary",

@@ -5884,32 +5884,34 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 338.568,
+      "1": 238.742,
       "10": 238.743,
       "11": 238.744,
       "12": 238.743,
       "2": 238.742,
       "3": 238.743,
       "4": 238.742,
-      "5": 238.742,
+      "5": 338.568,
       "6": 238.742,
       "7": 238.742,
       "8": 238.743,
       "9": 238.744
     },
+    "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
+    "cold_shard_id": 1,
     "parallel_workers": 4,
     "serial_cases": [
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 1354.274,
+      "1": 954.969,
       "10": 954.97,
       "11": 954.974,
       "12": 954.974,
       "2": 954.97,
       "3": 954.973,
       "4": 954.969,
-      "5": 954.969,
+      "5": 1354.274,
       "6": 954.969,
       "7": 954.97,
       "8": 954.97,
@@ -6352,9 +6354,9 @@
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 1354.274,
+      "duration_seconds": 954.969,
       "shard_id": 1,
-      "test_file_count": 1
+      "test_file_count": 37
     },
     {
       "duration_seconds": 954.97,
@@ -6372,9 +6374,9 @@
       "test_file_count": 38
     },
     {
-      "duration_seconds": 954.969,
+      "duration_seconds": 1354.274,
       "shard_id": 5,
-      "test_file_count": 37
+      "test_file_count": 1
     },
     {
       "duration_seconds": 954.969,

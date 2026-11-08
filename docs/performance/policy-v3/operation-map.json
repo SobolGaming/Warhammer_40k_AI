@@ -35404,6 +35404,17 @@
       "sensitive": false,
       "mandatory": true
     },
+    "ci-source-index-startup-tests": {
+      "paths": [
+        "tests/code_quality/test_ci_performance_gates.py"
+      ],
+      "owners": [
+        "test_failed_real_source_builder_stops_pytest_before_dispatch"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "finite-training-candidate-linkage": {
       "paths": [
         "src/warhammer40k_core/ai/training_candidates.py",
