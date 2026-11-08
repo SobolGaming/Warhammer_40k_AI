@@ -4,6 +4,126 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a74a199c7ceb83a5cffd83831039d92c7a277381623d2f1e83f14e7943bc1bed",
   "operation_map_sha256": "10d7966e40898c329f1fff084a67e64026e92d0444f9b21344c1b0403530a040",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "dd2fd1de0dedac61aa8eb37be21468303d57f3be7ea86d03fc8f3661fa2a393a",
+      "after_sha256": "23f14e7d0459328eb61c9d5a0bb25bfc3a73e3de1cd442925926ee954ba98f39",
+      "owners": {
+        "@document": {
+          "before": "dd2fd1de0dedac61aa8eb37be21468303d57f3be7ea86d03fc8f3661fa2a393a",
+          "after": "23f14e7d0459328eb61c9d5a0bb25bfc3a73e3de1cd442925926ee954ba98f39"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "f8408ebe9ea838682331a243f40b5e45b2adac33f586696610ebde7fbc0d8fbb",
+      "after_sha256": "dc0bf792a278a699a6b01ea01e066240be323c65f5fc0dbda213812027a8989b",
+      "owners": {
+        "@document": {
+          "before": "f8408ebe9ea838682331a243f40b5e45b2adac33f586696610ebde7fbc0d8fbb",
+          "after": "dc0bf792a278a699a6b01ea01e066240be323c65f5fc0dbda213812027a8989b"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "ff2ce54ed1bfe6a7a5f6d31ec82d9caa561cb889bd8da5b2facd8c87bd9e0060",
+      "after_sha256": "3422bf622448ba714e29da669b0efaf55a3131480b212746dcfa8867a6c1cfd7",
+      "owners": {
+        "@document": {
+          "before": "ff2ce54ed1bfe6a7a5f6d31ec82d9caa561cb889bd8da5b2facd8c87bd9e0060",
+          "after": "3422bf622448ba714e29da669b0efaf55a3131480b212746dcfa8867a6c1cfd7"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "0e966ab0c1850b1dbeb0b7de54b156618e9c1a46e094fb2f71716cedd365640e",
+      "after_sha256": "fca4cf55436d1e4561864cebcbb26d893458caa979530312692651506589c987",
+      "owners": {
+        "@document": {
+          "before": "0e966ab0c1850b1dbeb0b7de54b156618e9c1a46e094fb2f71716cedd365640e",
+          "after": "fca4cf55436d1e4561864cebcbb26d893458caa979530312692651506589c987"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "399c405570810d40db7f0429ecd79df66148a0bc54eaced7e6c2d587ce12a5ae",
+      "after_sha256": "da4fe3dab6e38c6977c84f5cce84e4891d2ef8096db8bfc517df692382594c19",
+      "owners": {
+        "@document": {
+          "before": "399c405570810d40db7f0429ecd79df66148a0bc54eaced7e6c2d587ce12a5ae",
+          "after": "da4fe3dab6e38c6977c84f5cce84e4891d2ef8096db8bfc517df692382594c19"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "cc3a87d1e80c190f78b02baf398a2a9ac0cb7d9f2a2b7526836df0a6c5949bbd",
+      "after_sha256": "81bb6045eede3fc0cafcd76d8d4b0f1c6fb8b9e1c565689e4e00022ef9b9a3f7",
+      "owners": {
+        "@document": {
+          "before": "cc3a87d1e80c190f78b02baf398a2a9ac0cb7d9f2a2b7526836df0a6c5949bbd",
+          "after": "81bb6045eede3fc0cafcd76d8d4b0f1c6fb8b9e1c565689e4e00022ef9b9a3f7"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "9d8f3c178a53f6288998dbf5d65060a1998ad3af9aa0004e9827e2225e1494e9",
+      "after_sha256": "1174df5684308a4f56c8c85e265bd60d6168e8a2032aae37f2d6804088e63874",
+      "owners": {
+        "@document": {
+          "before": "9d8f3c178a53f6288998dbf5d65060a1998ad3af9aa0004e9827e2225e1494e9",
+          "after": "1174df5684308a4f56c8c85e265bd60d6168e8a2032aae37f2d6804088e63874"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "6c8fd6dd8169c13c3323428be50e2012ca370312645e92ec7011d657bf5843de",
+      "after_sha256": "b5c8f54d4633e61088c0975297559ade271065052b0de45bae047b685472abcd",
+      "owners": {
+        "@document": {
+          "before": "6c8fd6dd8169c13c3323428be50e2012ca370312645e92ec7011d657bf5843de",
+          "after": "b5c8f54d4633e61088c0975297559ade271065052b0de45bae047b685472abcd"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "c4d76aaeafc6197eb445f014b7202bdd0a65ef013afc7fa86855d47c39439635",
+      "after_sha256": "fec34e9ba21471c536ad6a0796f89bbf157685e78e158daf3a274f047e2e260c",
+      "owners": {
+        "@document": {
+          "before": "c4d76aaeafc6197eb445f014b7202bdd0a65ef013afc7fa86855d47c39439635",
+          "after": "fec34e9ba21471c536ad6a0796f89bbf157685e78e158daf3a274f047e2e260c"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "2580b18bb543e950d0020b6279fe06320549655cba652f52fffc7e980221e303",
+      "after_sha256": "b7c0be8c4eea2c6a2c00fe2bafd107c8c0b7b0cbf6bb21fe36884e61296c5edf",
+      "owners": {
+        "@document": {
+          "before": "2580b18bb543e950d0020b6279fe06320549655cba652f52fffc7e980221e303",
+          "after": "b7c0be8c4eea2c6a2c00fe2bafd107c8c0b7b0cbf6bb21fe36884e61296c5edf"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "82ec3df9a6ef3e8a1454cf21c9f3672e99c639bdc6e82a3a0a9adeed172fd215",
+      "after_sha256": "58f8a7ea2fe5f84d57fe60c1a77a0ca884435eb0b0ef96bd63e49abc051e317f",
+      "owners": {
+        "@document": {
+          "before": "82ec3df9a6ef3e8a1454cf21c9f3672e99c639bdc6e82a3a0a9adeed172fd215",
+          "after": "58f8a7ea2fe5f84d57fe60c1a77a0ca884435eb0b0ef96bd63e49abc051e317f"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "e2f0e81de2c788137984ff365c0d4a8eb7265af2cff49b46d03e904f85365bbd",
+      "after_sha256": "c52e85cf8291ce3dc783c1809863bc488f906346dfa304836bfade0117961f45",
+      "owners": {
+        "@document": {
+          "before": "e2f0e81de2c788137984ff365c0d4a8eb7265af2cff49b46d03e904f85365bbd",
+          "after": "c52e85cf8291ce3dc783c1809863bc488f906346dfa304836bfade0117961f45"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "6aff32b647253b564e896765caf871837ef5ec6dba9cee609f17b29fca3fc294",
       "after_sha256": "7d63b79088b1a3cffe4dd1486698a3232fdef95d408ac6494686ab889cc0bdb1",
@@ -252,6 +372,234 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
