@@ -112,7 +112,7 @@ def terminal_proofs(terminal: AdmissionCase) -> tuple[TerminalProof, ...]:
     origin = VerifiedEpisodeOrigin.from_session(
         terminal.before, config=terminal.before.lifecycle.config
     )
-    proofs = []
+    proofs: list[TerminalProof] = []
     for perspective in ("player-a", "player-b"):
         transition = terminal.transition(perspective=perspective)
         episode = FiniteEpisodeAdmission.from_transitions(

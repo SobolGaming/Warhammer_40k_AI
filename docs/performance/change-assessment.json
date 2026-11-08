@@ -236,11 +236,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "26ba0c7aa78d9cceceef45aee44d9e9f262284d979bd6163cc8cdc710040a79f",
-      "after_sha256": "f093e0ceee32f20f3b7902dc79fc51eae90f47054f885a5e4b234a6982352582",
+      "after_sha256": "8173195b578069780148e12f04f27ab1ecbcd3dad91ede72d3c3a60dd4b7d091",
       "owners": {
         "@document": {
           "before": "26ba0c7aa78d9cceceef45aee44d9e9f262284d979bd6163cc8cdc710040a79f",
-          "after": "f093e0ceee32f20f3b7902dc79fc51eae90f47054f885a5e4b234a6982352582"
+          "after": "8173195b578069780148e12f04f27ab1ecbcd3dad91ede72d3c3a60dd4b7d091"
         }
       }
     },
@@ -356,7 +356,7 @@
     },
     "tests/infrastructure/adapters/test_training_admission.py": {
       "before_sha256": "a8dc39b97c5491fc9a23165cdf08acbd2899ab56e53c928706409cd65f836db0",
-      "after_sha256": "683b44ba1306e4ddfdb7b4e94dc79ab8d05ecf310303309f2d686f1a5f3608c2",
+      "after_sha256": "7181b401f29f9b95be447efa2ebe90fec77e5cabf7286c07fa3ee4f3017723d1",
       "owners": {
         "@module": {
           "before": "ad862f13422dc2ca62f5fd408465d077578646035d76a2c83c9c24fafa5ceb63",
@@ -384,7 +384,7 @@
         },
         "terminal_proofs": {
           "before": null,
-          "after": "bf2ee3cea888b8948ad1a5648fad0a7a03d492bd94aae80d03dd5c909db0631c"
+          "after": "4f8ca1f4b838414e2bd1062836ea20a7ce88e21c47479ae4d9410d7e3e5ae1d2"
         },
         "test_admission_factories_are_required": {
           "before": "fd6cc9485aab9b3fae591086bec049fcf4bfa3835cba9fcde9e19b3b411e6e06",
