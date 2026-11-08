@@ -35488,6 +35488,19 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "deployment-bounded-candidates": {
+      "paths": [
+        "src/warhammer40k_core/ai/deployment_candidate_search.py",
+        "src/warhammer40k_core/ai/deployment_candidate_validation.py",
+        "tests/infrastructure/adapters/test_deployment_candidates.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
