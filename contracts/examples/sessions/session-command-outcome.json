@@ -19,7 +19,7 @@
   "session": {
     "catalog_id": "phase9a-canonical",
     "created_at": "2026-07-18T20:00:00Z",
-    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e024e1e02a334bef18b3c1cdb921396d5f314298fae747cb9bdee0739010b7f2",
+    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b5aa998fb3e387e794b2f1482ae12cad55f68059461a88617fdb9b5bf40fe96f",
     "engine_version": "0.1.0",
     "event_cursor": "yrmdljckuNDyy3XIw-ipC3pifeN-U-dDOpt-va2S1LWosqbjyBlYmTdHmBR4TGD7",
     "game_id": "phase18e-contract-session",

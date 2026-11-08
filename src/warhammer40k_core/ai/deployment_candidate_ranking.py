@@ -30,7 +30,7 @@ DEPLOYMENT_RANKING_TIE_BREAK = "first-generated-accepted-v1"
 @dataclass(frozen=True, slots=True)
 class DeploymentCandidateScore:
     candidate_id: str
-    value: float
+    value: int | float
 
     def __post_init__(self) -> None:
         if type(self.candidate_id) is not str or not self.candidate_id.strip():
@@ -43,7 +43,10 @@ class DeploymentCandidateScore:
             raise PolicyError("Deployment scores require finite numeric values.") from exc
         if not math.isfinite(number):
             raise PolicyError("Deployment scores require finite numeric values.")
-        object.__setattr__(self, "value", 0.0 if number == 0 else number)
+        # Float conversion checks the admitted range, never the comparison value.
+        # Native int/float comparison and canonical JSON preserve exact integers.
+        if type(self.value) is float and number == 0:
+            object.__setattr__(self, "value", 0.0)
 
 
 class DeploymentCandidateRanker(Protocol):

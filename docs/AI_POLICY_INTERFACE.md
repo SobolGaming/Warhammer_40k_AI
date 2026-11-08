@@ -504,7 +504,10 @@ code that independently captures authority in a closure.
 A ranker returns a tuple of `DeploymentCandidateScore(candidate_id, value)` entries
 covering every accepted ID exactly once. Only finite integer/float values are
 accepted; booleans, nonfinite values, overflow and malformed/missing/extraneous/
-duplicate scores fail explicitly. Higher scores win. Equal scores select the
+duplicate scores fail explicitly. Integer scores retain their exact value for
+comparison and JSON evidence; the existing finite float-conversion check remains
+the admission range bound. Mixed integer/float comparisons do not coerce integer
+scores to floats. Higher scores win. Equal scores select the
 first accepted candidate in original generated order, independent of returned
 score ordering, under `first-generated-accepted-v1`. No fallback choice is made.
 The live checkpoint is checked again after the callback and when `select` returns

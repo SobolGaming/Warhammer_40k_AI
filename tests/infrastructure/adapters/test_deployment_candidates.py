@@ -943,6 +943,69 @@ def test_deployment_ranking_ties_follow_generation_not_score_order(
 
 
 @pytest.mark.parametrize(
+    ("values", "selected_index"),
+    [
+        ((2**53, 2**53 + 1), 1),
+        ((-(2**53 + 1), -(2**53)), 1),
+        ((float(2**53), 2**53 + 1), 1),
+        ((2**53 + 1, float(2**53)), 0),
+        ((2**53, float(2**53)), 0),
+        ((-1, -0.5), 1),
+        ((2**64, 2**64 + 1), 1),
+        ((10**308, 10**308 + 1), 1),
+    ],
+)
+def test_deployment_ranking_preserves_exact_numeric_scores_and_receipt(
+    deployment_session: LocalGameSession,
+    ranking_case: tuple[PlayerDecisionContext, ValidatedDeploymentCandidates],
+    values: tuple[int | float, int | float],
+    selected_index: int,
+) -> None:
+    context, validated = ranking_case
+
+    class NumericRanker:
+        def score(
+            self, context: PlayerDecisionContext, candidates: tuple[DeploymentCandidatePayload, ...]
+        ) -> tuple[DeploymentCandidateScore, ...]:
+            return tuple(
+                reversed(
+                    tuple(
+                        DeploymentCandidateScore(candidate["candidate_id"], value)
+                        for candidate, value in zip(candidates, values, strict=True)
+                    )
+                )
+            )
+
+    before = deployment_session.to_persistence_payload()
+    ranker = NumericRanker()
+    ranked = RankedDeploymentCandidates.rank(
+        validated,
+        context=context,
+        session=deployment_session,
+        ranker=ranker,
+        ranker_id="exact-numeric-v1",
+    )
+    assert ranked.selected_candidate_id == validated.accepted_ids[selected_index]
+    payload = json.loads(canonical_json(ranked.to_payload()))
+    scores = cast(list[dict[str, JsonValue]], payload["scores"])
+    assert [score["value"] for score in scores] == list(values)
+    assert [type(score["value"]) for score in scores] == [type(value) for value in values]
+    restored = RankedDeploymentCandidates.from_payload(
+        payload,
+        validated=validated,
+        context=context,
+        session=deployment_session,
+        ranker=ranker,
+        ranker_id="exact-numeric-v1",
+    )
+    assert restored == ranked
+    assert restored.select(context, session=deployment_session) == validated.select(
+        context, validated.accepted_ids[selected_index], session=deployment_session
+    )
+    assert deployment_session.to_persistence_payload() == before
+
+
+@pytest.mark.parametrize(
     "value", [True, "1", None, float("nan"), float("inf"), -float("inf"), 10**1000]
 )
 def test_deployment_score_rejects_nonfinite_and_untyped_values(value: object) -> None:

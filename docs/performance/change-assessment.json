@@ -1,226 +1,226 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "b20ef88d2ef5ab87500ccc1f13d61aeb7c29f59b",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e024e1e02a334bef18b3c1cdb921396d5f314298fae747cb9bdee0739010b7f2",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b5aa998fb3e387e794b2f1482ae12cad55f68059461a88617fdb9b5bf40fe96f",
   "operation_map_sha256": "609ab19b1a15b2d1560c81f7c484482b06d547c426c2b690a5b78f92e20fcc9b",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "23f14e7d0459328eb61c9d5a0bb25bfc3a73e3de1cd442925926ee954ba98f39",
-      "after_sha256": "b594be2b28e870a520f0fbf0344cb3ea511dc8240da8568bc7b666bc50531250",
+      "after_sha256": "a8f3993ca3e0e5d67f68f99fff2926904b7887901a9db49bb5dbae57c07a63c6",
       "owners": {
         "@document": {
           "before": "23f14e7d0459328eb61c9d5a0bb25bfc3a73e3de1cd442925926ee954ba98f39",
-          "after": "b594be2b28e870a520f0fbf0344cb3ea511dc8240da8568bc7b666bc50531250"
+          "after": "a8f3993ca3e0e5d67f68f99fff2926904b7887901a9db49bb5dbae57c07a63c6"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "dc0bf792a278a699a6b01ea01e066240be323c65f5fc0dbda213812027a8989b",
-      "after_sha256": "811e854e68467ac005a960282bc50b7f19997365a6ef922c407dd5abb3af0499",
+      "after_sha256": "22fc21e0a63211b097de09f65ace21776e3f862a2442e41ef351a319df7f3e8f",
       "owners": {
         "@document": {
           "before": "dc0bf792a278a699a6b01ea01e066240be323c65f5fc0dbda213812027a8989b",
-          "after": "811e854e68467ac005a960282bc50b7f19997365a6ef922c407dd5abb3af0499"
+          "after": "22fc21e0a63211b097de09f65ace21776e3f862a2442e41ef351a319df7f3e8f"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "3422bf622448ba714e29da669b0efaf55a3131480b212746dcfa8867a6c1cfd7",
-      "after_sha256": "bb794a68a7ff2324fc7b9a7de3e0f35441f60450631ae1f07144061754fb36d5",
+      "after_sha256": "c259344f32c10b50142ffbd6fc28a80280e8c9e2f13a0fdd247853236c28a3b1",
       "owners": {
         "@document": {
           "before": "3422bf622448ba714e29da669b0efaf55a3131480b212746dcfa8867a6c1cfd7",
-          "after": "bb794a68a7ff2324fc7b9a7de3e0f35441f60450631ae1f07144061754fb36d5"
+          "after": "c259344f32c10b50142ffbd6fc28a80280e8c9e2f13a0fdd247853236c28a3b1"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "fca4cf55436d1e4561864cebcbb26d893458caa979530312692651506589c987",
-      "after_sha256": "711726ae8e2ff46aa0e3e2c8a93866ad131962376b290e04a369352d99fdb98d",
+      "after_sha256": "0128e335b1b8ee9106051a094692ddddf458c00434e4417700273c45ad80585b",
       "owners": {
         "@document": {
           "before": "fca4cf55436d1e4561864cebcbb26d893458caa979530312692651506589c987",
-          "after": "711726ae8e2ff46aa0e3e2c8a93866ad131962376b290e04a369352d99fdb98d"
+          "after": "0128e335b1b8ee9106051a094692ddddf458c00434e4417700273c45ad80585b"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "da4fe3dab6e38c6977c84f5cce84e4891d2ef8096db8bfc517df692382594c19",
-      "after_sha256": "b71d7d2f213172ed6ce4ee364170ec84ccae5efacb8778e83b4efec45b824750",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
       "owners": {
         "@document": {
           "before": "da4fe3dab6e38c6977c84f5cce84e4891d2ef8096db8bfc517df692382594c19",
-          "after": "b71d7d2f213172ed6ce4ee364170ec84ccae5efacb8778e83b4efec45b824750"
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "81bb6045eede3fc0cafcd76d8d4b0f1c6fb8b9e1c565689e4e00022ef9b9a3f7",
-      "after_sha256": "93b7a21f433fb1ee81af8f5a729a2248e618b457a9a71a55ee190d4e817d21d1",
+      "after_sha256": "d69b988abd9ba8abeae53c5a02d0ce911d337198d793a2bd530d0471942bc01c",
       "owners": {
         "@document": {
           "before": "81bb6045eede3fc0cafcd76d8d4b0f1c6fb8b9e1c565689e4e00022ef9b9a3f7",
-          "after": "93b7a21f433fb1ee81af8f5a729a2248e618b457a9a71a55ee190d4e817d21d1"
+          "after": "d69b988abd9ba8abeae53c5a02d0ce911d337198d793a2bd530d0471942bc01c"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "1174df5684308a4f56c8c85e265bd60d6168e8a2032aae37f2d6804088e63874",
-      "after_sha256": "01f65c45b03f756ab75448b4b41db3fb34f61162796913adf5f3767492807a4e",
+      "after_sha256": "85f4173c6adb845693e20959795c94df67091ee7a5021c606ee0402a61dacb8b",
       "owners": {
         "@document": {
           "before": "1174df5684308a4f56c8c85e265bd60d6168e8a2032aae37f2d6804088e63874",
-          "after": "01f65c45b03f756ab75448b4b41db3fb34f61162796913adf5f3767492807a4e"
+          "after": "85f4173c6adb845693e20959795c94df67091ee7a5021c606ee0402a61dacb8b"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "b5c8f54d4633e61088c0975297559ade271065052b0de45bae047b685472abcd",
-      "after_sha256": "c5d2d5d71a19cdc3a44901ed337f87f610f4d636e01352993de6bb4d38ade3c6",
+      "after_sha256": "dc17b0d48d683da7bd35cc3426ce0191b0f5dec455261056e68d6e9fd42a8921",
       "owners": {
         "@document": {
           "before": "b5c8f54d4633e61088c0975297559ade271065052b0de45bae047b685472abcd",
-          "after": "c5d2d5d71a19cdc3a44901ed337f87f610f4d636e01352993de6bb4d38ade3c6"
+          "after": "dc17b0d48d683da7bd35cc3426ce0191b0f5dec455261056e68d6e9fd42a8921"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "fec34e9ba21471c536ad6a0796f89bbf157685e78e158daf3a274f047e2e260c",
-      "after_sha256": "0664b241fc893e085f44a783d30070d10796cf8d283f9aa72744de1f433f2d2e",
+      "after_sha256": "58567bfa1e07decde80fab91a980a1555cf4222af9f3211f998c7c43829cb54d",
       "owners": {
         "@document": {
           "before": "fec34e9ba21471c536ad6a0796f89bbf157685e78e158daf3a274f047e2e260c",
-          "after": "0664b241fc893e085f44a783d30070d10796cf8d283f9aa72744de1f433f2d2e"
+          "after": "58567bfa1e07decde80fab91a980a1555cf4222af9f3211f998c7c43829cb54d"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "b7c0be8c4eea2c6a2c00fe2bafd107c8c0b7b0cbf6bb21fe36884e61296c5edf",
-      "after_sha256": "4351b7acca3b9967122f1e8ddf64bafb5e8490b8125e2102ccff45898f6ef5ab",
+      "after_sha256": "fca6f8d79c34d1c9fbb3d40780d6e8322f6008383864ada3a468458581b2cf05",
       "owners": {
         "@document": {
           "before": "b7c0be8c4eea2c6a2c00fe2bafd107c8c0b7b0cbf6bb21fe36884e61296c5edf",
-          "after": "4351b7acca3b9967122f1e8ddf64bafb5e8490b8125e2102ccff45898f6ef5ab"
+          "after": "fca6f8d79c34d1c9fbb3d40780d6e8322f6008383864ada3a468458581b2cf05"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "58f8a7ea2fe5f84d57fe60c1a77a0ca884435eb0b0ef96bd63e49abc051e317f",
-      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "5f48795e320fea2e9fcb9bbcad7b88463570d30e5f6e5c4b34bfdabb8441c02f",
       "owners": {
         "@document": {
           "before": "58f8a7ea2fe5f84d57fe60c1a77a0ca884435eb0b0ef96bd63e49abc051e317f",
-          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
+          "after": "5f48795e320fea2e9fcb9bbcad7b88463570d30e5f6e5c4b34bfdabb8441c02f"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "4dcf83f2f71eb50e731f6e84f239e765aeec57c44fbf9a47ee140abe4c2644c0",
+      "after_sha256": "3916137f6da388ed619f65d7f0c782dec7803a792159e823a5781aedd41e35c0",
       "owners": {
         "@document": {
           "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "4dcf83f2f71eb50e731f6e84f239e765aeec57c44fbf9a47ee140abe4c2644c0"
+          "after": "3916137f6da388ed619f65d7f0c782dec7803a792159e823a5781aedd41e35c0"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "c52e85cf8291ce3dc783c1809863bc488f906346dfa304836bfade0117961f45",
-      "after_sha256": "0b11a3e40cc03f44f8a156b2c038e9853361b968e36035cc4b4b2e678e9c4e8c",
+      "after_sha256": "75ccbf42a4e42b7e7da91b350dced5a1d47c962f8f0f589d54b4c7183ada647a",
       "owners": {
         "@document": {
           "before": "c52e85cf8291ce3dc783c1809863bc488f906346dfa304836bfade0117961f45",
-          "after": "0b11a3e40cc03f44f8a156b2c038e9853361b968e36035cc4b4b2e678e9c4e8c"
+          "after": "75ccbf42a4e42b7e7da91b350dced5a1d47c962f8f0f589d54b4c7183ada647a"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "7d63b79088b1a3cffe4dd1486698a3232fdef95d408ac6494686ab889cc0bdb1",
-      "after_sha256": "02d0a4fffc3c9366a797af411432689be0213ad86f9533edf929c830385bc9b4",
+      "after_sha256": "acfe8bf4e4c954e3d9bb12a8e2e13950389b4a82f92b773347ec92c974c0c99f",
       "owners": {
         "@document": {
           "before": "7d63b79088b1a3cffe4dd1486698a3232fdef95d408ac6494686ab889cc0bdb1",
-          "after": "02d0a4fffc3c9366a797af411432689be0213ad86f9533edf929c830385bc9b4"
+          "after": "acfe8bf4e4c954e3d9bb12a8e2e13950389b4a82f92b773347ec92c974c0c99f"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "5477f59ec24f310d2d760d1d4f64c641802ce4f3dfe2b3d51711e7d850378b57",
-      "after_sha256": "07b5d07926abdbfadddb1ea68dbe7e280a90e53f380e80a80fcaa9737c97d005",
+      "after_sha256": "3ef217a9c437575f784f831c05de434905e2b0788c80d9ec12d745036940af25",
       "owners": {
         "@document": {
           "before": "5477f59ec24f310d2d760d1d4f64c641802ce4f3dfe2b3d51711e7d850378b57",
-          "after": "07b5d07926abdbfadddb1ea68dbe7e280a90e53f380e80a80fcaa9737c97d005"
+          "after": "3ef217a9c437575f784f831c05de434905e2b0788c80d9ec12d745036940af25"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "db9a8f930913901274e252a65f0dd1fd07e1308e8e9c9e3707d3a581d199ac38",
-      "after_sha256": "469b0309e51741e828f5c4b5ef1ff2e1787749daf40eb6dbefc666f192c52a46",
+      "after_sha256": "adc46556ff6b608272b13bd5fa0f5397a9a212cc4defd153e13c9d7587c76ae5",
       "owners": {
         "@document": {
           "before": "db9a8f930913901274e252a65f0dd1fd07e1308e8e9c9e3707d3a581d199ac38",
-          "after": "469b0309e51741e828f5c4b5ef1ff2e1787749daf40eb6dbefc666f192c52a46"
+          "after": "adc46556ff6b608272b13bd5fa0f5397a9a212cc4defd153e13c9d7587c76ae5"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "bc098bf74c4e1a797a6176743e5cad22437a521762967c97cf8f2be3a20f7f4a",
-      "after_sha256": "14d255947184ab468c84cadf1ab551630ac78106a5d0e5dcf71a7f3109ba5363",
+      "after_sha256": "8b61180588c6f1dc7564098c0bfe4c67b7b5a90120a8405c46ab86bf5f020218",
       "owners": {
         "@document": {
           "before": "bc098bf74c4e1a797a6176743e5cad22437a521762967c97cf8f2be3a20f7f4a",
-          "after": "14d255947184ab468c84cadf1ab551630ac78106a5d0e5dcf71a7f3109ba5363"
+          "after": "8b61180588c6f1dc7564098c0bfe4c67b7b5a90120a8405c46ab86bf5f020218"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "74eb2223c39fd01020cc230f83d3fca7b66c549277687ffb17af37fe5758092e",
-      "after_sha256": "d8066c264e80c3f6bd5f7e27d17c3b7b7d194667c78ae2d7952fce00bcc70aa6",
+      "after_sha256": "0d1bca868b420ca9682799d9667ed75ba845e825198fee886d42a5ba18b6bb9b",
       "owners": {
         "@document": {
           "before": "74eb2223c39fd01020cc230f83d3fca7b66c549277687ffb17af37fe5758092e",
-          "after": "d8066c264e80c3f6bd5f7e27d17c3b7b7d194667c78ae2d7952fce00bcc70aa6"
+          "after": "0d1bca868b420ca9682799d9667ed75ba845e825198fee886d42a5ba18b6bb9b"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "c71c321e55ea193fd64c5d1d652f6ae5a44436ba9f101fba206d0fbf6b57a153",
-      "after_sha256": "e6f47049bfb1bd2bd2cc840860d614cfa525a31ea89e440940f814dfda3e82b4",
+      "after_sha256": "b2a998de6d90ee6bf74a03ab1e6198a58fa507e5d83df482960da796f7fc85ba",
       "owners": {
         "@document": {
           "before": "c71c321e55ea193fd64c5d1d652f6ae5a44436ba9f101fba206d0fbf6b57a153",
-          "after": "e6f47049bfb1bd2bd2cc840860d614cfa525a31ea89e440940f814dfda3e82b4"
+          "after": "b2a998de6d90ee6bf74a03ab1e6198a58fa507e5d83df482960da796f7fc85ba"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "701aa129675457b4f0ca5b609956987e7b6374887ddf35f6d83522e3cfec1402",
-      "after_sha256": "4f24a6efe7e8df268234152286760050a754480741db72d8bedb24ffe79ed4d0",
+      "after_sha256": "e0c758e6189e7310f090d283ea23228fb515a393340f288ef708229e0304bfb5",
       "owners": {
         "@document": {
           "before": "701aa129675457b4f0ca5b609956987e7b6374887ddf35f6d83522e3cfec1402",
-          "after": "4f24a6efe7e8df268234152286760050a754480741db72d8bedb24ffe79ed4d0"
+          "after": "e0c758e6189e7310f090d283ea23228fb515a393340f288ef708229e0304bfb5"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "988e02fd6170950dadfe79c92f1ea79837666eb4dd58a72df32fbff949d6b3a9",
-      "after_sha256": "017ba1a396f2f01f32867756aba287f1d8873a236598b83bf8ddab089737ca5c",
+      "after_sha256": "fb8dbfe305e047c562df16019e1bc66104598fc41d5e9401fa997236c29454fa",
       "owners": {
         "@document": {
           "before": "988e02fd6170950dadfe79c92f1ea79837666eb4dd58a72df32fbff949d6b3a9",
-          "after": "017ba1a396f2f01f32867756aba287f1d8873a236598b83bf8ddab089737ca5c"
+          "after": "fb8dbfe305e047c562df16019e1bc66104598fc41d5e9401fa997236c29454fa"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "df527b60f974b9ff9fa7b860c66d9e06b5e8a745370bebc26c810d131ff12ec5",
-      "after_sha256": "6b9c7b322b647b91d0f1bed460f52eaa3a9e3b8b8fceda957d0d64255845048b",
+      "after_sha256": "c5d7712192b8cb345ee2d597a0aef74259105f37c648194385d177021348ed53",
       "owners": {
         "@document": {
           "before": "df527b60f974b9ff9fa7b860c66d9e06b5e8a745370bebc26c810d131ff12ec5",
-          "after": "6b9c7b322b647b91d0f1bed460f52eaa3a9e3b8b8fceda957d0d64255845048b"
+          "after": "c5d7712192b8cb345ee2d597a0aef74259105f37c648194385d177021348ed53"
         }
       }
     },
@@ -236,21 +236,21 @@
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "961d8f8c54f8fd7f4be9e5948663b9733702125458bd2d82fdf1a49c50ae5ead",
-      "after_sha256": "2b611fd964b5a5c619cc5ae012925e6c9e6d47c5954fc8499e98ce230937417e",
+      "after_sha256": "57d6b1b42c3bc4102bfc07fceeb03f504ff98d34ea9a1110ce3a3792a6a15a65",
       "owners": {
         "@document": {
           "before": "961d8f8c54f8fd7f4be9e5948663b9733702125458bd2d82fdf1a49c50ae5ead",
-          "after": "2b611fd964b5a5c619cc5ae012925e6c9e6d47c5954fc8499e98ce230937417e"
+          "after": "57d6b1b42c3bc4102bfc07fceeb03f504ff98d34ea9a1110ce3a3792a6a15a65"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "7e3e20393d60f37d0cfb484a3e6eebae7fa41a0d24cd6b0b93ee806d5da4196d",
-      "after_sha256": "8e5675ac5ac01755ce220dedce37a8a22ac1d2c32628ef3640416b4b9d345845",
+      "after_sha256": "d8deee01b04d500a986d6bf74b9eade2b7a3cde67f71845e4f30f1dff64f8697",
       "owners": {
         "@document": {
           "before": "7e3e20393d60f37d0cfb484a3e6eebae7fa41a0d24cd6b0b93ee806d5da4196d",
-          "after": "8e5675ac5ac01755ce220dedce37a8a22ac1d2c32628ef3640416b4b9d345845"
+          "after": "d8deee01b04d500a986d6bf74b9eade2b7a3cde67f71845e4f30f1dff64f8697"
         }
       }
     },
@@ -266,17 +266,17 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "c9d9729e744098830f205bbaf5e16d75408a83c62c2cf872a8636a35bcb3534f",
-      "after_sha256": "fd79dbc43a38d2f0700ca0e3c4a98f8cd449d66a707ea4f64e3c6f4ffe538a20",
+      "after_sha256": "479c7773a71c609fbd698e77ebf5666a05fefd58f50eb1e304a0ebe002d59088",
       "owners": {
         "@document": {
           "before": "c9d9729e744098830f205bbaf5e16d75408a83c62c2cf872a8636a35bcb3534f",
-          "after": "fd79dbc43a38d2f0700ca0e3c4a98f8cd449d66a707ea4f64e3c6f4ffe538a20"
+          "after": "479c7773a71c609fbd698e77ebf5666a05fefd58f50eb1e304a0ebe002d59088"
         }
       }
     },
     "src/warhammer40k_core/ai/deployment_candidate_ranking.py": {
       "before_sha256": null,
-      "after_sha256": "08e89417cf24f0aecd6a4f4be2f466e3479f5d2ac440f2ec6358668da67e2d72",
+      "after_sha256": "75dd39df1231941527363192f9e7f563f07551f0016aabf5454d664f18a5dda6",
       "owners": {
         "@module": {
           "before": null,
@@ -292,11 +292,11 @@
         },
         "DeploymentCandidateScore": {
           "before": null,
-          "after": "877a0222335875df545f16c7a1bdac4d884e11fbf0412145889519f54b01bc53"
+          "after": "cc59473699a843f3e9a08ef4d16015655ebbc4b69849e6c736e96a857b58ee08"
         },
         "DeploymentCandidateScore.__post_init__": {
           "before": null,
-          "after": "d17a5205a7f64090e2696c18b2fc8967063f9cfbc170bcae0a92ed2e5b5d21bc"
+          "after": "304f48588926165462401f24d59ced00ac2e97353cb0f7c49451eda517d6c847"
         },
         "RankedDeploymentCandidates": {
           "before": null,
@@ -334,7 +334,7 @@
     },
     "tests/infrastructure/adapters/test_deployment_candidates.py": {
       "before_sha256": "d799c30f1d3074229e25d9dfbe06596481868eb0d7725e14288b07dfc8e94f67",
-      "after_sha256": "e15d2c69c2481ec0fb0684785db074be1834b1e522d33473311f35b30ded6836",
+      "after_sha256": "33a28319ab887fa5af8cc1a86fa1bde2e9e49cac6058138aa8cdbdfa3326f5a0",
       "owners": {
         "@module": {
           "before": "ac05e9f3c7bb08bbe13a310bc44c699bd0951b2ffb1fe5aa064b110e65a2396f",
@@ -367,6 +367,10 @@
         "test_deployment_ranking_loader_rejects_drift": {
           "before": null,
           "after": "f9c7e48eaa5beafc1aba1adad1d152549ee1689413b136f3474e8904e0362fb5"
+        },
+        "test_deployment_ranking_preserves_exact_numeric_scores_and_receipt": {
+          "before": null,
+          "after": "bf7ab8691e1c87224b0e0c95c2cddbe63bf975d24975ae2936c3d15f3cfddaf3"
         },
         "test_deployment_ranking_rechecks_checkpoint_after_callback": {
           "before": null,
@@ -408,7 +412,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "ci/test_shards/shard-1.txt": {
@@ -427,7 +431,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "ci/test_shards/shard-10.txt": {
@@ -446,7 +450,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "ci/test_shards/shard-11.txt": {
@@ -465,7 +469,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "ci/test_shards/shard-12.txt": {
@@ -484,7 +488,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "ci/test_shards/shard-2.txt": {
@@ -503,7 +507,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "ci/test_shards/shard-3.txt": {
@@ -522,7 +526,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "ci/test_shards/shard-4.txt": {
@@ -541,7 +545,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "ci/test_shards/shard-5.txt": {
@@ -560,7 +564,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "ci/test_shards/shard-6.txt": {
@@ -579,7 +583,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "ci/test_shards/shard-7.txt": {
@@ -598,7 +602,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "ci/test_shards/shard-8.txt": {
@@ -617,7 +621,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "ci/test_shards/shard-9.txt": {
@@ -636,7 +640,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
@@ -680,7 +684,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
@@ -724,7 +728,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
@@ -768,7 +772,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
@@ -812,7 +816,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
@@ -856,7 +860,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
@@ -900,7 +904,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "contracts/examples/support-profile.json": {
@@ -944,7 +948,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "contracts/manifest.json": {
@@ -988,7 +992,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
@@ -998,7 +1002,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
@@ -1006,7 +1010,7 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "docs/AI_POLICY_INTERFACE.md": {
@@ -1014,7 +1018,7 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
@@ -1022,7 +1026,7 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
@@ -1030,7 +1034,7 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
@@ -1043,7 +1047,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "src/warhammer40k_core/ai/deployment_candidate_ranking.py": {
@@ -1053,7 +1057,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     },
     "tests/infrastructure/adapters/test_deployment_candidates.py": {
@@ -1063,7 +1067,7 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately versioned deployment ranking boundary that exposes only detached actor context and accepted candidate payloads, validates an exact finite score set, records deterministic selection evidence, and returns the ordinary bound proposal through unchanged engine authority.",
-      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
+      "source_obligation": "Preserve actor visibility and the validated checkpoint. Rejected/unvalidated candidates, authoritative checkpoint hashes and validation diagnostics stay operator-only. Preserve exact integer score ordering and receipt values alongside finite float scores; reject malformed, missing, duplicate, extraneous and nonfinite scores or stale bindings; tie-break in generated accepted order. Keep existing singleton/set training schemas and ordinary commit/replay semantics.",
       "unchanged_work": "This bounded AI ranking contract adds no engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, cache, runtime dependency or measured-driver change. The new operation has no existing detailed benchmark family. The required serial current-runtime smoke and all live semantic/work/cache controls remain required; no tactical quality, learned policy, dataset admission or full-game qualification is claimed."
     }
   },
