@@ -99,6 +99,32 @@ class AdmissionCase:
         )
 
 
+@dataclass(frozen=True)
+class TerminalProof:
+    transition: FiniteAcceptedTransition
+    episode: FiniteEpisodeAdmission
+
+
+@pytest.fixture(scope="module")
+def terminal_proofs(terminal: AdmissionCase) -> tuple[TerminalProof, ...]:
+    # Target-only cases share genuinely verified, immutable positive evidence.
+    # Origin/loader/boundary tests construct fresh evidence themselves.
+    origin = VerifiedEpisodeOrigin.from_session(
+        terminal.before, config=terminal.before.lifecycle.config
+    )
+    proofs = []
+    for perspective in ("player-a", "player-b"):
+        transition = terminal.transition(perspective=perspective)
+        episode = FiniteEpisodeAdmission.from_transitions(
+            origin,
+            transitions=(transition,),
+            final_session=terminal.after,
+            episode_end=TargetEpisodeEnd.TERMINAL,
+        )
+        proofs.append(TerminalProof(transition, episode))
+    return tuple(proofs)
+
+
 def _row(
     before: LocalGameSession, after: LocalGameSession, context: PlayerDecisionContext, chosen: str
 ) -> TrainingRow:
@@ -404,10 +430,20 @@ def test_episode_rejects_false_terminal_and_unexplained_stop(
 )
 @pytest.mark.parametrize("perspective", ["player-a", "player-b"])
 def test_terminal_labels_match_engine_scoring_from_both_perspectives(
-    terminal: AdmissionCase, meaning: TargetMeaning, value: float, perspective: str
+    terminal: AdmissionCase,
+    terminal_proofs: tuple[TerminalProof, ...],
+    meaning: TargetMeaning,
+    value: float,
+    perspective: str,
 ) -> None:
-    episode = terminal.episode(end=TargetEpisodeEnd.TERMINAL, reason=None, perspective=perspective)
-    receipt = _admit(terminal, episode, _target(terminal, episode, meaning=meaning, value=value))
+    proof = next(p for p in terminal_proofs if p.transition.perspective_player_id == perspective)
+    episode = proof.episode
+    receipt = _admit(
+        terminal,
+        episode,
+        _target(terminal, episode, meaning=meaning, value=value),
+        transition=proof.transition,
+    )
     assert receipt.to_payload()["eligible_for_learning"] is True
     assert (
         receipt.to_payload()["accepted_record_stop"] > receipt.to_payload()["accepted_record_start"]
@@ -419,9 +455,10 @@ def test_terminal_labels_match_engine_scoring_from_both_perspectives(
     "change", ["value", "producer", "evidence", "perspective", "local-reference"]
 )
 def test_target_rejects_unverified_value_evidence_producer_and_horizon(
-    terminal: AdmissionCase, change: str
+    terminal: AdmissionCase, terminal_proofs: tuple[TerminalProof, ...], change: str
 ) -> None:
-    episode = terminal.episode(end=TargetEpisodeEnd.TERMINAL, reason=None)
+    proof = terminal_proofs[0]
+    episode = proof.episode
     target = _target(terminal, episode)
     if change == "value":
         target = replace(target, value=1.0)
@@ -439,7 +476,7 @@ def test_target_rejects_unverified_value_evidence_producer_and_horizon(
             horizon_decisions=1,
         )
     with pytest.raises(TrainingAdmissionError):
-        _admit(terminal, episode, target)
+        _admit(terminal, episode, target, transition=proof.transition)
 
 
 @pytest.mark.parametrize("change", ["engine", "catalog", "rules", "reward", "config"])
@@ -636,10 +673,11 @@ def _local_target(
 
 @pytest.mark.parametrize("perspective", ["player-a", "player-b"])
 def test_local_resource_target_recomputes_terminal_balance_without_mutation(
-    terminal: AdmissionCase, perspective: str
+    terminal: AdmissionCase, terminal_proofs: tuple[TerminalProof, ...], perspective: str
 ) -> None:
-    episode = terminal.episode(end=TargetEpisodeEnd.TERMINAL, reason=None, perspective=perspective)
-    transition = terminal.transition(perspective=perspective)
+    proof = next(p for p in terminal_proofs if p.transition.perspective_player_id == perspective)
+    episode = proof.episode
+    transition = proof.transition
     original = terminal.after.to_persistence_payload()
     views = [terminal.after.view(viewer_player_id=player) for player in ("player-a", "player-b")]
     target, reference = _local_target(terminal, episode, transition, terminal.after)
@@ -647,7 +685,7 @@ def test_local_resource_target_recomputes_terminal_balance_without_mutation(
     assert target.value == terminal.after.lifecycle.state.command_point_total(perspective)
     assert target.value is not None
     assert target.value > 0
-    receipt = _admit(terminal, episode, target, final_session=terminal.after)
+    receipt = _admit(terminal, episode, target, transition=transition, final_session=terminal.after)
     assert receipt.to_payload()["eligible_for_learning"] is True
     assert terminal.row.target_value == 0.25
     assert terminal.after.to_persistence_payload() == original
@@ -848,15 +886,19 @@ def test_local_evidence_and_receipt_loaders_repeat_calculation(
         AdmittedTrainingTarget.from_payload(receipt.to_payload(), **args)  # type: ignore[arg-type]
 
 
-def test_early_terminal_does_not_shorten_a_local_horizon(terminal: AdmissionCase) -> None:
-    episode = terminal.episode(end=TargetEpisodeEnd.TERMINAL, reason=None)
-    target, _ = _local_target(terminal, episode, terminal.transition(), terminal.after)
+def test_early_terminal_does_not_shorten_a_local_horizon(
+    terminal: AdmissionCase, terminal_proofs: tuple[TerminalProof, ...]
+) -> None:
+    proof = terminal_proofs[0]
+    episode = proof.episode
+    target, _ = _local_target(terminal, episode, proof.transition, terminal.after)
     assert target.horizon_decisions is not None
     with pytest.raises(TrainingAdmissionError, match="exact endpoint"):
         _admit(
             terminal,
             episode,
             replace(target, horizon_decisions=target.horizon_decisions + 1),
+            transition=proof.transition,
             final_session=terminal.after,
         )
 

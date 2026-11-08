@@ -1171,7 +1171,16 @@ def test_failed_real_source_builder_stops_pytest_before_dispatch(
         timeout=30,
     )
     assert built.returncode != 0
-    assert json.loads(result.read_text(encoding="utf-8"))["exit_code"] != 0
+    completion = json.loads(result.read_text(encoding="utf-8"))
+    assert completion["exit_code"] != 0
+    messages = [json.loads(line) for line in built.stdout.splitlines()]
+    assert messages[0]["event"] == "source_index_build_started"
+    diagnostic = messages[-1]
+    assert diagnostic["event"] == "source_index_build_completed"
+    assert diagnostic["index"] == completion["index"]
+    assert diagnostic["input_key"] == completion["input_key"]
+    assert diagnostic["exit_code"] == completion["exit_code"]
+    assert diagnostic["elapsed_seconds"] >= 0
     assert not (tmp_path / "github-output").exists()
     probe = tmp_path / "test_probe.py"
     ran = tmp_path / "ran"

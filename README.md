@@ -362,6 +362,10 @@ and recording the four-worker execution model. Missing, negative, nonfinite or
 boolean weights fail closed; measurements rounded to zero remain valid. Finite S25 case validation,
 the complete selected inventory and the fourteen-minute deadline remain mandatory.
 
+Behavioral lanes log keyed cold-index start/completion and elapsed construction time.
+A case exceeding three minutes emits thread stacks and continues under the existing
+fourteen-minute step cutoff.
+
 Both Python CI lanes upload JUnit, slowest-test output, and per-worker JSON timing
 artifacts containing collection node IDs, collection time, setup/call/teardown times,
 outcomes, Python/platform/CPU/memory metadata, and commit/run IDs. Enable the same

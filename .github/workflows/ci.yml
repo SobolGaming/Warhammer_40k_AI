@@ -515,6 +515,8 @@ jobs:
                   "${source_index_args[@]}" \
                 -n 1 \
                 --dist=worksteal \
+                -o faulthandler_timeout=180 \
+                -o faulthandler_exit_on_timeout=false \
                 --selected-army-source-index="$SELECTED_ARMY_SOURCE_INDEX" \
                 --cov=warhammer40k_core \
                 --cov-report= \
@@ -536,6 +538,8 @@ jobs:
             "${source_index_args[@]}" \
             -n auto \
             --dist=worksteal \
+            -o faulthandler_timeout=180 \
+            -o faulthandler_exit_on_timeout=false \
             --selected-army-source-index="$SELECTED_ARMY_SOURCE_INDEX" \
             --cov=warhammer40k_core \
             --cov-report= \
