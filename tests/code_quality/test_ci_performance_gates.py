@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import subprocess
 import sys
@@ -1012,15 +1013,104 @@ def test_finite_partition_rejects_missing_extra_and_malformed_cases(
         sharding._case_partition(partition_root, frozenset({sharding.CASE_PARTITION_FILE}))
 
 
-def test_finite_partition_preserves_total_weight_and_other_file_weights() -> None:
-    durations = {sharding.CASE_PARTITION_FILE: 200.0, "tests/example.py": 37.0}
-    expanded = sharding._partitioned_durations(durations)
-    assert durations == {sharding.CASE_PARTITION_FILE: 200.0, "tests/example.py": 37.0}
+def test_finite_partition_preserves_total_weight_and_other_file_weights(
+    partition_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sharding, "REPOSITORY_ROOT", partition_root)
+    path = partition_root / sharding.CASE_PARTITION_PATH
+    declaration = json.loads(path.read_text())
+    nodes = tuple(declaration["nodes"])
+    historical = {node: float(len(nodes) - index) for index, node in enumerate(nodes)}
+    declaration["weights"] = historical
+    path.write_text(json.dumps(declaration))
+    durations = {sharding.CASE_PARTITION_FILE: 200.012345, "tests/example.py": 37.0}
+    original = dict(durations)
+    approx = cast(Callable[[float], object], vars(pytest)["approx"])
+    legacy = sharding._partitioned_durations(durations)
+    assert legacy == {
+        "tests/example.py": 37.0,
+        **{
+            node: durations[sharding.CASE_PARTITION_FILE] * weight / sum(historical.values())
+            for node, weight in historical.items()
+        },
+    }
+    current = {node: index + 0.125 for index, node in enumerate(nodes)}
+    current["tests/example.py::one"] = 37.0
+    raw = dict(current)
+    expanded = sharding._partitioned_durations(durations, case_seconds=current)
+    assert durations == original
+    assert current == raw
     assert expanded["tests/example.py"] == 37.0
     assert sharding.CASE_PARTITION_FILE not in expanded
     assert len(expanded) == 21
-    approx = cast(Callable[[float], object], vars(pytest)["approx"])
-    assert sum(expanded.values()) == approx(237.0)
+    assert sum(expanded.values()) == approx(sum(durations.values()))
+    assert expanded[nodes[0]] < expanded[nodes[-1]]
+    assert legacy[nodes[0]] > legacy[nodes[-1]]
+    denominator = sum(current[node] for node in nodes)
+    for node in nodes:
+        assert expanded[node] == approx(
+            durations[sharding.CASE_PARTITION_FILE] * current[node] / denominator
+        )
+    zero = dict(current)
+    zero[nodes[0]] = 0.0
+    assert sharding._partitioned_durations(durations, case_seconds=zero)[nodes[0]] == 0.0
+    all_zero = dict.fromkeys(nodes, 0.0)
+    assert (
+        sharding._partitioned_durations({sharding.CASE_PARTITION_FILE: 0.0}, case_seconds=all_zero)
+        == all_zero
+    )
+    with pytest.raises(SystemExit, match="partition"):
+        sharding._partitioned_durations(durations, case_seconds=all_zero)
+    missing = dict(current)
+    del missing[nodes[-1]]
+    with pytest.raises(SystemExit, match="partition"):
+        sharding._partitioned_durations(durations, case_seconds=missing)
+    for bad in (True, -1, float("nan"), float("inf"), -float("inf"), "1", None, 10**1000):
+        invalid = dict(current)
+        invalid[nodes[0]] = cast(float, bad)
+        with pytest.raises(SystemExit, match="partition"):
+            sharding._partitioned_durations(durations, case_seconds=invalid)
+    with pytest.raises(SystemExit, match="partition"):
+        sharding._partitioned_durations(durations, case_seconds=dict.fromkeys(nodes, 1e308))
+    large = sharding._partitioned_durations(
+        {sharding.CASE_PARTITION_FILE: 1e308}, case_seconds=current
+    )
+    assert all(math.isfinite(value) for value in large.values())
+    assert math.fsum(large.values()) == approx(1e308)
+
+    # A rounded current summary passes, but a self-consistent manifest/summary
+    # built with stale historical shares must fail even when total work matches.
+    monkeypatch.setattr(sharding, "_behavioral_shard_selectors", lambda: tuple(sorted(expanded)))
+    profiles: tuple[sharding.ProfileEvidence, ...] = (
+        {
+            "source": "complete current partition regression",
+            "junit_sha256": ["a" * 64],
+            "test_cases": len(current),
+            "test_files": 2,
+        },
+    )
+    output = partition_root / "generated"
+    rounded = sharding._rounded_durations(expanded)
+    shards = sharding._balanced_shards(durations=rounded, shard_count=12, case_seconds=current)
+    assert len(shards) == 12
+    assert all(shard.test_files for shard in shards)
+    assert sorted(selector for shard in shards for selector in shard.test_files) == sorted(expanded)
+    sharding._write_manifests(
+        output_dir=output, shards=shards, durations=rounded, profiles=profiles, case_seconds=current
+    )
+    summary = json.loads((output / "durations.json").read_text())
+    assert summary["case_seconds"] == raw
+    assert summary["profiles"] == list(profiles)
+    stale = sharding._rounded_durations(legacy)
+    stale_shards = sharding._balanced_shards(durations=stale, shard_count=12, case_seconds=current)
+    with pytest.raises(SystemExit, match="current case"):
+        sharding._write_manifests(
+            output_dir=output,
+            shards=stale_shards,
+            durations=stale,
+            profiles=profiles,
+            case_seconds=current,
+        )
 
 
 @pytest.fixture

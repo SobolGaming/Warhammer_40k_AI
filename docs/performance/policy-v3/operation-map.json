@@ -34201,7 +34201,13 @@
         "_write_manifests",
         "duration_worksteal_order",
         "pytest_collection_modifyitems",
-        "summary_case_seconds"
+        "summary_case_seconds",
+        "_check_current_partition_shares",
+        "_check_manifests",
+        "_current_partition_weights",
+        "_finite_scheduling_seconds",
+        "_partitioned_durations",
+        "_scaled_partition_weights"
       ],
       "families": [],
       "sensitive": false,
