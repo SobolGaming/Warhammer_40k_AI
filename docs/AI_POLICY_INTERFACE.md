@@ -485,13 +485,22 @@ qualification.
 
 `ai.deployment_candidate_ranking.RankedDeploymentCandidates.rank(...)` is the
 operator entry point for a caller-supplied `DeploymentCandidateRanker`. It takes
-a typed validation receipt, actor context, current local session, ranker identity
-and JSON configuration. Before invoking the ranker it checks the receipt's actor
-binding and exact live checkpoint. The ranker receives only a newly detached
+a typed validation receipt, actor context, current local session,
+`DeploymentRankerConfiguration` and explicit run reward-profile version. The
+configuration requires `PolicyProvenance` with the RANKER role, canonical JSON
+object parameters and `DeploymentRankingBehavior.DETERMINISTIC`: deterministic
+given the actor inputs, choice seed and parameters. Before invoking the ranker it
+strictly matches catalog packages, ruleset/descriptor, current semantic engine
+version and the run reward version, with no cross-version override. It also
+checks the receipt's actor binding and exact live checkpoint. The ranker receives only a newly detached
 `PlayerDecisionContext` and a tuple of accepted `DeploymentCandidatePayload`
-objects in their original generated order. Rejected and unvalidated proposals,
+objects in their original generated order, plus a detached `parameters` object
+through a required keyword argument. Parameters are explicitly actor-visible
+operator declarations; callers must not place private run evidence in them.
+Rejected and unvalidated proposals,
 generator budgets, the full generated-set hash, validation receipt/diagnostics,
-checkpoint commitments and the session never enter its arguments.
+checkpoint commitments, policy provenance, engine/build and game-configuration
+commitments, and the session never enter its arguments.
 
 The accepted subset is the deliberate engine-validation trust boundary; its
 membership can reveal legality. This API does not claim to hide differences in
@@ -515,16 +524,21 @@ the ordinary bound `PolicyAction`; selection also requires the original choice
 seed. The caller still commits through the ordinary viewer submission, with engine
 validation and mutation. The ranking operation itself submits no live action.
 
-The independent **operator-only** `deployment-candidate-ranking-v1` result retains
+The independent **operator-only** `deployment-candidate-ranking-v2` result retains
 the validation receipt, hashes of that receipt and complete generated set, a hash
-of the actual actor inputs, choice seed, declared ranker ID/configuration, scores
+of the actual actor inputs (including parameters), choice seed, typed configuration,
+verified current engine-build ID, exact live game-configuration hash, scores
 normalized into generated order, selected ID and tie rule. Its returned payloads
 are detached. `from_payload` requires the same typed validation evidence and
 reruns the supplied ranker against the current checkpoint, then compares every
-field. Loading a serialized validation receipt remains the existing separate
-engine-reproduction step. Ranker identity/configuration are caller declarations,
-not proof of model weights or deterministic implementation; nondeterministic output
-fails reproduction. The result certifies a bounded ranking, not an executed
+field, including the supplied run reward version's strict provenance join. Loading
+a serialized validation receipt remains the existing separate engine-reproduction
+step. Artifact identity and the deterministic behavior marker are caller
+declarations, not authentication of Python code or model weights; changed output
+fails reproduction. Scores are neither probabilities nor logged action
+probabilities. The v2 contract intentionally replaces the v1 callback and receipt;
+old v1 evidence retains meaning under its matching runtime and is not silently
+rewritten or admitted as v2. The result certifies a bounded ranking, not an executed
 transition, useful tactical alternatives or a learned policy.
 
 Focused tests exercise a genuine non-first accepted selection and ordinary commit,
@@ -532,7 +546,7 @@ save/load and exact replay; tie ordering; malformed scores and evidence drift;
 detached input mutation; hidden-work/private-RNG noninterference; and checkpoint
 drift before and during callbacks. Existing validated-set training linkage accepts
 the resulting chosen action through its unchanged exact transition checks. No
-training schema, runner route, proposal payload or adapter wire contract changes:
+legacy training schema, runner route, proposal payload or adapter wire contract changes:
 [ADAPTER_DECISION_CONTRACT.md](ADAPTER_DECISION_CONTRACT.md) already covers this
 same deployment proposal and ordinary submission path. Tactical/learned rankers,
 other proposal families, broader references and dataset admission remain follow-ups.
@@ -585,6 +599,30 @@ row/receipt/context drift, same-view/different-checkpoint rejection, detached
 roundtrips with fresh validation, ordinary save/load and reproduced transition,
 and named/admitted endpoint CP targets. These are bounded plumbing controls, not
 full-game or faction qualification.
+
+## Ranked deployment behavior and row provenance
+
+`ai.parameterized_training.RankedDeploymentTrainingLink.from_row(...)` composes a
+reproduced `RankedDeploymentCandidates` with an existing
+`DeploymentTrainingCandidateLink` and its complete `TrainingRow`. The independent
+`ranked-deployment-training-link-v1` operator payload retains both full receipts
+and their hashes plus the row hash. It requires exactly the same validated set,
+selected accepted candidate, historical choice seed, current engine build and
+complete `PolicyProvenance`, including artifact ID and role. The existing child
+link still verifies the row mask, ordinary accepted action, authoritative record
+and exact before checkpoint. An accepted action selected by another ranking or
+at another checkpoint cannot be relabeled as this behavior.
+
+`from_payload` compares every field against the supplied typed, verified ranking
+and candidate link; their existing loaders perform score/engine reproduction.
+`require_matches` rejects any full-row or context drift. Returned payloads are
+detached. Named/admitted targets continue using `candidate_link`, preserving
+existing mixed-episode source/perspective/horizon checks and TrainingRow v1.
+This companion supplies deterministic behavior provenance only; it does not
+invent stochastic probabilities, authenticate arbitrary model weights, admit a
+dataset, add runner attempt accounting or complete Stage 1. A general experiment
+manifest, selected-workload semantic features/references, other proposal families
+and tactical/learned rankers remain open.
 
 ## Named training target declarations
 

@@ -1,1051 +1,390 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "b20ef88d2ef5ab87500ccc1f13d61aeb7c29f59b",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b5aa998fb3e387e794b2f1482ae12cad55f68059461a88617fdb9b5bf40fe96f",
+  "base": "abce5815c9257d8e0fccbac1a15d117ae1a77d70",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d2fb93e8934b844d75354c537978accb5d083a06a00f864d09f252393f68b56",
   "operation_map_sha256": "609ab19b1a15b2d1560c81f7c484482b06d547c426c2b690a5b78f92e20fcc9b",
   "changes": {
-    "README.md": {
-      "before_sha256": "8dfbe7f6072c9ea7892bf03031310a8fbd934ff70c0c1228078ae73e3cd8d2b2",
-      "after_sha256": "a341c31eb1bc425edb92824001889119ef4bc31b56bfb46190504f5fc84b4c4e",
-      "owners": {
-        "@document": {
-          "before": "8dfbe7f6072c9ea7892bf03031310a8fbd934ff70c0c1228078ae73e3cd8d2b2",
-          "after": "a341c31eb1bc425edb92824001889119ef4bc31b56bfb46190504f5fc84b4c4e"
-        }
-      }
-    },
-    "ci/test_shards/durations.json": {
-      "before_sha256": "23f14e7d0459328eb61c9d5a0bb25bfc3a73e3de1cd442925926ee954ba98f39",
-      "after_sha256": "a8f3993ca3e0e5d67f68f99fff2926904b7887901a9db49bb5dbae57c07a63c6",
-      "owners": {
-        "@document": {
-          "before": "23f14e7d0459328eb61c9d5a0bb25bfc3a73e3de1cd442925926ee954ba98f39",
-          "after": "a8f3993ca3e0e5d67f68f99fff2926904b7887901a9db49bb5dbae57c07a63c6"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "dc0bf792a278a699a6b01ea01e066240be323c65f5fc0dbda213812027a8989b",
-      "after_sha256": "22fc21e0a63211b097de09f65ace21776e3f862a2442e41ef351a319df7f3e8f",
-      "owners": {
-        "@document": {
-          "before": "dc0bf792a278a699a6b01ea01e066240be323c65f5fc0dbda213812027a8989b",
-          "after": "22fc21e0a63211b097de09f65ace21776e3f862a2442e41ef351a319df7f3e8f"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "3422bf622448ba714e29da669b0efaf55a3131480b212746dcfa8867a6c1cfd7",
-      "after_sha256": "c259344f32c10b50142ffbd6fc28a80280e8c9e2f13a0fdd247853236c28a3b1",
-      "owners": {
-        "@document": {
-          "before": "3422bf622448ba714e29da669b0efaf55a3131480b212746dcfa8867a6c1cfd7",
-          "after": "c259344f32c10b50142ffbd6fc28a80280e8c9e2f13a0fdd247853236c28a3b1"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "fca4cf55436d1e4561864cebcbb26d893458caa979530312692651506589c987",
-      "after_sha256": "0128e335b1b8ee9106051a094692ddddf458c00434e4417700273c45ad80585b",
-      "owners": {
-        "@document": {
-          "before": "fca4cf55436d1e4561864cebcbb26d893458caa979530312692651506589c987",
-          "after": "0128e335b1b8ee9106051a094692ddddf458c00434e4417700273c45ad80585b"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "da4fe3dab6e38c6977c84f5cce84e4891d2ef8096db8bfc517df692382594c19",
-      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "owners": {
-        "@document": {
-          "before": "da4fe3dab6e38c6977c84f5cce84e4891d2ef8096db8bfc517df692382594c19",
-          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "81bb6045eede3fc0cafcd76d8d4b0f1c6fb8b9e1c565689e4e00022ef9b9a3f7",
-      "after_sha256": "d69b988abd9ba8abeae53c5a02d0ce911d337198d793a2bd530d0471942bc01c",
-      "owners": {
-        "@document": {
-          "before": "81bb6045eede3fc0cafcd76d8d4b0f1c6fb8b9e1c565689e4e00022ef9b9a3f7",
-          "after": "d69b988abd9ba8abeae53c5a02d0ce911d337198d793a2bd530d0471942bc01c"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "1174df5684308a4f56c8c85e265bd60d6168e8a2032aae37f2d6804088e63874",
-      "after_sha256": "85f4173c6adb845693e20959795c94df67091ee7a5021c606ee0402a61dacb8b",
-      "owners": {
-        "@document": {
-          "before": "1174df5684308a4f56c8c85e265bd60d6168e8a2032aae37f2d6804088e63874",
-          "after": "85f4173c6adb845693e20959795c94df67091ee7a5021c606ee0402a61dacb8b"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "b5c8f54d4633e61088c0975297559ade271065052b0de45bae047b685472abcd",
-      "after_sha256": "dc17b0d48d683da7bd35cc3426ce0191b0f5dec455261056e68d6e9fd42a8921",
-      "owners": {
-        "@document": {
-          "before": "b5c8f54d4633e61088c0975297559ade271065052b0de45bae047b685472abcd",
-          "after": "dc17b0d48d683da7bd35cc3426ce0191b0f5dec455261056e68d6e9fd42a8921"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "fec34e9ba21471c536ad6a0796f89bbf157685e78e158daf3a274f047e2e260c",
-      "after_sha256": "58567bfa1e07decde80fab91a980a1555cf4222af9f3211f998c7c43829cb54d",
-      "owners": {
-        "@document": {
-          "before": "fec34e9ba21471c536ad6a0796f89bbf157685e78e158daf3a274f047e2e260c",
-          "after": "58567bfa1e07decde80fab91a980a1555cf4222af9f3211f998c7c43829cb54d"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "b7c0be8c4eea2c6a2c00fe2bafd107c8c0b7b0cbf6bb21fe36884e61296c5edf",
-      "after_sha256": "fca6f8d79c34d1c9fbb3d40780d6e8322f6008383864ada3a468458581b2cf05",
-      "owners": {
-        "@document": {
-          "before": "b7c0be8c4eea2c6a2c00fe2bafd107c8c0b7b0cbf6bb21fe36884e61296c5edf",
-          "after": "fca6f8d79c34d1c9fbb3d40780d6e8322f6008383864ada3a468458581b2cf05"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "58f8a7ea2fe5f84d57fe60c1a77a0ca884435eb0b0ef96bd63e49abc051e317f",
-      "after_sha256": "5f48795e320fea2e9fcb9bbcad7b88463570d30e5f6e5c4b34bfdabb8441c02f",
-      "owners": {
-        "@document": {
-          "before": "58f8a7ea2fe5f84d57fe60c1a77a0ca884435eb0b0ef96bd63e49abc051e317f",
-          "after": "5f48795e320fea2e9fcb9bbcad7b88463570d30e5f6e5c4b34bfdabb8441c02f"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "3916137f6da388ed619f65d7f0c782dec7803a792159e823a5781aedd41e35c0",
-      "owners": {
-        "@document": {
-          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "3916137f6da388ed619f65d7f0c782dec7803a792159e823a5781aedd41e35c0"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "c52e85cf8291ce3dc783c1809863bc488f906346dfa304836bfade0117961f45",
-      "after_sha256": "75ccbf42a4e42b7e7da91b350dced5a1d47c962f8f0f589d54b4c7183ada647a",
-      "owners": {
-        "@document": {
-          "before": "c52e85cf8291ce3dc783c1809863bc488f906346dfa304836bfade0117961f45",
-          "after": "75ccbf42a4e42b7e7da91b350dced5a1d47c962f8f0f589d54b4c7183ada647a"
-        }
-      }
-    },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "7d63b79088b1a3cffe4dd1486698a3232fdef95d408ac6494686ab889cc0bdb1",
-      "after_sha256": "acfe8bf4e4c954e3d9bb12a8e2e13950389b4a82f92b773347ec92c974c0c99f",
+      "before_sha256": "acfe8bf4e4c954e3d9bb12a8e2e13950389b4a82f92b773347ec92c974c0c99f",
+      "after_sha256": "f2f3e9e99ac27903901132140ba17cb340917fca974471038614993f9f2c29ec",
       "owners": {
         "@document": {
-          "before": "7d63b79088b1a3cffe4dd1486698a3232fdef95d408ac6494686ab889cc0bdb1",
-          "after": "acfe8bf4e4c954e3d9bb12a8e2e13950389b4a82f92b773347ec92c974c0c99f"
+          "before": "acfe8bf4e4c954e3d9bb12a8e2e13950389b4a82f92b773347ec92c974c0c99f",
+          "after": "f2f3e9e99ac27903901132140ba17cb340917fca974471038614993f9f2c29ec"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "5477f59ec24f310d2d760d1d4f64c641802ce4f3dfe2b3d51711e7d850378b57",
-      "after_sha256": "3ef217a9c437575f784f831c05de434905e2b0788c80d9ec12d745036940af25",
+      "before_sha256": "3ef217a9c437575f784f831c05de434905e2b0788c80d9ec12d745036940af25",
+      "after_sha256": "d86dbcde08639c3eedf56f1c31f711b3b6d9749085984cb8127ac63751999015",
       "owners": {
         "@document": {
-          "before": "5477f59ec24f310d2d760d1d4f64c641802ce4f3dfe2b3d51711e7d850378b57",
-          "after": "3ef217a9c437575f784f831c05de434905e2b0788c80d9ec12d745036940af25"
+          "before": "3ef217a9c437575f784f831c05de434905e2b0788c80d9ec12d745036940af25",
+          "after": "d86dbcde08639c3eedf56f1c31f711b3b6d9749085984cb8127ac63751999015"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "db9a8f930913901274e252a65f0dd1fd07e1308e8e9c9e3707d3a581d199ac38",
-      "after_sha256": "adc46556ff6b608272b13bd5fa0f5397a9a212cc4defd153e13c9d7587c76ae5",
+      "before_sha256": "adc46556ff6b608272b13bd5fa0f5397a9a212cc4defd153e13c9d7587c76ae5",
+      "after_sha256": "ef6798d7da5d70337b81d862853db76164dc7cd8a1334feaa9dc28e1605e9741",
       "owners": {
         "@document": {
-          "before": "db9a8f930913901274e252a65f0dd1fd07e1308e8e9c9e3707d3a581d199ac38",
-          "after": "adc46556ff6b608272b13bd5fa0f5397a9a212cc4defd153e13c9d7587c76ae5"
+          "before": "adc46556ff6b608272b13bd5fa0f5397a9a212cc4defd153e13c9d7587c76ae5",
+          "after": "ef6798d7da5d70337b81d862853db76164dc7cd8a1334feaa9dc28e1605e9741"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "bc098bf74c4e1a797a6176743e5cad22437a521762967c97cf8f2be3a20f7f4a",
-      "after_sha256": "8b61180588c6f1dc7564098c0bfe4c67b7b5a90120a8405c46ab86bf5f020218",
+      "before_sha256": "8b61180588c6f1dc7564098c0bfe4c67b7b5a90120a8405c46ab86bf5f020218",
+      "after_sha256": "6efb9187171b840186a263b34a290676319263c62ab4e8145ba0a3438ef94250",
       "owners": {
         "@document": {
-          "before": "bc098bf74c4e1a797a6176743e5cad22437a521762967c97cf8f2be3a20f7f4a",
-          "after": "8b61180588c6f1dc7564098c0bfe4c67b7b5a90120a8405c46ab86bf5f020218"
+          "before": "8b61180588c6f1dc7564098c0bfe4c67b7b5a90120a8405c46ab86bf5f020218",
+          "after": "6efb9187171b840186a263b34a290676319263c62ab4e8145ba0a3438ef94250"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "74eb2223c39fd01020cc230f83d3fca7b66c549277687ffb17af37fe5758092e",
-      "after_sha256": "0d1bca868b420ca9682799d9667ed75ba845e825198fee886d42a5ba18b6bb9b",
+      "before_sha256": "0d1bca868b420ca9682799d9667ed75ba845e825198fee886d42a5ba18b6bb9b",
+      "after_sha256": "9c178099bc8495415118cc7c2416131f1f4bfe9db9b3dcd661b13882acf89e70",
       "owners": {
         "@document": {
-          "before": "74eb2223c39fd01020cc230f83d3fca7b66c549277687ffb17af37fe5758092e",
-          "after": "0d1bca868b420ca9682799d9667ed75ba845e825198fee886d42a5ba18b6bb9b"
+          "before": "0d1bca868b420ca9682799d9667ed75ba845e825198fee886d42a5ba18b6bb9b",
+          "after": "9c178099bc8495415118cc7c2416131f1f4bfe9db9b3dcd661b13882acf89e70"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "c71c321e55ea193fd64c5d1d652f6ae5a44436ba9f101fba206d0fbf6b57a153",
-      "after_sha256": "b2a998de6d90ee6bf74a03ab1e6198a58fa507e5d83df482960da796f7fc85ba",
+      "before_sha256": "b2a998de6d90ee6bf74a03ab1e6198a58fa507e5d83df482960da796f7fc85ba",
+      "after_sha256": "bc7b41cd5b8689ed83e71b50c6fccd0e4940bf70e198888bbcc3b454e487dd89",
       "owners": {
         "@document": {
-          "before": "c71c321e55ea193fd64c5d1d652f6ae5a44436ba9f101fba206d0fbf6b57a153",
-          "after": "b2a998de6d90ee6bf74a03ab1e6198a58fa507e5d83df482960da796f7fc85ba"
+          "before": "b2a998de6d90ee6bf74a03ab1e6198a58fa507e5d83df482960da796f7fc85ba",
+          "after": "bc7b41cd5b8689ed83e71b50c6fccd0e4940bf70e198888bbcc3b454e487dd89"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "701aa129675457b4f0ca5b609956987e7b6374887ddf35f6d83522e3cfec1402",
-      "after_sha256": "e0c758e6189e7310f090d283ea23228fb515a393340f288ef708229e0304bfb5",
+      "before_sha256": "e0c758e6189e7310f090d283ea23228fb515a393340f288ef708229e0304bfb5",
+      "after_sha256": "01a1d2be6cf72fb0fc1a654c9e9be0c30b685a4af281183c2b555779820bb8bc",
       "owners": {
         "@document": {
-          "before": "701aa129675457b4f0ca5b609956987e7b6374887ddf35f6d83522e3cfec1402",
-          "after": "e0c758e6189e7310f090d283ea23228fb515a393340f288ef708229e0304bfb5"
+          "before": "e0c758e6189e7310f090d283ea23228fb515a393340f288ef708229e0304bfb5",
+          "after": "01a1d2be6cf72fb0fc1a654c9e9be0c30b685a4af281183c2b555779820bb8bc"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "988e02fd6170950dadfe79c92f1ea79837666eb4dd58a72df32fbff949d6b3a9",
-      "after_sha256": "fb8dbfe305e047c562df16019e1bc66104598fc41d5e9401fa997236c29454fa",
+      "before_sha256": "fb8dbfe305e047c562df16019e1bc66104598fc41d5e9401fa997236c29454fa",
+      "after_sha256": "784d62c8fa3e634359766af1b8997e43bd2639ebc69dcedfd9e1de998a1fa175",
       "owners": {
         "@document": {
-          "before": "988e02fd6170950dadfe79c92f1ea79837666eb4dd58a72df32fbff949d6b3a9",
-          "after": "fb8dbfe305e047c562df16019e1bc66104598fc41d5e9401fa997236c29454fa"
+          "before": "fb8dbfe305e047c562df16019e1bc66104598fc41d5e9401fa997236c29454fa",
+          "after": "784d62c8fa3e634359766af1b8997e43bd2639ebc69dcedfd9e1de998a1fa175"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "df527b60f974b9ff9fa7b860c66d9e06b5e8a745370bebc26c810d131ff12ec5",
-      "after_sha256": "c5d7712192b8cb345ee2d597a0aef74259105f37c648194385d177021348ed53",
+      "before_sha256": "c5d7712192b8cb345ee2d597a0aef74259105f37c648194385d177021348ed53",
+      "after_sha256": "ba2cb10fe0202767796e1108cfba033f4c75611ac5df9daa03d96924cf6a8ebc",
       "owners": {
         "@document": {
-          "before": "df527b60f974b9ff9fa7b860c66d9e06b5e8a745370bebc26c810d131ff12ec5",
-          "after": "c5d7712192b8cb345ee2d597a0aef74259105f37c648194385d177021348ed53"
+          "before": "c5d7712192b8cb345ee2d597a0aef74259105f37c648194385d177021348ed53",
+          "after": "ba2cb10fe0202767796e1108cfba033f4c75611ac5df9daa03d96924cf6a8ebc"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "faeb408f8c6248c3c0ef00c4a3c7350acae70f0d84b798069de49c49917d22a9",
-      "after_sha256": "6265706b1f256452683013ae5c5670411e9cb5c687fce241d66c63c8c937ed8d",
+      "before_sha256": "6265706b1f256452683013ae5c5670411e9cb5c687fce241d66c63c8c937ed8d",
+      "after_sha256": "457fb5a7d980116be70ff8275f45c7552c8fc26da9a4ae412dcf067a16562f9b",
       "owners": {
         "@document": {
-          "before": "faeb408f8c6248c3c0ef00c4a3c7350acae70f0d84b798069de49c49917d22a9",
-          "after": "6265706b1f256452683013ae5c5670411e9cb5c687fce241d66c63c8c937ed8d"
+          "before": "6265706b1f256452683013ae5c5670411e9cb5c687fce241d66c63c8c937ed8d",
+          "after": "457fb5a7d980116be70ff8275f45c7552c8fc26da9a4ae412dcf067a16562f9b"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "961d8f8c54f8fd7f4be9e5948663b9733702125458bd2d82fdf1a49c50ae5ead",
-      "after_sha256": "57d6b1b42c3bc4102bfc07fceeb03f504ff98d34ea9a1110ce3a3792a6a15a65",
+      "before_sha256": "57d6b1b42c3bc4102bfc07fceeb03f504ff98d34ea9a1110ce3a3792a6a15a65",
+      "after_sha256": "e3a60b7b5ac049197e66354e2ad38229bc229468a070c4199ba26abc287dcb6b",
       "owners": {
         "@document": {
-          "before": "961d8f8c54f8fd7f4be9e5948663b9733702125458bd2d82fdf1a49c50ae5ead",
-          "after": "57d6b1b42c3bc4102bfc07fceeb03f504ff98d34ea9a1110ce3a3792a6a15a65"
+          "before": "57d6b1b42c3bc4102bfc07fceeb03f504ff98d34ea9a1110ce3a3792a6a15a65",
+          "after": "e3a60b7b5ac049197e66354e2ad38229bc229468a070c4199ba26abc287dcb6b"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "7e3e20393d60f37d0cfb484a3e6eebae7fa41a0d24cd6b0b93ee806d5da4196d",
-      "after_sha256": "d8deee01b04d500a986d6bf74b9eade2b7a3cde67f71845e4f30f1dff64f8697",
+      "before_sha256": "d8deee01b04d500a986d6bf74b9eade2b7a3cde67f71845e4f30f1dff64f8697",
+      "after_sha256": "e0138263e50589f5e377e8228f34f5d7a74a3e5ed5081b7840274726c0da8d53",
       "owners": {
         "@document": {
-          "before": "7e3e20393d60f37d0cfb484a3e6eebae7fa41a0d24cd6b0b93ee806d5da4196d",
-          "after": "d8deee01b04d500a986d6bf74b9eade2b7a3cde67f71845e4f30f1dff64f8697"
-        }
-      }
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "65afa253eb9c8cadfba6430a609c16530aea915db0604c65c5a65a567f4a703b",
-      "after_sha256": "6939ce5c3065e031e7317bef457c3a68d63e7ede48c585054098f28785ef569d",
-      "owners": {
-        "@document": {
-          "before": "65afa253eb9c8cadfba6430a609c16530aea915db0604c65c5a65a567f4a703b",
-          "after": "6939ce5c3065e031e7317bef457c3a68d63e7ede48c585054098f28785ef569d"
-        }
-      }
-    },
-    "scripts/build_test_shards.py": {
-      "before_sha256": "e7d1f5ff29bf5c43675461f3dcbe85baad4f69692b6679ff0deb28bbd3946169",
-      "after_sha256": "f56450d628e4a79cce2d2cb1b86e6ff76b81e7303e979a42464d7360ef09d47b",
-      "owners": {
-        "duration_worksteal_order": {
-          "before": "b693fd1492b3a419a387e6eda1eeffbf47eac78e4c949581c9d06b65b9f44aff",
-          "after": "e3bfbb628bcaad3d38635995462c39933595c835d7066c6cafdf091c26581665"
+          "before": "d8deee01b04d500a986d6bf74b9eade2b7a3cde67f71845e4f30f1dff64f8697",
+          "after": "e0138263e50589f5e377e8228f34f5d7a74a3e5ed5081b7840274726c0da8d53"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "c9d9729e744098830f205bbaf5e16d75408a83c62c2cf872a8636a35bcb3534f",
-      "after_sha256": "479c7773a71c609fbd698e77ebf5666a05fefd58f50eb1e304a0ebe002d59088",
+      "before_sha256": "479c7773a71c609fbd698e77ebf5666a05fefd58f50eb1e304a0ebe002d59088",
+      "after_sha256": "ab7444afac729ae1ba8d8567a026ce9c241f124bc0bee56d76d63217e704105c",
       "owners": {
         "@document": {
-          "before": "c9d9729e744098830f205bbaf5e16d75408a83c62c2cf872a8636a35bcb3534f",
-          "after": "479c7773a71c609fbd698e77ebf5666a05fefd58f50eb1e304a0ebe002d59088"
+          "before": "479c7773a71c609fbd698e77ebf5666a05fefd58f50eb1e304a0ebe002d59088",
+          "after": "ab7444afac729ae1ba8d8567a026ce9c241f124bc0bee56d76d63217e704105c"
         }
       }
     },
     "src/warhammer40k_core/ai/deployment_candidate_ranking.py": {
-      "before_sha256": null,
-      "after_sha256": "75dd39df1231941527363192f9e7f563f07551f0016aabf5454d664f18a5dda6",
+      "before_sha256": "75dd39df1231941527363192f9e7f563f07551f0016aabf5454d664f18a5dda6",
+      "after_sha256": "5097a8a00d232114d6991d4a6a0ac71e20ae364e290beec0bf6ab0f24b234ffe",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "029bbd91c7181439c2fe7e9b2ebd25b4c1cdf3926a1fdacc663ff230f2eae48b"
-        },
-        "DeploymentCandidateRanker": {
-          "before": null,
-          "after": "459b786e7254a0709b60944a9540c92d157c3ece98665bbdf8591bdd56821e82"
+          "before": "029bbd91c7181439c2fe7e9b2ebd25b4c1cdf3926a1fdacc663ff230f2eae48b",
+          "after": "aea4311c5d0ea49c8d5e682bfd5648e85e5d90eb85ddff7986438c968ca4281e"
         },
         "DeploymentCandidateRanker.score": {
-          "before": null,
-          "after": "800b8cffd714d58f46df9a656aea8136be19896828cdd9b1ab07547dbe2f7a64"
+          "before": "800b8cffd714d58f46df9a656aea8136be19896828cdd9b1ab07547dbe2f7a64",
+          "after": "43e47f02b4bde2622b04db7115bb1201b12dbce20c663762bb319c9f42c5e39e"
         },
-        "DeploymentCandidateScore": {
+        "DeploymentRankerConfiguration": {
           "before": null,
-          "after": "cc59473699a843f3e9a08ef4d16015655ebbc4b69849e6c736e96a857b58ee08"
+          "after": "9af292f62a12da43f3fdc6b3deceff351df607a49a962d14c84b3cf0601543f1"
         },
-        "DeploymentCandidateScore.__post_init__": {
+        "DeploymentRankerConfiguration.__post_init__": {
           "before": null,
-          "after": "304f48588926165462401f24d59ced00ac2e97353cb0f7c49451eda517d6c847"
+          "after": "3eb2c42580299c33a7587481bee6690d3b91e82a24797a6a1d1deb738a1d7817"
+        },
+        "DeploymentRankerConfiguration.parameters": {
+          "before": null,
+          "after": "4de80ab7bee4c937c8f0b0832927ca6e00a78212567715f5d3e17cd7d9226169"
+        },
+        "DeploymentRankerConfiguration.to_payload": {
+          "before": null,
+          "after": "0a0aa2dc3a2a8162fd092bec7b2d71d1472b7379002ebe338860cdb5216e8994"
+        },
+        "DeploymentRankingBehavior": {
+          "before": null,
+          "after": "711a633878428f5e05f310ab65e036f219aaa66fd4bb307495743b88feb84c4b"
         },
         "RankedDeploymentCandidates": {
-          "before": null,
-          "after": "3118f19f891f2cf8ae5b052377c2af3bd47504bd7e3ff824af7351e8195aae05"
-        },
-        "RankedDeploymentCandidates.__init__": {
-          "before": null,
-          "after": "1328e74dc56b6644e8979833737e959dd2c23114b683875153c0683b91da5f00"
-        },
-        "RankedDeploymentCandidates.content_hash": {
-          "before": null,
-          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
+          "before": "3118f19f891f2cf8ae5b052377c2af3bd47504bd7e3ff824af7351e8195aae05",
+          "after": "f73558e133a0c74c0c3547c33a7f652b3b254fd129b4f883a163c3f1def4a5aa"
         },
         "RankedDeploymentCandidates.from_payload": {
-          "before": null,
-          "after": "f8ff31253c68e420eba558ba604d371b6893a970fad892c08843a746c42efae3"
+          "before": "f8ff31253c68e420eba558ba604d371b6893a970fad892c08843a746c42efae3",
+          "after": "39d3915a8f56571ec7460c4dbb0970e5c43a6a74e64738eb27bdb08395bb189b"
         },
         "RankedDeploymentCandidates.rank": {
-          "before": null,
-          "after": "a21f6d5cd5de16b098d26af6776e5db337c3a1a94d02cc13dd84edbb98116df8"
-        },
-        "RankedDeploymentCandidates.select": {
-          "before": null,
-          "after": "0a772ee6cd6a4ca3707fdb56d241dcf36ab8c2fe7a33b17ce2c22117805274fb"
-        },
-        "RankedDeploymentCandidates.selected_candidate_id": {
-          "before": null,
-          "after": "a74c81b7224e91e342a2a6fc9c92e01b57f83cd62a1aefca690b3794bd3ae584"
-        },
-        "RankedDeploymentCandidates.to_payload": {
-          "before": null,
-          "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
+          "before": "a21f6d5cd5de16b098d26af6776e5db337c3a1a94d02cc13dd84edbb98116df8",
+          "after": "83ef6e1518b7d4b99b3a990b0df2f8dae4764997fe4f81d2e58bf6f684c9d73b"
         }
       }
     },
-    "tests/code_quality/test_ci_performance_gates.py": {
-      "before_sha256": "f57f5c7163552d715af35f05efbf027333a66cf2abe467b902b5d95b16e1f9c5",
-      "after_sha256": "43f4137f35f412f6eb3a74a36616bf69f7bcfc5f2a99392f930800693fa8d573",
+    "src/warhammer40k_core/ai/parameterized_training.py": {
+      "before_sha256": "72a64d7cca7c13ea2dbd3c09cb434b138cc2d00fb2e57c69744c404e3e5366bd",
+      "after_sha256": "6b2f1c07198292a8decedaa0a593440cdf7e6fec139ba6a288a47a3a17bbb8d6",
       "owners": {
-        "test_duration_dispatch_balances_actual_initial_worksteal_chunks": {
-          "before": "8f44a1c260eb4307087c12e459ab6f8d9e589635967defade89c354788e4b463",
-          "after": "3295aabf5ada2a81d74384474ee80ca7eae0a6ca57d96e13e6015125db6e4d2b"
+        "@module": {
+          "before": "84ca0c065aaeab699582d2926828b81835228600816a514e1c6b91d4baafff64",
+          "after": "9106e81941f1129f7e9d2568c67234062580e7722a9eac3aa6b3259caf849a7d"
         },
-        "test_duration_dispatch_profile_controls_the_real_worker_hook": {
-          "before": "332a6832254803bd4a0887a796e8b7ad53d0c29a3d956ca13cd7a59018086134",
-          "after": "fbbfe85b08bfead95805be29b11ca671ed84c1743a3755d85a313e06d32bd3ef"
+        "RankedDeploymentTrainingLink": {
+          "before": null,
+          "after": "65a939ea2ee26258a912589d47adbbad4ab68dea2ff2f1934a0ed941922ed338"
+        },
+        "RankedDeploymentTrainingLink.__init__": {
+          "before": null,
+          "after": "0ce4ee40d62f59fa07a3a5d165868d374beeca4b3936aaec07dfea3cbfe1f2c4"
+        },
+        "RankedDeploymentTrainingLink.from_payload": {
+          "before": null,
+          "after": "eabef4a62914b747913bc23df6fbb6104cf4a62d944ee2936749125bbc09fab3"
+        },
+        "RankedDeploymentTrainingLink.from_row": {
+          "before": null,
+          "after": "aab0558c7c7a7b4afb41f71c6e8740c76bdac570b846ad6b3e1c0f6083351889"
+        },
+        "RankedDeploymentTrainingLink.require_matches": {
+          "before": null,
+          "after": "05566658b4119767c842cf4ed145882cd46168caf3ca8b1ab24dccb6f532c7ad"
+        },
+        "RankedDeploymentTrainingLink.to_payload": {
+          "before": null,
+          "after": "cf052f0a8b677e8d733e61fa4b7a8992f8b3ac661ddca499e55ebdc842ba2283"
         }
       }
     },
     "tests/infrastructure/adapters/test_deployment_candidates.py": {
-      "before_sha256": "d799c30f1d3074229e25d9dfbe06596481868eb0d7725e14288b07dfc8e94f67",
-      "after_sha256": "33a28319ab887fa5af8cc1a86fa1bde2e9e49cac6058138aa8cdbdfa3326f5a0",
+      "before_sha256": "33a28319ab887fa5af8cc1a86fa1bde2e9e49cac6058138aa8cdbdfa3326f5a0",
+      "after_sha256": "9b1c97aec569a9f13242b1d7c7a3ae75df9d5c29b0beee5db1715027c3496404",
       "owners": {
         "@module": {
-          "before": "ac05e9f3c7bb08bbe13a310bc44c699bd0951b2ffb1fe5aa064b110e65a2396f",
-          "after": "fb2ed1880c986f30e783f202ca37700009c76a74693447b0ba24b0981cc8261a"
-        },
-        "_LastDeploymentRanker": {
-          "before": null,
-          "after": "dff6ae978ed423d270ff23af34162110d1f6cd976c2d8a845e0d4ffa896d8ee4"
+          "before": "fb2ed1880c986f30e783f202ca37700009c76a74693447b0ba24b0981cc8261a",
+          "after": "9200d1eaa245b34e26b14462154cf4567a3a4c99ab38958f586cfc2969b8712e"
         },
         "_LastDeploymentRanker.__init__": {
-          "before": null,
-          "after": "af0759c38147f05e171615c2262704cb443088a2c9fe69ba03561c28006be4d8"
+          "before": "af0759c38147f05e171615c2262704cb443088a2c9fe69ba03561c28006be4d8",
+          "after": "e192340fd1ffe4b8447f8fa80a8a92034aedd70624a9ceb0efd36506b1424db8"
         },
         "_LastDeploymentRanker.score": {
-          "before": null,
-          "after": "45130fd0b522c1c5730d2137f26f56afe05790a480f0587dbf7ec26fd13ff45c"
+          "before": "45130fd0b522c1c5730d2137f26f56afe05790a480f0587dbf7ec26fd13ff45c",
+          "after": "542ae4190019c41161c281cf15830f34aff5e94f916a17db3652df4280fdb6f4"
         },
-        "ranking_case": {
+        "_ranker_configuration": {
           "before": null,
-          "after": "1ca516410eb5cc85dadc5b74d7896b2f9bae000fb754316f993066dc351a2d77"
+          "after": "5fb7d5e4c27e57b0437edf1d64210b8de0daaf793a14f7055d9bfb47d83ba098"
+        },
+        "ranked_training": {
+          "before": null,
+          "after": "177af926b1666cd432f99ccb1f62bad63a38aec5c01911060c970b5152dd2aa0"
+        },
+        "test_deployment_ranker_configuration_rejects_invalid_parameters": {
+          "before": null,
+          "after": "2d11ccbe4fa002ee64d9edef8e41b0962d0f15d966dbdd857f7ce40b8b0fb1e5"
+        },
+        "test_deployment_ranker_configuration_requires_typed_deterministic_ranker": {
+          "before": null,
+          "after": "f536de034f9b3095e7055566743edeeb295a9b756924b27785aa1dda6c59c123"
         },
         "test_deployment_ranker_receives_only_detached_accepted_actor_payloads": {
-          "before": null,
-          "after": "615c96622b7f4bc17db908037015c572dcdd8086b6f07a0958052e710ea5a029"
+          "before": "615c96622b7f4bc17db908037015c572dcdd8086b6f07a0958052e710ea5a029",
+          "after": "5ff96623a8a91f06e8d853ac531a74a48d59db39cfc921f081824350d552b4b2"
         },
         "test_deployment_ranking_hidden_work_and_private_rng_noninterference": {
-          "before": null,
-          "after": "c97db816de385306ad3b0437741e9f504711ae343e400405310d5cf33e868a20"
+          "before": "c97db816de385306ad3b0437741e9f504711ae343e400405310d5cf33e868a20",
+          "after": "b531a7de79a3dd8fbdf6c87b99626819202f3346d55c5bef2aebb4358850b5d6"
         },
         "test_deployment_ranking_loader_rejects_drift": {
+          "before": "f9c7e48eaa5beafc1aba1adad1d152549ee1689413b136f3474e8904e0362fb5",
+          "after": "30e8c322c82f3dafe7e055a52dbca72c1e4fb796ba4c2886956cda6c6f2e180f"
+        },
+        "test_deployment_ranking_parameters_drive_behavior_and_reproduction": {
           "before": null,
-          "after": "f9c7e48eaa5beafc1aba1adad1d152549ee1689413b136f3474e8904e0362fb5"
+          "after": "8274f46b213b14d049e93cf330713a2c4536118f9d94fbf8b04c4fb46dc8683b"
         },
         "test_deployment_ranking_preserves_exact_numeric_scores_and_receipt": {
-          "before": null,
-          "after": "bf7ab8691e1c87224b0e0c95c2cddbe63bf975d24975ae2936c3d15f3cfddaf3"
+          "before": "bf7ab8691e1c87224b0e0c95c2cddbe63bf975d24975ae2936c3d15f3cfddaf3",
+          "after": "65b120524c100870ad63d6845a6f79c480fbcb0843adffccca5ee580a51c6f96"
         },
         "test_deployment_ranking_rechecks_checkpoint_after_callback": {
+          "before": "abdbef71a1508aa41aea09f4523919c3d04de1b94fb168d8074dd81512382345",
+          "after": "7d6dd8be316998de4516cd59a589c40b86b318942d5734d36ff4546b75b0fdac"
+        },
+        "test_deployment_ranking_rejects_incompatible_provenance_before_scoring": {
           "before": null,
-          "after": "abdbef71a1508aa41aea09f4523919c3d04de1b94fb168d8074dd81512382345"
+          "after": "735dea11f86268187341348c2b31bb189ce2577dc5cb77277ab18df436e2e58e"
         },
         "test_deployment_ranking_rejects_inexact_or_malformed_scores": {
+          "before": "65ba3f26ef6ba6c477a91fef2f48f6fcd88e24fbfb58608bb179e765d4c13314",
+          "after": "828f5cf20ccd0e203d3e02f991949f033d853988de22d036b18c57672302d022"
+        },
+        "test_deployment_ranking_rejects_untyped_run_inputs": {
           "before": null,
-          "after": "65ba3f26ef6ba6c477a91fef2f48f6fcd88e24fbfb58608bb179e765d4c13314"
+          "after": "781f26d646976dcbf1b7b3a6051b3ffc6273fc00a3eefa308b000c7d9c0065af"
         },
         "test_deployment_ranking_selects_nonfirst_and_preserves_ordinary_commit_replay": {
-          "before": null,
-          "after": "7de7fdaf561e22ccaf54834fd82954441d4d538ffaf3cbc5b85547f6e0d9c0a5"
+          "before": "7de7fdaf561e22ccaf54834fd82954441d4d538ffaf3cbc5b85547f6e0d9c0a5",
+          "after": "5786bf36bc11a84a90a6c4606299edd8affa912b57875bc488ee17f0628bdb24"
         },
         "test_deployment_ranking_ties_follow_generation_not_score_order": {
-          "before": null,
-          "after": "63ab8cc309e783399c6611333ffc7e24b6d06ec38b6b70a43a402cf6c8effdf1"
+          "before": "63ab8cc309e783399c6611333ffc7e24b6d06ec38b6b70a43a402cf6c8effdf1",
+          "after": "bd8b1f4937613ded66c4a0084b001de3a982bada409803d794951609abb5e962"
         },
-        "test_deployment_score_rejects_nonfinite_and_untyped_values": {
+        "test_deployment_set_training_commits_nonseed_alternative_and_binds_targets": {
+          "before": "5cd2ea500fd79a1b101ce232c939ee021958634dfe528fd0c5ca5fb6413589d2",
+          "after": "a4474c4571821398c5815f561f7059f195ae7ff692899e8082d794a395971d64"
+        },
+        "test_ranked_deployment_training_loader_rejects_drift": {
           "before": null,
-          "after": "5b3aa5cf8478caa839416ce8ccae151673741b0704835fc517e29a75c05ffe2a"
-        }
-      }
-    },
-    "tests/rules/section07/coverage.json": {
-      "before_sha256": "e55080c29061047c6578383b6f707c1ed01767e0a26d076de1478a626a510307",
-      "after_sha256": "703d938c75fc75e27b50632b2e5070c0944cde2fd0a2fddb9a7e225eea99fe3c",
-      "owners": {
-        "@document": {
-          "before": "e55080c29061047c6578383b6f707c1ed01767e0a26d076de1478a626a510307",
-          "after": "703d938c75fc75e27b50632b2e5070c0944cde2fd0a2fddb9a7e225eea99fe3c"
+          "after": "c9b70142c89996b3b0c50f2219c6f2d2439667f31e24737decdccf89e4f86bb6"
+        },
+        "test_ranked_deployment_training_rejects_inexact_join": {
+          "before": null,
+          "after": "d55a5c0008f16ba20b91b8e0d9083869eafabf07f09b2be478d4c618c4444084"
         }
       }
     }
   },
   "rows": {
-    "README.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/durations.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Regenerate current runtime build identity and its existing external contract examples and digests after the scoped AI runtime changes; no wire schema change.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Regenerate current runtime build identity and its existing external contract examples and digests after the scoped AI runtime changes; no wire schema change.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Regenerate current runtime build identity and its existing external contract examples and digests after the scoped AI runtime changes; no wire schema change.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Regenerate current runtime build identity and its existing external contract examples and digests after the scoped AI runtime changes; no wire schema change.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Regenerate current runtime build identity and its existing external contract examples and digests after the scoped AI runtime changes; no wire schema change.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Regenerate current runtime build identity and its existing external contract examples and digests after the scoped AI runtime changes; no wire schema change.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Regenerate current runtime build identity and its existing external contract examples and digests after the scoped AI runtime changes; no wire schema change.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Regenerate current runtime build identity and its existing external contract examples and digests after the scoped AI runtime changes; no wire schema change.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -1053,84 +392,63 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Refresh only the existing active deployment test file byte commitment after required contract regressions; retain all inventories and 260 deferred quality cases.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Maintain the bounded deployment ranking contract, explicit v2 migration, strict row join and open Stage 1 work without expanding support claims.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Maintain the bounded deployment ranking contract, explicit v2 migration, strict row join and open Stage 1 work without expanding support claims.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "scripts/build_test_shards.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "behavioral-worksteal-dispatch"
-      ],
-      "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Maintain the bounded deployment ranking contract, explicit v2 migration, strict row join and open Stage 1 work without expanding support claims.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "source-record",
-        "order108-terrain-semantics",
-        "order109-unit-control-semantics",
-        "order110-action-battle-shock-semantics"
+        "source-record"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Regenerate current runtime build identity and its existing external contract examples and digests after the scoped AI runtime changes; no wire schema change.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "src/warhammer40k_core/ai/deployment_candidate_ranking.py": {
-      "category": "algorithm_or_search",
+      "category": "serialization_or_replay_work",
       "operations": [
         "deployment-candidate-ranking"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Add bounded typed deterministic ranking configuration and v2 operator evidence with live source/build/config bindings; compose a separate strict accepted-row provenance link.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
-    "tests/code_quality/test_ci_performance_gates.py": {
-      "category": "measured_workload",
+    "src/warhammer40k_core/ai/parameterized_training.py": {
+      "category": "serialization_or_replay_work",
       "operations": [
-        "behavioral-worksteal-dispatch-tests"
+        "deployment-candidate-row-linkage"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+      "rationale": "Add bounded typed deterministic ranking configuration and v2 operator evidence with live source/build/config bindings; compose a separate strict accepted-row provenance link.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     },
     "tests/infrastructure/adapters/test_deployment_candidates.py": {
       "category": "measured_workload",
@@ -1138,19 +456,9 @@
         "deployment-bounded-candidates"
       ],
       "selected_families": [],
-      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
-      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
-      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
-    },
-    "tests/rules/section07/coverage.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-b6886d3bc2fb1ca4"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the live README byte authentication after documenting worker-local fixture reuse.",
-      "source_obligation": "Authenticate the maintained current README while retaining all historical governance hashes, source clauses, semantic assertions and qualifications.",
-      "unchanged_work": "Only authenticated_inputs.README.md changes. No engine, runtime identity, source content, test body, requirement, historical input, case inventory, coverage or timing limit changes."
+      "rationale": "Extend existing deployment tests for typed configuration, strict provenance rejection, detached parameters, accepted-row joins and unchanged normal commit/replay outcomes.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
+      "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
     }
   },
   "milestone": "ordinary",
