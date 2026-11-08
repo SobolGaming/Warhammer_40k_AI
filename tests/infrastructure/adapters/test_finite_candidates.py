@@ -9,6 +9,7 @@ import pytest
 from tests.shared.category_migration.phase18f_session_commands import (
     _compact_terminal_config,
     _deployment_payload_from_proposal,
+    _invalid_distance_witness,
     _terminal_progress_option_id,
 )
 from warhammer40k_core.adapters.access_control import ViewerContext
@@ -54,11 +55,13 @@ from warhammer40k_core.ai.training_targets import (
 )
 from warhammer40k_core.ai.training_transitions import (
     FiniteAcceptedTransition,
+    ParameterizedAcceptedTransition,
     TrainingTransitionError,
 )
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     BattlePhaseSequenceDescriptor,
+    RulesetDescriptor,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json
@@ -1286,3 +1289,82 @@ def test_finite_transition_reproduces_an_ordinary_terminal_boundary() -> None:
 def test_finite_transition_requires_verifying_factories() -> None:
     with pytest.raises(TrainingTransitionError, match="reproduction"):
         FiniteAcceptedTransition()
+
+
+def test_recorded_invalid_movement_is_outside_parameterized_admission_scope() -> None:
+    # Ordinary reachable movement supplies a real recorded rejection. This is an
+    # exclusion control, not certification of accepted movement transition evidence.
+    compact = _compact_terminal_config(game_id="unsupported-movement-admission")
+    session = LocalGameSession()
+    session.start(replace(compact, ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh()))
+    status = session.advance_until_decision_or_terminal()
+    for index in range(40):
+        request = status.decision_request
+        assert request is not None
+        assert request.actor_id is not None
+        context = PlayerDecisionContext.from_view(
+            session.view(viewer_player_id=request.actor_id), choice_seed=7
+        )
+        if context.route.proposal_kind == "normal_move":
+            break
+        if context.route.proposal_kind is not None:
+            assert context.route.proposal_kind == "deployment_placement"
+            status = session.submit_viewer_parameterized_payload(
+                viewer=ViewerContext.for_player(request.actor_id),
+                request_id=context.request["request_id"],
+                payload=_deployment_payload_from_proposal(context.observation["pending_proposal"]),
+                result_id=f"unsupported-prefix-{index}",
+            )
+        else:
+            candidates = FiniteCandidateSet.from_context(context)
+            chosen = _terminal_progress_option_id(cast(dict[str, JsonValue], context.request))
+            if context.route.decision_type == "select_movement_unit":
+                chosen = candidates.candidate_ids[0]
+            elif context.route.decision_type == "select_movement_action":
+                chosen = "normal_move"
+            status = session.submit_viewer_option(
+                viewer=ViewerContext.for_player(request.actor_id),
+                request_id=context.request["request_id"],
+                option_id=chosen,
+                result_id=f"unsupported-prefix-{index}",
+            )
+        if status.status_kind is LifecycleStatusKind.ADVANCED:
+            status = session.advance_until_decision_or_terminal()
+        assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    else:
+        pytest.fail("Ordinary setup did not reach movement within the declared budget.")
+    proposal = context.observation["pending_proposal"]
+    assert isinstance(proposal, dict)
+    payload: dict[str, JsonValue] = {
+        "proposal_request_id": proposal["request_id"],
+        "proposal_kind": proposal["proposal_kind"],
+        "unit_instance_id": proposal["unit_instance_id"],
+        "movement_phase_action": "normal_move",
+        "movement_mode": "normal",
+        "witness": _invalid_distance_witness(
+            projection=cast(dict[str, JsonValue], context.observation),
+            unit_instance_id=cast(str, proposal["unit_instance_id"]),
+        ),
+    }
+    rejected = session.fork()
+    status = rejected.submit_viewer_parameterized_payload(
+        viewer=ViewerContext.for_player(context.route.actor_id),
+        request_id=context.request["request_id"],
+        payload=payload,
+        result_id="recorded-invalid-movement",
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert rejected.decision_record_count() == session.decision_record_count() + 1
+    assert (
+        rejected.lifecycle.pending_decision_request()
+        != session.lifecycle.pending_decision_request()
+    )
+    with pytest.raises(TrainingTransitionError, match="Only deployment"):
+        ParameterizedAcceptedTransition.from_sessions(
+            context.propose(payload),
+            context=context,
+            before=session,
+            after=rejected,
+            trajectory_id="unsupported-recorded-attempt",
+            perspective_player_id="player-a",
+        )

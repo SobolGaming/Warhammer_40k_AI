@@ -219,8 +219,8 @@ as truncated/aborted/unsupported, validate target calculations or source-policy
 compatibility, or admit a dataset by itself. Admission must combine these checks
 with permitted semantic features, target/evidence validation and provenance.
 The separate episode/target admission companion below verifies origin reachability,
-finite slice continuity and a bounded set of target calculations. Parameterized
-transitions and complete dataset admission remain follow-up work. Legacy rows,
+finite slice continuity and a bounded set of target calculations. Other parameterized
+transition families and complete dataset admission remain follow-up work. Legacy rows,
 targets, runner behavior, replay and the ordinary adapter/wire decision contract
 remain unchanged.
 
@@ -317,6 +317,56 @@ comparing every field. Keep checkpoints, source/build identities, scoring audit
 and admission receipts outside model inputs and player projections. This bounded
 finite-slice/terminal-and-local-target admission does not qualify a dataset, broader semantic
 features, hidden-state planning, a full-game workload or playing strength.
+
+## Bounded parameterized transitions and mixed episodes
+
+`ParameterizedAcceptedTransition.from_sessions(action, ...)` adds the separate
+`parameterized-accepted-transition-v1` operator companion. Its only supported
+route is `submit_deployment_placement` / `deployment_placement` in setup
+`deploy_armies`. Supply the original `PolicyAction`, its historical actor context,
+trusted before/after local sessions, trajectory and value perspective. The action
+must match the actor, issued viewer request and observation hash exactly. The
+complete actor-view proposal is retained as immutable evidence; its identities
+are resolved by `submit_viewer_parameterized_payload` on the isolated replay fork.
+The existing adapter deployment contract supplies all legality and mutation.
+
+Finite and parameterized verification share one reproduction and continuity
+owner. Both require successful engine submission, ordinary advancement, the exact
+selected authoritative record and complete after checkpoint. Deployment rejects
+rule-invalid placements before recording and preserves the pending request and
+checkpoint for a legal retry. Neither those rejected proposals nor recorded
+rejections from unsupported families are accepted transitions. Movement's recorded
+invalid-attempt/retry path is tested only as an unsupported-family negative
+control; it is not certified by this companion. Stale, drifted, malformed, wrong-actor and
+wrong-family inputs fail explicitly. The closed loader repeats the complete
+ordinary submission and compares every canonical evidence field.
+
+`MixedEpisodeAdmission.from_transitions(...)` uses
+`mixed-episode-admission-v1` and accepts finite and supported parameterized
+evidence, including finite → placement → finite chains. It shares the existing
+ordinary origin, source/config, record, endpoint and end-classification checks.
+Finite transition `previous=` may name either concrete verified transition type;
+the finite transition payload and chosen finite action retain their v1 meanings.
+`FiniteEpisodeAdmission` still rejects parameterized members. Both episode
+loaders revalidate the complete chain; payloads are detached and immutable.
+
+`VerifiedLocalReference` also accepts a mixed episode and any of its verified
+transitions. Its unchanged `command-point-balance-v1` calculator requires the exact
+endpoint and accepted-record horizon, including automatic selections. This proves
+bounded endpoint CP evidence only. Parameterized candidate sets, row masks,
+parameterized row/target linkage and learning eligibility are not supplied:
+`AdmittedTrainingTarget` remains finite-episode/finite-row-only. No parameterized
+proposal is represented as a finite legal candidate or certified target receipt.
+
+Evidence is operator-only: checkpoint commitments, complete proposal payloads,
+authoritative identities and source/build information never become model inputs
+or player projections. Existing viewer secrecy and wire schemas are unchanged;
+the existing [adapter decision contract](ADAPTER_DECISION_CONTRACT.md) already
+covers the reused deployment path. The ordinary setup regression certifies this
+bounded proposal family, not movement, charge, shooting, fight, reactions, reserves
+or other parameterized mechanics. Candidate generation, nonmutating bulk legality,
+broader local references, semantic features, search, dataset admission and runner
+timing remain follow-ups.
 
 ## Named training target declarations
 
