@@ -11,11 +11,12 @@ from tests.shared.ai_training_admission_helpers import (
     DeploymentCase,
     DeploymentTrainingProof,
     TerminalProof,
-    _admit,
-    _automatic_attack_case,
-    _local_target,
-    _step,
-    _target,
+)
+from tests.shared.ai_training_admission_helpers import (
+    admit_target as _admit,
+)
+from tests.shared.ai_training_admission_helpers import (
+    automatic_attack_case as _automatic_attack_case,
 )
 from tests.shared.ai_training_admission_helpers import (
     continuing as continuing,
@@ -25,6 +26,15 @@ from tests.shared.ai_training_admission_helpers import (
 )
 from tests.shared.ai_training_admission_helpers import (
     deployment_training as deployment_training,
+)
+from tests.shared.ai_training_admission_helpers import (
+    local_target as _local_target,
+)
+from tests.shared.ai_training_admission_helpers import (
+    step as _step,
+)
+from tests.shared.ai_training_admission_helpers import (
+    target as _target,
 )
 from tests.shared.ai_training_admission_helpers import (
     terminal as terminal,

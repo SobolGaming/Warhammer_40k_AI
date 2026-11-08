@@ -86,11 +86,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "e0e410d93ce144f7c6e65e7eed47820b5c33369dd2070e54758fa098fcb3f373",
-      "after_sha256": "5a1c0ddd5a8726e4f96cedbfbab3a1d889d4f523f47751500085fda468480a52",
+      "after_sha256": "9d4d7ba346b3fc02fb7211165d73a7810965bbd91f47fe41c4bef9a192c86ae0",
       "owners": {
         "@document": {
           "before": "e0e410d93ce144f7c6e65e7eed47820b5c33369dd2070e54758fa098fcb3f373",
-          "after": "5a1c0ddd5a8726e4f96cedbfbab3a1d889d4f523f47751500085fda468480a52"
+          "after": "9d4d7ba346b3fc02fb7211165d73a7810965bbd91f47fe41c4bef9a192c86ae0"
         }
       }
     },
@@ -296,11 +296,11 @@
     },
     "tests/infrastructure/adapters/test_training_admission.py": {
       "before_sha256": "af08ae28fbc5356d1bfa8afd0f948b2b3acddf2768f8e2004e1a2ef6825c1ea5",
-      "after_sha256": "0f1007d7ddc51bc3e2f934b27e71900dc308004b3a0781abe522085178951e92",
+      "after_sha256": "26ec230eb248fb840bae22117c1a802bfd209578f906895ae4e0e182aea5643c",
       "owners": {
         "@module": {
           "before": "c37225ee65f5002505c1ab83c83a69dceef8867779f38f4c5b63a59ff9ff7973",
-          "after": "43d26ab921bdeb88ceb1d1508a68af7ef91e93a4f555cedbceb9af4ffec8c4df"
+          "after": "fd24777dd1fc57b59d8f1f5a6ec00e433d836e2ac8e8f9e708b5c0ee993f346d"
         },
         "AdmissionCase": {
           "before": "202f6095f6645e9cb079ead563034e321ff70a84e788ba1a5da0e9f4ddf311fb",
@@ -418,7 +418,7 @@
     },
     "tests/shared/ai_training_admission_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "0ad0415632b821e940679326eb6e6c77d255e03be38f249d4f6bfdae0be6b9ed",
+      "after_sha256": "cda58ef6708eeb8ecd83ae4917cf5cb6f6b0f288e90aa501c0ee14688a3c23ed",
       "owners": {
         "@module": {
           "before": null,
@@ -460,37 +460,25 @@
           "before": null,
           "after": "3d6d2e45b8023fafd58450c63be5fbcf82d774cface0beaecd1b142b137d573f"
         },
-        "_admit": {
-          "before": null,
-          "after": "df7dd51e05be1157d120ec049125b82b5fa46934703907076c5664c1618df4b5"
-        },
-        "_automatic_attack_case": {
-          "before": null,
-          "after": "41ba03bdad426291437c229e9b0c7789ed0c734589a2e10bbc4ca1e47d0df4a5"
-        },
-        "_local_target": {
-          "before": null,
-          "after": "6593488fe15b27567880da7f1950da32fcca50b236c28449eb32640834b94b26"
-        },
         "_row": {
           "before": null,
           "after": "5520746f32b0932ef90b61186f13bf134acf5a1d8cb6245cf571fc6a9e3a70e5"
         },
-        "_step": {
+        "admit_target": {
           "before": null,
-          "after": "d6b56bde65a33bc31ff8c2c71d7d43621403b48f3ddf3276cc50fecba688295d"
+          "after": "f15022848565fe781b31aa43073fcb8d098cc08cbe9fef42235987479307e338"
         },
-        "_target": {
+        "automatic_attack_case": {
           "before": null,
-          "after": "4e350ea033bd1e4f755106ae16efa0400b25d9d8b015ab17a1bbf82d855947bd"
+          "after": "e22763562854d6081dcd5554f202fe77247b0dfd1b84b53e4bf297f8eff03f38"
         },
         "continuing": {
           "before": null,
-          "after": "214338fb1b1733ce5cc2e2e16b5fe0dfb15915777217a303c71b2e9d5702c6b2"
+          "after": "4d6c6851c8d347f62079a37eddd500d9ef44f4d7c15ec16f4e492fca34ef8f05"
         },
         "deployment": {
           "before": null,
-          "after": "8b80de3ac2903423103c1aa41fc75b89b123b94214f9a279cc184d87383edb31"
+          "after": "1bd533ff1903f94e261b4c9c8898f22af11d10587c1f9c1337e7e4fe163abcf2"
         },
         "deployment_row": {
           "before": null,
@@ -499,6 +487,18 @@
         "deployment_training": {
           "before": null,
           "after": "e6a14787dd7335dfad809d3151339f81cce7ed7e86afc061883a467e296379e2"
+        },
+        "local_target": {
+          "before": null,
+          "after": "38c82e594ab72c520b852ff9dd9ad81ce1fbd2ad761491bb3426a81b134d3ea2"
+        },
+        "step": {
+          "before": null,
+          "after": "17be37c7237eb978d0b421bf614b3ca29640de3e5452ce54fabc5463a093d298"
+        },
+        "target": {
+          "before": null,
+          "after": "cca92c1e75ee8a326d4e2f93917edbc983a948c0200f7f0d8114254af9b0111e"
         },
         "terminal": {
           "before": null,

@@ -164,7 +164,7 @@ def _row(
     )
 
 
-def _step(before: LocalGameSession, chosen: str | None = None) -> AdmissionCase:
+def step(before: LocalGameSession, chosen: str | None = None) -> AdmissionCase:
     request = before.lifecycle.pending_decision_request()
     assert request is not None
     assert request.actor_id is not None
@@ -193,7 +193,7 @@ def continuing() -> AdmissionCase:
     session = LocalGameSession()
     session.start(canonical_setup_prebattle_smoke_config())
     session.advance_until_decision_or_terminal()
-    return _step(session)
+    return step(session)
 
 
 @pytest.fixture(scope="module")
@@ -252,7 +252,7 @@ def terminal() -> AdmissionCase:
     pytest.fail("Terminal admission fixture exceeded its explicit decision budget.")
 
 
-def _target(
+def target(
     case: AdmissionCase,
     episode: FiniteEpisodeAdmission,
     *,
@@ -280,7 +280,7 @@ def _target(
     )
 
 
-def _admit(
+def admit_target(
     case: AdmissionCase,
     episode: FiniteEpisodeAdmission,
     target: NamedTrainingTarget,
@@ -307,7 +307,7 @@ def _admit(
     )
 
 
-def _local_target(
+def local_target(
     case: AdmissionCase,
     episode: FiniteEpisodeAdmission,
     transition: FiniteAcceptedTransition,
@@ -340,7 +340,7 @@ def _local_target(
     return target, reference
 
 
-def _automatic_attack_case() -> AdmissionCase:
+def automatic_attack_case() -> AdmissionCase:
     # Explicit synthetic open board/close deployment; ordinary startup, placements
     # and shooting only. This is a timing fixture, not source-layout qualification.
     config = _compact_terminal_config(game_id="admission-auto")
@@ -406,7 +406,7 @@ def _automatic_attack_case() -> AdmissionCase:
         assert request is not None
         assert request.actor_id is not None
         if request.decision_type == "select_resolve_target_unit":
-            return _step(session)
+            return step(session)
         if request.decision_type == "submit_deployment_placement":
             view = session.view(viewer_player_id=request.actor_id)
             pending = view["pending_decision"]
@@ -528,7 +528,7 @@ def deployment() -> DeploymentCase:
         assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     else:
         pytest.fail("Ordinary setup did not reach deployment within the declared budget.")
-    first = _step(session)
+    first = step(session)
     pending = first.after.lifecycle.pending_decision_request()
     assert pending is not None
     assert pending.actor_id is not None
@@ -558,7 +558,7 @@ def deployment() -> DeploymentCase:
         perspective_player_id="player-a",
         previous=first_transition,
     )
-    last = _step(after)
+    last = step(after)
     return DeploymentCase(
         first,
         context,
