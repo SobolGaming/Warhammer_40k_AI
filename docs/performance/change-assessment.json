@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2d3bcb63830dc4ca110f2355e72e668728321d6bddc4789aace90c51d7965bfe",
   "operation_map_sha256": "7a9f4297dd0e92aa8d23a89f16571cd6e4303051f095f5c2d306995e66e98305",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "a12ef1beab62ff8c5608def65691e0d2f37b32cbcef11b7378b6aaf022b9fa40",
+      "after_sha256": "6e3568420efd4ec58e3d576c596b3bc23a4350beced3a04c44bc9583dbe0c598",
+      "owners": {
+        "@document": {
+          "before": "a12ef1beab62ff8c5608def65691e0d2f37b32cbcef11b7378b6aaf022b9fa40",
+          "after": "6e3568420efd4ec58e3d576c596b3bc23a4350beced3a04c44bc9583dbe0c598"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "b113e4bd8687b3d3e68077cb93e1ad6f6b33378fa26a18788b49277824fc1eda",
+      "after_sha256": "f4d3d4780ccc1c94b707dc946d79adf735f5743bb585d2616e7cd2b1740290a5",
+      "owners": {
+        "@document": {
+          "before": "b113e4bd8687b3d3e68077cb93e1ad6f6b33378fa26a18788b49277824fc1eda",
+          "after": "f4d3d4780ccc1c94b707dc946d79adf735f5743bb585d2616e7cd2b1740290a5"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "61ab3b354e0e7c09daf9db843f99efc07cf36e3a923bf656419240c6bdeeaada",
+      "after_sha256": "85a1b1aa3f031c544621d0befac2822bebb90032081ff86f8ceb3a0fb0f6625e",
+      "owners": {
+        "@document": {
+          "before": "61ab3b354e0e7c09daf9db843f99efc07cf36e3a923bf656419240c6bdeeaada",
+          "after": "85a1b1aa3f031c544621d0befac2822bebb90032081ff86f8ceb3a0fb0f6625e"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "b9175071d854b70cce28f7f8652fa42028b25a6be79772089bd37fd353ee67e1",
+      "after_sha256": "5a36ec1074973b1fe8a5a2ed0bd1e5b8296e941b55129c36973eb26a2bbbfc52",
+      "owners": {
+        "@document": {
+          "before": "b9175071d854b70cce28f7f8652fa42028b25a6be79772089bd37fd353ee67e1",
+          "after": "5a36ec1074973b1fe8a5a2ed0bd1e5b8296e941b55129c36973eb26a2bbbfc52"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "9c4d3d7e683312ffeca753477780592e07f182f490920ece7a8ad5b481dfd83b",
+      "after_sha256": "dfd5e20a103808408113264df7b6fd5ee3aa59cef16deb26d510165bb93efd4e",
+      "owners": {
+        "@document": {
+          "before": "9c4d3d7e683312ffeca753477780592e07f182f490920ece7a8ad5b481dfd83b",
+          "after": "dfd5e20a103808408113264df7b6fd5ee3aa59cef16deb26d510165bb93efd4e"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "599950ca1ec0895b1428982efeb797d9654eff0e20562c577733329127f96f65",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "owners": {
+        "@document": {
+          "before": "599950ca1ec0895b1428982efeb797d9654eff0e20562c577733329127f96f65",
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "c7a0ac08c651979f8ba14253a249a07aa21e38d95036f8582b7b54de203fd9ee",
+      "after_sha256": "9ed3e3a625bacababb9dee8b5688365dca859a90f9e39e6d8fc4029c33716e24",
+      "owners": {
+        "@document": {
+          "before": "c7a0ac08c651979f8ba14253a249a07aa21e38d95036f8582b7b54de203fd9ee",
+          "after": "9ed3e3a625bacababb9dee8b5688365dca859a90f9e39e6d8fc4029c33716e24"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "b60f7caae0070129af148e60c749805a29f991a64d01ceb9db71b512fe9c2ee9",
+      "owners": {
+        "@document": {
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "b60f7caae0070129af148e60c749805a29f991a64d01ceb9db71b512fe9c2ee9"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "5d1e6c9ddf6c2d5106ee3f288c8f5dead929f4175f17e9abd8df9cf20056c257",
+      "after_sha256": "0c67b8973357ff51d1f79aa02641ac7488888fcaf4d6d79d642a94ac17ab54d2",
+      "owners": {
+        "@document": {
+          "before": "5d1e6c9ddf6c2d5106ee3f288c8f5dead929f4175f17e9abd8df9cf20056c257",
+          "after": "0c67b8973357ff51d1f79aa02641ac7488888fcaf4d6d79d642a94ac17ab54d2"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "9e9e9df315bb662a4fafd3022adb75c64890e1e9acdb820343788a9022319d59",
+      "after_sha256": "6e3e3a040e20c7d9b8c2571110bcc6995f2d2ca83a1f2cbc1697221f68cb7553",
+      "owners": {
+        "@document": {
+          "before": "9e9e9df315bb662a4fafd3022adb75c64890e1e9acdb820343788a9022319d59",
+          "after": "6e3e3a040e20c7d9b8c2571110bcc6995f2d2ca83a1f2cbc1697221f68cb7553"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "99f8ca43ab44ed46c8f429a95b736c66a880547fa1820ba8f1d76f00e5512e7e",
+      "after_sha256": "d49c638f80cd1c2cffab9235c3ec6e6aea1bc7124a35b6ba06ee31cfe0131864",
+      "owners": {
+        "@document": {
+          "before": "99f8ca43ab44ed46c8f429a95b736c66a880547fa1820ba8f1d76f00e5512e7e",
+          "after": "d49c638f80cd1c2cffab9235c3ec6e6aea1bc7124a35b6ba06ee31cfe0131864"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "c39a9573d704db49d2d722f47e05b94f5c5eccfe46b8d1025414a5c547cbf428",
+      "after_sha256": "b9d016dd6527f05d7e63e144513e9887067edd34d9f0661a4861b2ff0d92090d",
+      "owners": {
+        "@document": {
+          "before": "c39a9573d704db49d2d722f47e05b94f5c5eccfe46b8d1025414a5c547cbf428",
+          "after": "b9d016dd6527f05d7e63e144513e9887067edd34d9f0661a4861b2ff0d92090d"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "6df49d9ceb4ee3664db980fecebeefaab79187f94bb23fd00c388cde0303d2f5",
+      "after_sha256": "db641a32edbbe8f0ede9ceb7ce54a135813a4dbea2f2a89a4a7411a8fd80c872",
+      "owners": {
+        "@document": {
+          "before": "6df49d9ceb4ee3664db980fecebeefaab79187f94bb23fd00c388cde0303d2f5",
+          "after": "db641a32edbbe8f0ede9ceb7ce54a135813a4dbea2f2a89a4a7411a8fd80c872"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "2c5203a21338363b3d794f66d636b405b94c9675a87e9981c45e742c1058d537",
       "after_sha256": "cab6522ba151240947dae7cd1d555197d6683142f1d341ccf4e6f0056334d597",
@@ -512,6 +642,136 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
