@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "b20ef88d2ef5ab87500ccc1f13d61aeb7c29f59b",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b5aa998fb3e387e794b2f1482ae12cad55f68059461a88617fdb9b5bf40fe96f",
-  "operation_map_sha256": "8dd11a149d7bce93538b37ac8461bf0e940db568be412c7e27b8e9d86efd491b",
+  "operation_map_sha256": "580ad86719324ddc96a96bd28a5169c9ef349724353c2fea2f8d809b3cc53577",
   "changes": {
     "README.md": {
       "before_sha256": "8dfbe7f6072c9ea7892bf03031310a8fbd934ff70c0c1228078ae73e3cd8d2b2",
@@ -266,11 +266,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "65afa253eb9c8cadfba6430a609c16530aea915db0604c65c5a65a567f4a703b",
-      "after_sha256": "3d9ba9408916304b6837083b491ca62c9f41c82854aca725c0a04b82b910a463",
+      "after_sha256": "f88455c8395f814b64f36b6a0af92fec32827f9c7183729130c346f2fde204a8",
       "owners": {
         "@document": {
           "before": "65afa253eb9c8cadfba6430a609c16530aea915db0604c65c5a65a567f4a703b",
-          "after": "3d9ba9408916304b6837083b491ca62c9f41c82854aca725c0a04b82b910a463"
+          "after": "f88455c8395f814b64f36b6a0af92fec32827f9c7183729130c346f2fde204a8"
         }
       }
     },
@@ -459,6 +459,48 @@
         "@document": {
           "before": "e55080c29061047c6578383b6f707c1ed01767e0a26d076de1478a626a510307",
           "after": "5851c3c92c9f2cbfec7346d293c944398708e6ef71278747ce51839e0e6ba215"
+        }
+      }
+    },
+    "tests/timing_plugin.py": {
+      "before_sha256": "69387b39047c641ea0a4f96eb29a56b834242d1c2cd34a5fa7797e0c01ec4d59",
+      "after_sha256": "a856dc037c43a738968ba9e266d775183fdecaf3aa64faa1c618a38c00152346",
+      "owners": {
+        "@module": {
+          "before": "b61ba653b3fd47c6bb3fa7e1ce09b92f22d8965c99c18e5d267714610bdb72e2",
+          "after": "25f2c62dfd830c61b8025720891ddeba208ee63af479f525a5d135938c55d6bd"
+        },
+        "_append_progress": {
+          "before": null,
+          "after": "bb18a2e66d2a0a109b77488925ad9f17b8adf0293556fe8dd8119510ab166d39"
+        },
+        "_optional_linux_text": {
+          "before": null,
+          "after": "4e8f524934917a3ea142bb3db0e191bca5e1a345f61f030eb8fd475c7f129f28"
+        },
+        "_resource_snapshot": {
+          "before": null,
+          "after": "d942347fbbd0681aa1a67c3604468f1b7c6c0cb953137a8d732ad2893105b006"
+        },
+        "pytest_collection_finish": {
+          "before": "a6055096fc4e231d5de00b6f12e3526d2dea8d4ec49e37da860bf59f7980bd29",
+          "after": "d0013d9b9af0addc8f4a93bf69118dfe69938a60cd10e7b5ec27b3e05242f8b5"
+        },
+        "pytest_runtest_logreport": {
+          "before": "f4c1fe74791d519d658b5319b2063a6edf3748bd41ed5f9f044f82637b111d14",
+          "after": "9e700b145386477d74549633a38bad4dedb71edfbefa157c6712fc09d780ccf3"
+        },
+        "pytest_runtest_logstart": {
+          "before": null,
+          "after": "bb816bfef591f6e4a520c143d61afa6402f8f1428880f4ab8a01b450157cbca4"
+        },
+        "pytest_sessionfinish": {
+          "before": "3a643a6311d12f664254ec287128d928185a0a8f92e34e39040539ff19098f1c",
+          "after": "a57a2d2e115e42896e1c4bba9c554f0bf77a9f03b0dad24b2a897b054d62a4b7"
+        },
+        "pytest_sessionstart": {
+          "before": "3ac1d2ab651f64a20a0a71cd13e117bee10aa8c96adb0cfed7fde79755711080",
+          "after": "7c2cb2b110be28476aab3ba8d80b8b24de6c00adf6b3ad8d3c2e73d0e2b315b7"
         }
       }
     }
@@ -1176,6 +1218,16 @@
       "rationale": "Refresh the live README byte authentication after the intentional CI measurement guidance change.",
       "source_obligation": "Authenticate the maintained current README while retaining all historical governance hashes, source clauses, semantic assertions and qualifications.",
       "unchanged_work": "Only authenticated_inputs.README.md changes. No engine, runtime identity, source content, test body, requirement, historical input, case inventory, coverage or timing limit changes."
+    },
+    "tests/timing_plugin.py": {
+      "category": "measured_workload",
+      "operations": [
+        "ci-worker-timing-progress"
+      ],
+      "selected_families": [],
+      "rationale": "Append opt-in per-process timing progress before session finish so CI timeout diagnosis retains actual execution evidence.",
+      "source_obligation": "Keep diagnostic records separate from the existing final timing receipt; preserve selection, order, test bodies, outcomes, coverage and every timeout.",
+      "unchanged_work": "Observation-only test tooling adds no engine, ranking, rule-source content, runtime identity, scheduler, profile weight or workload change. No timing cure or speedup is claimed. Existing legacy timing JSON remains unchanged."
     }
   },
   "milestone": "ordinary",
