@@ -265,8 +265,8 @@ Observed `match_utility` and `vp_margin` require producer `engine-final-scoring-
 and `evidence_hash=payload_digest(episode.to_payload()["final_result"])`. Utility is
 checked against the actual engine winners (win 1, draw 0.5, loss 0); VP margin is
 own minus opponent terminal capped VP. The match horizon must reach that exact
-terminal endpoint. Observed local references are rejected until a verified
-reference calculator exists. No arbitrary producer ID or hash authenticates one.
+terminal endpoint. Observed local references use the bounded verified calculator below; arbitrary
+producer IDs and hashes do not authenticate a calculation.
 
 Missing targets require producer `episode-boundary-v1`, the episode content hash,
 and its exact declared nonterminal stop reason. Their receipt always sets
@@ -275,11 +275,47 @@ are declarations of unobserved work, not achieved horizon or value evidence.
 Receipts bind the target/row link, transition, episode and actual accepted-record
 start/stop. They never reinterpret the original scalar `target_value`.
 
-All three companions are immutable and return detached JSON payloads. Their
+`VerifiedLocalReference.from_episode(...)` supplies the independently versioned
+`verified-local-reference-v1` operator companion. Its only current calculator is
+`command-point-balance-v1`, produced by `engine-command-point-balance-v1` with
+`command_points` units: the perspective player's remaining CP at the exact
+admitted endpoint, read through `GameState.command_point_total`. This is a local
+resource observation, not match utility, resource-change attribution or evidence
+that saving CP improves tactical results. No reward weight is prescribed.
+
+Supply the admitted episode, its selected transition, exact final session, target
+ID and positive integer `horizon_decisions`. The horizon starts at that selected
+transition's `accepted_record_start`, including the selected action, and ends at
+the episode's `accepted_record_stop`. Accepted automatic selections count even
+when CP is unchanged. Rejected attempts cannot extend the accepted finite chain;
+prefix records before its origin do not count. This bounded calculator supports
+only the supplied episode endpoint. Short/long horizons, including a horizon
+inside an atomic transition's automatic records or beyond an early terminal
+boundary, fail explicitly. An earlier observable endpoint needs its own admitted
+slice; no checkpoint or value is interpolated.
+
+Only terminal and truncated episodes can produce observed local references.
+Aborted/unsupported episodes retain missing targets excluded from learning. The
+calculator binds the episode/transition/checkpoint hashes, perspective, count
+interval, units, producer and value; the episode binds the verified source/build.
+It checks the exact checkpoint and source identity before reading the resource.
+The closed loader repeats that computation and compares the entire evidence.
+
+To admit an observed local target, use this fixed target ID, producer and units,
+its computed value and `evidence_hash=reference.content_hash`, then supply the
+same `final_session` to `AdmittedTrainingTarget.from_episode` or its loader. Both
+recompute the reference instead of accepting a calculator flag or a numeric hash
+claim. Unknown calculators, wrong values/units/producers, incompatible sources,
+drifted endpoints and mismatched horizons fail closed. Existing target, row and
+admission payload versions are unchanged; the optional endpoint argument is
+required only for observed local references. All checkpoint/evidence access stays
+operator-only, outside policy inputs and player projections.
+
+All four admission companions are immutable and return detached JSON payloads. Their
 closed loaders require the same trusted inputs and repeat verification before
 comparing every field. Keep checkpoints, source/build identities, scoring audit
 and admission receipts outside model inputs and player projections. This bounded
-finite-slice/terminal-target admission does not qualify a dataset, broader semantic
+finite-slice/terminal-and-local-target admission does not qualify a dataset, broader semantic
 features, hidden-state planning, a full-game workload or playing strength.
 
 ## Named training target declarations
