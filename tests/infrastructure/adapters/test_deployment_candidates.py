@@ -17,13 +17,20 @@ from tests.shared.category_migration.phase18f_session_commands import (
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.projection import GameViewPayload
+from warhammer40k_core.ai.deployment_candidate_ranking import (
+    DeploymentCandidateScore,
+    RankedDeploymentCandidates,
+)
 from warhammer40k_core.ai.deployment_candidate_search import (
     DeploymentCandidateExhaustedError,
     DeploymentCandidateSet,
     DeploymentSearchStop,
 )
 from warhammer40k_core.ai.deployment_candidate_validation import ValidatedDeploymentCandidates
-from warhammer40k_core.ai.deployment_candidates import DeploymentPlacementCandidate
+from warhammer40k_core.ai.deployment_candidates import (
+    DeploymentCandidatePayload,
+    DeploymentPlacementCandidate,
+)
 from warhammer40k_core.ai.parameterized_training import DeploymentTrainingCandidateLink
 from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyError
 from warhammer40k_core.ai.policy_contracts import TrainingRow
@@ -783,3 +790,322 @@ def test_deployment_set_link_rejects_same_view_different_authoritative_checkpoin
     assert link.to_payload()["validation"]["unvalidated_count"] == 4
     assert link.validated.candidate_set == validated.candidate_set
     assert "checkpoint_hash" not in candidates.to_payload()
+
+
+class _LastDeploymentRanker:
+    def __init__(self, *, tied: bool = False, mutate: bool = False) -> None:
+        self.tied = tied
+        self.mutate = mutate
+        self.calls: list[tuple[PlayerDecisionContext, tuple[DeploymentCandidatePayload, ...]]] = []
+
+    def score(
+        self, context: PlayerDecisionContext, candidates: tuple[DeploymentCandidatePayload, ...]
+    ) -> tuple[DeploymentCandidateScore, ...]:
+        self.calls.append((context, candidates))
+        scores = tuple(
+            DeploymentCandidateScore(candidate["candidate_id"], 0.0 if self.tied else float(index))
+            for index, candidate in enumerate(candidates)
+        )
+        if self.mutate:
+            context.observation["game_id"] = "changed"
+            candidates[0]["proposal"] = None
+        return tuple(reversed(scores))
+
+
+@pytest.fixture(scope="module")
+def ranking_case(
+    deployment_session: LocalGameSession,
+) -> tuple[PlayerDecisionContext, ValidatedDeploymentCandidates]:
+    context, seed = _context_seed(deployment_session)
+    candidates = DeploymentCandidateSet.generate(
+        seed,
+        context=context,
+        translations=((1000.0, 0.0), (0.0, 0.0), (1.0, 0.0), (2.0, 0.0)),
+    )
+    validated = ValidatedDeploymentCandidates.validate(
+        candidates,
+        context=context,
+        session=deployment_session,
+        validation_budget=3,
+    )
+    assert len(validated.accepted_ids) == 2
+    return context, validated
+
+
+def test_deployment_ranking_selects_nonfirst_and_preserves_ordinary_commit_replay(
+    deployment_session: LocalGameSession,
+    ranking_case: tuple[PlayerDecisionContext, ValidatedDeploymentCandidates],
+) -> None:
+    context, validated = ranking_case
+    ranker = _LastDeploymentRanker()
+    before = deployment_session.to_persistence_payload()
+    ranked = RankedDeploymentCandidates.rank(
+        validated,
+        context=context,
+        session=deployment_session,
+        ranker=ranker,
+        ranker_id="last-position-v1",
+        configuration_json='{"test":true}',
+    )
+    assert ranked.selected_candidate_id == validated.accepted_ids[1]
+    payload = ranked.to_payload()
+    assert payload["tie_break"] == "first-generated-accepted-v1"
+    assert [
+        entry["candidate_id"] for entry in cast(list[dict[str, JsonValue]], payload["scores"])
+    ] == list(validated.accepted_ids)
+    assert (
+        RankedDeploymentCandidates.from_payload(
+            json.loads(canonical_json(payload)),
+            validated=validated,
+            context=context,
+            session=deployment_session,
+            ranker=ranker,
+            ranker_id="last-position-v1",
+            configuration_json='{"test":true}',
+        )
+        == ranked
+    )
+    payload["scores"] = []
+    assert ranked.to_payload()["scores"]
+    live = deployment_session.fork()
+    action = ranked.select(context, session=live)
+    assert action == validated.select(context, validated.accepted_ids[1], session=live)
+    status = live.submit_viewer_parameterized_payload(
+        viewer=ViewerContext.for_player(action.actor_id),
+        request_id=action.request_id,
+        payload=json.loads(cast(str, action.proposal_json)),
+        result_id="ranked-candidate",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert (
+        ReplayRunner.from_payload(live.replay_artifact(artifact_id="ranked"))
+        .run()
+        .reproduced_exactly
+    )
+    assert (
+        LocalGameSession.from_persistence_payload(
+            live.to_persistence_payload()
+        ).to_persistence_payload()
+        == live.to_persistence_payload()
+    )
+    with pytest.raises(PolicyError, match="checkpoint"):
+        ranked.select(context, session=live)
+    with pytest.raises(PolicyError, match="choice seed"):
+        ranked.select(replace(context, choice_seed=8), session=deployment_session)
+    assert deployment_session.to_persistence_payload() == before
+    with pytest.raises(FrozenInstanceError):
+        ranked._payload_json = "{}"  # type: ignore[misc]
+
+
+def test_deployment_ranker_receives_only_detached_accepted_actor_payloads(
+    deployment_session: LocalGameSession,
+    ranking_case: tuple[PlayerDecisionContext, ValidatedDeploymentCandidates],
+) -> None:
+    context, validated = ranking_case
+    before = deployment_session.to_persistence_payload()
+    original = validated.to_payload()
+    ranker = _LastDeploymentRanker(mutate=True)
+    ranked = RankedDeploymentCandidates.rank(
+        validated,
+        context=context,
+        session=deployment_session,
+        ranker=ranker,
+        ranker_id="last-v1",
+    )
+    actor, candidates = ranker.calls[0]
+    assert actor == context
+    assert actor is not context
+    assert [candidate["candidate_id"] for candidate in candidates] == list(validated.accepted_ids)
+    assert all(
+        candidate.keys() == DeploymentCandidatePayload.__annotations__.keys()
+        for candidate in candidates
+    )
+    assert len(candidates) == 2
+    assert validated.to_payload() == original
+    assert validated.candidate_set.candidates[1].to_payload()["proposal"] is not None
+    assert ranked.select(context, session=deployment_session).proposal_json is not None
+    assert deployment_session.to_persistence_payload() == before
+
+
+def test_deployment_ranking_ties_follow_generation_not_score_order(
+    deployment_session: LocalGameSession,
+    ranking_case: tuple[PlayerDecisionContext, ValidatedDeploymentCandidates],
+) -> None:
+    context, validated = ranking_case
+    ranked = RankedDeploymentCandidates.rank(
+        validated,
+        context=context,
+        session=deployment_session,
+        ranker=_LastDeploymentRanker(tied=True),
+        ranker_id="tie-v1",
+    )
+    assert ranked.selected_candidate_id == validated.accepted_ids[0]
+
+
+@pytest.mark.parametrize(
+    "value", [True, "1", None, float("nan"), float("inf"), -float("inf"), 10**1000]
+)
+def test_deployment_score_rejects_nonfinite_and_untyped_values(value: object) -> None:
+    with pytest.raises(PolicyError, match="finite"):
+        DeploymentCandidateScore("candidate", cast(float, value))
+
+
+@pytest.mark.parametrize(
+    "change", ["missing", "extra", "duplicate", "rejected", "unvalidated", "list", "dict", "none"]
+)
+def test_deployment_ranking_rejects_inexact_or_malformed_scores(
+    deployment_session: LocalGameSession,
+    ranking_case: tuple[PlayerDecisionContext, ValidatedDeploymentCandidates],
+    change: str,
+) -> None:
+    context, validated = ranking_case
+
+    class InvalidRanker:
+        def score(
+            self, context: PlayerDecisionContext, candidates: tuple[DeploymentCandidatePayload, ...]
+        ) -> tuple[DeploymentCandidateScore, ...]:
+            scores = tuple(
+                DeploymentCandidateScore(candidate["candidate_id"], 1.0) for candidate in candidates
+            )
+            bad: object
+            if change == "missing":
+                bad = scores[:-1]
+            elif change == "extra":
+                bad = (*scores, DeploymentCandidateScore("unknown", 1.0))
+            elif change == "duplicate":
+                bad = (scores[0], scores[0])
+            elif change in ("rejected", "unvalidated"):
+                index = 0 if change == "rejected" else 3
+                bad = (
+                    scores[0],
+                    DeploymentCandidateScore(
+                        validated.candidate_set.candidates[index].candidate_id, 1.0
+                    ),
+                )
+            elif change == "list":
+                bad = list(scores)
+            elif change == "dict":
+                bad = tuple(
+                    {"candidate_id": score.candidate_id, "value": score.value} for score in scores
+                )
+            else:
+                bad = None
+            return cast(tuple[DeploymentCandidateScore, ...], bad)
+
+    before = deployment_session.to_persistence_payload()
+    with pytest.raises(PolicyError, match="scores"):
+        RankedDeploymentCandidates.rank(
+            validated,
+            context=context,
+            session=deployment_session,
+            ranker=InvalidRanker(),
+            ranker_id="invalid-v1",
+        )
+    assert deployment_session.to_persistence_payload() == before
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "schema_version",
+        "validation_hash",
+        "candidate_set_hash",
+        "actor_input_hash",
+        "choice_seed",
+        "ranker_id",
+        "configuration",
+        "tie_break",
+        "selected_candidate_id",
+        "scores",
+        "extra",
+    ],
+)
+def test_deployment_ranking_loader_rejects_drift(
+    deployment_session: LocalGameSession,
+    ranking_case: tuple[PlayerDecisionContext, ValidatedDeploymentCandidates],
+    field: str,
+) -> None:
+    context, validated = ranking_case
+    ranker = _LastDeploymentRanker()
+    ranked = RankedDeploymentCandidates.rank(
+        validated, context=context, session=deployment_session, ranker=ranker, ranker_id="last-v1"
+    )
+    payload = ranked.to_payload()
+    payload[field] = "drift"
+    with pytest.raises(PolicyError, match="drifted"):
+        RankedDeploymentCandidates.from_payload(
+            payload,
+            validated=validated,
+            context=context,
+            session=deployment_session,
+            ranker=ranker,
+            ranker_id="last-v1",
+        )
+
+
+def test_deployment_ranking_hidden_work_and_private_rng_noninterference() -> None:
+    first = _setup(hidden_result_suffix="-first", private_rng_seed="1" * 64)
+    second = _setup(hidden_result_suffix="-second", private_rng_seed="2" * 64)
+    context, seed = _context_seed(first)
+    other_context, other_seed = _context_seed(second)
+    assert context == other_context
+    assert seed == other_seed
+    candidates = DeploymentCandidateSet.generate(seed, context=context)
+    a = ValidatedDeploymentCandidates.validate(candidates, context=context, session=first)
+    b = ValidatedDeploymentCandidates.validate(candidates, context=other_context, session=second)
+    assert a.accepted_ids == b.accepted_ids
+    ranker = _LastDeploymentRanker()
+    ranked_a = RankedDeploymentCandidates.rank(
+        a, context=context, session=first, ranker=ranker, ranker_id="last-v1"
+    )
+    ranked_b = RankedDeploymentCandidates.rank(
+        b, context=other_context, session=second, ranker=ranker, ranker_id="last-v1"
+    )
+    assert ranker.calls[0] == ranker.calls[1]
+    assert ranked_a.selected_candidate_id == ranked_b.selected_candidate_id
+    assert ranked_a.to_payload()["actor_input_hash"] == ranked_b.to_payload()["actor_input_hash"]
+    assert ranked_a.to_payload()["validation_hash"] != ranked_b.to_payload()["validation_hash"]
+    with pytest.raises(PolicyError, match="checkpoint"):
+        RankedDeploymentCandidates.rank(
+            a, context=other_context, session=second, ranker=ranker, ranker_id="last-v1"
+        )
+    assert len(ranker.calls) == 2
+    view = context.observation
+    assert view["pending_decision"] is not None
+    view["pending_decision"]["request_id"] = "stale"
+    stale = PlayerDecisionContext.from_view(view, choice_seed=7)
+    with pytest.raises(PolicyError, match="binding"):
+        RankedDeploymentCandidates.rank(
+            a, context=stale, session=first, ranker=ranker, ranker_id="last-v1"
+        )
+    assert len(ranker.calls) == 2
+
+
+def test_deployment_ranking_rechecks_checkpoint_after_callback(
+    deployment_session: LocalGameSession,
+    ranking_case: tuple[PlayerDecisionContext, ValidatedDeploymentCandidates],
+) -> None:
+    context, validated = ranking_case
+    live = deployment_session.fork()
+
+    class MutatingRanker(_LastDeploymentRanker):
+        def score(
+            self, context: PlayerDecisionContext, candidates: tuple[DeploymentCandidatePayload, ...]
+        ) -> tuple[DeploymentCandidateScore, ...]:
+            action = validated.select(context, validated.accepted_ids[0], session=live)
+            live.submit_viewer_parameterized_payload(
+                viewer=ViewerContext.for_player(action.actor_id),
+                request_id=action.request_id,
+                payload=json.loads(cast(str, action.proposal_json)),
+                result_id="closure-commit",
+            )
+            return super().score(context, candidates)
+
+    with pytest.raises(PolicyError, match="checkpoint"):
+        RankedDeploymentCandidates.rank(
+            validated,
+            context=context,
+            session=live,
+            ranker=MutatingRanker(),
+            ranker_id="mutating-v1",
+        )
