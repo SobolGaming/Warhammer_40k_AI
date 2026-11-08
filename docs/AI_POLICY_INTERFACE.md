@@ -6,7 +6,7 @@ information-safe simulation, experiments and full-game qualification.
 
 Exact player-scoped routing, finite candidate sets, finite training linkage,
 bounded deployment translations and fork validation, accepted deployment candidate/row
-linkage, named targets and Phase 19E contracts exist;
+linkage (singleton and validated set), named targets and Phase 19E contracts exist;
 autonomous battle policies, training and full-game qualification are not established.
 The historical grouped Phase 19/20 row is not an assertion that those foundations
 are absent, nor an individual mapping of every 19A-19F subphase.
@@ -355,8 +355,8 @@ loaders revalidate the complete chain; payloads are detached and immutable.
 transitions. Its unchanged `command-point-balance-v1` calculator requires the exact
 endpoint and accepted-record horizon, including automatic selections. This proves
 bounded endpoint CP evidence. The separate accepted deployment row companion below
-now joins that evidence to named/admitted targets. Multi-candidate training joins
-and broader proposal families remain unsupported.
+now joins that evidence to named/admitted targets. The validated-set companion
+below adds exact multi-candidate joins; broader proposal families remain unsupported.
 
 Evidence is operator-only: checkpoint commitments, complete proposal payloads,
 authoritative identities and source/build information never become model inputs
@@ -417,8 +417,8 @@ full-game workload qualification.
 
 This adds no actor-facing or wire shape: ordinary deployment submission,
 engine validation, replay and viewer redaction remain governed by
-[ADAPTER_DECISION_CONTRACT.md](ADAPTER_DECISION_CONTRACT.md). Multi-candidate
-training/ranking, other proposal families, semantic deployment encoders,
+[ADAPTER_DECISION_CONTRACT.md](ADAPTER_DECISION_CONTRACT.md). Candidate
+ranking, other proposal families, semantic deployment encoders,
 broader references, dataset admission and runner progress accounting remain open.
 
 ## Bounded deployment alternatives and validation
@@ -469,7 +469,8 @@ it returns the ordinary bound `PolicyAction`. The eventual live commit still use
 the ordinary viewer adapter and revalidates legality. Validation alone proves no
 executed live transition or training eligibility. The existing accepted-singleton
 row contract, `(True,)` mask, slot zero and legacy `TrainingRow` are unchanged.
-Multi-set training, ranking, other proposal families and a generic information-safe
+The separate validated-set training companion below binds these alternatives to
+accepted evidence. Ranking, other proposal families and a generic information-safe
 simulation API remain follow-ups.
 
 The ordinary compact setup regressions in
@@ -478,6 +479,54 @@ accepted positions, internal invalid proposals, drift, budgets, duplicates,
 hidden-history/private-RNG isolation, immutable roundtrips and actual selection/commit/save/load/
 replay. They establish this bounded deployment path, not faction or full-game
 qualification.
+
+## Validated deployment-set training linkage
+
+`ai.parameterized_training.DeploymentTrainingCandidateLink.from_row(...)` takes
+an existing `TrainingRow`, typed `ValidatedDeploymentCandidates`, historical actor
+context and reproduced `ParameterizedAcceptedTransition`. Its independent
+`deployment-set-training-candidate-link-v1` payload owns the complete generated
+candidate set and operator validation receipt, their hashes, the full row hash,
+selected candidate ID/index and accepted-transition hash.
+
+The row mask covers exactly the ordered **validated prefix** of the generated
+set. Accepted slots are `True`; rejected slots are `False`. Unvalidated candidates
+have no mask slot, so incomplete validation never invents a legality result. The
+full generated set and receipt retain their geometry, unvalidated count, budgets,
+duplicate/raw counts and stop reasons. Because validation preserves generation
+order, the selected index is both its generated-set and validated-prefix slot.
+Only an accepted slot can be selected. This says nothing about candidate quality,
+coverage of all legal placements or rewards for rejected alternatives.
+
+The link checks the selected ordinary viewer action byte-for-byte, including its
+actor/request/view/proposal binding, against the reproduced accepted transition.
+The row's authoritative decision record must match. The validation checkpoint
+must equal the transition's before checkpoint: identical permitted observations
+with different hidden history or private RNG authority cannot be substituted.
+The shared singleton verifier enforces the same accepted-action join without
+changing the singleton's v1 payload, `(True,)` mask or slot-zero semantics.
+
+`from_payload(..., session=before, transition=...)` regenerates the actor-only set,
+reruns the recorded validation budget on ordinary fresh session forks and compares
+the complete receipt and row linkage. `require_matches` checks the full row and
+historical context against the retained immutable verified evidence. All returned
+payloads are detached. This companion is operator-only; checkpoint commitments,
+validation diagnostics and authoritative records never enter actor features.
+
+`LinkedTrainingTarget` and `AdmittedTrainingTarget` accept this separate link in
+mixed episodes using the same strict source, perspective, transition and exact
+endpoint-horizon checks as singleton deployment rows. Only the executed selected
+transition receives its target. No learner, ranking policy, dataset eligibility,
+new local reference calculator or runner accounting is introduced. Existing
+adapter decisions, wire schemas and engine mutation/replay remain covered by
+[ADAPTER_DECISION_CONTRACT.md](ADAPTER_DECISION_CONTRACT.md).
+
+The focused deployment regressions cover rejected and unvalidated selections,
+nonzero/nonseed accepted slots, validation and accepted-count budget stops,
+row/receipt/context drift, same-view/different-checkpoint rejection, detached
+roundtrips with fresh validation, ordinary save/load and reproduced transition,
+and named/admitted endpoint CP targets. These are bounded plumbing controls, not
+full-game or faction qualification.
 
 ## Named training target declarations
 

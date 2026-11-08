@@ -8,6 +8,7 @@ from enum import StrEnum
 from typing import TypedDict, cast
 
 from warhammer40k_core.ai.parameterized_training import (
+    DeploymentTrainingCandidateLink,
     ParameterizedTrainingCandidateLink,
     TrainingCandidateLink,
 )
@@ -301,7 +302,11 @@ def _require_link(
     row: TrainingRow,
     context: PlayerDecisionContext,
 ) -> None:
-    if type(link) not in (FiniteTrainingCandidateLink, ParameterizedTrainingCandidateLink):
+    if type(link) not in (
+        FiniteTrainingCandidateLink,
+        ParameterizedTrainingCandidateLink,
+        DeploymentTrainingCandidateLink,
+    ):
         raise TrainingTargetError("Named targets require a supported training candidate link.")
     try:
         link.require_matches(row, context=context)

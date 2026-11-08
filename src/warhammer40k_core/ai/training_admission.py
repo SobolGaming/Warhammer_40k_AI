@@ -8,6 +8,7 @@ from typing import Self, TypedDict, cast
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.ai.parameterized_training import (
+    DeploymentTrainingCandidateLink,
     ParameterizedTrainingCandidateLink,
     TrainingCandidateLink,
 )
@@ -483,7 +484,9 @@ class AdmittedTrainingTarget:
         else:
             matches_transition = (
                 type(episode) is MixedEpisodeAdmission
-                and type(link) is ParameterizedTrainingCandidateLink
+                and isinstance(
+                    link, (ParameterizedTrainingCandidateLink, DeploymentTrainingCandidateLink)
+                )
                 and link.transition == transition
             )
         if not matches_transition:

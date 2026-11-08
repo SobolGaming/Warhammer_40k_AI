@@ -1,664 +1,608 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "a500e587db086b2911e2b3341838f29553e06107",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:60e231d655832035f46e44e596f78757d32fd8b6d48bd058c5e3e96c21c44c6a",
+  "base": "5efa44633331cd0c3a11f20a33f6451f214d3370",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a74a199c7ceb83a5cffd83831039d92c7a277381623d2f1e83f14e7943bc1bed",
   "operation_map_sha256": "10d7966e40898c329f1fff084a67e64026e92d0444f9b21344c1b0403530a040",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "6e3568420efd4ec58e3d576c596b3bc23a4350beced3a04c44bc9583dbe0c598",
-      "after_sha256": "dd2fd1de0dedac61aa8eb37be21468303d57f3be7ea86d03fc8f3661fa2a393a",
-      "owners": {
-        "@document": {
-          "before": "6e3568420efd4ec58e3d576c596b3bc23a4350beced3a04c44bc9583dbe0c598",
-          "after": "dd2fd1de0dedac61aa8eb37be21468303d57f3be7ea86d03fc8f3661fa2a393a"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "f4d3d4780ccc1c94b707dc946d79adf735f5743bb585d2616e7cd2b1740290a5",
-      "after_sha256": "f8408ebe9ea838682331a243f40b5e45b2adac33f586696610ebde7fbc0d8fbb",
-      "owners": {
-        "@document": {
-          "before": "f4d3d4780ccc1c94b707dc946d79adf735f5743bb585d2616e7cd2b1740290a5",
-          "after": "f8408ebe9ea838682331a243f40b5e45b2adac33f586696610ebde7fbc0d8fbb"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "85a1b1aa3f031c544621d0befac2822bebb90032081ff86f8ceb3a0fb0f6625e",
-      "after_sha256": "ff2ce54ed1bfe6a7a5f6d31ec82d9caa561cb889bd8da5b2facd8c87bd9e0060",
-      "owners": {
-        "@document": {
-          "before": "85a1b1aa3f031c544621d0befac2822bebb90032081ff86f8ceb3a0fb0f6625e",
-          "after": "ff2ce54ed1bfe6a7a5f6d31ec82d9caa561cb889bd8da5b2facd8c87bd9e0060"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "5a36ec1074973b1fe8a5a2ed0bd1e5b8296e941b55129c36973eb26a2bbbfc52",
-      "after_sha256": "0e966ab0c1850b1dbeb0b7de54b156618e9c1a46e094fb2f71716cedd365640e",
-      "owners": {
-        "@document": {
-          "before": "5a36ec1074973b1fe8a5a2ed0bd1e5b8296e941b55129c36973eb26a2bbbfc52",
-          "after": "0e966ab0c1850b1dbeb0b7de54b156618e9c1a46e094fb2f71716cedd365640e"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "dfd5e20a103808408113264df7b6fd5ee3aa59cef16deb26d510165bb93efd4e",
-      "after_sha256": "399c405570810d40db7f0429ecd79df66148a0bc54eaced7e6c2d587ce12a5ae",
-      "owners": {
-        "@document": {
-          "before": "dfd5e20a103808408113264df7b6fd5ee3aa59cef16deb26d510165bb93efd4e",
-          "after": "399c405570810d40db7f0429ecd79df66148a0bc54eaced7e6c2d587ce12a5ae"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "cc3a87d1e80c190f78b02baf398a2a9ac0cb7d9f2a2b7526836df0a6c5949bbd",
-      "owners": {
-        "@document": {
-          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "cc3a87d1e80c190f78b02baf398a2a9ac0cb7d9f2a2b7526836df0a6c5949bbd"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "9ed3e3a625bacababb9dee8b5688365dca859a90f9e39e6d8fc4029c33716e24",
-      "after_sha256": "9d8f3c178a53f6288998dbf5d65060a1998ad3af9aa0004e9827e2225e1494e9",
-      "owners": {
-        "@document": {
-          "before": "9ed3e3a625bacababb9dee8b5688365dca859a90f9e39e6d8fc4029c33716e24",
-          "after": "9d8f3c178a53f6288998dbf5d65060a1998ad3af9aa0004e9827e2225e1494e9"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "b60f7caae0070129af148e60c749805a29f991a64d01ceb9db71b512fe9c2ee9",
-      "after_sha256": "6c8fd6dd8169c13c3323428be50e2012ca370312645e92ec7011d657bf5843de",
-      "owners": {
-        "@document": {
-          "before": "b60f7caae0070129af148e60c749805a29f991a64d01ceb9db71b512fe9c2ee9",
-          "after": "6c8fd6dd8169c13c3323428be50e2012ca370312645e92ec7011d657bf5843de"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "0c67b8973357ff51d1f79aa02641ac7488888fcaf4d6d79d642a94ac17ab54d2",
-      "after_sha256": "c4d76aaeafc6197eb445f014b7202bdd0a65ef013afc7fa86855d47c39439635",
-      "owners": {
-        "@document": {
-          "before": "0c67b8973357ff51d1f79aa02641ac7488888fcaf4d6d79d642a94ac17ab54d2",
-          "after": "c4d76aaeafc6197eb445f014b7202bdd0a65ef013afc7fa86855d47c39439635"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "6e3e3a040e20c7d9b8c2571110bcc6995f2d2ca83a1f2cbc1697221f68cb7553",
-      "after_sha256": "2580b18bb543e950d0020b6279fe06320549655cba652f52fffc7e980221e303",
-      "owners": {
-        "@document": {
-          "before": "6e3e3a040e20c7d9b8c2571110bcc6995f2d2ca83a1f2cbc1697221f68cb7553",
-          "after": "2580b18bb543e950d0020b6279fe06320549655cba652f52fffc7e980221e303"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "d49c638f80cd1c2cffab9235c3ec6e6aea1bc7124a35b6ba06ee31cfe0131864",
-      "after_sha256": "82ec3df9a6ef3e8a1454cf21c9f3672e99c639bdc6e82a3a0a9adeed172fd215",
-      "owners": {
-        "@document": {
-          "before": "d49c638f80cd1c2cffab9235c3ec6e6aea1bc7124a35b6ba06ee31cfe0131864",
-          "after": "82ec3df9a6ef3e8a1454cf21c9f3672e99c639bdc6e82a3a0a9adeed172fd215"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "b9d016dd6527f05d7e63e144513e9887067edd34d9f0661a4861b2ff0d92090d",
-      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "owners": {
-        "@document": {
-          "before": "b9d016dd6527f05d7e63e144513e9887067edd34d9f0661a4861b2ff0d92090d",
-          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "db641a32edbbe8f0ede9ceb7ce54a135813a4dbea2f2a89a4a7411a8fd80c872",
-      "after_sha256": "e2f0e81de2c788137984ff365c0d4a8eb7265af2cff49b46d03e904f85365bbd",
-      "owners": {
-        "@document": {
-          "before": "db641a32edbbe8f0ede9ceb7ce54a135813a4dbea2f2a89a4a7411a8fd80c872",
-          "after": "e2f0e81de2c788137984ff365c0d4a8eb7265af2cff49b46d03e904f85365bbd"
-        }
-      }
-    },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "cab6522ba151240947dae7cd1d555197d6683142f1d341ccf4e6f0056334d597",
-      "after_sha256": "6aff32b647253b564e896765caf871837ef5ec6dba9cee609f17b29fca3fc294",
+      "before_sha256": "6aff32b647253b564e896765caf871837ef5ec6dba9cee609f17b29fca3fc294",
+      "after_sha256": "7d63b79088b1a3cffe4dd1486698a3232fdef95d408ac6494686ab889cc0bdb1",
       "owners": {
         "@document": {
-          "before": "cab6522ba151240947dae7cd1d555197d6683142f1d341ccf4e6f0056334d597",
-          "after": "6aff32b647253b564e896765caf871837ef5ec6dba9cee609f17b29fca3fc294"
+          "before": "6aff32b647253b564e896765caf871837ef5ec6dba9cee609f17b29fca3fc294",
+          "after": "7d63b79088b1a3cffe4dd1486698a3232fdef95d408ac6494686ab889cc0bdb1"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "0483a63c22485540c0639ba3d9ee722079df4722d2255adc75059e0da4d76236",
-      "after_sha256": "9a8bf2690cd7b896f7ab2934af2456377b34380e3b8df67e2736799a365056a1",
+      "before_sha256": "9a8bf2690cd7b896f7ab2934af2456377b34380e3b8df67e2736799a365056a1",
+      "after_sha256": "5477f59ec24f310d2d760d1d4f64c641802ce4f3dfe2b3d51711e7d850378b57",
       "owners": {
         "@document": {
-          "before": "0483a63c22485540c0639ba3d9ee722079df4722d2255adc75059e0da4d76236",
-          "after": "9a8bf2690cd7b896f7ab2934af2456377b34380e3b8df67e2736799a365056a1"
+          "before": "9a8bf2690cd7b896f7ab2934af2456377b34380e3b8df67e2736799a365056a1",
+          "after": "5477f59ec24f310d2d760d1d4f64c641802ce4f3dfe2b3d51711e7d850378b57"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "ef97011174f94aa608982437999b36253c886a7a71b76d5aed1ab80462ddbda0",
-      "after_sha256": "6defb38e692b146dd068bf595e99263b38ac22c1f1e1f39077e786961fde3aed",
+      "before_sha256": "6defb38e692b146dd068bf595e99263b38ac22c1f1e1f39077e786961fde3aed",
+      "after_sha256": "db9a8f930913901274e252a65f0dd1fd07e1308e8e9c9e3707d3a581d199ac38",
       "owners": {
         "@document": {
-          "before": "ef97011174f94aa608982437999b36253c886a7a71b76d5aed1ab80462ddbda0",
-          "after": "6defb38e692b146dd068bf595e99263b38ac22c1f1e1f39077e786961fde3aed"
+          "before": "6defb38e692b146dd068bf595e99263b38ac22c1f1e1f39077e786961fde3aed",
+          "after": "db9a8f930913901274e252a65f0dd1fd07e1308e8e9c9e3707d3a581d199ac38"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "51c77acf66f817f8ccf90e1ae8a7697c794bc72b11b943fc1272bfc1b29a5f2b",
-      "after_sha256": "df7d4acb29f4c0123673e69467b089248a837ef35014426aaa861b6433a82442",
+      "before_sha256": "df7d4acb29f4c0123673e69467b089248a837ef35014426aaa861b6433a82442",
+      "after_sha256": "bc098bf74c4e1a797a6176743e5cad22437a521762967c97cf8f2be3a20f7f4a",
       "owners": {
         "@document": {
-          "before": "51c77acf66f817f8ccf90e1ae8a7697c794bc72b11b943fc1272bfc1b29a5f2b",
-          "after": "df7d4acb29f4c0123673e69467b089248a837ef35014426aaa861b6433a82442"
+          "before": "df7d4acb29f4c0123673e69467b089248a837ef35014426aaa861b6433a82442",
+          "after": "bc098bf74c4e1a797a6176743e5cad22437a521762967c97cf8f2be3a20f7f4a"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "4de138c938716879b3390ca6f107cdf96f8e21f76889120d71d4f243c4f85e1f",
-      "after_sha256": "3d7836050a248306d70da1db5d9009d7d68f9e9fc3e26c0bca76e61f55d6f777",
+      "before_sha256": "3d7836050a248306d70da1db5d9009d7d68f9e9fc3e26c0bca76e61f55d6f777",
+      "after_sha256": "74eb2223c39fd01020cc230f83d3fca7b66c549277687ffb17af37fe5758092e",
       "owners": {
         "@document": {
-          "before": "4de138c938716879b3390ca6f107cdf96f8e21f76889120d71d4f243c4f85e1f",
-          "after": "3d7836050a248306d70da1db5d9009d7d68f9e9fc3e26c0bca76e61f55d6f777"
+          "before": "3d7836050a248306d70da1db5d9009d7d68f9e9fc3e26c0bca76e61f55d6f777",
+          "after": "74eb2223c39fd01020cc230f83d3fca7b66c549277687ffb17af37fe5758092e"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "17bcc6a1f2ba576e726854910c64b9df5ff891e61c6e905fc7e3981f6e2e323b",
-      "after_sha256": "36d470cf6c4a3ea16485276f43cde10295865ab216d849a2ad0bad7440bd8ca9",
+      "before_sha256": "36d470cf6c4a3ea16485276f43cde10295865ab216d849a2ad0bad7440bd8ca9",
+      "after_sha256": "c71c321e55ea193fd64c5d1d652f6ae5a44436ba9f101fba206d0fbf6b57a153",
       "owners": {
         "@document": {
-          "before": "17bcc6a1f2ba576e726854910c64b9df5ff891e61c6e905fc7e3981f6e2e323b",
-          "after": "36d470cf6c4a3ea16485276f43cde10295865ab216d849a2ad0bad7440bd8ca9"
+          "before": "36d470cf6c4a3ea16485276f43cde10295865ab216d849a2ad0bad7440bd8ca9",
+          "after": "c71c321e55ea193fd64c5d1d652f6ae5a44436ba9f101fba206d0fbf6b57a153"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "c05c47a7a273a812f51d864f055521f620f81dc8f3febde3e85f04e0bfcda92e",
-      "after_sha256": "d58a69030cd55ff29be207ea80b174e236900337f5fa139c32a5448ac5cb9898",
+      "before_sha256": "d58a69030cd55ff29be207ea80b174e236900337f5fa139c32a5448ac5cb9898",
+      "after_sha256": "701aa129675457b4f0ca5b609956987e7b6374887ddf35f6d83522e3cfec1402",
       "owners": {
         "@document": {
-          "before": "c05c47a7a273a812f51d864f055521f620f81dc8f3febde3e85f04e0bfcda92e",
-          "after": "d58a69030cd55ff29be207ea80b174e236900337f5fa139c32a5448ac5cb9898"
+          "before": "d58a69030cd55ff29be207ea80b174e236900337f5fa139c32a5448ac5cb9898",
+          "after": "701aa129675457b4f0ca5b609956987e7b6374887ddf35f6d83522e3cfec1402"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "ca2202a92df4de9e469dfa24262606263bdf07ff2cc619d1fe96f26dbb4b9a6b",
-      "after_sha256": "18329adeca4edf369f8494470aa8e855c94ebb93c98e48bfbb8934866d6fe8d9",
+      "before_sha256": "18329adeca4edf369f8494470aa8e855c94ebb93c98e48bfbb8934866d6fe8d9",
+      "after_sha256": "988e02fd6170950dadfe79c92f1ea79837666eb4dd58a72df32fbff949d6b3a9",
       "owners": {
         "@document": {
-          "before": "ca2202a92df4de9e469dfa24262606263bdf07ff2cc619d1fe96f26dbb4b9a6b",
-          "after": "18329adeca4edf369f8494470aa8e855c94ebb93c98e48bfbb8934866d6fe8d9"
+          "before": "18329adeca4edf369f8494470aa8e855c94ebb93c98e48bfbb8934866d6fe8d9",
+          "after": "988e02fd6170950dadfe79c92f1ea79837666eb4dd58a72df32fbff949d6b3a9"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "9d4d7ba346b3fc02fb7211165d73a7810965bbd91f47fe41c4bef9a192c86ae0",
-      "after_sha256": "39309422d8b207340606acd1fd8839decd52963473f2338728ccc1e0f21cb6e5",
+      "before_sha256": "39309422d8b207340606acd1fd8839decd52963473f2338728ccc1e0f21cb6e5",
+      "after_sha256": "df527b60f974b9ff9fa7b860c66d9e06b5e8a745370bebc26c810d131ff12ec5",
       "owners": {
         "@document": {
-          "before": "9d4d7ba346b3fc02fb7211165d73a7810965bbd91f47fe41c4bef9a192c86ae0",
-          "after": "39309422d8b207340606acd1fd8839decd52963473f2338728ccc1e0f21cb6e5"
+          "before": "39309422d8b207340606acd1fd8839decd52963473f2338728ccc1e0f21cb6e5",
+          "after": "df527b60f974b9ff9fa7b860c66d9e06b5e8a745370bebc26c810d131ff12ec5"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "9df8ad7ef264ccdc5bfdf50df225872640d76797ca5da2586e772da2afaac248",
-      "after_sha256": "acf4bac29531f51c7d8bc71b5505eda06ad742c0efc1aa30a62c6d1a8bd62e94",
+      "before_sha256": "acf4bac29531f51c7d8bc71b5505eda06ad742c0efc1aa30a62c6d1a8bd62e94",
+      "after_sha256": "faeb408f8c6248c3c0ef00c4a3c7350acae70f0d84b798069de49c49917d22a9",
       "owners": {
         "@document": {
-          "before": "9df8ad7ef264ccdc5bfdf50df225872640d76797ca5da2586e772da2afaac248",
-          "after": "acf4bac29531f51c7d8bc71b5505eda06ad742c0efc1aa30a62c6d1a8bd62e94"
+          "before": "acf4bac29531f51c7d8bc71b5505eda06ad742c0efc1aa30a62c6d1a8bd62e94",
+          "after": "faeb408f8c6248c3c0ef00c4a3c7350acae70f0d84b798069de49c49917d22a9"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "2eddbd7eed3678a56fca638ebe99c895ae759a6fa3235ea63c1081c74caeffbc",
-      "after_sha256": "d80977d4fa19b8565ef16d7a76aac65168918b90660a1999819b1509a67af0fd",
+      "before_sha256": "d80977d4fa19b8565ef16d7a76aac65168918b90660a1999819b1509a67af0fd",
+      "after_sha256": "961d8f8c54f8fd7f4be9e5948663b9733702125458bd2d82fdf1a49c50ae5ead",
       "owners": {
         "@document": {
-          "before": "2eddbd7eed3678a56fca638ebe99c895ae759a6fa3235ea63c1081c74caeffbc",
-          "after": "d80977d4fa19b8565ef16d7a76aac65168918b90660a1999819b1509a67af0fd"
+          "before": "d80977d4fa19b8565ef16d7a76aac65168918b90660a1999819b1509a67af0fd",
+          "after": "961d8f8c54f8fd7f4be9e5948663b9733702125458bd2d82fdf1a49c50ae5ead"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "5186759274737d2c5bf04480e710120626f3ed254cb9014e9ceb6051fa89e31f",
-      "after_sha256": "ccdea5d1d908b58f5de9e0932f0d72200104f49e06967a5c043ed3e8caa5af20",
+      "before_sha256": "ccdea5d1d908b58f5de9e0932f0d72200104f49e06967a5c043ed3e8caa5af20",
+      "after_sha256": "7e3e20393d60f37d0cfb484a3e6eebae7fa41a0d24cd6b0b93ee806d5da4196d",
       "owners": {
         "@document": {
-          "before": "5186759274737d2c5bf04480e710120626f3ed254cb9014e9ceb6051fa89e31f",
-          "after": "ccdea5d1d908b58f5de9e0932f0d72200104f49e06967a5c043ed3e8caa5af20"
-        }
-      }
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "5ce5cfe8e1a461bb322dcaca08563824887f0f7d353bcd67b65814e7adf10ec9",
-      "after_sha256": "65afa253eb9c8cadfba6430a609c16530aea915db0604c65c5a65a567f4a703b",
-      "owners": {
-        "@document": {
-          "before": "5ce5cfe8e1a461bb322dcaca08563824887f0f7d353bcd67b65814e7adf10ec9",
-          "after": "65afa253eb9c8cadfba6430a609c16530aea915db0604c65c5a65a567f4a703b"
+          "before": "ccdea5d1d908b58f5de9e0932f0d72200104f49e06967a5c043ed3e8caa5af20",
+          "after": "7e3e20393d60f37d0cfb484a3e6eebae7fa41a0d24cd6b0b93ee806d5da4196d"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "cd111e721258480452cf61b8e77313b9dbc3f5c751cc029c9cbf91f242be3c06",
-      "after_sha256": "501707d7625953c56ec8887d9ca1cffc68483281c329ab2171c375e6044398aa",
+      "before_sha256": "501707d7625953c56ec8887d9ca1cffc68483281c329ab2171c375e6044398aa",
+      "after_sha256": "c9d9729e744098830f205bbaf5e16d75408a83c62c2cf872a8636a35bcb3534f",
       "owners": {
         "@document": {
-          "before": "cd111e721258480452cf61b8e77313b9dbc3f5c751cc029c9cbf91f242be3c06",
-          "after": "501707d7625953c56ec8887d9ca1cffc68483281c329ab2171c375e6044398aa"
+          "before": "501707d7625953c56ec8887d9ca1cffc68483281c329ab2171c375e6044398aa",
+          "after": "c9d9729e744098830f205bbaf5e16d75408a83c62c2cf872a8636a35bcb3534f"
         }
       }
     },
-    "src/warhammer40k_core/ai/deployment_candidate_search.py": {
-      "before_sha256": null,
-      "after_sha256": "fe63e9d0f1762543769f2b73717aeeb3ea9645d4702dedc7594e6f628fd56f0b",
+    "src/warhammer40k_core/ai/parameterized_training.py": {
+      "before_sha256": "64b45aae1c060fabe2ed95a48244d7f51209d8aaf3560c8c3647ff77ae3b8271",
+      "after_sha256": "72a64d7cca7c13ea2dbd3c09cb434b138cc2d00fb2e57c69744c404e3e5366bd",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "6539f1b7295e09d1c88fbc56cea30a9ab96a19eb40101dcf37595b418b4d320e"
+          "before": "9da21a4a668543952b044e2a8dc1464fc0b6e8fa7b24cf7d9099151e10c375cf",
+          "after": "84ca0c065aaeab699582d2926828b81835228600816a514e1c6b91d4baafff64"
         },
-        "DeploymentCandidateExhaustedError": {
+        "DeploymentTrainingCandidateLink": {
           "before": null,
-          "after": "e7a3680d321c2190afca6a22c75e32d50fd9a493ba8e382d868fd72f6d6bb3cd"
+          "after": "006815545377aeb9b7dca007b58a782f102f9f37897f5fe4df4b1790a5cc0051"
         },
-        "DeploymentCandidateExhaustedError.__init__": {
+        "DeploymentTrainingCandidateLink.__init__": {
           "before": null,
-          "after": "64633ec76914c668bcea8865804896c03f0bccd685c608a88ffd6e7f3bc84864"
+          "after": "601ea5a2d818959e07fa2b4ce4683c506661e3a89414d3af4101ea5a4f70a0f8"
         },
-        "DeploymentCandidateSet": {
+        "DeploymentTrainingCandidateLink.chosen_action_id": {
           "before": null,
-          "after": "cbf9bc3b533346cc175ccecac615f88134fce7498974d1868273b359db6c5ac7"
+          "after": "de741f11478c552fa5abd1da0a47c1e391ac39641f57e53141dad297f03944ee"
         },
-        "DeploymentCandidateSet.__init__": {
+        "DeploymentTrainingCandidateLink.chosen_action_index": {
           "before": null,
-          "after": "3d73c1525ea7ade4555814c84742cfe854ae7ac6ff37d8b038c3ff8520d1e536"
+          "after": "ffa31058fa8b4b1d41d5ea6bb13fc73b59719982ce3b150e6bfb941ce3f38246"
         },
-        "DeploymentCandidateSet.content_hash": {
+        "DeploymentTrainingCandidateLink.from_payload": {
           "before": null,
-          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
+          "after": "4582915df7086c6922ea3077871c5651784dddad301116d5f4e25e9c7603be5e"
         },
-        "DeploymentCandidateSet.from_payload": {
+        "DeploymentTrainingCandidateLink.from_row": {
           "before": null,
-          "after": "b24ff8318b6ccf9c00f4b0f70a430560a41d923a730fcab181d723160d5b1e6b"
+          "after": "681921d816a1c9e31c310270e2eabfd82e0a21fd37a032dacb8efb80be15c9c3"
         },
-        "DeploymentCandidateSet.generate": {
+        "DeploymentTrainingCandidateLink.require_matches": {
           "before": null,
-          "after": "02c04ac06aff65341f99a501016eb702c2ce947edc329ade43755c08c831e7fb"
+          "after": "ef9deb282c01c9144bc98ce7ad51251046bdeabf66f27a4288adf5a14a55eb5a"
         },
-        "DeploymentCandidateSet.require_context": {
+        "DeploymentTrainingCandidateLink.to_payload": {
           "before": null,
-          "after": "06d1d524f62c6a382ce4585f1cff03b2bc5a7d2f637a830b1f4a019dc547d07b"
+          "after": "04026e65addf2270bb7198a2a31908debc4ceb1e320d40757436429ea9db8377"
         },
-        "DeploymentCandidateSet.to_payload": {
+        "DeploymentTrainingCandidateLinkPayload": {
           "before": null,
-          "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
+          "after": "fec145ca48e4705e815eb5c526b3afb6932b80c31918e0daa00beb85c0f7e7f5"
         },
-        "DeploymentSearchStop": {
-          "before": null,
-          "after": "9c75ce3dcb597bdebd4af51c6ea0a87380d478474bccbac83de98f7b9da5b518"
+        "ParameterizedTrainingCandidateLink.from_row": {
+          "before": "b26febe13ec2f14c06eacbea936124a985d0d83ec2b803f3316437b54bd96bb3",
+          "after": "ff54424dd0776ffa5e0348be946d277fb6982e6fe3c7343a5ebac48ad4dbc229"
         },
-        "_number": {
+        "_require_accepted_candidate": {
           "before": null,
-          "after": "c55279ae57415f8e55297ecb4a8af18f510d39c892bc86e70cbbd74b48112777"
-        },
-        "_translated": {
-          "before": null,
-          "after": "9339590c537065a78330fdfc1b6a727efd0e11ba98a23f9ff27360a099f3ff3a"
-        },
-        "require_budget": {
-          "before": null,
-          "after": "05ebd925bc6cfe90e160f365d890a8dea701ee8a300097918c5a793327a9fdbb"
+          "after": "4696d3004315ca80a08cca81b4e2a2ef2642ee5fcc02a1a284892daec19f0607"
         }
       }
     },
-    "src/warhammer40k_core/ai/deployment_candidate_validation.py": {
-      "before_sha256": null,
-      "after_sha256": "6d849c5765ee0c588ccd73eb9180abed5a3d00d18438d1ed2bf6892193f5b33c",
+    "src/warhammer40k_core/ai/training_admission.py": {
+      "before_sha256": "f58b8e55a64786a027876c1e86e70c766ccf7140fbdcb2e043fbae119cf4e5e7",
+      "after_sha256": "0d21d1d7a9203856416f9bec6922085259bd852d18d7fba3e0128172106c0681",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "f60a4ee30849018fa826379aa1b7064a42ee640a241d466312e434675f559504"
+          "before": "90b249907761af4093b38f012cf90c65da2565dc64c82eea76404db9ef8b95b1",
+          "after": "b7d8c36fff61aa971e0f696f1fd05c9c41fc296ea435b6cca679875fd9afa73e"
         },
-        "ValidatedDeploymentCandidates": {
-          "before": null,
-          "after": "691ff07979f0936e220d38e2d56c6bf7e4c729b350b34716210b1ffeedd509e8"
+        "AdmittedTrainingTarget.from_episode": {
+          "before": "f87d5c7583e77c1d76df2004ba5d144758da4fa56116233749662daaff865a1b",
+          "after": "2b1a3111e8829f10ad1887eec587d1bd647af5a65f8a4010b6ede93d32ee08fe"
+        }
+      }
+    },
+    "src/warhammer40k_core/ai/training_targets.py": {
+      "before_sha256": "7eaec2224495e2c8cf3e117398f6d1e164c1e0cf738a1eb682bf569773c23067",
+      "after_sha256": "b426c6cd9d706c60f22836d40ef0a88ca70956fdbde34a1566494fefc9f92b82",
+      "owners": {
+        "@module": {
+          "before": "4ba1334a18f786c5d9587f2bae49bc614d1f2e49884df935c34d852c6fa61107",
+          "after": "b2c03e5f2edb5352808cd18e9aff4d31bae528abe97c569599773a3dc5e01acb"
         },
-        "ValidatedDeploymentCandidates.__init__": {
-          "before": null,
-          "after": "02a56ea0f3c0dea1601abaeab9acc015beacb6e9151f73d3e49ed08a4ae1fae7"
-        },
-        "ValidatedDeploymentCandidates.content_hash": {
-          "before": null,
-          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
-        },
-        "ValidatedDeploymentCandidates.from_payload": {
-          "before": null,
-          "after": "120f9505815040837fa121d069b2ebc89c8bfd00f7c03d27b848e16b99b5c2fd"
-        },
-        "ValidatedDeploymentCandidates.select": {
-          "before": null,
-          "after": "ff1847d3b55a617cb3bd2fa768a8cd6443fa06ec9652a86cdb96be5af8a6d5c5"
-        },
-        "ValidatedDeploymentCandidates.to_payload": {
-          "before": null,
-          "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
-        },
-        "ValidatedDeploymentCandidates.validate": {
-          "before": null,
-          "after": "50b60d5152f8cd55ab9fee85dbd7aee20640f1e2281ce55496cabf9501bbeb50"
+        "_require_link": {
+          "before": "f01f87e0e4e46e6a5f1affe623a7c213415562dfbbde8846a2e859865aaac4ff",
+          "after": "bbf095ee971687fc2d3e44c740f81f301c0fca526ef7eec2f07691c0bcc25c9f"
         }
       }
     },
     "tests/infrastructure/adapters/test_deployment_candidates.py": {
-      "before_sha256": null,
-      "after_sha256": "ac333eb0cc38d31d400c3a6d4b0d8550432ead96c6b9b98838320dc4ecab7256",
+      "before_sha256": "ac333eb0cc38d31d400c3a6d4b0d8550432ead96c6b9b98838320dc4ecab7256",
+      "after_sha256": "d799c30f1d3074229e25d9dfbe06596481868eb0d7725e14288b07dfc8e94f67",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "e2aaea0b32a562e1eae5bb58b7412f12ea9e71a09d222142767983bd91b3c21f"
+          "before": "e2aaea0b32a562e1eae5bb58b7412f12ea9e71a09d222142767983bd91b3c21f",
+          "after": "ac05e9f3c7bb08bbe13a310bc44c699bd0951b2ffb1fe5aa064b110e65a2396f"
         },
-        "_context_seed": {
+        "deployment_set_training": {
           "before": null,
-          "after": "c7011c0c77655bfffb1605ec8779133ae191d7f393e6207b28dc113629005aab"
+          "after": "124db1c3774d8cbfc25dc772a5553bb0d77e8f4e0baae3b747c90b00fffab739"
         },
-        "_setup": {
+        "test_deployment_set_link_rejects_same_view_different_authoritative_checkpoint": {
           "before": null,
-          "after": "8560d5b06b8046f8212cf3c9f36e00f0361e0d6786cfa436babb015321fcc074"
+          "after": "ccedb4a8f0061ad2a61dedf336505036412402986ce164a2da3ddc3225f8703e"
         },
-        "deployment_session": {
+        "test_deployment_set_training_commits_nonseed_alternative_and_binds_targets": {
           "before": null,
-          "after": "d9368354773259267e9e601d5573a2adddaea294f75759791544d7ad27da3aff"
+          "after": "5cd2ea500fd79a1b101ce232c939ee021958634dfe528fd0c5ca5fb6413589d2"
         },
-        "test_deployment_binding_and_receipt_tampering_fail_closed": {
+        "test_deployment_set_training_loader_reproduces_complete_evidence": {
           "before": null,
-          "after": "8625c8657412d0f82495d8ad26b4ffaf03785434c9edfbf6787fd7d23bb87f26"
+          "after": "62f8718e7f9598c5e788005e9061214cd600601ad39943d39743b5240de7003a"
         },
-        "test_deployment_generation_duplicate_and_raw_budget_accounting": {
+        "test_deployment_set_training_preserves_full_search_and_validated_prefix": {
           "before": null,
-          "after": "8978b151442a9a5623ea9b169351a89233018b65cd87a9eb5b168a1f0a6b14b4"
+          "after": "81316c7fd1682dd7cbd9bee6c95e62accab280894334aeeb49c1f300b099d664"
         },
-        "test_deployment_generation_has_distinct_geometry_and_stable_detached_roundtrip": {
+        "test_deployment_set_training_rejects_inexact_row_or_selection": {
           "before": null,
-          "after": "309387a4fb35f3ef89e3791010e845339d78c36461d8617a80d104653cbed039"
-        },
-        "test_deployment_generation_rejects_invalid_budget": {
-          "before": null,
-          "after": "7fee2d46632a9f5f63d8f7da6616a71803751487ac73e903a373c9f59eb7b4f1"
-        },
-        "test_deployment_generation_rejects_nonfinite_or_untyped_offsets": {
-          "before": null,
-          "after": "ec3d8aa2c0486b50df53759420442061d5019d62af92eb5f8c469acd027b0233"
-        },
-        "test_deployment_generator_ignores_hidden_history_and_private_rng": {
-          "before": null,
-          "after": "61b6d55b24f0f4776f0ac2ce68dfc73485901c1e5e1dbdc405a1a14b161d56cc"
-        },
-        "test_deployment_generator_rejects_malformed_geometry": {
-          "before": null,
-          "after": "e629a9fb786680918b4c124f00a9977a22954d6ca8672e7fc6ea980488a39191"
-        },
-        "test_deployment_invalid_seed_uses_engine_rejection_without_live_mutation": {
-          "before": null,
-          "after": "453cbeccc5a0583d02cd59ce563892a5faace1ea186931005520906d9a86e698"
-        },
-        "test_deployment_rule_rejection_is_internal_and_does_not_replace_live_request": {
-          "before": null,
-          "after": "8b6a1f0f84cf6c5ff1e37fab4a3ae9f1d971dfd6f9303247e31be629f7b434d5"
-        },
-        "test_deployment_set_loader_rejects_drift": {
-          "before": null,
-          "after": "de3a34ae0e06273150f32642c2c7c9fbf02e2a6ef0b0798101258cb81638b777"
-        },
-        "test_deployment_typed_exhaustion_reports_attempts_without_live_changes": {
-          "before": null,
-          "after": "b3314aebb6ae9fb0ade24ebfcd9f10291aa0643f80d0826afa625942fa47d913"
-        },
-        "test_deployment_validation_budget_returns_explicit_partial_valid_set": {
-          "before": null,
-          "after": "fed76878df9b46ee1b85c45f0978c56b86264f9e0d25d811460567638e2428c6"
-        },
-        "test_deployment_validation_preserves_live_state_and_commits_alternatives_with_replay": {
-          "before": null,
-          "after": "c7d6b8dbc0238353a3f1a706b111f9ab602c57a8e9e7340269b6eb5b52b56b09"
+          "after": "b258e6991ee9f1f8d6f4ac2f08ba01432fa9f14ba860d71913e0a59e2bc80adb"
         }
       }
     }
   },
   "rows": {
-    "ci/test_shards/durations.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -666,71 +610,76 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "source-record",
+        "order108-terrain-semantics",
+        "order109-unit-control-semantics",
+        "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
-    "src/warhammer40k_core/ai/deployment_candidate_search.py": {
-      "category": "algorithm_or_search",
+    "src/warhammer40k_core/ai/parameterized_training.py": {
+      "category": "serialization_or_replay_work",
       "operations": [
-        "deployment-bounded-candidates"
+        "deployment-candidate-row-linkage"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
-    "src/warhammer40k_core/ai/deployment_candidate_validation.py": {
-      "category": "algorithm_or_search",
+    "src/warhammer40k_core/ai/training_admission.py": {
+      "category": "serialization_or_replay_work",
       "operations": [
-        "deployment-bounded-candidates"
+        "finite-episode-target-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+    },
+    "src/warhammer40k_core/ai/training_targets.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "named-training-targets"
+      ],
+      "selected_families": [],
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     },
     "tests/infrastructure/adapters/test_deployment_candidates.py": {
       "category": "measured_workload",
@@ -738,9 +687,9 @@
         "deployment-bounded-candidates"
       ],
       "selected_families": [],
-      "rationale": "Add a bounded actor-view deployment translation generator and independent engine-validation service. Preserve the singleton/training schemas, existing engine legality and ordinary viewer submission path; regenerate required runtime/contract identities and authentic test-shard timings.",
-      "source_obligation": "Bind every proposal and ordered candidate set to the actor, current request and exact observation; bound raw, validation and accepted work; retain rejection diagnostics and counts; validate each unique alternative on an independent ordinary engine fork without changing the live session. Empty results are typed exhaustion, not proof of no legal action.",
-      "unchanged_work": "This adds opt-in AI-side bounded generation and validation. No existing engine legality, geometry search, RNG, authoritative mutation, replay algorithm, serialization algorithm, caches, runtime dependencies or benchmark drivers change. Existing offline AI owners map to no detailed benchmark family; the required serial current-runtime smoke and live semantic/work checks remain mandatory. No general placement coverage, ranking quality, speedup or full-game certification is claimed."
+      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
+      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
+      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
     }
   },
   "milestone": "ordinary",

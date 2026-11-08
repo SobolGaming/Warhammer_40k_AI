@@ -223,10 +223,10 @@
       "sha256": "e8548335a237455fce0e5888c15f192a278620aaad31ff2a13139755492e3c56"
     },
     "tests/infrastructure/adapters/test_deployment_candidates.py": {
-      "blob_sha1": "4c9d7c3a6f5ad2739d6c3da506a0d909f3df5e53",
-      "bytes": 17628,
+      "blob_sha1": "2d87907a81fd91a1611e5b7546b04ba30150736e",
+      "bytes": 31907,
       "mode": "100644",
-      "sha256": "ac333eb0cc38d31d400c3a6d4b0d8550432ead96c6b9b98838320dc4ecab7256"
+      "sha256": "d799c30f1d3074229e25d9dfbe06596481868eb0d7725e14288b07dfc8e94f67"
     },
     "tests/infrastructure/adapters/test_finite_candidates.py": {
       "blob_sha1": "c8967072bd63c9cce467b06ffe3853e76d880309",
