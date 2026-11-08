@@ -5,7 +5,7 @@ separates the implemented contracts below from proposed candidate generation,
 information-safe simulation, experiments and full-game qualification.
 
 Exact player-scoped routing, finite candidate sets, finite training linkage,
-named target declarations and Phase 19E provenance/training contracts exist;
+accepted deployment candidate/row linkage, named targets and Phase 19E contracts exist;
 autonomous battle policies, training and full-game qualification are not established.
 The historical grouped Phase 19/20 row is not an assertion that those foundations
 are absent, nor an individual mapping of every 19A-19F subphase.
@@ -353,10 +353,9 @@ loaders revalidate the complete chain; payloads are detached and immutable.
 `VerifiedLocalReference` also accepts a mixed episode and any of its verified
 transitions. Its unchanged `command-point-balance-v1` calculator requires the exact
 endpoint and accepted-record horizon, including automatic selections. This proves
-bounded endpoint CP evidence only. Parameterized candidate sets, row masks,
-parameterized row/target linkage and learning eligibility are not supplied:
-`AdmittedTrainingTarget` remains finite-episode/finite-row-only. No parameterized
-proposal is represented as a finite legal candidate or certified target receipt.
+bounded endpoint CP evidence. The separate accepted deployment row companion below
+now joins that evidence to named/admitted targets; broader proposal families and
+candidate-search sets remain unsupported.
 
 Evidence is operator-only: checkpoint commitments, complete proposal payloads,
 authoritative identities and source/build information never become model inputs
@@ -367,6 +366,59 @@ bounded proposal family, not movement, charge, shooting, fight, reactions, reser
 or other parameterized mechanics. Candidate generation, nonmutating bulk legality,
 broader local references, semantic features, search, dataset admission and runner
 timing remain follow-ups.
+
+## Accepted deployment candidate and row linkage
+
+`ai.deployment_candidates.DeploymentPlacementCandidate.from_action(action,
+context=before)` captures one supplied actor-view placement using
+`deployment-placement-candidate-v1`. Its content-derived candidate ID binds the
+complete canonical proposal, actor, viewer request and observation. The closed
+loader rechecks that context and the complete payload. `select(context)` returns
+the existing bound proposal action. Payload reads are detached, and no session,
+authoritative identifier, checkpoint, private RNG or outcome enters this snapshot.
+
+This is the submitted candidate, not a generated or ranked set. Capturing it does
+not validate placement legality, completeness or the quality of alternatives.
+Malformed or rule-invalid proposals cannot acquire an accepted row receipt:
+the ordinary engine acceptance verifier remains mandatory.
+
+`ai.parameterized_training.ParameterizedTrainingCandidateLink.from_row(...)`
+takes the original row, candidate, actor context and independently reproduced
+`ParameterizedAcceptedTransition`. It requires complete viewer-action equality,
+the before observation and actor, the exact authoritative decision record,
+the row's game and content-derived chosen candidate ID. Its only mask is
+`(True,)` and its chosen index is zero: this records the one accepted proposal,
+with no unexecuted or rejected alternatives represented as legal slots.
+The `parameterized-training-candidate-link-v1` payload commits to the complete
+legacy row, candidate and accepted transition. Loading requires the original row,
+context and verified transition and checks every serialized field. Mutable row
+diagnostics, features, scalar targets, masks and provenance are covered by the row
+hash; original row bytes and scalar meanings remain unchanged.
+
+This link is operator-only. Its accepted evidence and authoritative IDs do not
+become candidate/model inputs, and its existence does not certify semantic
+features or dataset eligibility. The candidate ID is linkage metadata, not an
+engine option ID or a semantic feature.
+
+`LinkedTrainingTarget` now accepts the finite or accepted-deployment row
+companion. `AdmittedTrainingTarget` accepts those rows in a verified mixed
+episode, requires the exact selected transition and preserves strict source,
+perspective, reward, endpoint and horizon checks. A parameterized row must use
+its verified deployment transition; cross-family joins fail. Finite rows can
+also be admitted within a mixed episode. The separate
+`mixed-target-admission-v1` receipt binds the mixed episode, selected transition
+and linked target; existing finite-only receipts retain their v1 payload.
+Observed terminal utility/VP and exact endpoint CP retain their existing
+calculators, while explicitly missing targets remain excluded from learning.
+Actor and target perspective can differ. The ordinary setup-to-terminal control
+proves this plumbing in a compact canonical Command/Fight configuration, not
+full-game workload qualification.
+
+This adds no actor-facing or wire shape: ordinary deployment submission,
+engine validation, replay and viewer redaction remain governed by
+[ADAPTER_DECISION_CONTRACT.md](ADAPTER_DECISION_CONTRACT.md). Multi-candidate
+generation/ranking, other proposal families, semantic deployment encoders,
+broader references, dataset admission and runner progress accounting remain open.
 
 ## Named training target declarations
 
@@ -397,7 +449,8 @@ conversion, unknown meanings/fields and inconsistent units/horizons fail explici
 
 `LinkedTrainingTarget.from_link(link, row=row, context=before, target=target)`
 binds the complete declaration to the SHA-256 of an exact
-`FiniteTrainingCandidateLink`. Its `named-training-target-link-v1` loader requires
+finite or accepted-deployment training candidate link. Its unchanged
+`named-training-target-link-v1` loader requires
 the original link, row and historical context, rechecks their complete join,
 requires the same reward profile, and checks that the value perspective names an
 actual observation player. That player may differ from the decision actor.

@@ -7,6 +7,10 @@ from dataclasses import dataclass
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.ai.parameterized_training import (
+    ParameterizedTrainingCandidateLink,
+    TrainingCandidateLink,
+)
 from warhammer40k_core.ai.player_policy import PlayerDecisionContext, payload_digest
 from warhammer40k_core.ai.policy_contracts import PolicyProvenanceError, TrainingRow
 from warhammer40k_core.ai.training_candidates import FiniteTrainingCandidateLink
@@ -34,6 +38,7 @@ EPISODE_ORIGIN_SCHEMA_VERSION = "verified-episode-origin-v1"
 EPISODE_ADMISSION_SCHEMA_VERSION = "finite-episode-admission-v1"
 MIXED_EPISODE_ADMISSION_SCHEMA_VERSION = "mixed-episode-admission-v1"
 TARGET_ADMISSION_SCHEMA_VERSION = "finite-target-admission-v1"
+MIXED_TARGET_ADMISSION_SCHEMA_VERSION = "mixed-target-admission-v1"
 TERMINAL_TARGET_PRODUCER = "engine-final-scoring-v1"
 MISSING_TARGET_PRODUCER = "episode-boundary-v1"
 LOCAL_REFERENCE_SCHEMA_VERSION = "verified-local-reference-v1"
@@ -302,7 +307,7 @@ class FiniteEpisodeAdmission(_EpisodeAdmission[FiniteAcceptedTransition]):
 class MixedEpisodeAdmission(_EpisodeAdmission[AcceptedTransition]):
     """Episode admission for finite and bounded verified parameterized transitions.
 
-    This does not provide parameterized training-row or named-target linkage.
+    Accepted deployment rows link through the separate parameterized companion.
     """
 
     __slots__ = ()
@@ -449,9 +454,9 @@ class AdmittedTrainingTarget:
         cls,
         linked: LinkedTrainingTarget,
         *,
-        episode: FiniteEpisodeAdmission,
-        transition: FiniteAcceptedTransition,
-        link: FiniteTrainingCandidateLink,
+        episode: FiniteEpisodeAdmission | MixedEpisodeAdmission,
+        transition: AcceptedTransition,
+        link: TrainingCandidateLink,
         row: TrainingRow,
         context: PlayerDecisionContext,
         config: GameConfig,
@@ -460,14 +465,29 @@ class AdmittedTrainingTarget:
     ) -> AdmittedTrainingTarget:
         if (
             type(linked) is not LinkedTrainingTarget
-            or type(episode) is not FiniteEpisodeAdmission
-            or type(transition) is not FiniteAcceptedTransition
+            or type(episode) not in (FiniteEpisodeAdmission, MixedEpisodeAdmission)
+            or type(transition) not in (FiniteAcceptedTransition, ParameterizedAcceptedTransition)
             or type(config) is not GameConfig
             or type(row) is not TrainingRow
         ):
             raise TrainingAdmissionError(
                 "Target admission requires typed episode and row evidence."
             )
+        if isinstance(transition, FiniteAcceptedTransition):
+            expected_link_hash = transition.to_payload()["training_candidate_link_hash"]
+            matches_transition = type(
+                link
+            ) is FiniteTrainingCandidateLink and expected_link_hash == payload_digest(
+                link.to_payload()
+            )
+        else:
+            matches_transition = (
+                type(episode) is MixedEpisodeAdmission
+                and type(link) is ParameterizedTrainingCandidateLink
+                and link.transition == transition
+            )
+        if not matches_transition:
+            raise TrainingAdmissionError("Target candidate and accepted transition family drifted.")
         try:
             linked.require_matches(link, row=row, context=context)
             # Deliberately offers no cross-version override for historical labels.
@@ -484,7 +504,6 @@ class AdmittedTrainingTarget:
             or boundary["origin"]["source_identity"]["game_config_hash"]
             != payload_digest(config.to_payload())
             or transition.content_hash not in boundary["transition_hashes"]
-            or item["training_candidate_link_hash"] != payload_digest(link.to_payload())
             or item["authoritative_record_id"] != row.decision_record_id
             or boundary["perspective_player_id"] != target.perspective_player_id
             or boundary["episode_end"] != target.episode_end.value
@@ -554,7 +573,9 @@ class AdmittedTrainingTarget:
                     "Observed target value contradicts engine final scoring."
                 )
         payload: AdmittedTargetPayload = {
-            "schema_version": TARGET_ADMISSION_SCHEMA_VERSION,
+            "schema_version": TARGET_ADMISSION_SCHEMA_VERSION
+            if type(episode) is FiniteEpisodeAdmission
+            else MIXED_TARGET_ADMISSION_SCHEMA_VERSION,
             "episode_hash": episode.content_hash,
             "transition_hash": transition.content_hash,
             "linked_target_hash": linked.content_hash,
@@ -572,9 +593,9 @@ class AdmittedTrainingTarget:
         payload: object,
         *,
         linked: LinkedTrainingTarget,
-        episode: FiniteEpisodeAdmission,
-        transition: FiniteAcceptedTransition,
-        link: FiniteTrainingCandidateLink,
+        episode: FiniteEpisodeAdmission | MixedEpisodeAdmission,
+        transition: AcceptedTransition,
+        link: TrainingCandidateLink,
         row: TrainingRow,
         context: PlayerDecisionContext,
         config: GameConfig,

@@ -1,497 +1,569 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "18e09691c00208b3d3520b32cebdd30cf1c4095d",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a5b4671ddcf4a59926db1d4b13a5f7ea4e2eb1876ab626b92743cf5cd13986f9",
-  "operation_map_sha256": "1fb1ab7dabd68cc29f3d6d84e2ed4454fd7383d22c5c4cb6be6ccbb8dfd480da",
+  "base": "92987542924a8a07cdd4c881efd8308e599e28df",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2d3bcb63830dc4ca110f2355e72e668728321d6bddc4789aace90c51d7965bfe",
+  "operation_map_sha256": "7a9f4297dd0e92aa8d23a89f16571cd6e4303051f095f5c2d306995e66e98305",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "b19643f24b3a856ce5d8f7f864cbd6db8cfc917b2511b8ffd564bfa197cef7e3",
-      "after_sha256": "a12ef1beab62ff8c5608def65691e0d2f37b32cbcef11b7378b6aaf022b9fa40",
+      "before_sha256": "a12ef1beab62ff8c5608def65691e0d2f37b32cbcef11b7378b6aaf022b9fa40",
+      "after_sha256": "6e3568420efd4ec58e3d576c596b3bc23a4350beced3a04c44bc9583dbe0c598",
       "owners": {
         "@document": {
-          "before": "b19643f24b3a856ce5d8f7f864cbd6db8cfc917b2511b8ffd564bfa197cef7e3",
-          "after": "a12ef1beab62ff8c5608def65691e0d2f37b32cbcef11b7378b6aaf022b9fa40"
+          "before": "a12ef1beab62ff8c5608def65691e0d2f37b32cbcef11b7378b6aaf022b9fa40",
+          "after": "6e3568420efd4ec58e3d576c596b3bc23a4350beced3a04c44bc9583dbe0c598"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "07f5b248764de8f0cfa62586094dd2ba531b2fcdd7ee71c28d98bd77f56cb1af",
-      "after_sha256": "b113e4bd8687b3d3e68077cb93e1ad6f6b33378fa26a18788b49277824fc1eda",
+      "before_sha256": "b113e4bd8687b3d3e68077cb93e1ad6f6b33378fa26a18788b49277824fc1eda",
+      "after_sha256": "f4d3d4780ccc1c94b707dc946d79adf735f5743bb585d2616e7cd2b1740290a5",
       "owners": {
         "@document": {
-          "before": "07f5b248764de8f0cfa62586094dd2ba531b2fcdd7ee71c28d98bd77f56cb1af",
-          "after": "b113e4bd8687b3d3e68077cb93e1ad6f6b33378fa26a18788b49277824fc1eda"
+          "before": "b113e4bd8687b3d3e68077cb93e1ad6f6b33378fa26a18788b49277824fc1eda",
+          "after": "f4d3d4780ccc1c94b707dc946d79adf735f5743bb585d2616e7cd2b1740290a5"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "1d7208c27e654e33260f4f6487087afd26debaee56d5dd24d80475d0e706b7d9",
-      "after_sha256": "61ab3b354e0e7c09daf9db843f99efc07cf36e3a923bf656419240c6bdeeaada",
+      "before_sha256": "61ab3b354e0e7c09daf9db843f99efc07cf36e3a923bf656419240c6bdeeaada",
+      "after_sha256": "85a1b1aa3f031c544621d0befac2822bebb90032081ff86f8ceb3a0fb0f6625e",
       "owners": {
         "@document": {
-          "before": "1d7208c27e654e33260f4f6487087afd26debaee56d5dd24d80475d0e706b7d9",
-          "after": "61ab3b354e0e7c09daf9db843f99efc07cf36e3a923bf656419240c6bdeeaada"
+          "before": "61ab3b354e0e7c09daf9db843f99efc07cf36e3a923bf656419240c6bdeeaada",
+          "after": "85a1b1aa3f031c544621d0befac2822bebb90032081ff86f8ceb3a0fb0f6625e"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "49823af31dee2ba23223318f48a4083b6cbf99fe1d2f05146313e6aae74a002e",
-      "after_sha256": "b9175071d854b70cce28f7f8652fa42028b25a6be79772089bd37fd353ee67e1",
+      "before_sha256": "b9175071d854b70cce28f7f8652fa42028b25a6be79772089bd37fd353ee67e1",
+      "after_sha256": "5a36ec1074973b1fe8a5a2ed0bd1e5b8296e941b55129c36973eb26a2bbbfc52",
       "owners": {
         "@document": {
-          "before": "49823af31dee2ba23223318f48a4083b6cbf99fe1d2f05146313e6aae74a002e",
-          "after": "b9175071d854b70cce28f7f8652fa42028b25a6be79772089bd37fd353ee67e1"
+          "before": "b9175071d854b70cce28f7f8652fa42028b25a6be79772089bd37fd353ee67e1",
+          "after": "5a36ec1074973b1fe8a5a2ed0bd1e5b8296e941b55129c36973eb26a2bbbfc52"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "f87f5af3c00195940c43f49fac13d2ebe3bffa0373d8fff04c149a58fcf55c7f",
-      "after_sha256": "9c4d3d7e683312ffeca753477780592e07f182f490920ece7a8ad5b481dfd83b",
+      "before_sha256": "9c4d3d7e683312ffeca753477780592e07f182f490920ece7a8ad5b481dfd83b",
+      "after_sha256": "dfd5e20a103808408113264df7b6fd5ee3aa59cef16deb26d510165bb93efd4e",
       "owners": {
         "@document": {
-          "before": "f87f5af3c00195940c43f49fac13d2ebe3bffa0373d8fff04c149a58fcf55c7f",
-          "after": "9c4d3d7e683312ffeca753477780592e07f182f490920ece7a8ad5b481dfd83b"
+          "before": "9c4d3d7e683312ffeca753477780592e07f182f490920ece7a8ad5b481dfd83b",
+          "after": "dfd5e20a103808408113264df7b6fd5ee3aa59cef16deb26d510165bb93efd4e"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "599950ca1ec0895b1428982efeb797d9654eff0e20562c577733329127f96f65",
-      "owners": {
-        "@document": {
-          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "599950ca1ec0895b1428982efeb797d9654eff0e20562c577733329127f96f65"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "f79760bd7fca99ffe62a5b9211c32982f48021f4466f7c12d220ca8729dde1be",
-      "after_sha256": "c7a0ac08c651979f8ba14253a249a07aa21e38d95036f8582b7b54de203fd9ee",
-      "owners": {
-        "@document": {
-          "before": "f79760bd7fca99ffe62a5b9211c32982f48021f4466f7c12d220ca8729dde1be",
-          "after": "c7a0ac08c651979f8ba14253a249a07aa21e38d95036f8582b7b54de203fd9ee"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "fd99e7b0870eb0e3d6b880a41ec6cf1b479b4d7143e441b21b1caf38a8c84764",
+      "before_sha256": "599950ca1ec0895b1428982efeb797d9654eff0e20562c577733329127f96f65",
       "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
       "owners": {
         "@document": {
-          "before": "fd99e7b0870eb0e3d6b880a41ec6cf1b479b4d7143e441b21b1caf38a8c84764",
+          "before": "599950ca1ec0895b1428982efeb797d9654eff0e20562c577733329127f96f65",
           "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
         }
       }
     },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "eadf5f0345dd814422a669e73b87f395fe7ce28aa2feab4a7028863d32ae3f25",
-      "after_sha256": "5d1e6c9ddf6c2d5106ee3f288c8f5dead929f4175f17e9abd8df9cf20056c257",
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "c7a0ac08c651979f8ba14253a249a07aa21e38d95036f8582b7b54de203fd9ee",
+      "after_sha256": "9ed3e3a625bacababb9dee8b5688365dca859a90f9e39e6d8fc4029c33716e24",
       "owners": {
         "@document": {
-          "before": "eadf5f0345dd814422a669e73b87f395fe7ce28aa2feab4a7028863d32ae3f25",
-          "after": "5d1e6c9ddf6c2d5106ee3f288c8f5dead929f4175f17e9abd8df9cf20056c257"
+          "before": "c7a0ac08c651979f8ba14253a249a07aa21e38d95036f8582b7b54de203fd9ee",
+          "after": "9ed3e3a625bacababb9dee8b5688365dca859a90f9e39e6d8fc4029c33716e24"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "b60f7caae0070129af148e60c749805a29f991a64d01ceb9db71b512fe9c2ee9",
+      "owners": {
+        "@document": {
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "b60f7caae0070129af148e60c749805a29f991a64d01ceb9db71b512fe9c2ee9"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "5d1e6c9ddf6c2d5106ee3f288c8f5dead929f4175f17e9abd8df9cf20056c257",
+      "after_sha256": "0c67b8973357ff51d1f79aa02641ac7488888fcaf4d6d79d642a94ac17ab54d2",
+      "owners": {
+        "@document": {
+          "before": "5d1e6c9ddf6c2d5106ee3f288c8f5dead929f4175f17e9abd8df9cf20056c257",
+          "after": "0c67b8973357ff51d1f79aa02641ac7488888fcaf4d6d79d642a94ac17ab54d2"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "e34a3e43ee534640dca68925e9e81b2b9fa441bcaa57129b8cbc5e6481fbbf88",
-      "after_sha256": "9e9e9df315bb662a4fafd3022adb75c64890e1e9acdb820343788a9022319d59",
+      "before_sha256": "9e9e9df315bb662a4fafd3022adb75c64890e1e9acdb820343788a9022319d59",
+      "after_sha256": "6e3e3a040e20c7d9b8c2571110bcc6995f2d2ca83a1f2cbc1697221f68cb7553",
       "owners": {
         "@document": {
-          "before": "e34a3e43ee534640dca68925e9e81b2b9fa441bcaa57129b8cbc5e6481fbbf88",
-          "after": "9e9e9df315bb662a4fafd3022adb75c64890e1e9acdb820343788a9022319d59"
+          "before": "9e9e9df315bb662a4fafd3022adb75c64890e1e9acdb820343788a9022319d59",
+          "after": "6e3e3a040e20c7d9b8c2571110bcc6995f2d2ca83a1f2cbc1697221f68cb7553"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "1eb91ccb6ddbe98d086e21b6be37bd533986c1cd2bf5b67728d18038b8f8518c",
-      "after_sha256": "99f8ca43ab44ed46c8f429a95b736c66a880547fa1820ba8f1d76f00e5512e7e",
+      "before_sha256": "99f8ca43ab44ed46c8f429a95b736c66a880547fa1820ba8f1d76f00e5512e7e",
+      "after_sha256": "d49c638f80cd1c2cffab9235c3ec6e6aea1bc7124a35b6ba06ee31cfe0131864",
       "owners": {
         "@document": {
-          "before": "1eb91ccb6ddbe98d086e21b6be37bd533986c1cd2bf5b67728d18038b8f8518c",
-          "after": "99f8ca43ab44ed46c8f429a95b736c66a880547fa1820ba8f1d76f00e5512e7e"
+          "before": "99f8ca43ab44ed46c8f429a95b736c66a880547fa1820ba8f1d76f00e5512e7e",
+          "after": "d49c638f80cd1c2cffab9235c3ec6e6aea1bc7124a35b6ba06ee31cfe0131864"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "d91b091ff1b7b8b0a691faec072952e63f3ff83512cdee74613d7aa6d8205fca",
-      "after_sha256": "c39a9573d704db49d2d722f47e05b94f5c5eccfe46b8d1025414a5c547cbf428",
+      "before_sha256": "c39a9573d704db49d2d722f47e05b94f5c5eccfe46b8d1025414a5c547cbf428",
+      "after_sha256": "b9d016dd6527f05d7e63e144513e9887067edd34d9f0661a4861b2ff0d92090d",
       "owners": {
         "@document": {
-          "before": "d91b091ff1b7b8b0a691faec072952e63f3ff83512cdee74613d7aa6d8205fca",
-          "after": "c39a9573d704db49d2d722f47e05b94f5c5eccfe46b8d1025414a5c547cbf428"
+          "before": "c39a9573d704db49d2d722f47e05b94f5c5eccfe46b8d1025414a5c547cbf428",
+          "after": "b9d016dd6527f05d7e63e144513e9887067edd34d9f0661a4861b2ff0d92090d"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "b00c20fa2f5c29e3f36c11e2f7f1dcac4f06a2d0fefe238f41236ca4751218c5",
-      "after_sha256": "6df49d9ceb4ee3664db980fecebeefaab79187f94bb23fd00c388cde0303d2f5",
+      "before_sha256": "6df49d9ceb4ee3664db980fecebeefaab79187f94bb23fd00c388cde0303d2f5",
+      "after_sha256": "db641a32edbbe8f0ede9ceb7ce54a135813a4dbea2f2a89a4a7411a8fd80c872",
       "owners": {
         "@document": {
-          "before": "b00c20fa2f5c29e3f36c11e2f7f1dcac4f06a2d0fefe238f41236ca4751218c5",
-          "after": "6df49d9ceb4ee3664db980fecebeefaab79187f94bb23fd00c388cde0303d2f5"
+          "before": "6df49d9ceb4ee3664db980fecebeefaab79187f94bb23fd00c388cde0303d2f5",
+          "after": "db641a32edbbe8f0ede9ceb7ce54a135813a4dbea2f2a89a4a7411a8fd80c872"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "5a1da78667ff5cac53953177c63c46cc97e27c0bde075b1bf9006af71857df5f",
-      "after_sha256": "2c5203a21338363b3d794f66d636b405b94c9675a87e9981c45e742c1058d537",
+      "before_sha256": "2c5203a21338363b3d794f66d636b405b94c9675a87e9981c45e742c1058d537",
+      "after_sha256": "cab6522ba151240947dae7cd1d555197d6683142f1d341ccf4e6f0056334d597",
       "owners": {
         "@document": {
-          "before": "5a1da78667ff5cac53953177c63c46cc97e27c0bde075b1bf9006af71857df5f",
-          "after": "2c5203a21338363b3d794f66d636b405b94c9675a87e9981c45e742c1058d537"
+          "before": "2c5203a21338363b3d794f66d636b405b94c9675a87e9981c45e742c1058d537",
+          "after": "cab6522ba151240947dae7cd1d555197d6683142f1d341ccf4e6f0056334d597"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "28088847167c1f4194448301a1c40dd029d434bbc6e4e20934d9ba4bcf3d4778",
-      "after_sha256": "91dcf75d5197f266ff2291b5bba24efc798e380637de1015d3bf8dcff1aac8d8",
+      "before_sha256": "91dcf75d5197f266ff2291b5bba24efc798e380637de1015d3bf8dcff1aac8d8",
+      "after_sha256": "0483a63c22485540c0639ba3d9ee722079df4722d2255adc75059e0da4d76236",
       "owners": {
         "@document": {
-          "before": "28088847167c1f4194448301a1c40dd029d434bbc6e4e20934d9ba4bcf3d4778",
-          "after": "91dcf75d5197f266ff2291b5bba24efc798e380637de1015d3bf8dcff1aac8d8"
+          "before": "91dcf75d5197f266ff2291b5bba24efc798e380637de1015d3bf8dcff1aac8d8",
+          "after": "0483a63c22485540c0639ba3d9ee722079df4722d2255adc75059e0da4d76236"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "e8abf199e359268018eed62b26b403b9f820dcda0e9d240e8cadbfdb3ee67564",
-      "after_sha256": "d9b2c8be3190db77c9074e84fe3f5567a2dddf36225c5041d9405914df2be4ca",
+      "before_sha256": "d9b2c8be3190db77c9074e84fe3f5567a2dddf36225c5041d9405914df2be4ca",
+      "after_sha256": "ef97011174f94aa608982437999b36253c886a7a71b76d5aed1ab80462ddbda0",
       "owners": {
         "@document": {
-          "before": "e8abf199e359268018eed62b26b403b9f820dcda0e9d240e8cadbfdb3ee67564",
-          "after": "d9b2c8be3190db77c9074e84fe3f5567a2dddf36225c5041d9405914df2be4ca"
+          "before": "d9b2c8be3190db77c9074e84fe3f5567a2dddf36225c5041d9405914df2be4ca",
+          "after": "ef97011174f94aa608982437999b36253c886a7a71b76d5aed1ab80462ddbda0"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "55c67228c8be8f0b0df863bd1812b4b8cb15be779a0b70a414b112bbc58fc31a",
-      "after_sha256": "afd7a79ecef594685a913833f3492a6f69b172ebfbc980e6d3bd1756039a0e17",
+      "before_sha256": "afd7a79ecef594685a913833f3492a6f69b172ebfbc980e6d3bd1756039a0e17",
+      "after_sha256": "51c77acf66f817f8ccf90e1ae8a7697c794bc72b11b943fc1272bfc1b29a5f2b",
       "owners": {
         "@document": {
-          "before": "55c67228c8be8f0b0df863bd1812b4b8cb15be779a0b70a414b112bbc58fc31a",
-          "after": "afd7a79ecef594685a913833f3492a6f69b172ebfbc980e6d3bd1756039a0e17"
+          "before": "afd7a79ecef594685a913833f3492a6f69b172ebfbc980e6d3bd1756039a0e17",
+          "after": "51c77acf66f817f8ccf90e1ae8a7697c794bc72b11b943fc1272bfc1b29a5f2b"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "36420999f8837e5c4227b293caf794d5e67cc1389d338b336c6e117c1971c248",
-      "after_sha256": "a8e885bab6f2e2f3098181eb410c623f4cd6c57eebb32fe328bbedd79165e6d5",
+      "before_sha256": "a8e885bab6f2e2f3098181eb410c623f4cd6c57eebb32fe328bbedd79165e6d5",
+      "after_sha256": "4de138c938716879b3390ca6f107cdf96f8e21f76889120d71d4f243c4f85e1f",
       "owners": {
         "@document": {
-          "before": "36420999f8837e5c4227b293caf794d5e67cc1389d338b336c6e117c1971c248",
-          "after": "a8e885bab6f2e2f3098181eb410c623f4cd6c57eebb32fe328bbedd79165e6d5"
+          "before": "a8e885bab6f2e2f3098181eb410c623f4cd6c57eebb32fe328bbedd79165e6d5",
+          "after": "4de138c938716879b3390ca6f107cdf96f8e21f76889120d71d4f243c4f85e1f"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "d3d8aaa00c1e99ee7253cd86cdd1f21f92e09961f0a51d121b5e6874a82a3ff2",
-      "after_sha256": "634ff11112d30f4cc3240a21ef9e72bd7a31ca030e38970fa4835e64e40bd0a7",
+      "before_sha256": "634ff11112d30f4cc3240a21ef9e72bd7a31ca030e38970fa4835e64e40bd0a7",
+      "after_sha256": "17bcc6a1f2ba576e726854910c64b9df5ff891e61c6e905fc7e3981f6e2e323b",
       "owners": {
         "@document": {
-          "before": "d3d8aaa00c1e99ee7253cd86cdd1f21f92e09961f0a51d121b5e6874a82a3ff2",
-          "after": "634ff11112d30f4cc3240a21ef9e72bd7a31ca030e38970fa4835e64e40bd0a7"
+          "before": "634ff11112d30f4cc3240a21ef9e72bd7a31ca030e38970fa4835e64e40bd0a7",
+          "after": "17bcc6a1f2ba576e726854910c64b9df5ff891e61c6e905fc7e3981f6e2e323b"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "e84ffd2b9fc549a03efb447fd80dd6a9d8f8dd11b67ae48749114b803fc37c66",
-      "after_sha256": "48ccb999b954c6bb1d629e8738ec981fdb9a5bfb32f3933afdabd67b2522ba10",
+      "before_sha256": "48ccb999b954c6bb1d629e8738ec981fdb9a5bfb32f3933afdabd67b2522ba10",
+      "after_sha256": "c05c47a7a273a812f51d864f055521f620f81dc8f3febde3e85f04e0bfcda92e",
       "owners": {
         "@document": {
-          "before": "e84ffd2b9fc549a03efb447fd80dd6a9d8f8dd11b67ae48749114b803fc37c66",
-          "after": "48ccb999b954c6bb1d629e8738ec981fdb9a5bfb32f3933afdabd67b2522ba10"
+          "before": "48ccb999b954c6bb1d629e8738ec981fdb9a5bfb32f3933afdabd67b2522ba10",
+          "after": "c05c47a7a273a812f51d864f055521f620f81dc8f3febde3e85f04e0bfcda92e"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "1304d26ff9519542bd706ba275b5dcd8fa0ba2c8a75b70fb7260b24c445c6060",
-      "after_sha256": "1a97731aff0e31b2ee22fcf70737c9fd89c88be976bb674043d914854956c088",
+      "before_sha256": "1a97731aff0e31b2ee22fcf70737c9fd89c88be976bb674043d914854956c088",
+      "after_sha256": "ca2202a92df4de9e469dfa24262606263bdf07ff2cc619d1fe96f26dbb4b9a6b",
       "owners": {
         "@document": {
-          "before": "1304d26ff9519542bd706ba275b5dcd8fa0ba2c8a75b70fb7260b24c445c6060",
-          "after": "1a97731aff0e31b2ee22fcf70737c9fd89c88be976bb674043d914854956c088"
+          "before": "1a97731aff0e31b2ee22fcf70737c9fd89c88be976bb674043d914854956c088",
+          "after": "ca2202a92df4de9e469dfa24262606263bdf07ff2cc619d1fe96f26dbb4b9a6b"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "8173195b578069780148e12f04f27ab1ecbcd3dad91ede72d3c3a60dd4b7d091",
-      "after_sha256": "e0e410d93ce144f7c6e65e7eed47820b5c33369dd2070e54758fa098fcb3f373",
+      "before_sha256": "e0e410d93ce144f7c6e65e7eed47820b5c33369dd2070e54758fa098fcb3f373",
+      "after_sha256": "9d4d7ba346b3fc02fb7211165d73a7810965bbd91f47fe41c4bef9a192c86ae0",
       "owners": {
         "@document": {
-          "before": "8173195b578069780148e12f04f27ab1ecbcd3dad91ede72d3c3a60dd4b7d091",
-          "after": "e0e410d93ce144f7c6e65e7eed47820b5c33369dd2070e54758fa098fcb3f373"
+          "before": "e0e410d93ce144f7c6e65e7eed47820b5c33369dd2070e54758fa098fcb3f373",
+          "after": "9d4d7ba346b3fc02fb7211165d73a7810965bbd91f47fe41c4bef9a192c86ae0"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "fd63d5e3419a8109760c50550a1647dfc536effce48b78972ffd110f21fdea7c",
-      "after_sha256": "c40baf9607c589ad983436da28659242124db7c580f8dad78a8843fb80a96377",
+      "before_sha256": "c40baf9607c589ad983436da28659242124db7c580f8dad78a8843fb80a96377",
+      "after_sha256": "9df8ad7ef264ccdc5bfdf50df225872640d76797ca5da2586e772da2afaac248",
       "owners": {
         "@document": {
-          "before": "fd63d5e3419a8109760c50550a1647dfc536effce48b78972ffd110f21fdea7c",
-          "after": "c40baf9607c589ad983436da28659242124db7c580f8dad78a8843fb80a96377"
+          "before": "c40baf9607c589ad983436da28659242124db7c580f8dad78a8843fb80a96377",
+          "after": "9df8ad7ef264ccdc5bfdf50df225872640d76797ca5da2586e772da2afaac248"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "17062e8b20d1e6f245e7a12b9d832ca6455493bfe28886ede46adae998499518",
-      "after_sha256": "ffbb9046513ea4f2019e028fd7ae29219b4718b02230904ff28c3e808d72bb1b",
+      "before_sha256": "ffbb9046513ea4f2019e028fd7ae29219b4718b02230904ff28c3e808d72bb1b",
+      "after_sha256": "2eddbd7eed3678a56fca638ebe99c895ae759a6fa3235ea63c1081c74caeffbc",
       "owners": {
         "@document": {
-          "before": "17062e8b20d1e6f245e7a12b9d832ca6455493bfe28886ede46adae998499518",
-          "after": "ffbb9046513ea4f2019e028fd7ae29219b4718b02230904ff28c3e808d72bb1b"
+          "before": "ffbb9046513ea4f2019e028fd7ae29219b4718b02230904ff28c3e808d72bb1b",
+          "after": "2eddbd7eed3678a56fca638ebe99c895ae759a6fa3235ea63c1081c74caeffbc"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "b40e0e9db1fcd0fa5f5278321a35e4eed8e632c97a8c8d007c19d0f452110cc6",
-      "after_sha256": "9c93b10974d219030078b8232ddc9853ccc4d85951407d3883afadaddaf12e0b",
+      "before_sha256": "9c93b10974d219030078b8232ddc9853ccc4d85951407d3883afadaddaf12e0b",
+      "after_sha256": "5186759274737d2c5bf04480e710120626f3ed254cb9014e9ceb6051fa89e31f",
       "owners": {
         "@document": {
-          "before": "b40e0e9db1fcd0fa5f5278321a35e4eed8e632c97a8c8d007c19d0f452110cc6",
-          "after": "9c93b10974d219030078b8232ddc9853ccc4d85951407d3883afadaddaf12e0b"
+          "before": "9c93b10974d219030078b8232ddc9853ccc4d85951407d3883afadaddaf12e0b",
+          "after": "5186759274737d2c5bf04480e710120626f3ed254cb9014e9ceb6051fa89e31f"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "7f42f6676a9eb50823b610062d49d708d847c2249d94f25580457329b230508a",
+      "after_sha256": "5ce5cfe8e1a461bb322dcaca08563824887f0f7d353bcd67b65814e7adf10ec9",
+      "owners": {
+        "@document": {
+          "before": "7f42f6676a9eb50823b610062d49d708d847c2249d94f25580457329b230508a",
+          "after": "5ce5cfe8e1a461bb322dcaca08563824887f0f7d353bcd67b65814e7adf10ec9"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "a5f913e1d183851c55a63843f9fb1df41bc4b5cadb4045c3c5e74671ab707677",
-      "after_sha256": "5ea436a0255b522cb508a14566ef43681969f86ac98cddeda0ecfce828206e2d",
+      "before_sha256": "5ea436a0255b522cb508a14566ef43681969f86ac98cddeda0ecfce828206e2d",
+      "after_sha256": "cd111e721258480452cf61b8e77313b9dbc3f5c751cc029c9cbf91f242be3c06",
       "owners": {
         "@document": {
-          "before": "a5f913e1d183851c55a63843f9fb1df41bc4b5cadb4045c3c5e74671ab707677",
-          "after": "5ea436a0255b522cb508a14566ef43681969f86ac98cddeda0ecfce828206e2d"
+          "before": "5ea436a0255b522cb508a14566ef43681969f86ac98cddeda0ecfce828206e2d",
+          "after": "cd111e721258480452cf61b8e77313b9dbc3f5c751cc029c9cbf91f242be3c06"
+        }
+      }
+    },
+    "src/warhammer40k_core/ai/deployment_candidates.py": {
+      "before_sha256": null,
+      "after_sha256": "45657259d62e48bf08519273d1ebc359da3c6bbe5d237785656b25b2300fdf2c",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "cbe9de75bff941544242a26a0bf05a0f1af0e8be5457f86e08c2dd00b363de82"
+        },
+        "DeploymentCandidatePayload": {
+          "before": null,
+          "after": "ce1376e9497995ae4b5189fc06721cfaa242e23c72e223bf8f00d20a1c15698b"
+        },
+        "DeploymentPlacementCandidate": {
+          "before": null,
+          "after": "ea465812a123cb6ea55d492bb2f32291b4d9615f063ef4e15207901f0c8b0e9b"
+        },
+        "DeploymentPlacementCandidate.__init__": {
+          "before": null,
+          "after": "a40c804e5cd1563dafeaca2759e5567a6abd5ae7c55e150ac38c181ec31a9be3"
+        },
+        "DeploymentPlacementCandidate.candidate_id": {
+          "before": null,
+          "after": "fc372ac1957d960081e8aecc70e1bb81a723b1101b59df2f1548a6eb6f44f059"
+        },
+        "DeploymentPlacementCandidate.content_hash": {
+          "before": null,
+          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
+        },
+        "DeploymentPlacementCandidate.from_action": {
+          "before": null,
+          "after": "f98b10190dfd84567e6d68bbf2015ac8f6cbffdcd1c9e8c86ad495afeca8f81a"
+        },
+        "DeploymentPlacementCandidate.from_payload": {
+          "before": null,
+          "after": "d886fe29cfef2281117020c658f32eb53facbf80a4d88ff6b10b47d3ace9ae82"
+        },
+        "DeploymentPlacementCandidate.select": {
+          "before": null,
+          "after": "b8de9d0aaf7de616ae0a1eba979b6de605e471e5b65bbe1d92b97089d04f583b"
+        },
+        "DeploymentPlacementCandidate.to_payload": {
+          "before": null,
+          "after": "30b178df91ebb702e3354eccdabd19399333f0e5ba0618e2938dcd106060b5a8"
+        }
+      }
+    },
+    "src/warhammer40k_core/ai/parameterized_training.py": {
+      "before_sha256": null,
+      "after_sha256": "64b45aae1c060fabe2ed95a48244d7f51209d8aaf3560c8c3647ff77ae3b8271",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "9da21a4a668543952b044e2a8dc1464fc0b6e8fa7b24cf7d9099151e10c375cf"
+        },
+        "ParameterizedTrainingCandidateLink": {
+          "before": null,
+          "after": "a85c87863076a7087c3361385c7280bb944b3714e879db90c12b59a4bdd19b38"
+        },
+        "ParameterizedTrainingCandidateLink.__init__": {
+          "before": null,
+          "after": "386ac4baf8815844c7ea648976687c1f150394b92d02e3d0401cf1ba41fefbf5"
+        },
+        "ParameterizedTrainingCandidateLink.chosen_action_id": {
+          "before": null,
+          "after": "201f63121fc3ab964cba2346797f9c8744164f842336539507114b27a9f6c8ee"
+        },
+        "ParameterizedTrainingCandidateLink.chosen_action_index": {
+          "before": null,
+          "after": "63b11f01018a6d3edf6a3c80f5d26643f0f89a059f0351afe41737e0015ce145"
+        },
+        "ParameterizedTrainingCandidateLink.from_payload": {
+          "before": null,
+          "after": "30fe723cc33788c12967bbbddc5e762763b991e5240e344e4551a1c5d813b1c7"
+        },
+        "ParameterizedTrainingCandidateLink.from_row": {
+          "before": null,
+          "after": "b26febe13ec2f14c06eacbea936124a985d0d83ec2b803f3316437b54bd96bb3"
+        },
+        "ParameterizedTrainingCandidateLink.require_matches": {
+          "before": null,
+          "after": "e5b8901c661ee4107105968ac6c380dde7eee9e221583a8cadc6e734ea6617e5"
+        },
+        "ParameterizedTrainingCandidateLink.to_payload": {
+          "before": null,
+          "after": "5a6361a518e3191bdefc747663f0a7edbebfaa7f80f5f9a0b0a2c55d2746d70d"
+        },
+        "ParameterizedTrainingCandidateLinkPayload": {
+          "before": null,
+          "after": "cba3a1a9ff6ea01f22db1ce28ecc325078a818ab8014c74d4a066782bac1ae5d"
         }
       }
     },
     "src/warhammer40k_core/ai/training_admission.py": {
-      "before_sha256": "c19a62ca9704e107c5f0d3144a804883d58e58927ad5cc7028b9265a2640870c",
-      "after_sha256": "0274ccf87ec66412cf6647e1656ca87e77d56a0651750228984af2a3f282a23f",
+      "before_sha256": "0274ccf87ec66412cf6647e1656ca87e77d56a0651750228984af2a3f282a23f",
+      "after_sha256": "f58b8e55a64786a027876c1e86e70c766ccf7140fbdcb2e043fbae119cf4e5e7",
       "owners": {
         "@module": {
-          "before": "384795abc5b73dbdd611f75c3cb01e9e7606adca7d51481077186bafb65a660e",
-          "after": "fd0e7dbe495857da071630e87a6d5fdd7db37ae585d33b8d1196d618d6f35fe0"
+          "before": "fd0e7dbe495857da071630e87a6d5fdd7db37ae585d33b8d1196d618d6f35fe0",
+          "after": "90b249907761af4093b38f012cf90c65da2565dc64c82eea76404db9ef8b95b1"
         },
-        "FiniteEpisodeAdmission": {
-          "before": "d766d68fd49149a60ac5ad8983b75b09b5caadd8a0fc3db3da349c75254eb89c",
-          "after": "33dbe56fa02f3ae4bce100825af6e90e356f57678e115ee8fba65d6f00211e5a"
+        "AdmittedTrainingTarget.from_episode": {
+          "before": "6b62b6cb6b4adec344b10e0cd2503164f212c71ea9a2cd09b3cf1cd562d95dd7",
+          "after": "f87d5c7583e77c1d76df2004ba5d144758da4fa56116233749662daaff865a1b"
         },
-        "FiniteEpisodeAdmission.__init__": {
-          "before": "3402173ada13af9dc7658caf33df482659a80ebdd04b76c0859a73099a3d6b95",
-          "after": null
-        },
-        "FiniteEpisodeAdmission.content_hash": {
-          "before": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4",
-          "after": null
-        },
-        "FiniteEpisodeAdmission.from_payload": {
-          "before": "733da9c78200306329e55fe6d37de525d411bbc67c90afb0a508e81b16888d98",
-          "after": null
-        },
-        "FiniteEpisodeAdmission.from_transitions": {
-          "before": "e82bee558f84d6f35201e5b0b146a28133a9ae1d32d1cdffe288401d7283abf6",
-          "after": null
-        },
-        "FiniteEpisodeAdmission.to_payload": {
-          "before": "a1219eabdb6c7df380340f912baa66833068114ca30ad9ffba9bb5c619e85946",
-          "after": null
+        "AdmittedTrainingTarget.from_payload": {
+          "before": "60bb9f205a7be701ab8ca1b6c34d9df6ab1cd1bdcff9138121c332bba4ebb756",
+          "after": "e5bcf086869b6cc12c63af4a29ba1f60fa924a15308cc8e4f17e125549a099fb"
         },
         "MixedEpisodeAdmission": {
-          "before": null,
-          "after": "9d509607df7ef6eb20338b608d45b1d45a7f0d839eb296de58ae07dafb87fd5c"
-        },
-        "VerifiedLocalReference.from_episode": {
-          "before": "63740c07e21521a26428b7636ded9c772bcc4b9af14a8cd2efd34f82416b1b76",
-          "after": "f17415148759a371bfc34e9a3785cabfcc6feed9e037f622fd47b9648d2ca50e"
-        },
-        "VerifiedLocalReference.from_payload": {
-          "before": "2f238dfa11d655e9aa9504b5eb956daceeef10fc1f5339efea20fe928c8a4c3e",
-          "after": "5922a696df08f37d8a6a03d23ef8ff7a8a11ad2bc47e6f476c5b0f2d1b2470a6"
-        },
-        "_EpisodeAdmission": {
-          "before": null,
-          "after": "34662a1aa7576d052d023e21237ca4c8559f318432286fa581af1f2eb1543bd1"
-        },
-        "_EpisodeAdmission.__init__": {
-          "before": null,
-          "after": "5a97dc8fa7748247ea38f974dda7681f135df19c1e7b8ca54c5fe7ea61b96a40"
-        },
-        "_EpisodeAdmission.content_hash": {
-          "before": null,
-          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
-        },
-        "_EpisodeAdmission.from_payload": {
-          "before": null,
-          "after": "c58582c86a76cdbdf63d2c6e1eb6a98301164320beae7c0a1d0eac53842a21b8"
-        },
-        "_EpisodeAdmission.from_transitions": {
-          "before": null,
-          "after": "e3f6643cc8450c7bd4e57dfa5d3a5a1f617c8179c6f883c48797839895cc75e7"
-        },
-        "_EpisodeAdmission.to_payload": {
-          "before": null,
-          "after": "a1219eabdb6c7df380340f912baa66833068114ca30ad9ffba9bb5c619e85946"
+          "before": "9d509607df7ef6eb20338b608d45b1d45a7f0d839eb296de58ae07dafb87fd5c",
+          "after": "fe09a335b217f37284c2f45aef99eac852bb6237e36ad783a1b94e1094793508"
         }
       }
     },
-    "src/warhammer40k_core/ai/training_transitions.py": {
-      "before_sha256": "96233c7bf8981d6c5432b54c7d14f2dc7a1a75f81d82768377c32c64a0e8dd24",
-      "after_sha256": "e4008094b81f0e6ad61bdc68979609a0c0ba7be6431206c43564a6c2bc8bdad2",
+    "src/warhammer40k_core/ai/training_targets.py": {
+      "before_sha256": "ec9521511002bfcb0ecfc1f10c337ca9681a121f65d0f03b64e165583883fad9",
+      "after_sha256": "7eaec2224495e2c8cf3e117398f6d1e164c1e0cf738a1eb682bf569773c23067",
       "owners": {
         "@module": {
-          "before": "e06fea680f83b2f4b2ba7748167ea84a3135042cd9348b3fedba56456af475ab",
-          "after": "20a2613eda3414be3a95dad13b0c288570c0a895c8c87bc952674e008185ecf1"
+          "before": "fb980d20a43e9fadcbbc5afde233bfed7dfebb4ab5db63c0c066c9fc304836e2",
+          "after": "4ba1334a18f786c5d9587f2bae49bc614d1f2e49884df935c34d852c6fa61107"
         },
-        "AcceptedTransitionPayload": {
-          "before": null,
-          "after": "a4ab496b67eeb3a4f478b732d9e148de7f5aeaaa70be7807eb2110dc643c2022"
+        "LinkedTrainingTarget.from_link": {
+          "before": "6e37340cf3cfdf750630cfac98cb8b3fc1373d930cc29474ee12e09126208983",
+          "after": "bee8943b3d7a5045f515bb6c59d3a77e3ba6c32c561f376a0c33ce0edc481c82"
         },
-        "FiniteAcceptedTransition": {
-          "before": "96c803d3e6603472c09731d76e924ed54c83da7e69776cf95a6dd4d8bc68e52d",
-          "after": "e759374e3d90746d5a0f8df2c0fb224349191be20de6b20e23ecd221e226ee33"
+        "LinkedTrainingTarget.from_payload": {
+          "before": "492e5813d5f92e5a9fabed3344eb17caec57baf9cd2144738abc1cebf5fcccde",
+          "after": "181aa86bec601f4a0e1132b7984d88b59589c179f59eadd495e8e21e774deac0"
         },
-        "FiniteAcceptedTransition.__init__": {
-          "before": "fe8d5028fad461786fe1194d1f555f6a91218fc229381f96a9aeacb8fa2f42d0",
-          "after": null
+        "LinkedTrainingTarget.require_matches": {
+          "before": "adf859e1a0a0fb28370f55cc856e71a8306eab29793f8b01f1133dfc224d2821",
+          "after": "170e4b812aaefd43a81fe79c7fd872fd9a7ee5289dd8aa11624e455426ee7e1a"
         },
-        "FiniteAcceptedTransition.accepted_record_start": {
-          "before": "c91dfae9130762a1521950c92ebf024402e6adcaec8b7d6349e37749fc210ca7",
-          "after": null
-        },
-        "FiniteAcceptedTransition.accepted_record_stop": {
-          "before": "493c52e92c5f1b7caf36a2c435564b9c7108ebfe72824881a3400bed9038f9df",
-          "after": null
-        },
-        "FiniteAcceptedTransition.actor_id": {
-          "before": "333380e616030b44dbbb4727aea5d71f2d45167c3b4def253640380bb7368f99",
-          "after": null
-        },
-        "FiniteAcceptedTransition.authoritative_record_id": {
-          "before": "57be5ae4705ebd3705d61bc2ec06d4a18043d65b3f2d83923cba39a0b71abec5",
-          "after": null
-        },
-        "FiniteAcceptedTransition.authoritative_request_id": {
-          "before": "87e797fdb0d08be8cd2132650867283d95fb05c1ce57b44bd1a052371a685e49",
-          "after": null
-        },
-        "FiniteAcceptedTransition.content_hash": {
-          "before": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4",
-          "after": null
-        },
-        "FiniteAcceptedTransition.from_payload": {
-          "before": "053a63ecd2a6015e2fba1b68b67445d9f8fa2afdb11de7bc58d01ee60a3f3896",
-          "after": "503716f5159aeafa3452a80b9800deb89d085647017520500f8a7e9b95f17199"
-        },
-        "FiniteAcceptedTransition.from_sessions": {
-          "before": "1d8b8321ceb248038826a2048c49f499248938cbadc5bbb835f0f72dc43c6ed5",
-          "after": "73a361087d6893951ff4d11b7a7474a276962110663f0cc6b5f2fce07310577a"
-        },
-        "FiniteAcceptedTransition.perspective_player_id": {
-          "before": "ab2cfc7b2361ce6bc5748c913238b63be178e87ce4d4b220f9c2187b52e1a560",
-          "after": null
-        },
-        "FiniteAcceptedTransitionPayload": {
-          "before": "2ff0535b0fd6ac60080f8e9a8b4f175d6cf983fed81afe0244ffcf31f61505bd",
-          "after": "76784db43772d497051ba947edf48685532aa408f381c39afb29a6d141f45d43"
-        },
-        "ParameterizedAcceptedTransition": {
-          "before": null,
-          "after": "73966022d64c356cd1c38d38b486f57b91573ae50eb3fb70e0c721423b8be44c"
-        },
-        "ParameterizedAcceptedTransition.from_payload": {
-          "before": null,
-          "after": "82ccac79b8edf8d18bc94cffd7b7fc6020e7ab2d58e65fb0e5c054d7f6c04978"
-        },
-        "ParameterizedAcceptedTransition.from_sessions": {
-          "before": null,
-          "after": "cb97caa801e2ef66f9563f973e17048a410074d78f1b27ea808c38c7454397a6"
-        },
-        "ParameterizedAcceptedTransition.to_payload": {
-          "before": null,
-          "after": "dbb78207d471cd038140fb2eb727ed05d29be579c2d27c7becbedb784135dc0b"
-        },
-        "ParameterizedAcceptedTransitionPayload": {
-          "before": null,
-          "after": "0925f82c338cd076626c278b138cc81996508842a7e623897d06c4cd803b6e07"
-        },
-        "ParameterizedActionPayload": {
-          "before": null,
-          "after": "17ad47daf4b7f2a075695da1f602f2563d4ab8fa5cf16164500883d11653c2b9"
-        },
-        "_AcceptedTransition": {
-          "before": null,
-          "after": "9d8f739d5750bf2b24cf68b594a4875e1de15f09fb7499a192d5109c5d3286b4"
-        },
-        "_AcceptedTransition.__init__": {
-          "before": null,
-          "after": "fe8d5028fad461786fe1194d1f555f6a91218fc229381f96a9aeacb8fa2f42d0"
-        },
-        "_AcceptedTransition.accepted_record_start": {
-          "before": null,
-          "after": "c91dfae9130762a1521950c92ebf024402e6adcaec8b7d6349e37749fc210ca7"
-        },
-        "_AcceptedTransition.accepted_record_stop": {
-          "before": null,
-          "after": "493c52e92c5f1b7caf36a2c435564b9c7108ebfe72824881a3400bed9038f9df"
-        },
-        "_AcceptedTransition.actor_id": {
-          "before": null,
-          "after": "333380e616030b44dbbb4727aea5d71f2d45167c3b4def253640380bb7368f99"
-        },
-        "_AcceptedTransition.authoritative_record_id": {
-          "before": null,
-          "after": "57be5ae4705ebd3705d61bc2ec06d4a18043d65b3f2d83923cba39a0b71abec5"
-        },
-        "_AcceptedTransition.authoritative_request_id": {
-          "before": null,
-          "after": "87e797fdb0d08be8cd2132650867283d95fb05c1ce57b44bd1a052371a685e49"
-        },
-        "_AcceptedTransition.content_hash": {
-          "before": null,
-          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
-        },
-        "_AcceptedTransition.perspective_player_id": {
-          "before": null,
-          "after": "ab2cfc7b2361ce6bc5748c913238b63be178e87ce4d4b220f9c2187b52e1a560"
-        },
-        "_AcceptedTransition.to_payload": {
-          "before": null,
-          "after": "d2ba227c23c490f5d010872cfb5d053b4f90c61e3d9fa9b76b38cea712dea24c"
-        },
-        "_reproduce": {
-          "before": null,
-          "after": "8202a1d7ce1077f9fc0382656507fa2bf39ea292a2bfee7b92a22b2abe550594"
-        },
-        "_require_exact": {
-          "before": null,
-          "after": "73000076ceb7f5e65800933309044d04227109a2a47f0a287c93f2cd7be20135"
+        "_require_link": {
+          "before": "737ec525d2d3f61c6080ff79e1d50eb655d83592996b96d73b70b43e1ced6df0",
+          "after": "f01f87e0e4e46e6a5f1affe623a7c213415562dfbbde8846a2e859865aaac4ff"
         }
       }
     },
     "tests/infrastructure/adapters/test_finite_candidates.py": {
-      "before_sha256": "06b0ce55d6a8c5492d54c6920725ea092615f4240e406f4061dd1d244eeba4a7",
-      "after_sha256": "40ac1bcbb3c971595e4c9fcf508969e9d48375ec60be69ed6f8350c641224f04",
+      "before_sha256": "40ac1bcbb3c971595e4c9fcf508969e9d48375ec60be69ed6f8350c641224f04",
+      "after_sha256": "46f9947f09bea4cb3dbbb0e665f488031c2565f2a3dad2097dd840627f0e2abb",
       "owners": {
-        "@module": {
-          "before": "4852743a22980066472b3c42dffd3ebeda0aa508faf34337ba5ce48600b74005",
-          "after": "e7402ad4f38882dc0074b1a9e32a2012606f2b35201173a81e88e81641b2c8d6"
-        },
-        "test_recorded_invalid_movement_is_outside_parameterized_admission_scope": {
-          "before": null,
-          "after": "e59ff83b460d34361863d76067419b0948e4efe8936b9faee54e99c4c8a80ec5"
+        "test_named_target_direct_construction_requires_typed_entries": {
+          "before": "75c2bfdb291a9ac13eb0b432e70b9e4e11592491e2872285a58e1bde5952496a",
+          "after": "8a7aebf517dcca617a2f954580a56974158d2cdf3c728262eabe4d3e3b843797"
         }
       }
     },
     "tests/infrastructure/adapters/test_training_admission.py": {
-      "before_sha256": "7181b401f29f9b95be447efa2ebe90fec77e5cabf7286c07fa3ee4f3017723d1",
-      "after_sha256": "af08ae28fbc5356d1bfa8afd0f948b2b3acddf2768f8e2004e1a2ef6825c1ea5",
+      "before_sha256": "af08ae28fbc5356d1bfa8afd0f948b2b3acddf2768f8e2004e1a2ef6825c1ea5",
+      "after_sha256": "26ec230eb248fb840bae22117c1a802bfd209578f906895ae4e0e182aea5643c",
       "owners": {
         "@module": {
-          "before": "6bd142667fc184363e6fd2a54a055f50145f2799094458f1709ff9c6f4fbbe71",
-          "after": "c37225ee65f5002505c1ab83c83a69dceef8867779f38f4c5b63a59ff9ff7973"
+          "before": "c37225ee65f5002505c1ab83c83a69dceef8867779f38f4c5b63a59ff9ff7973",
+          "after": "fd24777dd1fc57b59d8f1f5a6ec00e433d836e2ac8e8f9e708b5c0ee993f346d"
+        },
+        "AdmissionCase": {
+          "before": "202f6095f6645e9cb079ead563034e321ff70a84e788ba1a5da0e9f4ddf311fb",
+          "after": null
+        },
+        "AdmissionCase.episode": {
+          "before": "95412858f7f5d255e678ca32c7bc4bc4e5103a749561270357dc3df926ada9dc",
+          "after": null
         },
         "AdmissionCase.transition": {
-          "before": "436ea5f0a6d68cd422408f11008627b067595e2665cdf37af12b07fd63477b30",
+          "before": "4b75d17ddb70d7cb343e369278c8dfd31a38e0c2aae8df4e764c1749c4d7f171",
+          "after": null
+        },
+        "DeploymentCase": {
+          "before": "38c73996a3f28703abc3398a29259bf7fac9f0b59866092bd8d4a8c173dd1ceb",
+          "after": null
+        },
+        "DeploymentCase.episode": {
+          "before": "fb24e359af259cf1e03cb7545c9d5dd3c80fbe6c9b19c5e1100872996226a183",
+          "after": null
+        },
+        "DeploymentCase.proposal_transition": {
+          "before": "a43fe4776c027052b05fbbe2af8a84f718c5cb11c737ac9bc5815c730f4a81e7",
+          "after": null
+        },
+        "TerminalProof": {
+          "before": "3d6d2e45b8023fafd58450c63be5fbcf82d774cface0beaecd1b142b137d573f",
+          "after": null
+        },
+        "_admit": {
+          "before": "df7dd51e05be1157d120ec049125b82b5fa46934703907076c5664c1618df4b5",
+          "after": null
+        },
+        "_automatic_attack_case": {
+          "before": "41ba03bdad426291437c229e9b0c7789ed0c734589a2e10bbc4ca1e47d0df4a5",
+          "after": null
+        },
+        "_local_target": {
+          "before": "6593488fe15b27567880da7f1950da32fcca50b236c28449eb32640834b94b26",
+          "after": null
+        },
+        "_row": {
+          "before": "5520746f32b0932ef90b61186f13bf134acf5a1d8cb6245cf571fc6a9e3a70e5",
+          "after": null
+        },
+        "_step": {
+          "before": "d6b56bde65a33bc31ff8c2c71d7d43621403b48f3ddf3276cc50fecba688295d",
+          "after": null
+        },
+        "_target": {
+          "before": "4e350ea033bd1e4f755106ae16efa0400b25d9d8b015ab17a1bbf82d855947bd",
+          "after": null
+        },
+        "continuing": {
+          "before": "214338fb1b1733ce5cc2e2e16b5fe0dfb15915777217a303c71b2e9d5702c6b2",
+          "after": null
+        },
+        "deployment": {
+          "before": "8b80de3ac2903423103c1aa41fc75b89b123b94214f9a279cc184d87383edb31",
+          "after": null
+        },
+        "terminal": {
+          "before": "0769c86d8dbbcfedde5850f9e8145c74e66468d82f964185dd74005f48d0efc5",
+          "after": null
+        },
+        "terminal_proofs": {
+          "before": "4f8ca1f4b838414e2bd1062836ea20a7ce88e21c47479ae4d9410d7e3e5ae1d2",
+          "after": null
+        },
+        "test_accepted_deployment_row_roundtrips_without_changing_legacy_row": {
+          "before": null,
+          "after": "289c1004a69fe289b2e24be6d57f8fcaf48714d08f41fd01be3242f1356d2f08"
+        },
+        "test_deployment_candidate_is_detached_actor_view_evidence": {
+          "before": null,
+          "after": "19d9326827c6b081da7b7b7def82c3a3e6ceb71e623bb080179f734ea9b031a3"
+        },
+        "test_deployment_candidate_loader_rejects_drift": {
+          "before": null,
+          "after": "394075fe5178f0468740a83c4143846c64fd333411090181092aad6e926e2b8b"
+        },
+        "test_deployment_candidate_rejects_untyped_context": {
+          "before": null,
+          "after": "33139b751566ee43720cbde27f920b0d9fb61c2f762c425d875b7c604eb327ea"
+        },
+        "test_deployment_missing_target_is_excluded_and_finite_targets_join_mixed_episode": {
+          "before": null,
+          "after": "7a8c0a2c4e62fc90fb17a68c652386957d9db1ce7e28be91651bf28a91444b3c"
+        },
+        "test_deployment_named_and_admitted_targets_roundtrip": {
+          "before": null,
+          "after": "2e20ebfe945f0a08776b5951228484671f134e29261e13fd3eb3788811a1c848"
+        },
+        "test_deployment_row_mask_rejects_numeric_booleans": {
+          "before": null,
+          "after": "a9bb95783c084d4e875805876620e233b411842401a56752ec86991bd283fb79"
+        },
+        "test_deployment_row_target_survives_ordinary_terminal_continuation": {
+          "before": null,
+          "after": "78e3b8cac672171b2226e57d624a296fa546d6fe884477e6a51d4dd86a47f591"
+        },
+        "test_deployment_target_admission_rejects_wrong_joins": {
+          "before": null,
+          "after": "9b90cb7839c25c15a97ae01cccc32742a648bf8af0c81b51e7c48d26c9d4b46e"
+        },
+        "test_deployment_training_loader_checks_complete_evidence": {
+          "before": null,
+          "after": "e0934d24db33d550456d5a1442cff1061efb588382c86dcec8f9aa97f58a9d57"
+        },
+        "test_deployment_training_row_rejects_drift": {
+          "before": null,
+          "after": "cad0e51671f1899147161a742d4a5ed2f8bf5bbc08d6254f5787dd3a0f41cb04"
+        }
+      }
+    },
+    "tests/shared/ai_training_admission_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "cda58ef6708eeb8ecd83ae4917cf5cb6f6b0f288e90aa501c0ee14688a3c23ed",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "51aaaad977d70db68adb47792fb152dbffcb2db03bd8f1d0625df339c66aacb9"
+        },
+        "AdmissionCase": {
+          "before": null,
+          "after": "202f6095f6645e9cb079ead563034e321ff70a84e788ba1a5da0e9f4ddf311fb"
+        },
+        "AdmissionCase.episode": {
+          "before": null,
+          "after": "95412858f7f5d255e678ca32c7bc4bc4e5103a749561270357dc3df926ada9dc"
+        },
+        "AdmissionCase.transition": {
+          "before": null,
           "after": "4b75d17ddb70d7cb343e369278c8dfd31a38e0c2aae8df4e764c1749c4d7f171"
         },
         "DeploymentCase": {
@@ -506,33 +578,65 @@
           "before": null,
           "after": "a43fe4776c027052b05fbbe2af8a84f718c5cb11c737ac9bc5815c730f4a81e7"
         },
+        "DeploymentTrainingProof": {
+          "before": null,
+          "after": "d0aec6dd26988fa783ceeb6acb6f83c4475154462bb3968674ae57c6d1e08d5f"
+        },
+        "DeploymentTrainingProof.linked": {
+          "before": null,
+          "after": "c7d8a039cdc53612c62a2b124059dda9ce1c0660db943a421a79f8eb4c58639e"
+        },
+        "TerminalProof": {
+          "before": null,
+          "after": "3d6d2e45b8023fafd58450c63be5fbcf82d774cface0beaecd1b142b137d573f"
+        },
+        "_row": {
+          "before": null,
+          "after": "5520746f32b0932ef90b61186f13bf134acf5a1d8cb6245cf571fc6a9e3a70e5"
+        },
+        "admit_target": {
+          "before": null,
+          "after": "f15022848565fe781b31aa43073fcb8d098cc08cbe9fef42235987479307e338"
+        },
+        "automatic_attack_case": {
+          "before": null,
+          "after": "e22763562854d6081dcd5554f202fe77247b0dfd1b84b53e4bf297f8eff03f38"
+        },
+        "continuing": {
+          "before": null,
+          "after": "4d6c6851c8d347f62079a37eddd500d9ef44f4d7c15ec16f4e492fca34ef8f05"
+        },
         "deployment": {
           "before": null,
-          "after": "8b80de3ac2903423103c1aa41fc75b89b123b94214f9a279cc184d87383edb31"
+          "after": "1bd533ff1903f94e261b4c9c8898f22af11d10587c1f9c1337e7e4fe163abcf2"
         },
-        "test_mixed_episode_reaches_exact_local_reference_horizon": {
+        "deployment_row": {
           "before": null,
-          "after": "3cffbfe8df8baca81cd24ccd0ec5f4a843679e8a6acb0a9962f30b71d2e3d80b"
+          "after": "3df7fb3ccc594a5e90f413ae316c03e8114f9036970ed071def6b6e36b1e122d"
         },
-        "test_mixed_episode_rejects_discontinuous_or_drifted_evidence": {
+        "deployment_training": {
           "before": null,
-          "after": "41d20f4bb55a2952ff3b588829f209d3d04a2b8c94d4aee06cb34ada25077d6c"
+          "after": "e6a14787dd7335dfad809d3151339f81cce7ed7e86afc061883a467e296379e2"
         },
-        "test_parameterized_loader_recomputes_complete_evidence": {
+        "local_target": {
           "before": null,
-          "after": "17959c5a6d8f8e7a615de7b06a82b1ca3a8b777942d7e0ff3bc2fe04c59ed1fa"
+          "after": "38c82e594ab72c520b852ff9dd9ad81ce1fbd2ad761491bb3426a81b134d3ea2"
         },
-        "test_parameterized_transition_rejects_drift": {
+        "step": {
           "before": null,
-          "after": "34ee5a77a876fa7ea57898fedc1206b416bf2d2134ea4af428feda0dcd814f87"
+          "after": "17be37c7237eb978d0b421bf614b3ca29640de3e5452ce54fabc5463a093d298"
         },
-        "test_parameterized_transition_reproduces_ordinary_viewer_action": {
+        "target": {
           "before": null,
-          "after": "2e83924b7580bb3d49f4cfc9cb86d40f992ae87d637437a223865c41ae0523d2"
+          "after": "cca92c1e75ee8a326d4e2f93917edbc983a948c0200f7f0d8114254af9b0111e"
         },
-        "test_rule_rejected_deployment_preserves_request_and_allows_ordinary_retry": {
+        "terminal": {
           "before": null,
-          "after": "69a9ca6fd93f1aac115e914009e2f98a203cf2a1a364fb4f77206f25169cc1fc"
+          "after": "0769c86d8dbbcfedde5850f9e8145c74e66468d82f964185dd74005f48d0efc5"
+        },
+        "terminal_proofs": {
+          "before": null,
+          "after": "4f8ca1f4b838414e2bd1062836ea20a7ce88e21c47479ae4d9410d7e3e5ae1d2"
         }
       }
     }
@@ -544,9 +648,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "measured_workload",
@@ -554,9 +658,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "measured_workload",
@@ -564,9 +668,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "measured_workload",
@@ -574,9 +678,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "measured_workload",
@@ -584,9 +688,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "measured_workload",
@@ -594,9 +698,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "measured_workload",
@@ -604,9 +708,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "measured_workload",
@@ -614,9 +718,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "measured_workload",
@@ -624,9 +728,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "measured_workload",
@@ -634,9 +738,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "measured_workload",
@@ -644,9 +748,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "measured_workload",
@@ -654,9 +758,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "measured_workload",
@@ -664,9 +768,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -674,9 +778,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -684,9 +788,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -694,9 +798,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -704,9 +808,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -714,9 +818,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -724,9 +828,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -734,9 +838,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -744,9 +848,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -754,46 +858,71 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Refresh only current active-file byte identities for the two changed admission regression modules. Preserve historical native inventory, all test selection controls and the exact 260 deferred quality cases unchanged.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "source-record",
-        "order108-terrain-semantics",
-        "order109-unit-control-semantics",
-        "order110-action-battle-shock-semantics"
+        "source-record"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "src/warhammer40k_core/ai/deployment_candidates.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "deployment-candidate-row-linkage"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "src/warhammer40k_core/ai/parameterized_training.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "deployment-candidate-row-linkage"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "src/warhammer40k_core/ai/training_admission.py": {
       "category": "serialization_or_replay_work",
@@ -801,43 +930,54 @@
         "finite-episode-target-admission"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
-    "src/warhammer40k_core/ai/training_transitions.py": {
+    "src/warhammer40k_core/ai/training_targets.py": {
       "category": "serialization_or_replay_work",
       "operations": [
-        "finite-accepted-transition-linkage"
+        "named-training-targets"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "tests/infrastructure/adapters/test_finite_candidates.py": {
       "category": "measured_workload",
       "operations": [
-        "finite-accepted-transition-linkage",
+        "player-policy-boundary",
         "finite-training-candidate-linkage",
         "named-training-targets",
-        "player-policy-boundary",
-        "semantic-finite-observations"
+        "semantic-finite-observations",
+        "finite-accepted-transition-linkage"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     },
     "tests/infrastructure/adapters/test_training_admission.py": {
       "category": "measured_workload",
       "operations": [
-        "finite-episode-target-admission"
+        "finite-episode-target-admission",
+        "deployment-candidate-row-linkage"
       ],
       "selected_families": [],
-      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
-      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
-      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
+    },
+    "tests/shared/ai_training_admission_helpers.py": {
+      "category": "measured_workload",
+      "operations": [
+        "deployment-candidate-row-linkage"
+      ],
+      "selected_families": [],
+      "rationale": "Record one immutable actor-view deployment-placement candidate and join its singleton training row and named target to an ordinary accepted transition and mixed episode. Preserve finite v1 payload meanings; refresh generated identities and authentic scheduling evidence as required.",
+      "source_obligation": "Require exact actor/view/request/proposal equality, complete row hash and singleton true mask, reproduced accepted deployment record, strict source/reward compatibility and the admitted endpoint/horizon. Candidate evidence alone never certifies acceptance, alternate-candidate coverage or dataset eligibility.",
+      "unchanged_work": "No engine legality or mutation, adapter path, live RNG, replay algorithm, cache, dependency or benchmark driver changes. These offline evidence owners map to no detailed benchmark family. Current serial smoke, live semantic/work controls and all covered behavior, quality, type and review gates remain required. No full-game or performance improvement is claimed."
     }
   },
   "milestone": "ordinary",
