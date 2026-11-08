@@ -331,6 +331,13 @@ That later run failed; it is not a passing profile. Its 277 failed or unreported
 cases retained authentic older measurements. The exact derivation and timing hashes
 are recorded in `ci/test_shards/case-partitions.json` under `evidence.weight_refresh`.
 
+Within each worker's initial duration-balanced bucket, cases from the same module
+run together so pytest can reuse module-scoped fixtures. Worker assignments and
+capacities remain unchanged. Modules start in descending order of their longest
+case, with descending case costs inside each module and original collection order
+breaking ties. Later work stealing can still split a module group. This scheduling
+change preserves every case and does not certify the fourteen-minute CI goal.
+
 Session startup, source-index setup, reporting and runner queues are assessed
 separately. Weight totals are planning inputs, not job wall times or proof of the
 temporary fourteen-minute CI goal. Existing observation-based estimates do not

@@ -5,8 +5,9 @@ separates the implemented contracts below from broader proposed candidate genera
 information-safe simulation, experiments and full-game qualification.
 
 Exact player-scoped routing, finite candidate sets, finite training linkage,
-bounded deployment translations and fork validation, accepted deployment candidate/row
-linkage (singleton and validated set), named targets and Phase 19E contracts exist;
+bounded deployment translations, fork validation and accepted-only ranking,
+deployment candidate/row linkage (singleton and validated set), named targets
+and Phase 19E contracts exist;
 autonomous battle policies, training and full-game qualification are not established.
 The historical grouped Phase 19/20 row is not an assertion that those foundations
 are absent, nor an individual mapping of every 19A-19F subphase.
@@ -418,7 +419,7 @@ full-game workload qualification.
 This adds no actor-facing or wire shape: ordinary deployment submission,
 engine validation, replay and viewer redaction remain governed by
 [ADAPTER_DECISION_CONTRACT.md](ADAPTER_DECISION_CONTRACT.md). Candidate
-ranking, other proposal families, semantic deployment encoders,
+tactical/learned ranking, other proposal families, semantic deployment encoders,
 broader references, dataset admission and runner progress accounting remain open.
 
 ## Bounded deployment alternatives and validation
@@ -470,8 +471,8 @@ the ordinary viewer adapter and revalidates legality. Validation alone proves no
 executed live transition or training eligibility. The existing accepted-singleton
 row contract, `(True,)` mask, slot zero and legacy `TrainingRow` are unchanged.
 The separate validated-set training companion below binds these alternatives to
-accepted evidence. Ranking, other proposal families and a generic information-safe
-simulation API remain follow-ups.
+accepted evidence. Accepted-only ranking is described below; other proposal families
+and a generic information-safe simulation API remain follow-ups.
 
 The ordinary compact setup regressions in
 `tests/infrastructure/adapters/test_deployment_candidates.py` exercise distinct
@@ -479,6 +480,62 @@ accepted positions, internal invalid proposals, drift, budgets, duplicates,
 hidden-history/private-RNG isolation, immutable roundtrips and actual selection/commit/save/load/
 replay. They establish this bounded deployment path, not faction or full-game
 qualification.
+
+## Accepted-only deployment ranking
+
+`ai.deployment_candidate_ranking.RankedDeploymentCandidates.rank(...)` is the
+operator entry point for a caller-supplied `DeploymentCandidateRanker`. It takes
+a typed validation receipt, actor context, current local session, ranker identity
+and JSON configuration. Before invoking the ranker it checks the receipt's actor
+binding and exact live checkpoint. The ranker receives only a newly detached
+`PlayerDecisionContext` and a tuple of accepted `DeploymentCandidatePayload`
+objects in their original generated order. Rejected and unvalidated proposals,
+generator budgets, the full generated-set hash, validation receipt/diagnostics,
+checkpoint commitments and the session never enter its arguments.
+
+The accepted subset is the deliberate engine-validation trust boundary; its
+membership can reveal legality. This API does not claim to hide differences in
+legality from a player choosing a legal action. With the same actor context and
+accepted payloads, hidden-only work and private future RNG cannot change ranking
+inputs. Candidate IDs remain opaque bindings rather than semantic features. As
+with `PlayerPolicy`, this is a cooperative Python interface, not a sandbox against
+code that independently captures authority in a closure.
+
+A ranker returns a tuple of `DeploymentCandidateScore(candidate_id, value)` entries
+covering every accepted ID exactly once. Only finite integer/float values are
+accepted; booleans, nonfinite values, overflow and malformed/missing/extraneous/
+duplicate scores fail explicitly. Integer scores retain their exact value for
+comparison and JSON evidence; the existing finite float-conversion check remains
+the admission range bound. Mixed integer/float comparisons do not coerce integer
+scores to floats. Higher scores win. Equal scores select the
+first accepted candidate in original generated order, independent of returned
+score ordering, under `first-generated-accepted-v1`. No fallback choice is made.
+The live checkpoint is checked again after the callback and when `select` returns
+the ordinary bound `PolicyAction`; selection also requires the original choice
+seed. The caller still commits through the ordinary viewer submission, with engine
+validation and mutation. The ranking operation itself submits no live action.
+
+The independent **operator-only** `deployment-candidate-ranking-v1` result retains
+the validation receipt, hashes of that receipt and complete generated set, a hash
+of the actual actor inputs, choice seed, declared ranker ID/configuration, scores
+normalized into generated order, selected ID and tie rule. Its returned payloads
+are detached. `from_payload` requires the same typed validation evidence and
+reruns the supplied ranker against the current checkpoint, then compares every
+field. Loading a serialized validation receipt remains the existing separate
+engine-reproduction step. Ranker identity/configuration are caller declarations,
+not proof of model weights or deterministic implementation; nondeterministic output
+fails reproduction. The result certifies a bounded ranking, not an executed
+transition, useful tactical alternatives or a learned policy.
+
+Focused tests exercise a genuine non-first accepted selection and ordinary commit,
+save/load and exact replay; tie ordering; malformed scores and evidence drift;
+detached input mutation; hidden-work/private-RNG noninterference; and checkpoint
+drift before and during callbacks. Existing validated-set training linkage accepts
+the resulting chosen action through its unchanged exact transition checks. No
+training schema, runner route, proposal payload or adapter wire contract changes:
+[ADAPTER_DECISION_CONTRACT.md](ADAPTER_DECISION_CONTRACT.md) already covers this
+same deployment proposal and ordinary submission path. Tactical/learned rankers,
+other proposal families, broader references and dataset admission remain follow-ups.
 
 ## Validated deployment-set training linkage
 
@@ -516,8 +573,9 @@ validation diagnostics and authoritative records never enter actor features.
 `LinkedTrainingTarget` and `AdmittedTrainingTarget` accept this separate link in
 mixed episodes using the same strict source, perspective, transition and exact
 endpoint-horizon checks as singleton deployment rows. Only the executed selected
-transition receives its target. No learner, ranking policy, dataset eligibility,
-new local reference calculator or runner accounting is introduced. Existing
+transition receives its target. The separate ranking boundary above can select
+that action; this link adds no learner, dataset eligibility, new local reference
+calculator or runner accounting. Existing
 adapter decisions, wire schemas and engine mutation/replay remain covered by
 [ADAPTER_DECISION_CONTRACT.md](ADAPTER_DECISION_CONTRACT.md).
 

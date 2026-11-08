@@ -612,7 +612,7 @@ def _literal_partition_nodes(root: Path) -> tuple[str, ...]:
 def duration_worksteal_order(
     nodeids: tuple[str, ...], *, workers: int, selector_seconds: dict[str, float]
 ) -> tuple[int, ...]:
-    """Balance measured costs across xdist's actual consecutive initial chunks."""
+    """Balance initial worksteal chunks, then retain module fixtures within each."""
     if type(workers) is not int or workers < 1 or len(nodeids) != len(set(nodeids)):
         raise SystemExit("Duration dispatch requires positive workers and unique nodes.")
     if not isinstance(selector_seconds, dict):
@@ -646,6 +646,14 @@ def duration_worksteal_order(
         )
         buckets[worker].append(index)
         totals[worker] += costs[index]
+    for bucket in buckets:
+        modules: dict[str, list[int]] = {}
+        # Buckets already have descending costs and original-index ties. First
+        # occurrence prioritizes each module's longest case and keeps that case
+        # first; grouping changes neither worker membership nor capacity.
+        for index in bucket:
+            modules.setdefault(nodeids[index].split("::", 1)[0], []).append(index)
+        bucket[:] = [index for group in modules.values() for index in group]
     return tuple(index for bucket in buckets for index in bucket)
 
 

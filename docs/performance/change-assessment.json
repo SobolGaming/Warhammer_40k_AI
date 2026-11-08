@@ -1,377 +1,453 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "5efa44633331cd0c3a11f20a33f6451f214d3370",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a74a199c7ceb83a5cffd83831039d92c7a277381623d2f1e83f14e7943bc1bed",
-  "operation_map_sha256": "10d7966e40898c329f1fff084a67e64026e92d0444f9b21344c1b0403530a040",
+  "base": "b20ef88d2ef5ab87500ccc1f13d61aeb7c29f59b",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b5aa998fb3e387e794b2f1482ae12cad55f68059461a88617fdb9b5bf40fe96f",
+  "operation_map_sha256": "609ab19b1a15b2d1560c81f7c484482b06d547c426c2b690a5b78f92e20fcc9b",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "dd2fd1de0dedac61aa8eb37be21468303d57f3be7ea86d03fc8f3661fa2a393a",
-      "after_sha256": "23f14e7d0459328eb61c9d5a0bb25bfc3a73e3de1cd442925926ee954ba98f39",
+    "README.md": {
+      "before_sha256": "8dfbe7f6072c9ea7892bf03031310a8fbd934ff70c0c1228078ae73e3cd8d2b2",
+      "after_sha256": "a341c31eb1bc425edb92824001889119ef4bc31b56bfb46190504f5fc84b4c4e",
       "owners": {
         "@document": {
-          "before": "dd2fd1de0dedac61aa8eb37be21468303d57f3be7ea86d03fc8f3661fa2a393a",
-          "after": "23f14e7d0459328eb61c9d5a0bb25bfc3a73e3de1cd442925926ee954ba98f39"
+          "before": "8dfbe7f6072c9ea7892bf03031310a8fbd934ff70c0c1228078ae73e3cd8d2b2",
+          "after": "a341c31eb1bc425edb92824001889119ef4bc31b56bfb46190504f5fc84b4c4e"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "23f14e7d0459328eb61c9d5a0bb25bfc3a73e3de1cd442925926ee954ba98f39",
+      "after_sha256": "a8f3993ca3e0e5d67f68f99fff2926904b7887901a9db49bb5dbae57c07a63c6",
+      "owners": {
+        "@document": {
+          "before": "23f14e7d0459328eb61c9d5a0bb25bfc3a73e3de1cd442925926ee954ba98f39",
+          "after": "a8f3993ca3e0e5d67f68f99fff2926904b7887901a9db49bb5dbae57c07a63c6"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "f8408ebe9ea838682331a243f40b5e45b2adac33f586696610ebde7fbc0d8fbb",
-      "after_sha256": "dc0bf792a278a699a6b01ea01e066240be323c65f5fc0dbda213812027a8989b",
+      "before_sha256": "dc0bf792a278a699a6b01ea01e066240be323c65f5fc0dbda213812027a8989b",
+      "after_sha256": "22fc21e0a63211b097de09f65ace21776e3f862a2442e41ef351a319df7f3e8f",
       "owners": {
         "@document": {
-          "before": "f8408ebe9ea838682331a243f40b5e45b2adac33f586696610ebde7fbc0d8fbb",
-          "after": "dc0bf792a278a699a6b01ea01e066240be323c65f5fc0dbda213812027a8989b"
+          "before": "dc0bf792a278a699a6b01ea01e066240be323c65f5fc0dbda213812027a8989b",
+          "after": "22fc21e0a63211b097de09f65ace21776e3f862a2442e41ef351a319df7f3e8f"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "ff2ce54ed1bfe6a7a5f6d31ec82d9caa561cb889bd8da5b2facd8c87bd9e0060",
-      "after_sha256": "3422bf622448ba714e29da669b0efaf55a3131480b212746dcfa8867a6c1cfd7",
+      "before_sha256": "3422bf622448ba714e29da669b0efaf55a3131480b212746dcfa8867a6c1cfd7",
+      "after_sha256": "c259344f32c10b50142ffbd6fc28a80280e8c9e2f13a0fdd247853236c28a3b1",
       "owners": {
         "@document": {
-          "before": "ff2ce54ed1bfe6a7a5f6d31ec82d9caa561cb889bd8da5b2facd8c87bd9e0060",
-          "after": "3422bf622448ba714e29da669b0efaf55a3131480b212746dcfa8867a6c1cfd7"
+          "before": "3422bf622448ba714e29da669b0efaf55a3131480b212746dcfa8867a6c1cfd7",
+          "after": "c259344f32c10b50142ffbd6fc28a80280e8c9e2f13a0fdd247853236c28a3b1"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "0e966ab0c1850b1dbeb0b7de54b156618e9c1a46e094fb2f71716cedd365640e",
-      "after_sha256": "fca4cf55436d1e4561864cebcbb26d893458caa979530312692651506589c987",
+      "before_sha256": "fca4cf55436d1e4561864cebcbb26d893458caa979530312692651506589c987",
+      "after_sha256": "0128e335b1b8ee9106051a094692ddddf458c00434e4417700273c45ad80585b",
       "owners": {
         "@document": {
-          "before": "0e966ab0c1850b1dbeb0b7de54b156618e9c1a46e094fb2f71716cedd365640e",
-          "after": "fca4cf55436d1e4561864cebcbb26d893458caa979530312692651506589c987"
+          "before": "fca4cf55436d1e4561864cebcbb26d893458caa979530312692651506589c987",
+          "after": "0128e335b1b8ee9106051a094692ddddf458c00434e4417700273c45ad80585b"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "399c405570810d40db7f0429ecd79df66148a0bc54eaced7e6c2d587ce12a5ae",
-      "after_sha256": "da4fe3dab6e38c6977c84f5cce84e4891d2ef8096db8bfc517df692382594c19",
+      "before_sha256": "da4fe3dab6e38c6977c84f5cce84e4891d2ef8096db8bfc517df692382594c19",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
       "owners": {
         "@document": {
-          "before": "399c405570810d40db7f0429ecd79df66148a0bc54eaced7e6c2d587ce12a5ae",
-          "after": "da4fe3dab6e38c6977c84f5cce84e4891d2ef8096db8bfc517df692382594c19"
+          "before": "da4fe3dab6e38c6977c84f5cce84e4891d2ef8096db8bfc517df692382594c19",
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "cc3a87d1e80c190f78b02baf398a2a9ac0cb7d9f2a2b7526836df0a6c5949bbd",
-      "after_sha256": "81bb6045eede3fc0cafcd76d8d4b0f1c6fb8b9e1c565689e4e00022ef9b9a3f7",
+      "before_sha256": "81bb6045eede3fc0cafcd76d8d4b0f1c6fb8b9e1c565689e4e00022ef9b9a3f7",
+      "after_sha256": "d69b988abd9ba8abeae53c5a02d0ce911d337198d793a2bd530d0471942bc01c",
       "owners": {
         "@document": {
-          "before": "cc3a87d1e80c190f78b02baf398a2a9ac0cb7d9f2a2b7526836df0a6c5949bbd",
-          "after": "81bb6045eede3fc0cafcd76d8d4b0f1c6fb8b9e1c565689e4e00022ef9b9a3f7"
+          "before": "81bb6045eede3fc0cafcd76d8d4b0f1c6fb8b9e1c565689e4e00022ef9b9a3f7",
+          "after": "d69b988abd9ba8abeae53c5a02d0ce911d337198d793a2bd530d0471942bc01c"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "9d8f3c178a53f6288998dbf5d65060a1998ad3af9aa0004e9827e2225e1494e9",
-      "after_sha256": "1174df5684308a4f56c8c85e265bd60d6168e8a2032aae37f2d6804088e63874",
+      "before_sha256": "1174df5684308a4f56c8c85e265bd60d6168e8a2032aae37f2d6804088e63874",
+      "after_sha256": "85f4173c6adb845693e20959795c94df67091ee7a5021c606ee0402a61dacb8b",
       "owners": {
         "@document": {
-          "before": "9d8f3c178a53f6288998dbf5d65060a1998ad3af9aa0004e9827e2225e1494e9",
-          "after": "1174df5684308a4f56c8c85e265bd60d6168e8a2032aae37f2d6804088e63874"
+          "before": "1174df5684308a4f56c8c85e265bd60d6168e8a2032aae37f2d6804088e63874",
+          "after": "85f4173c6adb845693e20959795c94df67091ee7a5021c606ee0402a61dacb8b"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "6c8fd6dd8169c13c3323428be50e2012ca370312645e92ec7011d657bf5843de",
-      "after_sha256": "b5c8f54d4633e61088c0975297559ade271065052b0de45bae047b685472abcd",
+      "before_sha256": "b5c8f54d4633e61088c0975297559ade271065052b0de45bae047b685472abcd",
+      "after_sha256": "dc17b0d48d683da7bd35cc3426ce0191b0f5dec455261056e68d6e9fd42a8921",
       "owners": {
         "@document": {
-          "before": "6c8fd6dd8169c13c3323428be50e2012ca370312645e92ec7011d657bf5843de",
-          "after": "b5c8f54d4633e61088c0975297559ade271065052b0de45bae047b685472abcd"
+          "before": "b5c8f54d4633e61088c0975297559ade271065052b0de45bae047b685472abcd",
+          "after": "dc17b0d48d683da7bd35cc3426ce0191b0f5dec455261056e68d6e9fd42a8921"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "c4d76aaeafc6197eb445f014b7202bdd0a65ef013afc7fa86855d47c39439635",
-      "after_sha256": "fec34e9ba21471c536ad6a0796f89bbf157685e78e158daf3a274f047e2e260c",
+      "before_sha256": "fec34e9ba21471c536ad6a0796f89bbf157685e78e158daf3a274f047e2e260c",
+      "after_sha256": "58567bfa1e07decde80fab91a980a1555cf4222af9f3211f998c7c43829cb54d",
       "owners": {
         "@document": {
-          "before": "c4d76aaeafc6197eb445f014b7202bdd0a65ef013afc7fa86855d47c39439635",
-          "after": "fec34e9ba21471c536ad6a0796f89bbf157685e78e158daf3a274f047e2e260c"
+          "before": "fec34e9ba21471c536ad6a0796f89bbf157685e78e158daf3a274f047e2e260c",
+          "after": "58567bfa1e07decde80fab91a980a1555cf4222af9f3211f998c7c43829cb54d"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "2580b18bb543e950d0020b6279fe06320549655cba652f52fffc7e980221e303",
-      "after_sha256": "b7c0be8c4eea2c6a2c00fe2bafd107c8c0b7b0cbf6bb21fe36884e61296c5edf",
+      "before_sha256": "b7c0be8c4eea2c6a2c00fe2bafd107c8c0b7b0cbf6bb21fe36884e61296c5edf",
+      "after_sha256": "fca6f8d79c34d1c9fbb3d40780d6e8322f6008383864ada3a468458581b2cf05",
       "owners": {
         "@document": {
-          "before": "2580b18bb543e950d0020b6279fe06320549655cba652f52fffc7e980221e303",
-          "after": "b7c0be8c4eea2c6a2c00fe2bafd107c8c0b7b0cbf6bb21fe36884e61296c5edf"
+          "before": "b7c0be8c4eea2c6a2c00fe2bafd107c8c0b7b0cbf6bb21fe36884e61296c5edf",
+          "after": "fca6f8d79c34d1c9fbb3d40780d6e8322f6008383864ada3a468458581b2cf05"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "82ec3df9a6ef3e8a1454cf21c9f3672e99c639bdc6e82a3a0a9adeed172fd215",
-      "after_sha256": "58f8a7ea2fe5f84d57fe60c1a77a0ca884435eb0b0ef96bd63e49abc051e317f",
+      "before_sha256": "58f8a7ea2fe5f84d57fe60c1a77a0ca884435eb0b0ef96bd63e49abc051e317f",
+      "after_sha256": "5f48795e320fea2e9fcb9bbcad7b88463570d30e5f6e5c4b34bfdabb8441c02f",
       "owners": {
         "@document": {
-          "before": "82ec3df9a6ef3e8a1454cf21c9f3672e99c639bdc6e82a3a0a9adeed172fd215",
-          "after": "58f8a7ea2fe5f84d57fe60c1a77a0ca884435eb0b0ef96bd63e49abc051e317f"
+          "before": "58f8a7ea2fe5f84d57fe60c1a77a0ca884435eb0b0ef96bd63e49abc051e317f",
+          "after": "5f48795e320fea2e9fcb9bbcad7b88463570d30e5f6e5c4b34bfdabb8441c02f"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "3916137f6da388ed619f65d7f0c782dec7803a792159e823a5781aedd41e35c0",
+      "owners": {
+        "@document": {
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "3916137f6da388ed619f65d7f0c782dec7803a792159e823a5781aedd41e35c0"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "e2f0e81de2c788137984ff365c0d4a8eb7265af2cff49b46d03e904f85365bbd",
-      "after_sha256": "c52e85cf8291ce3dc783c1809863bc488f906346dfa304836bfade0117961f45",
+      "before_sha256": "c52e85cf8291ce3dc783c1809863bc488f906346dfa304836bfade0117961f45",
+      "after_sha256": "75ccbf42a4e42b7e7da91b350dced5a1d47c962f8f0f589d54b4c7183ada647a",
       "owners": {
         "@document": {
-          "before": "e2f0e81de2c788137984ff365c0d4a8eb7265af2cff49b46d03e904f85365bbd",
-          "after": "c52e85cf8291ce3dc783c1809863bc488f906346dfa304836bfade0117961f45"
+          "before": "c52e85cf8291ce3dc783c1809863bc488f906346dfa304836bfade0117961f45",
+          "after": "75ccbf42a4e42b7e7da91b350dced5a1d47c962f8f0f589d54b4c7183ada647a"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "6aff32b647253b564e896765caf871837ef5ec6dba9cee609f17b29fca3fc294",
-      "after_sha256": "7d63b79088b1a3cffe4dd1486698a3232fdef95d408ac6494686ab889cc0bdb1",
+      "before_sha256": "7d63b79088b1a3cffe4dd1486698a3232fdef95d408ac6494686ab889cc0bdb1",
+      "after_sha256": "acfe8bf4e4c954e3d9bb12a8e2e13950389b4a82f92b773347ec92c974c0c99f",
       "owners": {
         "@document": {
-          "before": "6aff32b647253b564e896765caf871837ef5ec6dba9cee609f17b29fca3fc294",
-          "after": "7d63b79088b1a3cffe4dd1486698a3232fdef95d408ac6494686ab889cc0bdb1"
+          "before": "7d63b79088b1a3cffe4dd1486698a3232fdef95d408ac6494686ab889cc0bdb1",
+          "after": "acfe8bf4e4c954e3d9bb12a8e2e13950389b4a82f92b773347ec92c974c0c99f"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "9a8bf2690cd7b896f7ab2934af2456377b34380e3b8df67e2736799a365056a1",
-      "after_sha256": "5477f59ec24f310d2d760d1d4f64c641802ce4f3dfe2b3d51711e7d850378b57",
+      "before_sha256": "5477f59ec24f310d2d760d1d4f64c641802ce4f3dfe2b3d51711e7d850378b57",
+      "after_sha256": "3ef217a9c437575f784f831c05de434905e2b0788c80d9ec12d745036940af25",
       "owners": {
         "@document": {
-          "before": "9a8bf2690cd7b896f7ab2934af2456377b34380e3b8df67e2736799a365056a1",
-          "after": "5477f59ec24f310d2d760d1d4f64c641802ce4f3dfe2b3d51711e7d850378b57"
+          "before": "5477f59ec24f310d2d760d1d4f64c641802ce4f3dfe2b3d51711e7d850378b57",
+          "after": "3ef217a9c437575f784f831c05de434905e2b0788c80d9ec12d745036940af25"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "6defb38e692b146dd068bf595e99263b38ac22c1f1e1f39077e786961fde3aed",
-      "after_sha256": "db9a8f930913901274e252a65f0dd1fd07e1308e8e9c9e3707d3a581d199ac38",
+      "before_sha256": "db9a8f930913901274e252a65f0dd1fd07e1308e8e9c9e3707d3a581d199ac38",
+      "after_sha256": "adc46556ff6b608272b13bd5fa0f5397a9a212cc4defd153e13c9d7587c76ae5",
       "owners": {
         "@document": {
-          "before": "6defb38e692b146dd068bf595e99263b38ac22c1f1e1f39077e786961fde3aed",
-          "after": "db9a8f930913901274e252a65f0dd1fd07e1308e8e9c9e3707d3a581d199ac38"
+          "before": "db9a8f930913901274e252a65f0dd1fd07e1308e8e9c9e3707d3a581d199ac38",
+          "after": "adc46556ff6b608272b13bd5fa0f5397a9a212cc4defd153e13c9d7587c76ae5"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "df7d4acb29f4c0123673e69467b089248a837ef35014426aaa861b6433a82442",
-      "after_sha256": "bc098bf74c4e1a797a6176743e5cad22437a521762967c97cf8f2be3a20f7f4a",
+      "before_sha256": "bc098bf74c4e1a797a6176743e5cad22437a521762967c97cf8f2be3a20f7f4a",
+      "after_sha256": "8b61180588c6f1dc7564098c0bfe4c67b7b5a90120a8405c46ab86bf5f020218",
       "owners": {
         "@document": {
-          "before": "df7d4acb29f4c0123673e69467b089248a837ef35014426aaa861b6433a82442",
-          "after": "bc098bf74c4e1a797a6176743e5cad22437a521762967c97cf8f2be3a20f7f4a"
+          "before": "bc098bf74c4e1a797a6176743e5cad22437a521762967c97cf8f2be3a20f7f4a",
+          "after": "8b61180588c6f1dc7564098c0bfe4c67b7b5a90120a8405c46ab86bf5f020218"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "3d7836050a248306d70da1db5d9009d7d68f9e9fc3e26c0bca76e61f55d6f777",
-      "after_sha256": "74eb2223c39fd01020cc230f83d3fca7b66c549277687ffb17af37fe5758092e",
+      "before_sha256": "74eb2223c39fd01020cc230f83d3fca7b66c549277687ffb17af37fe5758092e",
+      "after_sha256": "0d1bca868b420ca9682799d9667ed75ba845e825198fee886d42a5ba18b6bb9b",
       "owners": {
         "@document": {
-          "before": "3d7836050a248306d70da1db5d9009d7d68f9e9fc3e26c0bca76e61f55d6f777",
-          "after": "74eb2223c39fd01020cc230f83d3fca7b66c549277687ffb17af37fe5758092e"
+          "before": "74eb2223c39fd01020cc230f83d3fca7b66c549277687ffb17af37fe5758092e",
+          "after": "0d1bca868b420ca9682799d9667ed75ba845e825198fee886d42a5ba18b6bb9b"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "36d470cf6c4a3ea16485276f43cde10295865ab216d849a2ad0bad7440bd8ca9",
-      "after_sha256": "c71c321e55ea193fd64c5d1d652f6ae5a44436ba9f101fba206d0fbf6b57a153",
+      "before_sha256": "c71c321e55ea193fd64c5d1d652f6ae5a44436ba9f101fba206d0fbf6b57a153",
+      "after_sha256": "b2a998de6d90ee6bf74a03ab1e6198a58fa507e5d83df482960da796f7fc85ba",
       "owners": {
         "@document": {
-          "before": "36d470cf6c4a3ea16485276f43cde10295865ab216d849a2ad0bad7440bd8ca9",
-          "after": "c71c321e55ea193fd64c5d1d652f6ae5a44436ba9f101fba206d0fbf6b57a153"
+          "before": "c71c321e55ea193fd64c5d1d652f6ae5a44436ba9f101fba206d0fbf6b57a153",
+          "after": "b2a998de6d90ee6bf74a03ab1e6198a58fa507e5d83df482960da796f7fc85ba"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "d58a69030cd55ff29be207ea80b174e236900337f5fa139c32a5448ac5cb9898",
-      "after_sha256": "701aa129675457b4f0ca5b609956987e7b6374887ddf35f6d83522e3cfec1402",
+      "before_sha256": "701aa129675457b4f0ca5b609956987e7b6374887ddf35f6d83522e3cfec1402",
+      "after_sha256": "e0c758e6189e7310f090d283ea23228fb515a393340f288ef708229e0304bfb5",
       "owners": {
         "@document": {
-          "before": "d58a69030cd55ff29be207ea80b174e236900337f5fa139c32a5448ac5cb9898",
-          "after": "701aa129675457b4f0ca5b609956987e7b6374887ddf35f6d83522e3cfec1402"
+          "before": "701aa129675457b4f0ca5b609956987e7b6374887ddf35f6d83522e3cfec1402",
+          "after": "e0c758e6189e7310f090d283ea23228fb515a393340f288ef708229e0304bfb5"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "18329adeca4edf369f8494470aa8e855c94ebb93c98e48bfbb8934866d6fe8d9",
-      "after_sha256": "988e02fd6170950dadfe79c92f1ea79837666eb4dd58a72df32fbff949d6b3a9",
+      "before_sha256": "988e02fd6170950dadfe79c92f1ea79837666eb4dd58a72df32fbff949d6b3a9",
+      "after_sha256": "fb8dbfe305e047c562df16019e1bc66104598fc41d5e9401fa997236c29454fa",
       "owners": {
         "@document": {
-          "before": "18329adeca4edf369f8494470aa8e855c94ebb93c98e48bfbb8934866d6fe8d9",
-          "after": "988e02fd6170950dadfe79c92f1ea79837666eb4dd58a72df32fbff949d6b3a9"
+          "before": "988e02fd6170950dadfe79c92f1ea79837666eb4dd58a72df32fbff949d6b3a9",
+          "after": "fb8dbfe305e047c562df16019e1bc66104598fc41d5e9401fa997236c29454fa"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "39309422d8b207340606acd1fd8839decd52963473f2338728ccc1e0f21cb6e5",
-      "after_sha256": "df527b60f974b9ff9fa7b860c66d9e06b5e8a745370bebc26c810d131ff12ec5",
+      "before_sha256": "df527b60f974b9ff9fa7b860c66d9e06b5e8a745370bebc26c810d131ff12ec5",
+      "after_sha256": "c5d7712192b8cb345ee2d597a0aef74259105f37c648194385d177021348ed53",
       "owners": {
         "@document": {
-          "before": "39309422d8b207340606acd1fd8839decd52963473f2338728ccc1e0f21cb6e5",
-          "after": "df527b60f974b9ff9fa7b860c66d9e06b5e8a745370bebc26c810d131ff12ec5"
+          "before": "df527b60f974b9ff9fa7b860c66d9e06b5e8a745370bebc26c810d131ff12ec5",
+          "after": "c5d7712192b8cb345ee2d597a0aef74259105f37c648194385d177021348ed53"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "acf4bac29531f51c7d8bc71b5505eda06ad742c0efc1aa30a62c6d1a8bd62e94",
-      "after_sha256": "faeb408f8c6248c3c0ef00c4a3c7350acae70f0d84b798069de49c49917d22a9",
+      "before_sha256": "faeb408f8c6248c3c0ef00c4a3c7350acae70f0d84b798069de49c49917d22a9",
+      "after_sha256": "6265706b1f256452683013ae5c5670411e9cb5c687fce241d66c63c8c937ed8d",
       "owners": {
         "@document": {
-          "before": "acf4bac29531f51c7d8bc71b5505eda06ad742c0efc1aa30a62c6d1a8bd62e94",
-          "after": "faeb408f8c6248c3c0ef00c4a3c7350acae70f0d84b798069de49c49917d22a9"
+          "before": "faeb408f8c6248c3c0ef00c4a3c7350acae70f0d84b798069de49c49917d22a9",
+          "after": "6265706b1f256452683013ae5c5670411e9cb5c687fce241d66c63c8c937ed8d"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "d80977d4fa19b8565ef16d7a76aac65168918b90660a1999819b1509a67af0fd",
-      "after_sha256": "961d8f8c54f8fd7f4be9e5948663b9733702125458bd2d82fdf1a49c50ae5ead",
+      "before_sha256": "961d8f8c54f8fd7f4be9e5948663b9733702125458bd2d82fdf1a49c50ae5ead",
+      "after_sha256": "57d6b1b42c3bc4102bfc07fceeb03f504ff98d34ea9a1110ce3a3792a6a15a65",
       "owners": {
         "@document": {
-          "before": "d80977d4fa19b8565ef16d7a76aac65168918b90660a1999819b1509a67af0fd",
-          "after": "961d8f8c54f8fd7f4be9e5948663b9733702125458bd2d82fdf1a49c50ae5ead"
+          "before": "961d8f8c54f8fd7f4be9e5948663b9733702125458bd2d82fdf1a49c50ae5ead",
+          "after": "57d6b1b42c3bc4102bfc07fceeb03f504ff98d34ea9a1110ce3a3792a6a15a65"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "ccdea5d1d908b58f5de9e0932f0d72200104f49e06967a5c043ed3e8caa5af20",
-      "after_sha256": "7e3e20393d60f37d0cfb484a3e6eebae7fa41a0d24cd6b0b93ee806d5da4196d",
+      "before_sha256": "7e3e20393d60f37d0cfb484a3e6eebae7fa41a0d24cd6b0b93ee806d5da4196d",
+      "after_sha256": "d8deee01b04d500a986d6bf74b9eade2b7a3cde67f71845e4f30f1dff64f8697",
       "owners": {
         "@document": {
-          "before": "ccdea5d1d908b58f5de9e0932f0d72200104f49e06967a5c043ed3e8caa5af20",
-          "after": "7e3e20393d60f37d0cfb484a3e6eebae7fa41a0d24cd6b0b93ee806d5da4196d"
+          "before": "7e3e20393d60f37d0cfb484a3e6eebae7fa41a0d24cd6b0b93ee806d5da4196d",
+          "after": "d8deee01b04d500a986d6bf74b9eade2b7a3cde67f71845e4f30f1dff64f8697"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "65afa253eb9c8cadfba6430a609c16530aea915db0604c65c5a65a567f4a703b",
+      "after_sha256": "6939ce5c3065e031e7317bef457c3a68d63e7ede48c585054098f28785ef569d",
+      "owners": {
+        "@document": {
+          "before": "65afa253eb9c8cadfba6430a609c16530aea915db0604c65c5a65a567f4a703b",
+          "after": "6939ce5c3065e031e7317bef457c3a68d63e7ede48c585054098f28785ef569d"
+        }
+      }
+    },
+    "scripts/build_test_shards.py": {
+      "before_sha256": "e7d1f5ff29bf5c43675461f3dcbe85baad4f69692b6679ff0deb28bbd3946169",
+      "after_sha256": "f56450d628e4a79cce2d2cb1b86e6ff76b81e7303e979a42464d7360ef09d47b",
+      "owners": {
+        "duration_worksteal_order": {
+          "before": "b693fd1492b3a419a387e6eda1eeffbf47eac78e4c949581c9d06b65b9f44aff",
+          "after": "e3bfbb628bcaad3d38635995462c39933595c835d7066c6cafdf091c26581665"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "501707d7625953c56ec8887d9ca1cffc68483281c329ab2171c375e6044398aa",
-      "after_sha256": "c9d9729e744098830f205bbaf5e16d75408a83c62c2cf872a8636a35bcb3534f",
+      "before_sha256": "c9d9729e744098830f205bbaf5e16d75408a83c62c2cf872a8636a35bcb3534f",
+      "after_sha256": "479c7773a71c609fbd698e77ebf5666a05fefd58f50eb1e304a0ebe002d59088",
       "owners": {
         "@document": {
-          "before": "501707d7625953c56ec8887d9ca1cffc68483281c329ab2171c375e6044398aa",
-          "after": "c9d9729e744098830f205bbaf5e16d75408a83c62c2cf872a8636a35bcb3534f"
+          "before": "c9d9729e744098830f205bbaf5e16d75408a83c62c2cf872a8636a35bcb3534f",
+          "after": "479c7773a71c609fbd698e77ebf5666a05fefd58f50eb1e304a0ebe002d59088"
         }
       }
     },
-    "src/warhammer40k_core/ai/parameterized_training.py": {
-      "before_sha256": "64b45aae1c060fabe2ed95a48244d7f51209d8aaf3560c8c3647ff77ae3b8271",
-      "after_sha256": "72a64d7cca7c13ea2dbd3c09cb434b138cc2d00fb2e57c69744c404e3e5366bd",
+    "src/warhammer40k_core/ai/deployment_candidate_ranking.py": {
+      "before_sha256": null,
+      "after_sha256": "75dd39df1231941527363192f9e7f563f07551f0016aabf5454d664f18a5dda6",
       "owners": {
         "@module": {
-          "before": "9da21a4a668543952b044e2a8dc1464fc0b6e8fa7b24cf7d9099151e10c375cf",
-          "after": "84ca0c065aaeab699582d2926828b81835228600816a514e1c6b91d4baafff64"
-        },
-        "DeploymentTrainingCandidateLink": {
           "before": null,
-          "after": "006815545377aeb9b7dca007b58a782f102f9f37897f5fe4df4b1790a5cc0051"
+          "after": "029bbd91c7181439c2fe7e9b2ebd25b4c1cdf3926a1fdacc663ff230f2eae48b"
         },
-        "DeploymentTrainingCandidateLink.__init__": {
+        "DeploymentCandidateRanker": {
           "before": null,
-          "after": "601ea5a2d818959e07fa2b4ce4683c506661e3a89414d3af4101ea5a4f70a0f8"
+          "after": "459b786e7254a0709b60944a9540c92d157c3ece98665bbdf8591bdd56821e82"
         },
-        "DeploymentTrainingCandidateLink.chosen_action_id": {
+        "DeploymentCandidateRanker.score": {
           "before": null,
-          "after": "de741f11478c552fa5abd1da0a47c1e391ac39641f57e53141dad297f03944ee"
+          "after": "800b8cffd714d58f46df9a656aea8136be19896828cdd9b1ab07547dbe2f7a64"
         },
-        "DeploymentTrainingCandidateLink.chosen_action_index": {
+        "DeploymentCandidateScore": {
           "before": null,
-          "after": "ffa31058fa8b4b1d41d5ea6bb13fc73b59719982ce3b150e6bfb941ce3f38246"
+          "after": "cc59473699a843f3e9a08ef4d16015655ebbc4b69849e6c736e96a857b58ee08"
         },
-        "DeploymentTrainingCandidateLink.from_payload": {
+        "DeploymentCandidateScore.__post_init__": {
           "before": null,
-          "after": "4582915df7086c6922ea3077871c5651784dddad301116d5f4e25e9c7603be5e"
+          "after": "304f48588926165462401f24d59ced00ac2e97353cb0f7c49451eda517d6c847"
         },
-        "DeploymentTrainingCandidateLink.from_row": {
+        "RankedDeploymentCandidates": {
           "before": null,
-          "after": "681921d816a1c9e31c310270e2eabfd82e0a21fd37a032dacb8efb80be15c9c3"
+          "after": "3118f19f891f2cf8ae5b052377c2af3bd47504bd7e3ff824af7351e8195aae05"
         },
-        "DeploymentTrainingCandidateLink.require_matches": {
+        "RankedDeploymentCandidates.__init__": {
           "before": null,
-          "after": "ef9deb282c01c9144bc98ce7ad51251046bdeabf66f27a4288adf5a14a55eb5a"
+          "after": "1328e74dc56b6644e8979833737e959dd2c23114b683875153c0683b91da5f00"
         },
-        "DeploymentTrainingCandidateLink.to_payload": {
+        "RankedDeploymentCandidates.content_hash": {
           "before": null,
-          "after": "04026e65addf2270bb7198a2a31908debc4ceb1e320d40757436429ea9db8377"
+          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
         },
-        "DeploymentTrainingCandidateLinkPayload": {
+        "RankedDeploymentCandidates.from_payload": {
           "before": null,
-          "after": "fec145ca48e4705e815eb5c526b3afb6932b80c31918e0daa00beb85c0f7e7f5"
+          "after": "f8ff31253c68e420eba558ba604d371b6893a970fad892c08843a746c42efae3"
         },
-        "ParameterizedTrainingCandidateLink.from_row": {
-          "before": "b26febe13ec2f14c06eacbea936124a985d0d83ec2b803f3316437b54bd96bb3",
-          "after": "ff54424dd0776ffa5e0348be946d277fb6982e6fe3c7343a5ebac48ad4dbc229"
-        },
-        "_require_accepted_candidate": {
+        "RankedDeploymentCandidates.rank": {
           "before": null,
-          "after": "4696d3004315ca80a08cca81b4e2a2ef2642ee5fcc02a1a284892daec19f0607"
+          "after": "a21f6d5cd5de16b098d26af6776e5db337c3a1a94d02cc13dd84edbb98116df8"
+        },
+        "RankedDeploymentCandidates.select": {
+          "before": null,
+          "after": "0a772ee6cd6a4ca3707fdb56d241dcf36ab8c2fe7a33b17ce2c22117805274fb"
+        },
+        "RankedDeploymentCandidates.selected_candidate_id": {
+          "before": null,
+          "after": "a74c81b7224e91e342a2a6fc9c92e01b57f83cd62a1aefca690b3794bd3ae584"
+        },
+        "RankedDeploymentCandidates.to_payload": {
+          "before": null,
+          "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
         }
       }
     },
-    "src/warhammer40k_core/ai/training_admission.py": {
-      "before_sha256": "f58b8e55a64786a027876c1e86e70c766ccf7140fbdcb2e043fbae119cf4e5e7",
-      "after_sha256": "0d21d1d7a9203856416f9bec6922085259bd852d18d7fba3e0128172106c0681",
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "before_sha256": "f57f5c7163552d715af35f05efbf027333a66cf2abe467b902b5d95b16e1f9c5",
+      "after_sha256": "43f4137f35f412f6eb3a74a36616bf69f7bcfc5f2a99392f930800693fa8d573",
       "owners": {
-        "@module": {
-          "before": "90b249907761af4093b38f012cf90c65da2565dc64c82eea76404db9ef8b95b1",
-          "after": "b7d8c36fff61aa971e0f696f1fd05c9c41fc296ea435b6cca679875fd9afa73e"
+        "test_duration_dispatch_balances_actual_initial_worksteal_chunks": {
+          "before": "8f44a1c260eb4307087c12e459ab6f8d9e589635967defade89c354788e4b463",
+          "after": "3295aabf5ada2a81d74384474ee80ca7eae0a6ca57d96e13e6015125db6e4d2b"
         },
-        "AdmittedTrainingTarget.from_episode": {
-          "before": "f87d5c7583e77c1d76df2004ba5d144758da4fa56116233749662daaff865a1b",
-          "after": "2b1a3111e8829f10ad1887eec587d1bd647af5a65f8a4010b6ede93d32ee08fe"
-        }
-      }
-    },
-    "src/warhammer40k_core/ai/training_targets.py": {
-      "before_sha256": "7eaec2224495e2c8cf3e117398f6d1e164c1e0cf738a1eb682bf569773c23067",
-      "after_sha256": "b426c6cd9d706c60f22836d40ef0a88ca70956fdbde34a1566494fefc9f92b82",
-      "owners": {
-        "@module": {
-          "before": "4ba1334a18f786c5d9587f2bae49bc614d1f2e49884df935c34d852c6fa61107",
-          "after": "b2c03e5f2edb5352808cd18e9aff4d31bae528abe97c569599773a3dc5e01acb"
-        },
-        "_require_link": {
-          "before": "f01f87e0e4e46e6a5f1affe623a7c213415562dfbbde8846a2e859865aaac4ff",
-          "after": "bbf095ee971687fc2d3e44c740f81f301c0fca526ef7eec2f07691c0bcc25c9f"
+        "test_duration_dispatch_profile_controls_the_real_worker_hook": {
+          "before": "332a6832254803bd4a0887a796e8b7ad53d0c29a3d956ca13cd7a59018086134",
+          "after": "fbbfe85b08bfead95805be29b11ca671ed84c1743a3755d85a313e06d32bd3ef"
         }
       }
     },
     "tests/infrastructure/adapters/test_deployment_candidates.py": {
-      "before_sha256": "ac333eb0cc38d31d400c3a6d4b0d8550432ead96c6b9b98838320dc4ecab7256",
-      "after_sha256": "d799c30f1d3074229e25d9dfbe06596481868eb0d7725e14288b07dfc8e94f67",
+      "before_sha256": "d799c30f1d3074229e25d9dfbe06596481868eb0d7725e14288b07dfc8e94f67",
+      "after_sha256": "33a28319ab887fa5af8cc1a86fa1bde2e9e49cac6058138aa8cdbdfa3326f5a0",
       "owners": {
         "@module": {
-          "before": "e2aaea0b32a562e1eae5bb58b7412f12ea9e71a09d222142767983bd91b3c21f",
-          "after": "ac05e9f3c7bb08bbe13a310bc44c699bd0951b2ffb1fe5aa064b110e65a2396f"
+          "before": "ac05e9f3c7bb08bbe13a310bc44c699bd0951b2ffb1fe5aa064b110e65a2396f",
+          "after": "fb2ed1880c986f30e783f202ca37700009c76a74693447b0ba24b0981cc8261a"
         },
-        "deployment_set_training": {
+        "_LastDeploymentRanker": {
           "before": null,
-          "after": "124db1c3774d8cbfc25dc772a5553bb0d77e8f4e0baae3b747c90b00fffab739"
+          "after": "dff6ae978ed423d270ff23af34162110d1f6cd976c2d8a845e0d4ffa896d8ee4"
         },
-        "test_deployment_set_link_rejects_same_view_different_authoritative_checkpoint": {
+        "_LastDeploymentRanker.__init__": {
           "before": null,
-          "after": "ccedb4a8f0061ad2a61dedf336505036412402986ce164a2da3ddc3225f8703e"
+          "after": "af0759c38147f05e171615c2262704cb443088a2c9fe69ba03561c28006be4d8"
         },
-        "test_deployment_set_training_commits_nonseed_alternative_and_binds_targets": {
+        "_LastDeploymentRanker.score": {
           "before": null,
-          "after": "5cd2ea500fd79a1b101ce232c939ee021958634dfe528fd0c5ca5fb6413589d2"
+          "after": "45130fd0b522c1c5730d2137f26f56afe05790a480f0587dbf7ec26fd13ff45c"
         },
-        "test_deployment_set_training_loader_reproduces_complete_evidence": {
+        "ranking_case": {
           "before": null,
-          "after": "62f8718e7f9598c5e788005e9061214cd600601ad39943d39743b5240de7003a"
+          "after": "1ca516410eb5cc85dadc5b74d7896b2f9bae000fb754316f993066dc351a2d77"
         },
-        "test_deployment_set_training_preserves_full_search_and_validated_prefix": {
+        "test_deployment_ranker_receives_only_detached_accepted_actor_payloads": {
           "before": null,
-          "after": "81316c7fd1682dd7cbd9bee6c95e62accab280894334aeeb49c1f300b099d664"
+          "after": "615c96622b7f4bc17db908037015c572dcdd8086b6f07a0958052e710ea5a029"
         },
-        "test_deployment_set_training_rejects_inexact_row_or_selection": {
+        "test_deployment_ranking_hidden_work_and_private_rng_noninterference": {
           "before": null,
-          "after": "b258e6991ee9f1f8d6f4ac2f08ba01432fa9f14ba860d71913e0a59e2bc80adb"
+          "after": "c97db816de385306ad3b0437741e9f504711ae343e400405310d5cf33e868a20"
+        },
+        "test_deployment_ranking_loader_rejects_drift": {
+          "before": null,
+          "after": "f9c7e48eaa5beafc1aba1adad1d152549ee1689413b136f3474e8904e0362fb5"
+        },
+        "test_deployment_ranking_preserves_exact_numeric_scores_and_receipt": {
+          "before": null,
+          "after": "bf7ab8691e1c87224b0e0c95c2cddbe63bf975d24975ae2936c3d15f3cfddaf3"
+        },
+        "test_deployment_ranking_rechecks_checkpoint_after_callback": {
+          "before": null,
+          "after": "abdbef71a1508aa41aea09f4523919c3d04de1b94fb168d8074dd81512382345"
+        },
+        "test_deployment_ranking_rejects_inexact_or_malformed_scores": {
+          "before": null,
+          "after": "65ba3f26ef6ba6c477a91fef2f48f6fcd88e24fbfb58608bb179e765d4c13314"
+        },
+        "test_deployment_ranking_selects_nonfirst_and_preserves_ordinary_commit_replay": {
+          "before": null,
+          "after": "7de7fdaf561e22ccaf54834fd82954441d4d538ffaf3cbc5b85547f6e0d9c0a5"
+        },
+        "test_deployment_ranking_ties_follow_generation_not_score_order": {
+          "before": null,
+          "after": "63ab8cc309e783399c6611333ffc7e24b6d06ec38b6b70a43a402cf6c8effdf1"
+        },
+        "test_deployment_score_rejects_nonfinite_and_untyped_values": {
+          "before": null,
+          "after": "5b3aa5cf8478caa839416ce8ccae151673741b0704835fc517e29a75c05ffe2a"
+        }
+      }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "e55080c29061047c6578383b6f707c1ed01767e0a26d076de1478a626a510307",
+      "after_sha256": "703d938c75fc75e27b50632b2e5070c0944cde2fd0a2fddb9a7e225eea99fe3c",
+      "owners": {
+        "@document": {
+          "before": "e55080c29061047c6578383b6f707c1ed01767e0a26d076de1478a626a510307",
+          "after": "703d938c75fc75e27b50632b2e5070c0944cde2fd0a2fddb9a7e225eea99fe3c"
         }
       }
     }
   },
   "rows": {
+    "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+    },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
@@ -387,9 +463,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -406,9 +482,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -425,9 +501,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -444,9 +520,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -463,9 +539,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -482,9 +558,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -501,9 +577,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -520,9 +596,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -539,9 +615,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -558,9 +634,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -577,9 +653,28 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -596,9 +691,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -640,9 +735,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -684,9 +779,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -728,9 +823,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -772,9 +867,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -816,9 +911,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -860,9 +955,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -904,9 +999,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -948,9 +1043,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -958,33 +1053,51 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+    },
+    "scripts/build_test_shards.py": {
+      "category": "algorithm_or_search",
+      "operations": [
+        "behavioral-worksteal-dispatch"
+      ],
+      "selected_families": [],
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -995,39 +1108,29 @@
         "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
-    "src/warhammer40k_core/ai/parameterized_training.py": {
-      "category": "serialization_or_replay_work",
+    "src/warhammer40k_core/ai/deployment_candidate_ranking.py": {
+      "category": "algorithm_or_search",
       "operations": [
-        "deployment-candidate-row-linkage"
+        "deployment-candidate-ranking"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
-    "src/warhammer40k_core/ai/training_admission.py": {
-      "category": "serialization_or_replay_work",
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "category": "measured_workload",
       "operations": [
-        "finite-episode-target-admission"
+        "behavioral-worksteal-dispatch-tests"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
-    },
-    "src/warhammer40k_core/ai/training_targets.py": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "named-training-targets"
-      ],
-      "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
     },
     "tests/infrastructure/adapters/test_deployment_candidates.py": {
       "category": "measured_workload",
@@ -1035,9 +1138,19 @@
         "deployment-bounded-candidates"
       ],
       "selected_families": [],
-      "rationale": "Add a separate operator-only deployment-set training companion that preserves the complete generated set and validation receipt while binding the selected accepted slot to the exact reproduced transition. Update target joins, maintained documentation, runtime identities and authentic test evidence.",
-      "source_obligation": "Keep the singleton schema stable. Bind the full row, validated-prefix mask, accepted selection, exact viewer action and authoritative before checkpoint. Unvalidated candidates have no mask slot. Loaders regenerate the set and reproduce ordinary fork validation; named/admitted targets preserve existing source, perspective and horizon requirements.",
-      "unchanged_work": "The change adds bounded offline AI evidence serialization and joins. Existing engine legality, geometry/search algorithms, RNG, mutation, replay/persistence algorithms, caches, runtime dependencies and benchmark drivers remain unchanged. These existing AI operations map to no detailed benchmark family; required serial current-runtime smoke and live semantic/work checks still apply. No speedup, ranking quality, dataset eligibility or full-game qualification is claimed."
+      "rationale": "Add accepted-only deployment ranking with exact numeric ordering and ordinary engine submission. Preserve module-scoped fixture reuse during CI duration dispatch by grouping each already-assigned worker bucket by module.",
+      "source_obligation": "Preserve actor visibility, exact accepted scores and checkpoint binding; operator receipts retain privileged validation evidence. Preserve every CI case, worker-bucket membership and capacity, measured bucket cost, longest-case priority, raw profile, shard inventory and historical source. Restore fixture locality without relaxing any assertion, coverage rule or timing limit.",
+      "unchanged_work": "No engine legality, geometry/search, RNG, authoritative mutation, replay/persistence algorithm, production cache or runtime dependency changes. The existing LPT assignments are preserved; only within-worker order groups modules. All pre-existing owner mappings, families and sensitivity remain intact. Dispatch algorithm and workload controls are assessed explicitly; their existing mappings register no detailed benchmark family. Matched actual-base/head consumer evidence and required serial current-runtime smoke remain separate from complete hosted CI and full-game claims."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the live README byte authentication after documenting worker-local fixture reuse.",
+      "source_obligation": "Authenticate the maintained current README while retaining all historical governance hashes, source clauses, semantic assertions and qualifications.",
+      "unchanged_work": "Only authenticated_inputs.README.md changes. No engine, runtime identity, source content, test body, requirement, historical input, case inventory, coverage or timing limit changes."
     }
   },
   "milestone": "ordinary",
