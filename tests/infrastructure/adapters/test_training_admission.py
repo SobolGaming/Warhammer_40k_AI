@@ -1,32 +1,49 @@
 from __future__ import annotations
 
 import json
-from dataclasses import FrozenInstanceError, dataclass, replace
+from dataclasses import FrozenInstanceError, replace
 from typing import cast
 
 import pytest
 
-from tests.phase13b_shooting_declaration_helpers import _proposal_from_request
+from tests.shared.ai_training_admission_helpers import (
+    AdmissionCase,
+    DeploymentCase,
+    DeploymentTrainingProof,
+    TerminalProof,
+    _admit,
+    _automatic_attack_case,
+    _local_target,
+    _step,
+    _target,
+)
+from tests.shared.ai_training_admission_helpers import (
+    continuing as continuing,
+)
+from tests.shared.ai_training_admission_helpers import (
+    deployment as deployment,
+)
+from tests.shared.ai_training_admission_helpers import (
+    deployment_training as deployment_training,
+)
+from tests.shared.ai_training_admission_helpers import (
+    terminal as terminal,
+)
+from tests.shared.ai_training_admission_helpers import (
+    terminal_proofs as terminal_proofs,
+)
 from tests.shared.category_migration.phase18f_session_commands import (
-    _compact_terminal_config,
     _deployment_payload_from_proposal,
     _terminal_progress_option_id,
 )
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
-from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
-from warhammer40k_core.ai.finite_candidates import FiniteCandidateSet
-from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyAction, payload_digest
-from warhammer40k_core.ai.policy_contracts import (
-    PolicyArtifactKind,
-    PolicyProvenance,
-    TrainingFeature,
-    TrainingFeatureSourceKind,
-    TrainingRow,
-)
+from warhammer40k_core.ai.deployment_candidates import DeploymentPlacementCandidate
+from warhammer40k_core.ai.parameterized_training import ParameterizedTrainingCandidateLink
+from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyError, payload_digest
+from warhammer40k_core.ai.policy_contracts import PolicyProvenanceError, TrainingRow
 from warhammer40k_core.ai.training_admission import (
     COMMAND_POINT_BALANCE_TARGET,
-    LOCAL_REFERENCE_PRODUCER,
     MISSING_TARGET_PRODUCER,
     TERMINAL_TARGET_PRODUCER,
     AdmittedTrainingTarget,
@@ -36,10 +53,12 @@ from warhammer40k_core.ai.training_admission import (
     VerifiedEpisodeOrigin,
     VerifiedLocalReference,
 )
-from warhammer40k_core.ai.training_candidates import FiniteTrainingCandidateLink
+from warhammer40k_core.ai.training_candidates import (
+    FiniteTrainingCandidateLink,
+    TrainingCandidateLinkError,
+)
 from warhammer40k_core.ai.training_targets import (
     LinkedTrainingTarget,
-    NamedTrainingTarget,
     TargetEpisodeEnd,
     TargetHorizon,
     TargetMeaning,
@@ -51,261 +70,10 @@ from warhammer40k_core.ai.training_transitions import (
     ParameterizedAcceptedTransition,
     TrainingTransitionError,
 )
-from warhammer40k_core.core.ruleset_descriptor import (
-    BattlePhaseKind,
-    BattlePhaseSequenceDescriptor,
-)
-from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
-from warhammer40k_core.engine.game_state import GameConfig
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json
+from warhammer40k_core.engine.final_scoring import FinalScoringResult
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.phase import LifecycleStatusKind
-from warhammer40k_core.engine.phases.shooting_model import AvailableWeaponPayload
-
-
-@dataclass(frozen=True)
-class AdmissionCase:
-    before: LocalGameSession
-    after: LocalGameSession
-    context: PlayerDecisionContext
-    row: TrainingRow
-
-    def transition(
-        self,
-        row: TrainingRow | None = None,
-        *,
-        previous: AcceptedTransition | None = None,
-        perspective: str = "player-a",
-    ) -> FiniteAcceptedTransition:
-        selected = self.row if row is None else row
-        return FiniteAcceptedTransition.from_sessions(
-            FiniteTrainingCandidateLink.from_row(selected, context=self.context),
-            row=selected,
-            context=self.context,
-            before=self.before,
-            after=self.after,
-            trajectory_id="admission-trajectory",
-            perspective_player_id=perspective,
-            previous=previous,
-        )
-
-    def episode(
-        self,
-        *,
-        row: TrainingRow | None = None,
-        perspective: str = "player-a",
-        end: TargetEpisodeEnd = TargetEpisodeEnd.TRUNCATED,
-        reason: str | None = "decision-budget",
-    ) -> FiniteEpisodeAdmission:
-        return FiniteEpisodeAdmission.from_transitions(
-            VerifiedEpisodeOrigin.from_session(self.before, config=self.before.lifecycle.config),
-            transitions=(self.transition(row, perspective=perspective),),
-            final_session=self.after,
-            episode_end=end,
-            stop_reason=reason,
-        )
-
-
-@dataclass(frozen=True)
-class TerminalProof:
-    transition: FiniteAcceptedTransition
-    episode: FiniteEpisodeAdmission
-
-
-@pytest.fixture(scope="module")
-def terminal_proofs(terminal: AdmissionCase) -> tuple[TerminalProof, ...]:
-    # Target-only cases share genuinely verified, immutable positive evidence.
-    # Origin/loader/boundary tests construct fresh evidence themselves.
-    origin = VerifiedEpisodeOrigin.from_session(
-        terminal.before, config=terminal.before.lifecycle.config
-    )
-    proofs: list[TerminalProof] = []
-    for perspective in ("player-a", "player-b"):
-        transition = terminal.transition(perspective=perspective)
-        episode = FiniteEpisodeAdmission.from_transitions(
-            origin,
-            transitions=(transition,),
-            final_session=terminal.after,
-            episode_end=TargetEpisodeEnd.TERMINAL,
-        )
-        proofs.append(TerminalProof(transition, episode))
-    return tuple(proofs)
-
-
-def _row(
-    before: LocalGameSession, after: LocalGameSession, context: PlayerDecisionContext, chosen: str
-) -> TrainingRow:
-    candidates = FiniteCandidateSet.from_context(context)
-    provenance = PolicyProvenance.from_game_config(
-        artifact_id="admission-policy",
-        artifact_kind=PolicyArtifactKind.RANKER,
-        game_config=before.lifecycle.config,
-        reward_profile_version="admission-reward-v1",
-    )
-    return TrainingRow(
-        row_id=f"row-{before.decision_record_count()}",
-        game_id=before.lifecycle.config.game_id,
-        decision_record_id=after.lifecycle.decision_controller.records[
-            before.decision_record_count()
-        ].record_id,
-        policy_artifact_id=provenance.artifact_id,
-        policy_provenance=provenance,
-        reward_profile_version=provenance.reward_profile_version,
-        input_features=(
-            TrainingFeature(
-                feature_id="decision-option-count",
-                source_kind=TrainingFeatureSourceKind.DECISION_CONTEXT,
-                value=len(candidates.candidates),
-                source_descriptor_ids=("decision:" + context.route.decision_type,),
-            ),
-        ),
-        legal_action_mask=tuple(True for _ in candidates.candidates),
-        chosen_action_id=chosen,
-        target_value=0.25,
-        debug_metadata={},
-    )
-
-
-def _step(before: LocalGameSession, chosen: str | None = None) -> AdmissionCase:
-    request = before.lifecycle.pending_decision_request()
-    assert request is not None
-    assert request.actor_id is not None
-    context = PlayerDecisionContext.from_view(
-        before.view(viewer_player_id=request.actor_id), choice_seed=7
-    )
-    chosen = FiniteCandidateSet.from_context(context).candidate_ids[0] if chosen is None else chosen
-    after = before.fork()
-    status = after.submit_viewer_option(
-        viewer=ViewerContext.for_player(request.actor_id),
-        request_id=context.request["request_id"],
-        option_id=chosen,
-        result_id=f"admission-{before.decision_record_count()}",
-    )
-    if status.status_kind is LifecycleStatusKind.ADVANCED:
-        status = after.advance_until_decision_or_terminal()
-    assert status.status_kind in (
-        LifecycleStatusKind.WAITING_FOR_DECISION,
-        LifecycleStatusKind.TERMINAL,
-    )
-    return AdmissionCase(before, after, context, _row(before, after, context, chosen))
-
-
-@pytest.fixture(scope="module")
-def continuing() -> AdmissionCase:
-    session = LocalGameSession()
-    session.start(canonical_setup_prebattle_smoke_config())
-    session.advance_until_decision_or_terminal()
-    return _step(session)
-
-
-@pytest.fixture(scope="module")
-def terminal() -> AdmissionCase:
-    compact = _compact_terminal_config(game_id="admission-terminal")
-    config = replace(
-        compact,
-        ruleset_descriptor=replace(
-            compact.ruleset_descriptor,
-            descriptor_hash="",
-            battle_phase_sequence=BattlePhaseSequenceDescriptor(
-                phases=(BattlePhaseKind.COMMAND, BattlePhaseKind.SHOOTING, BattlePhaseKind.FIGHT)
-            ),
-        ),
-    )
-    session = LocalGameSession()
-    session.start(config)
-    status = session.advance_until_decision_or_terminal()
-    for index in range(100):
-        request = status.decision_request
-        assert request is not None
-        assert request.actor_id is not None
-        view = session.view(viewer_player_id=request.actor_id)
-        if request.is_parameterized_submission_request():
-            assert request.decision_type == "submit_deployment_placement"
-            pending = view["pending_decision"]
-            assert pending is not None
-            status = session.submit_viewer_parameterized_payload(
-                viewer=ViewerContext.for_player(request.actor_id),
-                request_id=pending["request_id"],
-                payload=_deployment_payload_from_proposal(view["pending_proposal"]),
-                result_id=f"admission-placement-{index}",
-            )
-        else:
-            context = PlayerDecisionContext.from_view(view, choice_seed=7)
-            chosen = _terminal_progress_option_id(cast(dict[str, JsonValue], context.request))
-            # Prefix choices need ordinary commits, not two full lifecycle
-            # reconstructions and a discarded training row per decision.
-            before_checkpoint = session.to_persistence_payload()
-            status = session.submit_viewer_option(
-                viewer=ViewerContext.for_player(request.actor_id),
-                request_id=context.request["request_id"],
-                option_id=chosen,
-                result_id=f"admission-{session.decision_record_count()}",
-            )
-            if status.status_kind is LifecycleStatusKind.ADVANCED:
-                status = session.advance_until_decision_or_terminal()
-            if status.status_kind is LifecycleStatusKind.TERMINAL:
-                before = LocalGameSession.from_persistence_payload(before_checkpoint)
-                return AdmissionCase(
-                    before, session, context, _row(before, session, context, chosen)
-                )
-        if status.status_kind is LifecycleStatusKind.ADVANCED:
-            status = session.advance_until_decision_or_terminal()
-        assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    pytest.fail("Terminal admission fixture exceeded its explicit decision budget.")
-
-
-def _target(
-    case: AdmissionCase,
-    episode: FiniteEpisodeAdmission,
-    *,
-    meaning: TargetMeaning = TargetMeaning.MATCH_UTILITY,
-    value: float | None = 0.5,
-) -> NamedTrainingTarget:
-    boundary = episode.to_payload()
-    observed = boundary["episode_end"] == "terminal"
-    return NamedTrainingTarget(
-        target_id="test-match-target",
-        meaning=meaning,
-        perspective_player_id=boundary["perspective_player_id"],
-        horizon=TargetHorizon.MATCH_END,
-        horizon_decisions=None,
-        episode_end=TargetEpisodeEnd(boundary["episode_end"]),
-        validity=TargetValidity.OBSERVED if observed else TargetValidity.MISSING,
-        value=value if observed else None,
-        value_unit="unit_interval" if meaning is TargetMeaning.MATCH_UTILITY else "victory_points",
-        missing_reason=None if observed else boundary["stop_reason"],
-        producer_id=TERMINAL_TARGET_PRODUCER if observed else MISSING_TARGET_PRODUCER,
-        evidence_hash=payload_digest(boundary["final_result"])
-        if observed
-        else episode.content_hash,
-        reward_profile_version=case.row.reward_profile_version,
-    )
-
-
-def _admit(
-    case: AdmissionCase,
-    episode: FiniteEpisodeAdmission,
-    target: NamedTrainingTarget,
-    *,
-    row: TrainingRow | None = None,
-    config: GameConfig | None = None,
-    transition: FiniteAcceptedTransition | None = None,
-    final_session: LocalGameSession | None = None,
-) -> AdmittedTrainingTarget:
-    row = case.row if row is None else row
-    link = FiniteTrainingCandidateLink.from_row(row, context=case.context)
-    return AdmittedTrainingTarget.from_episode(
-        LinkedTrainingTarget.from_link(link, row=row, context=case.context, target=target),
-        episode=episode,
-        transition=case.transition(row, perspective=episode.to_payload()["perspective_player_id"])
-        if transition is None
-        else transition,
-        link=link,
-        row=row,
-        context=case.context,
-        config=case.before.lifecycle.config if config is None else config,
-        reward_profile_version=case.row.reward_profile_version,
-        final_session=final_session,
-    )
 
 
 def test_origin_replays_prefix_and_round_trips_without_mutation(terminal: AdmissionCase) -> None:
@@ -644,39 +412,6 @@ def test_terminal_boundary_cannot_be_reclassified(
         terminal.episode(end=end, reason=reason)
 
 
-def _local_target(
-    case: AdmissionCase,
-    episode: FiniteEpisodeAdmission,
-    transition: FiniteAcceptedTransition,
-    final_session: LocalGameSession,
-) -> tuple[NamedTrainingTarget, VerifiedLocalReference]:
-    reference = VerifiedLocalReference.from_episode(
-        episode,
-        transition=transition,
-        final_session=final_session,
-        target_id=COMMAND_POINT_BALANCE_TARGET,
-        horizon_decisions=episode.to_payload()["accepted_record_stop"]
-        - transition.accepted_record_start,
-    )
-    evidence = reference.to_payload()
-    target = NamedTrainingTarget(
-        target_id=COMMAND_POINT_BALANCE_TARGET,
-        meaning=TargetMeaning.LOCAL_REFERENCE,
-        perspective_player_id=evidence["perspective_player_id"],
-        horizon=TargetHorizon.DECISION_COUNT,
-        horizon_decisions=evidence["horizon_decisions"],
-        episode_end=TargetEpisodeEnd(episode.to_payload()["episode_end"]),
-        validity=TargetValidity.OBSERVED,
-        value=evidence["value"],
-        value_unit=evidence["value_unit"],
-        missing_reason=None,
-        producer_id=LOCAL_REFERENCE_PRODUCER,
-        evidence_hash=reference.content_hash,
-        reward_profile_version=case.row.reward_profile_version,
-    )
-    return target, reference
-
-
 @pytest.mark.parametrize("perspective", ["player-a", "player-b"])
 def test_local_resource_target_recomputes_terminal_balance_without_mutation(
     terminal: AdmissionCase, terminal_proofs: tuple[TerminalProof, ...], perspective: str
@@ -909,136 +644,6 @@ def test_early_terminal_does_not_shorten_a_local_horizon(
         )
 
 
-def _automatic_attack_case() -> AdmissionCase:
-    # Explicit synthetic open board/close deployment; ordinary startup, placements
-    # and shooting only. This is a timing fixture, not source-layout qualification.
-    config = _compact_terminal_config(game_id="admission-auto")
-    mission = config.mission_setup
-    assert mission is not None
-    enemy = config.army_muster_requests[1]
-    config = replace(
-        config,
-        ruleset_descriptor=replace(
-            config.ruleset_descriptor,
-            descriptor_hash="",
-            battle_phase_sequence=BattlePhaseSequenceDescriptor(
-                phases=(BattlePhaseKind.COMMAND, BattlePhaseKind.SHOOTING, BattlePhaseKind.FIGHT)
-            ),
-        ),
-        army_muster_requests=(
-            config.army_muster_requests[0],
-            replace(
-                enemy,
-                unit_selections=(
-                    *enemy.unit_selections,
-                    replace(enemy.unit_selections[0], unit_selection_id="terminal-unit-c"),
-                ),
-            ),
-        ),
-        mission_setup=replace(
-            mission,
-            deployment_map_id="admission-synthetic-close-zones",
-            terrain_layout_id="admission-synthetic-open-board",
-            battlefield_layout_id=None,
-            terrain_features=(),
-            terrain_areas=(),
-            objective_terrain_areas=(),
-            deployment_zones=tuple(
-                replace(
-                    zone,
-                    shape=replace(
-                        zone.shape,
-                        polygons=tuple(
-                            replace(
-                                polygon,
-                                vertices=tuple(
-                                    replace(
-                                        point,
-                                        x=point.x + (12 if zone.player_id == "player-a" else -12),
-                                    )
-                                    for point in polygon.vertices
-                                ),
-                            )
-                            for polygon in zone.shape.polygons
-                        ),
-                    ),
-                )
-                for zone in mission.deployment_zones
-            ),
-        ),
-    )
-    session = LocalGameSession()
-    session.start(config)
-    status = session.advance_until_decision_or_terminal()
-    for index in range(20):
-        request = status.decision_request
-        assert request is not None
-        assert request.actor_id is not None
-        if request.decision_type == "select_resolve_target_unit":
-            return _step(session)
-        if request.decision_type == "submit_deployment_placement":
-            view = session.view(viewer_player_id=request.actor_id)
-            pending = view["pending_decision"]
-            assert pending is not None
-            payload = _deployment_payload_from_proposal(view["pending_proposal"])
-            for placement in cast(list[dict[str, JsonValue]], payload["model_placements"]):
-                pose = cast(dict[str, JsonValue], placement["pose"])
-                position = cast(dict[str, JsonValue], pose["position"])
-                if request.actor_id == "player-a":
-                    position["x"] = cast(float, position["x"]) + 12
-                if placement["unit_instance_id"] == "army-beta:terminal-unit-c":
-                    position["y"] = cast(float, position["y"]) + 9
-            status = session.submit_viewer_parameterized_payload(
-                viewer=ViewerContext.for_player(request.actor_id),
-                request_id=pending["request_id"],
-                result_id=f"auto-prefix-{index}",
-                payload=payload,
-            )
-        elif request.decision_type == "submit_shooting_declaration":
-            proposal = _proposal_from_request(
-                request=request, target_unit_id="army-beta:terminal-unit-b"
-            )
-            first = proposal.declarations[0]
-            envelope = cast(dict[str, JsonValue], request.payload)
-            offered = cast(dict[str, JsonValue], envelope["proposal_request"])
-            weapon = next(
-                item
-                for item in cast(list[AvailableWeaponPayload], offered["available_weapons"])
-                if item["model_instance_id"] != first.attacker_model_instance_id
-            )
-            second = replace(
-                first,
-                attacker_model_instance_id=weapon["model_instance_id"],
-                weapon_instance_id=weapon["weapon_instance_id"],
-                wargear_id=weapon["wargear_id"],
-                weapon_profile_id=weapon["weapon_profile_id"],
-                target_unit_instance_id="army-beta:terminal-unit-c",
-            )
-            status = session.submit_parameterized_payload(
-                request_id=request.request_id,
-                result_id=f"auto-prefix-{index}",
-                payload=validate_json_value(
-                    replace(proposal, declarations=(first, second)).to_payload()
-                ),
-            )
-        else:
-            chosen = {
-                "select_shooting_unit": "army-alpha:terminal-unit-a",
-                "select_shooting_type": "normal",
-            }.get(request.decision_type)
-            if chosen is None:
-                chosen = _terminal_progress_option_id(
-                    cast(dict[str, JsonValue], request.to_payload())
-                )
-            status = session.submit_option(
-                request_id=request.request_id, result_id=f"auto-prefix-{index}", option_id=chosen
-            )
-        if status.status_kind is LifecycleStatusKind.ADVANCED:
-            status = session.advance_until_decision_or_terminal()
-        assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION, status
-    pytest.fail("Automatic attack fixture exceeded its explicit prefix budget.")
-
-
 def test_local_horizon_counts_automatic_records_and_rejects_interior_boundary() -> None:
     case = _automatic_attack_case()
     transition = case.transition()
@@ -1067,106 +672,6 @@ def test_local_horizon_counts_automatic_records_and_rejects_interior_boundary() 
                 replace(target, horizon_decisions=unavailable),
                 final_session=case.after,
             )
-
-
-@dataclass(frozen=True)
-class DeploymentCase:
-    first: AdmissionCase
-    context: PlayerDecisionContext
-    action: PolicyAction
-    after: LocalGameSession
-    last: AdmissionCase
-    transitions: tuple[AcceptedTransition, ...]
-    origin: VerifiedEpisodeOrigin
-
-    def proposal_transition(
-        self, action: PolicyAction | None = None
-    ) -> ParameterizedAcceptedTransition:
-        return ParameterizedAcceptedTransition.from_sessions(
-            self.action if action is None else action,
-            context=self.context,
-            before=self.first.after,
-            after=self.after,
-            trajectory_id="admission-trajectory",
-            perspective_player_id="player-a",
-            previous=self.transitions[0],
-        )
-
-    def episode(self) -> MixedEpisodeAdmission:
-        return MixedEpisodeAdmission.from_transitions(
-            self.origin,
-            transitions=self.transitions,
-            final_session=self.last.after,
-            episode_end=TargetEpisodeEnd.TRUNCATED,
-            stop_reason="setup-slice",
-        )
-
-
-@pytest.fixture(scope="module")
-def deployment() -> DeploymentCase:
-    session = LocalGameSession()
-    session.start(_compact_terminal_config(game_id="parameterized-admission"))
-    status = session.advance_until_decision_or_terminal()
-    for index in range(30):
-        request = status.decision_request
-        assert request is not None
-        assert request.actor_id is not None
-        if request.decision_type == "select_deployment_unit":
-            break
-        context = PlayerDecisionContext.from_view(
-            session.view(viewer_player_id=request.actor_id), choice_seed=7
-        )
-        status = session.submit_viewer_option(
-            viewer=ViewerContext.for_player(request.actor_id),
-            request_id=context.request["request_id"],
-            option_id=_terminal_progress_option_id(cast(dict[str, JsonValue], context.request)),
-            result_id=f"deployment-prefix-{index}",
-        )
-        if status.status_kind is LifecycleStatusKind.ADVANCED:
-            status = session.advance_until_decision_or_terminal()
-        assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    else:
-        pytest.fail("Ordinary setup did not reach deployment within the declared budget.")
-    first = _step(session)
-    pending = first.after.lifecycle.pending_decision_request()
-    assert pending is not None
-    assert pending.actor_id is not None
-    context = PlayerDecisionContext.from_view(
-        first.after.view(viewer_player_id=pending.actor_id), choice_seed=7
-    )
-    action = context.propose(
-        _deployment_payload_from_proposal(context.observation["pending_proposal"])
-    )
-    after = first.after.fork()
-    status = after.submit_viewer_parameterized_payload(
-        viewer=ViewerContext.for_player(action.actor_id),
-        request_id=action.request_id,
-        payload=json.loads(cast(str, action.proposal_json)),
-        result_id="accepted-deployment",
-    )
-    if status.status_kind is LifecycleStatusKind.ADVANCED:
-        status = after.advance_until_decision_or_terminal()
-    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    first_transition = first.transition()
-    placement = ParameterizedAcceptedTransition.from_sessions(
-        action,
-        context=context,
-        before=first.after,
-        after=after,
-        trajectory_id="admission-trajectory",
-        perspective_player_id="player-a",
-        previous=first_transition,
-    )
-    last = _step(after)
-    return DeploymentCase(
-        first,
-        context,
-        action,
-        after,
-        last,
-        (first_transition, placement, last.transition(previous=placement)),
-        VerifiedEpisodeOrigin.from_session(first.before, config=first.before.lifecycle.config),
-    )
 
 
 def test_parameterized_transition_reproduces_ordinary_viewer_action(
@@ -1461,3 +966,493 @@ def test_mixed_episode_rejects_discontinuous_or_drifted_evidence(
             episode_end=end,
             stop_reason="setup-slice",
         )
+
+
+def test_deployment_candidate_is_detached_actor_view_evidence(deployment: DeploymentCase) -> None:
+    context = deployment.context
+    candidate = DeploymentPlacementCandidate.from_action(deployment.action, context=context)
+    payload = candidate.to_payload()
+    assert payload["actor_id"] == context.route.actor_id
+    assert payload["request_id"] == context.request["request_id"]
+    assert payload["request_id"] != deployment.transitions[1].authoritative_request_id
+    assert payload["proposal"] == json.loads(cast(str, deployment.action.proposal_json))
+    assert set(payload) == {
+        "schema_version",
+        "candidate_id",
+        "actor_id",
+        "request_id",
+        "observation_hash",
+        "proposal",
+    }
+    assert candidate.content_hash == payload_digest(payload)
+    assert candidate.select(context) == context.propose(payload["proposal"])
+    assert (
+        DeploymentPlacementCandidate.from_payload(
+            json.loads(canonical_json(payload)), context=context
+        )
+        == candidate
+    )
+    equivalent = replace(deployment.action, proposal_json=json.dumps(payload["proposal"], indent=4))
+    assert DeploymentPlacementCandidate.from_action(equivalent, context=context) == candidate
+    payload["proposal"] = {}
+    assert candidate.to_payload()["proposal"]
+    with pytest.raises(FrozenInstanceError):
+        candidate._action_json = "{}"  # type: ignore[misc]
+    with pytest.raises(PolicyError):
+        DeploymentPlacementCandidate()
+    with pytest.raises(PolicyError):
+        candidate.select(deployment.last.context)
+    with pytest.raises(PolicyError):
+        DeploymentPlacementCandidate.from_action(
+            replace(deployment.action, actor_id="other-player"), context=context
+        )
+    with pytest.raises(PolicyError):
+        DeploymentPlacementCandidate.from_action(
+            deployment.first.context.select_option(deployment.first.row.chosen_action_id),
+            context=deployment.first.context,
+        )
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "schema_version",
+        "candidate_id",
+        "actor_id",
+        "request_id",
+        "observation_hash",
+        "proposal",
+        "unknown",
+    ],
+)
+def test_deployment_candidate_loader_rejects_drift(deployment: DeploymentCase, field: str) -> None:
+    candidate = DeploymentPlacementCandidate.from_action(
+        deployment.action, context=deployment.context
+    )
+    payload: dict[str, object] = dict(candidate.to_payload())
+    payload[field] = "drifted"
+    with pytest.raises(PolicyError):
+        DeploymentPlacementCandidate.from_payload(payload, context=deployment.context)
+    payload = dict(candidate.to_payload())
+    payload.pop("candidate_id")
+    with pytest.raises(PolicyError):
+        DeploymentPlacementCandidate.from_payload(payload, context=deployment.context)
+
+
+def test_accepted_deployment_row_roundtrips_without_changing_legacy_row(
+    deployment: DeploymentCase, deployment_training: DeploymentTrainingProof
+) -> None:
+    proof = deployment_training
+    row, link = proof.row, proof.link
+    original = canonical_json(row.to_payload())
+    link.require_matches(row, context=deployment.context)
+    assert link.chosen_action_id == row.chosen_action_id == link.candidate.candidate_id
+    assert link.chosen_action_index == 0
+    assert link.to_payload()["accepted_transition_hash"] == deployment.transitions[1].content_hash
+    assert (
+        ParameterizedTrainingCandidateLink.from_payload(
+            json.loads(canonical_json(link.to_payload())),
+            row=row,
+            context=deployment.context,
+            transition=link.transition,
+        )
+        == link
+    )
+    assert TrainingRow.from_payload(row.to_payload()).to_payload() == row.to_payload()
+    payload = link.to_payload()
+    payload["candidate"]["proposal"] = {}
+    assert link.to_payload()["candidate"]["proposal"]
+    assert canonical_json(row.to_payload()) == original
+    assert row.target_value == 0.25
+    with pytest.raises(FrozenInstanceError):
+        link._evidence_json = "{}"  # type: ignore[misc]
+    with pytest.raises(TrainingCandidateLinkError):
+        ParameterizedTrainingCandidateLink()
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "row",
+        "record",
+        "game",
+        "chosen",
+        "false-mask",
+        "wide-mask",
+        "feature",
+        "scalar",
+        "metadata",
+        "context",
+        "proposal",
+        "malformed",
+        "rejected",
+        "transition",
+    ],
+)
+def test_deployment_training_row_rejects_drift(
+    deployment: DeploymentCase, deployment_training: DeploymentTrainingProof, change: str
+) -> None:
+    proof = deployment_training
+    row, context, candidate, transition = (
+        proof.row,
+        deployment.context,
+        proof.link.candidate,
+        proof.link.transition,
+    )
+    if change == "row":
+        row = replace(row, row_id="other-row")
+    elif change == "record":
+        row = replace(row, decision_record_id=deployment.transitions[0].authoritative_record_id)
+    elif change == "game":
+        row = replace(row, game_id="other-game")
+    elif change == "chosen":
+        row = replace(row, chosen_action_id="other-candidate")
+    elif change == "false-mask":
+        with pytest.raises(PolicyProvenanceError, match="at least one legal"):
+            replace(row, legal_action_mask=(False,))
+        return
+    elif change == "wide-mask":
+        row = replace(row, legal_action_mask=(True, True))
+    elif change == "feature":
+        row = replace(row, input_features=(replace(row.input_features[0], value=2),))
+    elif change == "scalar":
+        row = replace(row, target_value=0.75)
+    elif change == "metadata":
+        row = replace(row, debug_metadata={"changed": True})
+    elif change == "context":
+        view = context.observation
+        view["battle_round"] += 1
+        context = PlayerDecisionContext.from_view(view, choice_seed=7)
+    elif change in ("proposal", "malformed", "rejected"):
+        proposal = json.loads(cast(str, deployment.action.proposal_json))
+        if change == "malformed":
+            proposal.pop("model_placements")
+        else:
+            proposal["model_placements"][0]["pose"]["position"]["x"] += (
+                -1000.0 if change == "rejected" else 0.25
+            )
+        candidate = DeploymentPlacementCandidate.from_action(
+            context.propose(proposal), context=context
+        )
+        row = replace(row, chosen_action_id=candidate.candidate_id)
+    else:
+        transition = cast(ParameterizedAcceptedTransition, deployment.transitions[0])
+    if change in ("proposal", "malformed", "rejected", "transition"):
+        with pytest.raises(TrainingCandidateLinkError):
+            ParameterizedTrainingCandidateLink.from_row(
+                row, candidate=candidate, context=context, transition=transition
+            )
+    else:
+        with pytest.raises(TrainingCandidateLinkError):
+            proof.link.require_matches(row, context=context)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("schema_version", "future"),
+        ("row_id", "wrong"),
+        ("game_id", "wrong"),
+        ("training_row_hash", "0" * 64),
+        ("candidate_hash", "0" * 64),
+        ("candidate", {}),
+        ("chosen_action_id", "wrong"),
+        ("chosen_action_index", True),
+        ("chosen_action_index", 0.0),
+        ("chosen_action_index", 1),
+        ("accepted_transition_hash", "0" * 64),
+        ("unknown", None),
+    ],
+)
+def test_deployment_training_loader_checks_complete_evidence(
+    deployment: DeploymentCase,
+    deployment_training: DeploymentTrainingProof,
+    field: str,
+    value: object,
+) -> None:
+    proof = deployment_training
+    payload: dict[str, object] = dict(proof.link.to_payload())
+    payload[field] = value
+    with pytest.raises(TrainingCandidateLinkError):
+        ParameterizedTrainingCandidateLink.from_payload(
+            payload, row=proof.row, context=deployment.context, transition=proof.link.transition
+        )
+
+
+def test_deployment_named_and_admitted_targets_roundtrip(
+    deployment: DeploymentCase, deployment_training: DeploymentTrainingProof
+) -> None:
+    proof = deployment_training
+    linked = proof.linked(deployment.context)
+    assert (
+        LinkedTrainingTarget.from_payload(
+            linked.to_payload(), link=proof.link, row=proof.row, context=deployment.context
+        )
+        == linked
+    )
+    original = deployment.last.after.to_persistence_payload()
+    receipt = AdmittedTrainingTarget.from_episode(
+        linked,
+        episode=proof.episode,
+        transition=proof.link.transition,
+        link=proof.link,
+        row=proof.row,
+        context=deployment.context,
+        config=deployment.first.before.lifecycle.config,
+        reward_profile_version=proof.row.reward_profile_version,
+        final_session=deployment.last.after,
+    )
+    assert receipt.to_payload()["schema_version"] == "mixed-target-admission-v1"
+    assert receipt.to_payload()["eligible_for_learning"]
+    assert (
+        receipt.to_payload()["accepted_record_start"] == proof.link.transition.accepted_record_start
+    )
+    assert (
+        AdmittedTrainingTarget.from_payload(
+            receipt.to_payload(),
+            linked=linked,
+            episode=proof.episode,
+            transition=proof.link.transition,
+            link=proof.link,
+            row=proof.row,
+            context=deployment.context,
+            config=deployment.first.before.lifecycle.config,
+            reward_profile_version=proof.row.reward_profile_version,
+            final_session=deployment.last.after,
+        )
+        == receipt
+    )
+    assert original == deployment.last.after.to_persistence_payload()
+    detached = receipt.to_payload()
+    detached["eligible_for_learning"] = False
+    with pytest.raises(TrainingAdmissionError):
+        AdmittedTrainingTarget.from_payload(
+            detached,
+            linked=linked,
+            episode=proof.episode,
+            transition=proof.link.transition,
+            link=proof.link,
+            row=proof.row,
+            context=deployment.context,
+            config=deployment.first.before.lifecycle.config,
+            reward_profile_version=proof.row.reward_profile_version,
+            final_session=deployment.last.after,
+        )
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "horizon",
+        "value",
+        "perspective",
+        "producer",
+        "evidence",
+        "transition",
+        "source",
+        "reward",
+        "endpoint",
+    ],
+)
+def test_deployment_target_admission_rejects_wrong_joins(
+    deployment: DeploymentCase, deployment_training: DeploymentTrainingProof, change: str
+) -> None:
+    proof = deployment_training
+    target = proof.target
+    if change == "horizon":
+        target = replace(target, horizon_decisions=cast(int, target.horizon_decisions) + 1)
+    elif change == "value":
+        target = replace(target, value=cast(float, target.value) + 1)
+    elif change == "perspective":
+        target = replace(target, perspective_player_id="player-b")
+    elif change == "producer":
+        target = replace(target, producer_id="unverified")
+    elif change == "evidence":
+        target = replace(target, evidence_hash="0" * 64)
+    linked = LinkedTrainingTarget.from_link(
+        proof.link, row=proof.row, context=deployment.context, target=target
+    )
+    config = deployment.first.before.lifecycle.config
+    with pytest.raises(TrainingAdmissionError):
+        AdmittedTrainingTarget.from_episode(
+            linked,
+            episode=proof.episode,
+            transition=deployment.transitions[0]
+            if change == "transition"
+            else proof.link.transition,
+            link=proof.link,
+            row=proof.row,
+            context=deployment.context,
+            config=replace(config, game_id="wrong-game") if change == "source" else config,
+            reward_profile_version="wrong"
+            if change == "reward"
+            else proof.row.reward_profile_version,
+            final_session=deployment.after if change == "endpoint" else deployment.last.after,
+        )
+
+
+def test_deployment_missing_target_is_excluded_and_finite_targets_join_mixed_episode(
+    deployment: DeploymentCase, deployment_training: DeploymentTrainingProof
+) -> None:
+    proof = deployment_training
+    missing = replace(
+        proof.target,
+        validity=TargetValidity.MISSING,
+        value=None,
+        missing_reason="setup-slice",
+        producer_id=MISSING_TARGET_PRODUCER,
+        evidence_hash=proof.episode.content_hash,
+    )
+    finite = deployment.last
+    finite_link = FiniteTrainingCandidateLink.from_row(finite.row, context=finite.context)
+    for link, row, context, transition in (
+        (proof.link, proof.row, deployment.context, proof.link.transition),
+        (finite_link, finite.row, finite.context, deployment.transitions[-1]),
+    ):
+        linked = LinkedTrainingTarget.from_link(link, row=row, context=context, target=missing)
+        receipt = AdmittedTrainingTarget.from_episode(
+            linked,
+            episode=proof.episode,
+            transition=transition,
+            link=link,
+            row=row,
+            context=context,
+            config=deployment.first.before.lifecycle.config,
+            reward_profile_version=row.reward_profile_version,
+        )
+        assert not receipt.to_payload()["eligible_for_learning"]
+        assert receipt.to_payload()["schema_version"] == "mixed-target-admission-v1"
+
+
+def test_deployment_row_target_survives_ordinary_terminal_continuation(
+    deployment: DeploymentCase, deployment_training: DeploymentTrainingProof
+) -> None:
+    # This compact canonical Command/Fight workload proves target plumbing,
+    # not a competitive game or general proposal-family coverage.
+    proof = deployment_training
+    perspective = next(
+        player
+        for player in deployment.context.observation["player_ids"]
+        if player != deployment.action.actor_id
+    )
+    selected = ParameterizedAcceptedTransition.from_sessions(
+        deployment.action,
+        context=deployment.context,
+        before=deployment.first.after,
+        after=deployment.after,
+        trajectory_id="deployment-terminal-target",
+        perspective_player_id=perspective,
+    )
+    transitions: list[AcceptedTransition] = [selected]
+    session = deployment.after
+    for index in range(100):
+        request = session.lifecycle.pending_decision_request()
+        assert request is not None
+        assert request.actor_id is not None
+        context = PlayerDecisionContext.from_view(
+            session.view(viewer_player_id=request.actor_id), choice_seed=7
+        )
+        before = session
+        if context.route.proposal_kind is not None:
+            proposal = _deployment_payload_from_proposal(context.observation["pending_proposal"])
+            session = before.fork()
+            status = session.submit_viewer_parameterized_payload(
+                viewer=ViewerContext.for_player(context.route.actor_id),
+                request_id=context.request["request_id"],
+                payload=proposal,
+                result_id=f"deployment-target-continuation-{index}",
+            )
+            if status.status_kind is LifecycleStatusKind.ADVANCED:
+                status = session.advance_until_decision_or_terminal()
+            next_transition: AcceptedTransition = ParameterizedAcceptedTransition.from_sessions(
+                context.propose(proposal),
+                context=context,
+                before=before,
+                after=session,
+                trajectory_id="deployment-terminal-target",
+                perspective_player_id=perspective,
+                previous=transitions[-1],
+            )
+        else:
+            chosen = _terminal_progress_option_id(cast(dict[str, JsonValue], context.request))
+            case = _step(before, chosen)
+            session = case.after
+            next_transition = FiniteAcceptedTransition.from_sessions(
+                FiniteTrainingCandidateLink.from_row(case.row, context=context),
+                row=case.row,
+                context=context,
+                before=before,
+                after=session,
+                trajectory_id="deployment-terminal-target",
+                perspective_player_id=perspective,
+                previous=transitions[-1],
+            )
+        transitions.append(next_transition)
+        if next_transition.to_payload()["outcome"] == "terminal":
+            break
+    else:
+        pytest.fail("Compact deployment target continuation exceeded its declared budget.")
+    episode = MixedEpisodeAdmission.from_transitions(
+        VerifiedEpisodeOrigin.from_session(
+            deployment.first.after, config=deployment.first.after.lifecycle.config
+        ),
+        transitions=tuple(transitions),
+        final_session=session,
+        episode_end=TargetEpisodeEnd.TERMINAL,
+    )
+    result_payload = episode.to_payload()["final_result"]
+    assert result_payload is not None
+    result = FinalScoringResult.from_payload(result_payload)
+    value = 0.5 if result.is_draw else float(perspective in result.winner_player_ids)
+    target = replace(
+        proof.target,
+        target_id="deployment-terminal-match-utility",
+        meaning=TargetMeaning.MATCH_UTILITY,
+        perspective_player_id=perspective,
+        horizon=TargetHorizon.MATCH_END,
+        horizon_decisions=None,
+        episode_end=TargetEpisodeEnd.TERMINAL,
+        value=value,
+        value_unit="unit_interval",
+        producer_id=TERMINAL_TARGET_PRODUCER,
+        evidence_hash=payload_digest(result_payload),
+    )
+    link = ParameterizedTrainingCandidateLink.from_row(
+        proof.row, candidate=proof.link.candidate, context=deployment.context, transition=selected
+    )
+    linked = LinkedTrainingTarget.from_link(
+        link, row=proof.row, context=deployment.context, target=target
+    )
+    receipt = AdmittedTrainingTarget.from_episode(
+        linked,
+        episode=episode,
+        transition=selected,
+        link=link,
+        row=proof.row,
+        context=deployment.context,
+        config=deployment.first.before.lifecycle.config,
+        reward_profile_version=proof.row.reward_profile_version,
+    )
+    assert selected.actor_id != selected.perspective_player_id == target.perspective_player_id
+    assert receipt.to_payload()["eligible_for_learning"]
+    assert (
+        receipt.to_payload()["accepted_record_stop"] == episode.to_payload()["accepted_record_stop"]
+    )
+
+
+def test_deployment_candidate_rejects_untyped_context(deployment: DeploymentCase) -> None:
+    candidate = DeploymentPlacementCandidate.from_action(
+        deployment.action, context=deployment.context
+    )
+    invalid = cast(PlayerDecisionContext, None)
+    with pytest.raises(PolicyError, match="typed player context"):
+        candidate.select(invalid)
+    with pytest.raises(PolicyError, match="typed player context"):
+        DeploymentPlacementCandidate.from_payload(candidate.to_payload(), context=invalid)
+
+
+def test_deployment_row_mask_rejects_numeric_booleans(
+    deployment_training: DeploymentTrainingProof,
+) -> None:
+    with pytest.raises(PolicyProvenanceError, match="bool"):
+        replace(deployment_training.row, legal_action_mask=cast(tuple[bool, ...], (1,)))

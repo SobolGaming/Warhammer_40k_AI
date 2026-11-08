@@ -223,16 +223,16 @@
       "sha256": "e8548335a237455fce0e5888c15f192a278620aaad31ff2a13139755492e3c56"
     },
     "tests/infrastructure/adapters/test_finite_candidates.py": {
+      "blob_sha1": "c8967072bd63c9cce467b06ffe3853e76d880309",
+      "bytes": 56841,
       "mode": "100644",
-      "blob_sha1": "4a7faab0e907267f3047eb3925bc205d7a30ec98",
-      "sha256": "40ac1bcbb3c971595e4c9fcf508969e9d48375ec60be69ed6f8350c641224f04",
-      "bytes": 56838
+      "sha256": "46f9947f09bea4cb3dbbb0e665f488031c2565f2a3dad2097dd840627f0e2abb"
     },
     "tests/infrastructure/adapters/test_training_admission.py": {
+      "blob_sha1": "c3111b2ac53d19f74d7bb2b5143d0bacfe247042",
+      "bytes": 58314,
       "mode": "100644",
-      "blob_sha1": "0024b594567aa1e68c13cb0d5842e2284d019c82",
-      "sha256": "af08ae28fbc5356d1bfa8afd0f948b2b3acddf2768f8e2004e1a2ef6825c1ea5",
-      "bytes": 59655
+      "sha256": "0f1007d7ddc51bc3e2f934b27e71900dc308004b3a0781abe522085178951e92"
     },
     "tests/infrastructure/adapters/unit/test_session_commands.py": {
       "blob_sha1": "6232e501f8011b78ac9e99b91792c579baec5694",

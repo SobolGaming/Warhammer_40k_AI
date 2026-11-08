@@ -7,6 +7,10 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import TypedDict, cast
 
+from warhammer40k_core.ai.parameterized_training import (
+    ParameterizedTrainingCandidateLink,
+    TrainingCandidateLink,
+)
 from warhammer40k_core.ai.player_policy import PlayerDecisionContext, payload_digest
 from warhammer40k_core.ai.policy_contracts import PolicyProvenanceError, TrainingRow
 from warhammer40k_core.ai.training_candidates import (
@@ -232,7 +236,7 @@ class LinkedTrainingTarget:
     @classmethod
     def from_link(
         cls,
-        link: FiniteTrainingCandidateLink,
+        link: TrainingCandidateLink,
         *,
         row: TrainingRow,
         context: PlayerDecisionContext,
@@ -245,7 +249,7 @@ class LinkedTrainingTarget:
 
     def require_matches(
         self,
-        link: FiniteTrainingCandidateLink,
+        link: TrainingCandidateLink,
         *,
         row: TrainingRow,
         context: PlayerDecisionContext,
@@ -276,7 +280,7 @@ class LinkedTrainingTarget:
         cls,
         payload: object,
         *,
-        link: FiniteTrainingCandidateLink,
+        link: TrainingCandidateLink,
         row: TrainingRow,
         context: PlayerDecisionContext,
     ) -> LinkedTrainingTarget:
@@ -292,13 +296,13 @@ class LinkedTrainingTarget:
 
 
 def _require_link(
-    link: FiniteTrainingCandidateLink,
+    link: TrainingCandidateLink,
     *,
     row: TrainingRow,
     context: PlayerDecisionContext,
 ) -> None:
-    if type(link) is not FiniteTrainingCandidateLink:
-        raise TrainingTargetError("Named targets require a finite training candidate link.")
+    if type(link) not in (FiniteTrainingCandidateLink, ParameterizedTrainingCandidateLink):
+        raise TrainingTargetError("Named targets require a supported training candidate link.")
     try:
         link.require_matches(row, context=context)
     except TrainingCandidateLinkError as exc:

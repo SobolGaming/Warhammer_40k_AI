@@ -697,7 +697,7 @@ def test_named_target_direct_construction_requires_typed_entries() -> None:
         replace(target, meaning=cast(TargetMeaning, "local_reference"))
     with pytest.raises(TrainingTargetError, match="typed named"):
         LinkedTrainingTarget("0" * 64, cast(NamedTrainingTarget, {}))
-    with pytest.raises(TrainingTargetError, match="finite training"):
+    with pytest.raises(TrainingTargetError, match="supported training"):
         LinkedTrainingTarget.from_link(
             cast(FiniteTrainingCandidateLink, None), row=row, context=context, target=target
         )
