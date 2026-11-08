@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import TypedDict, cast
+from typing import Self, TypedDict, cast
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.ai.player_policy import PlayerDecisionContext, payload_digest
@@ -18,7 +18,9 @@ from warhammer40k_core.ai.training_targets import (
 )
 from warhammer40k_core.ai.training_transitions import (
     ACCEPTED_RECORD_TIME_CONVENTION,
+    AcceptedTransition,
     FiniteAcceptedTransition,
+    ParameterizedAcceptedTransition,
 )
 from warhammer40k_core.build_identity import current_engine_build_id
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -30,6 +32,7 @@ from warhammer40k_core.engine.replay import ReplaySourceIdentityPayload
 
 EPISODE_ORIGIN_SCHEMA_VERSION = "verified-episode-origin-v1"
 EPISODE_ADMISSION_SCHEMA_VERSION = "finite-episode-admission-v1"
+MIXED_EPISODE_ADMISSION_SCHEMA_VERSION = "mixed-episode-admission-v1"
 TARGET_ADMISSION_SCHEMA_VERSION = "finite-target-admission-v1"
 TERMINAL_TARGET_PRODUCER = "engine-final-scoring-v1"
 MISSING_TARGET_PRODUCER = "episode-boundary-v1"
@@ -144,8 +147,8 @@ class VerifiedEpisodeOrigin:
 
 
 @dataclass(frozen=True, slots=True, init=False)
-class FiniteEpisodeAdmission:
-    """A contiguous finite slice from a reachable origin to a declared boundary.
+class _EpisodeAdmission[Transition: AcceptedTransition]:
+    """Shared verification of a contiguous slice from a reachable origin.
 
     Terminal results come from the engine. Truncation, abort and unsupported
     reasons are explicit operator declarations, not authenticated diagnoses.
@@ -154,33 +157,44 @@ class FiniteEpisodeAdmission:
     _evidence_json: str
 
     def __init__(self) -> None:
-        raise TrainingAdmissionError("Admit an episode through a verified finite chain.")
+        raise TrainingAdmissionError("Admit an episode through a verified transition chain.")
 
     @classmethod
     def from_transitions(
         cls,
         origin: VerifiedEpisodeOrigin,
         *,
-        transitions: tuple[FiniteAcceptedTransition, ...],
+        transitions: tuple[Transition, ...],
         final_session: LocalGameSession,
         episode_end: TargetEpisodeEnd,
         stop_reason: str | None = None,
-    ) -> FiniteEpisodeAdmission:
+    ) -> Self:
+        # Keep the generic factory type before concrete-family validation narrows cls.
+        result = object.__new__(cls)
         if (
             type(origin) is not VerifiedEpisodeOrigin
             or type(final_session) is not LocalGameSession
             or type(episode_end) is not TargetEpisodeEnd
             or type(transitions) is not tuple
             or not transitions
-            or any(type(item) is not FiniteAcceptedTransition for item in transitions)
+            or cls not in (FiniteEpisodeAdmission, MixedEpisodeAdmission)
+            or any(
+                type(item)
+                not in (
+                    (FiniteAcceptedTransition,)
+                    if cls is FiniteEpisodeAdmission
+                    else (FiniteAcceptedTransition, ParameterizedAcceptedTransition)
+                )
+                for item in transitions
+            )
         ):
             raise TrainingAdmissionError(
-                "Episode admission requires typed nonempty finite evidence."
+                "Episode admission requires typed nonempty supported transition evidence."
             )
         root = origin.to_payload()
         if root["engine_build_id"] != current_engine_build_id():
             raise TrainingAdmissionError("Episode engine build drifted.")
-        previous: FiniteAcceptedTransition | None = None
+        previous: AcceptedTransition | None = None
         checkpoint_hash = root["origin_checkpoint_hash"]
         stop = 0
         first = transitions[0].to_payload()
@@ -233,7 +247,9 @@ class FiniteEpisodeAdmission:
         else:
             stop_reason = _identifier("Episode stop_reason", stop_reason)
         payload: FiniteEpisodePayload = {
-            "schema_version": EPISODE_ADMISSION_SCHEMA_VERSION,
+            "schema_version": EPISODE_ADMISSION_SCHEMA_VERSION
+            if cls is FiniteEpisodeAdmission
+            else MIXED_EPISODE_ADMISSION_SCHEMA_VERSION,
             "time_convention": ACCEPTED_RECORD_TIME_CONVENTION,
             "origin": root,
             "trajectory_id": first["trajectory_id"],
@@ -245,7 +261,6 @@ class FiniteEpisodeAdmission:
             "stop_reason": stop_reason,
             "final_result": final_result,
         }
-        result = object.__new__(cls)
         object.__setattr__(result, "_evidence_json", _json(payload))
         return result
 
@@ -255,11 +270,11 @@ class FiniteEpisodeAdmission:
         payload: object,
         *,
         origin: VerifiedEpisodeOrigin,
-        transitions: tuple[FiniteAcceptedTransition, ...],
+        transitions: tuple[Transition, ...],
         final_session: LocalGameSession,
         episode_end: TargetEpisodeEnd,
         stop_reason: str | None = None,
-    ) -> FiniteEpisodeAdmission:
+    ) -> Self:
         expected = cls.from_transitions(
             origin,
             transitions=transitions,
@@ -276,6 +291,21 @@ class FiniteEpisodeAdmission:
     @property
     def content_hash(self) -> str:
         return payload_digest(self.to_payload())
+
+
+class FiniteEpisodeAdmission(_EpisodeAdmission[FiniteAcceptedTransition]):
+    """Finite-only episode admission retaining the finite-episode-admission-v1 contract."""
+
+    __slots__ = ()
+
+
+class MixedEpisodeAdmission(_EpisodeAdmission[AcceptedTransition]):
+    """Episode admission for finite and bounded verified parameterized transitions.
+
+    This does not provide parameterized training-row or named-target linkage.
+    """
+
+    __slots__ = ()
 
 
 class LocalReferencePayload(TypedDict):
@@ -311,16 +341,16 @@ class VerifiedLocalReference:
     @classmethod
     def from_episode(
         cls,
-        episode: FiniteEpisodeAdmission,
+        episode: FiniteEpisodeAdmission | MixedEpisodeAdmission,
         *,
-        transition: FiniteAcceptedTransition,
+        transition: AcceptedTransition,
         final_session: LocalGameSession,
         target_id: str,
         horizon_decisions: int,
     ) -> VerifiedLocalReference:
         if (
-            type(episode) is not FiniteEpisodeAdmission
-            or type(transition) is not FiniteAcceptedTransition
+            type(episode) not in (FiniteEpisodeAdmission, MixedEpisodeAdmission)
+            or type(transition) not in (FiniteAcceptedTransition, ParameterizedAcceptedTransition)
             or type(final_session) is not LocalGameSession
         ):
             raise TrainingAdmissionError("Local references require typed episode evidence.")
@@ -381,8 +411,8 @@ class VerifiedLocalReference:
         cls,
         payload: object,
         *,
-        episode: FiniteEpisodeAdmission,
-        transition: FiniteAcceptedTransition,
+        episode: FiniteEpisodeAdmission | MixedEpisodeAdmission,
+        transition: AcceptedTransition,
         final_session: LocalGameSession,
         target_id: str,
         horizon_decisions: int,

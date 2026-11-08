@@ -16,7 +16,7 @@ from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.ai.finite_candidates import FiniteCandidateSet
-from warhammer40k_core.ai.player_policy import PlayerDecisionContext, payload_digest
+from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyAction, payload_digest
 from warhammer40k_core.ai.policy_contracts import (
     PolicyArtifactKind,
     PolicyProvenance,
@@ -31,6 +31,7 @@ from warhammer40k_core.ai.training_admission import (
     TERMINAL_TARGET_PRODUCER,
     AdmittedTrainingTarget,
     FiniteEpisodeAdmission,
+    MixedEpisodeAdmission,
     TrainingAdmissionError,
     VerifiedEpisodeOrigin,
     VerifiedLocalReference,
@@ -44,7 +45,12 @@ from warhammer40k_core.ai.training_targets import (
     TargetMeaning,
     TargetValidity,
 )
-from warhammer40k_core.ai.training_transitions import FiniteAcceptedTransition
+from warhammer40k_core.ai.training_transitions import (
+    AcceptedTransition,
+    FiniteAcceptedTransition,
+    ParameterizedAcceptedTransition,
+    TrainingTransitionError,
+)
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     BattlePhaseSequenceDescriptor,
@@ -67,7 +73,7 @@ class AdmissionCase:
         self,
         row: TrainingRow | None = None,
         *,
-        previous: FiniteAcceptedTransition | None = None,
+        previous: AcceptedTransition | None = None,
         perspective: str = "player-a",
     ) -> FiniteAcceptedTransition:
         selected = self.row if row is None else row
@@ -1061,3 +1067,397 @@ def test_local_horizon_counts_automatic_records_and_rejects_interior_boundary() 
                 replace(target, horizon_decisions=unavailable),
                 final_session=case.after,
             )
+
+
+@dataclass(frozen=True)
+class DeploymentCase:
+    first: AdmissionCase
+    context: PlayerDecisionContext
+    action: PolicyAction
+    after: LocalGameSession
+    last: AdmissionCase
+    transitions: tuple[AcceptedTransition, ...]
+    origin: VerifiedEpisodeOrigin
+
+    def proposal_transition(
+        self, action: PolicyAction | None = None
+    ) -> ParameterizedAcceptedTransition:
+        return ParameterizedAcceptedTransition.from_sessions(
+            self.action if action is None else action,
+            context=self.context,
+            before=self.first.after,
+            after=self.after,
+            trajectory_id="admission-trajectory",
+            perspective_player_id="player-a",
+            previous=self.transitions[0],
+        )
+
+    def episode(self) -> MixedEpisodeAdmission:
+        return MixedEpisodeAdmission.from_transitions(
+            self.origin,
+            transitions=self.transitions,
+            final_session=self.last.after,
+            episode_end=TargetEpisodeEnd.TRUNCATED,
+            stop_reason="setup-slice",
+        )
+
+
+@pytest.fixture(scope="module")
+def deployment() -> DeploymentCase:
+    session = LocalGameSession()
+    session.start(_compact_terminal_config(game_id="parameterized-admission"))
+    status = session.advance_until_decision_or_terminal()
+    for index in range(30):
+        request = status.decision_request
+        assert request is not None
+        assert request.actor_id is not None
+        if request.decision_type == "select_deployment_unit":
+            break
+        context = PlayerDecisionContext.from_view(
+            session.view(viewer_player_id=request.actor_id), choice_seed=7
+        )
+        status = session.submit_viewer_option(
+            viewer=ViewerContext.for_player(request.actor_id),
+            request_id=context.request["request_id"],
+            option_id=_terminal_progress_option_id(cast(dict[str, JsonValue], context.request)),
+            result_id=f"deployment-prefix-{index}",
+        )
+        if status.status_kind is LifecycleStatusKind.ADVANCED:
+            status = session.advance_until_decision_or_terminal()
+        assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    else:
+        pytest.fail("Ordinary setup did not reach deployment within the declared budget.")
+    first = _step(session)
+    pending = first.after.lifecycle.pending_decision_request()
+    assert pending is not None
+    assert pending.actor_id is not None
+    context = PlayerDecisionContext.from_view(
+        first.after.view(viewer_player_id=pending.actor_id), choice_seed=7
+    )
+    action = context.propose(
+        _deployment_payload_from_proposal(context.observation["pending_proposal"])
+    )
+    after = first.after.fork()
+    status = after.submit_viewer_parameterized_payload(
+        viewer=ViewerContext.for_player(action.actor_id),
+        request_id=action.request_id,
+        payload=json.loads(cast(str, action.proposal_json)),
+        result_id="accepted-deployment",
+    )
+    if status.status_kind is LifecycleStatusKind.ADVANCED:
+        status = after.advance_until_decision_or_terminal()
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    first_transition = first.transition()
+    placement = ParameterizedAcceptedTransition.from_sessions(
+        action,
+        context=context,
+        before=first.after,
+        after=after,
+        trajectory_id="admission-trajectory",
+        perspective_player_id="player-a",
+        previous=first_transition,
+    )
+    last = _step(after)
+    return DeploymentCase(
+        first,
+        context,
+        action,
+        after,
+        last,
+        (first_transition, placement, last.transition(previous=placement)),
+        VerifiedEpisodeOrigin.from_session(first.before, config=first.before.lifecycle.config),
+    )
+
+
+def test_parameterized_transition_reproduces_ordinary_viewer_action(
+    deployment: DeploymentCase,
+) -> None:
+    before = deployment.first.after.to_persistence_payload()
+    after = deployment.after.to_persistence_payload()
+    transition = deployment.proposal_transition()
+    payload = transition.to_payload()
+    assert payload["schema_version"] == "parameterized-accepted-transition-v1"
+    assert payload["proposal_kind"] == "deployment_placement"
+    assert payload["viewer_action"]["request_id"] != payload["authoritative_request_id"]
+    assert payload["accepted_record_start"] == deployment.transitions[0].accepted_record_stop
+    assert payload["accepted_record_stop"] == payload["accepted_record_start"] + len(
+        payload["record_hashes"]
+    )
+    assert (
+        ParameterizedAcceptedTransition.from_payload(
+            json.loads(canonical_json(payload)),
+            action=deployment.action,
+            context=deployment.context,
+            before=deployment.first.after,
+            after=deployment.after,
+            trajectory_id="admission-trajectory",
+            perspective_player_id="player-a",
+            previous=deployment.transitions[0],
+        )
+        == transition
+    )
+    payload["viewer_action"]["proposal"] = {}
+    payload["record_hashes"].clear()
+    assert transition.to_payload()["record_hashes"]
+    assert transition.to_payload()["viewer_action"]["proposal"]
+    with pytest.raises(FrozenInstanceError):
+        transition._evidence_json = "{}"  # type: ignore[misc]
+    with pytest.raises(TrainingTransitionError):
+        ParameterizedAcceptedTransition()
+    assert before == deployment.first.after.to_persistence_payload()
+    assert after == deployment.after.to_persistence_payload()
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "actor",
+        "request",
+        "observation",
+        "context",
+        "malformed",
+        "stale",
+        "ruleset",
+        "placement",
+        "family",
+        "endpoint",
+        "predecessor",
+    ],
+)
+def test_parameterized_transition_rejects_drift(deployment: DeploymentCase, change: str) -> None:
+    action, context = deployment.action, deployment.context
+    after = deployment.after
+    previous = deployment.transitions[0]
+    if change in ("actor", "request", "observation"):
+        action = replace(
+            action, **{f"{change}_id" if change != "observation" else "observation_hash": "wrong"}
+        )
+    elif change in ("malformed", "stale", "ruleset", "placement"):
+        proposal = json.loads(cast(str, action.proposal_json))
+        if change == "malformed":
+            proposal.pop("model_placements")
+        elif change == "stale":
+            proposal["proposal_request_id"] = "stale-proposal"
+        elif change == "ruleset":
+            proposal["ruleset_descriptor_hash"] = "0" * 64
+        else:
+            proposal["model_placements"][0]["pose"]["position"]["x"] += 0.25
+        action = context.propose(proposal)
+    elif change in ("context", "family"):
+        view = context.observation
+        if change == "context":
+            view["battle_round"] += 1
+        else:
+            pending = view["pending_decision"]
+            assert pending is not None
+            assert pending["interaction"] is not None
+            pending["interaction"]["proposal_kind"] = "movement"
+        context = PlayerDecisionContext.from_view(view, choice_seed=7)
+        action = context.propose(json.loads(cast(str, action.proposal_json)))
+    elif change == "endpoint":
+        after = deployment.last.after
+    else:
+        previous = deployment.transitions[-1]
+    with pytest.raises(TrainingTransitionError):
+        ParameterizedAcceptedTransition.from_sessions(
+            action,
+            context=context,
+            before=deployment.first.after,
+            after=after,
+            trajectory_id="admission-trajectory",
+            perspective_player_id="player-a",
+            previous=previous,
+        )
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "schema_version",
+        "viewer_action",
+        "proposal_kind",
+        "authoritative_record_id",
+        "before_checkpoint_hash",
+        "record_hashes",
+        "accepted_record_stop",
+        "unknown",
+    ],
+)
+def test_parameterized_loader_recomputes_complete_evidence(
+    deployment: DeploymentCase, field: str
+) -> None:
+    payload: dict[str, object] = dict(deployment.proposal_transition().to_payload())
+    payload[field] = "drifted"
+    with pytest.raises(TrainingTransitionError):
+        ParameterizedAcceptedTransition.from_payload(
+            payload,
+            action=deployment.action,
+            context=deployment.context,
+            before=deployment.first.after,
+            after=deployment.after,
+            trajectory_id="admission-trajectory",
+            perspective_player_id="player-a",
+            previous=deployment.transitions[0],
+        )
+
+
+def test_rule_rejected_deployment_preserves_request_and_allows_ordinary_retry(
+    deployment: DeploymentCase,
+) -> None:
+    before = deployment.first.after
+    proposal = json.loads(cast(str, deployment.action.proposal_json))
+    for placement in proposal["model_placements"]:
+        placement["pose"]["position"]["x"] = -1000.0
+    rejected = before.fork()
+    status = rejected.submit_viewer_parameterized_payload(
+        viewer=ViewerContext.for_player(deployment.action.actor_id),
+        request_id=deployment.action.request_id,
+        payload=proposal,
+        result_id="rejected-placement",
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert isinstance(status.payload, dict)
+    assert status.payload["invalid_reason"] == "deployment_placement_invalid"
+    assert rejected.to_persistence_payload() == before.to_persistence_payload()
+    retry = rejected.lifecycle.pending_decision_request()
+    assert retry is not None
+    assert retry == before.lifecycle.pending_decision_request()
+    with pytest.raises(TrainingTransitionError, match="no new engine decision record"):
+        ParameterizedAcceptedTransition.from_sessions(
+            deployment.context.propose(proposal),
+            context=deployment.context,
+            before=before,
+            after=rejected,
+            trajectory_id="admission-trajectory",
+            perspective_player_id="player-a",
+            previous=deployment.transitions[0],
+        )
+    # Deployment rejects before recording; an ordinary legal retry uses the same request.
+    assert retry.actor_id is not None
+    context = PlayerDecisionContext.from_view(
+        rejected.view(viewer_player_id=retry.actor_id), choice_seed=7
+    )
+    valid = _deployment_payload_from_proposal(context.observation["pending_proposal"])
+    accepted = rejected.fork()
+    status = accepted.submit_viewer_parameterized_payload(
+        viewer=ViewerContext.for_player(retry.actor_id),
+        request_id=context.request["request_id"],
+        payload=valid,
+        result_id="legal-placement-retry",
+    )
+    if status.status_kind is LifecycleStatusKind.ADVANCED:
+        status = accepted.advance_until_decision_or_terminal()
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    transition = ParameterizedAcceptedTransition.from_sessions(
+        context.propose(valid),
+        context=context,
+        before=rejected,
+        after=accepted,
+        trajectory_id="retry-slice",
+        perspective_player_id="player-a",
+    )
+    assert transition.accepted_record_start == 0
+    assert (
+        transition.accepted_record_stop
+        == accepted.decision_record_count() - rejected.decision_record_count()
+    )
+    episode = MixedEpisodeAdmission.from_transitions(
+        VerifiedEpisodeOrigin.from_session(rejected, config=rejected.lifecycle.config),
+        transitions=(transition,),
+        final_session=accepted,
+        episode_end=TargetEpisodeEnd.TRUNCATED,
+        stop_reason="retry-slice-end",
+    )
+    assert episode.to_payload()["origin"]["prefix_record_count"] == rejected.decision_record_count()
+
+
+def test_mixed_episode_reaches_exact_local_reference_horizon(deployment: DeploymentCase) -> None:
+    episode = deployment.episode()
+    assert episode.to_payload()["schema_version"] == "mixed-episode-admission-v1"
+    assert (
+        MixedEpisodeAdmission.from_payload(
+            episode.to_payload(),
+            origin=deployment.origin,
+            transitions=deployment.transitions,
+            final_session=deployment.last.after,
+            episode_end=TargetEpisodeEnd.TRUNCATED,
+            stop_reason="setup-slice",
+        )
+        == episode
+    )
+    for transition in deployment.transitions:
+        horizon = episode.to_payload()["accepted_record_stop"] - transition.accepted_record_start
+        reference = VerifiedLocalReference.from_episode(
+            episode,
+            transition=transition,
+            final_session=deployment.last.after,
+            target_id=COMMAND_POINT_BALANCE_TARGET,
+            horizon_decisions=horizon,
+        )
+        state = deployment.last.after.lifecycle.state
+        assert state is not None
+        assert reference.to_payload()["value"] == state.command_point_total("player-a")
+        assert reference.to_payload()["accepted_record_start"] == transition.accepted_record_start
+        assert (
+            VerifiedLocalReference.from_payload(
+                reference.to_payload(),
+                episode=episode,
+                transition=transition,
+                final_session=deployment.last.after,
+                target_id=COMMAND_POINT_BALANCE_TARGET,
+                horizon_decisions=horizon,
+            )
+            == reference
+        )
+        with pytest.raises(TrainingAdmissionError, match="horizon"):
+            VerifiedLocalReference.from_episode(
+                episode,
+                transition=transition,
+                final_session=deployment.last.after,
+                target_id=COMMAND_POINT_BALANCE_TARGET,
+                horizon_decisions=horizon + 1,
+            )
+    with pytest.raises(TrainingAdmissionError):
+        FiniteEpisodeAdmission.from_transitions(
+            deployment.origin,
+            transitions=cast(tuple[FiniteAcceptedTransition, ...], deployment.transitions),
+            final_session=deployment.last.after,
+            episode_end=TargetEpisodeEnd.TRUNCATED,
+            stop_reason="setup-slice",
+        )
+
+
+@pytest.mark.parametrize(
+    "change", ["gap", "reverse", "duplicate", "origin", "endpoint", "terminal", "payload"]
+)
+def test_mixed_episode_rejects_discontinuous_or_drifted_evidence(
+    deployment: DeploymentCase, change: str
+) -> None:
+    transitions, origin, final = deployment.transitions, deployment.origin, deployment.last.after
+    end = TargetEpisodeEnd.TRUNCATED
+    if change == "gap":
+        transitions = transitions[:1] + transitions[2:]
+    elif change == "reverse":
+        transitions = tuple(reversed(transitions))
+    elif change == "duplicate":
+        transitions = transitions + transitions[-1:]
+    elif change == "origin":
+        origin = VerifiedEpisodeOrigin.from_session(
+            deployment.first.after, config=deployment.first.after.lifecycle.config
+        )
+    elif change == "endpoint":
+        final = deployment.after
+    elif change == "terminal":
+        end = TargetEpisodeEnd.TERMINAL
+    payload = dict(deployment.episode().to_payload())
+    if change == "payload":
+        payload["accepted_record_stop"] = 999
+    with pytest.raises(TrainingAdmissionError):
+        MixedEpisodeAdmission.from_payload(
+            payload,
+            origin=origin,
+            transitions=transitions,
+            final_session=final,
+            episode_end=end,
+            stop_reason="setup-slice",
+        )
