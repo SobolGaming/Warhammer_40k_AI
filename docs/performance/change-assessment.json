@@ -1,86 +1,86 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "18e09691c00208b3d3520b32cebdd30cf1c4095d",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1f9091a5b8e56dd428531dfafbd1d904fc4771e582e70a1c5d2869494061e60b",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a5b4671ddcf4a59926db1d4b13a5f7ea4e2eb1876ab626b92743cf5cd13986f9",
   "operation_map_sha256": "1fb1ab7dabd68cc29f3d6d84e2ed4454fd7383d22c5c4cb6be6ccbb8dfd480da",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "5a1da78667ff5cac53953177c63c46cc97e27c0bde075b1bf9006af71857df5f",
-      "after_sha256": "a0a0c610f334ee52412c89a53e5aea0eb7480847ae2cc282312f00de06dea345",
+      "after_sha256": "2c5203a21338363b3d794f66d636b405b94c9675a87e9981c45e742c1058d537",
       "owners": {
         "@document": {
           "before": "5a1da78667ff5cac53953177c63c46cc97e27c0bde075b1bf9006af71857df5f",
-          "after": "a0a0c610f334ee52412c89a53e5aea0eb7480847ae2cc282312f00de06dea345"
+          "after": "2c5203a21338363b3d794f66d636b405b94c9675a87e9981c45e742c1058d537"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "28088847167c1f4194448301a1c40dd029d434bbc6e4e20934d9ba4bcf3d4778",
-      "after_sha256": "5050d4ec064350559a764e67e5e9ff77b5328b3d51c844746e3377729403e895",
+      "after_sha256": "91dcf75d5197f266ff2291b5bba24efc798e380637de1015d3bf8dcff1aac8d8",
       "owners": {
         "@document": {
           "before": "28088847167c1f4194448301a1c40dd029d434bbc6e4e20934d9ba4bcf3d4778",
-          "after": "5050d4ec064350559a764e67e5e9ff77b5328b3d51c844746e3377729403e895"
+          "after": "91dcf75d5197f266ff2291b5bba24efc798e380637de1015d3bf8dcff1aac8d8"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "e8abf199e359268018eed62b26b403b9f820dcda0e9d240e8cadbfdb3ee67564",
-      "after_sha256": "584ad51cad7bc5dc9123260787800945f5a8159141ecde64f6b3541739f91e7e",
+      "after_sha256": "d9b2c8be3190db77c9074e84fe3f5567a2dddf36225c5041d9405914df2be4ca",
       "owners": {
         "@document": {
           "before": "e8abf199e359268018eed62b26b403b9f820dcda0e9d240e8cadbfdb3ee67564",
-          "after": "584ad51cad7bc5dc9123260787800945f5a8159141ecde64f6b3541739f91e7e"
+          "after": "d9b2c8be3190db77c9074e84fe3f5567a2dddf36225c5041d9405914df2be4ca"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "55c67228c8be8f0b0df863bd1812b4b8cb15be779a0b70a414b112bbc58fc31a",
-      "after_sha256": "ce82eef9dc2a67cb4ba19469c0f4cea161f2eb7fbd9018d11b241b016ff17365",
+      "after_sha256": "afd7a79ecef594685a913833f3492a6f69b172ebfbc980e6d3bd1756039a0e17",
       "owners": {
         "@document": {
           "before": "55c67228c8be8f0b0df863bd1812b4b8cb15be779a0b70a414b112bbc58fc31a",
-          "after": "ce82eef9dc2a67cb4ba19469c0f4cea161f2eb7fbd9018d11b241b016ff17365"
+          "after": "afd7a79ecef594685a913833f3492a6f69b172ebfbc980e6d3bd1756039a0e17"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "36420999f8837e5c4227b293caf794d5e67cc1389d338b336c6e117c1971c248",
-      "after_sha256": "1bd8038f0eeac097657264a916f04a075bd9834aac5fbde24125dc3f9535597d",
+      "after_sha256": "a8e885bab6f2e2f3098181eb410c623f4cd6c57eebb32fe328bbedd79165e6d5",
       "owners": {
         "@document": {
           "before": "36420999f8837e5c4227b293caf794d5e67cc1389d338b336c6e117c1971c248",
-          "after": "1bd8038f0eeac097657264a916f04a075bd9834aac5fbde24125dc3f9535597d"
+          "after": "a8e885bab6f2e2f3098181eb410c623f4cd6c57eebb32fe328bbedd79165e6d5"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "d3d8aaa00c1e99ee7253cd86cdd1f21f92e09961f0a51d121b5e6874a82a3ff2",
-      "after_sha256": "d38b9bf6366285291ce2d3b7af0b7c0ef57c679049304e65aaf799f0637a59da",
+      "after_sha256": "634ff11112d30f4cc3240a21ef9e72bd7a31ca030e38970fa4835e64e40bd0a7",
       "owners": {
         "@document": {
           "before": "d3d8aaa00c1e99ee7253cd86cdd1f21f92e09961f0a51d121b5e6874a82a3ff2",
-          "after": "d38b9bf6366285291ce2d3b7af0b7c0ef57c679049304e65aaf799f0637a59da"
+          "after": "634ff11112d30f4cc3240a21ef9e72bd7a31ca030e38970fa4835e64e40bd0a7"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "e84ffd2b9fc549a03efb447fd80dd6a9d8f8dd11b67ae48749114b803fc37c66",
-      "after_sha256": "ced4d28fa3e23318954940cd4ceea7ad84d5b8b446ffc5533c87e0aaf5428e97",
+      "after_sha256": "48ccb999b954c6bb1d629e8738ec981fdb9a5bfb32f3933afdabd67b2522ba10",
       "owners": {
         "@document": {
           "before": "e84ffd2b9fc549a03efb447fd80dd6a9d8f8dd11b67ae48749114b803fc37c66",
-          "after": "ced4d28fa3e23318954940cd4ceea7ad84d5b8b446ffc5533c87e0aaf5428e97"
+          "after": "48ccb999b954c6bb1d629e8738ec981fdb9a5bfb32f3933afdabd67b2522ba10"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "1304d26ff9519542bd706ba275b5dcd8fa0ba2c8a75b70fb7260b24c445c6060",
-      "after_sha256": "28aec8105802477b6d49668dbe27844c49d6a9ba6cd22b36d5110ced647c01f6",
+      "after_sha256": "1a97731aff0e31b2ee22fcf70737c9fd89c88be976bb674043d914854956c088",
       "owners": {
         "@document": {
           "before": "1304d26ff9519542bd706ba275b5dcd8fa0ba2c8a75b70fb7260b24c445c6060",
-          "after": "28aec8105802477b6d49668dbe27844c49d6a9ba6cd22b36d5110ced647c01f6"
+          "after": "1a97731aff0e31b2ee22fcf70737c9fd89c88be976bb674043d914854956c088"
         }
       }
     },
@@ -114,19 +114,29 @@
         }
       }
     },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "before_sha256": "b40e0e9db1fcd0fa5f5278321a35e4eed8e632c97a8c8d007c19d0f452110cc6",
+      "after_sha256": "9c93b10974d219030078b8232ddc9853ccc4d85951407d3883afadaddaf12e0b",
+      "owners": {
+        "@document": {
+          "before": "b40e0e9db1fcd0fa5f5278321a35e4eed8e632c97a8c8d007c19d0f452110cc6",
+          "after": "9c93b10974d219030078b8232ddc9853ccc4d85951407d3883afadaddaf12e0b"
+        }
+      }
+    },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "a5f913e1d183851c55a63843f9fb1df41bc4b5cadb4045c3c5e74671ab707677",
-      "after_sha256": "cc05301f00031207a97e8d26b06d7ea0cc3f1679ec52191d1dbd4738bbbdbb1e",
+      "after_sha256": "5ea436a0255b522cb508a14566ef43681969f86ac98cddeda0ecfce828206e2d",
       "owners": {
         "@document": {
           "before": "a5f913e1d183851c55a63843f9fb1df41bc4b5cadb4045c3c5e74671ab707677",
-          "after": "cc05301f00031207a97e8d26b06d7ea0cc3f1679ec52191d1dbd4738bbbdbb1e"
+          "after": "5ea436a0255b522cb508a14566ef43681969f86ac98cddeda0ecfce828206e2d"
         }
       }
     },
     "src/warhammer40k_core/ai/training_admission.py": {
       "before_sha256": "c19a62ca9704e107c5f0d3144a804883d58e58927ad5cc7028b9265a2640870c",
-      "after_sha256": "3ea9aff4b41eb0e8ac544586dc5c29536e096463c9a3d7dde76c3d3faea0192f",
+      "after_sha256": "0274ccf87ec66412cf6647e1656ca87e77d56a0651750228984af2a3f282a23f",
       "owners": {
         "@module": {
           "before": "384795abc5b73dbdd611f75c3cb01e9e7606adca7d51481077186bafb65a660e",
@@ -186,7 +196,7 @@
         },
         "_EpisodeAdmission.from_transitions": {
           "before": null,
-          "after": "6e98f7091a293843bce27b87ce4c282851478d7248cedfd76edd554146543765"
+          "after": "e3f6643cc8450c7bd4e57dfa5d3a5a1f617c8179c6f883c48797839895cc75e7"
         },
         "_EpisodeAdmission.to_payload": {
           "before": null,
@@ -497,6 +507,14 @@
       "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
     },
     "docs/AI_POLICY_INTERFACE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add bounded operator-only deployment-placement accepted transition reproduction and mixed finite/proposal episode admission, sharing existing finite reproduction and continuity checks; refresh required generated identity and genuine test scheduling evidence.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],

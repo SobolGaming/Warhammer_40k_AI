@@ -169,6 +169,8 @@ class _EpisodeAdmission[Transition: AcceptedTransition]:
         episode_end: TargetEpisodeEnd,
         stop_reason: str | None = None,
     ) -> Self:
+        # Keep the generic factory type before concrete-family validation narrows cls.
+        result = object.__new__(cls)
         if (
             type(origin) is not VerifiedEpisodeOrigin
             or type(final_session) is not LocalGameSession
@@ -259,9 +261,8 @@ class _EpisodeAdmission[Transition: AcceptedTransition]:
             "stop_reason": stop_reason,
             "final_result": final_result,
         }
-        result = object.__new__(cls)
         object.__setattr__(result, "_evidence_json", _json(payload))
-        return cast(Self, result)
+        return result
 
     @classmethod
     def from_payload(
