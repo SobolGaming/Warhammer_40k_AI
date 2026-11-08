@@ -6,6 +6,9 @@ from typing import cast
 
 import pytest
 
+from tests.shared.ai_training_admission_helpers import DeploymentCase, DeploymentTrainingProof
+from tests.shared.ai_training_admission_helpers import deployment as deployment
+from tests.shared.ai_training_admission_helpers import deployment_training as deployment_training
 from tests.shared.category_migration.phase18f_session_commands import (
     _compact_terminal_config,
     _deployment_payload_from_proposal,
@@ -21,7 +24,28 @@ from warhammer40k_core.ai.deployment_candidate_search import (
 )
 from warhammer40k_core.ai.deployment_candidate_validation import ValidatedDeploymentCandidates
 from warhammer40k_core.ai.deployment_candidates import DeploymentPlacementCandidate
+from warhammer40k_core.ai.parameterized_training import DeploymentTrainingCandidateLink
 from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyError
+from warhammer40k_core.ai.policy_contracts import TrainingRow
+from warhammer40k_core.ai.training_admission import (
+    COMMAND_POINT_BALANCE_TARGET,
+    LOCAL_REFERENCE_PRODUCER,
+    AdmittedTrainingTarget,
+    MixedEpisodeAdmission,
+    TrainingAdmissionError,
+    VerifiedEpisodeOrigin,
+    VerifiedLocalReference,
+)
+from warhammer40k_core.ai.training_candidates import TrainingCandidateLinkError
+from warhammer40k_core.ai.training_targets import (
+    LinkedTrainingTarget,
+    NamedTrainingTarget,
+    TargetEpisodeEnd,
+    TargetHorizon,
+    TargetMeaning,
+    TargetValidity,
+)
+from warhammer40k_core.ai.training_transitions import ParameterizedAcceptedTransition
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.replay import ReplayRunner
@@ -411,3 +435,351 @@ def test_deployment_generator_rejects_malformed_geometry(
     seed = DeploymentPlacementCandidate.from_action(context.propose(proposal), context=context)
     with pytest.raises(PolicyError):
         DeploymentCandidateSet.generate(seed, context=context)
+
+
+@pytest.fixture(scope="module")
+def deployment_set_training(
+    deployment: DeploymentCase, deployment_training: DeploymentTrainingProof
+) -> tuple[TrainingRow, DeploymentTrainingCandidateLink]:
+    candidates = DeploymentCandidateSet.generate(
+        deployment_training.link.candidate,
+        context=deployment.context,
+        translations=((1000.0, 0.0), (0.0, 0.0), (1.0, 0.0), (2.0, 0.0)),
+    )
+    validated = ValidatedDeploymentCandidates.validate(
+        candidates,
+        context=deployment.context,
+        session=deployment.first.after,
+        validation_budget=3,
+    )
+    assert validated.to_payload()["accepted_count"] == 2
+    row = replace(deployment_training.row, legal_action_mask=(False, True, True))
+    return row, DeploymentTrainingCandidateLink.from_row(
+        row,
+        validated=validated,
+        context=deployment.context,
+        transition=deployment_training.link.transition,
+    )
+
+
+def test_deployment_set_training_preserves_full_search_and_validated_prefix(
+    deployment: DeploymentCase,
+    deployment_set_training: tuple[TrainingRow, DeploymentTrainingCandidateLink],
+) -> None:
+    row, link = deployment_set_training
+    original = deployment.first.after.to_persistence_payload()
+    payload = link.to_payload()
+    assert payload["schema_version"] == "deployment-set-training-candidate-link-v1"
+    assert link.chosen_action_index == 1
+    assert link.chosen_action_id == row.chosen_action_id
+    assert len(link.validated.candidate_set.candidates) == 4
+    assert len(row.legal_action_mask) == 3
+    assert payload["validation"]["unvalidated_count"] == 1
+    assert payload["validation"]["stop_reason"] == "validation_budget"
+    assert (
+        payload["validation"]["checkpoint_hash"]
+        == link.transition.to_payload()["before_checkpoint_hash"]
+    )
+    assert (
+        DeploymentTrainingCandidateLink.from_payload(
+            json.loads(canonical_json(payload)),
+            row=row,
+            context=deployment.context,
+            session=deployment.first.after,
+            transition=link.transition,
+        )
+        == link
+    )
+    assert original == deployment.first.after.to_persistence_payload()
+    assert TrainingRow.from_payload(row.to_payload()) == row
+    payload["candidate_set"]["candidates"] = []
+    payload["validation"]["results"] = []
+    assert link.to_payload()["candidate_set"]["candidates"]
+    assert link.to_payload()["validation"]["results"]
+    with pytest.raises(FrozenInstanceError):
+        link._evidence_json = "{}"  # type: ignore[misc]
+    with pytest.raises(TrainingCandidateLinkError):
+        DeploymentTrainingCandidateLink()
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "rejected",
+        "unvalidated",
+        "other-accepted",
+        "mask",
+        "tail-mask",
+        "short-mask",
+        "row",
+        "record",
+        "game",
+        "feature",
+        "scalar",
+        "context",
+        "transition",
+    ],
+)
+def test_deployment_set_training_rejects_inexact_row_or_selection(
+    deployment: DeploymentCase,
+    deployment_set_training: tuple[TrainingRow, DeploymentTrainingCandidateLink],
+    change: str,
+) -> None:
+    row, link = deployment_set_training
+    context, transition = deployment.context, link.transition
+    if change in ("rejected", "unvalidated", "other-accepted"):
+        slot = {"rejected": 0, "unvalidated": 3, "other-accepted": 2}[change]
+        row = replace(
+            row, chosen_action_id=link.validated.candidate_set.candidates[slot].candidate_id
+        )
+    elif change == "mask":
+        row = replace(row, legal_action_mask=(True, True, True))
+    elif change == "tail-mask":
+        row = replace(row, legal_action_mask=(False, True, True, False))
+    elif change == "short-mask":
+        row = replace(row, legal_action_mask=(False, True))
+    elif change == "row":
+        row = replace(row, row_id="changed")
+    elif change == "record":
+        row = replace(row, decision_record_id=deployment.transitions[0].authoritative_record_id)
+    elif change == "game":
+        row = replace(row, game_id="changed")
+    elif change == "feature":
+        row = replace(row, input_features=(replace(row.input_features[0], value=4),))
+    elif change == "scalar":
+        row = replace(row, target_value=0.75)
+    elif change == "context":
+        context = deployment.last.context
+    else:
+        transition = cast(ParameterizedAcceptedTransition, deployment.transitions[0])
+    if change == "transition":
+        with pytest.raises(TrainingCandidateLinkError):
+            DeploymentTrainingCandidateLink.from_row(
+                row, validated=link.validated, context=context, transition=transition
+            )
+    else:
+        with pytest.raises(TrainingCandidateLinkError):
+            link.require_matches(row, context=context)
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "schema_version",
+        "training_row_hash",
+        "candidate_set_hash",
+        "validation_hash",
+        "accepted_transition_hash",
+        "chosen_action_id",
+        "chosen_action_index",
+        "bool-index",
+        "unknown",
+        "missing",
+        "receipt",
+        "set",
+        "session",
+    ],
+)
+def test_deployment_set_training_loader_reproduces_complete_evidence(
+    deployment: DeploymentCase,
+    deployment_set_training: tuple[TrainingRow, DeploymentTrainingCandidateLink],
+    change: str,
+) -> None:
+    row, link = deployment_set_training
+    payload: dict[str, object] = dict(link.to_payload())
+    session = deployment.first.after
+    if change == "receipt":
+        cast(dict[str, object], payload["validation"])["rejected_count"] = 0
+    elif change == "set":
+        cast(dict[str, object], payload["candidate_set"])["duplicates"] = 99
+    elif change == "session":
+        session = deployment.after
+    elif change == "bool-index":
+        payload["chosen_action_index"] = True
+    elif change == "missing":
+        payload.pop("validation")
+    else:
+        payload[change] = "changed"
+    with pytest.raises(TrainingCandidateLinkError):
+        DeploymentTrainingCandidateLink.from_payload(
+            payload,
+            row=row,
+            context=deployment.context,
+            session=session,
+            transition=link.transition,
+        )
+
+
+def test_deployment_set_training_commits_nonseed_alternative_and_binds_targets(
+    deployment: DeploymentCase,
+    deployment_set_training: tuple[TrainingRow, DeploymentTrainingCandidateLink],
+) -> None:
+    row, original = deployment_set_training
+    validated = original.validated
+    candidate_id = validated.candidate_set.candidates[2].candidate_id
+    before = deployment.first.after
+    after = before.fork()
+    action = validated.select(deployment.context, candidate_id, session=after)
+    status = after.submit_viewer_parameterized_payload(
+        viewer=ViewerContext.for_player(action.actor_id),
+        request_id=action.request_id,
+        payload=json.loads(cast(str, action.proposal_json)),
+        result_id="training-alternative",
+    )
+    if status.status_kind is LifecycleStatusKind.ADVANCED:
+        status = after.advance_until_decision_or_terminal()
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    transition = ParameterizedAcceptedTransition.from_sessions(
+        action,
+        context=deployment.context,
+        before=before,
+        after=after,
+        trajectory_id="alternative",
+        perspective_player_id=action.actor_id,
+    )
+    row = replace(
+        row, chosen_action_id=candidate_id, decision_record_id=transition.authoritative_record_id
+    )
+    link = DeploymentTrainingCandidateLink.from_row(
+        row, validated=validated, context=deployment.context, transition=transition
+    )
+    assert link.chosen_action_index == 2
+    assert (
+        LocalGameSession.from_persistence_payload(
+            after.to_persistence_payload()
+        ).to_persistence_payload()
+        == after.to_persistence_payload()
+    )
+    episode = MixedEpisodeAdmission.from_transitions(
+        VerifiedEpisodeOrigin.from_session(before, config=before.lifecycle.config),
+        transitions=(transition,),
+        final_session=after,
+        episode_end=TargetEpisodeEnd.TRUNCATED,
+        stop_reason="alternative-boundary",
+    )
+    reference = VerifiedLocalReference.from_episode(
+        episode,
+        transition=transition,
+        final_session=after,
+        target_id=COMMAND_POINT_BALANCE_TARGET,
+        horizon_decisions=transition.accepted_record_stop,
+    )
+    target = NamedTrainingTarget(
+        target_id=COMMAND_POINT_BALANCE_TARGET,
+        meaning=TargetMeaning.LOCAL_REFERENCE,
+        perspective_player_id=action.actor_id,
+        horizon=TargetHorizon.DECISION_COUNT,
+        horizon_decisions=transition.accepted_record_stop,
+        episode_end=TargetEpisodeEnd.TRUNCATED,
+        validity=TargetValidity.OBSERVED,
+        value=reference.to_payload()["value"],
+        value_unit="command_points",
+        missing_reason=None,
+        producer_id=LOCAL_REFERENCE_PRODUCER,
+        evidence_hash=reference.content_hash,
+        reward_profile_version=row.reward_profile_version,
+    )
+    linked = LinkedTrainingTarget.from_link(
+        link, row=row, context=deployment.context, target=target
+    )
+    assert (
+        LinkedTrainingTarget.from_payload(
+            linked.to_payload(), link=link, row=row, context=deployment.context
+        )
+        == linked
+    )
+    admitted = AdmittedTrainingTarget.from_episode(
+        linked,
+        episode=episode,
+        transition=transition,
+        link=link,
+        row=row,
+        context=deployment.context,
+        config=before.lifecycle.config,
+        reward_profile_version=row.reward_profile_version,
+        final_session=after,
+    )
+    assert admitted.to_payload()["eligible_for_learning"]
+    assert (
+        AdmittedTrainingTarget.from_payload(
+            admitted.to_payload(),
+            linked=linked,
+            episode=episode,
+            transition=transition,
+            link=link,
+            row=row,
+            context=deployment.context,
+            config=before.lifecycle.config,
+            reward_profile_version=row.reward_profile_version,
+            final_session=after,
+        )
+        == admitted
+    )
+    with pytest.raises(TrainingAdmissionError):
+        AdmittedTrainingTarget.from_episode(
+            linked,
+            episode=episode,
+            transition=original.transition,
+            link=link,
+            row=row,
+            context=deployment.context,
+            config=before.lifecycle.config,
+            reward_profile_version=row.reward_profile_version,
+            final_session=after,
+        )
+
+
+def test_deployment_set_link_rejects_same_view_different_authoritative_checkpoint(
+    deployment_set_training: tuple[TrainingRow, DeploymentTrainingCandidateLink],
+) -> None:
+    first = _setup(hidden_result_suffix="-first", private_rng_seed="1" * 64)
+    second = _setup(hidden_result_suffix="-second", private_rng_seed="2" * 64)
+    context, seed = _context_seed(first)
+    second_context, second_seed = _context_seed(second)
+    assert context.observation_json == second_context.observation_json
+    assert seed == second_seed
+    candidates = DeploymentCandidateSet.generate(seed, context=context)
+    validated = ValidatedDeploymentCandidates.validate(
+        candidates, context=context, session=first, accepted_limit=1
+    )
+    action = seed.select(second_context)
+    after = second.fork()
+    status = after.submit_viewer_parameterized_payload(
+        viewer=ViewerContext.for_player(action.actor_id),
+        request_id=action.request_id,
+        payload=json.loads(cast(str, action.proposal_json)),
+        result_id="same-view-deployment",
+    )
+    if status.status_kind is LifecycleStatusKind.ADVANCED:
+        status = after.advance_until_decision_or_terminal()
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    transition = ParameterizedAcceptedTransition.from_sessions(
+        action,
+        context=second_context,
+        before=second,
+        after=after,
+        trajectory_id="same-view",
+        perspective_player_id=action.actor_id,
+    )
+    row = replace(
+        deployment_set_training[0],
+        game_id=context.observation["game_id"],
+        chosen_action_id=seed.candidate_id,
+        legal_action_mask=(True,),
+        decision_record_id=transition.authoritative_record_id,
+    )
+    with pytest.raises(TrainingCandidateLinkError, match="checkpoint"):
+        DeploymentTrainingCandidateLink.from_row(
+            row, validated=validated, context=second_context, transition=transition
+        )
+    correct = ValidatedDeploymentCandidates.validate(
+        candidates, context=second_context, session=second, accepted_limit=1
+    )
+    link = DeploymentTrainingCandidateLink.from_row(
+        row, validated=correct, context=second_context, transition=transition
+    )
+    assert link.chosen_action_index == 0
+    assert link.to_payload()["validation"]["stop_reason"] == "accepted_limit"
+    assert link.to_payload()["validation"]["unvalidated_count"] == 4
+    assert link.validated.candidate_set == validated.candidate_set
+    assert "checkpoint_hash" not in candidates.to_payload()

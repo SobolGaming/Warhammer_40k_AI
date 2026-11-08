@@ -1,4 +1,4 @@
-"""Operator-only row linkage for one engine-accepted deployment candidate."""
+"""Operator-only singleton and validated-set deployment training linkage."""
 
 from __future__ import annotations
 
@@ -6,6 +6,9 @@ import json
 from dataclasses import dataclass
 from typing import TypedDict, cast
 
+from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.ai.deployment_candidate_search import DeploymentCandidateSet
+from warhammer40k_core.ai.deployment_candidate_validation import ValidatedDeploymentCandidates
 from warhammer40k_core.ai.deployment_candidates import (
     DeploymentCandidatePayload,
     DeploymentPlacementCandidate,
@@ -17,7 +20,12 @@ from warhammer40k_core.ai.training_candidates import (
     TrainingCandidateLinkError,
 )
 from warhammer40k_core.ai.training_transitions import ParameterizedAcceptedTransition
-from warhammer40k_core.engine.event_log import EventLogError, canonical_json, validate_json_value
+from warhammer40k_core.engine.event_log import (
+    EventLogError,
+    JsonValue,
+    canonical_json,
+    validate_json_value,
+)
 
 PARAMETERIZED_TRAINING_LINK_SCHEMA_VERSION = "parameterized-training-candidate-link-v1"
 
@@ -58,40 +66,11 @@ class ParameterizedTrainingCandidateLink:
         context: PlayerDecisionContext,
         transition: ParameterizedAcceptedTransition,
     ) -> ParameterizedTrainingCandidateLink:
-        if (
-            type(row) is not TrainingRow
-            or type(candidate) is not DeploymentPlacementCandidate
-            or type(context) is not PlayerDecisionContext
-            or type(transition) is not ParameterizedAcceptedTransition
-        ):
-            raise TrainingCandidateLinkError("Deployment linkage requires typed accepted evidence.")
-        try:
-            action = candidate.select(context)
-            row_payload = validate_json_value(row.to_payload())
-        except (PolicyError, EventLogError) as exc:
-            raise TrainingCandidateLinkError("Deployment candidate or row binding failed.") from exc
-        evidence = transition.to_payload()
-        if (
-            row.game_id != context.observation["game_id"]
-            or row.chosen_action_id != candidate.candidate_id
-            or row.legal_action_mask != (True,)
-            or row.decision_record_id != evidence["authoritative_record_id"]
-            or evidence["actor_id"] != action.actor_id
-            or evidence["before_observation_hash"] != action.observation_hash
-            or evidence["proposal_kind"] != "deployment_placement"
-            or canonical_json(evidence["viewer_action"])
-            != canonical_json(
-                {
-                    "actor_id": action.actor_id,
-                    "request_id": action.request_id,
-                    "observation_hash": action.observation_hash,
-                    "proposal": json.loads(cast(str, action.proposal_json)),
-                }
-            )
-        ):
-            raise TrainingCandidateLinkError(
-                "Deployment row, selected candidate or acceptance drifted."
-            )
+        row_payload = _require_accepted_candidate(
+            row, candidate=candidate, context=context, transition=transition
+        )
+        if row.legal_action_mask != (True,):
+            raise TrainingCandidateLinkError("Singleton deployment row requires slot zero only.")
         payload: ParameterizedTrainingCandidateLinkPayload = {
             "schema_version": PARAMETERIZED_TRAINING_LINK_SCHEMA_VERSION,
             "row_id": row.row_id,
@@ -159,4 +138,189 @@ class ParameterizedTrainingCandidateLink:
         return expected
 
 
-type TrainingCandidateLink = FiniteTrainingCandidateLink | ParameterizedTrainingCandidateLink
+DEPLOYMENT_TRAINING_LINK_SCHEMA_VERSION = "deployment-set-training-candidate-link-v1"
+
+
+class DeploymentTrainingCandidateLinkPayload(TypedDict):
+    schema_version: str
+    row_id: str
+    game_id: str
+    training_row_hash: str
+    candidate_set_hash: str
+    candidate_set: dict[str, JsonValue]
+    validation_hash: str
+    validation: dict[str, JsonValue]
+    chosen_action_id: str
+    chosen_action_index: int
+    accepted_transition_hash: str
+
+
+@dataclass(frozen=True, slots=True, init=False)
+class DeploymentTrainingCandidateLink:
+    """Full search evidence with a row mask over the ordered validated prefix.
+
+    Rejected validated slots are False. Unvalidated candidates have no mask slot;
+    their geometry, count and budget stop remain in the operator-only receipt.
+    The selected slot must be accepted and reproduced at the same checkpoint.
+    """
+
+    validated: ValidatedDeploymentCandidates
+    transition: ParameterizedAcceptedTransition
+    _evidence_json: str
+
+    def __init__(self) -> None:
+        raise TrainingCandidateLinkError("Link a deployment set through validated evidence.")
+
+    @classmethod
+    def from_row(
+        cls,
+        row: TrainingRow,
+        *,
+        validated: ValidatedDeploymentCandidates,
+        context: PlayerDecisionContext,
+        transition: ParameterizedAcceptedTransition,
+    ) -> DeploymentTrainingCandidateLink:
+        if (
+            type(row) is not TrainingRow
+            or type(validated) is not ValidatedDeploymentCandidates
+            or type(transition) is not ParameterizedAcceptedTransition
+        ):
+            raise TrainingCandidateLinkError("Deployment set linkage requires typed evidence.")
+        if row.chosen_action_id not in validated.accepted_ids:
+            raise TrainingCandidateLinkError("Selected deployment slot was not accepted.")
+        candidates = validated.candidate_set.candidates
+        chosen_index = next(
+            index
+            for index, candidate in enumerate(candidates)
+            if candidate.candidate_id == row.chosen_action_id
+        )
+        row_payload = _require_accepted_candidate(
+            row, candidate=candidates[chosen_index], context=context, transition=transition
+        )
+        receipt = validated.to_payload()
+        results = cast(list[dict[str, JsonValue]], receipt["results"])
+        mask = tuple(cast(bool, result["accepted"]) for result in results)
+        if (
+            row.legal_action_mask != mask
+            or receipt["checkpoint_hash"] != transition.to_payload()["before_checkpoint_hash"]
+        ):
+            raise TrainingCandidateLinkError("Deployment validated mask or checkpoint drifted.")
+        payload: DeploymentTrainingCandidateLinkPayload = {
+            "schema_version": DEPLOYMENT_TRAINING_LINK_SCHEMA_VERSION,
+            "row_id": row.row_id,
+            "game_id": row.game_id,
+            "training_row_hash": payload_digest(row_payload),
+            "candidate_set_hash": validated.candidate_set.content_hash,
+            "candidate_set": validated.candidate_set.to_payload(),
+            "validation_hash": validated.content_hash,
+            "validation": receipt,
+            "chosen_action_id": row.chosen_action_id,
+            "chosen_action_index": chosen_index,
+            "accepted_transition_hash": transition.content_hash,
+        }
+        result = object.__new__(cls)
+        object.__setattr__(result, "validated", validated)
+        object.__setattr__(result, "transition", transition)
+        object.__setattr__(result, "_evidence_json", canonical_json(payload))
+        return result
+
+    @property
+    def chosen_action_id(self) -> str:
+        return self.to_payload()["chosen_action_id"]
+
+    @property
+    def chosen_action_index(self) -> int:
+        return self.to_payload()["chosen_action_index"]
+
+    def require_matches(self, row: TrainingRow, *, context: PlayerDecisionContext) -> None:
+        expected = type(self).from_row(
+            row, validated=self.validated, context=context, transition=self.transition
+        )
+        if self != expected:
+            raise TrainingCandidateLinkError("Complete deployment set training row drifted.")
+
+    def to_payload(self) -> DeploymentTrainingCandidateLinkPayload:
+        return cast(DeploymentTrainingCandidateLinkPayload, json.loads(self._evidence_json))
+
+    @classmethod
+    def from_payload(
+        cls,
+        payload: object,
+        *,
+        row: TrainingRow,
+        context: PlayerDecisionContext,
+        session: LocalGameSession,
+        transition: ParameterizedAcceptedTransition,
+    ) -> DeploymentTrainingCandidateLink:
+        if (
+            not isinstance(payload, dict)
+            or payload.keys() != DeploymentTrainingCandidateLinkPayload.__annotations__.keys()
+        ):
+            raise TrainingCandidateLinkError("Deployment set link has missing or unknown fields.")
+        value = cast(dict[str, object], payload)
+        try:
+            candidate_set = DeploymentCandidateSet.from_payload(
+                value["candidate_set"], context=context
+            )
+            validated = ValidatedDeploymentCandidates.from_payload(
+                value["validation"], candidate_set=candidate_set, context=context, session=session
+            )
+            expected = cls.from_row(
+                row, validated=validated, context=context, transition=transition
+            )
+            observed = canonical_json(validate_json_value(value))
+        except (PolicyError, EventLogError) as exc:
+            raise TrainingCandidateLinkError("Malformed deployment set training linkage.") from exc
+        if observed != canonical_json(expected.to_payload()):
+            raise TrainingCandidateLinkError("Deployment set training linkage evidence drifted.")
+        return expected
+
+
+type TrainingCandidateLink = (
+    FiniteTrainingCandidateLink
+    | ParameterizedTrainingCandidateLink
+    | DeploymentTrainingCandidateLink
+)
+
+
+def _require_accepted_candidate(
+    row: TrainingRow,
+    *,
+    candidate: DeploymentPlacementCandidate,
+    context: PlayerDecisionContext,
+    transition: ParameterizedAcceptedTransition,
+) -> JsonValue:
+    if (
+        type(row) is not TrainingRow
+        or type(candidate) is not DeploymentPlacementCandidate
+        or type(context) is not PlayerDecisionContext
+        or type(transition) is not ParameterizedAcceptedTransition
+    ):
+        raise TrainingCandidateLinkError("Deployment linkage requires typed accepted evidence.")
+    try:
+        action = candidate.select(context)
+        row_payload = validate_json_value(row.to_payload())
+    except (PolicyError, EventLogError) as exc:
+        raise TrainingCandidateLinkError("Deployment candidate or row binding failed.") from exc
+    evidence = transition.to_payload()
+    if (
+        row.game_id != context.observation["game_id"]
+        or row.chosen_action_id != candidate.candidate_id
+        or row.decision_record_id != evidence["authoritative_record_id"]
+        or evidence["actor_id"] != action.actor_id
+        or evidence["before_observation_hash"] != action.observation_hash
+        or evidence["proposal_kind"] != "deployment_placement"
+        or canonical_json(evidence["viewer_action"])
+        != canonical_json(
+            {
+                "actor_id": action.actor_id,
+                "request_id": action.request_id,
+                "observation_hash": action.observation_hash,
+                "proposal": json.loads(cast(str, action.proposal_json)),
+            }
+        )
+    ):
+        raise TrainingCandidateLinkError(
+            "Deployment row, selected candidate or acceptance drifted."
+        )
+    return row_payload
