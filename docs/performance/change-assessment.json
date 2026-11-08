@@ -1,450 +1,382 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "a53e64091cd8573e6db359737448ebeb5f8c1931",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7e0fefeac61b697635ef14e78e2ff36c856b7ebd86e157295e46ee1613852565",
-  "operation_map_sha256": "afd59dd1985f9e4756c1a974586a452331084cddb3b5b97e9356dee0164b5737",
+  "base": "53b4783e38f7dc7f4903947c405469e05e84d59b",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0973a83001b35bf10c1c6bed090c58bc1c74db80394d30e6e1e476ecfc1e6fae",
+  "operation_map_sha256": "574ea716e1b64c85b79c1f7456fa093fe421c6e18e914b7295148b88b118f654",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "85c6840fa6889ce19b40cd58966ddf97fb5ae54d5a2074495e819e3fc3691acc",
-      "after_sha256": "e5591e0f6cddada1d6f8340c56ab5f6e70b50fc0c80e5f414683b1a208629046",
+      "before_sha256": "e5591e0f6cddada1d6f8340c56ab5f6e70b50fc0c80e5f414683b1a208629046",
+      "after_sha256": "8062e2cc8a7868f7fac424ec7c685414cc279ddda3f939202d75f1d816d44545",
       "owners": {
         "@document": {
-          "before": "85c6840fa6889ce19b40cd58966ddf97fb5ae54d5a2074495e819e3fc3691acc",
-          "after": "e5591e0f6cddada1d6f8340c56ab5f6e70b50fc0c80e5f414683b1a208629046"
+          "before": "e5591e0f6cddada1d6f8340c56ab5f6e70b50fc0c80e5f414683b1a208629046",
+          "after": "8062e2cc8a7868f7fac424ec7c685414cc279ddda3f939202d75f1d816d44545"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "c8a4400decfec5e32d9688640db7796ad84872b61323e26c273affda25c6d48d",
-      "after_sha256": "ee3b07b2ff2803bc9ccca42bac2a28bc34328b98838ad97a211d854ad92f478a",
+      "before_sha256": "ee3b07b2ff2803bc9ccca42bac2a28bc34328b98838ad97a211d854ad92f478a",
+      "after_sha256": "4f6cbcb8064139a60d0542f7c15f356002d85a04fd0ebe6a3b363665ef853831",
       "owners": {
         "@document": {
-          "before": "c8a4400decfec5e32d9688640db7796ad84872b61323e26c273affda25c6d48d",
-          "after": "ee3b07b2ff2803bc9ccca42bac2a28bc34328b98838ad97a211d854ad92f478a"
+          "before": "ee3b07b2ff2803bc9ccca42bac2a28bc34328b98838ad97a211d854ad92f478a",
+          "after": "4f6cbcb8064139a60d0542f7c15f356002d85a04fd0ebe6a3b363665ef853831"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "324ed62c784661c8f48e9f55a16bc5a91b65a814209f3ce29da6d004a2c0e0b8",
-      "after_sha256": "e130c682391b4d968735b913bbccf14512c759eb5b5546f24595d2000ff6d4ee",
+      "before_sha256": "e130c682391b4d968735b913bbccf14512c759eb5b5546f24595d2000ff6d4ee",
+      "after_sha256": "bb513f2a436119f1bcf7c1c2d060077fb4ea04655fe968f3ea4ae1d5e2dd3eb0",
       "owners": {
         "@document": {
-          "before": "324ed62c784661c8f48e9f55a16bc5a91b65a814209f3ce29da6d004a2c0e0b8",
-          "after": "e130c682391b4d968735b913bbccf14512c759eb5b5546f24595d2000ff6d4ee"
+          "before": "e130c682391b4d968735b913bbccf14512c759eb5b5546f24595d2000ff6d4ee",
+          "after": "bb513f2a436119f1bcf7c1c2d060077fb4ea04655fe968f3ea4ae1d5e2dd3eb0"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "4808e1fea1f48c47d2437906c91fbb51e54183275fe7e36248b039a5aeb2b3de",
-      "after_sha256": "5e44942c0ae7dae3e0cb01e7d42fff99c6c9f7842aa489037dc24d58b55bfcc0",
+      "before_sha256": "5e44942c0ae7dae3e0cb01e7d42fff99c6c9f7842aa489037dc24d58b55bfcc0",
+      "after_sha256": "32d9a3156e8888f336612e263cde31e6a2577551dfdd6561f591ae7c70b27b37",
       "owners": {
         "@document": {
-          "before": "4808e1fea1f48c47d2437906c91fbb51e54183275fe7e36248b039a5aeb2b3de",
-          "after": "5e44942c0ae7dae3e0cb01e7d42fff99c6c9f7842aa489037dc24d58b55bfcc0"
+          "before": "5e44942c0ae7dae3e0cb01e7d42fff99c6c9f7842aa489037dc24d58b55bfcc0",
+          "after": "32d9a3156e8888f336612e263cde31e6a2577551dfdd6561f591ae7c70b27b37"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "3a19855ff13fe606c417b6ea49d0102b0003ce17a98b0bb87820bbd5ef237712",
-      "after_sha256": "4aaf702b0060d0ed8e3c885395c77ac3a21df9599af471db31004e9fe4d85393",
+      "before_sha256": "4aaf702b0060d0ed8e3c885395c77ac3a21df9599af471db31004e9fe4d85393",
+      "after_sha256": "888b7f4424a42daa501ddf713ae574495e53a20cf828bd24825f62550b504540",
       "owners": {
         "@document": {
-          "before": "3a19855ff13fe606c417b6ea49d0102b0003ce17a98b0bb87820bbd5ef237712",
-          "after": "4aaf702b0060d0ed8e3c885395c77ac3a21df9599af471db31004e9fe4d85393"
+          "before": "4aaf702b0060d0ed8e3c885395c77ac3a21df9599af471db31004e9fe4d85393",
+          "after": "888b7f4424a42daa501ddf713ae574495e53a20cf828bd24825f62550b504540"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "c3fa8ccc8fea66f7af57340df09a152951b249ac3f86d563dc1b063130a3ed0a",
-      "after_sha256": "179c47dd572c41609b1614a984232ba822e47b5c44735f0a25becd31056836c7",
+      "before_sha256": "179c47dd572c41609b1614a984232ba822e47b5c44735f0a25becd31056836c7",
+      "after_sha256": "36cb4acdc3303e6b8fd4d50e5f0da7e253289cb9733d73a2771364569e002985",
       "owners": {
         "@document": {
-          "before": "c3fa8ccc8fea66f7af57340df09a152951b249ac3f86d563dc1b063130a3ed0a",
-          "after": "179c47dd572c41609b1614a984232ba822e47b5c44735f0a25becd31056836c7"
+          "before": "179c47dd572c41609b1614a984232ba822e47b5c44735f0a25becd31056836c7",
+          "after": "36cb4acdc3303e6b8fd4d50e5f0da7e253289cb9733d73a2771364569e002985"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "484ae91cefbf04e323d44b00d74f0c408233119f139172f2c7ad746c3091be6e",
-      "after_sha256": "1ab09bba3484955e0d665fd901b8846c84b7a1f4243bc31b047e7ee901c20513",
+      "before_sha256": "1ab09bba3484955e0d665fd901b8846c84b7a1f4243bc31b047e7ee901c20513",
+      "after_sha256": "1904a271fb299882e8ab7e184a101f706b3b33ea7fe87219d062123369ccdd2c",
       "owners": {
         "@document": {
-          "before": "484ae91cefbf04e323d44b00d74f0c408233119f139172f2c7ad746c3091be6e",
-          "after": "1ab09bba3484955e0d665fd901b8846c84b7a1f4243bc31b047e7ee901c20513"
+          "before": "1ab09bba3484955e0d665fd901b8846c84b7a1f4243bc31b047e7ee901c20513",
+          "after": "1904a271fb299882e8ab7e184a101f706b3b33ea7fe87219d062123369ccdd2c"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "b214a13ab1299a2b15104825f45d46f1933190bb6ab56f59eb4ecaf86d3d2484",
-      "after_sha256": "fb48fc645efcadef24999d0e4b0b24cf9b6ba43194c9037e5564cb0a984ede77",
+      "before_sha256": "fb48fc645efcadef24999d0e4b0b24cf9b6ba43194c9037e5564cb0a984ede77",
+      "after_sha256": "63b3ee41b99ab806d140d32b40609747ec319146b4ad604b696adf173f00a201",
       "owners": {
         "@document": {
-          "before": "b214a13ab1299a2b15104825f45d46f1933190bb6ab56f59eb4ecaf86d3d2484",
-          "after": "fb48fc645efcadef24999d0e4b0b24cf9b6ba43194c9037e5564cb0a984ede77"
+          "before": "fb48fc645efcadef24999d0e4b0b24cf9b6ba43194c9037e5564cb0a984ede77",
+          "after": "63b3ee41b99ab806d140d32b40609747ec319146b4ad604b696adf173f00a201"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "7075e2587e67584cad7d0a114eb216d43d8886282bf908ee77c34818fe4cab63",
-      "after_sha256": "35812c917d010083a9ecbacfdbe35f306907597fedb119ad04bf97dd3249d3f8",
+      "before_sha256": "35812c917d010083a9ecbacfdbe35f306907597fedb119ad04bf97dd3249d3f8",
+      "after_sha256": "379be9e12290bebe301cd340f3103f1288428f79c149bbabe0451f9046a88e45",
       "owners": {
         "@document": {
-          "before": "7075e2587e67584cad7d0a114eb216d43d8886282bf908ee77c34818fe4cab63",
-          "after": "35812c917d010083a9ecbacfdbe35f306907597fedb119ad04bf97dd3249d3f8"
+          "before": "35812c917d010083a9ecbacfdbe35f306907597fedb119ad04bf97dd3249d3f8",
+          "after": "379be9e12290bebe301cd340f3103f1288428f79c149bbabe0451f9046a88e45"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "6108157365e170d04ca2f15b30f2310cfe1ddb10325b8dc3c286213a078ff0ed",
-      "after_sha256": "94a68d0ecd068c39463481310c06753ac2acba5bf71316308255e22dcb53ce85",
+      "before_sha256": "94a68d0ecd068c39463481310c06753ac2acba5bf71316308255e22dcb53ce85",
+      "after_sha256": "202b9de9451d398b71b925b4bcba6196d014b7095409321ba32034f09a5d05f3",
       "owners": {
         "@document": {
-          "before": "6108157365e170d04ca2f15b30f2310cfe1ddb10325b8dc3c286213a078ff0ed",
-          "after": "94a68d0ecd068c39463481310c06753ac2acba5bf71316308255e22dcb53ce85"
+          "before": "94a68d0ecd068c39463481310c06753ac2acba5bf71316308255e22dcb53ce85",
+          "after": "202b9de9451d398b71b925b4bcba6196d014b7095409321ba32034f09a5d05f3"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "50c6da9892158fc5574490a455798d0b4642d60a8bfae88322ab1775d2fab996",
-      "after_sha256": "5094b415c3680a209d36e846e2eb96264e3b8c6b27022b87a0710615046c055d",
+      "before_sha256": "5094b415c3680a209d36e846e2eb96264e3b8c6b27022b87a0710615046c055d",
+      "after_sha256": "2eed82fcca6105679b0ec14b278abf1783d7bb55cbef7c4f3062c68f3f6d2a39",
       "owners": {
         "@document": {
-          "before": "50c6da9892158fc5574490a455798d0b4642d60a8bfae88322ab1775d2fab996",
-          "after": "5094b415c3680a209d36e846e2eb96264e3b8c6b27022b87a0710615046c055d"
+          "before": "5094b415c3680a209d36e846e2eb96264e3b8c6b27022b87a0710615046c055d",
+          "after": "2eed82fcca6105679b0ec14b278abf1783d7bb55cbef7c4f3062c68f3f6d2a39"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "240440530e3b55c788e5bf4427b2c090450b6e9036536ec489a85a8906f7c9d9",
-      "after_sha256": "182d052c56cf9612d24af5c73749f0cd750c945fb908b9e2a9d2180b1354ab03",
+      "before_sha256": "182d052c56cf9612d24af5c73749f0cd750c945fb908b9e2a9d2180b1354ab03",
+      "after_sha256": "69e21fa5c32708ad32e3daae68992ba49c140ba223c87b9599955dc21b316673",
       "owners": {
         "@document": {
-          "before": "240440530e3b55c788e5bf4427b2c090450b6e9036536ec489a85a8906f7c9d9",
-          "after": "182d052c56cf9612d24af5c73749f0cd750c945fb908b9e2a9d2180b1354ab03"
+          "before": "182d052c56cf9612d24af5c73749f0cd750c945fb908b9e2a9d2180b1354ab03",
+          "after": "69e21fa5c32708ad32e3daae68992ba49c140ba223c87b9599955dc21b316673"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "4eaaf81b551fd092196ed832fe4dea2c15f086499410a756b363f16b400e5a4e",
-      "after_sha256": "4522fd8ab634f54b05977edfdb155b97c0195be3df775905ac93d0292656a85f",
+      "before_sha256": "4522fd8ab634f54b05977edfdb155b97c0195be3df775905ac93d0292656a85f",
+      "after_sha256": "cbb75e72635546fcd74e08253580d3a5b573d61953ed88e9b803afd6c314a8bd",
       "owners": {
         "@document": {
-          "before": "4eaaf81b551fd092196ed832fe4dea2c15f086499410a756b363f16b400e5a4e",
-          "after": "4522fd8ab634f54b05977edfdb155b97c0195be3df775905ac93d0292656a85f"
+          "before": "4522fd8ab634f54b05977edfdb155b97c0195be3df775905ac93d0292656a85f",
+          "after": "cbb75e72635546fcd74e08253580d3a5b573d61953ed88e9b803afd6c314a8bd"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "8fb44899eddd880bd91df97da79e3906cd4682a2761e1ccfbb5a9658cf8e4891",
-      "after_sha256": "a6c704324e25c763a4fa5150eb54cf9670ebef34732ad5ceacb1f333a8ffe9f3",
+      "before_sha256": "a6c704324e25c763a4fa5150eb54cf9670ebef34732ad5ceacb1f333a8ffe9f3",
+      "after_sha256": "1bab83b5867369300ab4a91fc338387de1d7a0002d78e1fc0df9b4c39dbf945f",
       "owners": {
         "@document": {
-          "before": "8fb44899eddd880bd91df97da79e3906cd4682a2761e1ccfbb5a9658cf8e4891",
-          "after": "a6c704324e25c763a4fa5150eb54cf9670ebef34732ad5ceacb1f333a8ffe9f3"
+          "before": "a6c704324e25c763a4fa5150eb54cf9670ebef34732ad5ceacb1f333a8ffe9f3",
+          "after": "1bab83b5867369300ab4a91fc338387de1d7a0002d78e1fc0df9b4c39dbf945f"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "0bcc1d571cb8165475612a586f9e110139a7c2a885daa70bd85ee8dd979fe8d6",
-      "after_sha256": "bef86d6c13175ce7d855b6e8be079df219f485849055c45ce809bca1ed34f6f5",
+      "before_sha256": "bef86d6c13175ce7d855b6e8be079df219f485849055c45ce809bca1ed34f6f5",
+      "after_sha256": "ed6216b6347349147d93aff851fee0d1d5fc4d80f4b64be2bbeb9d2cc0806ce7",
       "owners": {
         "@document": {
-          "before": "0bcc1d571cb8165475612a586f9e110139a7c2a885daa70bd85ee8dd979fe8d6",
-          "after": "bef86d6c13175ce7d855b6e8be079df219f485849055c45ce809bca1ed34f6f5"
+          "before": "bef86d6c13175ce7d855b6e8be079df219f485849055c45ce809bca1ed34f6f5",
+          "after": "ed6216b6347349147d93aff851fee0d1d5fc4d80f4b64be2bbeb9d2cc0806ce7"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "2071847edc294cc182c211e3e080e03e6bcd5f43369f52b869c6a805e2078aa1",
-      "after_sha256": "dec899364c318075d3286911eb47b2dc46fb9d9675e2be24dc1277b9725ca910",
+      "before_sha256": "dec899364c318075d3286911eb47b2dc46fb9d9675e2be24dc1277b9725ca910",
+      "after_sha256": "b0c476119252115ef10963e6225ce46934402d5810c1731a92e8c494e062c83c",
       "owners": {
         "@document": {
-          "before": "2071847edc294cc182c211e3e080e03e6bcd5f43369f52b869c6a805e2078aa1",
-          "after": "dec899364c318075d3286911eb47b2dc46fb9d9675e2be24dc1277b9725ca910"
+          "before": "dec899364c318075d3286911eb47b2dc46fb9d9675e2be24dc1277b9725ca910",
+          "after": "b0c476119252115ef10963e6225ce46934402d5810c1731a92e8c494e062c83c"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "f9d9995907809d4acf40f5c599a658b43d4df109bb85e994fc3047d5ae6a8d5b",
-      "after_sha256": "97885d35850224bd9f0e1f16edc27b89d35be24f1a50dd50617c09c74a9c965b",
+      "before_sha256": "97885d35850224bd9f0e1f16edc27b89d35be24f1a50dd50617c09c74a9c965b",
+      "after_sha256": "3cc8acd62e935fbae869be740c9f283e3884b509266f87bb2381112fe3e85c95",
       "owners": {
         "@document": {
-          "before": "f9d9995907809d4acf40f5c599a658b43d4df109bb85e994fc3047d5ae6a8d5b",
-          "after": "97885d35850224bd9f0e1f16edc27b89d35be24f1a50dd50617c09c74a9c965b"
+          "before": "97885d35850224bd9f0e1f16edc27b89d35be24f1a50dd50617c09c74a9c965b",
+          "after": "3cc8acd62e935fbae869be740c9f283e3884b509266f87bb2381112fe3e85c95"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "42655fdcb71cba4dcd9c81818b73f7fdc9c2d38c0da197a5c1b5155d4ca2ea63",
-      "after_sha256": "f417f093337350f4073175847ec691664803548c91cbf531b1720876039382c1",
+      "before_sha256": "f417f093337350f4073175847ec691664803548c91cbf531b1720876039382c1",
+      "after_sha256": "8e3e435ae4faa35af2dab9e00a8b26ce2ddc5ed19d8dac56cd6ac15c6d5f23a4",
       "owners": {
         "@document": {
-          "before": "42655fdcb71cba4dcd9c81818b73f7fdc9c2d38c0da197a5c1b5155d4ca2ea63",
-          "after": "f417f093337350f4073175847ec691664803548c91cbf531b1720876039382c1"
+          "before": "f417f093337350f4073175847ec691664803548c91cbf531b1720876039382c1",
+          "after": "8e3e435ae4faa35af2dab9e00a8b26ce2ddc5ed19d8dac56cd6ac15c6d5f23a4"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "6d3c7ea70c6211c637810c3ab4b860c77b5b7364e7c20285af1cb847bb7fe7b2",
-      "after_sha256": "aca566b59640f5d61dc21ff95ed91b251440b8620d4beaefe9b28de6f0d71211",
+      "before_sha256": "aca566b59640f5d61dc21ff95ed91b251440b8620d4beaefe9b28de6f0d71211",
+      "after_sha256": "f0dc59d919906b954dbecf03680ca14abb8703284606cf0522eb656af2f0b56f",
       "owners": {
         "@document": {
-          "before": "6d3c7ea70c6211c637810c3ab4b860c77b5b7364e7c20285af1cb847bb7fe7b2",
-          "after": "aca566b59640f5d61dc21ff95ed91b251440b8620d4beaefe9b28de6f0d71211"
+          "before": "aca566b59640f5d61dc21ff95ed91b251440b8620d4beaefe9b28de6f0d71211",
+          "after": "f0dc59d919906b954dbecf03680ca14abb8703284606cf0522eb656af2f0b56f"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "9aa9a8eae55369ac8053dc0b0bd0073ea9ea35be6cbf03be1fc3f7ce1f8b16ff",
-      "after_sha256": "a8078e4f16891f25dbd153d18f4178540002b2b814d6e716187e027065ad5919",
+      "before_sha256": "a8078e4f16891f25dbd153d18f4178540002b2b814d6e716187e027065ad5919",
+      "after_sha256": "a8debf3c323fd12c54e14b4eed2e49c54f63b4fe3c5625053dfed898738d72f1",
       "owners": {
         "@document": {
-          "before": "9aa9a8eae55369ac8053dc0b0bd0073ea9ea35be6cbf03be1fc3f7ce1f8b16ff",
-          "after": "a8078e4f16891f25dbd153d18f4178540002b2b814d6e716187e027065ad5919"
+          "before": "a8078e4f16891f25dbd153d18f4178540002b2b814d6e716187e027065ad5919",
+          "after": "a8debf3c323fd12c54e14b4eed2e49c54f63b4fe3c5625053dfed898738d72f1"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "071d505d16dc80528216a6802232ccd30632155ca196b84339746c9be4141603",
-      "after_sha256": "17a729c7aec855b777f6392e2093aa5c1621a98d651efa1af2f1ce97758a9833",
+      "before_sha256": "17a729c7aec855b777f6392e2093aa5c1621a98d651efa1af2f1ce97758a9833",
+      "after_sha256": "811947b62fe25c752872c81a5e8eb7e973f06820d8000c3f24f8aeb18ef85638",
       "owners": {
         "@document": {
-          "before": "071d505d16dc80528216a6802232ccd30632155ca196b84339746c9be4141603",
-          "after": "17a729c7aec855b777f6392e2093aa5c1621a98d651efa1af2f1ce97758a9833"
+          "before": "17a729c7aec855b777f6392e2093aa5c1621a98d651efa1af2f1ce97758a9833",
+          "after": "811947b62fe25c752872c81a5e8eb7e973f06820d8000c3f24f8aeb18ef85638"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "f1aea1c8a8fd47fb44342ff7586bc9d5e3c95a2d953037f3caa8d4217d31cc41",
-      "after_sha256": "aa750d26575aec7146c501c055052a19d90e94d3447fde09f270fdaf82d0e5ed",
+      "before_sha256": "aa750d26575aec7146c501c055052a19d90e94d3447fde09f270fdaf82d0e5ed",
+      "after_sha256": "6ee48a5000a36d896de2675e2ce85f193d389b6dae59ea54d6489a8cc6d8ac17",
       "owners": {
         "@document": {
-          "before": "f1aea1c8a8fd47fb44342ff7586bc9d5e3c95a2d953037f3caa8d4217d31cc41",
-          "after": "aa750d26575aec7146c501c055052a19d90e94d3447fde09f270fdaf82d0e5ed"
+          "before": "aa750d26575aec7146c501c055052a19d90e94d3447fde09f270fdaf82d0e5ed",
+          "after": "6ee48a5000a36d896de2675e2ce85f193d389b6dae59ea54d6489a8cc6d8ac17"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "9938328cc2914ec64bb6cd9703d3bbbf29978ce62ad5a02d5c3ea5a7fda41bc9",
-      "after_sha256": "2c3702db58bf68f103fe2fdef24f31e0779fd37941257ced951b4dfde13c84eb",
+      "before_sha256": "2c3702db58bf68f103fe2fdef24f31e0779fd37941257ced951b4dfde13c84eb",
+      "after_sha256": "bf4debcf74a86cefa716681281c7923dc348e866b60588b0db47b8e677758cdf",
       "owners": {
         "@document": {
-          "before": "9938328cc2914ec64bb6cd9703d3bbbf29978ce62ad5a02d5c3ea5a7fda41bc9",
-          "after": "2c3702db58bf68f103fe2fdef24f31e0779fd37941257ced951b4dfde13c84eb"
+          "before": "2c3702db58bf68f103fe2fdef24f31e0779fd37941257ced951b4dfde13c84eb",
+          "after": "bf4debcf74a86cefa716681281c7923dc348e866b60588b0db47b8e677758cdf"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "bba6a88639c02a26fd862b71ba7f9c6c06b308f3bced14c258d7343e8c21ef36",
-      "after_sha256": "02404b3c4e72e1285015d46cbb788b66c018fe1559bf9702eb9bdb74d895a530",
+      "before_sha256": "02404b3c4e72e1285015d46cbb788b66c018fe1559bf9702eb9bdb74d895a530",
+      "after_sha256": "fd9784f945031dbb20ebbfb80cab23fcc30852fbb2c0ce7c7a44ccb1455804f8",
       "owners": {
         "@document": {
-          "before": "bba6a88639c02a26fd862b71ba7f9c6c06b308f3bced14c258d7343e8c21ef36",
-          "after": "02404b3c4e72e1285015d46cbb788b66c018fe1559bf9702eb9bdb74d895a530"
+          "before": "02404b3c4e72e1285015d46cbb788b66c018fe1559bf9702eb9bdb74d895a530",
+          "after": "fd9784f945031dbb20ebbfb80cab23fcc30852fbb2c0ce7c7a44ccb1455804f8"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "4670e6d9a976bc7f9882a9015805119afc3d09d4ecef600d39d7c578397deaff",
-      "after_sha256": "05f6fe2c901f1ddc41629cbb080c7672cdaccead8117a67881565f2bb5a70bb4",
+      "before_sha256": "05f6fe2c901f1ddc41629cbb080c7672cdaccead8117a67881565f2bb5a70bb4",
+      "after_sha256": "ee1195a88a32cfb9d911820562166d079bfc2242556d6470fe159bace0f90725",
       "owners": {
         "@document": {
-          "before": "4670e6d9a976bc7f9882a9015805119afc3d09d4ecef600d39d7c578397deaff",
-          "after": "05f6fe2c901f1ddc41629cbb080c7672cdaccead8117a67881565f2bb5a70bb4"
+          "before": "05f6fe2c901f1ddc41629cbb080c7672cdaccead8117a67881565f2bb5a70bb4",
+          "after": "ee1195a88a32cfb9d911820562166d079bfc2242556d6470fe159bace0f90725"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "36d995e5daa4f5d741efdef866f33d6a1bf801046f9bc33eee6817beebd32002",
-      "after_sha256": "9a58eb27b4952e5fba82db796e55a015b65a65a3ee8ffdc49ee782653962dd81",
+      "before_sha256": "9a58eb27b4952e5fba82db796e55a015b65a65a3ee8ffdc49ee782653962dd81",
+      "after_sha256": "deac0ca0714e76b2cd407498770450d3b53c90ba5a03728f7d220853e0145640",
       "owners": {
         "@document": {
-          "before": "36d995e5daa4f5d741efdef866f33d6a1bf801046f9bc33eee6817beebd32002",
-          "after": "9a58eb27b4952e5fba82db796e55a015b65a65a3ee8ffdc49ee782653962dd81"
+          "before": "9a58eb27b4952e5fba82db796e55a015b65a65a3ee8ffdc49ee782653962dd81",
+          "after": "deac0ca0714e76b2cd407498770450d3b53c90ba5a03728f7d220853e0145640"
         }
       }
     },
-    "src/warhammer40k_core/ai/semantic_features.py": {
+    "src/warhammer40k_core/ai/training_transitions.py": {
       "before_sha256": null,
-      "after_sha256": "0a90102c6f47a7ab8679fd8d0b2a44820e397fe35f4a9cfa05cb9f631abf5570",
+      "after_sha256": "96233c7bf8981d6c5432b54c7d14f2dc7a1a75f81d82768377c32c64a0e8dd24",
       "owners": {
         "@module": {
           "before": null,
-          "after": "2909331b9929389af26ddda9216be9bbf807d682bb903cde4e0636bee144c5af"
+          "after": "e06fea680f83b2f4b2ba7748167ea84a3135042cd9348b3fedba56456af475ab"
         },
-        "FeatureInformationScope": {
+        "FiniteAcceptedTransition": {
           "before": null,
-          "after": "226df14ba3adf46e754f6fa8e1bfe8a319defd2d2d681d4c0c4d5e3b050aef04"
+          "after": "96c803d3e6603472c09731d76e924ed54c83da7e69776cf95a6dd4d8bc68e52d"
         },
-        "FeatureUnit": {
+        "FiniteAcceptedTransition.__init__": {
           "before": null,
-          "after": "5487ac877b426ab235f080e1598ced09438eeb0aa142adacf048a0227d9619df"
+          "after": "fe8d5028fad461786fe1194d1f555f6a91218fc229381f96a9aeacb8fa2f42d0"
         },
-        "FeatureValueKind": {
+        "FiniteAcceptedTransition.accepted_record_start": {
           "before": null,
-          "after": "442b43a72ed8e83e52d296d12aa61a7938c557638c1c129fbd9cbdff58f326ba"
+          "after": "c91dfae9130762a1521950c92ebf024402e6adcaec8b7d6349e37749fc210ca7"
         },
-        "FiniteTrainingObservation": {
+        "FiniteAcceptedTransition.accepted_record_stop": {
           "before": null,
-          "after": "a6b5c43c4968408f1f5ecb1307ce01cfad94f3a00685c48f505536b19dcaff7f"
+          "after": "493c52e92c5f1b7caf36a2c435564b9c7108ebfe72824881a3400bed9038f9df"
         },
-        "FiniteTrainingObservation.__post_init__": {
+        "FiniteAcceptedTransition.actor_id": {
           "before": null,
-          "after": "8230e54b87763e6f33d468d6e7a7d419534f6f125bacc1d17742cefb78787740"
+          "after": "333380e616030b44dbbb4727aea5d71f2d45167c3b4def253640380bb7368f99"
         },
-        "FiniteTrainingObservation.content_hash": {
+        "FiniteAcceptedTransition.authoritative_record_id": {
+          "before": null,
+          "after": "57be5ae4705ebd3705d61bc2ec06d4a18043d65b3f2d83923cba39a0b71abec5"
+        },
+        "FiniteAcceptedTransition.authoritative_request_id": {
+          "before": null,
+          "after": "87e797fdb0d08be8cd2132650867283d95fb05c1ce57b44bd1a052371a685e49"
+        },
+        "FiniteAcceptedTransition.content_hash": {
           "before": null,
           "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
         },
-        "FiniteTrainingObservation.from_link": {
+        "FiniteAcceptedTransition.from_payload": {
           "before": null,
-          "after": "c020eaf4edc5e59f909a9fe89f9592cc4db052229dbdaff350ecece44d042fed"
+          "after": "053a63ecd2a6015e2fba1b68b67445d9f8fa2afdb11de7bc58d01ee60a3f3896"
         },
-        "FiniteTrainingObservation.from_payload": {
+        "FiniteAcceptedTransition.from_sessions": {
           "before": null,
-          "after": "01ae9313ba910ce76bc23e0e9f071bf4261e12efb971e8b3bacbe7dcd1e343d3"
+          "after": "1d8b8321ceb248038826a2048c49f499248938cbadc5bbb835f0f72dc43c6ed5"
         },
-        "FiniteTrainingObservation.require_matches": {
+        "FiniteAcceptedTransition.perspective_player_id": {
           "before": null,
-          "after": "9c68023298d7fa4da149fa36531ab1005324caeacfb82ce2466e9b89c51d75ba"
+          "after": "ab2cfc7b2361ce6bc5748c913238b63be178e87ce4d4b220f9c2187b52e1a560"
         },
-        "FiniteTrainingObservation.to_payload": {
+        "FiniteAcceptedTransition.to_payload": {
           "before": null,
-          "after": "464e64b490d43e3230f61ec954b885423adef88876f2ccdf1f20e8ddf22235d9"
+          "after": "30f48050164c2810b52ee01452f41a2b977e46e099db285038c214a1ab3fd9b8"
         },
-        "FiniteTrainingObservationPayload": {
+        "FiniteAcceptedTransitionPayload": {
           "before": null,
-          "after": "5ec664354f97e310336d83816aaaa0200b8b48225196333c62275d402f171ad3"
+          "after": "2ff0535b0fd6ac60080f8e9a8b4f175d6cf983fed81afe0244ffcf31f61505bd"
         },
-        "SemanticFeatureDefinition": {
+        "TrainingTransitionError": {
           "before": null,
-          "after": "5de821a0852d015cb6b470e4373a63996e723dda4559834fb1119f49e8c05ff6"
+          "after": "2750fc321112ad8dd954d161c6c134e6fe49a963d5074595131484e789d43276"
         },
-        "SemanticFeatureDefinition.__post_init__": {
+        "TransitionPositionPayload": {
           "before": null,
-          "after": "405915493dad76ad55987e902ffa1959d365e7679776efa3257ec509f6c68409"
+          "after": "2804a1473f029118c5e75f7509498af4aa1e38bd31608e61e53ea35d569c1115"
         },
-        "SemanticFeatureDefinition.from_payload": {
+        "_position": {
           "before": null,
-          "after": "9112945544bdc075248e6a047385649ece51d671bfba8a19439ffed6bba2cbed"
-        },
-        "SemanticFeatureDefinition.to_payload": {
-          "before": null,
-          "after": "3d145d5d8012c836063f321b8b2c78faf709a48f14e53532c7baef1d28083f4b"
-        },
-        "SemanticFeatureDefinitionPayload": {
-          "before": null,
-          "after": "02790c2e3030e3f983d17e6b0869a65f4fe887104625811545b00d1f4172b821"
-        },
-        "SemanticFeatureError": {
-          "before": null,
-          "after": "8becaa1232d4c22b7a36215025ec7db1ad9d0780a044900a23d17b1abda2f738"
-        },
-        "SemanticFeatureValue": {
-          "before": null,
-          "after": "aac80f91775fbb7c7980385a0797bcc987f5af077829baf66883bd986394cc9a"
-        },
-        "SemanticFeatureValue.__post_init__": {
-          "before": null,
-          "after": "aee8ae3b29ce3222e99b17300160e93f89a9e29657a5c72ed5a9154189fd64c9"
-        },
-        "SemanticFeatureValue.from_payload": {
-          "before": null,
-          "after": "c214b65428f70a1f4c3b5169fbb8886a6cf195a02c33d908726cb1ed6b68eeb6"
-        },
-        "SemanticFeatureValue.to_payload": {
-          "before": null,
-          "after": "eb205ef73ca702d4bf0542a5060e264f50ffb9d4dbf453ba7caa5c88139633d4"
-        },
-        "SemanticFeatureValuePayload": {
-          "before": null,
-          "after": "b31bdd41e421ae698658cd7b8ab5f952d1418f886d3a7a26a80f1b6792ca2019"
-        },
-        "SemanticObservation": {
-          "before": null,
-          "after": "a6fc96a16b4c1bb4fc32fa7769eaa5b8bde484ffdbaf10b9ad7e4a4658c436fa"
-        },
-        "SemanticObservation.__post_init__": {
-          "before": null,
-          "after": "f2ea789e4b4fb97c9b755caf1aedc2dc6b0d2e509e6880e2bb1029cc18e96bcf"
-        },
-        "SemanticObservation.from_context": {
-          "before": null,
-          "after": "4a16b0cad33e969cfbe7ffc32228cefea9b5466856b91dab95b3644eafe719e9"
-        },
-        "SemanticObservation.from_payload": {
-          "before": null,
-          "after": "de3d0c9e5ec85ee447016f4bff9640849d72fad91448d0e4ed30f9ef8292ba78"
-        },
-        "SemanticObservation.model_inputs": {
-          "before": null,
-          "after": "dc0251b1679bde6b1713592b2713ac2d369568cfeaa24146ce4afe9f085432c3"
-        },
-        "SemanticObservation.to_payload": {
-          "before": null,
-          "after": "a1c4dfc3095dc56f39b3168b99b9d9bd09a86a2732ee8f688be2e371bc91846a"
-        },
-        "SemanticObservationPayload": {
-          "before": null,
-          "after": "b130f8bd592f5826f8cde60f47f9e7321267f562cb6c3e143e34b76ffc191b53"
-        },
-        "_object": {
-          "before": null,
-          "after": "50c7c0ec9f1d6c5d1543d0c4c84f33cf9ea1baf8bd3d9e892e96888ea2efa339"
-        },
-        "_sha256": {
-          "before": null,
-          "after": "cd4c59ad3a97b5f09d10a788481a5de4bda8159a8406fc66a28d549332b43c3c"
+          "after": "6363786ede36b5feb81f9521c4f4637eb0ceccfe3d35c3b82f1b18ddfa955a29"
         }
       }
     },
     "tests/infrastructure/adapters/test_finite_candidates.py": {
-      "before_sha256": "b4a13ab933a2c539fe2c072aa0ac6a00a5d0ce861e19f8099b30df437e1868e7",
-      "after_sha256": "12b0c83d61fc33f59ca1bf475a7e86993462989a710ac7f4c0cacda38a3e34fc",
+      "before_sha256": "12b0c83d61fc33f59ca1bf475a7e86993462989a710ac7f4c0cacda38a3e34fc",
+      "after_sha256": "06b0ce55d6a8c5492d54c6920725ea092615f4240e406f4061dd1d244eeba4a7",
       "owners": {
         "@module": {
-          "before": "f0b9595be370b686f713c11f79c7d867ea14eb243ebfa2d4074dd03bf034d8d8",
-          "after": "2ea81bfb8173965016fa349fa714bbeea41fc2a2c17b82ab07258ef06c7fee6a"
+          "before": "2ea81bfb8173965016fa349fa714bbeea41fc2a2c17b82ab07258ef06c7fee6a",
+          "after": "4852743a22980066472b3c42dffd3ebeda0aa508faf34337ba5ce48600b74005"
         },
-        "test_semantic_count_rejects_wrong_type_or_range": {
+        "test_finite_accepted_transition_reproduces_commit_without_mutating_inputs": {
           "before": null,
-          "after": "e7c63db14dda9988175a82a91397f18a1dba60d0eeeae36b92291c31fc928664"
+          "after": "b8bba6cae9ddac3bb87b0b8f1a5ac3792256b48d448e999ecf6da5f04d822348"
         },
-        "test_semantic_feature_rejects_definition_drift": {
+        "test_finite_transition_links_consecutive_actors_and_rejects_gaps": {
           "before": null,
-          "after": "99421c74642f8c0a54490a54cc0cb62435b1055e11ed16e1d6d3a509732ba900"
+          "after": "7d095dcb887d1a3e723b6fdb2d89895c8185757be4265fc4be538873c6dbf2c9"
         },
-        "test_semantic_inputs_ignore_hidden_opponent_selection_and_future_rng": {
+        "test_finite_transition_loader_rejects_tampered_evidence": {
           "before": null,
-          "after": "6292476b517e2ee2e8c9fa1c670f64a574c149186dcfa148f8c54a81b2b5dde5"
+          "after": "4c43f3d7648457439f455c3a989c6cc8da467ea1e6f6b31304d74c137548d5c7"
         },
-        "test_semantic_inputs_ignore_opaque_option_ids_labels_and_choice_seed": {
+        "test_finite_transition_rejects_a_record_without_engine_application": {
           "before": null,
-          "after": "e910f8b77b6490cdb8999cb96f007ae97f2ba35101fd220c739f7fc5ae777ff8"
+          "after": "ed31d5a500fc65bdcec332f41ee2c1ee6ffa71f541744a4d289b52a95fbe816b"
         },
-        "test_semantic_observation_rejects_feature_drift": {
+        "test_finite_transition_rejects_invalid_engine_joins": {
           "before": null,
-          "after": "1e6295d89af607a0a7187cfa1067e894b304ae5b7e6027f20137f17ebcbb6c4c"
+          "after": "e0cbf84b84f98d8bf52eb82060b63fdbdccff3dbfaf86b85f64840ce9ce16c66"
         },
-        "test_semantic_observation_rejects_shape_version_and_binding_drift": {
+        "test_finite_transition_rejects_lossy_temporal_indices": {
           "before": null,
-          "after": "63bba55688f1a444e93bbb11d53e654b7d5b3b4e85fb99d62e328e573ca3c515"
+          "after": "ffae8595124c91a3e216dae238b3ab7645a2cbb96a8be766e64a336b783c8f90"
         },
-        "test_semantic_observation_requires_immutable_typed_features": {
+        "test_finite_transition_reproduces_an_ordinary_terminal_boundary": {
           "before": null,
-          "after": "81af516dcf025ed6d77e252814e331caa4fdb11573da0849e0663efeabf861b3"
+          "after": "0dbd707f3b1db7860eeefba7a473d06782edaf3b2f99360ea3582c3958fdd994"
         },
-        "test_semantic_observation_round_trip_preserves_legacy_row_and_engine": {
+        "test_finite_transition_requires_verifying_factories": {
           "before": null,
-          "after": "c9e5163da0a87cd55cb4c90071bb57c38fadaf1d755900f37d8b8bd89f1b93ba"
-        },
-        "test_semantic_training_join_rejects_inconsistent_legacy_inputs": {
-          "before": null,
-          "after": "d8c26cd237cfd493cdacbedabca8aff9bd31b7d999e0408ca23382d8fea65ef0"
-        },
-        "test_semantic_training_loader_rejects_link_drift": {
-          "before": null,
-          "after": "9aa0882d2dee4a3cf71f7c4a3e6dd5ed3a6e98adc341ba3224d827bc8fbcf78d"
+          "after": "852ce0cb8fdd4e37b4884527629f30fe7b33f20ce1986a12ed0ae04d6d52a9d8"
         }
       }
     }
@@ -465,9 +397,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -484,9 +416,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -503,9 +435,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -522,9 +454,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -541,9 +473,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -560,9 +492,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -579,9 +511,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -598,9 +530,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -617,9 +549,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -636,9 +568,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -655,9 +587,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -674,9 +606,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -693,9 +625,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -737,9 +669,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -781,9 +713,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -825,9 +757,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -869,9 +801,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -913,9 +845,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -957,9 +889,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -1001,9 +933,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -1045,9 +977,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -1055,33 +987,33 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -1092,19 +1024,19 @@
         "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
-    "src/warhammer40k_core/ai/semantic_features.py": {
+    "src/warhammer40k_core/ai/training_transitions.py": {
       "category": "serialization_or_replay_work",
       "operations": [
-        "semantic-finite-observations"
+        "finite-accepted-transition-linkage"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     },
     "tests/infrastructure/adapters/test_finite_candidates.py": {
       "category": "rule_semantics",
@@ -1112,12 +1044,13 @@
         "player-policy-boundary",
         "finite-training-candidate-linkage",
         "named-training-targets",
-        "semantic-finite-observations"
+        "semantic-finite-observations",
+        "finite-accepted-transition-linkage"
       ],
       "selected_families": [],
-      "rationale": "Add a closed, independently versioned finite semantic registry, actor-view observation encoder and exact offline training-row companion, with scoped regressions and required generated identities/evidence.",
-      "source_obligation": "Derive only the existing scalar finite option count from the detached actor view. Pin integer kind, count units, scalar dimensions and actor-view scope; keep opaque identity and provenance outside numeric model inputs. Reject unknown required semantics and drift; preserve all legacy row bytes and engine authority.",
-      "unchanged_work": "No engine, adapter, runner, dependency, search, geometry, cache or existing benchmark-driver changes. The new offline encoder/serializer has no existing measured driver or live-runtime caller. Required serial current-runtime smoke/postflight and all live source, semantic, work and cache controls remain mandatory. Historical comparisons and full-game targets remain unchanged."
+      "rationale": "Add operator-only finite accepted-transition evidence with exact ordinary engine re-execution, immutable checkpoint/row/view joins and contiguous accepted-record linkage; refresh only required generated identities, test inventories and maintained contracts.",
+      "source_obligation": "Candidate integrity and the existence of a DecisionRecord do not prove engine acceptance. Require successful ordinary viewer submission and normalized engine outcome, reproduce the complete after checkpoint from the supplied trusted origin, and reject row, identity, observation or trajectory discontinuity. Preserve existing rows, scalar/target semantics and all engine authority.",
+      "unchanged_work": "No existing engine, adapter, runner, dependency, algorithm, cache, measured workload or benchmark driver is changed. The new offline verifier invokes existing exact replay/submission/persistence APIs on an isolated fork and has no live-runtime caller or existing measured baseline. Its new owner has no detailed family. Generated fixture changes carry the new runtime identity only. Serial current-runtime smoke/postflight and all live semantic, work, source and cache controls remain mandatory; full-game performance remains unqualified."
     }
   },
   "milestone": "ordinary",

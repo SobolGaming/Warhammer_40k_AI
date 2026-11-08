@@ -171,6 +171,57 @@ dataset, provide complete unit/weapon/geometry/scoring semantics, or add a learn
 The ordinary finite adapter submission and wire contract already cover the
 unchanged decision path.
 
+## Accepted finite transitions and bounded trajectory linkage
+
+`ai.training_transitions.FiniteAcceptedTransition.from_sessions(...)` is the
+operator-only `finite-accepted-transition-v1` companion. Supply the original
+finite link, row, historical context, and trusted before/after `LocalGameSession`
+checkpoints, plus an explicit trajectory ID and value perspective. It checks the
+complete candidate/row join and the before actor observation, then repeats the
+chosen ordinary viewer submission on an isolated exact-replay fork. It never
+submits to either supplied session or gives the fork to a policy.
+
+A `DecisionRecord` is insufficient: the engine records some rule-invalid attempts
+before returning their rejection. The verifier requires a successful submission
+and, when it returns `ADVANCED`, successful deterministic advancement to the next
+waiting or terminal boundary. Invalid and unsupported outcomes fail explicitly.
+The complete reproduced after checkpoint must match, including state, private RNG,
+history and configuration. No caller-supplied acceptance flag is trusted. This
+also rejects record-only histories, a different selected option, missing records,
+unrecorded state changes and mismatched viewer/authoritative identities.
+
+The companion records the candidate-link hash, both checkpoint and same-actor
+observation commitments, the submitted authoritative request/option/record/result
+identity, and ordered hashes of every reproduced record. Actor, active turn and
+value perspective remain separate. Before/after positions retain stage, setup
+step, battle phase and round. These identities and hashes are linkage evidence,
+not semantic model inputs; keep the companion and checkpoint access operator-only.
+
+`accepted-engine-records-from-origin-v1` starts at zero at the explicitly supplied
+slice origin. Every successful reproduced engine record, including automatic
+selections, advances the index. It does not reinterpret the global record ordinal
+or count rejected attempts before the origin. Passing `previous=` requires the
+same trajectory and perspective, an exact preceding after-checkpoint commitment,
+and a continuing predecessor. The next start equals that predecessor's stop;
+its hash and origin commitment are retained. Missing, reordered, duplicated or
+gapped links cannot load as the same trajectory. Returned payloads are detached
+and the evidence is immutable.
+
+The closed loader requires the same trusted inputs, explicit trajectory and
+perspective, and predecessor; it repeats engine reproduction and compares the
+complete canonical evidence. `terminal` means an engine terminal boundary;
+`continuing` makes no claim about how an experiment eventually ends. No reward,
+winner, future scoring or chance sample is added to actor observations.
+
+This is bounded finite-transition verification from a supplied origin. It does
+not authenticate that origin, prove its reachability, classify an entire episode
+as truncated/aborted/unsupported, validate target calculations or source-policy
+compatibility, or admit a dataset by itself. Admission must combine these checks
+with permitted semantic features, target/evidence validation and provenance.
+Parameterized transitions and a complete trajectory/episode admission service
+remain follow-up work. Legacy rows, targets, runner behavior, replay and the
+ordinary adapter/wire decision contract remain unchanged.
+
 ## Named training target declarations
 
 `ai.training_targets.NamedTrainingTarget` is the independently versioned
