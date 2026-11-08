@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a5b4671ddcf4a59926db1d4b13a5f7ea4e2eb1876ab626b92743cf5cd13986f9",
   "operation_map_sha256": "1fb1ab7dabd68cc29f3d6d84e2ed4454fd7383d22c5c4cb6be6ccbb8dfd480da",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "b19643f24b3a856ce5d8f7f864cbd6db8cfc917b2511b8ffd564bfa197cef7e3",
+      "after_sha256": "a12ef1beab62ff8c5608def65691e0d2f37b32cbcef11b7378b6aaf022b9fa40",
+      "owners": {
+        "@document": {
+          "before": "b19643f24b3a856ce5d8f7f864cbd6db8cfc917b2511b8ffd564bfa197cef7e3",
+          "after": "a12ef1beab62ff8c5608def65691e0d2f37b32cbcef11b7378b6aaf022b9fa40"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "07f5b248764de8f0cfa62586094dd2ba531b2fcdd7ee71c28d98bd77f56cb1af",
+      "after_sha256": "b113e4bd8687b3d3e68077cb93e1ad6f6b33378fa26a18788b49277824fc1eda",
+      "owners": {
+        "@document": {
+          "before": "07f5b248764de8f0cfa62586094dd2ba531b2fcdd7ee71c28d98bd77f56cb1af",
+          "after": "b113e4bd8687b3d3e68077cb93e1ad6f6b33378fa26a18788b49277824fc1eda"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "1d7208c27e654e33260f4f6487087afd26debaee56d5dd24d80475d0e706b7d9",
+      "after_sha256": "61ab3b354e0e7c09daf9db843f99efc07cf36e3a923bf656419240c6bdeeaada",
+      "owners": {
+        "@document": {
+          "before": "1d7208c27e654e33260f4f6487087afd26debaee56d5dd24d80475d0e706b7d9",
+          "after": "61ab3b354e0e7c09daf9db843f99efc07cf36e3a923bf656419240c6bdeeaada"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "49823af31dee2ba23223318f48a4083b6cbf99fe1d2f05146313e6aae74a002e",
+      "after_sha256": "b9175071d854b70cce28f7f8652fa42028b25a6be79772089bd37fd353ee67e1",
+      "owners": {
+        "@document": {
+          "before": "49823af31dee2ba23223318f48a4083b6cbf99fe1d2f05146313e6aae74a002e",
+          "after": "b9175071d854b70cce28f7f8652fa42028b25a6be79772089bd37fd353ee67e1"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "f87f5af3c00195940c43f49fac13d2ebe3bffa0373d8fff04c149a58fcf55c7f",
+      "after_sha256": "9c4d3d7e683312ffeca753477780592e07f182f490920ece7a8ad5b481dfd83b",
+      "owners": {
+        "@document": {
+          "before": "f87f5af3c00195940c43f49fac13d2ebe3bffa0373d8fff04c149a58fcf55c7f",
+          "after": "9c4d3d7e683312ffeca753477780592e07f182f490920ece7a8ad5b481dfd83b"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "599950ca1ec0895b1428982efeb797d9654eff0e20562c577733329127f96f65",
+      "owners": {
+        "@document": {
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "599950ca1ec0895b1428982efeb797d9654eff0e20562c577733329127f96f65"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "f79760bd7fca99ffe62a5b9211c32982f48021f4466f7c12d220ca8729dde1be",
+      "after_sha256": "c7a0ac08c651979f8ba14253a249a07aa21e38d95036f8582b7b54de203fd9ee",
+      "owners": {
+        "@document": {
+          "before": "f79760bd7fca99ffe62a5b9211c32982f48021f4466f7c12d220ca8729dde1be",
+          "after": "c7a0ac08c651979f8ba14253a249a07aa21e38d95036f8582b7b54de203fd9ee"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "fd99e7b0870eb0e3d6b880a41ec6cf1b479b4d7143e441b21b1caf38a8c84764",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "owners": {
+        "@document": {
+          "before": "fd99e7b0870eb0e3d6b880a41ec6cf1b479b4d7143e441b21b1caf38a8c84764",
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "eadf5f0345dd814422a669e73b87f395fe7ce28aa2feab4a7028863d32ae3f25",
+      "after_sha256": "5d1e6c9ddf6c2d5106ee3f288c8f5dead929f4175f17e9abd8df9cf20056c257",
+      "owners": {
+        "@document": {
+          "before": "eadf5f0345dd814422a669e73b87f395fe7ce28aa2feab4a7028863d32ae3f25",
+          "after": "5d1e6c9ddf6c2d5106ee3f288c8f5dead929f4175f17e9abd8df9cf20056c257"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "e34a3e43ee534640dca68925e9e81b2b9fa441bcaa57129b8cbc5e6481fbbf88",
+      "after_sha256": "9e9e9df315bb662a4fafd3022adb75c64890e1e9acdb820343788a9022319d59",
+      "owners": {
+        "@document": {
+          "before": "e34a3e43ee534640dca68925e9e81b2b9fa441bcaa57129b8cbc5e6481fbbf88",
+          "after": "9e9e9df315bb662a4fafd3022adb75c64890e1e9acdb820343788a9022319d59"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "1eb91ccb6ddbe98d086e21b6be37bd533986c1cd2bf5b67728d18038b8f8518c",
+      "after_sha256": "99f8ca43ab44ed46c8f429a95b736c66a880547fa1820ba8f1d76f00e5512e7e",
+      "owners": {
+        "@document": {
+          "before": "1eb91ccb6ddbe98d086e21b6be37bd533986c1cd2bf5b67728d18038b8f8518c",
+          "after": "99f8ca43ab44ed46c8f429a95b736c66a880547fa1820ba8f1d76f00e5512e7e"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "d91b091ff1b7b8b0a691faec072952e63f3ff83512cdee74613d7aa6d8205fca",
+      "after_sha256": "c39a9573d704db49d2d722f47e05b94f5c5eccfe46b8d1025414a5c547cbf428",
+      "owners": {
+        "@document": {
+          "before": "d91b091ff1b7b8b0a691faec072952e63f3ff83512cdee74613d7aa6d8205fca",
+          "after": "c39a9573d704db49d2d722f47e05b94f5c5eccfe46b8d1025414a5c547cbf428"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "b00c20fa2f5c29e3f36c11e2f7f1dcac4f06a2d0fefe238f41236ca4751218c5",
+      "after_sha256": "6df49d9ceb4ee3664db980fecebeefaab79187f94bb23fd00c388cde0303d2f5",
+      "owners": {
+        "@document": {
+          "before": "b00c20fa2f5c29e3f36c11e2f7f1dcac4f06a2d0fefe238f41236ca4751218c5",
+          "after": "6df49d9ceb4ee3664db980fecebeefaab79187f94bb23fd00c388cde0303d2f5"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "5a1da78667ff5cac53953177c63c46cc97e27c0bde075b1bf9006af71857df5f",
       "after_sha256": "2c5203a21338363b3d794f66d636b405b94c9675a87e9981c45e742c1058d537",
@@ -408,6 +538,136 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the genuine successful complete local covered JUnit profile. Retain every selected case and exact-once partition, with measured costs rather than invented timing values.",
+      "source_obligation": "Require actor-view action binding, ordinary viewer adapter re-execution, accepted status, exact checkpoint/record reproduction, ordinary reachable origin and contiguous accepted-record horizons. Keep finite payload meanings and finite row/target eligibility unchanged. Deployment rule rejection is pre-record; recorded movement rejection is an unsupported-family exclusion control.",
+      "unchanged_work": "No engine rules, adapter mutation/validation, RNG, replay algorithms, caches, dependencies or benchmark drivers change. The existing mapped offline admission owners have no detailed comparison family. This is not a deliberate performance change or a full-game performance claim. Current serial smoke, live semantic checks, exact-head reviews and complete behavior/quality gates remain required."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
