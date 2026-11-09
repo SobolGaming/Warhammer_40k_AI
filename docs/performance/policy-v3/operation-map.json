@@ -34201,7 +34201,10 @@
         "_write_manifests",
         "duration_worksteal_order",
         "pytest_collection_modifyitems",
-        "summary_case_seconds"
+        "summary_case_seconds",
+        "_calibrated_selectors",
+        "_planning_inputs",
+        "dispatch_case_seconds"
       ],
       "families": [],
       "sensitive": false,
@@ -35532,6 +35535,46 @@
       ],
       "owners": [
         "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "hosted-timing-calibration": {
+      "paths": [
+        "scripts/hosted_timing_calibration.py",
+        "tests/code_quality/test_hosted_timing_calibration.py",
+        "ci/test_shards/hosted-calibration.json"
+      ],
+      "owners": [
+        "@document",
+        "@imports",
+        "@module",
+        "@text",
+        "_hash",
+        "_inventory",
+        "_object",
+        "_pairs",
+        "_positive",
+        "_seconds",
+        "_source",
+        "build_calibration",
+        "calibrated_seconds",
+        "load_planning_seconds",
+        "measured",
+        "passed_phases",
+        "read_json",
+        "test_all_raw_case_ids_are_checked_before_outcome_filtering",
+        "test_calibrated_selector_costs_ignore_input_dictionary_order",
+        "test_calibration_keeps_failed_run_and_complete_baseline_separate",
+        "test_isolated_and_parallel_workers_are_distinct_invocations",
+        "test_phase_admission_is_closed",
+        "test_raw_report_source_and_inventory_are_checked",
+        "test_repeated_report_or_completed_case_within_artifact_is_rejected",
+        "test_same_derived_node_costs_drive_assignment_and_real_dispatch",
+        "test_samples_remain_separate_and_never_combine_cross_worker_phases",
+        "test_sidecar_duplicate_keys_and_changed_bytes_fail_closed",
+        "test_sidecar_rejects_drift"
       ],
       "families": [],
       "sensitive": false,

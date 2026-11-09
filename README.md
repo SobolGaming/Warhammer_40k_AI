@@ -364,7 +364,51 @@ containing the isolated mirror and remaining-suite XMLs from the same covered ru
 Label its host, worker counts and concurrent validation accurately; do not mix
 local and hosted-runner timings in one representative CI profile. Local timing
 weights do not establish hosted cost accuracy or a speedup.
-Every supplied run must cover the current behavioral file inventory. Missing files,
+A separate `hosted-calibration.json` may supply historical planning observations.
+It does not replace or alter `profiles`, `case_seconds`, measured file totals, or
+complete-profile admission. The generator and four-worker dispatch both use
+`max(complete baseline cost, largest admitted hosted setup+call+teardown total)`.
+Finite S25 selectors use these same derived node costs for assignment; their old
+ratio evidence remains historical and is not applied again to calibrated costs.
+Ordinary selector costs sum their exact nodes; the isolated mirror retains its
+separate selector and one-worker execution. Summation is canonical and stable
+under input dictionary permutations.
+
+The sidecar records every admitted sample's separate setup/call/teardown values,
+raw worker SHA-256, artifact ID, run/attempt, enclosing outcome, actual tested
+checkout, source head and that source head's recorded engine fingerprint. A failed enclosing run
+stays failed. `scripts.hosted_timing_calibration.build_calibration` accepts raw
+worker files paired with independently verified artifact/API metadata: worker
+JSON itself does not identify the attempt. It checks recorded build fingerprints
+and unchanged test-module bytes against each historical source head. Current
+module hashes and exact case inventory are separate compatibility checks, not
+claims that all historical runtime/helper/context inputs equal current ones.
+
+Only complete passed triples from one worker report are admitted. Every raw node,
+including failed/incomplete rows, must belong to that worker's collected baseline
+inventory. Duplicate phases, completed cases within an artifact/attempt, worker
+invocations, contradictory artifact metadata and count drift fail closed. The
+supported invocation identities distinguish the isolated one-worker lane from the
+four-worker remainder; repeated observations across artifacts/attempts remain
+separate samples before taking the maximum. Unobserved cases are listed explicitly
+and retain their complete baseline measurement. Changed/removed/renamed cases or
+changed test-module bytes require explicit sidecar regeneration, and behavioral
+inventory changes still require a fresh complete successful baseline profile.
+
+The committed calibration contains 99 raw worker receipts and 12,701 passed
+three-phase samples covering all 6,151 current cases: exact-base successful run
+[42549486854](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42549486854)
+and failed attempts 1 and 2 of
+[42556245215](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42556245215).
+There are no baseline-only cases in this sidecar. Fixture setup observations are
+worker/order dependent; taking maxima and regrouping does not establish new fixture
+multiplicity, hosted wall time or the fourteen-minute goal. Existing module grouping
+is retained. Fresh complete correctness/coverage qualification remains mandatory.
+`--check` re-derives every planning cost/selector and the sidecar digest; worker
+dispatch rejects a missing or altered declared sidecar. Run the normal generator
+command above with this sidecar in the output directory to reproduce the manifests.
+
+Every supplied complete baseline JUnit run must cover the current behavioral file inventory. Missing files,
 duplicate cases, failed/skipped cases, invalid durations, and truncated suite counts
 are rejected. Outside the explicit initial migration seed above, new test files
 require a fresh complete profile; timings are never filled with zero. `durations.json` preserves report SHA-256 hashes and run descriptions.

@@ -2,135 +2,155 @@
   "policy": "rules-engine-performance-v3",
   "base": "625e8703a049fb0fb0dc0ce6bec9c6ffeab60ce2",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:73584caec99bbe35fd9d05d6d81a7ee27d0f0b267cbc0978d406fe6301affc53",
-  "operation_map_sha256": "2909345b5811629a61fa8a844835daf9e7a251bda287cd91c1873223562b81d7",
+  "operation_map_sha256": "e6ca2c77320a120c41a8d637c24fb158d3b272b142741a79432940f921d5adf4",
   "changes": {
+    "README.md": {
+      "before_sha256": "4cd48e0ea7878b8830e3bb3232a40c2b5e0b1aa7fab120192a58442ce3737e2c",
+      "after_sha256": "acc063a93b419973ef74e62bb2ce07f977be6cce81c238f9c4cef4efa4a71495",
+      "owners": {
+        "@document": {
+          "before": "4cd48e0ea7878b8830e3bb3232a40c2b5e0b1aa7fab120192a58442ce3737e2c",
+          "after": "acc063a93b419973ef74e62bb2ce07f977be6cce81c238f9c4cef4efa4a71495"
+        }
+      }
+    },
     "ci/test_shards/durations.json": {
       "before_sha256": "5ccfb4b22af53c4acb22abe007b118684d80dc8626de984e3b13f635b1845d0e",
-      "after_sha256": "1da0d9d29470afed6825fd2541c007551d6f92d7388eb766e3dea9b1aef2ef1d",
+      "after_sha256": "8ec3bb92a8d93ff42a68ad936606558269a8ca30487fe83e0a2fa4129ead4d58",
       "owners": {
         "@document": {
           "before": "5ccfb4b22af53c4acb22abe007b118684d80dc8626de984e3b13f635b1845d0e",
-          "after": "1da0d9d29470afed6825fd2541c007551d6f92d7388eb766e3dea9b1aef2ef1d"
+          "after": "8ec3bb92a8d93ff42a68ad936606558269a8ca30487fe83e0a2fa4129ead4d58"
+        }
+      }
+    },
+    "ci/test_shards/hosted-calibration.json": {
+      "before_sha256": null,
+      "after_sha256": "32c6e9509c528fa6e21b5beed921c3f59d7c5c6c840cbbc5c37623b903524bf4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "32c6e9509c528fa6e21b5beed921c3f59d7c5c6c840cbbc5c37623b903524bf4"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "6c015f30c3c919a2e91963da72bf7827f522ceec5becefffcae6a15824e3794d",
-      "after_sha256": "b1dd4b491888d310a86c7fd56ae6ffaaa8adb19d94ef0850fe3f2250d1e3c472",
+      "after_sha256": "8855abcb35a4d2ce99ed31ca82cf6e9d3a549d9e2b895ce9fc4d9e5e14865669",
       "owners": {
         "@document": {
           "before": "6c015f30c3c919a2e91963da72bf7827f522ceec5becefffcae6a15824e3794d",
-          "after": "b1dd4b491888d310a86c7fd56ae6ffaaa8adb19d94ef0850fe3f2250d1e3c472"
+          "after": "8855abcb35a4d2ce99ed31ca82cf6e9d3a549d9e2b895ce9fc4d9e5e14865669"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "4f111f96906da4dd239adf61d944f6f093ce25117d68b695e807a25d9585ace9",
-      "after_sha256": "595d39ec227447a9a5c2d10877348dbc1db7bdddaaaa1759ded00543bdc175c6",
+      "after_sha256": "550123216f82ef876ee394bee828ae26d16d00e075cee99501856039541cc044",
       "owners": {
         "@document": {
           "before": "4f111f96906da4dd239adf61d944f6f093ce25117d68b695e807a25d9585ace9",
-          "after": "595d39ec227447a9a5c2d10877348dbc1db7bdddaaaa1759ded00543bdc175c6"
+          "after": "550123216f82ef876ee394bee828ae26d16d00e075cee99501856039541cc044"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "599fb21602be11775f37a3e54911bffbd1cd7b3e9f74acdf0c72c7417b78b3fb",
-      "after_sha256": "de4150732b6daf884be507d08602cb14e10eeab5bc77d9fcacb25a0965e902b5",
+      "after_sha256": "927fe262b0d7950c64eb69bdce5eca4366ea5729a4819dbea4c2153d530f3135",
       "owners": {
         "@document": {
           "before": "599fb21602be11775f37a3e54911bffbd1cd7b3e9f74acdf0c72c7417b78b3fb",
-          "after": "de4150732b6daf884be507d08602cb14e10eeab5bc77d9fcacb25a0965e902b5"
+          "after": "927fe262b0d7950c64eb69bdce5eca4366ea5729a4819dbea4c2153d530f3135"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "67da15a42942d82000b0fc28f5b490750545ec50ac0410d9e3e5b29e69a37a94",
-      "after_sha256": "d6d119e0e64630d4758c37d9131727eccfb4a0037ba4e4b0b0f91e7f2c64b907",
+      "after_sha256": "b2edf95e6fbbd7ebfae3e583f5141a5652702f85c33fc859933f52ea088033c7",
       "owners": {
         "@document": {
           "before": "67da15a42942d82000b0fc28f5b490750545ec50ac0410d9e3e5b29e69a37a94",
-          "after": "d6d119e0e64630d4758c37d9131727eccfb4a0037ba4e4b0b0f91e7f2c64b907"
+          "after": "b2edf95e6fbbd7ebfae3e583f5141a5652702f85c33fc859933f52ea088033c7"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "5d9e4d25620a22de5b605146d8515b6c797643602b4821d9b4f76d3709ca3fcd",
-      "after_sha256": "51674f19fbf60b80601df861df487c58023859d461ae5c655ce256910b6de773",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
       "owners": {
         "@document": {
           "before": "5d9e4d25620a22de5b605146d8515b6c797643602b4821d9b4f76d3709ca3fcd",
-          "after": "51674f19fbf60b80601df861df487c58023859d461ae5c655ce256910b6de773"
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "ce9e0d5a87ed6bd9fc0370e7c2649a24a5db939aedb4d3178439ade84428fe99",
-      "after_sha256": "cb6479cad4e8ab9665ccea0e1aae056f7c9f1cc5b1ae9209d93d7e25d010034e",
+      "after_sha256": "81d778ae1901b9a717dbc485ee2da0e96086663b3f09cefeee67825a5e74c523",
       "owners": {
         "@document": {
           "before": "ce9e0d5a87ed6bd9fc0370e7c2649a24a5db939aedb4d3178439ade84428fe99",
-          "after": "cb6479cad4e8ab9665ccea0e1aae056f7c9f1cc5b1ae9209d93d7e25d010034e"
+          "after": "81d778ae1901b9a717dbc485ee2da0e96086663b3f09cefeee67825a5e74c523"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "8b84d1ce4b1f76d8832192936ce6789088e6eaec77a63d1a647b16976a98f54f",
-      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "d8d1f77a4558866f878b6128cc9af00be94f4a71247e5b5f3f22537fbf421fb2",
       "owners": {
         "@document": {
           "before": "8b84d1ce4b1f76d8832192936ce6789088e6eaec77a63d1a647b16976a98f54f",
-          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
+          "after": "d8d1f77a4558866f878b6128cc9af00be94f4a71247e5b5f3f22537fbf421fb2"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "2489f9b0b2c9c2774731119ea4c8b78cc7936b6a9d95563efc6f3cd8b2c675d2",
-      "after_sha256": "1006327ecd3042646cc7b8e88fd52e5a8b8d73c3ab8a1e0b65968d82b4134cf1",
+      "after_sha256": "c128ab22f224a112906e88b787d78e0086724d250bf819c215340c4fe087b11f",
       "owners": {
         "@document": {
           "before": "2489f9b0b2c9c2774731119ea4c8b78cc7936b6a9d95563efc6f3cd8b2c675d2",
-          "after": "1006327ecd3042646cc7b8e88fd52e5a8b8d73c3ab8a1e0b65968d82b4134cf1"
+          "after": "c128ab22f224a112906e88b787d78e0086724d250bf819c215340c4fe087b11f"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "0a0ebb1f60c9632a50af4396d3ab902001b890ca95fde5b641dfa325f65b37d9",
-      "after_sha256": "3d922edda90fe5e39f2d4e18ec728032906595c34a7f2edaaef1e382dfbab7f5",
+      "after_sha256": "386a4c1ba37e2e37f3e437768186a0b6747f16ee2dad50571a3b915cc2fa97c3",
       "owners": {
         "@document": {
           "before": "0a0ebb1f60c9632a50af4396d3ab902001b890ca95fde5b641dfa325f65b37d9",
-          "after": "3d922edda90fe5e39f2d4e18ec728032906595c34a7f2edaaef1e382dfbab7f5"
+          "after": "386a4c1ba37e2e37f3e437768186a0b6747f16ee2dad50571a3b915cc2fa97c3"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "3c447afc116f406183f923927b3032e6049bddedd80d19960a0b2ffa8c06d22a",
+      "after_sha256": "a8c7689c6f29c12dafe46a6ebc0706c32414bb0f3541e3cc368b68cf55ecf3fb",
       "owners": {
         "@document": {
           "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "3c447afc116f406183f923927b3032e6049bddedd80d19960a0b2ffa8c06d22a"
+          "after": "a8c7689c6f29c12dafe46a6ebc0706c32414bb0f3541e3cc368b68cf55ecf3fb"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "4746c5dca055e70c459b1aa7033764eff3def6f02ec2b3cf65d053c85a3cb490",
-      "after_sha256": "0df6083f0ded654ac27011ace66d2017273c31b6d7b2194794501ad36b285de9",
+      "after_sha256": "645d4189235dc9f5f9b1dc20de0156be9879785e6eafe05fd6a48504391cad9d",
       "owners": {
         "@document": {
           "before": "4746c5dca055e70c459b1aa7033764eff3def6f02ec2b3cf65d053c85a3cb490",
-          "after": "0df6083f0ded654ac27011ace66d2017273c31b6d7b2194794501ad36b285de9"
+          "after": "645d4189235dc9f5f9b1dc20de0156be9879785e6eafe05fd6a48504391cad9d"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "73e01877fc5efeb192c1ffb6f086f90ecc15744bdee14a7fda1a905ac1a06fc5",
-      "after_sha256": "ae3d31fbb6f16ecd686607bacc377145dfeff11d7bd949d8fce323ddc65a90d3",
+      "after_sha256": "b78b45cf98eb47b8568d72728fde7965561d629410ad5141c2b03f42d2f0a1ea",
       "owners": {
         "@document": {
           "before": "73e01877fc5efeb192c1ffb6f086f90ecc15744bdee14a7fda1a905ac1a06fc5",
-          "after": "ae3d31fbb6f16ecd686607bacc377145dfeff11d7bd949d8fce323ddc65a90d3"
+          "after": "b78b45cf98eb47b8568d72728fde7965561d629410ad5141c2b03f42d2f0a1ea"
         }
       }
     },
@@ -246,21 +266,117 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "ce405a0e1c970d95fc9188132d2f8470d8f5c0d5eb243f9b5c24b68e24e5d324",
-      "after_sha256": "07a717237ede2ac739295b283a556efa3bcee29a27eed519d318e6d780c6b9ce",
+      "after_sha256": "7b5ad4538a9c7953a28b8e1fe67d4c5a7b81b3025130b780e2ee1fcd03cf4f67",
       "owners": {
         "@document": {
           "before": "ce405a0e1c970d95fc9188132d2f8470d8f5c0d5eb243f9b5c24b68e24e5d324",
-          "after": "07a717237ede2ac739295b283a556efa3bcee29a27eed519d318e6d780c6b9ce"
+          "after": "7b5ad4538a9c7953a28b8e1fe67d4c5a7b81b3025130b780e2ee1fcd03cf4f67"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "decf656620ed1b2e0778084d749fc193e70431c9e133a38f384a9491d3a9da32",
-      "after_sha256": "05d4cd2f6adb3cb00ebf25774ff130a47a03cfd3f7000c780e2742d57cc00e74",
+      "after_sha256": "e35fe81862b08f22e7e6f945362df35a3dff7a5a90219da87372fe7043708cd1",
       "owners": {
         "@document": {
           "before": "decf656620ed1b2e0778084d749fc193e70431c9e133a38f384a9491d3a9da32",
-          "after": "05d4cd2f6adb3cb00ebf25774ff130a47a03cfd3f7000c780e2742d57cc00e74"
+          "after": "e35fe81862b08f22e7e6f945362df35a3dff7a5a90219da87372fe7043708cd1"
+        }
+      }
+    },
+    "scripts/build_test_shards.py": {
+      "before_sha256": "f56450d628e4a79cce2d2cb1b86e6ff76b81e7303e979a42464d7360ef09d47b",
+      "after_sha256": "fcc9a251a577d207fa1aab63aae2015195e1d45833a9214495dc47537eb8c04f",
+      "owners": {
+        "@module": {
+          "before": "c657151b505d7329bf8c9fd9fab05568bf9c1dd6197577619ea1bd8c49fd27c6",
+          "after": "fd5f54bcf41f4cf478c0859edb0af1853c9abdbb9d4a6b4998940f91f287fa01"
+        },
+        "_calibrated_selectors": {
+          "before": null,
+          "after": "4feccb8ea0fe0e0524945b6dd81635762a60189ac0835227f0c01a337766ae55"
+        },
+        "_check_manifests": {
+          "before": "168e9490868e82c9af2d6190f61dab30fc1f7860fe72185a258d9f10eb589b1c",
+          "after": "9ec7f0fc83dabfec597b83c1fa068a1e3d5a02070400c46ca57239a3f0cf40ef"
+        },
+        "_planning_inputs": {
+          "before": null,
+          "after": "81895ef308e2d2f5ebe5552cdeaa1a020b0aefec1b9e66c9ddd5ea4f4adece7a"
+        },
+        "_summary_payload": {
+          "before": "d2d469291d8c4c20a76dbdf470c5e21a9f6cd7d9b5a3ba0ee484555ec20e5544",
+          "after": "ad21cd38b91905c43138cad3120a92ce159f44ee64f46e5412afe7865d91fbff"
+        },
+        "_write_manifests": {
+          "before": "174610fd5b1c4ad55ee4afc7012aa2012f420948a134891f989ff79b2ef6b8e2",
+          "after": "530bb7aa0767196b25c2144455534e5020c432ed98dfdc615739b31969c9b364"
+        },
+        "dispatch_case_seconds": {
+          "before": null,
+          "after": "52aa0002f1dd70bb8dfe70b7dfd484abbd257fa79062209ab55b3c0638409b20"
+        },
+        "main": {
+          "before": "a00c012d56f5195cd705f1c1b6d7ef530146c640126d2fcf2d3e47b2d854608e",
+          "after": "d031d70d0be2e36453fa58a123459db00f18ee4aa07d3e9ea998cc6b0d93343c"
+        }
+      }
+    },
+    "scripts/hosted_timing_calibration.py": {
+      "before_sha256": null,
+      "after_sha256": "ae5c14f5adc44f618c45d40dd5bb801a40ea48c60e567f5b28dd6f86c4572a15",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "5ba14631375af494c9c25aec183365c102233f11a39034ead25ef05690369ae6"
+        },
+        "_hash": {
+          "before": null,
+          "after": "6fb489f961267eb2b4704524872f0e9e7b4cccdc43478bd57930dabb0868c656"
+        },
+        "_inventory": {
+          "before": null,
+          "after": "a7005d837da7a3d9b75c2bcfe38baf0ab96547aede2ae089c8b6657c120c90f3"
+        },
+        "_object": {
+          "before": null,
+          "after": "d84ff4a54dc95f1ac2ed99d755eb44f35d9706fb65ec5a94c1519513b23c8249"
+        },
+        "_pairs": {
+          "before": null,
+          "after": "e4ebf9e64a03f94a83a2932d410f776e7175489bae21b9d7fc9b5645351a293f"
+        },
+        "_positive": {
+          "before": null,
+          "after": "1e2983ab5308bc333752bb9dfd3c0183e1821e8a32ce5f03c95c7c59aa4e126c"
+        },
+        "_seconds": {
+          "before": null,
+          "after": "95eb5ff15c13029db80d4cd5dda8c504b17c83687710f9a812d44114c60af427"
+        },
+        "_source": {
+          "before": null,
+          "after": "d45f2833020f16ed30a4435062a965692a5a64aea5dce582e11d13e8b777c53a"
+        },
+        "build_calibration": {
+          "before": null,
+          "after": "7b9dfcf59b1ea5f73c78b80dc8b7fe4f5a7800dc35ce38eb654d40bd42705595"
+        },
+        "calibrated_seconds": {
+          "before": null,
+          "after": "27b3099ce315ad4c211c2fb22685bc23c38d9388969c7a8a292b404ffae2866b"
+        },
+        "load_planning_seconds": {
+          "before": null,
+          "after": "f04d11e349c7d162161ffb6159e5e3d578159b3a7738b6838d8fe710acde1ff5"
+        },
+        "passed_phases": {
+          "before": null,
+          "after": "86bfc3a4151c725ad23e582e47badaf570184a8f9afd31810e3a602a63c58fda"
+        },
+        "read_json": {
+          "before": null,
+          "after": "ce259ba764e39acef28b2cb61b1d13e830779b5e6e74411361855f9679d78d0b"
         }
       }
     },
@@ -309,6 +425,74 @@
         "DeploymentExperimentProvenance.to_payload": {
           "before": null,
           "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
+        }
+      }
+    },
+    "tests/code_quality/test_hosted_timing_calibration.py": {
+      "before_sha256": null,
+      "after_sha256": "7ef4eab699dd39d5511f584a7d756eb0fade03652ebbe9d4be2bf9e80d3856ec",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "4741b93f72740b3608f3e2994d6fbd992ff66832398000d51b551b591d2a8cec"
+        },
+        "measured": {
+          "before": null,
+          "after": "a34c6507f3e5c22bd8d890a494fc84af6a82fc7b4c031e939c42113ac4cf4de9"
+        },
+        "test_all_raw_case_ids_are_checked_before_outcome_filtering": {
+          "before": null,
+          "after": "8edd78d8a56b79d8485d1caf000d5d47f79361e2eea6078270ea7803d9650669"
+        },
+        "test_calibrated_selector_costs_ignore_input_dictionary_order": {
+          "before": null,
+          "after": "37f67ec67ffab7fe6d1527a87c2e9f55f4b57d84e6cdc6a8aa01db035ddc1ca0"
+        },
+        "test_calibration_keeps_failed_run_and_complete_baseline_separate": {
+          "before": null,
+          "after": "8d3483ae514e9f069ceec0314c62c16ab6082401a0a1cbcd4bfc5fbadebf7d26"
+        },
+        "test_isolated_and_parallel_workers_are_distinct_invocations": {
+          "before": null,
+          "after": "77297fd4bc8b4ab4e9e70fe0eabaab9a2d36d85a3e079d5d4df87645a01af137"
+        },
+        "test_phase_admission_is_closed": {
+          "before": null,
+          "after": "d85278748540044084b3554c26efa16858f1481946b9d675ca598dcca36feab0"
+        },
+        "test_raw_report_source_and_inventory_are_checked": {
+          "before": null,
+          "after": "c24429d9f7d9f019754541f1cdc63bb430d2c99d706c65c67b86dffdb660d5e0"
+        },
+        "test_repeated_report_or_completed_case_within_artifact_is_rejected": {
+          "before": null,
+          "after": "42eb0065048d93c813e6e0158b09cd1e1e6cc7a9ea04ab383e2f2f84cad2c0d9"
+        },
+        "test_same_derived_node_costs_drive_assignment_and_real_dispatch": {
+          "before": null,
+          "after": "e6b9734b2012fad9dd2a2f3254712ef94f6a12494564d20355306b76a55c4e6e"
+        },
+        "test_samples_remain_separate_and_never_combine_cross_worker_phases": {
+          "before": null,
+          "after": "77cfcb839364a0a1f64da2747b83ff3c338bce8c51e84854063dbcdd289a8742"
+        },
+        "test_sidecar_duplicate_keys_and_changed_bytes_fail_closed": {
+          "before": null,
+          "after": "79d867404afe96c818d80af4d823b6b797317ef2766a68c7769c16dd68389056"
+        },
+        "test_sidecar_rejects_drift": {
+          "before": null,
+          "after": "b061f724700d3339b9bafa16b610af94a89d8c125b34718fb8a6d49c8b168533"
+        }
+      }
+    },
+    "tests/conftest.py": {
+      "before_sha256": "45128336d8bcece2d4bc8e83a54e85ebefd7f0146cffb568c7a8374b02e57d9f",
+      "after_sha256": "356781227dc7c116107f80ba537ae98f61136407a106eab6fa324f197c059e0b",
+      "owners": {
+        "pytest_collection_modifyitems": {
+          "before": "038761732660887cc6618d87c324cef2a2d92c5d1d73bbaf0b54bfdce7d9afa4",
+          "after": "1a55ebfe607c2efea1d43e4f224f1bb4d94a131ff800163e211fbb4d86051f76"
         }
       }
     },
@@ -364,15 +548,35 @@
     }
   },
   "rows": {
+    "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the bounded choice provenance join and its remaining whole-run/dataset/authentication obligations; explicitly register its new owning operation.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
+    },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
+    },
+    "ci/test_shards/hosted-calibration.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission",
+        "hosted-timing-calibration"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -380,9 +584,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -390,9 +594,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -400,9 +604,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -410,9 +614,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -420,9 +624,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -430,9 +634,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -440,9 +644,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -450,9 +654,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -460,9 +664,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -470,9 +674,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -480,9 +684,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -490,9 +694,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "rationale": "Preserve complete successful local baseline measurements; separately derive calibrated planning costs from historical passed phase samples with raw/artifact/attempt/source evidence, using identical exact node costs for assignment and dispatch. Retain every case, finite partition, mirror lane, fixture grouping and deadline.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -501,8 +705,8 @@
       ],
       "selected_families": [],
       "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -511,8 +715,8 @@
       ],
       "selected_families": [],
       "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -521,8 +725,8 @@
       ],
       "selected_families": [],
       "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -531,8 +735,8 @@
       ],
       "selected_families": [],
       "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -541,8 +745,8 @@
       ],
       "selected_families": [],
       "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -551,8 +755,8 @@
       ],
       "selected_families": [],
       "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -561,8 +765,8 @@
       ],
       "selected_families": [],
       "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -571,8 +775,8 @@
       ],
       "selected_families": [],
       "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -581,40 +785,61 @@
       ],
       "selected_families": [],
       "rationale": "Explicitly admit the new bounded deployment experiment regression module without changing historical deferrals, retained tests or the selected behavioral scope.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
       "rationale": "Document the bounded choice provenance join and its remaining whole-run/dataset/authentication obligations; explicitly register its new owning operation.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
       "rationale": "Document the bounded choice provenance join and its remaining whole-run/dataset/authentication obligations; explicitly register its new owning operation.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
       "rationale": "Document the bounded choice provenance join and its remaining whole-run/dataset/authentication obligations; explicitly register its new owning operation.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
       "rationale": "Document the bounded choice provenance join and its remaining whole-run/dataset/authentication obligations; explicitly register its new owning operation.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
+    },
+    "scripts/build_test_shards.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f",
+        "behavioral-worksteal-dispatch"
+      ],
+      "selected_families": [],
+      "rationale": "Validate explicit hosted diagnostic calibration separately from complete profile admission; enforce phase/node/count/source/invocation identities, derive stable per-node planning maxima and apply them consistently to the existing scheduler. This changes CI scheduling input semantics, not any engine algorithm or measured runtime operation.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
+    },
+    "scripts/hosted_timing_calibration.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "hosted-timing-calibration"
+      ],
+      "selected_families": [],
+      "rationale": "Validate explicit hosted diagnostic calibration separately from complete profile admission; enforce phase/node/count/source/invocation identities, derive stable per-node planning maxima and apply them consistently to the existing scheduler. This changes CI scheduling input semantics, not any engine algorithm or measured runtime operation.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -626,8 +851,8 @@
       ],
       "selected_families": [],
       "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "src/warhammer40k_core/ai/deployment_experiment.py": {
       "category": "serialization_or_replay_work",
@@ -636,8 +861,29 @@
       ],
       "selected_families": [],
       "rationale": "Implement and verify a separate operator-only accepted-choice experiment join over existing ranked row, geometry, accepted transition and reachable mixed episode evidence.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
+    },
+    "tests/code_quality/test_hosted_timing_calibration.py": {
+      "category": "measured_workload",
+      "operations": [
+        "hosted-timing-calibration"
+      ],
+      "selected_families": [],
+      "rationale": "Validate explicit hosted diagnostic calibration separately from complete profile admission; enforce phase/node/count/source/invocation identities, derive stable per-node planning maxima and apply them consistently to the existing scheduler. This changes CI scheduling input semantics, not any engine algorithm or measured runtime operation.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
+    },
+    "tests/conftest.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci79-ordering-e52e4ddd58b7ef887ab03c04116e676f6280b824ab7469d5d3080e5cba4f2128",
+        "behavioral-worksteal-dispatch"
+      ],
+      "selected_families": [],
+      "rationale": "Validate explicit hosted diagnostic calibration separately from complete profile admission; enforce phase/node/count/source/invocation identities, derive stable per-node planning maxima and apply them consistently to the existing scheduler. This changes CI scheduling input semantics, not any engine algorithm or measured runtime operation.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
     "tests/infrastructure/adapters/test_deployment_experiment.py": {
       "category": "measured_workload",
@@ -646,8 +892,8 @@
       ],
       "selected_families": [],
       "rationale": "Implement and verify a separate operator-only accepted-choice experiment join over existing ranked row, geometry, accepted transition and reachable mixed episode evidence.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
-      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     }
   },
   "milestone": "ordinary",
