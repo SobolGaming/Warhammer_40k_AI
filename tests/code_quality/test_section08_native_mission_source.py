@@ -245,7 +245,7 @@ def test_source_history_guard_precedes_index_and_covered_pytest() -> None:
         < step.index("scripts.ci_source_index")
         < step.index("--cov=warhammer40k_core")
     )
-    assert "timeout-minutes: 14" in step
+    assert "timeout-minutes: 15" in step
     builder = (ROOT / "scripts/ci_source_index.py").read_text(encoding="utf-8")
     assert '"tools.ability_support_sources"' in builder
     assert '"-m"' in builder

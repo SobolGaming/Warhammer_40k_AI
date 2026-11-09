@@ -193,3 +193,24 @@ selected cases, exact 260 deferrals, 120-second mirror runner, 180-second serial
 smoke, 600-second quality limits and every other check remain required. Earlier
 failed runs retain their original outcomes; this update is not a qualification
 claim.
+
+## CI and coverage update - 9 November 2026
+
+After PR647, the owner directed raising the active full-package branch-coverage
+floor from 66.5% to 67% and allowing a fifteen-minute CI limit. Configuration,
+active local commands and the combined CI coverage gate enforce 67%, retaining
+two decimal places. The behavioral source-index setup and covered-test step,
+including its internal source-index deadline, now allow 900 seconds. The total
+CI goal is fifteen minutes; a per-step cutoff does not prove that goal passed.
+
+The complete branch denominator, selected tests and inventories, omissions and
+exclusions, exact 260 deferred quality cases, 120-second bounded mirror runner,
+180-second serial performance command and 600-second quality limits remain
+unchanged. Exact-base assessment, independent reviews and all other required
+local and remote gates remain mandatory. Later coverage work must restore 85%.
+
+Earlier thresholds and outcomes remain historical. PR647 main run 42625649279
+attempts 1 and 2 failed behavioral shard 8 at the fourteen-minute limit; combined
+coverage did not run. Incomplete worker progress journals do not establish
+completed tests or passing coverage. This policy update does not reclassify those
+failures or establish that the fifteen-minute limit is sufficient.

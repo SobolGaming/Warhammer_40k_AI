@@ -212,7 +212,7 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=66.5
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=67
 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports
@@ -271,7 +271,7 @@ Focused subsets and `--lf` are for iteration, never replacements for this final 
 PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
   uv run pytest tests --ignore=tests/code_quality \
   -n auto --dist=worksteal \
-  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=66.5
+  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=67
 ```
 
 The `PATH` prefix exposes the Node.js runtime bundled with Codex desktop to the executable
@@ -279,18 +279,18 @@ viewer-renderer regressions. It is safe when that directory is absent: an indepe
 `node` later on the existing `PATH` remains available. Keep this prefix on full-suite runs so those
 tests do not fail only because the desktop shell omitted the bundled runtime.
 
-CI shards this same behavioral suite, combines branch coverage, and applies the temporary 66.5%
+CI shards this same behavioral suite, combines branch coverage, and applies the temporary 67%
 gate after every shard succeeds. Full type checking and architecture checks also remain required
 in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
 format for a shorter edit/commit loop.
 
-The temporary CI goal is 14 minutes in total. Each behavioral shard has an 840-second
+The temporary CI goal is 15 minutes in total. Each behavioral shard has a 900-second
 cutoff covering source-index setup and its covered test run. The separate complete
 performance command remains limited to 180 seconds, and quality lanes retain their
 600-second limit. Report actual end-to-end time and queue overhead; a per-step
 cutoff does not establish that the total goal passed.
 
-The current owner-approved coverage floor is 66.5%; later coverage work must restore 85%. The full
+The current owner-approved coverage floor is 67%; later coverage work must restore 85%. The full
 warhammer40k_core package and branch metric remain unchanged, with no added coverage
 omissions or exclusions. This policy change does not claim either threshold has passed;
 all required tests and other gates must still succeed. See the
@@ -336,14 +336,14 @@ run together so pytest can reuse module-scoped fixtures. Worker assignments and
 capacities remain unchanged. Modules start in descending order of their longest
 case, with descending case costs inside each module and original collection order
 breaking ties. Later work stealing can still split a module group. This scheduling
-change preserves every case and does not certify the fourteen-minute CI goal.
+change preserves every case and does not certify the fifteen-minute CI goal.
 
 Session startup, source-index setup, reporting and runner queues are assessed
 separately. Weight totals are planning inputs, not job wall times or proof of the
-temporary fourteen-minute CI goal. Existing observation-based estimates do not
+temporary fifteen-minute CI goal. Existing observation-based estimates do not
 relax the complete-profile validation below.
 
-Cold selected-source construction stays inside that same fourteen-minute step and
+Cold selected-source construction stays inside that same fifteen-minute step and
 overlaps pytest startup and collection. The controller admits no test execution
 until construction succeeds with a completion record bound to the exact input key
 and index path. Failure, malformed completion and deadline expiry stop dispatch.
@@ -420,7 +420,7 @@ qualification. All current cases now have admitted observations, including the
 52 cases in the changed runner-accounting and deployment-experiment modules.
 Local and hosted measurements remain separate. Fixture setup observations are
 worker/order dependent; taking maxima and regrouping does not establish new fixture
-multiplicity, hosted wall time or the fourteen-minute goal. Existing module grouping
+multiplicity, hosted wall time or the fifteen-minute goal. Existing module grouping
 is retained. Fresh complete correctness/coverage qualification remains mandatory.
 `--check` re-derives every planning cost/selector and the sidecar digest; worker
 dispatch rejects a missing or altered declared sidecar. Run the normal generator
@@ -443,11 +443,11 @@ not substitute file averages for missing case costs. Shard assignment separately
 accounts for the mirror's serial execution, retaining measured times unchanged
 and recording the four-worker execution model. Missing, negative, nonfinite or
 boolean weights fail closed; measurements rounded to zero remain valid. Finite S25 case validation,
-the complete selected inventory and the fourteen-minute deadline remain mandatory.
+the complete selected inventory and the fifteen-minute deadline remain mandatory.
 
 Behavioral lanes log keyed cold-index start/completion and elapsed construction time.
 A case exceeding three minutes emits thread stacks and continues under the existing
-fourteen-minute step cutoff.
+fifteen-minute step cutoff.
 
 Both Python CI lanes upload JUnit, slowest-test output, and per-worker JSON timing
 artifacts containing collection node IDs, collection time, setup/call/teardown times,
@@ -472,7 +472,7 @@ completion of subsequent reporting or process shutdown. The existing final worke
 `.json` payload and calibration admission remain unchanged; `.jsonl` progress is
 never a substitute for a complete timing receipt or a passing test/CI outcome.
 The journal changes neither scheduling nor case selection, worker counts,
-coverage requirements or the fourteen-minute cutoff.
+coverage requirements or the fifteen-minute cutoff.
 
 `quality-fast` now aggregates concurrent lint, contract/conformance, code-quality,
 and the existing macOS semantic audit. Every child must succeed, including on draft
