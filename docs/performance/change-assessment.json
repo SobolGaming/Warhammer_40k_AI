@@ -415,6 +415,16 @@
           "after": "4e90c3126b484b93f8de6ae6d8e47e34bc57ca4fdd16cf8ad03e4a35c1c3a215"
         }
       }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "c88bf4d7576aa4fe642c1f7db90aceb1cd03346f265135d753c97b3e57af2888",
+      "after_sha256": "2a348ac1ec1d616052466e6fc49ff1b1d37c6e8073ac26f7c85668e9f563e1fb",
+      "owners": {
+        "@document": {
+          "before": "c88bf4d7576aa4fe642c1f7db90aceb1cd03346f265135d753c97b3e57af2888",
+          "after": "2a348ac1ec1d616052466e6fc49ff1b1d37c6e8073ac26f7c85668e9f563e1fb"
+        }
+      }
     }
   },
   "rows": {
@@ -1123,6 +1133,16 @@
       "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
       "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
       "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only the current README authentication fingerprint after the permitted timing-provenance guidance update; preserve every source capture, hierarchy obligation and assertion.",
+      "source_obligation": "The section07 authentication regression requires the current maintained README bytes to match its reviewed current-control fingerprint. Historical source and raw-capture commitments retain their exact original values.",
+      "unchanged_work": "Only one maintained-document SHA256 changes. Runtime and Python test bytes, native hierarchy semantics, raw source captures, behavioral selection, timing formulas and measured performance workloads remain unchanged."
     }
   },
   "milestone": "ordinary",
