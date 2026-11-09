@@ -1,416 +1,364 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "894b7265ba77e1dd7c2939c28b79cb9d43dca1a4",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:59a70b743c2545eecfa01101c69675a360a1b46326296f751538e143043accb4",
-  "operation_map_sha256": "7a0347be485f47e81bea26a1304a74e250dc87385e425f8d3006f907f636c69a",
+  "base": "625e8703a049fb0fb0dc0ce6bec9c6ffeab60ce2",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:73584caec99bbe35fd9d05d6d81a7ee27d0f0b267cbc0978d406fe6301affc53",
+  "operation_map_sha256": "2909345b5811629a61fa8a844835daf9e7a251bda287cd91c1873223562b81d7",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "b4c0f76da7a385a0cb08b1d92dee0342df0abcd5e1546d0c975516ff68811a8b",
-      "after_sha256": "5ccfb4b22af53c4acb22abe007b118684d80dc8626de984e3b13f635b1845d0e",
+      "before_sha256": "5ccfb4b22af53c4acb22abe007b118684d80dc8626de984e3b13f635b1845d0e",
+      "after_sha256": "1da0d9d29470afed6825fd2541c007551d6f92d7388eb766e3dea9b1aef2ef1d",
       "owners": {
         "@document": {
-          "before": "b4c0f76da7a385a0cb08b1d92dee0342df0abcd5e1546d0c975516ff68811a8b",
-          "after": "5ccfb4b22af53c4acb22abe007b118684d80dc8626de984e3b13f635b1845d0e"
+          "before": "5ccfb4b22af53c4acb22abe007b118684d80dc8626de984e3b13f635b1845d0e",
+          "after": "1da0d9d29470afed6825fd2541c007551d6f92d7388eb766e3dea9b1aef2ef1d"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "eb3d933e81e230616b7437c4792be08020a2975b8d777d75d08bc912ac4e930a",
-      "after_sha256": "6c015f30c3c919a2e91963da72bf7827f522ceec5becefffcae6a15824e3794d",
+      "before_sha256": "6c015f30c3c919a2e91963da72bf7827f522ceec5becefffcae6a15824e3794d",
+      "after_sha256": "b1dd4b491888d310a86c7fd56ae6ffaaa8adb19d94ef0850fe3f2250d1e3c472",
       "owners": {
         "@document": {
-          "before": "eb3d933e81e230616b7437c4792be08020a2975b8d777d75d08bc912ac4e930a",
-          "after": "6c015f30c3c919a2e91963da72bf7827f522ceec5becefffcae6a15824e3794d"
+          "before": "6c015f30c3c919a2e91963da72bf7827f522ceec5becefffcae6a15824e3794d",
+          "after": "b1dd4b491888d310a86c7fd56ae6ffaaa8adb19d94ef0850fe3f2250d1e3c472"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "48410533c30ce5bff89628cb572807e2cf0e620f145f8732f51189536b4ebb77",
-      "after_sha256": "4f111f96906da4dd239adf61d944f6f093ce25117d68b695e807a25d9585ace9",
+      "before_sha256": "4f111f96906da4dd239adf61d944f6f093ce25117d68b695e807a25d9585ace9",
+      "after_sha256": "595d39ec227447a9a5c2d10877348dbc1db7bdddaaaa1759ded00543bdc175c6",
       "owners": {
         "@document": {
-          "before": "48410533c30ce5bff89628cb572807e2cf0e620f145f8732f51189536b4ebb77",
-          "after": "4f111f96906da4dd239adf61d944f6f093ce25117d68b695e807a25d9585ace9"
+          "before": "4f111f96906da4dd239adf61d944f6f093ce25117d68b695e807a25d9585ace9",
+          "after": "595d39ec227447a9a5c2d10877348dbc1db7bdddaaaa1759ded00543bdc175c6"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "4121b66f6821e53c2c83e1e42d9ee90c601f720f91d9996cd38c1d136246dc4e",
-      "after_sha256": "599fb21602be11775f37a3e54911bffbd1cd7b3e9f74acdf0c72c7417b78b3fb",
+      "before_sha256": "599fb21602be11775f37a3e54911bffbd1cd7b3e9f74acdf0c72c7417b78b3fb",
+      "after_sha256": "de4150732b6daf884be507d08602cb14e10eeab5bc77d9fcacb25a0965e902b5",
       "owners": {
         "@document": {
-          "before": "4121b66f6821e53c2c83e1e42d9ee90c601f720f91d9996cd38c1d136246dc4e",
-          "after": "599fb21602be11775f37a3e54911bffbd1cd7b3e9f74acdf0c72c7417b78b3fb"
+          "before": "599fb21602be11775f37a3e54911bffbd1cd7b3e9f74acdf0c72c7417b78b3fb",
+          "after": "de4150732b6daf884be507d08602cb14e10eeab5bc77d9fcacb25a0965e902b5"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "9948b8b09f25744f03401d5fca8135191f5bc25d63d1d10c7f5b032d5a7a1b67",
-      "after_sha256": "67da15a42942d82000b0fc28f5b490750545ec50ac0410d9e3e5b29e69a37a94",
+      "before_sha256": "67da15a42942d82000b0fc28f5b490750545ec50ac0410d9e3e5b29e69a37a94",
+      "after_sha256": "d6d119e0e64630d4758c37d9131727eccfb4a0037ba4e4b0b0f91e7f2c64b907",
       "owners": {
         "@document": {
-          "before": "9948b8b09f25744f03401d5fca8135191f5bc25d63d1d10c7f5b032d5a7a1b67",
-          "after": "67da15a42942d82000b0fc28f5b490750545ec50ac0410d9e3e5b29e69a37a94"
+          "before": "67da15a42942d82000b0fc28f5b490750545ec50ac0410d9e3e5b29e69a37a94",
+          "after": "d6d119e0e64630d4758c37d9131727eccfb4a0037ba4e4b0b0f91e7f2c64b907"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "1b3460830abb80bc770f1b36360fda4fa8773ae347819e3acda345dd2fb5d2c0",
-      "after_sha256": "5d9e4d25620a22de5b605146d8515b6c797643602b4821d9b4f76d3709ca3fcd",
+      "before_sha256": "5d9e4d25620a22de5b605146d8515b6c797643602b4821d9b4f76d3709ca3fcd",
+      "after_sha256": "51674f19fbf60b80601df861df487c58023859d461ae5c655ce256910b6de773",
       "owners": {
         "@document": {
-          "before": "1b3460830abb80bc770f1b36360fda4fa8773ae347819e3acda345dd2fb5d2c0",
-          "after": "5d9e4d25620a22de5b605146d8515b6c797643602b4821d9b4f76d3709ca3fcd"
+          "before": "5d9e4d25620a22de5b605146d8515b6c797643602b4821d9b4f76d3709ca3fcd",
+          "after": "51674f19fbf60b80601df861df487c58023859d461ae5c655ce256910b6de773"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "ce9e0d5a87ed6bd9fc0370e7c2649a24a5db939aedb4d3178439ade84428fe99",
+      "before_sha256": "ce9e0d5a87ed6bd9fc0370e7c2649a24a5db939aedb4d3178439ade84428fe99",
+      "after_sha256": "cb6479cad4e8ab9665ccea0e1aae056f7c9f1cc5b1ae9209d93d7e25d010034e",
       "owners": {
         "@document": {
-          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "ce9e0d5a87ed6bd9fc0370e7c2649a24a5db939aedb4d3178439ade84428fe99"
+          "before": "ce9e0d5a87ed6bd9fc0370e7c2649a24a5db939aedb4d3178439ade84428fe99",
+          "after": "cb6479cad4e8ab9665ccea0e1aae056f7c9f1cc5b1ae9209d93d7e25d010034e"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "82d391367daff47c789d8cb6cf44ccd10cdb796eff5372c9774a1cadfde7806d",
-      "after_sha256": "8b84d1ce4b1f76d8832192936ce6789088e6eaec77a63d1a647b16976a98f54f",
-      "owners": {
-        "@document": {
-          "before": "82d391367daff47c789d8cb6cf44ccd10cdb796eff5372c9774a1cadfde7806d",
-          "after": "8b84d1ce4b1f76d8832192936ce6789088e6eaec77a63d1a647b16976a98f54f"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "b030a1015b6ba7dde1e379516fa5d85e06cd44e66c7f15eb1d7a9826313496d9",
-      "after_sha256": "2489f9b0b2c9c2774731119ea4c8b78cc7936b6a9d95563efc6f3cd8b2c675d2",
-      "owners": {
-        "@document": {
-          "before": "b030a1015b6ba7dde1e379516fa5d85e06cd44e66c7f15eb1d7a9826313496d9",
-          "after": "2489f9b0b2c9c2774731119ea4c8b78cc7936b6a9d95563efc6f3cd8b2c675d2"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "447bf29e66634407aced7efe2f66c75a1fefb11f7819671ce3311220861f4f83",
-      "after_sha256": "0a0ebb1f60c9632a50af4396d3ab902001b890ca95fde5b641dfa325f65b37d9",
-      "owners": {
-        "@document": {
-          "before": "447bf29e66634407aced7efe2f66c75a1fefb11f7819671ce3311220861f4f83",
-          "after": "0a0ebb1f60c9632a50af4396d3ab902001b890ca95fde5b641dfa325f65b37d9"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "49f2687b51d63d8e4ce6ab7f0954ccc8ef8974de03c3d3386f7db2e962c6bc87",
+      "before_sha256": "8b84d1ce4b1f76d8832192936ce6789088e6eaec77a63d1a647b16976a98f54f",
       "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
       "owners": {
         "@document": {
-          "before": "49f2687b51d63d8e4ce6ab7f0954ccc8ef8974de03c3d3386f7db2e962c6bc87",
+          "before": "8b84d1ce4b1f76d8832192936ce6789088e6eaec77a63d1a647b16976a98f54f",
           "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
         }
       }
     },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "5a12264105c4c224f2fa1883182e561cc4d418f965730f3998a975bfa4b8e44c",
-      "after_sha256": "4746c5dca055e70c459b1aa7033764eff3def6f02ec2b3cf65d053c85a3cb490",
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "2489f9b0b2c9c2774731119ea4c8b78cc7936b6a9d95563efc6f3cd8b2c675d2",
+      "after_sha256": "1006327ecd3042646cc7b8e88fd52e5a8b8d73c3ab8a1e0b65968d82b4134cf1",
       "owners": {
         "@document": {
-          "before": "5a12264105c4c224f2fa1883182e561cc4d418f965730f3998a975bfa4b8e44c",
-          "after": "4746c5dca055e70c459b1aa7033764eff3def6f02ec2b3cf65d053c85a3cb490"
+          "before": "2489f9b0b2c9c2774731119ea4c8b78cc7936b6a9d95563efc6f3cd8b2c675d2",
+          "after": "1006327ecd3042646cc7b8e88fd52e5a8b8d73c3ab8a1e0b65968d82b4134cf1"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "0a0ebb1f60c9632a50af4396d3ab902001b890ca95fde5b641dfa325f65b37d9",
+      "after_sha256": "3d922edda90fe5e39f2d4e18ec728032906595c34a7f2edaaef1e382dfbab7f5",
+      "owners": {
+        "@document": {
+          "before": "0a0ebb1f60c9632a50af4396d3ab902001b890ca95fde5b641dfa325f65b37d9",
+          "after": "3d922edda90fe5e39f2d4e18ec728032906595c34a7f2edaaef1e382dfbab7f5"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "3c447afc116f406183f923927b3032e6049bddedd80d19960a0b2ffa8c06d22a",
+      "owners": {
+        "@document": {
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "3c447afc116f406183f923927b3032e6049bddedd80d19960a0b2ffa8c06d22a"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "4746c5dca055e70c459b1aa7033764eff3def6f02ec2b3cf65d053c85a3cb490",
+      "after_sha256": "0df6083f0ded654ac27011ace66d2017273c31b6d7b2194794501ad36b285de9",
+      "owners": {
+        "@document": {
+          "before": "4746c5dca055e70c459b1aa7033764eff3def6f02ec2b3cf65d053c85a3cb490",
+          "after": "0df6083f0ded654ac27011ace66d2017273c31b6d7b2194794501ad36b285de9"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "4c96e32fc6c638a9c9703c7b0af7dd38a720bc4fa232ce770923f51e88d6b2bf",
-      "after_sha256": "73e01877fc5efeb192c1ffb6f086f90ecc15744bdee14a7fda1a905ac1a06fc5",
+      "before_sha256": "73e01877fc5efeb192c1ffb6f086f90ecc15744bdee14a7fda1a905ac1a06fc5",
+      "after_sha256": "ae3d31fbb6f16ecd686607bacc377145dfeff11d7bd949d8fce323ddc65a90d3",
       "owners": {
         "@document": {
-          "before": "4c96e32fc6c638a9c9703c7b0af7dd38a720bc4fa232ce770923f51e88d6b2bf",
-          "after": "73e01877fc5efeb192c1ffb6f086f90ecc15744bdee14a7fda1a905ac1a06fc5"
+          "before": "73e01877fc5efeb192c1ffb6f086f90ecc15744bdee14a7fda1a905ac1a06fc5",
+          "after": "ae3d31fbb6f16ecd686607bacc377145dfeff11d7bd949d8fce323ddc65a90d3"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "f2f3e9e99ac27903901132140ba17cb340917fca974471038614993f9f2c29ec",
-      "after_sha256": "7c2cb60c12aa329cccd85d6fa2134e0c837676a45624ee5f798871f925d93b06",
+      "before_sha256": "7c2cb60c12aa329cccd85d6fa2134e0c837676a45624ee5f798871f925d93b06",
+      "after_sha256": "79add8435c6ca649076c9e9ebae946f00908b1d20769845fa5f2f8c7be4646cd",
       "owners": {
         "@document": {
-          "before": "f2f3e9e99ac27903901132140ba17cb340917fca974471038614993f9f2c29ec",
-          "after": "7c2cb60c12aa329cccd85d6fa2134e0c837676a45624ee5f798871f925d93b06"
+          "before": "7c2cb60c12aa329cccd85d6fa2134e0c837676a45624ee5f798871f925d93b06",
+          "after": "79add8435c6ca649076c9e9ebae946f00908b1d20769845fa5f2f8c7be4646cd"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "d86dbcde08639c3eedf56f1c31f711b3b6d9749085984cb8127ac63751999015",
-      "after_sha256": "ced9d09863e921913295714f50481ed44bdef821677ff48d14ad5136064624df",
+      "before_sha256": "ced9d09863e921913295714f50481ed44bdef821677ff48d14ad5136064624df",
+      "after_sha256": "93344b887b9e23749a2082cb8c64608443651075899d8f523265d6f8b1d9291a",
       "owners": {
         "@document": {
-          "before": "d86dbcde08639c3eedf56f1c31f711b3b6d9749085984cb8127ac63751999015",
-          "after": "ced9d09863e921913295714f50481ed44bdef821677ff48d14ad5136064624df"
+          "before": "ced9d09863e921913295714f50481ed44bdef821677ff48d14ad5136064624df",
+          "after": "93344b887b9e23749a2082cb8c64608443651075899d8f523265d6f8b1d9291a"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "ef6798d7da5d70337b81d862853db76164dc7cd8a1334feaa9dc28e1605e9741",
-      "after_sha256": "4c239c8df694d6cf4d91ff666ce917eb45a1d7a27a2e441c9421f404a0379a23",
+      "before_sha256": "4c239c8df694d6cf4d91ff666ce917eb45a1d7a27a2e441c9421f404a0379a23",
+      "after_sha256": "3403fb39354ff6f9ed92100db383faa9872f6e26502d3f28caf272b88872075b",
       "owners": {
         "@document": {
-          "before": "ef6798d7da5d70337b81d862853db76164dc7cd8a1334feaa9dc28e1605e9741",
-          "after": "4c239c8df694d6cf4d91ff666ce917eb45a1d7a27a2e441c9421f404a0379a23"
+          "before": "4c239c8df694d6cf4d91ff666ce917eb45a1d7a27a2e441c9421f404a0379a23",
+          "after": "3403fb39354ff6f9ed92100db383faa9872f6e26502d3f28caf272b88872075b"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "6efb9187171b840186a263b34a290676319263c62ab4e8145ba0a3438ef94250",
-      "after_sha256": "953777501df3a313ebfe1b43226de515c280c2706ba36f4ce90cae30a10c6942",
+      "before_sha256": "953777501df3a313ebfe1b43226de515c280c2706ba36f4ce90cae30a10c6942",
+      "after_sha256": "d8142d1d3b911690c2d7043544587395d4cc73c23738c84f8f0baa4530bd3106",
       "owners": {
         "@document": {
-          "before": "6efb9187171b840186a263b34a290676319263c62ab4e8145ba0a3438ef94250",
-          "after": "953777501df3a313ebfe1b43226de515c280c2706ba36f4ce90cae30a10c6942"
+          "before": "953777501df3a313ebfe1b43226de515c280c2706ba36f4ce90cae30a10c6942",
+          "after": "d8142d1d3b911690c2d7043544587395d4cc73c23738c84f8f0baa4530bd3106"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "9c178099bc8495415118cc7c2416131f1f4bfe9db9b3dcd661b13882acf89e70",
-      "after_sha256": "8407d2f672a70b7e8a4f7eb1806c990e824972e1889ec85642cd1a7e5a6f2071",
+      "before_sha256": "8407d2f672a70b7e8a4f7eb1806c990e824972e1889ec85642cd1a7e5a6f2071",
+      "after_sha256": "f7141824285d7c9c09173971e97aaf6869abd359b2597b11208aef3e7bdbf6c1",
       "owners": {
         "@document": {
-          "before": "9c178099bc8495415118cc7c2416131f1f4bfe9db9b3dcd661b13882acf89e70",
-          "after": "8407d2f672a70b7e8a4f7eb1806c990e824972e1889ec85642cd1a7e5a6f2071"
+          "before": "8407d2f672a70b7e8a4f7eb1806c990e824972e1889ec85642cd1a7e5a6f2071",
+          "after": "f7141824285d7c9c09173971e97aaf6869abd359b2597b11208aef3e7bdbf6c1"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "bc7b41cd5b8689ed83e71b50c6fccd0e4940bf70e198888bbcc3b454e487dd89",
-      "after_sha256": "ad8a192da22eb8f2971235a331bf6673a3fba59a79225bf84e39fb28c859298a",
+      "before_sha256": "ad8a192da22eb8f2971235a331bf6673a3fba59a79225bf84e39fb28c859298a",
+      "after_sha256": "14a91410e76273ae17f76a9117bfff4ddb27210700b3d334dd021d7ae0990d52",
       "owners": {
         "@document": {
-          "before": "bc7b41cd5b8689ed83e71b50c6fccd0e4940bf70e198888bbcc3b454e487dd89",
-          "after": "ad8a192da22eb8f2971235a331bf6673a3fba59a79225bf84e39fb28c859298a"
+          "before": "ad8a192da22eb8f2971235a331bf6673a3fba59a79225bf84e39fb28c859298a",
+          "after": "14a91410e76273ae17f76a9117bfff4ddb27210700b3d334dd021d7ae0990d52"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "01a1d2be6cf72fb0fc1a654c9e9be0c30b685a4af281183c2b555779820bb8bc",
-      "after_sha256": "ac16aa00aa3538ded10d21e43f09c29996bb8b64f981ec9b91319f73a38f35b2",
+      "before_sha256": "ac16aa00aa3538ded10d21e43f09c29996bb8b64f981ec9b91319f73a38f35b2",
+      "after_sha256": "a2f8bc5bf577289649a4906d7604f2275346c30bc1bc54b2aca3138508f2e5a4",
       "owners": {
         "@document": {
-          "before": "01a1d2be6cf72fb0fc1a654c9e9be0c30b685a4af281183c2b555779820bb8bc",
-          "after": "ac16aa00aa3538ded10d21e43f09c29996bb8b64f981ec9b91319f73a38f35b2"
+          "before": "ac16aa00aa3538ded10d21e43f09c29996bb8b64f981ec9b91319f73a38f35b2",
+          "after": "a2f8bc5bf577289649a4906d7604f2275346c30bc1bc54b2aca3138508f2e5a4"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "784d62c8fa3e634359766af1b8997e43bd2639ebc69dcedfd9e1de998a1fa175",
-      "after_sha256": "814e7fd18ef90214cf44332cc184d8a52ff094199e1019f401eb9b96d2f428ea",
+      "before_sha256": "814e7fd18ef90214cf44332cc184d8a52ff094199e1019f401eb9b96d2f428ea",
+      "after_sha256": "c50d7cf82dd3e5f59872d8731f3d4a808625fa271189f65e5be0f48a40f6fdaa",
       "owners": {
         "@document": {
-          "before": "784d62c8fa3e634359766af1b8997e43bd2639ebc69dcedfd9e1de998a1fa175",
-          "after": "814e7fd18ef90214cf44332cc184d8a52ff094199e1019f401eb9b96d2f428ea"
+          "before": "814e7fd18ef90214cf44332cc184d8a52ff094199e1019f401eb9b96d2f428ea",
+          "after": "c50d7cf82dd3e5f59872d8731f3d4a808625fa271189f65e5be0f48a40f6fdaa"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "ba2cb10fe0202767796e1108cfba033f4c75611ac5df9daa03d96924cf6a8ebc",
-      "after_sha256": "39192c32019a6ea9d030c932e17d21ae1035717a5d0c217d41bc72d5c93e803f",
+      "before_sha256": "39192c32019a6ea9d030c932e17d21ae1035717a5d0c217d41bc72d5c93e803f",
+      "after_sha256": "cd7dfa9a413ac9a6096652c04a7d425f2bde4c2719b999e8d7f1b6d09745599d",
       "owners": {
         "@document": {
-          "before": "ba2cb10fe0202767796e1108cfba033f4c75611ac5df9daa03d96924cf6a8ebc",
-          "after": "39192c32019a6ea9d030c932e17d21ae1035717a5d0c217d41bc72d5c93e803f"
+          "before": "39192c32019a6ea9d030c932e17d21ae1035717a5d0c217d41bc72d5c93e803f",
+          "after": "cd7dfa9a413ac9a6096652c04a7d425f2bde4c2719b999e8d7f1b6d09745599d"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "457fb5a7d980116be70ff8275f45c7552c8fc26da9a4ae412dcf067a16562f9b",
-      "after_sha256": "2c439a86f22c15408b861f7d058fffaea186960eacf911f252fa0f2300a2924d",
+      "before_sha256": "2c439a86f22c15408b861f7d058fffaea186960eacf911f252fa0f2300a2924d",
+      "after_sha256": "2d77720d5c6ca3ae3c76df488aa66ca2692bdbf6cc3ef681a6f61e49b09179cc",
       "owners": {
         "@document": {
-          "before": "457fb5a7d980116be70ff8275f45c7552c8fc26da9a4ae412dcf067a16562f9b",
-          "after": "2c439a86f22c15408b861f7d058fffaea186960eacf911f252fa0f2300a2924d"
+          "before": "2c439a86f22c15408b861f7d058fffaea186960eacf911f252fa0f2300a2924d",
+          "after": "2d77720d5c6ca3ae3c76df488aa66ca2692bdbf6cc3ef681a6f61e49b09179cc"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "e3a60b7b5ac049197e66354e2ad38229bc229468a070c4199ba26abc287dcb6b",
-      "after_sha256": "77c07e6a15e2dfdecb5e8766442c2b39e87a1cdb921707a9e2bb4e535d7bd85e",
+      "before_sha256": "77c07e6a15e2dfdecb5e8766442c2b39e87a1cdb921707a9e2bb4e535d7bd85e",
+      "after_sha256": "3061785945f0bc36e6c00c1970856be3daeee594fdd68ec60b55fede746861fd",
       "owners": {
         "@document": {
-          "before": "e3a60b7b5ac049197e66354e2ad38229bc229468a070c4199ba26abc287dcb6b",
-          "after": "77c07e6a15e2dfdecb5e8766442c2b39e87a1cdb921707a9e2bb4e535d7bd85e"
+          "before": "77c07e6a15e2dfdecb5e8766442c2b39e87a1cdb921707a9e2bb4e535d7bd85e",
+          "after": "3061785945f0bc36e6c00c1970856be3daeee594fdd68ec60b55fede746861fd"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "e0138263e50589f5e377e8228f34f5d7a74a3e5ed5081b7840274726c0da8d53",
-      "after_sha256": "ce405a0e1c970d95fc9188132d2f8470d8f5c0d5eb243f9b5c24b68e24e5d324",
+      "before_sha256": "ce405a0e1c970d95fc9188132d2f8470d8f5c0d5eb243f9b5c24b68e24e5d324",
+      "after_sha256": "07a717237ede2ac739295b283a556efa3bcee29a27eed519d318e6d780c6b9ce",
       "owners": {
         "@document": {
-          "before": "e0138263e50589f5e377e8228f34f5d7a74a3e5ed5081b7840274726c0da8d53",
-          "after": "ce405a0e1c970d95fc9188132d2f8470d8f5c0d5eb243f9b5c24b68e24e5d324"
+          "before": "ce405a0e1c970d95fc9188132d2f8470d8f5c0d5eb243f9b5c24b68e24e5d324",
+          "after": "07a717237ede2ac739295b283a556efa3bcee29a27eed519d318e6d780c6b9ce"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "6939ce5c3065e031e7317bef457c3a68d63e7ede48c585054098f28785ef569d",
-      "after_sha256": "decf656620ed1b2e0778084d749fc193e70431c9e133a38f384a9491d3a9da32",
+      "before_sha256": "decf656620ed1b2e0778084d749fc193e70431c9e133a38f384a9491d3a9da32",
+      "after_sha256": "05d4cd2f6adb3cb00ebf25774ff130a47a03cfd3f7000c780e2742d57cc00e74",
       "owners": {
         "@document": {
-          "before": "6939ce5c3065e031e7317bef457c3a68d63e7ede48c585054098f28785ef569d",
-          "after": "decf656620ed1b2e0778084d749fc193e70431c9e133a38f384a9491d3a9da32"
+          "before": "decf656620ed1b2e0778084d749fc193e70431c9e133a38f384a9491d3a9da32",
+          "after": "05d4cd2f6adb3cb00ebf25774ff130a47a03cfd3f7000c780e2742d57cc00e74"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "ab7444afac729ae1ba8d8567a026ce9c241f124bc0bee56d76d63217e704105c",
-      "after_sha256": "8bd6467c4b369201e1f802ee3664a087c3dd27acdaa27642b65622a64b441f66",
+      "before_sha256": "8bd6467c4b369201e1f802ee3664a087c3dd27acdaa27642b65622a64b441f66",
+      "after_sha256": "09a62dcc9a832025ac4056ba9e4a17e4a4b8190dda151e10637b4c66dc2ac538",
       "owners": {
         "@document": {
-          "before": "ab7444afac729ae1ba8d8567a026ce9c241f124bc0bee56d76d63217e704105c",
-          "after": "8bd6467c4b369201e1f802ee3664a087c3dd27acdaa27642b65622a64b441f66"
+          "before": "8bd6467c4b369201e1f802ee3664a087c3dd27acdaa27642b65622a64b441f66",
+          "after": "09a62dcc9a832025ac4056ba9e4a17e4a4b8190dda151e10637b4c66dc2ac538"
         }
       }
     },
-    "src/warhammer40k_core/ai/deployment_geometry_features.py": {
+    "src/warhammer40k_core/ai/deployment_experiment.py": {
       "before_sha256": null,
-      "after_sha256": "e1038173d8385d9fbc95615744757818ee551a904a403b5fab8e6e220379780d",
+      "after_sha256": "662a34c86be9203453190ade11f54bf9ea1ecd35b2f488a57772dc86eeede141",
       "owners": {
         "@module": {
           "before": null,
-          "after": "2b9226b144834875b0d91fc52e7940c9cebd22cae79b5c8086fb6e5478c58149"
+          "after": "a1412d1fac66d154e5617bd7f6a4aa8e0bc3643ba944ee392dcceab08fc86e0c"
         },
-        "DeploymentGeometryDefinition": {
+        "DeploymentExperimentError": {
           "before": null,
-          "after": "e42d19e3a034167bfefac08fbe700d0b3c0d129952d2647dd501e041aedcc098"
+          "after": "0019e7883bcaaba3dea9ab611c2c18e3c4c7f715927d47665281fc0510fde713"
         },
-        "DeploymentGeometryDefinition.to_payload": {
+        "DeploymentExperimentProvenance": {
           "before": null,
-          "after": "23f967c0d4101443f458ad6a323f4b5731abd0ad9597af7bf7ce57110204c358"
+          "after": "e54ea55e9d14618854e7d1f2e289393d159bcc5f872d01294665340af3bf29f6"
         },
-        "DeploymentGeometryError": {
+        "DeploymentExperimentProvenance.__init__": {
           "before": null,
-          "after": "9db4f328e9a57af14a6c15b98d3a185175d4384d9e48c21431065d07a8d12eed"
+          "after": "ba7da0ef6f6727cd06303c9692973e4eb06677c413299994ed5ee23e600688c5"
         },
-        "DeploymentGeometryObservation": {
+        "DeploymentExperimentProvenance.content_hash": {
           "before": null,
-          "after": "50670df64ee70df3d9e6615364badfb6b5ef4037c0227fba2387c739feade70b"
+          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
         },
-        "DeploymentGeometryObservation.__init__": {
+        "DeploymentExperimentProvenance.from_episode": {
           "before": null,
-          "after": "69322d9d7ed510069e13475bbc39be9618ec9560bd158ea6e93a5a1fc6cb5281"
+          "after": "05c0a21a3b46c36908778e4b85cfe4fafaea3efe72639bccc0771df529904867"
         },
-        "DeploymentGeometryObservation.from_candidate": {
+        "DeploymentExperimentProvenance.from_payload": {
           "before": null,
-          "after": "10ac8b0c1b6e20b37d8b672a79b2ede78410d341dca11f281c3a0ba6d7addb3d"
+          "after": "74a8cce2c34cf1e25d564f0d003b21f43c8542663125467e192fc4c821078b5c"
         },
-        "DeploymentGeometryObservation.from_payload": {
-          "before": null,
-          "after": "9604499d6946ef60acd6882786b9a47ce5475f1de30dea1f98e8b52c42f6989c"
-        },
-        "DeploymentGeometryObservation.to_payload": {
+        "DeploymentExperimentProvenance.to_payload": {
           "before": null,
           "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
-        },
-        "DeploymentGeometryObservation.training_features": {
-          "before": null,
-          "after": "8dbd42d9c0111950b0f748d697ed2f2af78273d6986e9ea2088f5c1014839179"
-        },
-        "DeploymentTrainingGeometry": {
-          "before": null,
-          "after": "07424f2241f665ead6b21d7f1583f8e0299745113fff93113413bea0972281e2"
-        },
-        "DeploymentTrainingGeometry.__init__": {
-          "before": null,
-          "after": "511ca047e5f15398e584288ac564bc149372a6c330cc86e2aca3e7d28d06e425"
-        },
-        "DeploymentTrainingGeometry.from_link": {
-          "before": null,
-          "after": "486d9e05ca54f6b415e88fabc01304f2bb604ae08e2d7e3402fbdc3e409f3eab"
-        },
-        "DeploymentTrainingGeometry.from_payload": {
-          "before": null,
-          "after": "c1f9457904fce39f1947ba421f87bb1f0b082dac70d7bcdb673d1747249d4203"
-        },
-        "DeploymentTrainingGeometry.to_payload": {
-          "before": null,
-          "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
-        },
-        "_number": {
-          "before": null,
-          "after": "a4e5d2c75a8b9e6ca9b777b23b4a75ec904e19604fa058f7beeb118c17c195e4"
-        },
-        "_positions": {
-          "before": null,
-          "after": "c05da71675591580630a212ed8cc36fc391a3b80d63f8863fa889569af8dc2f1"
-        },
-        "_require_payload": {
-          "before": null,
-          "after": "a5210333419e5fbc6dc167935e7aa2b1bd52873beb4eb497d779f9274f6d2756"
         }
       }
     },
-    "tests/infrastructure/adapters/test_deployment_geometry_features.py": {
+    "tests/infrastructure/adapters/test_deployment_experiment.py": {
       "before_sha256": null,
-      "after_sha256": "12d4b70e44b1d8678086cac7aeee191579bed3d2aa5e553f6514c5f5cf37a67d",
+      "after_sha256": "866059309064c6863bbe16594b3df2748666d99530bd86d33090257776077a6d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "9dc7eb915830509b42ffd1d4b54a7d3518117325b0e678ff979a7a714c339f5a"
+          "after": "685c10c9413a0f8d514b0a7fa57467225f443dcdb9786281a5dac2942d1d05b1"
         },
-        "_OriginXRanker": {
+        "ExperimentCase": {
           "before": null,
-          "after": "c3c679a4b054ba3cd2a4275dad3a1600e6ba56d7903709b51884d80586c71bcf"
+          "after": "955357d8a31be35cbf2db159df710e27a7066d358e8afbaa5fde8f0d4524b15a"
         },
-        "_OriginXRanker.score": {
+        "ExperimentCase.evidence": {
           "before": null,
-          "after": "65b116f47bc1bf109c398616f310962cf0af54725a7865253b2fe6b28d99d4a1"
+          "after": "e0685722201df9748ba4dd3a73aa1eee0e15f72fd4b2e2b792dc6b5349bfcc76"
         },
-        "_candidate": {
+        "_GeometryRanker": {
           "before": null,
-          "after": "867a85c8c8169aa9abba8b989c4cc699576af8e9f98470f115ba22dbf1a126b8"
+          "after": "59462e97f26163b8845fb13ea4e7f90d9844f5c6d75a8d8307e546beeaf378b2"
         },
-        "_hidden_context": {
+        "_GeometryRanker.score": {
           "before": null,
-          "after": "100249053dcbee5d27b4e414e2060d11d83d571a3373cc231ef734d7202bb3df"
+          "after": "04ba7c0b7ab6f711b181b051e0f049f7d2479d204f7582f69b758a5245148b22"
         },
-        "geometry_training": {
+        "_object": {
           "before": null,
-          "after": "e53fcaf40124bba67c243b6995e202e9097aac9018a28ca1185a249a433e6b19"
+          "after": "b04984b8bf1b04609d3667a5b05335fd76ca68f7e605eb863679866539750b0a"
         },
-        "test_deployment_geometry_derivation_translation_and_closed_roundtrip": {
+        "experiment": {
           "before": null,
-          "after": "46b8eb7a6a760bbcc117b46a3c8d1489ca4a54dc002fb0294ad3e76962849493"
+          "after": "5f90dd95f4c49a81bd7b9b3a8d0fc9f02dc926e252bf5ba5e7a90aa706858225"
         },
-        "test_deployment_geometry_drives_accepted_rank_commit_and_exact_training_join": {
+        "test_experiment_closed_loader_rejects_component_drift": {
           "before": null,
-          "after": "4a0b55b1fd4ade27754e77b1b093f85736636e0162980c73038bc7c46c7b520c"
+          "after": "7c5da7d17da4b7561da57909276f06df733837c0b60af049e8d1fbfe657ef293"
         },
-        "test_deployment_geometry_hidden_work_and_private_rng_noninterference": {
+        "test_experiment_joins_real_producers_encoder_and_reachable_accepted_episode": {
           "before": null,
-          "after": "112e18df2ff3225a88ec83d3387d1d14eada4fefd5f704de15d48d1b6ff3f0ee"
+          "after": "feb2582906e450b05025e7a0dc6e56d273504cb2c5e462a9056cb9b49ba13d3a"
         },
-        "test_deployment_geometry_loader_rejects_binding_definition_and_value_drift": {
+        "test_experiment_rejects_incompatible_verified_inputs": {
           "before": null,
-          "after": "c2ec8d33d50bcd9589480fa9a8e1be84c4c81fe88e2f27abcc11728fb302fbd5"
+          "after": "f39c3aa21793e38d7e1c8261c05cddc3c675b48e3d9dc833e3181db60b2aba78"
         },
-        "test_deployment_geometry_rejects_stale_context_and_direct_construction": {
+        "test_experiment_rejects_untyped_or_non_json_evidence": {
           "before": null,
-          "after": "cef5bb6421027870c23b3e89535d8a3de36084d8322c0817d1afba36e94f5b4f"
-        },
-        "test_deployment_geometry_rejects_unsupported_numeric_inputs": {
-          "before": null,
-          "after": "311ca317aed4c0cb1008b585ead12311cc94d9326e88ef694054c92cd139bb85"
-        },
-        "test_deployment_geometry_training_rejects_semantic_or_full_row_drift": {
-          "before": null,
-          "after": "afa82560ad3e8453054de20e48583257773bfc87d0e7dd252baf5bd2ddd66713"
-        },
-        "test_deployment_geometry_uses_all_origins_and_ignores_ids_order_and_facing": {
-          "before": null,
-          "after": "24c22f8f30dec89cbb62464f40f7805f9546cddea92da7b4e477896ad92d13b8"
+          "after": "743bc902ed5f4dfc9f83b2f1f56faad4fa2298da32222920350f11516e9a608b"
         }
       }
     }
@@ -422,9 +370,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -432,9 +380,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -442,9 +390,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -452,9 +400,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -462,9 +410,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -472,9 +420,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -482,9 +430,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -492,9 +440,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -502,9 +450,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -512,9 +460,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -522,9 +470,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -532,9 +480,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -542,9 +490,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh twelve-shard scheduling metadata from one authentic complete successful covered local JUnit profile; preserve exact case admission and scheduler behavior.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate all twelve shards and exact case weights from one authentic complete successful covered local JUnit profile; retain every selected case and existing scheduling algorithms/limits.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -552,9 +500,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate current runtime identity and required external examples/digests for the new bounded AI encoder; external wire schemas and versions remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -562,9 +510,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate current runtime identity and required external examples/digests for the new bounded AI encoder; external wire schemas and versions remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -572,9 +520,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate current runtime identity and required external examples/digests for the new bounded AI encoder; external wire schemas and versions remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -582,9 +530,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate current runtime identity and required external examples/digests for the new bounded AI encoder; external wire schemas and versions remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -592,9 +540,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate current runtime identity and required external examples/digests for the new bounded AI encoder; external wire schemas and versions remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -602,9 +550,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate current runtime identity and required external examples/digests for the new bounded AI encoder; external wire schemas and versions remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -612,9 +560,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate current runtime identity and required external examples/digests for the new bounded AI encoder; external wire schemas and versions remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -622,9 +570,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate current runtime identity and required external examples/digests for the new bounded AI encoder; external wire schemas and versions remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -632,41 +580,41 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Admit the new focused geometry test module and verify numeric semantics, exact joins, hidden-input isolation, ordinary accepted alternatives and replay without altering retained tests.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Explicitly admit the new bounded deployment experiment regression module without changing historical deferrals, retained tests or the selected behavioral scope.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the bounded actor-only geometry encoder and exact ranked-row companion, its source obligations and remaining Stage 1 gaps; explicitly register the new operation owner.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Document the bounded choice provenance join and its remaining whole-run/dataset/authentication obligations; explicitly register its new owning operation.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the bounded actor-only geometry encoder and exact ranked-row companion, its source obligations and remaining Stage 1 gaps; explicitly register the new operation owner.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Document the bounded choice provenance join and its remaining whole-run/dataset/authentication obligations; explicitly register its new owning operation.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the bounded actor-only geometry encoder and exact ranked-row companion, its source obligations and remaining Stage 1 gaps; explicitly register the new operation owner.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Document the bounded choice provenance join and its remaining whole-run/dataset/authentication obligations; explicitly register its new owning operation.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the bounded actor-only geometry encoder and exact ranked-row companion, its source obligations and remaining Stage 1 gaps; explicitly register the new operation owner.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Document the bounded choice provenance join and its remaining whole-run/dataset/authentication obligations; explicitly register its new owning operation.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -677,29 +625,29 @@
         "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Regenerate current runtime identity and required external examples/digests for the new bounded AI encoder; external wire schemas and versions remain unchanged.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Regenerate current runtime identity and required external examples/digests together; adapter wire schemas, versions and gameplay behavior remain unchanged.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
-    "src/warhammer40k_core/ai/deployment_geometry_features.py": {
+    "src/warhammer40k_core/ai/deployment_experiment.py": {
       "category": "serialization_or_replay_work",
       "operations": [
-        "semantic-deployment-geometry"
+        "deployment-experiment-provenance"
       ],
       "selected_families": [],
-      "rationale": "Add a separately versioned actor-only model-origin encoder and exact ranked accepted-training semantic companion without altering engine authority or existing row schemas.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Implement and verify a separate operator-only accepted-choice experiment join over existing ranked row, geometry, accepted transition and reachable mixed episode evidence.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     },
-    "tests/infrastructure/adapters/test_deployment_geometry_features.py": {
+    "tests/infrastructure/adapters/test_deployment_experiment.py": {
       "category": "measured_workload",
       "operations": [
-        "semantic-deployment-geometry"
+        "deployment-experiment-provenance"
       ],
       "selected_families": [],
-      "rationale": "Admit the new focused geometry test module and verify numeric semantics, exact joins, hidden-input isolation, ordinary accepted alternatives and replay without altering retained tests.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require permitted semantic features with explicit units, dimensions, aggregation, information scope and exact row/candidate joins. Derive only supplied actor-view model origins; arbitrary identities remain linkage. Preserve actual engine acceptance, source provenance, ranked accepted transitions and ordinary commit/save/load/replay. These bounded proposal summaries do not certify footprints, tactical quality, all features/references, dataset eligibility or full games.",
-      "unchanged_work": "No engine legality, gameplay orchestration, geometry solver, path search, candidate generation/validation algorithm or budget, game RNG, authoritative mutation, persistence/replay algorithm, runtime dependency or cache changes. The new opt-in encoder performs bounded deterministic numeric reductions and exact JSON/row linkage on supplied proposals. The explicit AI operation registers no detailed comparison families. Existing sensitive selectors, measurements, coverage denominator, timing budgets and all live semantic/work/cache controls remain unchanged. Serial current-runtime smoke is mandatory. A refreshed complete local timing profile is labeled with its actual host/concurrency and does not certify hosted scheduling accuracy, a speedup or the fourteen-minute CI goal."
+      "rationale": "Implement and verify a separate operator-only accepted-choice experiment join over existing ranked row, geometry, accepted transition and reachable mixed episode evidence.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup."
     }
   },
   "milestone": "ordinary",
