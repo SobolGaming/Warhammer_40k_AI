@@ -395,21 +395,30 @@ and retain their complete baseline measurement. Changed/removed/renamed cases or
 changed test-module bytes require explicit sidecar regeneration, and behavioral
 inventory changes still require a fresh complete successful baseline profile.
 
-The current calibration retains 95 original raw worker receipts and 12,081 passed
-three-phase samples covering 6,126 unchanged cases from historical successful run
-[42549486854](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42549486854)
+The current calibration retains 141 source-bound raw worker receipts and 17,820
+passed three-phase samples covering all 6,178 current cases. Sources are historical
+successful run
+[42549486854](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42549486854),
+failed attempts 1 and 2 of
+[42556245215](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42556245215),
 and failed attempts 1 and 2 of
-[42556245215](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42556245215).
-Four whole worker receipts whose collected inventory included a changed test
-module were omitted when rederiving the sidecar from the original raw artifacts.
-Retained receipts and phase values keep their original identities and outcomes.
-All 52 cases in the changed runner-accounting and deployment-experiment modules
-use only their fresh complete local baseline timings; no historical observations
-are invented for them. The complete 6,178-case local profile used one isolated
-mirror worker and twelve remainder workers in native WSL2, with type/static gates
-concurrent during the early run. Local and hosted measurements remain separate.
-These historical samples are planning evidence, not complete current hosted
-qualification. Fixture setup observations are
+[42602087197](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42602087197).
+Both new enclosing attempts remain failures: the first hit two fourteen-minute
+cutoffs; the second hit one cutoff and lost a worker in an existing S25 case.
+Their completed original workers contribute only complete passed phase triples.
+Controller/replacement-worker receipts are omitted, and four original worker
+receipts whose collected inventory included a changed test module remain omitted
+whole. Retained raw identities and phase values are preserved; no failed attempt
+is rewritten as a pass. Inherited successful-job copies in the rerun API are not
+new worker invocations or new observations.
+
+The complete 6,178-case local baseline is unchanged: one isolated mirror worker
+and twelve remainder workers in native WSL2, with type/static gates concurrent
+during the early run. Hosted observations augment its per-case planning maxima;
+they do not replace the complete profile or establish successful hosted
+qualification. All current cases now have admitted observations, including the
+52 cases in the changed runner-accounting and deployment-experiment modules.
+Local and hosted measurements remain separate. Fixture setup observations are
 worker/order dependent; taking maxima and regrouping does not establish new fixture
 multiplicity, hosted wall time or the fourteen-minute goal. Existing module grouping
 is retained. Fresh complete correctness/coverage qualification remains mandatory.
