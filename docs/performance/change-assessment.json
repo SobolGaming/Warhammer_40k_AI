@@ -14,6 +14,36 @@
         }
       }
     },
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "8f712b4f80dcd8efb4d32d53686ee4ba143ee5d43763b3369dc29ea847f2d123",
+      "after_sha256": "312d60d1edf622cff5960ce0048bbe7ebfecbcc7df79e6f6afeddd15fe3664a6",
+      "owners": {
+        "@document": {
+          "before": "8f712b4f80dcd8efb4d32d53686ee4ba143ee5d43763b3369dc29ea847f2d123",
+          "after": "312d60d1edf622cff5960ce0048bbe7ebfecbcc7df79e6f6afeddd15fe3664a6"
+        }
+      }
+    },
+    "ci/quality_shards/shard-2-modules.txt": {
+      "before_sha256": "5a9d25eb2fb58f0ce81f4bb55eddce1071b424f8946f791328fccf6f9e2b1387",
+      "after_sha256": "20ecb0c14fd3a25dee5b2475d5fc5e1d06cad24b548df392c83101b7e069b06f",
+      "owners": {
+        "@document": {
+          "before": "5a9d25eb2fb58f0ce81f4bb55eddce1071b424f8946f791328fccf6f9e2b1387",
+          "after": "20ecb0c14fd3a25dee5b2475d5fc5e1d06cad24b548df392c83101b7e069b06f"
+        }
+      }
+    },
+    "ci/quality_shards/shard-2.txt": {
+      "before_sha256": "c17a8aa22d5c3073d6787b3f4f0de575e4e851bc49a7bc864bb30c1790f0771d",
+      "after_sha256": "9dfc0ee0a631ca07d1828df15414ebc36981a93d8fcea4b01cb9568d4afb6cf0",
+      "owners": {
+        "@document": {
+          "before": "c17a8aa22d5c3073d6787b3f4f0de575e4e851bc49a7bc864bb30c1790f0771d",
+          "after": "9dfc0ee0a631ca07d1828df15414ebc36981a93d8fcea4b01cb9568d4afb6cf0"
+        }
+      }
+    },
     "ci/test_shards/durations.json": {
       "before_sha256": "5ccfb4b22af53c4acb22abe007b118684d80dc8626de984e3b13f635b1845d0e",
       "after_sha256": "8ec3bb92a8d93ff42a68ad936606558269a8ca30487fe83e0a2fa4129ead4d58",
@@ -563,6 +593,30 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Document the bounded choice provenance join and its remaining whole-run/dataset/authentication obligations; explicitly register its new owning operation.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
+    },
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Register all 39 actually collected hosted calibration quality controls as one whole module on existing lane 2. Preserve all historical node/module relative order, sorted complete inventory, exact 260 deferrals and performance receipt consumer placement; no timing weights, deadlines or execution machinery change.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
+    },
+    "ci/quality_shards/shard-2-modules.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Register all 39 actually collected hosted calibration quality controls as one whole module on existing lane 2. Preserve all historical node/module relative order, sorted complete inventory, exact 260 deferrals and performance receipt consumer placement; no timing weights, deadlines or execution machinery change.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
+      "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
+    },
+    "ci/quality_shards/shard-2.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Register all 39 actually collected hosted calibration quality controls as one whole module on existing lane 2. Preserve all historical node/module relative order, sorted complete inventory, exact 260 deferrals and performance receipt consumer placement; no timing weights, deadlines or execution machinery change.",
       "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require strict reproducibility/source joins: bind one ranked accepted deployment row and its selected model-origin encoder to its exact transition in a reachable verified mixed episode, current build and trusted config/reward. Retain actual producer seeds, count budgets and parameters. Keep operator evidence out of actor inputs. Artifact identity, arbitrary scorer encoder use and episode stop reasons retain declaration limits. No whole-run or dataset certification. The owner separately authorized repairing CI timing calibration within PR645 while preserving tests, coverage and the fourteen-minute step limit. Historical/partial hosted observations are planning diagnostics only; fresh qualification remains required.",
       "unchanged_work": "No engine legality, authority, gameplay orchestration, geometry solver, candidate generation/validation algorithm or budget, RNG, persistence/replay algorithm, dependency or cache changes. The new opt-in owner only checks typed existing evidence and serializes a bounded composed receipt. Its explicit operation registers no detailed comparison families. Existing sensitive selectors, measurements, live controls, coverage denominator and timing budgets remain unchanged; serial current-runtime smoke is required. Fresh complete local JUnit timing weights retain host/concurrency labels and do not certify hosted timing accuracy or a speedup. CI calibration preserves all complete baseline measurement bytes and historical failed outcomes; no guessed multipliers or new fixture scheduling algorithm. Changed CI input-admission/dispatch owners do not change engine/source-contract generation algorithms or performance families."
     },
