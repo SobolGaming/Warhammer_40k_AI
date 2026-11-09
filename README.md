@@ -415,39 +415,40 @@ and retain their complete baseline measurement. Changed/removed/renamed cases or
 changed test-module bytes require explicit sidecar regeneration, and behavioral
 inventory changes still require a fresh complete successful baseline profile.
 
-The current calibration retains 235 source-bound raw worker receipts and 29,640
-passed three-phase samples covering all 6,178 current cases. All 141 previously
-retained receipts and their observations remain intact. Their sources are historical
-successful run
+The current calibration retains 214 compatible source-bound raw worker receipts
+and 26,405 passed three-phase samples covering 6,126 current cases. The 83
+cases in the two changed deployment experiment/runner accounting modules use only
+the fresh complete baseline. This split-contract update omits 21 whole historical
+worker receipts whose collected test-module bytes changed; it never rewrites their
+raw bytes or admits only selected rows from an incompatible worker. All prior
+receipts, observations and profiles remain in Git history and their original
+GitHub artifacts. No partial progress journal is a calibration receipt.
+
+Retained sources include successful historical run
 [42549486854](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42549486854),
 failed attempts 1 and 2 of
-[42556245215](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42556245215),
-and failed attempts 1 and 2 of
-[42602087197](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42602087197).
-Both attempts of 42602087197 remain failures: the first hit two fourteen-minute
-cutoffs; the second hit one cutoff and lost a worker in an existing S25 case.
-Controller/replacement-worker receipts and the four older receipts incompatible
-with current test-module bytes remain omitted.
-
-The refresh adds 49 original worker receipts from successful covered PR run
-[42641115451](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42641115451)
-and 45 completed worker receipts from the eleven successful behavioral jobs in
-attempt 1 of failed main run
+[42556245215](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42556245215)
+and [42602087197](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42602087197),
+successful covered PR run
+[42641115451](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42641115451),
+and completed original workers from attempt 1 of failed main run
 [42644169069](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42644169069).
-The enclosing main attempt remains failed; only its complete passed phase triples
-are admitted. Its terminated shard's partial progress journals are not calibration
-receipts. Artifact/API metadata binds each retained receipt to its actual run
-attempt and checkout. Inherited successful-job copies in a rerun API are not new
-worker invocations or new observations.
+Failed enclosing attempts retain their failed outcomes. Independently downloaded
+artifact/API metadata and exact raw hashes rebind every retained receipt; original
+source heads and recorded engine fingerprints stay unchanged. Controller and
+replacement receipts and inherited successful-job copies remain excluded.
 
-The complete baseline is the successful 6,178-case covered hosted PR run
-42641115451: source head `245cd35e1c9d2de8f962856df9e117f76fe71442`,
-tested checkout `eed05455b3bdd3a09a4d4315f4829da1aa45d809`, and twelve
-`ubuntu-latest` shards with four remainder workers and one isolated mirror worker.
-Its authentic JUnit case measurements replace the earlier local baseline; previous
-profiles remain in Git history and retained artifacts. The unchanged maximum
-formula retains every older slower admitted observation. All current cases have
-admitted observations, with no baseline-only cases.
+The complete baseline is the successful local 6,209-case covered split-contract
+run: Python 3.14.5 under WSL, one isolated mirror worker followed by 32 remainder
+workers, with static/contract checks concurrent during the enclosing validation.
+The tested working source is based on `be1bac984d2d97a6dbd67361c43c3a0b31002e1e`
+and has runtime fingerprint
+`a03a3fe975c4e75c13d2d3a44a30c5df851e1620db0e7086c75f1226be9013ae`.
+Its authentic complete JUnit measurements include all 31 added cases. The prior
+6,178-case hosted baseline remains historical; local and hosted measurements are
+not mixed into one representative baseline. The unchanged maximum formula still
+retains every compatible slower hosted observation. Local timings do not establish
+hosted cost accuracy or a speedup; fresh hosted qualification remains required.
 
 Fixture setup observations are worker/order dependent; taking maxima and regrouping
 does not establish new fixture multiplicity, hosted wall time or the eighteen-minute

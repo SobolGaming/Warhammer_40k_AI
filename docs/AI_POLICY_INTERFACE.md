@@ -715,9 +715,10 @@ All receipt data is operator-only and never added to scorer/encoder inputs. The
 focused consumer uses geometry to select a non-first accepted placement through
 ordinary commit/save/load/replay, then joins its reachable mixed episode.
 
-This is partial experiment provenance. Whole-run routing, limits, attempted/failed
-choice accounting, data splits/dataset admission, artifact authentication, broader
-information-access/feature vocabularies and Stage 1 completion remain open. Existing
+This is partial experiment provenance. The separate runner admission and dataset
+partition contracts below retain supplied run/choice accounting and split groups.
+Artifact authentication, broader information-access/feature vocabularies and
+Stage 1 completion remain open. Existing
 TrainingRow, finite/target schemas and adapter wire shapes are unchanged; the
 [deployment adapter contract](ADAPTER_DECISION_CONTRACT.md) still owns execution.
 
@@ -823,8 +824,9 @@ or a verified whole-game result. Wall-clock diagnostics do not participate in
 deterministic decisions. Use the existing session replay artifact for authoritative
 execution; the report does not perform independent episode/experiment admission.
 The bounded operator admission below joins supplied run evidence to episodes and
-deployment rows. Broader workload manifests, hard cancellation, dataset splits,
-other feature/target families and Stage 1 completion remain open.
+deployment rows; the separate split contract partitions that admitted inventory.
+Broader workload manifests, hard cancellation, other feature/target families and
+Stage 1 completion remain open.
 
 ## Runner and bounded deployment dataset admission
 
@@ -888,8 +890,52 @@ inventory boundary, not certification of a full dataset or supported full-game
 workload. It cannot count omitted external runs, manifest-less initialization
 failures or arbitrary callback/process crashes that produced no report. Timing and
 failure diagnoses remain producer evidence; wall-clock limits stay cooperative.
-Data splits, artifact authentication, other proposal/feature/target families,
-training and Stage 1 qualification remain open.
+The separate bounded split contract below partitions this supplied inventory.
+Artifact authentication, other proposal/feature/target families, training and
+Stage 1 qualification remain open.
+
+## Bounded deployment dataset partitions
+
+`ai.deployment_dataset_split.DeploymentDatasetSplit.from_datasets(...)` accepts
+a nonempty tuple of existing `DeploymentDatasetAdmission` receipts and a tuple
+of `DeploymentSplitAssignment` declarations. Each assignment names exactly one
+`(dataset_occurrence, run_occurrence)`, a `DeploymentDatasetPartition` (`train`,
+`validation` or `test`), a nonempty scenario-family label and a nonempty geometry-
+group label. Missing, duplicate, conflicting or unknown occurrence assignments
+fail closed. Empty partitions are explicit; no split ratio or random assignment
+is inferred.
+
+Every run occurrence, including an excluded or zero-row failed run, belongs to
+one partition with all its rows. A conservative trajectory commitment binds the
+verified startup checkpoint, source identity and build: alternate replayed
+prefixes, branches and player perspectives from that same startup stay together.
+This uses the original startup, not the run's potentially later slice origin,
+runner ID, row ID or accepted-transition hash. Existing declared trajectory IDs
+also bind supplied slices together, even across distinct startup commitments.
+Repeated trajectory identities must have identical scenario-family and geometry-
+group declarations. Each trajectory, declared family and declared geometry group
+must belong to a single partition across all supplied datasets. Namespaces for
+family and geometry labels are separate; labels are exact and case-sensitive.
+
+The versioned `deployment-dataset-split-v1` receipt retains every complete source
+dataset, its hash and every dataset/run/choice occurrence. Duplicate datasets and
+deterministic runs within a partition remain separate counted occurrences. Each
+partition references complete runs and rows and derives attempted/failed runs,
+attempted choices, every submission outcome, admitted/eligible rows and excluded
+rows. These counts reconcile with the global inventory, including empty partitions
+and zero-dispatch failures. A split never promotes a previously excluded row.
+The exact loader rebuilds the receipt from typed admitted datasets and assignments;
+altered sources, memberships, declarations or counts fail, and payloads are detached.
+
+Group evidence is explicitly `declared-unverified`. The contract enforces supplied
+labels and startup identity; it does not independently authenticate equivalent
+geometry, discover undeclared scenario relationships, prove statistical independence,
+or identify all equivalent trajectories across changed configurations/builds.
+Operators must declare those relationships consistently before freezing a split.
+It cannot account for omitted external runs or report-less failures. This is an
+operator-only inventory contract with no new policy/scorer inputs, adapter wire
+shapes, learner or Stage 1 qualification claim. The existing deployment adapter
+contract still owns every executed choice.
 
 The local adapter always projects current authoritative state. It reuses only a
 viewer identity map derived from complete event history and the full viewer

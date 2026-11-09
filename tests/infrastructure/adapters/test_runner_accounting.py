@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import replace
+from dataclasses import FrozenInstanceError, replace
 from typing import cast
 
 import pytest
@@ -16,6 +16,11 @@ from tests.shared.category_migration.phase18f_session_commands import (
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
+from warhammer40k_core.ai.deployment_dataset_split import (
+    DeploymentDatasetPartition,
+    DeploymentDatasetSplit,
+    DeploymentSplitAssignment,
+)
 from warhammer40k_core.ai.player_policy import (
     CandidateExhaustedError,
     PlayerDecisionContext,
@@ -414,6 +419,289 @@ def admit(report: RunReport, before: LocalGameSession, after: LocalGameSession) 
         final_session=after,
         attempt_sessions=() if not report.decisions else (before,),
     )
+
+
+@pytest.fixture(scope="module")
+def split_datasets() -> tuple[DeploymentDatasetAdmission, ...]:
+    datasets: list[DeploymentDatasetAdmission] = []
+    for index in range(4):
+        session = LocalGameSession()
+        session.start(
+            replace(
+                canonical_setup_prebattle_smoke_config(),
+                private_rng_seed=f"{index % 3 + 1:02x}" * 32,
+            )
+        )
+        session.advance_until_decision_or_terminal()
+        if index == 3:
+            # Same ordinary startup as dataset 0, but a different replayed prefix.
+            session = step(session).after
+        before = session.fork()
+        with pytest.raises(RunnerError) as caught:
+            BoundedPolicyRunner(
+                session=session,
+                router=PolicyRouter(()),
+                limits=RunLimits(13 + index, 1, 1e-12 if index == 2 else 120),
+            ).run()
+        receipt = admit(caught.value.report, before, session)
+        datasets.append(DeploymentDatasetAdmission.from_runs((receipt,)))
+    return tuple(datasets)
+
+
+def _split_assignments() -> tuple[DeploymentSplitAssignment, ...]:
+    return tuple(
+        DeploymentSplitAssignment(index, 0, partition, f"family-{index}", f"geometry-{index}")
+        for index, partition in enumerate(DeploymentDatasetPartition)
+    )
+
+
+def test_split_preserves_duplicate_occurrences_and_zero_row_failure_denominators(
+    split_datasets: tuple[DeploymentDatasetAdmission, ...],
+) -> None:
+    datasets = (*split_datasets[:3], split_datasets[0])
+    assignments = (*_split_assignments(), replace(_split_assignments()[0], dataset_occurrence=3))
+    split = DeploymentDatasetSplit.from_datasets(datasets, assignments=assignments)
+    payload = split.to_payload()
+    assert payload["datasets"] == [dataset.to_payload() for dataset in datasets]
+    assert payload["dataset_hashes"] == [dataset.content_hash for dataset in datasets]
+    assert payload["group_evidence"] == "declared-unverified"
+    counts = cast(dict[str, JsonValue], payload["counts"])
+    assert counts == {
+        "attempted_runs": 4,
+        "failed_runs": 4,
+        "attempted_choices": 3,
+        "submission_outcomes": {"accepted": 0, "rejected": 0, "unverified": 0, "not_submitted": 3},
+        "admitted_rows": 0,
+        "eligible_rows": 0,
+        "excluded_rows": 0,
+    }
+    partitions = cast(dict[str, dict[str, JsonValue]], payload["partitions"])
+    assert partitions["train"]["run_occurrences"] == [[0, 0], [3, 0]]
+    assert partitions["validation"]["run_occurrences"] == [[1, 0]]
+    assert partitions["test"]["run_occurrences"] == [[2, 0]]
+    for name in counts:
+        if name == "submission_outcomes":
+            for outcome, count in cast(dict[str, int], counts[name]).items():
+                assert count == sum(
+                    cast(dict[str, int], cast(dict[str, JsonValue], part["counts"])[name])[outcome]
+                    for part in partitions.values()
+                )
+        else:
+            assert counts[name] == sum(
+                cast(int, cast(dict[str, JsonValue], part["counts"])[name])
+                for part in partitions.values()
+            )
+    assert split.content_hash == payload_digest(payload)
+    assert (
+        DeploymentDatasetSplit.from_payload(
+            json.loads(json.dumps(payload)), datasets=datasets, assignments=assignments
+        )
+        == split
+    )
+    assert (
+        DeploymentDatasetSplit.from_datasets(datasets, assignments=tuple(reversed(assignments)))
+        == split
+    )
+    payload["datasets"] = []
+    assert split.to_payload()["datasets"] != []
+    with pytest.raises(FrozenInstanceError):
+        split._payload_json = "{}"  # type: ignore[misc]
+
+
+@pytest.mark.parametrize("change", ["missing", "duplicate", "conflicting", "dataset", "run"])
+def test_split_rejects_incomplete_or_ambiguous_occurrence_assignments(
+    split_datasets: tuple[DeploymentDatasetAdmission, ...], change: str
+) -> None:
+    assignments = _split_assignments()
+    if change == "missing":
+        assignments = assignments[:-1]
+    elif change in ("duplicate", "conflicting"):
+        assignments += (
+            replace(
+                assignments[0],
+                partition=(
+                    DeploymentDatasetPartition.TEST
+                    if change == "conflicting"
+                    else assignments[0].partition
+                ),
+            ),
+        )
+    elif change == "dataset":
+        assignments = (replace(assignments[0], dataset_occurrence=9), *assignments[1:])
+    else:
+        assignments = (replace(assignments[0], run_occurrence=1), *assignments[1:])
+    with pytest.raises(TrainingAdmissionError, match="assignment"):
+        DeploymentDatasetSplit.from_datasets(split_datasets[:3], assignments=assignments)
+
+
+@pytest.mark.parametrize("group", ["scenario_family", "geometry_group"])
+def test_split_rejects_independent_declared_group_leakage(
+    split_datasets: tuple[DeploymentDatasetAdmission, ...], group: str
+) -> None:
+    assignments = _split_assignments()
+    second = (
+        replace(assignments[1], scenario_family=assignments[0].scenario_family)
+        if group == "scenario_family"
+        else replace(assignments[1], geometry_group=assignments[0].geometry_group)
+    )
+    with pytest.raises(TrainingAdmissionError, match="declared group leaks"):
+        DeploymentDatasetSplit.from_datasets(
+            split_datasets[:3], assignments=(assignments[0], second, assignments[2])
+        )
+
+
+@pytest.mark.parametrize("prefix", [False, True])
+@pytest.mark.parametrize("change", ["partition", "family", "geometry"])
+def test_split_keeps_duplicate_and_replayed_prefix_trajectories_together(
+    split_datasets: tuple[DeploymentDatasetAdmission, ...], prefix: bool, change: str
+) -> None:
+    datasets = (split_datasets[0], split_datasets[3 if prefix else 0])
+    first = _split_assignments()[0]
+    second = replace(first, dataset_occurrence=1)
+    positive = DeploymentDatasetSplit.from_datasets(datasets, assignments=(first, second))
+    members = cast(list[dict[str, JsonValue]], positive.to_payload()["assignments"])
+    assert members[0]["startup_trajectory_hash"] == members[1]["startup_trajectory_hash"]
+    if prefix:
+        sources = [
+            cast(list[dict[str, JsonValue]], dataset.to_payload()["runs"]) for dataset in datasets
+        ]
+        assert sources[0][0]["origin"] != sources[1][0]["origin"]
+    if change == "partition":
+        second = replace(second, partition=DeploymentDatasetPartition.TEST)
+    elif change == "family":
+        second = replace(second, scenario_family="different-family")
+    else:
+        second = replace(second, geometry_group="different-geometry")
+    with pytest.raises(TrainingAdmissionError, match="trajectory"):
+        DeploymentDatasetSplit.from_datasets(datasets, assignments=(first, second))
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "schema_version",
+        "scope",
+        "group_evidence",
+        "trajectory_grouping",
+        "datasets",
+        "dataset_hashes",
+        "assignments",
+        "partitions",
+        "counts",
+        "extra",
+    ],
+)
+def test_split_closed_loader_rejects_changed_evidence_or_accounting(
+    split_datasets: tuple[DeploymentDatasetAdmission, ...], field: str
+) -> None:
+    assignments = _split_assignments()
+    datasets = split_datasets[:3]
+    split = DeploymentDatasetSplit.from_datasets(datasets, assignments=assignments)
+    payload = split.to_payload()
+    payload[field] = "drift"
+    with pytest.raises(TrainingAdmissionError, match="drifted"):
+        DeploymentDatasetSplit.from_payload(payload, datasets=datasets, assignments=assignments)
+
+
+@pytest.mark.parametrize(
+    "change", ["dataset-bool", "run-negative", "partition", "family-empty", "geometry-space"]
+)
+def test_split_assignment_rejects_inexact_or_missing_declarations(change: str) -> None:
+    item = _split_assignments()[0]
+    dataset_occurrence = True if change == "dataset-bool" else item.dataset_occurrence
+    run_occurrence = -1 if change == "run-negative" else item.run_occurrence
+    partition = (
+        cast(DeploymentDatasetPartition, "train") if change == "partition" else item.partition
+    )
+    scenario_family = "" if change == "family-empty" else item.scenario_family
+    geometry_group = " " if change == "geometry-space" else item.geometry_group
+    with pytest.raises(TrainingAdmissionError, match="assignment"):
+        replace(
+            item,
+            dataset_occurrence=dataset_occurrence,
+            run_occurrence=run_occurrence,
+            partition=partition,
+            scenario_family=scenario_family,
+            geometry_group=geometry_group,
+        )
+
+
+def test_split_requires_typed_admitted_inputs(
+    split_datasets: tuple[DeploymentDatasetAdmission, ...],
+) -> None:
+    with pytest.raises(TrainingAdmissionError):
+        DeploymentDatasetSplit()
+    for datasets, assignments in (
+        ((), ()),
+        ((cast(DeploymentDatasetAdmission, split_datasets[0].to_payload()),), ()),
+        (split_datasets[:3], (cast(DeploymentSplitAssignment, {}),)),
+    ):
+        with pytest.raises(TrainingAdmissionError, match="typed"):
+            DeploymentDatasetSplit.from_datasets(datasets, assignments=assignments)
+
+
+def test_split_binds_declared_trajectory_ids_across_distinct_verified_startups() -> None:
+    datasets: list[DeploymentDatasetAdmission] = []
+    for seed in ("a1", "a2"):
+        session = LocalGameSession()
+        session.start(replace(canonical_setup_prebattle_smoke_config(), private_rng_seed=seed * 32))
+        session.advance_until_decision_or_terminal()
+        before = session.fork()
+        policy = ChoicePolicy()
+        route = PolicyRoute.from_view(session.view(viewer_player_id="player-a"))
+        with pytest.raises(RunnerError) as caught:
+            BoundedPolicyRunner(
+                session=session,
+                router=PolicyRouter((PolicyRegistration(route, "split-test", "{}", policy),)),
+                limits=RunLimits(13, 1, 120),
+            ).run()
+        row = replace(
+            step(before).row,
+            decision_record_id=session.lifecycle.decision_controller.records[
+                before.decision_record_count()
+            ].record_id,
+        )
+        transition = FiniteAcceptedTransition.from_sessions(
+            FiniteTrainingCandidateLink.from_row(row, context=policy.contexts[0]),
+            row=row,
+            context=policy.contexts[0],
+            before=before,
+            after=session,
+            trajectory_id="declared-common-trajectory",
+            perspective_player_id="player-a" if seed == "a1" else "player-b",
+        )
+        receipt = RunnerAdmission.from_report(
+            caught.value.report,
+            origin=VerifiedEpisodeOrigin.from_session(before, config=before.lifecycle.config),
+            initial_session=before,
+            final_session=session,
+            attempt_sessions=(before,),
+            transitions=(transition,),
+        )
+        datasets.append(DeploymentDatasetAdmission.from_runs((receipt,)))
+    first = _split_assignments()[0]
+    second = replace(first, dataset_occurrence=1)
+    split = DeploymentDatasetSplit.from_datasets(tuple(datasets), assignments=(first, second))
+    members = cast(list[dict[str, JsonValue]], split.to_payload()["assignments"])
+    assert members[0]["startup_trajectory_hash"] != members[1]["startup_trajectory_hash"]
+    assert (
+        members[0]["declared_trajectory_ids"]
+        == members[1]["declared_trajectory_ids"]
+        == ["declared-common-trajectory"]
+    )
+    with pytest.raises(TrainingAdmissionError, match="trajectory leaks"):
+        DeploymentDatasetSplit.from_datasets(
+            tuple(datasets),
+            assignments=(
+                first,
+                replace(
+                    second,
+                    partition=DeploymentDatasetPartition.TEST,
+                    scenario_family="different",
+                    geometry_group="different",
+                ),
+            ),
+        )
 
 
 @pytest.mark.parametrize(

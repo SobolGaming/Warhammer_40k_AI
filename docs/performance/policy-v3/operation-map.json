@@ -35542,6 +35542,19 @@
       "sensitive": false,
       "mandatory": true
     },
+    "deployment-dataset-partitions": {
+      "paths": [
+        "src/warhammer40k_core/ai/deployment_dataset_split.py",
+        "tests/infrastructure/adapters/test_runner_accounting.py",
+        "tests/infrastructure/adapters/test_deployment_experiment.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "hosted-timing-calibration": {
       "paths": [
         "scripts/hosted_timing_calibration.py",
