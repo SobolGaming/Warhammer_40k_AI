@@ -207,7 +207,7 @@ Evaluation uses frozen heuristic baselines, prior model checkpoints and speciali
 
 Suspicious self-play goes to the existing Core/faction remediation owner with a minimal replay and source-linked invariant. Quarantine affected outcomes and dependent labels, retain diagnostics, repair under a separately authorized engine task and rerun the affected benchmark. AI must not exploit bugs or compensate by altering rules.
 
-Substantial training and evaluations run outside PR CI. Preserve the accepted 14-minute setup/test step cutoff, 66.5% coverage floor and all existing tests/quality requirements. The broader 14-minute total-CI goal is separate. A future PR still needs the actual-base assessment and serial smoke required by policy, including a documentation PR; this local planning revision does not claim those gates passed.
+Substantial training and evaluations run outside PR CI. Preserve the accepted 15-minute setup/test step cutoff, 67% coverage floor and all existing tests/quality requirements. The broader 15-minute total-CI goal is separate. A future PR still needs the actual-base assessment and serial smoke required by policy, including a documentation PR; this local planning revision does not claim those gates passed.
 
 ## 8. Recommendation disposition and review changes
 

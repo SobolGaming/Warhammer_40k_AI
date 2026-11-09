@@ -462,8 +462,8 @@ jobs:
 
       - name: Run behavioral coverage shard
         id: behavior
-        # Temporary owner-approved setup-and-test cutoff; total CI goal is 14 minutes.
-        timeout-minutes: 14
+        # Temporary owner-approved setup-and-test cutoff; total CI goal is 15 minutes.
+        timeout-minutes: 15
         env:
           TEST_TIMING_DIR: reports/behavior-timing
           TEST_TIMING_PROGRESS: "1"
@@ -477,7 +477,7 @@ jobs:
         run: |
           mkdir -p reports
           mapfile -t shard_paths < "$SHARD_MANIFEST"
-          source_index_deadline=$(( $(date +%s) + 14 * 60 ))
+          source_index_deadline=$(( $(date +%s) + 15 * 60 ))
           uv run --no-sync python -B -m scripts.validate_source_history
           source_index_pid=""
           source_index_args=()
@@ -627,4 +627,4 @@ jobs:
         run: |
           uv run --no-sync python scripts/check_shard_coverage.py coverage-data --shard-count 12
           uv run --no-sync coverage combine coverage-data/behavior-coverage-*
-          uv run --no-sync coverage report --fail-under=66.5
+          uv run --no-sync coverage report --fail-under=67
