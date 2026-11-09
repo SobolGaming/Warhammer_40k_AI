@@ -42,3 +42,4 @@ tests/code_quality/test_registered_source_scopes.py
 tests/code_quality/test_banshee_eldrad_source.py
 tests/code_quality/test_starfang_source_policy.py
 tests/code_quality/test_later_ir_icon_source.py
+tests/code_quality/test_behavioral_deadline.py

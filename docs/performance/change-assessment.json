@@ -2,15 +2,65 @@
   "policy": "rules-engine-performance-v3",
   "base": "1e9f2170529bdd2609d05177bdda011950004335",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5c2a39a910500c85b2f56adc78b8c05147188a444c1137bd65a2beb04846dfb5",
-  "operation_map_sha256": "cfae5df2478c7f783a7cd853123eaa47e76275c1d6cf97c2b4effddb2d08e199",
+  "operation_map_sha256": "cf9e73e3ff987a56390e20bdf3860eb1a7a0df7440797c43c23c5b53e947d665",
   "changes": {
+    ".github/workflows/ci.yml": {
+      "before_sha256": "e13e2fa7df19d7a0e852b55de36e54af18dfc6c4d40fa2b8f6a45984303dfb16",
+      "after_sha256": "6bbe0d42253f920cdf57a008d622c0b203fb59372db224206cc636cf6fa77d06",
+      "owners": {
+        "@document": {
+          "before": "e13e2fa7df19d7a0e852b55de36e54af18dfc6c4d40fa2b8f6a45984303dfb16",
+          "after": "6bbe0d42253f920cdf57a008d622c0b203fb59372db224206cc636cf6fa77d06"
+        }
+      }
+    },
+    "AGENTS.md": {
+      "before_sha256": "400f86357067ffbaecedb22d4a582ed083a26dcf4cf5de036d208ee7330e7a42",
+      "after_sha256": "ad3d947ff75713b004de037a26600ce00b6ab5db44b9862a089092580da3c49c",
+      "owners": {
+        "@document": {
+          "before": "400f86357067ffbaecedb22d4a582ed083a26dcf4cf5de036d208ee7330e7a42",
+          "after": "ad3d947ff75713b004de037a26600ce00b6ab5db44b9862a089092580da3c49c"
+        }
+      }
+    },
     "README.md": {
       "before_sha256": "495c65f89d1461a0cb1a0de4bbb8a45b2575528fc40dc222a02c989668fbf28c",
-      "after_sha256": "86b725f2fa7deb4c9cdff369f11c267d7316f1e23cff638a347e1a6b32a0befa",
+      "after_sha256": "6e2de7dda72a7c394ed50235beff89028c9e9c9592d9732c963c67059984c06c",
       "owners": {
         "@document": {
           "before": "495c65f89d1461a0cb1a0de4bbb8a45b2575528fc40dc222a02c989668fbf28c",
-          "after": "86b725f2fa7deb4c9cdff369f11c267d7316f1e23cff638a347e1a6b32a0befa"
+          "after": "6e2de7dda72a7c394ed50235beff89028c9e9c9592d9732c963c67059984c06c"
+        }
+      }
+    },
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "4e29a0d2543402b81b57df0336e7e8bd9839aef4b30c8ebe00a6554ab0c994a9",
+      "after_sha256": "4ce39c898fcea5fdcaaafeae6c372777479a7f260e34f96a63781381b6218c67",
+      "owners": {
+        "@document": {
+          "before": "4e29a0d2543402b81b57df0336e7e8bd9839aef4b30c8ebe00a6554ab0c994a9",
+          "after": "4ce39c898fcea5fdcaaafeae6c372777479a7f260e34f96a63781381b6218c67"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4-modules.txt": {
+      "before_sha256": "7cf1017f20b086efdf1aa59545405a1ee9d1070aade88f1d5d1808f0b6739a60",
+      "after_sha256": "326fbf6a1e85a4566684e09daaf8c2d99d2b847206124c7e23283610a1abd2ff",
+      "owners": {
+        "@document": {
+          "before": "7cf1017f20b086efdf1aa59545405a1ee9d1070aade88f1d5d1808f0b6739a60",
+          "after": "326fbf6a1e85a4566684e09daaf8c2d99d2b847206124c7e23283610a1abd2ff"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "before_sha256": "a3fbdc7441e76d2b3657ea74ced5a445f2643953e6db09d788b8210f02efe663",
+      "after_sha256": "69641fe3334df3e023ff3c7368c7e7209ff411be1e7a61b64e85b83563127f8f",
+      "owners": {
+        "@document": {
+          "before": "a3fbdc7441e76d2b3657ea74ced5a445f2643953e6db09d788b8210f02efe663",
+          "after": "69641fe3334df3e023ff3c7368c7e7209ff411be1e7a61b64e85b83563127f8f"
         }
       }
     },
@@ -154,23 +204,226 @@
         }
       }
     },
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+      "before_sha256": "b34460c76fbf29206a85b2fe7ea5bc5a3224a8abdcca4d9501d671093dff6a32",
+      "after_sha256": "8dd1274dbb6dea216e6da691549746977d9273bc4524a07271b5bb8d4da5f52b",
+      "owners": {
+        "@document": {
+          "before": "b34460c76fbf29206a85b2fe7ea5bc5a3224a8abdcca4d9501d671093dff6a32",
+          "after": "8dd1274dbb6dea216e6da691549746977d9273bc4524a07271b5bb8d4da5f52b"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "439bcc0c19ab88cf56b6296509a4c6f4a8f97cfbc073ed4baf4189cc4df596dc",
+      "after_sha256": "55e2f7fe3033b2f97ed2b5f8d3ff322db65f7c4b8791638777974c8c95034454",
+      "owners": {
+        "@document": {
+          "before": "439bcc0c19ab88cf56b6296509a4c6f4a8f97cfbc073ed4baf4189cc4df596dc",
+          "after": "55e2f7fe3033b2f97ed2b5f8d3ff322db65f7c4b8791638777974c8c95034454"
+        }
+      }
+    },
+    "scripts/behavioral_deadline.py": {
+      "before_sha256": null,
+      "after_sha256": "4ea3b32022b9bf12959c36d022cbc0e0a81ed26512a7c49876bdaa0870b306e8",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "40b9c41777554adfff4fb70b59dfb63eb70917560e01f36049e2b186951b29f6"
+        },
+        "approved": {
+          "before": null,
+          "after": "a263369b22e070c7353aa012461d71b2d9168e1966cce4f46c54a5f5c229bd43"
+        },
+        "main": {
+          "before": null,
+          "after": "db564ee8aa27028af96a4c6836c296333484273605d312fa8d5098bfb253827d"
+        },
+        "snapshot_coverage": {
+          "before": null,
+          "after": "f2c983e240360f8dfdb4bbde531f954800f7cabc8ede45a63cb09c624bdafee8"
+        },
+        "supervise": {
+          "before": null,
+          "after": "cb5eebbba158a4cccf6df4606618af6c38daba7d4fae6139c72f15c780958ed1"
+        },
+        "termination_due": {
+          "before": null,
+          "after": "a6e199511a1416a9368593ae9ae7663458249f310b10587fdcdbd692764c8f5b"
+        }
+      }
+    },
+    "scripts/ci_attribution_supervisor.py": {
+      "before_sha256": "efbb32849dbe057f8a7df57c76be881ec69f1353da4d80a018850ee802e05cb9",
+      "after_sha256": "73d345db49d06dc20c8d5d0d9a89957a9229893007329922123931012f003b41",
+      "owners": {
+        "cleanup": {
+          "before": "f34da8c9e35c2295731e824944cca25476e6a1656cbd05960f61450228aed128",
+          "after": "8df00a628c92b832d2289e29962d40b677a699184f592d2bfabb0e73c4d79870"
+        }
+      }
+    },
+    "scripts/ci_source_index.py": {
+      "before_sha256": "8a8d7c4cde41ecbc9d575c1a44b47a4c7690e197a197535d1547bdfc63ef1a33",
+      "after_sha256": "037ef5be429aec8abdcb2093453fc671607830827949266f9c69ffa5d5420a80",
+      "owners": {
+        "BuildGate": {
+          "before": "a73527b75507bc8db3e20bc5d82d594de55ed9e292953e41cf6f805dcb00344a",
+          "after": "1632f9d6f59dbdb2d6c3640050b8c52021ee48dd3793f6e69f06ad935e891fe2"
+        },
+        "BuildGate.wait": {
+          "before": "ec9fce4f13d6ad82cdde8dd954c08724b5e2897b37d288180fa3d8641b5ddb71",
+          "after": "145fb3865f31fa5d07acd73829efa7766ec3644351057818dfd743c3488b425f"
+        },
+        "pytest_addoption": {
+          "before": "931ded419063d528928cc6235c8a7f12a61cec0e538f30188dba2ff13b2c22f5",
+          "after": "5c8e81f101a35481823bc9a1466611c9fb6a03bfab240ea75cdcc0ec83225a6e"
+        },
+        "pytest_configure": {
+          "before": "d49aa162196151f80703908681381aac7fec95956d4ed06412c8bb3fb1dc7cfa",
+          "after": "1b390b3132e9feb0958081fa0df067096d58fe28e335439ec4f07d823e87f3d2"
+        }
+      }
+    },
+    "scripts/run_behavioral_coverage.sh": {
+      "before_sha256": null,
+      "after_sha256": "c7137faa1d952e3b8ca4c02ff5b6ce3d81c3f44515a698af5d5f5e1da416dd01",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c7137faa1d952e3b8ca4c02ff5b6ce3d81c3f44515a698af5d5f5e1da416dd01"
+        }
+      }
+    },
+    "tests/code_quality/test_behavioral_deadline.py": {
+      "before_sha256": null,
+      "after_sha256": "2723adae0e6f3611d16aa688fe929780ca2cc3cc29d9f73bd51400c886a720bc",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "7cac9c777638593881ed06948010f5ff2d568b2b7d00cdbe927e7915e6796a25"
+        },
+        "test_approval_and_execution_boundaries_are_independent": {
+          "before": null,
+          "after": "12e7dd54c31cd292a9af556c178212623036d8c985566f259d935ee2452797b3"
+        },
+        "test_cancellation_after_workload_exit_fails_approval": {
+          "before": null,
+          "after": "18de80c829f40ccaf4815be03734a4fd2dc6956c128296e0f6e70a39bc626a50"
+        },
+        "test_execution_timeout_stops_descendants_and_preserves_only_available_partial_results": {
+          "before": null,
+          "after": "180590210895d15430509e3637f67d5a736b96674eca0f294654a171501dda46"
+        },
+        "test_hosted_workload_uses_supervisor_and_preserves_diagnostics": {
+          "before": null,
+          "after": "cec26afb27bbeeb7b11bffcbe5ce2f44dc276db11db1b2390162d4ac68721e61"
+        },
+        "test_late_passing_pytest_keeps_complete_reports_and_coverage_but_fails_approval": {
+          "before": null,
+          "after": "e973279a8ceff009d8d0a49dd0d151cb4ad80fcfc8ef6937c47c13ba9c50574b"
+        },
+        "test_source_index_barrier_consumes_the_shared_monotonic_deadline": {
+          "before": null,
+          "after": "f71bfc955a6075d0d8d0272eebd738e5f367237e378a5ee5154ccf7d5566de13"
+        },
+        "test_successful_short_workload_is_approved": {
+          "before": null,
+          "after": "46446ee5db4dbc280becc61c00ee0a55aeb4ec3e58d0a9e36be5a6f87a6584fa"
+        }
+      }
+    },
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "before_sha256": "2b76e3ff85a9708810c246f4c2954309507a82b1468b36f9d7cf07e9dcd21eb6",
+      "after_sha256": "7153158d2a95dea16d131a453b547984198a9b0f9be2ad03c82e0b56883d2535",
+      "owners": {
+        "test_cold_source_index_overlaps_startup_inside_the_unchanged_deadline": {
+          "before": "b7fedddfe196da16b40ffae24cbf00064261d675af41caec79e40c24115868ce",
+          "after": "5f137fabcfb00f288dae812748d071713eb06a3bfc7ec1d2bcee5c91abbacdfb"
+        }
+      }
+    },
+    "tests/code_quality/test_quality_runtime.py": {
+      "before_sha256": "64b68643fb3b867db3dac35435c68f3164406412508a9c1b7267e76dfa43d073",
+      "after_sha256": "014f6e1473c6d35e8a497be75780c73c7bad395417ddab669f2b3a3d4b3cb132",
+      "owners": {
+        "test_live_workflow_preserves_required_names_and_all_four_producer_controls": {
+          "before": "77a58d03e22d2c31747612929dbbebf2ba5a92ac78f21c25defc7886fc87e1e2",
+          "after": "392b2e90242bc784b51badc0f41ca7dcfa89263b90e6d612237ae68754d19e77"
+        }
+      }
+    },
+    "tests/code_quality/test_section08_native_mission_source.py": {
+      "before_sha256": "1e8696112b6a6cce2a7dde0053b103febf716b626db6bccb9fe5b6373837d1b7",
+      "after_sha256": "7b9051ec479f41172350e843ae9799c1560799f0677aa595ac83b782a82192b7",
+      "owners": {
+        "test_source_history_guard_precedes_index_and_covered_pytest": {
+          "before": "66ef55e74c663c678cda0717423f91c929f0972e291758c63d7bf835dd905438",
+          "after": "6e292f530b2c3881a12adfa631cbd5eace5fbf9dce34f905617babe149a7f4e8"
+        }
+      }
+    },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "71afe1655bfebfd762acf43633f4849b198f288df0b65acaeddfc3e18835ccee",
-      "after_sha256": "2d7cca0047a1f760e247a0edb2ae0850b7c89a9f7048748e2ceb1659f4029404",
+      "after_sha256": "c88bf4d7576aa4fe642c1f7db90aceb1cd03346f265135d753c97b3e57af2888",
       "owners": {
         "@document": {
           "before": "71afe1655bfebfd762acf43633f4849b198f288df0b65acaeddfc3e18835ccee",
-          "after": "2d7cca0047a1f760e247a0edb2ae0850b7c89a9f7048748e2ceb1659f4029404"
+          "after": "c88bf4d7576aa4fe642c1f7db90aceb1cd03346f265135d753c97b3e57af2888"
         }
       }
     }
   },
   "rows": {
+    ".github/workflows/ci.yml": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavioral-worker-progress",
+        "covered-shard-workload"
+      ],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+    },
+    "AGENTS.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
     "README.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
+    "ci/quality_shards/shard-4-modules.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
       "source_obligation": "",
       "unchanged_work": ""
     },
@@ -180,9 +433,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/hosted-calibration.json": {
       "category": "rule_semantics",
@@ -191,9 +444,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -201,9 +454,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -211,9 +464,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -221,9 +474,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -231,9 +484,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -241,9 +494,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -251,9 +504,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -261,9 +514,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -271,9 +524,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -281,9 +534,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -291,9 +544,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -301,9 +554,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -311,9 +564,103 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+    },
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
+    "scripts/behavioral_deadline.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "covered-shard-deadline-controller"
+      ],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+    },
+    "scripts/ci_attribution_supervisor.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci-diagnostic-ci-attribution-supervisor"
+      ],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+    },
+    "scripts/ci_source_index.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci-source-index-startup"
+      ],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+    },
+    "scripts/run_behavioral_coverage.sh": {
+      "category": "rule_semantics",
+      "operations": [
+        "covered-shard-workload"
+      ],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+    },
+    "tests/code_quality/test_behavioral_deadline.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "covered-shard-deadline-regression"
+      ],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+    },
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci-source-index-deadline-guard"
+      ],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+    },
+    "tests/code_quality/test_quality_runtime.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci69-qualification-791593bfe3358a4b2494de163105067ce4a8b0311cd0f91b15629ec6395d030a"
+      ],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+    },
+    "tests/code_quality/test_section08_native_mission_source.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "",
+      "unchanged_work": ""
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -321,9 +668,9 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
-      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
-      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
+      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
     }
   },
   "milestone": "ordinary",

@@ -284,11 +284,31 @@ gate after every shard succeeds. Full type checking and architecture checks also
 in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
 format for a shorter edit/commit loop.
 
-The temporary CI goal is 15 minutes in total. Each behavioral shard has a 900-second
-cutoff covering source-index setup and its covered test run. The separate complete
-performance command remains limited to 180 seconds, and quality lanes retain their
-600-second limit. Report actual end-to-end time and queue overhead; a per-step
-cutoff does not establish that the total goal passed.
+Each covered behavioral shard must finish successfully within 18 minutes
+(1,080 seconds, inclusive) for approval. Timing alone does not terminate it then:
+the supervisor permits execution through exactly 30 minutes and terminates the
+workload process group only after 1,800 seconds. A passing workload that finishes
+after 18 minutes still fails the gate while retaining its complete results.
+Source-history validation, cold index construction, the isolated mirror, parallel
+tests and their report finalization all run inside the same supervisor clock.
+Approval uses observed workload completion; later supervisor log replay and
+diagnostic copying have a separately recorded elapsed time. Abnormal exit or
+controller cancellation also cleans up the owned process group and fails approval.
+
+The workflow's 32-minute outer safety guard leaves cleanup/reporting grace beyond
+the controller's execution allowance; it is not an approval threshold. Reports
+always include the supervisor's elapsed time, exit status and termination reason,
+the covered-work log, available JUnit and timing journals. On termination or workload failure, available
+coverage files/fragments are copied under reports/partial-coverage as diagnostics;
+they are not promoted to complete coverage. Report uploads include hidden coverage
+files. Missing complete coverage and any late/failed shard keep the combined gate
+failed. No complete result is fabricated for a terminated process.
+
+The isolated mirror's existing 120-second bound, separate 180-second performance
+command, 600-second quality limits, twelve shards, and 67% branch floor remain
+unchanged. Record actual observed completion times separately from configured
+limits. Historical fifteen-minute timeout receipts remain historical failures;
+their configured limit is not an unobserved test completion duration.
 
 The current owner-approved coverage floor is 67%; later coverage work must restore 85%. The full
 warhammer40k_core package and branch metric remain unchanged, with no added coverage
@@ -336,14 +356,14 @@ run together so pytest can reuse module-scoped fixtures. Worker assignments and
 capacities remain unchanged. Modules start in descending order of their longest
 case, with descending case costs inside each module and original collection order
 breaking ties. Later work stealing can still split a module group. This scheduling
-change preserves every case and does not certify the fifteen-minute CI goal.
+change preserves every case and does not certify the eighteen-minute approval goal.
 
 Session startup, source-index setup, reporting and runner queues are assessed
 separately. Weight totals are planning inputs, not job wall times or proof of the
-temporary fifteen-minute CI goal. Existing observation-based estimates do not
+eighteen-minute approval goal. Existing observation-based estimates do not
 relax the complete-profile validation below.
 
-Cold selected-source construction stays inside that same fifteen-minute step and
+Cold selected-source construction stays inside the same supervised covered workload and
 overlaps pytest startup and collection. The controller admits no test execution
 until construction succeeds with a completion record bound to the exact input key
 and index path. Failure, malformed completion and deadline expiry stop dispatch.
@@ -430,8 +450,8 @@ formula retains every older slower admitted observation. All current cases have
 admitted observations, with no baseline-only cases.
 
 Fixture setup observations are worker/order dependent; taking maxima and regrouping
-does not establish new fixture multiplicity, hosted wall time or the fifteen-minute
-goal. Existing module grouping, twelve shards, four-worker dispatch, the cold
+does not establish new fixture multiplicity, hosted wall time or the eighteen-minute
+approval goal. Existing module grouping, twelve shards, four-worker dispatch, the cold
 shard-1 role, isolated mirror limit and full coverage requirements remain unchanged.
 Fresh complete correctness/coverage qualification remains mandatory. `--check`
 re-derives every planning cost/selector and the sidecar digest; worker dispatch
@@ -455,11 +475,11 @@ not substitute file averages for missing case costs. Shard assignment separately
 accounts for the mirror's serial execution, retaining measured times unchanged
 and recording the four-worker execution model. Missing, negative, nonfinite or
 boolean weights fail closed; measurements rounded to zero remain valid. Finite S25 case validation,
-the complete selected inventory and the fifteen-minute deadline remain mandatory.
+the complete selected inventory and the eighteen-minute approval deadline remain mandatory.
 
 Behavioral lanes log keyed cold-index start/completion and elapsed construction time.
 A case exceeding three minutes emits thread stacks and continues under the existing
-fifteen-minute step cutoff.
+thirty-minute execution allowance.
 
 Both Python CI lanes upload JUnit, slowest-test output, and per-worker JSON timing
 artifacts containing collection node IDs, collection time, setup/call/teardown times,
@@ -484,7 +504,7 @@ completion of subsequent reporting or process shutdown. The existing final worke
 `.json` payload and calibration admission remain unchanged; `.jsonl` progress is
 never a substitute for a complete timing receipt or a passing test/CI outcome.
 The journal changes neither scheduling nor case selection, worker counts,
-coverage requirements or the fifteen-minute cutoff.
+coverage requirements or the supervisor's approval/execution policy.
 
 `quality-fast` now aggregates concurrent lint, contract/conformance, code-quality,
 and the existing macOS semantic audit. Every child must succeed, including on draft

@@ -188,6 +188,15 @@ An unresolved computation or timeout must never become a visibility/rules answer
 
 Stubs are allowed only for pure functions and must be marked `stubbed`.
 
+Covered behavioral CI approval requires successful completion within 18 minutes
+(1,080 seconds inclusive). Timing alone must not terminate a workload until elapsed
+time exceeds 30 minutes (1,800 seconds). Preserve complete results for late passing
+workloads but fail approval; preserve available partial diagnostics on termination.
+The controller includes source history, index construction, mirror, parallel tests
+and test reporting. A longer outer safety guard is cleanup grace, not approval.
+Keep twelve shards, existing tests, the 67% branch floor, mirror 120-second bound,
+serial smoke 180-second bound and quality 600-second limits unchanged.
+
 Final validation runs the complete behavioral suite **once with coverage**, then
 all code-quality tests once without coverage, using the commands below. Do not
 repeat the behavioral suite without coverage as a second final gate. Both suites

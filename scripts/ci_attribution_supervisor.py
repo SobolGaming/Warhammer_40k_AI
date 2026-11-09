@@ -17,7 +17,11 @@ def signal_group(pid: int, signum: int) -> bool:
     return True
 
 
-def cleanup(process: subprocess.Popen, grace: float = 2.0, kill_grace: float = 2.0) -> bool:
+def cleanup(
+    process: subprocess.Popen[bytes] | subprocess.Popen[str],
+    grace: float = 2.0,
+    kill_grace: float = 2.0,
+) -> bool:
     """Reap the leader and prove group absence, or fail within the cleanup deadline."""
     process.poll()  # Reaps an already exited direct child.
     remained = signal_group(process.pid, signal.SIGTERM)
