@@ -103,6 +103,8 @@ class RunReport:
     elapsed_seconds: float
     manifest: RunManifest | None
     failure_reason: str | None
+    final_checkpoint_hash: str | None
+    final_record_count: int
 
     def to_payload(self) -> dict[str, JsonValue]:
         """Detached diagnostics for trusted operators, never a player projection."""
@@ -110,13 +112,15 @@ class RunReport:
             dict[str, JsonValue],
             validate_json_value(
                 {
-                    "schema": "bounded-player-policy-report-v2",
+                    "schema": "bounded-player-policy-report-v3",
                     "run_id": self.run_id,
                     "manifest": None if self.manifest is None else self.manifest.to_payload(),
                     "stop_reason": self.stop_reason,
                     "failure_reason": self.failure_reason,
                     "decisions": [asdict(attempt) for attempt in self.decisions],
                     "elapsed_seconds": self.elapsed_seconds,
+                    "final_checkpoint_hash": self.final_checkpoint_hash,
+                    "final_record_count": self.final_record_count,
                 }
             ),
         )
@@ -157,6 +161,10 @@ class BoundedPolicyRunner:
             perf_counter() - self._started,
             self._manifest,
             self._failure_reason,
+            None
+            if self._manifest is None
+            else payload_digest(self._session.to_persistence_payload()),
+            self._session.decision_record_count(),
         )
 
     def _fail(self, message: str, reason: str | None = None) -> RunnerError:
@@ -201,9 +209,10 @@ class BoundedPolicyRunner:
             self._manifest = RunManifest(
                 canonical_json(
                     {
-                        "schema": "bounded-player-policy-run-v2",
+                        "schema": "bounded-player-policy-run-v3",
                         "engine_build_id": current_engine_build_id(),
                         "initial_checkpoint": payload_digest(checkpoint),
+                        "initial_record_count": self._session.decision_record_count(),
                         "session_identity": identity,
                         "router_identity": self._router.identity,
                         "declared_registrations": self._router.to_manifest_payload(),

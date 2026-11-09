@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 
+from tests.shared.ai_training_admission_helpers import step
 from tests.shared.category_migration.phase18f_session_commands import (
     _compact_terminal_config,
     _deployment_payload_from_proposal,
@@ -31,6 +32,15 @@ from warhammer40k_core.ai.runner import (
     RunnerError,
     RunReport,
 )
+from warhammer40k_core.ai.runner_admission import DeploymentDatasetAdmission, RunnerAdmission
+from warhammer40k_core.ai.training_admission import (
+    FiniteEpisodeAdmission,
+    TrainingAdmissionError,
+    VerifiedEpisodeOrigin,
+)
+from warhammer40k_core.ai.training_candidates import FiniteTrainingCandidateLink
+from warhammer40k_core.ai.training_targets import TargetEpisodeEnd
+from warhammer40k_core.ai.training_transitions import FiniteAcceptedTransition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import LifecycleStatusKind
@@ -202,6 +212,7 @@ def test_ordinary_recorded_movement_rejection_is_not_an_accepted_choice() -> Non
         )
     )
     status = session.advance_until_decision_or_terminal()
+    prefix_session: LocalGameSession | None = None
     for index in range(40):
         request = status.decision_request
         assert request is not None
@@ -224,6 +235,7 @@ def test_ordinary_recorded_movement_rejection_is_not_an_accepted_choice() -> Non
             if context.route.decision_type == "select_movement_unit":
                 chosen = context.request["options"][0]["option_id"]
             elif context.route.decision_type == "select_movement_action":
+                prefix_session = session.fork()
                 chosen = "normal_move"
             status = session.submit_viewer_option(
                 viewer=ViewerContext.for_player(request.actor_id),
@@ -255,6 +267,7 @@ def test_ordinary_recorded_movement_rejection_is_not_an_accepted_choice() -> Non
                 }
             )
 
+    checkpoint = session.fork()
     before = session.decision_record_count()
     with pytest.raises(RunnerError, match="invalid submission") as caught:
         BoundedPolicyRunner(
@@ -268,6 +281,16 @@ def test_ordinary_recorded_movement_rejection_is_not_an_accepted_choice() -> Non
             ),
             limits=RunLimits(13, 2, 120),
         ).run()
+    admission = admit(caught.value.report, checkpoint, session)
+    dataset = DeploymentDatasetAdmission.from_runs((admission,)).to_payload()
+    assert dataset["counts"] == {
+        "attempted_runs": 1,
+        "failed_runs": 1,
+        "attempted_choices": 1,
+        "submission_outcomes": {"accepted": 0, "rejected": 1, "unverified": 0, "not_submitted": 0},
+        "admitted_rows": 0,
+        "eligible_rows": 0,
+    }
     (attempt,) = caught.value.report.decisions
     assert caught.value.report.failure_reason == "submission_rejected"
     assert attempt.submission_outcome == "rejected"
@@ -283,3 +306,312 @@ def test_ordinary_recorded_movement_rejection_is_not_an_accepted_choice() -> Non
         .run()
         .reproduced_exactly
     )
+
+    # Repeat the ordinary final selection and rejection as one run so the
+    # accepted episode ends before the rejection's extra engine record.
+    assert prefix_session is not None
+    initial = prefix_session
+    before_move = initial.fork()
+    selection_request = initial.lifecycle.pending_decision_request()
+    assert selection_request is not None
+    assert selection_request.actor_id is not None
+    selection_view = initial.view(viewer_player_id=selection_request.actor_id)
+    selection_pending = selection_view["pending_decision"]
+    assert selection_pending is not None
+    choice_hash = payload_digest(
+        [
+            "player-policy-choice-v1",
+            13,
+            selection_view["game_id"],
+            selection_request.actor_id,
+            selection_pending["request_id"],
+        ]
+    )
+    selection_context = PlayerDecisionContext.from_view(
+        selection_view, choice_seed=int(choice_hash, 16)
+    )
+    before_move.submit_viewer_option(
+        viewer=ViewerContext.for_player(selection_request.actor_id),
+        request_id=selection_pending["request_id"],
+        option_id="normal_move",
+        result_id=f"ai:{choice_hash}",
+    )
+    before_move.advance_until_decision_or_terminal()
+
+    class SelectMovementPolicy:
+        def choose(self, context: PlayerDecisionContext) -> PolicyAction:
+            return context.select_option("normal_move")
+
+    final = initial.fork()
+    with pytest.raises(RunnerError, match="invalid submission") as failed_run:
+        BoundedPolicyRunner(
+            session=final,
+            router=PolicyRouter(
+                (
+                    PolicyRegistration(
+                        selection_context.route, "select-move-v1", "{}", SelectMovementPolicy()
+                    ),
+                    PolicyRegistration(
+                        context.route, "invalid-move-v1", "{}", InvalidMovementPolicy()
+                    ),
+                )
+            ),
+            limits=RunLimits(13, 3, 120),
+        ).run()
+    prefix_row = replace(
+        step(initial, "normal_move").row,
+        decision_record_id=before_move.lifecycle.decision_controller.records[
+            initial.decision_record_count()
+        ].record_id,
+    )
+    prefix_transition = FiniteAcceptedTransition.from_sessions(
+        FiniteTrainingCandidateLink.from_row(prefix_row, context=selection_context),
+        row=prefix_row,
+        context=selection_context,
+        before=initial,
+        after=before_move,
+        trajectory_id="rejected-movement-prefix",
+        perspective_player_id="player-a",
+    )
+    origin = VerifiedEpisodeOrigin.from_session(initial, config=initial.lifecycle.config)
+    prefix_episode = FiniteEpisodeAdmission.from_transitions(
+        origin,
+        transitions=(prefix_transition,),
+        final_session=before_move,
+        episode_end=TargetEpisodeEnd.TRUNCATED,
+        stop_reason="accepted-prefix-before-runner-failure",
+    )
+    joined = RunnerAdmission.from_report(
+        failed_run.value.report,
+        origin=origin,
+        initial_session=initial,
+        final_session=final,
+        attempt_sessions=(initial, before_move),
+        transitions=(prefix_transition,),
+        episode=prefix_episode,
+    )
+    assert (
+        prefix_episode.to_payload()["final_checkpoint_hash"]
+        != failed_run.value.report.final_checkpoint_hash
+    )
+    counts = cast(
+        dict[str, JsonValue], DeploymentDatasetAdmission.from_runs((joined,)).to_payload()["counts"]
+    )
+    assert counts["submission_outcomes"] == {
+        "accepted": 1,
+        "rejected": 1,
+        "unverified": 0,
+        "not_submitted": 0,
+    }
+    assert counts["failed_runs"] == 1
+
+
+def admit(report: RunReport, before: LocalGameSession, after: LocalGameSession) -> RunnerAdmission:
+    return RunnerAdmission.from_report(
+        report,
+        origin=VerifiedEpisodeOrigin.from_session(before, config=before.lifecycle.config),
+        initial_session=before,
+        final_session=after,
+        attempt_sessions=() if not report.decisions else (before,),
+    )
+
+
+@pytest.mark.parametrize(
+    "mode", ["valid", "exhausted", "drift", "invalid", "missing", "no-dispatch"]
+)
+def test_runner_admission_preserves_complete_supplied_run_denominators(mode: str) -> None:
+    session, route = session_and_route()
+    before = session.fork()
+    policy = ChoicePolicy(mode)
+    router = (
+        PolicyRouter(())
+        if mode == "missing"
+        else PolicyRouter((PolicyRegistration(route, "admitted-v1", "{}", policy),))
+    )
+    with pytest.raises(RunnerError) as caught:
+        BoundedPolicyRunner(
+            session=session,
+            router=router,
+            limits=RunLimits(13, 1, 1e-12 if mode == "no-dispatch" else 120),
+        ).run()
+    report = caught.value.report
+    receipt = admit(report, before, session)
+    payload = receipt.to_payload()
+    assert payload["report"] == report.to_payload()
+    assert report.final_checkpoint_hash == payload_digest(session.to_persistence_payload())
+    assert report.final_record_count == session.decision_record_count()
+    assert (
+        RunnerAdmission.from_payload(
+            json.loads(json.dumps(payload)),
+            report=report,
+            origin=VerifiedEpisodeOrigin.from_session(before, config=before.lifecycle.config),
+            initial_session=before,
+            final_session=session,
+            attempt_sessions=() if not report.decisions else (before,),
+        )
+        == receipt
+    )
+    dataset = DeploymentDatasetAdmission.from_runs((receipt, receipt))
+    counts = cast(dict[str, JsonValue], dataset.to_payload()["counts"])
+    assert counts["attempted_runs"] == counts["failed_runs"] == 2
+    assert counts["attempted_choices"] == 2 * len(report.decisions)
+    assert counts["eligible_rows"] == counts["admitted_rows"] == 0
+    assert (
+        DeploymentDatasetAdmission.from_payload(dataset.to_payload(), runs=(receipt, receipt))
+        == dataset
+    )
+    payload["report"] = None
+    assert receipt.to_payload()["report"] is not None
+    assert all(
+        set(c.__slots__) == {"route", "observation_json", "choice_seed"} for c in policy.contexts
+    )
+
+
+@pytest.mark.parametrize(
+    "change", ["seed", "request", "route", "count", "outcome", "checkpoint", "manifest", "omitted"]
+)
+def test_runner_admission_rejects_report_or_boundary_drift(change: str) -> None:
+    session, route = session_and_route()
+    before = session.fork()
+    with pytest.raises(RunnerError) as caught:
+        BoundedPolicyRunner(
+            session=session,
+            router=PolicyRouter((PolicyRegistration(route, "test-v1", "{}", ChoicePolicy()),)),
+            limits=RunLimits(13, 1, 120),
+        ).run()
+    report = caught.value.report
+    attempt = report.decisions[0]
+    if change == "seed":
+        report = replace(report, decisions=(replace(attempt, choice_seed=attempt.choice_seed + 1),))
+    elif change == "request":
+        report = replace(report, decisions=(replace(attempt, viewer_request_id="other"),))
+    elif change == "route":
+        report = replace(
+            report, decisions=(replace(attempt, route=replace(route, actor_id="player-b")),)
+        )
+    elif change == "count":
+        report = replace(report, decisions=(replace(attempt, recorded_decisions=0),))
+    elif change == "outcome":
+        report = replace(report, decisions=(replace(attempt, accepted=False),))
+    elif change == "checkpoint":
+        report = replace(report, final_checkpoint_hash="other")
+    elif change == "manifest":
+        report = replace(report, manifest=None)
+    else:
+        report = replace(report, decisions=())
+    with pytest.raises(TrainingAdmissionError):
+        admit(report, before, session)
+
+
+def test_runner_admission_keeps_successful_zero_choice_boundary() -> None:
+    session, route = session_and_route()
+    before = session.fork()
+    report = BoundedPolicyRunner(
+        session=session, router=PolicyRouter(()), limits=RunLimits(13, 1, 120)
+    ).run(stop_at=RunBoundary("setup", route.setup_step or "missing"))
+    receipt = admit(report, before, session)
+    counts = cast(
+        dict[str, JsonValue],
+        DeploymentDatasetAdmission.from_runs((receipt,)).to_payload()["counts"],
+    )
+    assert counts["attempted_runs"] == 1
+    assert counts["failed_runs"] == counts["attempted_choices"] == 0
+    payload = receipt.to_payload()
+    payload["unexpected"] = 1
+    with pytest.raises(TrainingAdmissionError, match="payload drifted"):
+        RunnerAdmission.from_payload(
+            payload,
+            report=report,
+            origin=VerifiedEpisodeOrigin.from_session(before, config=before.lifecycle.config),
+            initial_session=before,
+            final_session=session,
+            attempt_sessions=(),
+        )
+
+
+def test_runner_admission_keeps_failed_suffix_with_verified_accepted_prefix() -> None:
+    session, route = session_and_route()
+    before = session.fork()
+    policy = ChoicePolicy()
+    with pytest.raises(RunnerError, match="Unsupported exact") as caught:
+        BoundedPolicyRunner(
+            session=session,
+            router=PolicyRouter((PolicyRegistration(route, "prefix-v1", "{}", policy),)),
+            limits=RunLimits(13, 5, 120),
+        ).run()
+    report = caught.value.report
+    assert len(report.decisions) == 2
+    context = policy.contexts[0]
+    chosen = context.request["options"][0]["option_id"]
+    row = replace(
+        step(before, chosen).row,
+        decision_record_id=session.lifecycle.decision_controller.records[
+            before.decision_record_count()
+        ].record_id,
+    )
+    transition = FiniteAcceptedTransition.from_sessions(
+        FiniteTrainingCandidateLink.from_row(row, context=context),
+        row=row,
+        context=context,
+        before=before,
+        after=session,
+        trajectory_id="runner-prefix",
+        perspective_player_id="player-a",
+    )
+    origin = VerifiedEpisodeOrigin.from_session(before, config=before.lifecycle.config)
+    episode = FiniteEpisodeAdmission.from_transitions(
+        origin,
+        transitions=(transition,),
+        final_session=session,
+        episode_end=TargetEpisodeEnd.UNSUPPORTED,
+        stop_reason="unsupported_route",
+    )
+    receipt = RunnerAdmission.from_report(
+        report,
+        origin=origin,
+        initial_session=before,
+        final_session=session,
+        attempt_sessions=(before, session),
+        transitions=(transition,),
+        episode=episode,
+    )
+    payload = receipt.to_payload()
+    assert payload["episode_hash"] == episode.content_hash
+    assert payload["transition_hashes"] == [transition.content_hash]
+    counts = cast(
+        dict[str, JsonValue],
+        DeploymentDatasetAdmission.from_runs((receipt,)).to_payload()["counts"],
+    )
+    assert counts["attempted_choices"] == 2
+    assert counts["submission_outcomes"] == {
+        "accepted": 1,
+        "rejected": 0,
+        "unverified": 0,
+        "not_submitted": 1,
+    }
+    with pytest.raises(TrainingAdmissionError, match="episode"):
+        RunnerAdmission.from_report(
+            report,
+            origin=origin,
+            initial_session=before,
+            final_session=session,
+            attempt_sessions=(before, session),
+            transitions=(),
+            episode=episode,
+        )
+    with pytest.raises(TrainingAdmissionError, match="end contradicts"):
+        RunnerAdmission.from_report(
+            report,
+            origin=origin,
+            initial_session=before,
+            final_session=session,
+            attempt_sessions=(before, session),
+            transitions=(transition,),
+            episode=FiniteEpisodeAdmission.from_transitions(
+                origin,
+                transitions=(transition,),
+                final_session=session,
+                episode_end=TargetEpisodeEnd.TRUNCATED,
+                stop_reason="unsupported_route",
+            ),
+        )

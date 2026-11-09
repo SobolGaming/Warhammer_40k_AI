@@ -1,448 +1,586 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "1ee6ff0c82de8f2b6c75857cfd74a28060fd0ad3",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3417002e193efeb7abd0e44b48de763875b524fa69aed3f5d7225452c2e2f45c",
-  "operation_map_sha256": "c782fe4059a92a22cc26d867db5060e7cddc3fcc8be6baff62feda4ca6428348",
+  "base": "78403e226ef6915d49fb8a9f7751096fc4632e86",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5c2a39a910500c85b2f56adc78b8c05147188a444c1137bd65a2beb04846dfb5",
+  "operation_map_sha256": "28d83510c2b5693c46a1cfaa76588c3c416a674abeeda233822bed607d9a116a",
   "changes": {
-    "README.md": {
-      "before_sha256": "acc063a93b419973ef74e62bb2ce07f977be6cce81c238f9c4cef4efa4a71495",
-      "after_sha256": "d52bd5afc0c98df170cd246b83a26732525920d3bfd8ea037764e82d0dbc0b97",
+    ".github/workflows/ci.yml": {
+      "before_sha256": "fee4a71c601a61d75dbb3d4385da5317fc96ea577dd25e1992c3ddfe3712a741",
+      "after_sha256": "0b5c6a23c3c285cb48a32a653c532e8ba0c0b66e926be10dcc195ac4032a2b07",
       "owners": {
         "@document": {
-          "before": "acc063a93b419973ef74e62bb2ce07f977be6cce81c238f9c4cef4efa4a71495",
-          "after": "d52bd5afc0c98df170cd246b83a26732525920d3bfd8ea037764e82d0dbc0b97"
+          "before": "fee4a71c601a61d75dbb3d4385da5317fc96ea577dd25e1992c3ddfe3712a741",
+          "after": "0b5c6a23c3c285cb48a32a653c532e8ba0c0b66e926be10dcc195ac4032a2b07"
+        }
+      }
+    },
+    "README.md": {
+      "before_sha256": "d52bd5afc0c98df170cd246b83a26732525920d3bfd8ea037764e82d0dbc0b97",
+      "after_sha256": "487895d1d6cdb88ca6731d7eee27fd89db9687b4c699f38ccaa3fc8f80e1c061",
+      "owners": {
+        "@document": {
+          "before": "d52bd5afc0c98df170cd246b83a26732525920d3bfd8ea037764e82d0dbc0b97",
+          "after": "487895d1d6cdb88ca6731d7eee27fd89db9687b4c699f38ccaa3fc8f80e1c061"
+        }
+      }
+    },
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "312d60d1edf622cff5960ce0048bbe7ebfecbcc7df79e6f6afeddd15fe3664a6",
+      "after_sha256": "4e29a0d2543402b81b57df0336e7e8bd9839aef4b30c8ebe00a6554ab0c994a9",
+      "owners": {
+        "@document": {
+          "before": "312d60d1edf622cff5960ce0048bbe7ebfecbcc7df79e6f6afeddd15fe3664a6",
+          "after": "4e29a0d2543402b81b57df0336e7e8bd9839aef4b30c8ebe00a6554ab0c994a9"
+        }
+      }
+    },
+    "ci/quality_shards/shard-2.txt": {
+      "before_sha256": "9dfc0ee0a631ca07d1828df15414ebc36981a93d8fcea4b01cb9568d4afb6cf0",
+      "after_sha256": "3b4cc42316454754c8f9054fd3aabceb92dbd35955ec7451ff3de83b33ccef0b",
+      "owners": {
+        "@document": {
+          "before": "9dfc0ee0a631ca07d1828df15414ebc36981a93d8fcea4b01cb9568d4afb6cf0",
+          "after": "3b4cc42316454754c8f9054fd3aabceb92dbd35955ec7451ff3de83b33ccef0b"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "8ec3bb92a8d93ff42a68ad936606558269a8ca30487fe83e0a2fa4129ead4d58",
-      "after_sha256": "933e7ab239058f4e63098b5523a7d7d6703a2b1bc0b2915a9f0a351cbf227c86",
+      "before_sha256": "933e7ab239058f4e63098b5523a7d7d6703a2b1bc0b2915a9f0a351cbf227c86",
+      "after_sha256": "d2a809d15f16edb66c38f711aeabf64d135c9c8d4b1030459c4769ae6dd0b9a9",
       "owners": {
         "@document": {
-          "before": "8ec3bb92a8d93ff42a68ad936606558269a8ca30487fe83e0a2fa4129ead4d58",
-          "after": "933e7ab239058f4e63098b5523a7d7d6703a2b1bc0b2915a9f0a351cbf227c86"
+          "before": "933e7ab239058f4e63098b5523a7d7d6703a2b1bc0b2915a9f0a351cbf227c86",
+          "after": "d2a809d15f16edb66c38f711aeabf64d135c9c8d4b1030459c4769ae6dd0b9a9"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
-      "before_sha256": "32c6e9509c528fa6e21b5beed921c3f59d7c5c6c840cbbc5c37623b903524bf4",
-      "after_sha256": "107b9aa429ddd037c02d558a118df0b8ed52b2cc8bf9bf279eadf4481b224062",
+      "before_sha256": "107b9aa429ddd037c02d558a118df0b8ed52b2cc8bf9bf279eadf4481b224062",
+      "after_sha256": "5f8696b47f3520fce5155763f1d4c5ac6013e9e398013ac11b48a76f5b6a8717",
       "owners": {
         "@document": {
-          "before": "32c6e9509c528fa6e21b5beed921c3f59d7c5c6c840cbbc5c37623b903524bf4",
-          "after": "107b9aa429ddd037c02d558a118df0b8ed52b2cc8bf9bf279eadf4481b224062"
+          "before": "107b9aa429ddd037c02d558a118df0b8ed52b2cc8bf9bf279eadf4481b224062",
+          "after": "5f8696b47f3520fce5155763f1d4c5ac6013e9e398013ac11b48a76f5b6a8717"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "8855abcb35a4d2ce99ed31ca82cf6e9d3a549d9e2b895ce9fc4d9e5e14865669",
-      "after_sha256": "e8300c03d4534861909129462cb90e22fc384b02c9167324cecb4eddb721a3d8",
+      "before_sha256": "e8300c03d4534861909129462cb90e22fc384b02c9167324cecb4eddb721a3d8",
+      "after_sha256": "49e1ac4fc3beccd4d9ffefffe3bf572826887dbf4b2f5c852b62c25e797a4fae",
       "owners": {
         "@document": {
-          "before": "8855abcb35a4d2ce99ed31ca82cf6e9d3a549d9e2b895ce9fc4d9e5e14865669",
-          "after": "e8300c03d4534861909129462cb90e22fc384b02c9167324cecb4eddb721a3d8"
+          "before": "e8300c03d4534861909129462cb90e22fc384b02c9167324cecb4eddb721a3d8",
+          "after": "49e1ac4fc3beccd4d9ffefffe3bf572826887dbf4b2f5c852b62c25e797a4fae"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "550123216f82ef876ee394bee828ae26d16d00e075cee99501856039541cc044",
-      "after_sha256": "9047897ed5448ea78ce52a629d9f7c6a69c4daf3c59aba075ae7f99c76b87a23",
+      "before_sha256": "9047897ed5448ea78ce52a629d9f7c6a69c4daf3c59aba075ae7f99c76b87a23",
+      "after_sha256": "73af6859e2c719d30b123671ed95ffc5e3107bec6a94c37b22e35ab1c0c5a040",
       "owners": {
         "@document": {
-          "before": "550123216f82ef876ee394bee828ae26d16d00e075cee99501856039541cc044",
-          "after": "9047897ed5448ea78ce52a629d9f7c6a69c4daf3c59aba075ae7f99c76b87a23"
+          "before": "9047897ed5448ea78ce52a629d9f7c6a69c4daf3c59aba075ae7f99c76b87a23",
+          "after": "73af6859e2c719d30b123671ed95ffc5e3107bec6a94c37b22e35ab1c0c5a040"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "927fe262b0d7950c64eb69bdce5eca4366ea5729a4819dbea4c2153d530f3135",
-      "after_sha256": "5f0d288207bba28f1726d292ac84f85da4333a907d9811d64e224b9f3adefcb2",
-      "owners": {
-        "@document": {
-          "before": "927fe262b0d7950c64eb69bdce5eca4366ea5729a4819dbea4c2153d530f3135",
-          "after": "5f0d288207bba28f1726d292ac84f85da4333a907d9811d64e224b9f3adefcb2"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "b2edf95e6fbbd7ebfae3e583f5141a5652702f85c33fc859933f52ea088033c7",
-      "after_sha256": "a9cad866c8011a92f30fa1512e81b2677876719170ec5bb124bb49279f249036",
-      "owners": {
-        "@document": {
-          "before": "b2edf95e6fbbd7ebfae3e583f5141a5652702f85c33fc859933f52ea088033c7",
-          "after": "a9cad866c8011a92f30fa1512e81b2677876719170ec5bb124bb49279f249036"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "7464dfcd7b38d6f6994227abdeae159e33dac202eaf9dc8007c721d5ee0cdf7f",
-      "owners": {
-        "@document": {
-          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "7464dfcd7b38d6f6994227abdeae159e33dac202eaf9dc8007c721d5ee0cdf7f"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "81d778ae1901b9a717dbc485ee2da0e96086663b3f09cefeee67825a5e74c523",
+      "before_sha256": "5f0d288207bba28f1726d292ac84f85da4333a907d9811d64e224b9f3adefcb2",
       "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
       "owners": {
         "@document": {
-          "before": "81d778ae1901b9a717dbc485ee2da0e96086663b3f09cefeee67825a5e74c523",
+          "before": "5f0d288207bba28f1726d292ac84f85da4333a907d9811d64e224b9f3adefcb2",
           "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
         }
       }
     },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "d8d1f77a4558866f878b6128cc9af00be94f4a71247e5b5f3f22537fbf421fb2",
-      "after_sha256": "35153257760f6978bbc1202e7826e877866e1f3c3d1ea196fdc1406365082b0d",
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "a9cad866c8011a92f30fa1512e81b2677876719170ec5bb124bb49279f249036",
+      "after_sha256": "7df4dd6c6c00c29899c3eae1ee6942eb41e8a2da3b97104143eb62537e649682",
       "owners": {
         "@document": {
-          "before": "d8d1f77a4558866f878b6128cc9af00be94f4a71247e5b5f3f22537fbf421fb2",
-          "after": "35153257760f6978bbc1202e7826e877866e1f3c3d1ea196fdc1406365082b0d"
+          "before": "a9cad866c8011a92f30fa1512e81b2677876719170ec5bb124bb49279f249036",
+          "after": "7df4dd6c6c00c29899c3eae1ee6942eb41e8a2da3b97104143eb62537e649682"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "7464dfcd7b38d6f6994227abdeae159e33dac202eaf9dc8007c721d5ee0cdf7f",
+      "after_sha256": "b40a24ead88989fa458c0cdbf5339dc62bdd7fd0e0a06bb51f50d1b7612b8221",
+      "owners": {
+        "@document": {
+          "before": "7464dfcd7b38d6f6994227abdeae159e33dac202eaf9dc8007c721d5ee0cdf7f",
+          "after": "b40a24ead88989fa458c0cdbf5339dc62bdd7fd0e0a06bb51f50d1b7612b8221"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "c950a8d3fac4d2a01c20c1b7f5c2c44dd3a77b0b5e543a453ec7e0ee216b09ca",
+      "owners": {
+        "@document": {
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "c950a8d3fac4d2a01c20c1b7f5c2c44dd3a77b0b5e543a453ec7e0ee216b09ca"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "35153257760f6978bbc1202e7826e877866e1f3c3d1ea196fdc1406365082b0d",
+      "after_sha256": "9ae860baafebfcf6fa775a040c3920c5f15e795a78a14d8e9bb5f7b0c9ac76ff",
+      "owners": {
+        "@document": {
+          "before": "35153257760f6978bbc1202e7826e877866e1f3c3d1ea196fdc1406365082b0d",
+          "after": "9ae860baafebfcf6fa775a040c3920c5f15e795a78a14d8e9bb5f7b0c9ac76ff"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "c128ab22f224a112906e88b787d78e0086724d250bf819c215340c4fe087b11f",
-      "after_sha256": "c6fa42748066e7081ac0c7f56444e24a43ced181302df22b7fc602632793b4a4",
+      "before_sha256": "c6fa42748066e7081ac0c7f56444e24a43ced181302df22b7fc602632793b4a4",
+      "after_sha256": "29f331bae2d766edc097f6b8d84a30b3df5967f6304b0be35eac6dbac3afdb6d",
       "owners": {
         "@document": {
-          "before": "c128ab22f224a112906e88b787d78e0086724d250bf819c215340c4fe087b11f",
-          "after": "c6fa42748066e7081ac0c7f56444e24a43ced181302df22b7fc602632793b4a4"
+          "before": "c6fa42748066e7081ac0c7f56444e24a43ced181302df22b7fc602632793b4a4",
+          "after": "29f331bae2d766edc097f6b8d84a30b3df5967f6304b0be35eac6dbac3afdb6d"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "386a4c1ba37e2e37f3e437768186a0b6747f16ee2dad50571a3b915cc2fa97c3",
-      "after_sha256": "eb45604cea6c2574f6e5e22b88f26fe7260fb6080ae411ee88f8ff4971ff9ca7",
+      "before_sha256": "eb45604cea6c2574f6e5e22b88f26fe7260fb6080ae411ee88f8ff4971ff9ca7",
+      "after_sha256": "e6da45e19dbdb1bc2544a839acd45c0a58859ee5dacb6e6fa4163a4629c6bcc6",
       "owners": {
         "@document": {
-          "before": "386a4c1ba37e2e37f3e437768186a0b6747f16ee2dad50571a3b915cc2fa97c3",
-          "after": "eb45604cea6c2574f6e5e22b88f26fe7260fb6080ae411ee88f8ff4971ff9ca7"
+          "before": "eb45604cea6c2574f6e5e22b88f26fe7260fb6080ae411ee88f8ff4971ff9ca7",
+          "after": "e6da45e19dbdb1bc2544a839acd45c0a58859ee5dacb6e6fa4163a4629c6bcc6"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "a8c7689c6f29c12dafe46a6ebc0706c32414bb0f3541e3cc368b68cf55ecf3fb",
-      "after_sha256": "a406ecbafe30a2c82d9874311e37eb422d823d6ee75ad9b501ac6965555c23ea",
+      "before_sha256": "a406ecbafe30a2c82d9874311e37eb422d823d6ee75ad9b501ac6965555c23ea",
+      "after_sha256": "7ae2043c09f9a018676f910a6c8f8170adf57a942fe881bae888a8d4e102a2eb",
       "owners": {
         "@document": {
-          "before": "a8c7689c6f29c12dafe46a6ebc0706c32414bb0f3541e3cc368b68cf55ecf3fb",
-          "after": "a406ecbafe30a2c82d9874311e37eb422d823d6ee75ad9b501ac6965555c23ea"
+          "before": "a406ecbafe30a2c82d9874311e37eb422d823d6ee75ad9b501ac6965555c23ea",
+          "after": "7ae2043c09f9a018676f910a6c8f8170adf57a942fe881bae888a8d4e102a2eb"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "645d4189235dc9f5f9b1dc20de0156be9879785e6eafe05fd6a48504391cad9d",
-      "after_sha256": "7341f4582c1bfca28f9d8fc7178883d7053dcdb2db35fecd3b039604b99bab4b",
+      "before_sha256": "7341f4582c1bfca28f9d8fc7178883d7053dcdb2db35fecd3b039604b99bab4b",
+      "after_sha256": "680db5bc05934fb622b4469b7f31342d5e0e318c7246b8dc13e5f798392486de",
       "owners": {
         "@document": {
-          "before": "645d4189235dc9f5f9b1dc20de0156be9879785e6eafe05fd6a48504391cad9d",
-          "after": "7341f4582c1bfca28f9d8fc7178883d7053dcdb2db35fecd3b039604b99bab4b"
+          "before": "7341f4582c1bfca28f9d8fc7178883d7053dcdb2db35fecd3b039604b99bab4b",
+          "after": "680db5bc05934fb622b4469b7f31342d5e0e318c7246b8dc13e5f798392486de"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "b78b45cf98eb47b8568d72728fde7965561d629410ad5141c2b03f42d2f0a1ea",
-      "after_sha256": "f8dcc6c88773015399eceea798a4616769cc23a41c5fa5c434bde070cf740eb8",
+      "before_sha256": "f8dcc6c88773015399eceea798a4616769cc23a41c5fa5c434bde070cf740eb8",
+      "after_sha256": "2aac9ba12531b686e69bf9512630ad740a2eacaee48d2441b44d8e35471d99a0",
       "owners": {
         "@document": {
-          "before": "b78b45cf98eb47b8568d72728fde7965561d629410ad5141c2b03f42d2f0a1ea",
-          "after": "f8dcc6c88773015399eceea798a4616769cc23a41c5fa5c434bde070cf740eb8"
+          "before": "f8dcc6c88773015399eceea798a4616769cc23a41c5fa5c434bde070cf740eb8",
+          "after": "2aac9ba12531b686e69bf9512630ad740a2eacaee48d2441b44d8e35471d99a0"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "79add8435c6ca649076c9e9ebae946f00908b1d20769845fa5f2f8c7be4646cd",
-      "after_sha256": "ca464e8a6612c998f428af136d74a147914a0782fd1174b4aa17b5ec2ea46ce7",
+      "before_sha256": "ca464e8a6612c998f428af136d74a147914a0782fd1174b4aa17b5ec2ea46ce7",
+      "after_sha256": "64b2037c30bb8e8f9bcdae54e15a77f8b8ed33ec316f62b269c7271e683a910f",
       "owners": {
         "@document": {
-          "before": "79add8435c6ca649076c9e9ebae946f00908b1d20769845fa5f2f8c7be4646cd",
-          "after": "ca464e8a6612c998f428af136d74a147914a0782fd1174b4aa17b5ec2ea46ce7"
+          "before": "ca464e8a6612c998f428af136d74a147914a0782fd1174b4aa17b5ec2ea46ce7",
+          "after": "64b2037c30bb8e8f9bcdae54e15a77f8b8ed33ec316f62b269c7271e683a910f"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "93344b887b9e23749a2082cb8c64608443651075899d8f523265d6f8b1d9291a",
-      "after_sha256": "0473443bfbca1e00cf9b516e803c85413d5d60387eb479456843db71a2c50ddc",
+      "before_sha256": "0473443bfbca1e00cf9b516e803c85413d5d60387eb479456843db71a2c50ddc",
+      "after_sha256": "a4a81e74319d2494bdb28dbf4bf4efe4385313869916ae4ad1b4d51458881c37",
       "owners": {
         "@document": {
-          "before": "93344b887b9e23749a2082cb8c64608443651075899d8f523265d6f8b1d9291a",
-          "after": "0473443bfbca1e00cf9b516e803c85413d5d60387eb479456843db71a2c50ddc"
+          "before": "0473443bfbca1e00cf9b516e803c85413d5d60387eb479456843db71a2c50ddc",
+          "after": "a4a81e74319d2494bdb28dbf4bf4efe4385313869916ae4ad1b4d51458881c37"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "3403fb39354ff6f9ed92100db383faa9872f6e26502d3f28caf272b88872075b",
-      "after_sha256": "acfeff5a61d461e0ef63fcdb4ce6310cd916e796a4733aedd53ec163bacf3a5a",
+      "before_sha256": "acfeff5a61d461e0ef63fcdb4ce6310cd916e796a4733aedd53ec163bacf3a5a",
+      "after_sha256": "4038ffd0b962a780efeb366ae03d7bd8b6d9edd38361565d51194266a8374a37",
       "owners": {
         "@document": {
-          "before": "3403fb39354ff6f9ed92100db383faa9872f6e26502d3f28caf272b88872075b",
-          "after": "acfeff5a61d461e0ef63fcdb4ce6310cd916e796a4733aedd53ec163bacf3a5a"
+          "before": "acfeff5a61d461e0ef63fcdb4ce6310cd916e796a4733aedd53ec163bacf3a5a",
+          "after": "4038ffd0b962a780efeb366ae03d7bd8b6d9edd38361565d51194266a8374a37"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "d8142d1d3b911690c2d7043544587395d4cc73c23738c84f8f0baa4530bd3106",
-      "after_sha256": "b44c8597f8396768db301f7d9e9d61d7277649e617c4f3497f78e188fa9ba24f",
+      "before_sha256": "b44c8597f8396768db301f7d9e9d61d7277649e617c4f3497f78e188fa9ba24f",
+      "after_sha256": "5607732ed832af4cec6bf13779e9e47cf0b835cc3aa5dd2e7018595e46622a4b",
       "owners": {
         "@document": {
-          "before": "d8142d1d3b911690c2d7043544587395d4cc73c23738c84f8f0baa4530bd3106",
-          "after": "b44c8597f8396768db301f7d9e9d61d7277649e617c4f3497f78e188fa9ba24f"
+          "before": "b44c8597f8396768db301f7d9e9d61d7277649e617c4f3497f78e188fa9ba24f",
+          "after": "5607732ed832af4cec6bf13779e9e47cf0b835cc3aa5dd2e7018595e46622a4b"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "f7141824285d7c9c09173971e97aaf6869abd359b2597b11208aef3e7bdbf6c1",
-      "after_sha256": "e4b810dc7536934479e328829c4835e1d7c787b211e7986846ab6a57e2a70f2c",
+      "before_sha256": "e4b810dc7536934479e328829c4835e1d7c787b211e7986846ab6a57e2a70f2c",
+      "after_sha256": "3467db0b84621d26aaec3038ab3e7d0e7bb0dab123d7b8a06efdc1b780f4203a",
       "owners": {
         "@document": {
-          "before": "f7141824285d7c9c09173971e97aaf6869abd359b2597b11208aef3e7bdbf6c1",
-          "after": "e4b810dc7536934479e328829c4835e1d7c787b211e7986846ab6a57e2a70f2c"
+          "before": "e4b810dc7536934479e328829c4835e1d7c787b211e7986846ab6a57e2a70f2c",
+          "after": "3467db0b84621d26aaec3038ab3e7d0e7bb0dab123d7b8a06efdc1b780f4203a"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "14a91410e76273ae17f76a9117bfff4ddb27210700b3d334dd021d7ae0990d52",
-      "after_sha256": "5cac7614737b2568737d9692c1ba3525309d8aad2318970a0f5d0fca17763b0f",
+      "before_sha256": "5cac7614737b2568737d9692c1ba3525309d8aad2318970a0f5d0fca17763b0f",
+      "after_sha256": "1a6c51120a9fed9bcfecb6aa0d15993f07dff55a49b59cbcbc9f83bfca4097e6",
       "owners": {
         "@document": {
-          "before": "14a91410e76273ae17f76a9117bfff4ddb27210700b3d334dd021d7ae0990d52",
-          "after": "5cac7614737b2568737d9692c1ba3525309d8aad2318970a0f5d0fca17763b0f"
+          "before": "5cac7614737b2568737d9692c1ba3525309d8aad2318970a0f5d0fca17763b0f",
+          "after": "1a6c51120a9fed9bcfecb6aa0d15993f07dff55a49b59cbcbc9f83bfca4097e6"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "a2f8bc5bf577289649a4906d7604f2275346c30bc1bc54b2aca3138508f2e5a4",
-      "after_sha256": "0daebd97dbf56fe7237e91bec21dc9c013dd6bfd6e562440ed2d136e9c6a6cbd",
+      "before_sha256": "0daebd97dbf56fe7237e91bec21dc9c013dd6bfd6e562440ed2d136e9c6a6cbd",
+      "after_sha256": "d0bea3a593c98f8451459a1b43bba8fda2c75771113a75db61dfdd7b88de0fef",
       "owners": {
         "@document": {
-          "before": "a2f8bc5bf577289649a4906d7604f2275346c30bc1bc54b2aca3138508f2e5a4",
-          "after": "0daebd97dbf56fe7237e91bec21dc9c013dd6bfd6e562440ed2d136e9c6a6cbd"
+          "before": "0daebd97dbf56fe7237e91bec21dc9c013dd6bfd6e562440ed2d136e9c6a6cbd",
+          "after": "d0bea3a593c98f8451459a1b43bba8fda2c75771113a75db61dfdd7b88de0fef"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "c50d7cf82dd3e5f59872d8731f3d4a808625fa271189f65e5be0f48a40f6fdaa",
-      "after_sha256": "46b43e140a16a28268fddbafa20096601b77b5ccea9c4ee3111dbda06b6c4855",
+      "before_sha256": "46b43e140a16a28268fddbafa20096601b77b5ccea9c4ee3111dbda06b6c4855",
+      "after_sha256": "e37746e3fb42c153d6ddd24499e1f94af7a42a5ae6cd32753255b4c09b7b9884",
       "owners": {
         "@document": {
-          "before": "c50d7cf82dd3e5f59872d8731f3d4a808625fa271189f65e5be0f48a40f6fdaa",
-          "after": "46b43e140a16a28268fddbafa20096601b77b5ccea9c4ee3111dbda06b6c4855"
+          "before": "46b43e140a16a28268fddbafa20096601b77b5ccea9c4ee3111dbda06b6c4855",
+          "after": "e37746e3fb42c153d6ddd24499e1f94af7a42a5ae6cd32753255b4c09b7b9884"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "cd7dfa9a413ac9a6096652c04a7d425f2bde4c2719b999e8d7f1b6d09745599d",
-      "after_sha256": "096c82641fc6ff523d5613956d265bfb11af598366a15cdd2dc88e2875f87bb9",
+      "before_sha256": "096c82641fc6ff523d5613956d265bfb11af598366a15cdd2dc88e2875f87bb9",
+      "after_sha256": "997f14f408155f5645d992be34c1ba06afcdd6ec86c2c2b7e529c30b603ac9cd",
       "owners": {
         "@document": {
-          "before": "cd7dfa9a413ac9a6096652c04a7d425f2bde4c2719b999e8d7f1b6d09745599d",
-          "after": "096c82641fc6ff523d5613956d265bfb11af598366a15cdd2dc88e2875f87bb9"
+          "before": "096c82641fc6ff523d5613956d265bfb11af598366a15cdd2dc88e2875f87bb9",
+          "after": "997f14f408155f5645d992be34c1ba06afcdd6ec86c2c2b7e529c30b603ac9cd"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "2d77720d5c6ca3ae3c76df488aa66ca2692bdbf6cc3ef681a6f61e49b09179cc",
-      "after_sha256": "af6758d909772f29b5f66e7b316674d72c28c102090d327e41605aeb0b796cef",
+      "before_sha256": "af6758d909772f29b5f66e7b316674d72c28c102090d327e41605aeb0b796cef",
+      "after_sha256": "82edde9246481c5a66d938cf6098abf59d361c15632df800a99220ad2eefedeb",
       "owners": {
         "@document": {
-          "before": "2d77720d5c6ca3ae3c76df488aa66ca2692bdbf6cc3ef681a6f61e49b09179cc",
-          "after": "af6758d909772f29b5f66e7b316674d72c28c102090d327e41605aeb0b796cef"
+          "before": "af6758d909772f29b5f66e7b316674d72c28c102090d327e41605aeb0b796cef",
+          "after": "82edde9246481c5a66d938cf6098abf59d361c15632df800a99220ad2eefedeb"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "3061785945f0bc36e6c00c1970856be3daeee594fdd68ec60b55fede746861fd",
-      "after_sha256": "7c8549edddcd0405114e5ef3916876a3938d764b91a4411f72cc52f47ca1c88a",
+      "before_sha256": "7c8549edddcd0405114e5ef3916876a3938d764b91a4411f72cc52f47ca1c88a",
+      "after_sha256": "b3c96c828f18a30f204f8d9fdca685aeca83a6081da248a25fa24ddf05b463c6",
       "owners": {
         "@document": {
-          "before": "3061785945f0bc36e6c00c1970856be3daeee594fdd68ec60b55fede746861fd",
-          "after": "7c8549edddcd0405114e5ef3916876a3938d764b91a4411f72cc52f47ca1c88a"
+          "before": "7c8549edddcd0405114e5ef3916876a3938d764b91a4411f72cc52f47ca1c88a",
+          "after": "b3c96c828f18a30f204f8d9fdca685aeca83a6081da248a25fa24ddf05b463c6"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "7b5ad4538a9c7953a28b8e1fe67d4c5a7b81b3025130b780e2ee1fcd03cf4f67",
-      "after_sha256": "839c36b417445fe1ce68878a32943f938be74237b80c06e234a2541a246f1c3c",
+      "before_sha256": "839c36b417445fe1ce68878a32943f938be74237b80c06e234a2541a246f1c3c",
+      "after_sha256": "2c288e142fcfc1cc4bf355fa2427a51bd5000197ebb8bcbcb7b943163b83e81e",
       "owners": {
         "@document": {
-          "before": "7b5ad4538a9c7953a28b8e1fe67d4c5a7b81b3025130b780e2ee1fcd03cf4f67",
-          "after": "839c36b417445fe1ce68878a32943f938be74237b80c06e234a2541a246f1c3c"
+          "before": "839c36b417445fe1ce68878a32943f938be74237b80c06e234a2541a246f1c3c",
+          "after": "2c288e142fcfc1cc4bf355fa2427a51bd5000197ebb8bcbcb7b943163b83e81e"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "e35fe81862b08f22e7e6f945362df35a3dff7a5a90219da87372fe7043708cd1",
-      "after_sha256": "74eb5ff76f4032ef3d28a9547758f302cde5f80154ba837edaf749dce4b0cebf",
+      "before_sha256": "74eb5ff76f4032ef3d28a9547758f302cde5f80154ba837edaf749dce4b0cebf",
+      "after_sha256": "19b25afef8f4a108ce13db186141daae8e9f12c8ed85a0185dc9fb2c049641f0",
       "owners": {
         "@document": {
-          "before": "e35fe81862b08f22e7e6f945362df35a3dff7a5a90219da87372fe7043708cd1",
-          "after": "74eb5ff76f4032ef3d28a9547758f302cde5f80154ba837edaf749dce4b0cebf"
+          "before": "74eb5ff76f4032ef3d28a9547758f302cde5f80154ba837edaf749dce4b0cebf",
+          "after": "19b25afef8f4a108ce13db186141daae8e9f12c8ed85a0185dc9fb2c049641f0"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "09a62dcc9a832025ac4056ba9e4a17e4a4b8190dda151e10637b4c66dc2ac538",
-      "after_sha256": "2f7fa2cf40044b58d4e1e37fbcee041a410943924b84176532e329d63d3ce5a8",
+      "before_sha256": "2f7fa2cf40044b58d4e1e37fbcee041a410943924b84176532e329d63d3ce5a8",
+      "after_sha256": "7807200de0081a0b500ca69c811ac62644dc9d45e5e2f2bdca43681ecc8dd0fa",
       "owners": {
         "@document": {
-          "before": "09a62dcc9a832025ac4056ba9e4a17e4a4b8190dda151e10637b4c66dc2ac538",
-          "after": "2f7fa2cf40044b58d4e1e37fbcee041a410943924b84176532e329d63d3ce5a8"
-        }
-      }
-    },
-    "src/warhammer40k_core/ai/player_policy.py": {
-      "before_sha256": "2acffe217fd8bf145520a04e38250343cf2154f2d1c12d80514a7ccc3cbe4754",
-      "after_sha256": "378579408960b8c72486d89c66d61d130876641790cce9a18be4edfb3de011f5",
-      "owners": {
-        "PolicyRouter.__init__": {
-          "before": "10b24f1e6627f90a12c700f3ac4b6a2b870598b03db9181585d67700129ae931",
-          "after": "54dd4642402e7f8ac641e38e351d021bdd8ef4935898457e82227d6339ed6cc3"
-        },
-        "PolicyRouter.identity": {
-          "before": null,
-          "after": "d8bdfc321ebaea1e6d42f31415c2b34f4287ab8c6d5ea1516c31e0a00b221c5c"
-        },
-        "PolicyRouter.to_manifest_payload": {
-          "before": null,
-          "after": "bdd9c0a183a0ba32e0ab234e42c26395fc8168e8612debec2febd68ee41687e4"
+          "before": "2f7fa2cf40044b58d4e1e37fbcee041a410943924b84176532e329d63d3ce5a8",
+          "after": "7807200de0081a0b500ca69c811ac62644dc9d45e5e2f2bdca43681ecc8dd0fa"
         }
       }
     },
     "src/warhammer40k_core/ai/runner.py": {
-      "before_sha256": "2daf95a46e45472c78f9687de74613e8a827f25cd6131a9d9b59fd122f9e9617",
-      "after_sha256": "579c9eda0c44f68d65885c8896a378a79b963f5f6ac241dc1cf8b470fe6bbe18",
+      "before_sha256": "579c9eda0c44f68d65885c8896a378a79b963f5f6ac241dc1cf8b470fe6bbe18",
+      "after_sha256": "ea7aa3a524351bedabea722827b901e5ea64cafcff6f476a19e88d4724e287d8",
       "owners": {
-        "@module": {
-          "before": "5f4f1c2cac650dfed19c27c07d12704355034ac561e73d6a369f00467c15c0fb",
-          "after": "888bf716b35ba1c1d734b4ac0d979e2cccaa97a9ec737e6b780671e320f35c99"
-        },
-        "BoundedPolicyRunner.__init__": {
-          "before": "574e45bfb0760b0e873f743f5c03721c74131c29feac695cc060e4a80d5b5a7b",
-          "after": "399d6fa88dec4ab2b12b32a5f57110049ccc924965311ed1df38f23c444ce74e"
-        },
-        "BoundedPolicyRunner._attempt": {
-          "before": null,
-          "after": "75860fc15252b637063ccbe66679250759414dbea19743efbfe906c62699b865"
-        },
-        "BoundedPolicyRunner._check_status": {
-          "before": "960ce1883b21d772aa5636e64e38815c438ead56355fe72804084fe9eeae57a0",
-          "after": "f87ad2ff5ba02bf6a4e9f2535eb220c1aa636d4cec2d61766623235dea684add"
-        },
-        "BoundedPolicyRunner._check_time": {
-          "before": "a4208a3a0442068dee7e079d7e66a04a7f7a31fca88c035965440405212788c9",
-          "after": "d05b011a3c8da7bc97cb9576533410a0bc6900345c85e52728c3067e39092a77"
-        },
-        "BoundedPolicyRunner._fail": {
-          "before": "14cb2c0a29b7f38dfb0d81a980c0cd067fcba3b61ae08cd3ffb80c50678d28a3",
-          "after": "3034ad422dbd2327cc170d0eb1207788d7b190e09d7ec636a0155d073d90cbff"
-        },
         "BoundedPolicyRunner._report": {
-          "before": "a1280774ffd2bbe7a6023a406dca0800a470d11cbfb4bdd2b8d4a3b3ddb6c69a",
-          "after": "400bdd1ead1866d0e3f7806d9ffe63bde8f943cf5bb670507711c2cd8f858bfa"
+          "before": "400bdd1ead1866d0e3f7806d9ffe63bde8f943cf5bb670507711c2cd8f858bfa",
+          "after": "260b0e35899686370a3c4331a47c394e5e72eba53f55dfae06c8c5e3e958b0c7"
         },
         "BoundedPolicyRunner.run": {
-          "before": "485ef5196696d0f7ee60ba92dde00f6ad82e6303bf520b0e618098b94b89ecb3",
-          "after": "747d36d63d5122e192867e5f35903da3d29324b4df75fc69c0d66fb425ee35ac"
-        },
-        "DecisionTiming": {
-          "before": "0d183b1ed362b290d60552d67f4fdb2bd5f8807d4c1f93ac42aa16b864736546",
-          "after": "cc45c848c9bf904f8d29ed93d52755a2bb289ab275e49b80e9cd18b6c72d66fe"
-        },
-        "RunManifest": {
-          "before": null,
-          "after": "09b88693cbab1747f85738bacb0503a6dd722e992f27bbed21fbf3e8a96b7ab7"
-        },
-        "RunManifest.run_id": {
-          "before": null,
-          "after": "21acb08a3bc9880ac9cb45bcce46217d3037e24b2949589776686cca7227533d"
-        },
-        "RunManifest.to_payload": {
-          "before": null,
-          "after": "96aa8dacbb730bd41f0810f2e59ed0c798c5199312c2ba268ae9fadc3e3a6bdb"
+          "before": "747d36d63d5122e192867e5f35903da3d29324b4df75fc69c0d66fb425ee35ac",
+          "after": "d3c71cbc4d345e14d6b32fb5aa9465bc6853151554a628eadba07eb4e63cb45e"
         },
         "RunReport": {
-          "before": "8ab6ddd0c56a232c58c481ea026c3620335c06a89fecf66615fe8b1943851009",
-          "after": "5045be2ec5dccee9892f5eb7517470d3a58bbfa6b8231b390d533483fdea69e8"
+          "before": "5045be2ec5dccee9892f5eb7517470d3a58bbfa6b8231b390d533483fdea69e8",
+          "after": "75bcb21ed469a14ef88f4a9bbf640010e3d6e1202386995fed9adff2ea0181ef"
         },
         "RunReport.to_payload": {
+          "before": "d14265443ef650add7817b612457e48b8217695cad92a711225f70ea116177ce",
+          "after": "9a28e7c708c08320d38d40b9ec1947db2aedf03092963cedc7cd5f3e5ae1cf26"
+        }
+      }
+    },
+    "src/warhammer40k_core/ai/runner_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "47a8b339bcaed8aedfd69ad6d91e37e990a9c0d058c252fa9cc909e2b9716685",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "d14265443ef650add7817b612457e48b8217695cad92a711225f70ea116177ce"
+          "after": "04dd4899110a1d5a642b4716a7a0b5af0332f21fa5ca7bff75130d86932054e0"
+        },
+        "DeploymentDatasetAdmission": {
+          "before": null,
+          "after": "3e620d4da0073069df212745d207fa00114b6f208daf73939be6126986bfcf57"
+        },
+        "DeploymentDatasetAdmission.__init__": {
+          "before": null,
+          "after": "960ba6598771eb30759bba9394e0c7609d92c427a38bde3de8749a62edb2aff6"
+        },
+        "DeploymentDatasetAdmission.content_hash": {
+          "before": null,
+          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
+        },
+        "DeploymentDatasetAdmission.from_payload": {
+          "before": null,
+          "after": "24226b2d9b5210b3b59ce7d458ac174a47160526f53c20893a98ce78365ecfe9"
+        },
+        "DeploymentDatasetAdmission.from_runs": {
+          "before": null,
+          "after": "5a2138d299e196932040cbb85e3543aae5d4cbf6f0f780ed7ac41f5e729843af"
+        },
+        "DeploymentDatasetAdmission.to_payload": {
+          "before": null,
+          "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
+        },
+        "RunnerAdmission": {
+          "before": null,
+          "after": "692fc73ba3007d6d268552c25ce906524c40294eca5ce504f8f2aa923f98b1ce"
+        },
+        "RunnerAdmission.__init__": {
+          "before": null,
+          "after": "129a96c1f511da6394e8d923f49f41efdf2b544a715458af28f31c13b9c102f9"
+        },
+        "RunnerAdmission._check_attempt": {
+          "before": null,
+          "after": "1124a031c2fc9213026cc996d5f3004bed5ab3ee7c1e17fc6128320c9d081ea4"
+        },
+        "RunnerAdmission._check_stop": {
+          "before": null,
+          "after": "560e4b62abe78e4cc5acfe46e383267d714b76a58874f499a217a19c1fce00cd"
+        },
+        "RunnerAdmission.content_hash": {
+          "before": null,
+          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
+        },
+        "RunnerAdmission.from_payload": {
+          "before": null,
+          "after": "1ea4ec865a166183bd80f1a78021e3b034cfbb0e66cc93e05520bbec089ff1bd"
+        },
+        "RunnerAdmission.from_report": {
+          "before": null,
+          "after": "f09bfe0b1504ebe3559f35a790448a45094cc433b0b7680b24fe1a8b98dc2b46"
+        },
+        "RunnerAdmission.to_payload": {
+          "before": null,
+          "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
+        },
+        "_record_hashes": {
+          "before": null,
+          "after": "ff9e98c1c407bdaf30d258562a4d52da7551309462a9a5f0d6fe7a9e16246155"
+        },
+        "_require": {
+          "before": null,
+          "after": "3e4e41ff3c8c7f6151e8cfe962471bc5109b5c5a9dd657efb33db1d520d98bee"
+        },
+        "_seconds": {
+          "before": null,
+          "after": "3460aa7f60c6e44b11b1b61faac2f65fa7152dffa08938ecb594aec12b10e9e6"
+        }
+      }
+    },
+    "tests/code_quality/test_hosted_timing_calibration.py": {
+      "before_sha256": "7ef4eab699dd39d5511f584a7d756eb0fade03652ebbe9d4be2bf9e80d3856ec",
+      "after_sha256": "d6d97d4bc6cb09337d703e65b5f48d404badbaa4e82d9e553d49fafa0e297085",
+      "owners": {
+        "@module": {
+          "before": "4741b93f72740b3608f3e2994d6fbd992ff66832398000d51b551b591d2a8cec",
+          "after": "97da043b0b924cf854c73adb7be6103cd67ccf633f1c0e320d2567a159023f49"
+        },
+        "_progress_child": {
+          "before": null,
+          "after": "71b0a40c541d6af8c50ee5ecaca0f018d8f0f48c672e33da14146164f6e26904"
+        },
+        "test_progress_journal_records_live_worker_events_and_unchanged_final_receipts": {
+          "before": null,
+          "after": "1398fd8d02f867df4c3f091ae64a9754f1f53c4a41050f8195a4fa0eaeaac96d"
+        },
+        "test_progress_journal_requires_explicit_valid_opt_in": {
+          "before": null,
+          "after": "f1f8a3a49b18904533119a7a39f0cac8a8331f7e5cb97c443dacc2205e4fb00e"
+        },
+        "test_progress_journal_survives_worker_exit_without_qualifying_partial_data": {
+          "before": null,
+          "after": "71877d4e3c4e3061038c59b117993b55b76b13b78cbc1ebe9a31ffbcdca517b8"
+        }
+      }
+    },
+    "tests/infrastructure/adapters/test_deployment_experiment.py": {
+      "before_sha256": "866059309064c6863bbe16594b3df2748666d99530bd86d33090257776077a6d",
+      "after_sha256": "a5e491b0ec56d9adf661bc35f66a2e3121f9ee5180404b66c82f339b5091aefc",
+      "owners": {
+        "@module": {
+          "before": "685c10c9413a0f8d514b0a7fa57467225f443dcdb9786281a5dac2942d1d05b1",
+          "after": "f65227e71fea11c1ab64036f002e4739ffa2ec327790513757d82f3a028cc154"
+        },
+        "test_runner_dataset_joins_ranked_choice_and_keeps_failed_run_rows_excluded": {
+          "before": null,
+          "after": "dc953ac16a45d0c1e4df0d21d48dd7067bd27638f8cf1dffe1d706e1996fa7c5"
+        },
+        "test_successful_terminal_run_cannot_claim_an_earlier_prefix_preceded_failure": {
+          "before": null,
+          "after": "97208a23a03bc01e73655f043b8f86ff1b5a8b32fd89708dbc80b911bd5d5591"
         }
       }
     },
     "tests/infrastructure/adapters/test_runner_accounting.py": {
-      "before_sha256": null,
-      "after_sha256": "c754fb958367a1f52c572b981a148ae5d765108ae9f64be114236e80832afe7c",
+      "before_sha256": "c754fb958367a1f52c572b981a148ae5d765108ae9f64be114236e80832afe7c",
+      "after_sha256": "739a94e3561b7f7dc711f9b98e5b14fa281920d3ff17ff3b9a0986661c927dbb",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "3449598287b1d997fe582ccf632dbb0de7a91acce2bef9c0d8ba0323bdd4f62d"
+          "before": "3449598287b1d997fe582ccf632dbb0de7a91acce2bef9c0d8ba0323bdd4f62d",
+          "after": "c5124bb4dbe7af506f7098c0d4d8fa2d4fffe9a58e07b40fa9cf933d4f7e6911"
         },
-        "ChoicePolicy": {
+        "admit": {
           "before": null,
-          "after": "d25a04bc6b500e1c7d5f0a849e3a851d83f5e092b71d6883f21ea11900285005"
-        },
-        "ChoicePolicy.__init__": {
-          "before": null,
-          "after": "a5c84924daafdf77fd1dc69592d121cd9f2f00eacce1d8f6af8ece01da4e44f7"
-        },
-        "ChoicePolicy.choose": {
-          "before": null,
-          "after": "a3fa11c7c362016babee4f155e3ba3b6ca218a01ba06f364aa8d55b9aa76eb4b"
-        },
-        "session_and_route": {
-          "before": null,
-          "after": "3cc9cb95b303bc8cc4a86670ed0354f3b0b302b4e2cccb77b875dd23e66e1e19"
-        },
-        "test_failed_choice_retains_actual_seed_binding_and_stage": {
-          "before": null,
-          "after": "c6995abd96e184fac1412ceff1e8c4c33e4c213bde77b0022a948d286a2c5d8d"
-        },
-        "test_manifest_preserves_declared_routing_seeds_limits_and_detaches_payloads": {
-          "before": null,
-          "after": "38fafba8ef4117926983688e1871a065a5cedaf66016277edf42fcc5506d6c44"
-        },
-        "test_missing_route_is_a_failed_attempt_without_a_policy_call": {
-          "before": null,
-          "after": "f55eb915c8e614c8782dbd46f57b0699993da66f3070ad0e1d1b8d29864f9d56"
+          "after": "7b684e7ead3bd1656e9e800209955a3ed23d15e3ea52c791a5c32c83ee7fce09"
         },
         "test_ordinary_recorded_movement_rejection_is_not_an_accepted_choice": {
-          "before": null,
-          "after": "ed37b5eb5c065cd27e03ae2c375d7665420333a65dd7f071b45ff99721082cfa"
+          "before": "ed37b5eb5c065cd27e03ae2c375d7665420333a65dd7f071b45ff99721082cfa",
+          "after": "a24c9ca351ce160c27538a2e027368806f91625315f4f4d770dbfab297f37a47"
         },
-        "test_successful_choice_and_budget_stop_keep_separate_record_accounting": {
+        "test_runner_admission_keeps_failed_suffix_with_verified_accepted_prefix": {
           "before": null,
-          "after": "7ee69a914dab21c6cb5ade9e27921d41cafc92776b204ba5e47ef28120f860f9"
+          "after": "86922ff2ac68db77ea1cb89a147eef28ac249332b65ca133ec9646fbd7cca087"
         },
-        "test_time_limit_before_dispatch_preserves_manifest_without_invented_attempt": {
+        "test_runner_admission_keeps_successful_zero_choice_boundary": {
           "before": null,
-          "after": "7c388d56f17ac40aa8d0c80b340f2370fc464fac2d8cc4a57e32a3049b737190"
+          "after": "4c2cc65082752524e5a9c6d6c46c218edb942ce0c7bbfab7fdfb2cb126a914c4"
+        },
+        "test_runner_admission_preserves_complete_supplied_run_denominators": {
+          "before": null,
+          "after": "91f7617648dc47269bebda60359324adb58f202b07e94c69ddf8c1f46e5e3166"
+        },
+        "test_runner_admission_rejects_report_or_boundary_drift": {
+          "before": null,
+          "after": "7b151836a37f23e6b068d9198fa9f085b4770925994f632c01f0d23e57c69b7b"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "f49643725e5bbba99b34a8d9901680549b2f7c56b045d1ac23421d7a52d61a87",
-      "after_sha256": "a2cdfea1dcfe95ca5fd806e15f48914339f4def827fbaa11c281fe63be628f2e",
+      "before_sha256": "a2cdfea1dcfe95ca5fd806e15f48914339f4def827fbaa11c281fe63be628f2e",
+      "after_sha256": "9be479a673e5af9bd5348d5adddfa312e41613a85c95948d11cb4bd6c5f1c30c",
       "owners": {
         "@document": {
-          "before": "f49643725e5bbba99b34a8d9901680549b2f7c56b045d1ac23421d7a52d61a87",
-          "after": "a2cdfea1dcfe95ca5fd806e15f48914339f4def827fbaa11c281fe63be628f2e"
+          "before": "a2cdfea1dcfe95ca5fd806e15f48914339f4def827fbaa11c281fe63be628f2e",
+          "after": "9be479a673e5af9bd5348d5adddfa312e41613a85c95948d11cb4bd6c5f1c30c"
+        }
+      }
+    },
+    "tests/timing_plugin.py": {
+      "before_sha256": "69387b39047c641ea0a4f96eb29a56b834242d1c2cd34a5fa7797e0c01ec4d59",
+      "after_sha256": "658a309a9f34a70eabf9ce11fe6ecd093473ee13b36a8ccef13fa351c483c2fc",
+      "owners": {
+        "@module": {
+          "before": "b61ba653b3fd47c6bb3fa7e1ce09b92f22d8965c99c18e5d267714610bdb72e2",
+          "after": "60b7e03ff80d18bc254d1d8019e90855283e953b4c975e437e7a63a3ac1686af"
+        },
+        "_append_progress": {
+          "before": null,
+          "after": "0dad79d349cd1e6faaf5ed46cb22d8c9a53261696a51ee610fca2bb02f8a4153"
+        },
+        "pytest_collection_finish": {
+          "before": "a6055096fc4e231d5de00b6f12e3526d2dea8d4ec49e37da860bf59f7980bd29",
+          "after": "e568a37efc0115832ab50a0009179fa3fe89c8e1aca48a446019b25c74152d03"
+        },
+        "pytest_runtest_logreport": {
+          "before": "f4c1fe74791d519d658b5319b2063a6edf3748bd41ed5f9f044f82637b111d14",
+          "after": "d1c7a368ac4541aa36a2b21ed342f73e1ebb94994ae1f457142a67567ee13f06"
+        },
+        "pytest_runtest_logstart": {
+          "before": null,
+          "after": "ddfe36a217df4ea6e0e5a9ad387db963057d01f35e291853841be59deee68175"
+        },
+        "pytest_sessionfinish": {
+          "before": "3a643a6311d12f664254ec287128d928185a0a8f92e34e39040539ff19098f1c",
+          "after": "41f0f55fd5592fe421e7b1906afdbacb6452b82f2168d78bb0c2915a7861d278"
+        },
+        "pytest_sessionstart": {
+          "before": "3ac1d2ab651f64a20a0a71cd13e117bee10aa8c96adb0cfed7fde79755711080",
+          "after": "3063d550bc0b0e98ec699c193ebf627e7feeb56ee16019fd647aad3af7a1b9b3"
         }
       }
     }
   },
   "rows": {
+    ".github/workflows/ci.yml": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavioral-worker-progress"
+      ],
+      "selected_families": [],
+      "rationale": "Add explicitly enabled per-worker progress diagnostics before session completion so a timed-out job preserves its active node and completed phases; retain the existing final JSON format and exact selected inventory.",
+      "source_obligation": "Bounded CI diagnosis for PR647 requires actual worker/setup evidence before changing planning. Missing final JSON does not identify unfinished work. Worker-only JSONL is best-effort operator diagnostics, not authenticated or qualifying calibration/training data. Preserve every existing case, four-worker work stealing, 66.5% coverage and 840-second cutoff.",
+      "unchanged_work": "No engine, policy, replay, scheduler, partition, measured-weight, worker-resource, budget or test omission changes. Journals append and close one event at a time only under explicit opt-in; no fsync or repeated full state rewrite. Existing final timing JSON and calibration admission are unchanged. Three focused quality controls cover live events, worker termination and strict opt-in. Serial runtime smoke and fresh full hosted qualification remain mandatory; no performance improvement is claimed."
+    },
     "README.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
+    },
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add explicitly enabled per-worker progress diagnostics before session completion so a timed-out job preserves its active node and completed phases; retain the existing final JSON format and exact selected inventory.",
+      "source_obligation": "Bounded CI diagnosis for PR647 requires actual worker/setup evidence before changing planning. Missing final JSON does not identify unfinished work. Worker-only JSONL is best-effort operator diagnostics, not authenticated or qualifying calibration/training data. Preserve every existing case, four-worker work stealing, 66.5% coverage and 840-second cutoff.",
+      "unchanged_work": "No engine, policy, replay, scheduler, partition, measured-weight, worker-resource, budget or test omission changes. Journals append and close one event at a time only under explicit opt-in; no fsync or repeated full state rewrite. Existing final timing JSON and calibration admission are unchanged. Three focused quality controls cover live events, worker termination and strict opt-in. Serial runtime smoke and fresh full hosted qualification remain mandatory; no performance improvement is claimed."
+    },
+    "ci/quality_shards/shard-2.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add explicitly enabled per-worker progress diagnostics before session completion so a timed-out job preserves its active node and completed phases; retain the existing final JSON format and exact selected inventory.",
+      "source_obligation": "Bounded CI diagnosis for PR647 requires actual worker/setup evidence before changing planning. Missing final JSON does not identify unfinished work. Worker-only JSONL is best-effort operator diagnostics, not authenticated or qualifying calibration/training data. Preserve every existing case, four-worker work stealing, 66.5% coverage and 840-second cutoff.",
+      "unchanged_work": "No engine, policy, replay, scheduler, partition, measured-weight, worker-resource, budget or test omission changes. Journals append and close one event at a time only under explicit opt-in; no fsync or repeated full state rewrite. Existing final timing JSON and calibration admission are unchanged. Three focused quality controls cover live events, worker termination and strict opt-in. Serial runtime smoke and fresh full hosted qualification remain mandatory; no performance improvement is claimed."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -459,9 +597,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/hosted-calibration.json": {
       "category": "rule_semantics",
@@ -471,9 +609,9 @@
         "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -490,9 +628,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -509,9 +647,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -528,9 +666,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -547,9 +685,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -566,9 +704,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -585,9 +723,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -604,9 +742,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -623,9 +761,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -642,9 +780,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -661,9 +799,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -680,9 +818,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -699,9 +837,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -743,9 +881,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -787,9 +925,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -831,9 +969,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -875,9 +1013,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -919,9 +1057,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -963,9 +1101,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -1007,9 +1145,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -1051,9 +1189,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -1061,41 +1199,41 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -1106,19 +1244,9 @@
         "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
-    },
-    "src/warhammer40k_core/ai/player_policy.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "player-policy-boundary"
-      ],
-      "selected_families": [],
-      "rationale": "Retain operator-only declared run provenance and actual attempted-choice outcomes; qualify acceptance by ordinary submission status, preserving rejection records separately.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "src/warhammer40k_core/ai/runner.py": {
       "category": "rule_semantics",
@@ -1126,9 +1254,40 @@
         "player-policy-boundary"
       ],
       "selected_families": [],
-      "rationale": "Retain operator-only declared run provenance and actual attempted-choice outcomes; qualify acceptance by ordinary submission status, preserving rejection records separately.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Join complete bounded runner reports, reproduced episodes, selected deployment experiments and exact admitted targets while preserving failed denominators and detached player inputs.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
+    },
+    "src/warhammer40k_core/ai/runner_admission.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "player-policy-boundary"
+      ],
+      "selected_families": [],
+      "rationale": "Join complete bounded runner reports, reproduced episodes, selected deployment experiments and exact admitted targets while preserving failed denominators and detached player inputs.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
+    },
+    "tests/code_quality/test_hosted_timing_calibration.py": {
+      "category": "measured_workload",
+      "operations": [
+        "hosted-timing-calibration",
+        "behavioral-worker-progress"
+      ],
+      "selected_families": [],
+      "rationale": "Add explicitly enabled per-worker progress diagnostics before session completion so a timed-out job preserves its active node and completed phases; retain the existing final JSON format and exact selected inventory.",
+      "source_obligation": "Bounded CI diagnosis for PR647 requires actual worker/setup evidence before changing planning. Missing final JSON does not identify unfinished work. Worker-only JSONL is best-effort operator diagnostics, not authenticated or qualifying calibration/training data. Preserve every existing case, four-worker work stealing, 66.5% coverage and 840-second cutoff.",
+      "unchanged_work": "No engine, policy, replay, scheduler, partition, measured-weight, worker-resource, budget or test omission changes. Journals append and close one event at a time only under explicit opt-in; no fsync or repeated full state rewrite. Existing final timing JSON and calibration admission are unchanged. Three focused quality controls cover live events, worker termination and strict opt-in. Serial runtime smoke and fresh full hosted qualification remain mandatory; no performance improvement is claimed."
+    },
+    "tests/infrastructure/adapters/test_deployment_experiment.py": {
+      "category": "measured_workload",
+      "operations": [
+        "deployment-experiment-provenance"
+      ],
+      "selected_families": [],
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "tests/infrastructure/adapters/test_runner_accounting.py": {
       "category": "measured_workload",
@@ -1136,9 +1295,9 @@
         "player-policy-boundary"
       ],
       "selected_families": [],
-      "rationale": "Retain operator-only declared run provenance and actual attempted-choice outcomes; qualify acceptance by ordinary submission status, preserving rejection records separately.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -1146,9 +1305,19 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Maintain the exact runtime/external identity, additive active test inventory, measured timing manifests and documented scope without changing engine algorithms or budgets.",
-      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/routing/outcomes and Stage 1 reproducibility obligations; AI_POLICY_INTERFACE.md running/diagnosing requires exact route/configuration/seed/limit evidence and truthful failed-attempt accounting. Rule-invalid recorded proposals must not count as accepted choices; policy declarations remain unverified. Preserve detached actor inputs, ordinary submission and exact replay. Stage 1 remains open.",
-      "unchanged_work": "No legality, mutation, private RNG, geometry/search, candidate generation, persistence/replay algorithm, dependency, cache, selected case omission or timing budget changes. Runner changes only retain bounded diagnostic data and classify the existing submission outcome/count; no deliberate optimization or detailed comparison family. Current serial smoke and full correctness/coverage remain required. Timing observations retain measured origins and failures; no hosted speedup or full-game certification claim."
+      "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
+      "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
+      "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
+    },
+    "tests/timing_plugin.py": {
+      "category": "measured_workload",
+      "operations": [
+        "behavioral-worker-progress"
+      ],
+      "selected_families": [],
+      "rationale": "Add explicitly enabled per-worker progress diagnostics before session completion so a timed-out job preserves its active node and completed phases; retain the existing final JSON format and exact selected inventory.",
+      "source_obligation": "Bounded CI diagnosis for PR647 requires actual worker/setup evidence before changing planning. Missing final JSON does not identify unfinished work. Worker-only JSONL is best-effort operator diagnostics, not authenticated or qualifying calibration/training data. Preserve every existing case, four-worker work stealing, 66.5% coverage and 840-second cutoff.",
+      "unchanged_work": "No engine, policy, replay, scheduler, partition, measured-weight, worker-resource, budget or test omission changes. Journals append and close one event at a time only under explicit opt-in; no fsync or repeated full state rewrite. Existing final timing JSON and calibration admission are unchanged. Three focused quality controls cover live events, worker termination and strict opt-in. Serial runtime smoke and fresh full hosted qualification remain mandatory; no performance improvement is claimed."
     }
   },
   "milestone": "ordinary",

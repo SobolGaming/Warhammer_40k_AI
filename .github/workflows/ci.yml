@@ -466,6 +466,7 @@ jobs:
         timeout-minutes: 14
         env:
           TEST_TIMING_DIR: reports/behavior-timing
+          TEST_TIMING_PROGRESS: "1"
           COVERAGE_FILE: .coverage.${{ matrix.shard_id }}
           SHARD_ID: ${{ matrix.shard_id }}
           SHARD_MANIFEST: ${{ matrix.manifest }}

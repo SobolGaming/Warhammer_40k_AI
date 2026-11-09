@@ -34054,6 +34054,7 @@
       "paths": [
         "src/warhammer40k_core/ai/player_policy.py",
         "src/warhammer40k_core/ai/runner.py",
+        "src/warhammer40k_core/ai/runner_admission.py",
         "src/warhammer40k_core/ai/finite_candidates.py",
         "tests/infrastructure/adapters/test_finite_candidates.py",
         "tests/infrastructure/adapters/test_runner_accounting.py"
@@ -35576,6 +35577,32 @@
         "test_samples_remain_separate_and_never_combine_cross_worker_phases",
         "test_sidecar_duplicate_keys_and_changed_bytes_fail_closed",
         "test_sidecar_rejects_drift"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "behavioral-worker-progress": {
+      "paths": [
+        "tests/timing_plugin.py",
+        "tests/code_quality/test_hosted_timing_calibration.py",
+        ".github/workflows/ci.yml"
+      ],
+      "owners": [
+        "@document",
+        "@imports",
+        "@module",
+        "@text",
+        "_append_progress",
+        "_progress_child",
+        "pytest_sessionstart",
+        "pytest_collection_finish",
+        "pytest_runtest_logstart",
+        "pytest_runtest_logreport",
+        "pytest_sessionfinish",
+        "test_progress_journal_records_live_worker_events_and_unchanged_final_receipts",
+        "test_progress_journal_survives_worker_exit_without_qualifying_partial_data",
+        "test_progress_journal_requires_explicit_valid_opt_in"
       ],
       "families": [],
       "sensitive": false,

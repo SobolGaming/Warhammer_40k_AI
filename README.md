@@ -395,15 +395,30 @@ and retain their complete baseline measurement. Changed/removed/renamed cases or
 changed test-module bytes require explicit sidecar regeneration, and behavioral
 inventory changes still require a fresh complete successful baseline profile.
 
-The committed calibration contains 99 raw worker receipts and 12,701 passed
-three-phase samples covering the 6,151 pre-existing cases: historical successful run
-[42549486854](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42549486854)
+The current calibration retains 141 source-bound raw worker receipts and 17,820
+passed three-phase samples covering all 6,178 current cases. Sources are historical
+successful run
+[42549486854](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42549486854),
+failed attempts 1 and 2 of
+[42556245215](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42556245215),
 and failed attempts 1 and 2 of
-[42556245215](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42556245215).
-The eight new runner-accounting cases retain only their fresh complete local
-baseline timings; no historical hosted observations are invented for them.
-The historical samples remain planning evidence, not a complete current hosted
-qualification. Fixture setup observations are
+[42602087197](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42602087197).
+Both new enclosing attempts remain failures: the first hit two fourteen-minute
+cutoffs; the second hit one cutoff and lost a worker in an existing S25 case.
+Their completed original workers contribute only complete passed phase triples.
+Controller/replacement-worker receipts are omitted, and four original worker
+receipts whose collected inventory included a changed test module remain omitted
+whole. Retained raw identities and phase values are preserved; no failed attempt
+is rewritten as a pass. Inherited successful-job copies in the rerun API are not
+new worker invocations or new observations.
+
+The complete 6,178-case local baseline is unchanged: one isolated mirror worker
+and twelve remainder workers in native WSL2, with type/static gates concurrent
+during the early run. Hosted observations augment its per-case planning maxima;
+they do not replace the complete profile or establish successful hosted
+qualification. All current cases now have admitted observations, including the
+52 cases in the changed runner-accounting and deployment-experiment modules.
+Local and hosted measurements remain separate. Fixture setup observations are
 worker/order dependent; taking maxima and regrouping does not establish new fixture
 multiplicity, hosted wall time or the fourteen-minute goal. Existing module grouping
 is retained. Fresh complete correctness/coverage qualification remains mandatory.
@@ -439,6 +454,25 @@ artifacts containing collection node IDs, collection time, setup/call/teardown t
 outcomes, Python/platform/CPU/memory metadata, and commit/run IDs. Enable the same
 local evidence with `TEST_TIMING_DIR=reports/timing`. These artifacts distinguish
 collection overhead and long individual cases from aggregate file costs.
+
+Behavioral CI additionally sets `TEST_TIMING_PROGRESS=1` with `TEST_TIMING_DIR`
+to append a separate `<worker>.progress.jsonl` diagnostic journal. The flag must
+be exactly `1` with a nonempty timing directory; without it the existing behavior
+is unchanged. Only xdist workers journal execution. A header records worker/PID,
+run/attempt/checkout declarations, UTC start and monotonic origin; collection,
+test-start, completed setup/call/teardown phases and entry into session finish
+carry elapsed timestamps. Each line is appended and closed without `fsync`,
+retaining progress if a later test or shutdown stalls. Existing report uploads
+include these journals. A hard termination may leave a partial last line, and
+missing finalization is not proof of which earlier stack snapshot was current.
+
+These operator-only journals are best-effort process diagnostics, not durable or
+authenticated completion evidence. `session_finish` records hook entry, not
+completion of subsequent reporting or process shutdown. The existing final worker
+`.json` payload and calibration admission remain unchanged; `.jsonl` progress is
+never a substitute for a complete timing receipt or a passing test/CI outcome.
+The journal changes neither scheduling nor case selection, worker counts,
+coverage requirements or the fourteen-minute cutoff.
 
 `quality-fast` now aggregates concurrent lint, contract/conformance, code-quality,
 and the existing macOS semantic audit. Every child must succeed, including on draft
