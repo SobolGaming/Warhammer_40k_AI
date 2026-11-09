@@ -2423,6 +2423,12 @@
       "bytes": 12807,
       "mode": "100644",
       "sha256": "866059309064c6863bbe16594b3df2748666d99530bd86d33090257776077a6d"
+    },
+    "tests/infrastructure/adapters/test_runner_accounting.py": {
+      "blob_sha1": "6d6d96e0a83cb99a89b0f9d4ed38c2cae12c3bd3",
+      "bytes": 12266,
+      "mode": "100644",
+      "sha256": "c754fb958367a1f52c572b981a148ae5d765108ae9f64be114236e80832afe7c"
     }
   },
   "active_roots": [

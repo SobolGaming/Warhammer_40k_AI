@@ -782,14 +782,46 @@ The time limit is cooperative: checked between synchronous calls and after a
 policy returns, before committing. It cannot interrupt a blocking call. Use an
 external process deadline when hard cancellation is required.
 
-`RunReport` records the run ID, stop reason, elapsed time and each attempted
-policy's actor/route/request/ID, choice and submission durations, and acceptance.
-`RunnerError.report` preserves prior progress and the failed attempt's timing.
-The operator-only run ID commits to the engine build, initial persistence
-checkpoint (including engine RNG identity), session identity, exact routing and
-policy configuration, separate policy seed, limits and requested boundary.
-Wall-clock timings are diagnostics, not part of deterministic decisions.
-Keep the existing session replay artifact as the authoritative execution record.
+`RunReport` now retains an immutable operator-only `RunManifest` as well as
+its deterministic run ID. The `bounded-player-policy-run-v2` manifest preserves
+the engine build, initial checkpoint commitment (including private RNG authority),
+session/source identity, complete exact route registrations and declared policy
+configuration, separate policy seed, decision/time limits and requested boundary.
+The registry ID is derived from those retained declarations. Policy identifiers
+and configurations are **declared-unverified**: the runner neither authenticates
+arbitrary callback code/weights nor proves that the callback used its declaration.
+Configurations remain registration metadata; they are not new callback arguments.
+
+The detached JSON-safe `bounded-player-policy-report-v2` export records stop and
+failure reasons, elapsed time and an ordered attempt for every dispatched route,
+including missing routes with no policy ID and zero choice/submission durations.
+Each attempt binds authoritative and viewer request IDs, actor/route, observation
+hash and the actual actor-only choice seed, with failure stage and measured call
+durations. `recorded_decisions` counts all records added during submission and
+ordinary advancement, including automatic selections and recorded rejections;
+it is not an accepted-choice count. `accepted` requires a successful ordinary
+submission status plus new records. Typed `INVALID` submissions are `rejected`,
+even when a rule-invalid movement attempt was recorded. Other failed statuses or
+submission exceptions retain `unverified` rather than claiming acceptance or
+rollback. Pre-submission failures are `not_submitted`. An accepted submission
+followed by an advancement failure remains accepted with a progress failure stage.
+
+`RunnerError.report` preserves prior progress and the failed attempt. Decision and
+time exhaustion retain explicit reasons; a limit reached before dispatch or a
+requested boundary creates no invented attempt. Initialization failure before the
+manifest is constructed has `manifest=None` and run ID `unstarted`. Unexpected
+arbitrary Python callback exceptions still propagate; this is not a durable
+all-process crash ledger or a hard watchdog. Cooperative time checks can observe
+an overrun only after a synchronous call returns. Reaching a limit is an error,
+not a terminal outcome or a training target.
+
+The manifest and report stay entirely outside actor inputs and external wire
+payloads. The manifest hash commits to producer declarations, not authenticated artifacts
+or a verified whole-game result. Wall-clock diagnostics do not participate in
+deterministic decisions. Use the existing session replay artifact for authoritative
+execution; the report does not perform independent episode/experiment admission.
+Broader workload manifests, attempt-to-training joins, hard cancellation, dataset
+admission and Stage 1 completion remain open.
 
 The local adapter always projects current authoritative state. It reuses only a
 viewer identity map derived from complete event history and the full viewer

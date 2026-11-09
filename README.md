@@ -396,11 +396,14 @@ changed test-module bytes require explicit sidecar regeneration, and behavioral
 inventory changes still require a fresh complete successful baseline profile.
 
 The committed calibration contains 99 raw worker receipts and 12,701 passed
-three-phase samples covering all 6,151 current cases: exact-base successful run
+three-phase samples covering the 6,151 pre-existing cases: historical successful run
 [42549486854](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42549486854)
 and failed attempts 1 and 2 of
 [42556245215](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42556245215).
-There are no baseline-only cases in this sidecar. Fixture setup observations are
+The eight new runner-accounting cases retain only their fresh complete local
+baseline timings; no historical hosted observations are invented for them.
+The historical samples remain planning evidence, not a complete current hosted
+qualification. Fixture setup observations are
 worker/order dependent; taking maxima and regrouping does not establish new fixture
 multiplicity, hosted wall time or the fourteen-minute goal. Existing module grouping
 is retained. Fresh complete correctness/coverage qualification remains mandatory.
