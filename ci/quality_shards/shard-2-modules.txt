@@ -20,3 +20,4 @@ tests/code_quality/test_order123_datasheet_identity.py
 tests/code_quality/test_order54_large_model_setup.py
 tests/code_quality/test_section15_static_provenance.py
 tests/code_quality/test_order41_explosives.py
+tests/code_quality/test_hosted_timing_calibration.py

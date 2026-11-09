@@ -8,6 +8,7 @@ import math
 import os
 import re
 import stat
+import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from itertools import product
@@ -41,6 +42,8 @@ class Shard:
 
 
 def main() -> int:
+    if __package__ in (None, ""):
+        sys.path.insert(0, str(REPOSITORY_ROOT))
     parser = argparse.ArgumentParser(
         description="Build or verify duration-balanced behavioral pytest shard manifests."
     )
@@ -76,8 +79,9 @@ def main() -> int:
     durations, profiles = _profile_medians(tuple(args.junit), tuple(args.profile_source))
     case_seconds = _case_profile_medians(tuple(args.junit))
     durations = _rounded_durations(_partitioned_durations(durations, case_seconds=case_seconds))
+    planning, calibrated, _ = _planning_inputs(output_dir, durations, case_seconds)
     shards = _balanced_shards(
-        durations=durations, shard_count=args.shard_count, case_seconds=case_seconds
+        durations=planning, shard_count=args.shard_count, case_seconds=calibrated
     )
     _write_manifests(
         output_dir=output_dir,
@@ -1020,8 +1024,14 @@ def _write_manifests(
     for shard in shards:
         manifest_path = output_dir / f"shard-{shard.shard_id}.txt"
         manifest_path.write_text("\n".join(shard.test_files) + "\n", encoding="utf-8", newline="\n")
+    _, planning_seconds, calibration_sha256 = _planning_inputs(output_dir, durations, case_seconds)
     summary = _summary_payload(
-        shards=shards, durations=durations, profiles=profiles, case_seconds=case_seconds
+        shards=shards,
+        durations=durations,
+        profiles=profiles,
+        case_seconds=case_seconds,
+        planning_seconds=planning_seconds,
+        calibration_sha256=calibration_sha256,
     )
     (output_dir / "durations.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n",
@@ -1075,9 +1085,8 @@ def _check_manifests(*, output_dir: Path, shard_count: int) -> None:
         if "case_seconds" in cast(dict[str, object], summary)
         else None
     )
-    shards = _balanced_shards(
-        durations=durations, shard_count=shard_count, case_seconds=case_seconds
-    )
+    planning, calibrated, calibration_sha256 = _planning_inputs(output_dir, durations, case_seconds)
+    shards = _balanced_shards(durations=planning, shard_count=shard_count, case_seconds=calibrated)
     for shard in shards:
         if manifest_entries[shard.shard_id] != shard.test_files:
             manifest_path = output_dir / f"shard-{shard.shard_id}.txt"
@@ -1086,7 +1095,12 @@ def _check_manifests(*, output_dir: Path, shard_count: int) -> None:
             )
     profiles = _summary_profiles(summary)
     expected_summary = _summary_payload(
-        shards=shards, durations=durations, profiles=profiles, case_seconds=case_seconds
+        shards=shards,
+        durations=durations,
+        profiles=profiles,
+        case_seconds=case_seconds,
+        planning_seconds=calibrated,
+        calibration_sha256=calibration_sha256,
     )
     if summary != expected_summary:
         raise SystemExit("Shard duration summary does not match the committed manifests.")
@@ -1098,6 +1112,8 @@ def _summary_payload(
     durations: dict[str, float],
     profiles: tuple[ProfileEvidence, ...] = (),
     case_seconds: dict[str, float] | None = None,
+    planning_seconds: dict[str, float] | None = None,
+    calibration_sha256: str | None = None,
 ) -> dict[str, object]:
     summary: dict[str, object] = {
         "strategy": SHARD_STRATEGY,
@@ -1108,7 +1124,7 @@ def _summary_payload(
         "shards": [
             {
                 "shard_id": shard.shard_id,
-                "duration_seconds": round(shard.duration_seconds, 3),
+                "duration_seconds": round(sum(durations[name] for name in shard.test_files), 3),
                 "test_file_count": len(shard.test_files),
             }
             for shard in shards
@@ -1116,6 +1132,20 @@ def _summary_payload(
     }
     if case_seconds is not None:
         summary["case_seconds"] = dict(sorted(case_seconds.items()))
+        if calibration_sha256 is not None:
+            from scripts.hosted_timing_calibration import FILENAME, FORMULA, ROLE
+
+            if planning_seconds is None:
+                raise SystemExit("Calibration requires derived case planning costs.")
+            durations = _calibrated_selectors(durations, planning_seconds)
+            case_seconds = planning_seconds
+            summary["calibration"] = {
+                "file": FILENAME,
+                "sha256": calibration_sha256,
+                "role": ROLE,
+                "formula": FORMULA,
+            }
+            summary["planning_selector_seconds"] = dict(sorted(durations.items()))
         weights = _execution_weights(durations, case_seconds)
         peaks = _selector_case_peaks(durations, case_seconds)
         summary["execution_model"] = {
@@ -1200,6 +1230,51 @@ def summary_case_seconds(summary: object) -> dict[str, float]:
     ):
         raise SystemExit("Case scheduling weight exceeds its measured file total.")
     return result
+
+
+def _calibrated_selectors(baseline: dict[str, float], cases: dict[str, float]) -> dict[str, float]:
+    # Finite selectors use their exact derived node cost, never historical ratios.
+    groups: dict[str, list[float]] = {selector: [] for selector in baseline}
+    for node in sorted(cases):
+        owner = node if node in groups else node.split("::", 1)[0]
+        if owner not in groups:
+            raise SystemExit("Calibration case has no selected owner: " + node)
+        groups[owner].append(cases[node])
+    return {owner: math.fsum(values) for owner, values in groups.items()}
+
+
+def _planning_inputs(
+    directory: Path, baseline: dict[str, float], cases: dict[str, float] | None
+) -> tuple[dict[str, float], dict[str, float] | None, str | None]:
+    from scripts.hosted_timing_calibration import FILENAME, load_planning_seconds
+
+    path = directory / FILENAME
+    if not path.exists():
+        return baseline, cases, None
+    if cases is None:
+        raise SystemExit("Calibration requires complete baseline case evidence.")
+    planning, digest = load_planning_seconds(path, baseline=cases, root=REPOSITORY_ROOT)
+    return _calibrated_selectors(baseline, planning), planning, digest
+
+
+def dispatch_case_seconds(summary: object, profile: Path) -> dict[str, float]:
+    from scripts.hosted_timing_calibration import FILENAME, FORMULA, ROLE, load_planning_seconds
+
+    baseline = summary_case_seconds(summary)
+    fields = cast(dict[str, object], summary)
+    if "calibration" not in fields:
+        return baseline
+    metadata = fields["calibration"]
+    if not isinstance(metadata, dict) or metadata.keys() != {"file", "sha256", "role", "formula"}:
+        raise SystemExit("Invalid calibration summary fields.")
+    if metadata["file"] != FILENAME or metadata["role"] != ROLE or metadata["formula"] != FORMULA:
+        raise SystemExit("Invalid calibration summary identity.")
+    return load_planning_seconds(
+        profile.parent / FILENAME,
+        baseline=baseline,
+        root=REPOSITORY_ROOT,
+        expected_sha256=metadata["sha256"],
+    )[0]
 
 
 def _summary_profiles(summary: object) -> tuple[ProfileEvidence, ...]:

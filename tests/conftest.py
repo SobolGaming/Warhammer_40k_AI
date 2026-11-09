@@ -95,8 +95,8 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     ):
         return
     from scripts.build_test_shards import (
+        dispatch_case_seconds,
         duration_worksteal_order,
-        summary_case_seconds,
         worksteal_relevance_order,
     )
 
@@ -107,7 +107,7 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         weighted = duration_worksteal_order(
             tuple(items[index].nodeid for index in order),
             workers=4,
-            selector_seconds=summary_case_seconds(summary),
+            selector_seconds=dispatch_case_seconds(summary, Path(profile)),
         )
         order = tuple(order[index] for index in weighted)
     items[:] = [items[index] for index in order]

@@ -675,9 +675,51 @@ detached. Named/admitted targets continue using `candidate_link`, preserving
 existing mixed-episode source/perspective/horizon checks and TrainingRow v1.
 This companion supplies deterministic behavior provenance only; it does not
 invent stochastic probabilities, authenticate arbitrary model weights, admit a
-dataset, add runner attempt accounting or complete Stage 1. A general experiment
-manifest, selected-workload semantic features/references, other proposal families
-and tactical/learned rankers remain open.
+dataset, add runner attempt accounting or complete Stage 1. The bounded experiment companion below joins this choice to its encoder and
+verified episode. Broader run manifests, selected-workload semantic features/references,
+other proposal families and tactical/learned rankers remain open.
+
+## Bounded deployment experiment provenance
+
+`ai.deployment_experiment.DeploymentExperimentProvenance.from_episode(...)` joins
+one `RankedDeploymentTrainingLink`, its complete row and actor context to a typed
+`MixedEpisodeAdmission` and separately supplied trusted game config/reward version.
+The independently versioned `deployment-choice-experiment-provenance-v1` receipt
+has explicit `single-accepted-deployment-choice` scope. Its content hash identifies
+these exact evidence bytes; it is not an authenticated whole-run identifier.
+
+The factory rederives the selected-row geometry, rechecks the complete ranked row,
+requires strict source/reward compatibility, and joins both ranking and ordinary
+startup/replay origin to the current build and exact config commitment. The exact
+accepted transition must occur in the verified episode with the same origin,
+trajectory and perspective. An unrelated episode or a config with different
+private RNG authority cannot be substituted even when actor observations agree.
+The existing admission owner verifies origin reachability and contiguous ordinary
+accepted transitions; callers cannot supply a bare episode digest as evidence.
+
+The receipt retains full episode, accepted transition, ranked-row and geometry
+payloads. Existing producer receipts preserve the formation seed proposal,
+generator version/ordered translations, actual raw and validation/accepted-count
+budgets, attempted/rejected/unvalidated counts, choice seed, ranking parameters,
+behavior/tie rule and current encoder definitions/values. The translation generator
+is deterministic and has no random generation seed. Private engine RNG remains
+bound by config/checkpoint commitments and is not published as an actor seed.
+The exact loader recomposes all fields from the supplied typed verified receipts;
+their own loaders remain responsible for engine and scorer reproduction.
+
+Ranker artifact identity and deterministic behavior are declarations, not
+authentication of arbitrary code/weights. Geometry is verified for the selected
+training row; this does not prove an arbitrary scorer used that encoder internally.
+Episode stop reasons are declarations, not proof of runner limit enforcement.
+All receipt data is operator-only and never added to scorer/encoder inputs. The
+focused consumer uses geometry to select a non-first accepted placement through
+ordinary commit/save/load/replay, then joins its reachable mixed episode.
+
+This is partial experiment provenance. Whole-run routing, limits, attempted/failed
+choice accounting, data splits/dataset admission, artifact authentication, broader
+information-access/feature vocabularies and Stage 1 completion remain open. Existing
+TrainingRow, finite/target schemas and adapter wire shapes are unchanged; the
+[deployment adapter contract](ADAPTER_DECISION_CONTRACT.md) still owns execution.
 
 ## Named training target declarations
 

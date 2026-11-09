@@ -2417,6 +2417,12 @@
       "bytes": 18084,
       "mode": "100644",
       "sha256": "12d4b70e44b1d8678086cac7aeee191579bed3d2aa5e553f6514c5f5cf37a67d"
+    },
+    "tests/infrastructure/adapters/test_deployment_experiment.py": {
+      "blob_sha1": "2c1f1d66dc3adee4c73c91cb8665fa50955e44ee",
+      "bytes": 12807,
+      "mode": "100644",
+      "sha256": "866059309064c6863bbe16594b3df2748666d99530bd86d33090257776077a6d"
     }
   },
   "active_roots": [
