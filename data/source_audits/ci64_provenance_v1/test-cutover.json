@@ -2420,15 +2420,15 @@
     },
     "tests/infrastructure/adapters/test_deployment_experiment.py": {
       "mode": "100644",
-      "bytes": 26550,
-      "sha256": "a5e491b0ec56d9adf661bc35f66a2e3121f9ee5180404b66c82f339b5091aefc",
-      "blob_sha1": "cd3cf1445d8a7cf5910280b635492248b2243cff"
+      "bytes": 28884,
+      "sha256": "d38db01e885eb39e64f1088559b76e90cef1e4fe00404f5bc5de61368b70f32c",
+      "blob_sha1": "748ee59287e4b72f1b73ee98edc327e47e8fbf58"
     },
     "tests/infrastructure/adapters/test_runner_accounting.py": {
       "mode": "100644",
-      "bytes": 25257,
-      "sha256": "739a94e3561b7f7dc711f9b98e5b14fa281920d3ff17ff3b9a0986661c927dbb",
-      "blob_sha1": "e175fe5d5bd63bfcb4d5ead74d5325251a6c637a"
+      "bytes": 37433,
+      "sha256": "093685b9b42f7709aa381cd2bb0a8e6846e1763b3af4df3cf8df9b505f0ec55d",
+      "blob_sha1": "69e605d937da3a36c3609c767b0e69ef24efb993"
     }
   },
   "active_roots": [

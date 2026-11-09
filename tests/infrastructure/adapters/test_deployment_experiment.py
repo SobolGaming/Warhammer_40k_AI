@@ -24,6 +24,11 @@ from warhammer40k_core.ai.deployment_candidates import (
     DeploymentCandidatePayload,
     DeploymentPlacementCandidate,
 )
+from warhammer40k_core.ai.deployment_dataset_split import (
+    DeploymentDatasetPartition,
+    DeploymentDatasetSplit,
+    DeploymentSplitAssignment,
+)
 from warhammer40k_core.ai.deployment_experiment import (
     DeploymentExperimentError,
     DeploymentExperimentProvenance,
@@ -528,6 +533,49 @@ def test_runner_dataset_joins_ranked_choice_and_keeps_failed_run_rows_excluded(
         )
         == dataset
     )
+    repeated = DeploymentDatasetAdmission.from_runs(
+        (receipt, receipt), choices=(*choices, (1, experiment, linked, admitted))
+    )
+    datasets = (dataset, repeated)
+    assignments = tuple(
+        DeploymentSplitAssignment(
+            dataset_index, run_index, DeploymentDatasetPartition.TRAIN, "setup", "layout-a"
+        )
+        for dataset_index, run_index in ((0, 0), (1, 0), (1, 1))
+    )
+    split = DeploymentDatasetSplit.from_datasets(datasets, assignments=assignments)
+    split_payload = split.to_payload()
+    split_counts = _object(split_payload["counts"])
+    assert split_counts["attempted_runs"] == split_counts["admitted_rows"] == 3
+    assert split_counts["failed_runs"] == split_counts["excluded_rows"] == 3 * int(failure)
+    assert split_counts["eligible_rows"] == 3 * int(not failure)
+    partitions = _object(split_payload["partitions"])
+    assert _object(partitions["train"])["choice_occurrences"] == [[0, 0], [1, 0], [1, 1]]
+    assert _object(partitions["train"])["counts"] == split_counts
+    assert _object(partitions["validation"])["choice_occurrences"] == []
+    assert _object(partitions["test"])["run_occurrences"] == []
+    assert split_payload["datasets"] == [item.to_payload() for item in datasets]
+    assert (
+        DeploymentDatasetSplit.from_payload(
+            json.loads(json.dumps(split_payload)), datasets=datasets, assignments=assignments
+        )
+        == split
+    )
+    # A split cannot promote an excluded row, discard occurrences or relabel a
+    # supplied partition while retaining the original typed assignment evidence.
+    _object(_object(split_payload["partitions"])["train"])["choice_occurrences"] = [[0, 0]]
+    with pytest.raises(TrainingAdmissionError, match="drifted"):
+        DeploymentDatasetSplit.from_payload(
+            split_payload, datasets=datasets, assignments=assignments
+        )
+    with pytest.raises(TrainingAdmissionError, match="trajectory"):
+        DeploymentDatasetSplit.from_datasets(
+            datasets,
+            assignments=(
+                *assignments[:2],
+                replace(assignments[2], partition=DeploymentDatasetPartition.TEST),
+            ),
+        )
     assert before.to_persistence_payload() != after.to_persistence_payload()
     assert (
         LocalGameSession.from_persistence_payload(

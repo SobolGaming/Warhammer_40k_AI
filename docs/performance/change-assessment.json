@@ -1,586 +1,1083 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "1e9f2170529bdd2609d05177bdda011950004335",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5c2a39a910500c85b2f56adc78b8c05147188a444c1137bd65a2beb04846dfb5",
-  "operation_map_sha256": "cf9e73e3ff987a56390e20bdf3860eb1a7a0df7440797c43c23c5b53e947d665",
+  "base": "be1bac984d2d97a6dbd67361c43c3a0b31002e1e",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a03a3fe975c4e75c13d2d3a44a30c5df851e1620db0e7086c75f1226be9013ae",
+  "operation_map_sha256": "3ee330173a46e8ed1d28a005b9969513874ee5f8fd75eba9dde08a05286fe35d",
   "changes": {
-    ".github/workflows/ci.yml": {
-      "before_sha256": "e13e2fa7df19d7a0e852b55de36e54af18dfc6c4d40fa2b8f6a45984303dfb16",
-      "after_sha256": "6bbe0d42253f920cdf57a008d622c0b203fb59372db224206cc636cf6fa77d06",
-      "owners": {
-        "@document": {
-          "before": "e13e2fa7df19d7a0e852b55de36e54af18dfc6c4d40fa2b8f6a45984303dfb16",
-          "after": "6bbe0d42253f920cdf57a008d622c0b203fb59372db224206cc636cf6fa77d06"
-        }
-      }
-    },
-    "AGENTS.md": {
-      "before_sha256": "400f86357067ffbaecedb22d4a582ed083a26dcf4cf5de036d208ee7330e7a42",
-      "after_sha256": "ad3d947ff75713b004de037a26600ce00b6ab5db44b9862a089092580da3c49c",
-      "owners": {
-        "@document": {
-          "before": "400f86357067ffbaecedb22d4a582ed083a26dcf4cf5de036d208ee7330e7a42",
-          "after": "ad3d947ff75713b004de037a26600ce00b6ab5db44b9862a089092580da3c49c"
-        }
-      }
-    },
     "README.md": {
-      "before_sha256": "495c65f89d1461a0cb1a0de4bbb8a45b2575528fc40dc222a02c989668fbf28c",
-      "after_sha256": "6e2de7dda72a7c394ed50235beff89028c9e9c9592d9732c963c67059984c06c",
+      "before_sha256": "6e2de7dda72a7c394ed50235beff89028c9e9c9592d9732c963c67059984c06c",
+      "after_sha256": "2214d57f18ef9d3eafc75007fd7962d96961371c1aba97f9e51ad6bd535ea9e6",
       "owners": {
         "@document": {
-          "before": "495c65f89d1461a0cb1a0de4bbb8a45b2575528fc40dc222a02c989668fbf28c",
-          "after": "6e2de7dda72a7c394ed50235beff89028c9e9c9592d9732c963c67059984c06c"
-        }
-      }
-    },
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "4e29a0d2543402b81b57df0336e7e8bd9839aef4b30c8ebe00a6554ab0c994a9",
-      "after_sha256": "4ce39c898fcea5fdcaaafeae6c372777479a7f260e34f96a63781381b6218c67",
-      "owners": {
-        "@document": {
-          "before": "4e29a0d2543402b81b57df0336e7e8bd9839aef4b30c8ebe00a6554ab0c994a9",
-          "after": "4ce39c898fcea5fdcaaafeae6c372777479a7f260e34f96a63781381b6218c67"
-        }
-      }
-    },
-    "ci/quality_shards/shard-4-modules.txt": {
-      "before_sha256": "7cf1017f20b086efdf1aa59545405a1ee9d1070aade88f1d5d1808f0b6739a60",
-      "after_sha256": "326fbf6a1e85a4566684e09daaf8c2d99d2b847206124c7e23283610a1abd2ff",
-      "owners": {
-        "@document": {
-          "before": "7cf1017f20b086efdf1aa59545405a1ee9d1070aade88f1d5d1808f0b6739a60",
-          "after": "326fbf6a1e85a4566684e09daaf8c2d99d2b847206124c7e23283610a1abd2ff"
-        }
-      }
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "a3fbdc7441e76d2b3657ea74ced5a445f2643953e6db09d788b8210f02efe663",
-      "after_sha256": "69641fe3334df3e023ff3c7368c7e7209ff411be1e7a61b64e85b83563127f8f",
-      "owners": {
-        "@document": {
-          "before": "a3fbdc7441e76d2b3657ea74ced5a445f2643953e6db09d788b8210f02efe663",
-          "after": "69641fe3334df3e023ff3c7368c7e7209ff411be1e7a61b64e85b83563127f8f"
+          "before": "6e2de7dda72a7c394ed50235beff89028c9e9c9592d9732c963c67059984c06c",
+          "after": "2214d57f18ef9d3eafc75007fd7962d96961371c1aba97f9e51ad6bd535ea9e6"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "d2a809d15f16edb66c38f711aeabf64d135c9c8d4b1030459c4769ae6dd0b9a9",
-      "after_sha256": "29d83f94af473afe58a7cefcc80a24ff2a99d4749669e93bb6bc3beb5c5450d6",
+      "before_sha256": "29d83f94af473afe58a7cefcc80a24ff2a99d4749669e93bb6bc3beb5c5450d6",
+      "after_sha256": "242f29fefa9f3cb77a804e499e5e582c35b1ba01d118df2413a731c2941aedc8",
       "owners": {
         "@document": {
-          "before": "d2a809d15f16edb66c38f711aeabf64d135c9c8d4b1030459c4769ae6dd0b9a9",
-          "after": "29d83f94af473afe58a7cefcc80a24ff2a99d4749669e93bb6bc3beb5c5450d6"
+          "before": "29d83f94af473afe58a7cefcc80a24ff2a99d4749669e93bb6bc3beb5c5450d6",
+          "after": "242f29fefa9f3cb77a804e499e5e582c35b1ba01d118df2413a731c2941aedc8"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
-      "before_sha256": "5f8696b47f3520fce5155763f1d4c5ac6013e9e398013ac11b48a76f5b6a8717",
-      "after_sha256": "507c15f68b052713f1cbff8a64d406680faab6927eac7d4de6c06de3db761c70",
+      "before_sha256": "507c15f68b052713f1cbff8a64d406680faab6927eac7d4de6c06de3db761c70",
+      "after_sha256": "0502176043c983581a7a54b4b3041f59c81d229e86d9ede2e1ee5ba779d4fab6",
       "owners": {
         "@document": {
-          "before": "5f8696b47f3520fce5155763f1d4c5ac6013e9e398013ac11b48a76f5b6a8717",
-          "after": "507c15f68b052713f1cbff8a64d406680faab6927eac7d4de6c06de3db761c70"
+          "before": "507c15f68b052713f1cbff8a64d406680faab6927eac7d4de6c06de3db761c70",
+          "after": "0502176043c983581a7a54b4b3041f59c81d229e86d9ede2e1ee5ba779d4fab6"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "49e1ac4fc3beccd4d9ffefffe3bf572826887dbf4b2f5c852b62c25e797a4fae",
-      "after_sha256": "dc8c22daa4c771dc43da0d5937731d761d19ead6100192ce1a226166ee8c2166",
+      "before_sha256": "dc8c22daa4c771dc43da0d5937731d761d19ead6100192ce1a226166ee8c2166",
+      "after_sha256": "9c1c8ec6c37d6da34cab07c842b8f417c7ab94cafcf2170fda4d7bca8fc715f3",
       "owners": {
         "@document": {
-          "before": "49e1ac4fc3beccd4d9ffefffe3bf572826887dbf4b2f5c852b62c25e797a4fae",
-          "after": "dc8c22daa4c771dc43da0d5937731d761d19ead6100192ce1a226166ee8c2166"
+          "before": "dc8c22daa4c771dc43da0d5937731d761d19ead6100192ce1a226166ee8c2166",
+          "after": "9c1c8ec6c37d6da34cab07c842b8f417c7ab94cafcf2170fda4d7bca8fc715f3"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "73af6859e2c719d30b123671ed95ffc5e3107bec6a94c37b22e35ab1c0c5a040",
-      "after_sha256": "7f36c27e2e123c187e98fae24ddec21a86b606d6490d9cc5d562bb892e6f6b04",
+      "before_sha256": "7f36c27e2e123c187e98fae24ddec21a86b606d6490d9cc5d562bb892e6f6b04",
+      "after_sha256": "f5133b39854e7edf51c2dd5a34ac4f1aec315d929ddbc2e8bec9f6d19dac1ff0",
       "owners": {
         "@document": {
-          "before": "73af6859e2c719d30b123671ed95ffc5e3107bec6a94c37b22e35ab1c0c5a040",
-          "after": "7f36c27e2e123c187e98fae24ddec21a86b606d6490d9cc5d562bb892e6f6b04"
+          "before": "7f36c27e2e123c187e98fae24ddec21a86b606d6490d9cc5d562bb892e6f6b04",
+          "after": "f5133b39854e7edf51c2dd5a34ac4f1aec315d929ddbc2e8bec9f6d19dac1ff0"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "4aa16a296ca21a982666efc1a4cbf622a9f00791b97a457fe0ac2ba9d7651548",
+      "before_sha256": "4aa16a296ca21a982666efc1a4cbf622a9f00791b97a457fe0ac2ba9d7651548",
+      "after_sha256": "80ef4e5f16ec87fbe848945ad6454d73500dd3b4ba7ce24ff9062e42ccf68421",
       "owners": {
         "@document": {
-          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "4aa16a296ca21a982666efc1a4cbf622a9f00791b97a457fe0ac2ba9d7651548"
+          "before": "4aa16a296ca21a982666efc1a4cbf622a9f00791b97a457fe0ac2ba9d7651548",
+          "after": "80ef4e5f16ec87fbe848945ad6454d73500dd3b4ba7ce24ff9062e42ccf68421"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "7df4dd6c6c00c29899c3eae1ee6942eb41e8a2da3b97104143eb62537e649682",
-      "after_sha256": "b7b4df73ecca120ca578a21b8a45cf6229ad76d07bfdbffd189149bf1c149bae",
+      "before_sha256": "b7b4df73ecca120ca578a21b8a45cf6229ad76d07bfdbffd189149bf1c149bae",
+      "after_sha256": "40bf47848c91e8480509ea80c90df194cae72e0c967f3a2debc731da23a95de6",
       "owners": {
         "@document": {
-          "before": "7df4dd6c6c00c29899c3eae1ee6942eb41e8a2da3b97104143eb62537e649682",
-          "after": "b7b4df73ecca120ca578a21b8a45cf6229ad76d07bfdbffd189149bf1c149bae"
+          "before": "b7b4df73ecca120ca578a21b8a45cf6229ad76d07bfdbffd189149bf1c149bae",
+          "after": "40bf47848c91e8480509ea80c90df194cae72e0c967f3a2debc731da23a95de6"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "b40a24ead88989fa458c0cdbf5339dc62bdd7fd0e0a06bb51f50d1b7612b8221",
-      "after_sha256": "4f6e15c2c757a107d8f1be893051e12a0fdc3585c9975cfcd8be7d2c21df331e",
+      "before_sha256": "4f6e15c2c757a107d8f1be893051e12a0fdc3585c9975cfcd8be7d2c21df331e",
+      "after_sha256": "f317563f31c233658bced853cc57bc807a8059663f403aa9d87d65d55ae8f38a",
       "owners": {
         "@document": {
-          "before": "b40a24ead88989fa458c0cdbf5339dc62bdd7fd0e0a06bb51f50d1b7612b8221",
-          "after": "4f6e15c2c757a107d8f1be893051e12a0fdc3585c9975cfcd8be7d2c21df331e"
+          "before": "4f6e15c2c757a107d8f1be893051e12a0fdc3585c9975cfcd8be7d2c21df331e",
+          "after": "f317563f31c233658bced853cc57bc807a8059663f403aa9d87d65d55ae8f38a"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "c950a8d3fac4d2a01c20c1b7f5c2c44dd3a77b0b5e543a453ec7e0ee216b09ca",
-      "after_sha256": "36142e44b2fd4929791d2b4da4aa192e6066f499d5b69b942f95b5c71b55a25f",
+      "before_sha256": "36142e44b2fd4929791d2b4da4aa192e6066f499d5b69b942f95b5c71b55a25f",
+      "after_sha256": "ac3c709a9b5a4774b163b4c40e76c6bc4228663229a71c4db1d94b8d1bc37371",
       "owners": {
         "@document": {
-          "before": "c950a8d3fac4d2a01c20c1b7f5c2c44dd3a77b0b5e543a453ec7e0ee216b09ca",
-          "after": "36142e44b2fd4929791d2b4da4aa192e6066f499d5b69b942f95b5c71b55a25f"
+          "before": "36142e44b2fd4929791d2b4da4aa192e6066f499d5b69b942f95b5c71b55a25f",
+          "after": "ac3c709a9b5a4774b163b4c40e76c6bc4228663229a71c4db1d94b8d1bc37371"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "9ae860baafebfcf6fa775a040c3920c5f15e795a78a14d8e9bb5f7b0c9ac76ff",
-      "after_sha256": "780440d2ce6ab76411ce4d83afa0b1c747ebd52e5706e46f544b44b203375c3d",
+      "before_sha256": "780440d2ce6ab76411ce4d83afa0b1c747ebd52e5706e46f544b44b203375c3d",
+      "after_sha256": "e9bfb6d4152127d34c5779ca55d83db4ac43eb7f2b75a522c026c328bfebfccb",
       "owners": {
         "@document": {
-          "before": "9ae860baafebfcf6fa775a040c3920c5f15e795a78a14d8e9bb5f7b0c9ac76ff",
-          "after": "780440d2ce6ab76411ce4d83afa0b1c747ebd52e5706e46f544b44b203375c3d"
+          "before": "780440d2ce6ab76411ce4d83afa0b1c747ebd52e5706e46f544b44b203375c3d",
+          "after": "e9bfb6d4152127d34c5779ca55d83db4ac43eb7f2b75a522c026c328bfebfccb"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "29f331bae2d766edc097f6b8d84a30b3df5967f6304b0be35eac6dbac3afdb6d",
-      "after_sha256": "818a5478a6daef2543fffe6061e3f266543a9a2774ab93ce3da93463735208c6",
+      "before_sha256": "818a5478a6daef2543fffe6061e3f266543a9a2774ab93ce3da93463735208c6",
+      "after_sha256": "5a8261890bcd335ebb6b1d99da879c80195b14fa5ced5626abcb7e009856403e",
       "owners": {
         "@document": {
-          "before": "29f331bae2d766edc097f6b8d84a30b3df5967f6304b0be35eac6dbac3afdb6d",
-          "after": "818a5478a6daef2543fffe6061e3f266543a9a2774ab93ce3da93463735208c6"
+          "before": "818a5478a6daef2543fffe6061e3f266543a9a2774ab93ce3da93463735208c6",
+          "after": "5a8261890bcd335ebb6b1d99da879c80195b14fa5ced5626abcb7e009856403e"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "e6da45e19dbdb1bc2544a839acd45c0a58859ee5dacb6e6fa4163a4629c6bcc6",
-      "after_sha256": "51af39364c1d3e902e0b2df4e88c8abe1844941b213dad0ea041ab0e5b323678",
+      "before_sha256": "51af39364c1d3e902e0b2df4e88c8abe1844941b213dad0ea041ab0e5b323678",
+      "after_sha256": "e40d4b3f10f055a014ac1e1afada5ebf733ad0dd73dcae5b404a0396d3e73c55",
       "owners": {
         "@document": {
-          "before": "e6da45e19dbdb1bc2544a839acd45c0a58859ee5dacb6e6fa4163a4629c6bcc6",
-          "after": "51af39364c1d3e902e0b2df4e88c8abe1844941b213dad0ea041ab0e5b323678"
+          "before": "51af39364c1d3e902e0b2df4e88c8abe1844941b213dad0ea041ab0e5b323678",
+          "after": "e40d4b3f10f055a014ac1e1afada5ebf733ad0dd73dcae5b404a0396d3e73c55"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "7ae2043c09f9a018676f910a6c8f8170adf57a942fe881bae888a8d4e102a2eb",
-      "after_sha256": "0ea3dac4576cb9e747f6ac428f87ca693441eefae29e01086cee89a629a87e2c",
+      "before_sha256": "0ea3dac4576cb9e747f6ac428f87ca693441eefae29e01086cee89a629a87e2c",
+      "after_sha256": "a9b4831e29d6f237d1667ab868b3dc878a1eacc102c7194b5e345ef26b93b23c",
       "owners": {
         "@document": {
-          "before": "7ae2043c09f9a018676f910a6c8f8170adf57a942fe881bae888a8d4e102a2eb",
-          "after": "0ea3dac4576cb9e747f6ac428f87ca693441eefae29e01086cee89a629a87e2c"
+          "before": "0ea3dac4576cb9e747f6ac428f87ca693441eefae29e01086cee89a629a87e2c",
+          "after": "a9b4831e29d6f237d1667ab868b3dc878a1eacc102c7194b5e345ef26b93b23c"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "680db5bc05934fb622b4469b7f31342d5e0e318c7246b8dc13e5f798392486de",
-      "after_sha256": "9db8ff207f5153d4438bb26799a31cd0b4f4953faf5b8472d1bfca0d6dcdbc03",
+      "before_sha256": "9db8ff207f5153d4438bb26799a31cd0b4f4953faf5b8472d1bfca0d6dcdbc03",
+      "after_sha256": "6738dd781568b41b1ae7108131aeb64db2a4bf19ef580defee19a45829ddecfc",
       "owners": {
         "@document": {
-          "before": "680db5bc05934fb622b4469b7f31342d5e0e318c7246b8dc13e5f798392486de",
-          "after": "9db8ff207f5153d4438bb26799a31cd0b4f4953faf5b8472d1bfca0d6dcdbc03"
+          "before": "9db8ff207f5153d4438bb26799a31cd0b4f4953faf5b8472d1bfca0d6dcdbc03",
+          "after": "6738dd781568b41b1ae7108131aeb64db2a4bf19ef580defee19a45829ddecfc"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "2aac9ba12531b686e69bf9512630ad740a2eacaee48d2441b44d8e35471d99a0",
-      "after_sha256": "e2abb7018e06f6ff73c3951ca7ff5b6c66b08d469985509f5c4f8cecd76dd8da",
+      "before_sha256": "e2abb7018e06f6ff73c3951ca7ff5b6c66b08d469985509f5c4f8cecd76dd8da",
+      "after_sha256": "c4077153055ec989ed70e7fbc4f16741a13b2a24a0af4bf669a7db20b94a594c",
       "owners": {
         "@document": {
-          "before": "2aac9ba12531b686e69bf9512630ad740a2eacaee48d2441b44d8e35471d99a0",
-          "after": "e2abb7018e06f6ff73c3951ca7ff5b6c66b08d469985509f5c4f8cecd76dd8da"
+          "before": "e2abb7018e06f6ff73c3951ca7ff5b6c66b08d469985509f5c4f8cecd76dd8da",
+          "after": "c4077153055ec989ed70e7fbc4f16741a13b2a24a0af4bf669a7db20b94a594c"
         }
       }
     },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "before_sha256": "b34460c76fbf29206a85b2fe7ea5bc5a3224a8abdcca4d9501d671093dff6a32",
-      "after_sha256": "8dd1274dbb6dea216e6da691549746977d9273bc4524a07271b5bb8d4da5f52b",
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "64b2037c30bb8e8f9bcdae54e15a77f8b8ed33ec316f62b269c7271e683a910f",
+      "after_sha256": "28798c756b4f476b3d5d180067ac158396ba8b62f45332560eadf21baa2b537b",
       "owners": {
         "@document": {
-          "before": "b34460c76fbf29206a85b2fe7ea5bc5a3224a8abdcca4d9501d671093dff6a32",
-          "after": "8dd1274dbb6dea216e6da691549746977d9273bc4524a07271b5bb8d4da5f52b"
+          "before": "64b2037c30bb8e8f9bcdae54e15a77f8b8ed33ec316f62b269c7271e683a910f",
+          "after": "28798c756b4f476b3d5d180067ac158396ba8b62f45332560eadf21baa2b537b"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "a4a81e74319d2494bdb28dbf4bf4efe4385313869916ae4ad1b4d51458881c37",
+      "after_sha256": "1d5accd84e5eb59db987fe08ea9664aa98d26e833bdef0686f8daff7e16f0a4d",
+      "owners": {
+        "@document": {
+          "before": "a4a81e74319d2494bdb28dbf4bf4efe4385313869916ae4ad1b4d51458881c37",
+          "after": "1d5accd84e5eb59db987fe08ea9664aa98d26e833bdef0686f8daff7e16f0a4d"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "4038ffd0b962a780efeb366ae03d7bd8b6d9edd38361565d51194266a8374a37",
+      "after_sha256": "0e006339974d7e84c53a66d62066bdf33f5d93aab68bf2f028517581ce9a0161",
+      "owners": {
+        "@document": {
+          "before": "4038ffd0b962a780efeb366ae03d7bd8b6d9edd38361565d51194266a8374a37",
+          "after": "0e006339974d7e84c53a66d62066bdf33f5d93aab68bf2f028517581ce9a0161"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "5607732ed832af4cec6bf13779e9e47cf0b835cc3aa5dd2e7018595e46622a4b",
+      "after_sha256": "f22010a25ce81fc74e0dc50fba1a40d4eb8a539d3dc941873166d2abefe3c9a5",
+      "owners": {
+        "@document": {
+          "before": "5607732ed832af4cec6bf13779e9e47cf0b835cc3aa5dd2e7018595e46622a4b",
+          "after": "f22010a25ce81fc74e0dc50fba1a40d4eb8a539d3dc941873166d2abefe3c9a5"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "3467db0b84621d26aaec3038ab3e7d0e7bb0dab123d7b8a06efdc1b780f4203a",
+      "after_sha256": "da3c661fb1da680e8e0c10633eddace0d2a8151c1b3f148f7477c9b68f737695",
+      "owners": {
+        "@document": {
+          "before": "3467db0b84621d26aaec3038ab3e7d0e7bb0dab123d7b8a06efdc1b780f4203a",
+          "after": "da3c661fb1da680e8e0c10633eddace0d2a8151c1b3f148f7477c9b68f737695"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "1a6c51120a9fed9bcfecb6aa0d15993f07dff55a49b59cbcbc9f83bfca4097e6",
+      "after_sha256": "53e0fdfe43d26628b4739e01aa640849dcda2bb8e394e9ab474150c0114ee82b",
+      "owners": {
+        "@document": {
+          "before": "1a6c51120a9fed9bcfecb6aa0d15993f07dff55a49b59cbcbc9f83bfca4097e6",
+          "after": "53e0fdfe43d26628b4739e01aa640849dcda2bb8e394e9ab474150c0114ee82b"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "d0bea3a593c98f8451459a1b43bba8fda2c75771113a75db61dfdd7b88de0fef",
+      "after_sha256": "3d2b6b10eb4825822cb525c77ca152cac36c6aa319fcc81d4a99b76317fb9c3d",
+      "owners": {
+        "@document": {
+          "before": "d0bea3a593c98f8451459a1b43bba8fda2c75771113a75db61dfdd7b88de0fef",
+          "after": "3d2b6b10eb4825822cb525c77ca152cac36c6aa319fcc81d4a99b76317fb9c3d"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "e37746e3fb42c153d6ddd24499e1f94af7a42a5ae6cd32753255b4c09b7b9884",
+      "after_sha256": "11222821dbedf2a454d20bd76210d2bd6cee1f716b40892d4a7c765905a127e9",
+      "owners": {
+        "@document": {
+          "before": "e37746e3fb42c153d6ddd24499e1f94af7a42a5ae6cd32753255b4c09b7b9884",
+          "after": "11222821dbedf2a454d20bd76210d2bd6cee1f716b40892d4a7c765905a127e9"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "before_sha256": "997f14f408155f5645d992be34c1ba06afcdd6ec86c2c2b7e529c30b603ac9cd",
+      "after_sha256": "7edc78adc91ac2eddb7326595769c6891be909cb0982a95d9cca8019f7b0ff71",
+      "owners": {
+        "@document": {
+          "before": "997f14f408155f5645d992be34c1ba06afcdd6ec86c2c2b7e529c30b603ac9cd",
+          "after": "7edc78adc91ac2eddb7326595769c6891be909cb0982a95d9cca8019f7b0ff71"
+        }
+      }
+    },
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "before_sha256": "d2b378857123d17be2e166285d729e24531064bfbe5c9ab6122043550184a5f8",
+      "after_sha256": "3891c9d37e9ba057cbd7daa78b67191deabfdb25580f5d7998c45b821f78cf76",
+      "owners": {
+        "@document": {
+          "before": "d2b378857123d17be2e166285d729e24531064bfbe5c9ab6122043550184a5f8",
+          "after": "3891c9d37e9ba057cbd7daa78b67191deabfdb25580f5d7998c45b821f78cf76"
+        }
+      }
+    },
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "b3c96c828f18a30f204f8d9fdca685aeca83a6081da248a25fa24ddf05b463c6",
+      "after_sha256": "08fc2fb799fa1caec8540101f5c3cbb8045a542fd315f4bd1f0a81cce933a162",
+      "owners": {
+        "@document": {
+          "before": "b3c96c828f18a30f204f8d9fdca685aeca83a6081da248a25fa24ddf05b463c6",
+          "after": "08fc2fb799fa1caec8540101f5c3cbb8045a542fd315f4bd1f0a81cce933a162"
+        }
+      }
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "before_sha256": "2c288e142fcfc1cc4bf355fa2427a51bd5000197ebb8bcbcb7b943163b83e81e",
+      "after_sha256": "0dd5dd41910f1af971e386ffd310d56c12b3b7108e998924f12e8cdda3bca4bd",
+      "owners": {
+        "@document": {
+          "before": "2c288e142fcfc1cc4bf355fa2427a51bd5000197ebb8bcbcb7b943163b83e81e",
+          "after": "0dd5dd41910f1af971e386ffd310d56c12b3b7108e998924f12e8cdda3bca4bd"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "439bcc0c19ab88cf56b6296509a4c6f4a8f97cfbc073ed4baf4189cc4df596dc",
-      "after_sha256": "55e2f7fe3033b2f97ed2b5f8d3ff322db65f7c4b8791638777974c8c95034454",
+      "before_sha256": "55e2f7fe3033b2f97ed2b5f8d3ff322db65f7c4b8791638777974c8c95034454",
+      "after_sha256": "92cd879d9acbabf4cfbf38cd3ce2e9c3c1a8f9a4283ca1f09a0be791f7851679",
       "owners": {
         "@document": {
-          "before": "439bcc0c19ab88cf56b6296509a4c6f4a8f97cfbc073ed4baf4189cc4df596dc",
-          "after": "55e2f7fe3033b2f97ed2b5f8d3ff322db65f7c4b8791638777974c8c95034454"
+          "before": "55e2f7fe3033b2f97ed2b5f8d3ff322db65f7c4b8791638777974c8c95034454",
+          "after": "92cd879d9acbabf4cfbf38cd3ce2e9c3c1a8f9a4283ca1f09a0be791f7851679"
         }
       }
     },
-    "scripts/behavioral_deadline.py": {
-      "before_sha256": null,
-      "after_sha256": "4ea3b32022b9bf12959c36d022cbc0e0a81ed26512a7c49876bdaa0870b306e8",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "40b9c41777554adfff4fb70b59dfb63eb70917560e01f36049e2b186951b29f6"
-        },
-        "approved": {
-          "before": null,
-          "after": "a263369b22e070c7353aa012461d71b2d9168e1966cce4f46c54a5f5c229bd43"
-        },
-        "main": {
-          "before": null,
-          "after": "db564ee8aa27028af96a4c6836c296333484273605d312fa8d5098bfb253827d"
-        },
-        "snapshot_coverage": {
-          "before": null,
-          "after": "f2c983e240360f8dfdb4bbde531f954800f7cabc8ede45a63cb09c624bdafee8"
-        },
-        "supervise": {
-          "before": null,
-          "after": "cb5eebbba158a4cccf6df4606618af6c38daba7d4fae6139c72f15c780958ed1"
-        },
-        "termination_due": {
-          "before": null,
-          "after": "a6e199511a1416a9368593ae9ae7663458249f310b10587fdcdbd692764c8f5b"
-        }
-      }
-    },
-    "scripts/ci_attribution_supervisor.py": {
-      "before_sha256": "efbb32849dbe057f8a7df57c76be881ec69f1353da4d80a018850ee802e05cb9",
-      "after_sha256": "4d3bf3cadfb7920745a5d38c07455554040c253084a6f1b90eb5aac646abf79d",
-      "owners": {
-        "@module": {
-          "before": "cc8154eee280f221a8ae79487a1cc1263b6284fea9abc29fe6ab30b92c22784c",
-          "after": "09bbfbca3423e8f0e8b3c84859271c333b36388f031544f90ec023be97bc2a21"
-        },
-        "cleanup": {
-          "before": "f34da8c9e35c2295731e824944cca25476e6a1656cbd05960f61450228aed128",
-          "after": "8df00a628c92b832d2289e29962d40b677a699184f592d2bfabb0e73c4d79870"
-        },
-        "run_owned": {
-          "before": "8a19c0bab5bdacb34979f07606ebaf5ba06501af4607f1be817a74bc01c5b89d",
-          "after": "e7fbeb6970e768fe4168baf8b063e8380d04c711f4be75ee5fc4f4eadf2293f8"
-        }
-      }
-    },
-    "scripts/ci_source_index.py": {
-      "before_sha256": "8a8d7c4cde41ecbc9d575c1a44b47a4c7690e197a197535d1547bdfc63ef1a33",
-      "after_sha256": "037ef5be429aec8abdcb2093453fc671607830827949266f9c69ffa5d5420a80",
-      "owners": {
-        "BuildGate": {
-          "before": "a73527b75507bc8db3e20bc5d82d594de55ed9e292953e41cf6f805dcb00344a",
-          "after": "1632f9d6f59dbdb2d6c3640050b8c52021ee48dd3793f6e69f06ad935e891fe2"
-        },
-        "BuildGate.wait": {
-          "before": "ec9fce4f13d6ad82cdde8dd954c08724b5e2897b37d288180fa3d8641b5ddb71",
-          "after": "145fb3865f31fa5d07acd73829efa7766ec3644351057818dfd743c3488b425f"
-        },
-        "pytest_addoption": {
-          "before": "931ded419063d528928cc6235c8a7f12a61cec0e538f30188dba2ff13b2c22f5",
-          "after": "5c8e81f101a35481823bc9a1466611c9fb6a03bfab240ea75cdcc0ec83225a6e"
-        },
-        "pytest_configure": {
-          "before": "d49aa162196151f80703908681381aac7fec95956d4ed06412c8bb3fb1dc7cfa",
-          "after": "1b390b3132e9feb0958081fa0df067096d58fe28e335439ec4f07d823e87f3d2"
-        }
-      }
-    },
-    "scripts/run_behavioral_coverage.sh": {
-      "before_sha256": null,
-      "after_sha256": "c7137faa1d952e3b8ca4c02ff5b6ce3d81c3f44515a698af5d5f5e1da416dd01",
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "7807200de0081a0b500ca69c811ac62644dc9d45e5e2f2bdca43681ecc8dd0fa",
+      "after_sha256": "b2ad8dfd75676751dfe43ac46f2c6f1fcc173e01d107fbf4cbe862bade34a372",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "c7137faa1d952e3b8ca4c02ff5b6ce3d81c3f44515a698af5d5f5e1da416dd01"
+          "before": "7807200de0081a0b500ca69c811ac62644dc9d45e5e2f2bdca43681ecc8dd0fa",
+          "after": "b2ad8dfd75676751dfe43ac46f2c6f1fcc173e01d107fbf4cbe862bade34a372"
         }
       }
     },
-    "tests/code_quality/test_behavioral_deadline.py": {
+    "src/warhammer40k_core/ai/deployment_dataset_split.py": {
       "before_sha256": null,
-      "after_sha256": "4da2c6fe9d96bccc5c12481124af96e7dd9d5bb762fb12529ba3e8b15e9d071d",
+      "after_sha256": "5a14566879c3f983042d7a1d8dca481705044b55249dcac8e07284a5d47a204b",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7cac9c777638593881ed06948010f5ff2d568b2b7d00cdbe927e7915e6796a25"
+          "after": "7afabb7e654cb2172e4f6d8537958f52638913ff2f664e5611fe84cb150ccf13"
         },
-        "test_approval_and_execution_boundaries_are_independent": {
+        "DeploymentDatasetPartition": {
           "before": null,
-          "after": "12e7dd54c31cd292a9af556c178212623036d8c985566f259d935ee2452797b3"
+          "after": "528c8f8dd8331448f7daf38a528cfe07ef793ed45343961dafe057dcc706bd7c"
         },
-        "test_cancellation_after_workload_exit_fails_approval": {
+        "DeploymentDatasetSplit": {
           "before": null,
-          "after": "9674e853f5f1a3442d363901d34ce27e8e1d6f7309b2e2ed4319d0fd6b7cc0b8"
+          "after": "ddcf00933e8d92bbb14225d70e78e1c35bd01bcbc6ba188efcb404d07f9e5f7b"
         },
-        "test_execution_timeout_stops_descendants_and_preserves_only_available_partial_results": {
+        "DeploymentDatasetSplit.__init__": {
           "before": null,
-          "after": "180590210895d15430509e3637f67d5a736b96674eca0f294654a171501dda46"
+          "after": "6685c81138b92d6798c49c343d4811492c13a9d12f99e810c8b0e6d2fd001628"
         },
-        "test_hosted_workload_uses_supervisor_and_preserves_diagnostics": {
+        "DeploymentDatasetSplit.content_hash": {
           "before": null,
-          "after": "cec26afb27bbeeb7b11bffcbe5ce2f44dc276db11db1b2390162d4ac68721e61"
+          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
         },
-        "test_late_passing_pytest_keeps_complete_reports_and_coverage_but_fails_approval": {
+        "DeploymentDatasetSplit.from_datasets": {
           "before": null,
-          "after": "e973279a8ceff009d8d0a49dd0d151cb4ad80fcfc8ef6937c47c13ba9c50574b"
+          "after": "ed880efbd5cb2c26ab615c6161b5dfc662d4dfc75465e667d2a4e5ed563bf09e"
         },
-        "test_source_index_barrier_consumes_the_shared_monotonic_deadline": {
+        "DeploymentDatasetSplit.from_payload": {
           "before": null,
-          "after": "f71bfc955a6075d0d8d0272eebd738e5f367237e378a5ee5154ccf7d5566de13"
+          "after": "b17057af1b25e6674a6d076186d2780bbaedc225891f9ca05c66ad6063ccc4cd"
         },
-        "test_successful_short_workload_is_approved": {
+        "DeploymentDatasetSplit.to_payload": {
           "before": null,
-          "after": "46446ee5db4dbc280becc61c00ee0a55aeb4ec3e58d0a9e36be5a6f87a6584fa"
+          "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
+        },
+        "DeploymentSplitAssignment": {
+          "before": null,
+          "after": "6c9c27a8f657076083817776ec3df0f09f0c942fcbed067b380a58136a77af17"
+        },
+        "DeploymentSplitAssignment.__post_init__": {
+          "before": null,
+          "after": "5b7c3c2789dcae768fa32b003d4aa40adf91491380d48a029ce4fc5c9ffbb308"
+        },
+        "DeploymentSplitAssignment.to_payload": {
+          "before": null,
+          "after": "1873e5ebe8c6d2c36cbba144becdd99c964b7e4c62bf0e5b871a293fcb6046ee"
+        },
+        "_counts": {
+          "before": null,
+          "after": "276ddc73543125402281437c8b6756bd1217a09c805c9c0c78992750de47bf93"
+        },
+        "_require": {
+          "before": null,
+          "after": "3e4e41ff3c8c7f6151e8cfe962471bc5109b5c5a9dd657efb33db1d520d98bee"
         }
       }
     },
-    "tests/code_quality/test_ci_performance_gates.py": {
-      "before_sha256": "2b76e3ff85a9708810c246f4c2954309507a82b1468b36f9d7cf07e9dcd21eb6",
-      "after_sha256": "7153158d2a95dea16d131a453b547984198a9b0f9be2ad03c82e0b56883d2535",
+    "tests/infrastructure/adapters/test_deployment_experiment.py": {
+      "before_sha256": "a5e491b0ec56d9adf661bc35f66a2e3121f9ee5180404b66c82f339b5091aefc",
+      "after_sha256": "d38db01e885eb39e64f1088559b76e90cef1e4fe00404f5bc5de61368b70f32c",
       "owners": {
-        "test_cold_source_index_overlaps_startup_inside_the_unchanged_deadline": {
-          "before": "b7fedddfe196da16b40ffae24cbf00064261d675af41caec79e40c24115868ce",
-          "after": "5f137fabcfb00f288dae812748d071713eb06a3bfc7ec1d2bcee5c91abbacdfb"
+        "@module": {
+          "before": "f65227e71fea11c1ab64036f002e4739ffa2ec327790513757d82f3a028cc154",
+          "after": "cde32271d7119749ff748f9c55b9ef0a18c4e9f442994b1513bc80bd6c02e831"
+        },
+        "test_runner_dataset_joins_ranked_choice_and_keeps_failed_run_rows_excluded": {
+          "before": "dc953ac16a45d0c1e4df0d21d48dd7067bd27638f8cf1dffe1d706e1996fa7c5",
+          "after": "a18935fbc5922bf863e42569b2e5d217b8f9e4eb96b97a525935498e5d60afc1"
         }
       }
     },
-    "tests/code_quality/test_quality_runtime.py": {
-      "before_sha256": "64b68643fb3b867db3dac35435c68f3164406412508a9c1b7267e76dfa43d073",
-      "after_sha256": "014f6e1473c6d35e8a497be75780c73c7bad395417ddab669f2b3a3d4b3cb132",
+    "tests/infrastructure/adapters/test_runner_accounting.py": {
+      "before_sha256": "739a94e3561b7f7dc711f9b98e5b14fa281920d3ff17ff3b9a0986661c927dbb",
+      "after_sha256": "093685b9b42f7709aa381cd2bb0a8e6846e1763b3af4df3cf8df9b505f0ec55d",
       "owners": {
-        "test_live_workflow_preserves_required_names_and_all_four_producer_controls": {
-          "before": "77a58d03e22d2c31747612929dbbebf2ba5a92ac78f21c25defc7886fc87e1e2",
-          "after": "392b2e90242bc784b51badc0f41ca7dcfa89263b90e6d612237ae68754d19e77"
-        }
-      }
-    },
-    "tests/code_quality/test_section08_native_mission_source.py": {
-      "before_sha256": "1e8696112b6a6cce2a7dde0053b103febf716b626db6bccb9fe5b6373837d1b7",
-      "after_sha256": "7b9051ec479f41172350e843ae9799c1560799f0677aa595ac83b782a82192b7",
-      "owners": {
-        "test_source_history_guard_precedes_index_and_covered_pytest": {
-          "before": "66ef55e74c663c678cda0717423f91c929f0972e291758c63d7bf835dd905438",
-          "after": "6e292f530b2c3881a12adfa631cbd5eace5fbf9dce34f905617babe149a7f4e8"
+        "@module": {
+          "before": "c5124bb4dbe7af506f7098c0d4d8fa2d4fffe9a58e07b40fa9cf933d4f7e6911",
+          "after": "38a187211e7fa30e0c5623ce58375042ab4659882b12b6c68ba5699295c8b7e7"
+        },
+        "_split_assignments": {
+          "before": null,
+          "after": "17a642e3a2146f32d979058da4c69f60616fe3edf42c797ec8f56a6831524598"
+        },
+        "split_datasets": {
+          "before": null,
+          "after": "94201c71742ffad09e2c01bb44ca453d4483deb6ac315f12fd48b119fc9e357b"
+        },
+        "test_split_assignment_rejects_inexact_or_missing_declarations": {
+          "before": null,
+          "after": "beac313cc76f1bc337111430f32bc3ce88e6d78fd0be9daf0607df10308c302c"
+        },
+        "test_split_binds_declared_trajectory_ids_across_distinct_verified_startups": {
+          "before": null,
+          "after": "06abc3c762b94b93ae4b3f88b5d9925e1cda048d253102c216993bc8ac89b6a9"
+        },
+        "test_split_closed_loader_rejects_changed_evidence_or_accounting": {
+          "before": null,
+          "after": "cfc01bc6a1a21b535f20ecb4a5ca0a1547be8fbbc2760f0ef7cad195a7ef1fef"
+        },
+        "test_split_keeps_duplicate_and_replayed_prefix_trajectories_together": {
+          "before": null,
+          "after": "1d641624144323ccd5e3c43c96d505dedff780904bc959cc5df5fe079692808c"
+        },
+        "test_split_preserves_duplicate_occurrences_and_zero_row_failure_denominators": {
+          "before": null,
+          "after": "e2e22e3ed31cab903dcf6ed1b7d184b126227003cb08ffa249a4d4e0ef77cc23"
+        },
+        "test_split_rejects_incomplete_or_ambiguous_occurrence_assignments": {
+          "before": null,
+          "after": "daa148c28835a585a3c6b7ba083697ee1127bf877b1f2665868274db2d0e4f20"
+        },
+        "test_split_rejects_independent_declared_group_leakage": {
+          "before": null,
+          "after": "8cd79b807f51c12a635362c351fc16b2c50edee8243d8c7f888ef840f5d1ddde"
+        },
+        "test_split_requires_typed_admitted_inputs": {
+          "before": null,
+          "after": "4e90c3126b484b93f8de6ae6d8e47e34bc57ca4fdd16cf8ad03e4a35c1c3a215"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "71afe1655bfebfd762acf43633f4849b198f288df0b65acaeddfc3e18835ccee",
-      "after_sha256": "c88bf4d7576aa4fe642c1f7db90aceb1cd03346f265135d753c97b3e57af2888",
+      "before_sha256": "c88bf4d7576aa4fe642c1f7db90aceb1cd03346f265135d753c97b3e57af2888",
+      "after_sha256": "2a348ac1ec1d616052466e6fc49ff1b1d37c6e8073ac26f7c85668e9f563e1fb",
       "owners": {
         "@document": {
-          "before": "71afe1655bfebfd762acf43633f4849b198f288df0b65acaeddfc3e18835ccee",
-          "after": "c88bf4d7576aa4fe642c1f7db90aceb1cd03346f265135d753c97b3e57af2888"
+          "before": "c88bf4d7576aa4fe642c1f7db90aceb1cd03346f265135d753c97b3e57af2888",
+          "after": "2a348ac1ec1d616052466e6fc49ff1b1d37c6e8073ac26f7c85668e9f563e1fb"
         }
       }
     }
   },
   "rows": {
-    ".github/workflows/ci.yml": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavioral-worker-progress",
-        "covered-shard-workload"
-      ],
-      "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
-    },
-    "AGENTS.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "",
-      "unchanged_work": ""
-    },
     "README.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "",
-      "unchanged_work": ""
-    },
-    "ci/quality_shards/all.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "",
-      "unchanged_work": ""
-    },
-    "ci/quality_shards/shard-4-modules.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "",
-      "unchanged_work": ""
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
       "source_obligation": "",
       "unchanged_work": ""
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/hosted-calibration.json": {
       "category": "rule_semantics",
       "operations": [
-        "hosted-timing-calibration",
-        "mfm-current-behavior-profile"
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission",
+        "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
+      ],
+      "selected_families": [],
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+    },
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
+    "docs/AI_POLICY_INTERFACE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
       "source_obligation": "",
       "unchanged_work": ""
     },
@@ -588,87 +1085,54 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
       "source_obligation": "",
       "unchanged_work": ""
     },
-    "scripts/behavioral_deadline.py": {
+    "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "covered-shard-deadline-controller"
+        "source-record",
+        "order108-terrain-semantics",
+        "order109-unit-control-semantics",
+        "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
-    "scripts/ci_attribution_supervisor.py": {
+    "src/warhammer40k_core/ai/deployment_dataset_split.py": {
       "category": "rule_semantics",
       "operations": [
-        "ci-diagnostic-ci-attribution-supervisor"
+        "deployment-dataset-partitions"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
-    "scripts/ci_source_index.py": {
+    "tests/infrastructure/adapters/test_deployment_experiment.py": {
       "category": "rule_semantics",
       "operations": [
-        "ci-source-index-startup"
+        "deployment-experiment-provenance",
+        "deployment-dataset-partitions"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
-    "scripts/run_behavioral_coverage.sh": {
+    "tests/infrastructure/adapters/test_runner_accounting.py": {
       "category": "rule_semantics",
       "operations": [
-        "covered-shard-workload"
+        "player-policy-boundary",
+        "deployment-dataset-partitions"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
-    },
-    "tests/code_quality/test_behavioral_deadline.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "covered-shard-deadline-regression"
-      ],
-      "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
-    },
-    "tests/code_quality/test_ci_performance_gates.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "ci-source-index-deadline-guard"
-      ],
-      "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
-    },
-    "tests/code_quality/test_quality_runtime.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "ci69-qualification-791593bfe3358a4b2494de163105067ce4a8b0311cd0f91b15629ec6395d030a"
-      ],
-      "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
-    },
-    "tests/code_quality/test_section08_native_mission_source.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "",
-      "unchanged_work": ""
+      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
+      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -676,9 +1140,9 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Separate covered-shard approval from execution allowance and preserve diagnostics; maintain exact CI evidence and inventory while retaining the complete hosted 6,178-case profile and all prior slower observations.",
-      "source_obligation": "Covered CI approval requires completion within 1,080 seconds; timing termination starts only after 1,800 seconds. Preserve complete late results and available partial diagnostics.",
-      "unchanged_work": "No engine, native measured-workload, dependency or behavioral-case changes. Twelve shards, 67% branch coverage, mirror 120-second, smoke 180-second and quality 600-second bounds remain intact. CI supervision implements the separately authorized 18/30-minute policy."
+      "rationale": "Refresh only the current README authentication fingerprint after the permitted timing-provenance guidance update; preserve every source capture, hierarchy obligation and assertion.",
+      "source_obligation": "The section07 authentication regression requires the current maintained README bytes to match its reviewed current-control fingerprint. Historical source and raw-capture commitments retain their exact original values.",
+      "unchanged_work": "Only one maintained-document SHA256 changes. Runtime and Python test bytes, native hierarchy semantics, raw source captures, behavioral selection, timing formulas and measured performance workloads remain unchanged."
     }
   },
   "milestone": "ordinary",
