@@ -2411,6 +2411,12 @@
       "bytes": 42323,
       "mode": "100644",
       "sha256": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38"
+    },
+    "tests/infrastructure/adapters/test_deployment_geometry_features.py": {
+      "blob_sha1": "8c6bafe129269b04042ca3c31518e14859f1db13",
+      "bytes": 18084,
+      "mode": "100644",
+      "sha256": "12d4b70e44b1d8678086cac7aeee191579bed3d2aa5e553f6514c5f5cf37a67d"
     }
   },
   "active_roots": [

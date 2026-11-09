@@ -551,6 +551,61 @@ legacy training schema, runner route, proposal payload or adapter wire contract 
 same deployment proposal and ordinary submission path. Tactical/learned rankers,
 other proposal families, broader references and dataset admission remain follow-ups.
 
+## Deployment model-origin semantic features
+
+`ai.deployment_geometry_features.DeploymentGeometryObservation.from_candidate(...)`
+derives an independently versioned `deployment-model-origin-observation-v1` from
+one bound actor-view deployment candidate and its `PlayerDecisionContext`. The
+closed `deployment-model-origin-features-v1` registry pins these ordered values:
+
+| Feature | Type and dimensions | Units and meaning |
+|---|---|---|
+| `deployment-model-count` | Integer scalar `[]` | Count of distinct proposed model references, each once across component units. |
+| `deployment-origin-centroid` | Real vector `[3]` | Unweighted arithmetic mean of proposed model-origin X, Y, Z in inches. |
+| `deployment-origin-span` | Real vector `[3]` | Maximum minus minimum model-origin X, Y, Z in inches. |
+
+The frame is the ordinary proposal's absolute battlefield-world XYZ frame, with
+no actor-relative rotation or normalization. Origins are pose positions, not
+physical footprint edges, base/hull extents, facing, terrain distances, objective
+control or coherency. A singleton has zero span. All definitions declare
+`decision_context` source, `actor_view` information scope, exact aggregation and
+no categorical vocabulary. Numerical reduction uses geometry ordering so model
+reference names and proposal ordering do not affect the seven flattened numeric
+`model_inputs`. Actor/request/view/candidate IDs and candidate content hash remain
+separate linkage fields, never model inputs. Source descriptors identify the
+versioned encoder, not a new rule or official source obligation.
+
+This pure encoder reads only the supplied proposal and actor context. It rejects
+empty or duplicate model references, malformed XYZ origins, booleans, nonnumeric
+coordinates and nonfinite/overflowing summaries. It does not validate placement
+legality or certify the model set against authoritative state. Actual ranking
+uses the existing accepted-only boundary and ordinary engine commit. Its exact
+loader rederives values and compares all fields, registry definitions and full
+candidate/context binding; geometry-equivalent renamed candidates have equal
+numeric inputs but distinct evidence. Returned payloads are detached.
+
+`training_features()` emits the corresponding three existing `TrainingFeature`
+values, with `encoder:deployment-model-origin-features-v1` provenance. The
+separate operator-only `DeploymentTrainingGeometry.from_link(...)` requires an
+existing `RankedDeploymentTrainingLink`, complete row and historical context. It
+rechecks that link's ranking, selection, accepted transition and full row, derives
+geometry for exactly its selected candidate, and requires the complete ordered
+row feature definitions, values, shapes and source descriptors to match. The
+`deployment-training-geometry-v1` receipt binds the complete ranked-link hash and
+derived observation. Its loader redoes these checks; unrelated accepted-candidate
+geometry and unsupported extra features fail. Existing rows are not rewritten;
+finite features, TrainingRow v1 and target admission retain their semantics.
+
+Focused regressions exercise a non-first geometry-ranked legal alternative,
+ordinary commit/save/load/exact replay, exact selected-row joins, definition and
+value drift, translation and reference-renaming invariance, and hidden-only work
+and private RNG noninterference. This is a partial geometric representation for
+the bounded deployment fixture, not a tactical ranker, reference-value calculator,
+complete deployment representation, dataset admission or Stage 1 completion.
+Other geometry/scoring semantics and the proposed screen/preserve experiment
+remain open. No adapter proposal/wire shape changes: the existing
+[deployment contract](ADAPTER_DECISION_CONTRACT.md) remains the submission owner.
+
 ## Validated deployment-set training linkage
 
 `ai.parameterized_training.DeploymentTrainingCandidateLink.from_row(...)` takes
