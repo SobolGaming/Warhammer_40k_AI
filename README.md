@@ -455,6 +455,25 @@ outcomes, Python/platform/CPU/memory metadata, and commit/run IDs. Enable the sa
 local evidence with `TEST_TIMING_DIR=reports/timing`. These artifacts distinguish
 collection overhead and long individual cases from aggregate file costs.
 
+Behavioral CI additionally sets `TEST_TIMING_PROGRESS=1` with `TEST_TIMING_DIR`
+to append a separate `<worker>.progress.jsonl` diagnostic journal. The flag must
+be exactly `1` with a nonempty timing directory; without it the existing behavior
+is unchanged. Only xdist workers journal execution. A header records worker/PID,
+run/attempt/checkout declarations, UTC start and monotonic origin; collection,
+test-start, completed setup/call/teardown phases and entry into session finish
+carry elapsed timestamps. Each line is appended and closed without `fsync`,
+retaining progress if a later test or shutdown stalls. Existing report uploads
+include these journals. A hard termination may leave a partial last line, and
+missing finalization is not proof of which earlier stack snapshot was current.
+
+These operator-only journals are best-effort process diagnostics, not durable or
+authenticated completion evidence. `session_finish` records hook entry, not
+completion of subsequent reporting or process shutdown. The existing final worker
+`.json` payload and calibration admission remain unchanged; `.jsonl` progress is
+never a substitute for a complete timing receipt or a passing test/CI outcome.
+The journal changes neither scheduling nor case selection, worker counts,
+coverage requirements or the fourteen-minute cutoff.
+
 `quality-fast` now aggregates concurrent lint, contract/conformance, code-quality,
 and the existing macOS semantic audit. Every child must succeed, including on draft
 PRs; failed, cancelled, and unexpectedly skipped children fail the aggregate.

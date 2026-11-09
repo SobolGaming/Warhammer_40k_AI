@@ -4,7 +4,10 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import os
 import subprocess
+import sys
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import cast
 
@@ -346,3 +349,188 @@ def test_isolated_and_parallel_workers_are_distinct_invocations(
     )
     assert result["observed_cases"] == 2
     assert calibrated_seconds(result, baseline=baseline, root=root) == dict.fromkeys(baseline, 35.0)
+
+
+def _progress_child(
+    directory: Path,
+    *,
+    progress: str | None,
+    crash: bool = False,
+    fail: bool = False,
+    timing_directory: bool = True,
+) -> tuple[subprocess.CompletedProcess[str], Path]:
+    directory.mkdir()
+    timing = directory / "timing"
+    (directory / "pytest.ini").write_text("[pytest]\n", encoding="utf-8")
+    (directory / "test_progress.py").write_text(
+        "import json, os\nfrom pathlib import Path\nimport pytest\n"
+        "@pytest.mark.parametrize('number', range(4))\n"
+        "def test_progress(number, request):\n"
+        "    if os.environ.get('TEST_TIMING_PROGRESS') == '1':\n"
+        "        root = Path(os.environ['TEST_TIMING_DIR'])\n"
+        "        worker = os.environ['PYTEST_XDIST_WORKER']\n"
+        "        journal = root / (worker + '.progress.jsonl')\n"
+        "        events = [json.loads(line) for line in journal.read_text().splitlines()]\n"
+        "        starts = [event for event in events if event['event'] == 'test_start']\n"
+        "        assert starts[-1]['nodeid'] == request.node.nodeid\n"
+        "        assert events[-1]['event'] == 'phase'\n"
+        "        assert events[-1]['phase'] == 'setup'\n"
+        "        assert not (root / (worker + '.json')).exists()\n"
+        + ("    if number == 0: os._exit(23)\n" if crash else "")
+        + ("    assert number != 0, 'deliberate diagnostic failure'\n" if fail else ""),
+        encoding="utf-8",
+    )
+    environment = dict(os.environ)
+    for name in (
+        "TEST_TIMING_DIR",
+        "TEST_TIMING_PROGRESS",
+        "PYTEST_XDIST_WORKER",
+        "PYTEST_XDIST_WORKER_COUNT",
+        "PYTEST_ADDOPTS",
+    ):
+        environment.pop(name, None)
+    environment.update(
+        PYTHONDONTWRITEBYTECODE="1",
+        PYTHONPATH=str(sharding.REPOSITORY_ROOT),
+        PYTEST_DISABLE_PLUGIN_AUTOLOAD="1",
+        GITHUB_RUN_ID="123",
+        GITHUB_RUN_ATTEMPT="2",
+        GITHUB_SHA="a" * 40,
+    )
+    if progress is not None:
+        environment["TEST_TIMING_PROGRESS"] = progress
+    if timing_directory:
+        environment["TEST_TIMING_DIR"] = str(timing)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-B",
+            "-m",
+            "pytest",
+            "-c",
+            str(directory / "pytest.ini"),
+            "--confcutdir",
+            str(directory),
+            "-p",
+            "xdist.plugin",
+            "-p",
+            "tests.timing_plugin",
+            "-n",
+            "2",
+            "--dist=worksteal",
+            "--max-worker-restart=0",
+            "-q",
+            str(directory / "test_progress.py"),
+        ],
+        cwd=directory,
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=90,
+    )
+    return result, timing
+
+
+def test_progress_journal_records_live_worker_events_and_unchanged_final_receipts(
+    tmp_path: Path,
+) -> None:
+    result, timing = _progress_child(tmp_path / "normal", progress="1", fail=True)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "1 failed, 3 passed" in result.stdout
+    journals = sorted(timing.glob("*.jsonl"))
+    assert [path.name for path in journals] == ["gw0.progress.jsonl", "gw1.progress.jsonl"]
+    failures = 0
+    for path in journals:
+        raw = path.read_text()
+        assert raw.endswith("\n")
+        events = [json.loads(line) for line in raw.splitlines()]
+        header = events[0]
+        assert header["event"] == "session_start"
+        assert header["schema"] == "pytest-worker-progress-v1"
+        assert header["github_run_id"] == "123"
+        assert header["github_run_attempt"] == "2"
+        assert header["github_sha"] == "a" * 40
+        assert datetime.fromisoformat(header["started_utc"]).utcoffset() == timedelta(0)
+        assert header["pid"] > 0
+        assert header["monotonic_origin_seconds"] > 0
+        assert events[1]["event"] == "collection"
+        assert events[1]["count"] == len(events[1]["nodeids"]) == 4
+        assert events[-1]["event"] == "session_finish"
+        elapsed = [event["elapsed_seconds"] for event in events]
+        assert elapsed == sorted(elapsed)
+        final = json.loads((timing / (header["worker"] + ".json")).read_text())
+        assert set(final) == {
+            "worker",
+            "platform",
+            "python",
+            "cpu_count",
+            "linux_meminfo",
+            "github_run_id",
+            "github_sha",
+            "worker_count",
+            "elapsed_seconds",
+            "collection_seconds",
+            "exit_status",
+            "collected_nodeids",
+            "reports",
+        }
+        assert final["worker"] == header["worker"]
+        assert final["exit_status"] == events[-1]["exit_status"]
+        assert final["collected_nodeids"] == events[1]["nodeids"]
+        phases = [
+            {key: event[key] for key in ("nodeid", "phase", "seconds", "outcome")}
+            for event in events
+            if event["event"] == "phase"
+        ]
+        assert phases == final["reports"]
+        assert {phase["phase"] for phase in phases} == {"setup", "call", "teardown"}
+        failures += sum(phase["outcome"] == "failed" for phase in phases)
+    assert failures == 1
+    assert not (timing / "controller.progress.jsonl").exists()
+    workflow = (sharding.REPOSITORY_ROOT / ".github/workflows/ci.yml").read_text()
+    assert workflow.count('TEST_TIMING_PROGRESS: "1"') == 1
+    assert (
+        'TEST_TIMING_DIR: reports/behavior-timing\n          TEST_TIMING_PROGRESS: "1"' in workflow
+    )
+
+
+def test_progress_journal_survives_worker_exit_without_qualifying_partial_data(
+    tmp_path: Path,
+) -> None:
+    result, timing = _progress_child(tmp_path / "crash", progress="1", crash=True)
+    assert result.returncode == 1, result.stdout + result.stderr
+    incomplete: list[Path] = []
+    for path in timing.glob("*.jsonl"):
+        events = [json.loads(line) for line in path.read_text().splitlines()]
+        if any(event["event"] == "session_finish" for event in events):
+            continue
+        incomplete.append(path)
+        worker = events[0]["worker"]
+        assert not (timing / (worker + ".json")).exists()
+        starts = [event for event in events if event["event"] == "test_start"]
+        assert starts[-1]["nodeid"].endswith("test_progress[0]")
+        assert events[-1]["event"] == "phase"
+        assert events[-1]["nodeid"] == starts[-1]["nodeid"]
+        assert events[-1]["phase"] == "setup"
+        assert events[-1]["outcome"] == "passed"
+        assert not any(event.get("phase") == "call" for event in events)
+        assert path not in tuple(timing.glob("*.json"))
+    assert len(incomplete) == 1
+
+
+def test_progress_journal_requires_explicit_valid_opt_in(tmp_path: Path) -> None:
+    result, timing = _progress_child(tmp_path / "disabled", progress=None)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert len(tuple(timing.glob("gw*.json"))) == 2
+    assert not tuple(timing.glob("*.jsonl"))
+    for flag, has_directory in (("0", True), ("true", True), ("1", False)):
+        result, timing = _progress_child(
+            tmp_path / f"invalid-{flag}", progress=flag, timing_directory=has_directory
+        )
+        assert result.returncode != 0
+        assert (
+            "TEST_TIMING_PROGRESS requires value 1 and TEST_TIMING_DIR"
+            in result.stdout + result.stderr
+        )
+        assert not tuple(timing.glob("*.jsonl"))

@@ -35581,6 +35581,32 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "behavioral-worker-progress": {
+      "paths": [
+        "tests/timing_plugin.py",
+        "tests/code_quality/test_hosted_timing_calibration.py",
+        ".github/workflows/ci.yml"
+      ],
+      "owners": [
+        "@document",
+        "@imports",
+        "@module",
+        "@text",
+        "_append_progress",
+        "_progress_child",
+        "pytest_sessionstart",
+        "pytest_collection_finish",
+        "pytest_runtest_logstart",
+        "pytest_runtest_logreport",
+        "pytest_sessionfinish",
+        "test_progress_journal_records_live_worker_events_and_unchanged_final_receipts",
+        "test_progress_journal_survives_worker_exit_without_qualifying_partial_data",
+        "test_progress_journal_requires_explicit_valid_opt_in"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

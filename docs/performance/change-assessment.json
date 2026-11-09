@@ -2,15 +2,45 @@
   "policy": "rules-engine-performance-v3",
   "base": "78403e226ef6915d49fb8a9f7751096fc4632e86",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5c2a39a910500c85b2f56adc78b8c05147188a444c1137bd65a2beb04846dfb5",
-  "operation_map_sha256": "061fec1406528114e20462c800c246a6423cb1491b71145caf6aa03cd6760cae",
+  "operation_map_sha256": "28d83510c2b5693c46a1cfaa76588c3c416a674abeeda233822bed607d9a116a",
   "changes": {
+    ".github/workflows/ci.yml": {
+      "before_sha256": "fee4a71c601a61d75dbb3d4385da5317fc96ea577dd25e1992c3ddfe3712a741",
+      "after_sha256": "0b5c6a23c3c285cb48a32a653c532e8ba0c0b66e926be10dcc195ac4032a2b07",
+      "owners": {
+        "@document": {
+          "before": "fee4a71c601a61d75dbb3d4385da5317fc96ea577dd25e1992c3ddfe3712a741",
+          "after": "0b5c6a23c3c285cb48a32a653c532e8ba0c0b66e926be10dcc195ac4032a2b07"
+        }
+      }
+    },
     "README.md": {
       "before_sha256": "d52bd5afc0c98df170cd246b83a26732525920d3bfd8ea037764e82d0dbc0b97",
-      "after_sha256": "49a24e8f81e8aead317edaf7d837a3fdbd2916e21418d1b8505951ed60661fe5",
+      "after_sha256": "487895d1d6cdb88ca6731d7eee27fd89db9687b4c699f38ccaa3fc8f80e1c061",
       "owners": {
         "@document": {
           "before": "d52bd5afc0c98df170cd246b83a26732525920d3bfd8ea037764e82d0dbc0b97",
-          "after": "49a24e8f81e8aead317edaf7d837a3fdbd2916e21418d1b8505951ed60661fe5"
+          "after": "487895d1d6cdb88ca6731d7eee27fd89db9687b4c699f38ccaa3fc8f80e1c061"
+        }
+      }
+    },
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "312d60d1edf622cff5960ce0048bbe7ebfecbcc7df79e6f6afeddd15fe3664a6",
+      "after_sha256": "4e29a0d2543402b81b57df0336e7e8bd9839aef4b30c8ebe00a6554ab0c994a9",
+      "owners": {
+        "@document": {
+          "before": "312d60d1edf622cff5960ce0048bbe7ebfecbcc7df79e6f6afeddd15fe3664a6",
+          "after": "4e29a0d2543402b81b57df0336e7e8bd9839aef4b30c8ebe00a6554ab0c994a9"
+        }
+      }
+    },
+    "ci/quality_shards/shard-2.txt": {
+      "before_sha256": "9dfc0ee0a631ca07d1828df15414ebc36981a93d8fcea4b01cb9568d4afb6cf0",
+      "after_sha256": "3b4cc42316454754c8f9054fd3aabceb92dbd35955ec7451ff3de83b33ccef0b",
+      "owners": {
+        "@document": {
+          "before": "9dfc0ee0a631ca07d1828df15414ebc36981a93d8fcea4b01cb9568d4afb6cf0",
+          "after": "3b4cc42316454754c8f9054fd3aabceb92dbd35955ec7451ff3de83b33ccef0b"
         }
       }
     },
@@ -266,21 +296,21 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "839c36b417445fe1ce68878a32943f938be74237b80c06e234a2541a246f1c3c",
-      "after_sha256": "f234b5a53ef43b0b3af410009e90056f5fd35a827059ba45256e35133b35a848",
+      "after_sha256": "2c288e142fcfc1cc4bf355fa2427a51bd5000197ebb8bcbcb7b943163b83e81e",
       "owners": {
         "@document": {
           "before": "839c36b417445fe1ce68878a32943f938be74237b80c06e234a2541a246f1c3c",
-          "after": "f234b5a53ef43b0b3af410009e90056f5fd35a827059ba45256e35133b35a848"
+          "after": "2c288e142fcfc1cc4bf355fa2427a51bd5000197ebb8bcbcb7b943163b83e81e"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "74eb5ff76f4032ef3d28a9547758f302cde5f80154ba837edaf749dce4b0cebf",
-      "after_sha256": "d26ed4ab147a3058138dde368304ea33b365adef406d48ad339084195a1caeb7",
+      "after_sha256": "19b25afef8f4a108ce13db186141daae8e9f12c8ed85a0185dc9fb2c049641f0",
       "owners": {
         "@document": {
           "before": "74eb5ff76f4032ef3d28a9547758f302cde5f80154ba837edaf749dce4b0cebf",
-          "after": "d26ed4ab147a3058138dde368304ea33b365adef406d48ad339084195a1caeb7"
+          "after": "19b25afef8f4a108ce13db186141daae8e9f12c8ed85a0185dc9fb2c049641f0"
         }
       }
     },
@@ -394,6 +424,32 @@
         }
       }
     },
+    "tests/code_quality/test_hosted_timing_calibration.py": {
+      "before_sha256": "7ef4eab699dd39d5511f584a7d756eb0fade03652ebbe9d4be2bf9e80d3856ec",
+      "after_sha256": "d6d97d4bc6cb09337d703e65b5f48d404badbaa4e82d9e553d49fafa0e297085",
+      "owners": {
+        "@module": {
+          "before": "4741b93f72740b3608f3e2994d6fbd992ff66832398000d51b551b591d2a8cec",
+          "after": "97da043b0b924cf854c73adb7be6103cd67ccf633f1c0e320d2567a159023f49"
+        },
+        "_progress_child": {
+          "before": null,
+          "after": "71b0a40c541d6af8c50ee5ecaca0f018d8f0f48c672e33da14146164f6e26904"
+        },
+        "test_progress_journal_records_live_worker_events_and_unchanged_final_receipts": {
+          "before": null,
+          "after": "1398fd8d02f867df4c3f091ae64a9754f1f53c4a41050f8195a4fa0eaeaac96d"
+        },
+        "test_progress_journal_requires_explicit_valid_opt_in": {
+          "before": null,
+          "after": "f1f8a3a49b18904533119a7a39f0cac8a8331f7e5cb97c443dacc2205e4fb00e"
+        },
+        "test_progress_journal_survives_worker_exit_without_qualifying_partial_data": {
+          "before": null,
+          "after": "71877d4e3c4e3061038c59b117993b55b76b13b78cbc1ebe9a31ffbcdca517b8"
+        }
+      }
+    },
     "tests/infrastructure/adapters/test_deployment_experiment.py": {
       "before_sha256": "866059309064c6863bbe16594b3df2748666d99530bd86d33090257776077a6d",
       "after_sha256": "a5e491b0ec56d9adf661bc35f66a2e3121f9ee5180404b66c82f339b5091aefc",
@@ -448,16 +504,60 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "a2cdfea1dcfe95ca5fd806e15f48914339f4def827fbaa11c281fe63be628f2e",
-      "after_sha256": "716cc98080d50682524aef274bb3cb647b71d4be57f7600d41455fdc29efc77f",
+      "after_sha256": "9be479a673e5af9bd5348d5adddfa312e41613a85c95948d11cb4bd6c5f1c30c",
       "owners": {
         "@document": {
           "before": "a2cdfea1dcfe95ca5fd806e15f48914339f4def827fbaa11c281fe63be628f2e",
-          "after": "716cc98080d50682524aef274bb3cb647b71d4be57f7600d41455fdc29efc77f"
+          "after": "9be479a673e5af9bd5348d5adddfa312e41613a85c95948d11cb4bd6c5f1c30c"
+        }
+      }
+    },
+    "tests/timing_plugin.py": {
+      "before_sha256": "69387b39047c641ea0a4f96eb29a56b834242d1c2cd34a5fa7797e0c01ec4d59",
+      "after_sha256": "658a309a9f34a70eabf9ce11fe6ecd093473ee13b36a8ccef13fa351c483c2fc",
+      "owners": {
+        "@module": {
+          "before": "b61ba653b3fd47c6bb3fa7e1ce09b92f22d8965c99c18e5d267714610bdb72e2",
+          "after": "60b7e03ff80d18bc254d1d8019e90855283e953b4c975e437e7a63a3ac1686af"
+        },
+        "_append_progress": {
+          "before": null,
+          "after": "0dad79d349cd1e6faaf5ed46cb22d8c9a53261696a51ee610fca2bb02f8a4153"
+        },
+        "pytest_collection_finish": {
+          "before": "a6055096fc4e231d5de00b6f12e3526d2dea8d4ec49e37da860bf59f7980bd29",
+          "after": "e568a37efc0115832ab50a0009179fa3fe89c8e1aca48a446019b25c74152d03"
+        },
+        "pytest_runtest_logreport": {
+          "before": "f4c1fe74791d519d658b5319b2063a6edf3748bd41ed5f9f044f82637b111d14",
+          "after": "d1c7a368ac4541aa36a2b21ed342f73e1ebb94994ae1f457142a67567ee13f06"
+        },
+        "pytest_runtest_logstart": {
+          "before": null,
+          "after": "ddfe36a217df4ea6e0e5a9ad387db963057d01f35e291853841be59deee68175"
+        },
+        "pytest_sessionfinish": {
+          "before": "3a643a6311d12f664254ec287128d928185a0a8f92e34e39040539ff19098f1c",
+          "after": "41f0f55fd5592fe421e7b1906afdbacb6452b82f2168d78bb0c2915a7861d278"
+        },
+        "pytest_sessionstart": {
+          "before": "3ac1d2ab651f64a20a0a71cd13e117bee10aa8c96adb0cfed7fde79755711080",
+          "after": "3063d550bc0b0e98ec699c193ebf627e7feeb56ee16019fd647aad3af7a1b9b3"
         }
       }
     }
   },
   "rows": {
+    ".github/workflows/ci.yml": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavioral-worker-progress"
+      ],
+      "selected_families": [],
+      "rationale": "Add explicitly enabled per-worker progress diagnostics before session completion so a timed-out job preserves its active node and completed phases; retain the existing final JSON format and exact selected inventory.",
+      "source_obligation": "Bounded CI diagnosis for PR647 requires actual worker/setup evidence before changing planning. Missing final JSON does not identify unfinished work. Worker-only JSONL is best-effort operator diagnostics, not authenticated or qualifying calibration/training data. Preserve every existing case, four-worker work stealing, 66.5% coverage and 840-second cutoff.",
+      "unchanged_work": "No engine, policy, replay, scheduler, partition, measured-weight, worker-resource, budget or test omission changes. Journals append and close one event at a time only under explicit opt-in; no fsync or repeated full state rewrite. Existing final timing JSON and calibration admission are unchanged. Three focused quality controls cover live events, worker termination and strict opt-in. Serial runtime smoke and fresh full hosted qualification remain mandatory; no performance improvement is claimed."
+    },
     "README.md": {
       "category": "governance",
       "operations": [],
@@ -465,6 +565,22 @@
       "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
       "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
       "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
+    },
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add explicitly enabled per-worker progress diagnostics before session completion so a timed-out job preserves its active node and completed phases; retain the existing final JSON format and exact selected inventory.",
+      "source_obligation": "Bounded CI diagnosis for PR647 requires actual worker/setup evidence before changing planning. Missing final JSON does not identify unfinished work. Worker-only JSONL is best-effort operator diagnostics, not authenticated or qualifying calibration/training data. Preserve every existing case, four-worker work stealing, 66.5% coverage and 840-second cutoff.",
+      "unchanged_work": "No engine, policy, replay, scheduler, partition, measured-weight, worker-resource, budget or test omission changes. Journals append and close one event at a time only under explicit opt-in; no fsync or repeated full state rewrite. Existing final timing JSON and calibration admission are unchanged. Three focused quality controls cover live events, worker termination and strict opt-in. Serial runtime smoke and fresh full hosted qualification remain mandatory; no performance improvement is claimed."
+    },
+    "ci/quality_shards/shard-2.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add explicitly enabled per-worker progress diagnostics before session completion so a timed-out job preserves its active node and completed phases; retain the existing final JSON format and exact selected inventory.",
+      "source_obligation": "Bounded CI diagnosis for PR647 requires actual worker/setup evidence before changing planning. Missing final JSON does not identify unfinished work. Worker-only JSONL is best-effort operator diagnostics, not authenticated or qualifying calibration/training data. Preserve every existing case, four-worker work stealing, 66.5% coverage and 840-second cutoff.",
+      "unchanged_work": "No engine, policy, replay, scheduler, partition, measured-weight, worker-resource, budget or test omission changes. Journals append and close one event at a time only under explicit opt-in; no fsync or repeated full state rewrite. Existing final timing JSON and calibration admission are unchanged. Three focused quality controls cover live events, worker termination and strict opt-in. Serial runtime smoke and fresh full hosted qualification remain mandatory; no performance improvement is claimed."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -1152,6 +1268,17 @@
       "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
       "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
     },
+    "tests/code_quality/test_hosted_timing_calibration.py": {
+      "category": "measured_workload",
+      "operations": [
+        "hosted-timing-calibration",
+        "behavioral-worker-progress"
+      ],
+      "selected_families": [],
+      "rationale": "Add explicitly enabled per-worker progress diagnostics before session completion so a timed-out job preserves its active node and completed phases; retain the existing final JSON format and exact selected inventory.",
+      "source_obligation": "Bounded CI diagnosis for PR647 requires actual worker/setup evidence before changing planning. Missing final JSON does not identify unfinished work. Worker-only JSONL is best-effort operator diagnostics, not authenticated or qualifying calibration/training data. Preserve every existing case, four-worker work stealing, 66.5% coverage and 840-second cutoff.",
+      "unchanged_work": "No engine, policy, replay, scheduler, partition, measured-weight, worker-resource, budget or test omission changes. Journals append and close one event at a time only under explicit opt-in; no fsync or repeated full state rewrite. Existing final timing JSON and calibration admission are unchanged. Three focused quality controls cover live events, worker termination and strict opt-in. Serial runtime smoke and fresh full hosted qualification remain mandatory; no performance improvement is claimed."
+    },
     "tests/infrastructure/adapters/test_deployment_experiment.py": {
       "category": "measured_workload",
       "operations": [
@@ -1181,6 +1308,16 @@
       "rationale": "Maintain exact current build, generated contracts, additive regression integrity, measured shard scheduling and maintained scope for runner admission.",
       "source_obligation": "AI_IMPLEMENTATION_PLAN.md authority/outcomes and Stage 1 provenance/data admission: bind runner attempts to exact reachable checkpoints and accepted transitions, retain all supplied failed attempts in denominators, exclude error outcomes from learning and keep checkpoint, registration and rejection evidence operator-only. Declared callbacks/ranker artifacts are not authenticated; Stage 1 remains open.",
       "unchanged_work": "No legality, engine mutation, private RNG, geometry/search, persistence or replay algorithm, dependency, cache policy, timing budget or selected-test omission changes. New admission reuses ordinary replay and typed accepted evidence; bounded report checkpoint commitments are operator diagnostics. No optimization or throughput claim; serial current-runtime smoke and complete correctness/coverage required. Timing refresh preserves raw historical receipt identities and failures, omits whole incompatible workers, and retains a complete measured local baseline."
+    },
+    "tests/timing_plugin.py": {
+      "category": "measured_workload",
+      "operations": [
+        "behavioral-worker-progress"
+      ],
+      "selected_families": [],
+      "rationale": "Add explicitly enabled per-worker progress diagnostics before session completion so a timed-out job preserves its active node and completed phases; retain the existing final JSON format and exact selected inventory.",
+      "source_obligation": "Bounded CI diagnosis for PR647 requires actual worker/setup evidence before changing planning. Missing final JSON does not identify unfinished work. Worker-only JSONL is best-effort operator diagnostics, not authenticated or qualifying calibration/training data. Preserve every existing case, four-worker work stealing, 66.5% coverage and 840-second cutoff.",
+      "unchanged_work": "No engine, policy, replay, scheduler, partition, measured-weight, worker-resource, budget or test omission changes. Journals append and close one event at a time only under explicit opt-in; no fsync or repeated full state rewrite. Existing final timing JSON and calibration admission are unchanged. Three focused quality controls cover live events, worker termination and strict opt-in. Serial runtime smoke and fresh full hosted qualification remain mandatory; no performance improvement is claimed."
     }
   },
   "milestone": "ordinary",
