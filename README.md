@@ -395,36 +395,48 @@ and retain their complete baseline measurement. Changed/removed/renamed cases or
 changed test-module bytes require explicit sidecar regeneration, and behavioral
 inventory changes still require a fresh complete successful baseline profile.
 
-The current calibration retains 141 source-bound raw worker receipts and 17,820
-passed three-phase samples covering all 6,178 current cases. Sources are historical
+The current calibration retains 235 source-bound raw worker receipts and 29,640
+passed three-phase samples covering all 6,178 current cases. All 141 previously
+retained receipts and their observations remain intact. Their sources are historical
 successful run
 [42549486854](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42549486854),
 failed attempts 1 and 2 of
 [42556245215](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42556245215),
 and failed attempts 1 and 2 of
 [42602087197](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42602087197).
-Both new enclosing attempts remain failures: the first hit two fourteen-minute
+Both attempts of 42602087197 remain failures: the first hit two fourteen-minute
 cutoffs; the second hit one cutoff and lost a worker in an existing S25 case.
-Their completed original workers contribute only complete passed phase triples.
-Controller/replacement-worker receipts are omitted, and four original worker
-receipts whose collected inventory included a changed test module remain omitted
-whole. Retained raw identities and phase values are preserved; no failed attempt
-is rewritten as a pass. Inherited successful-job copies in the rerun API are not
-new worker invocations or new observations.
+Controller/replacement-worker receipts and the four older receipts incompatible
+with current test-module bytes remain omitted.
 
-The complete 6,178-case local baseline is unchanged: one isolated mirror worker
-and twelve remainder workers in native WSL2, with type/static gates concurrent
-during the early run. Hosted observations augment its per-case planning maxima;
-they do not replace the complete profile or establish successful hosted
-qualification. All current cases now have admitted observations, including the
-52 cases in the changed runner-accounting and deployment-experiment modules.
-Local and hosted measurements remain separate. Fixture setup observations are
-worker/order dependent; taking maxima and regrouping does not establish new fixture
-multiplicity, hosted wall time or the fifteen-minute goal. Existing module grouping
-is retained. Fresh complete correctness/coverage qualification remains mandatory.
-`--check` re-derives every planning cost/selector and the sidecar digest; worker
-dispatch rejects a missing or altered declared sidecar. Run the normal generator
-command above with this sidecar in the output directory to reproduce the manifests.
+The refresh adds 49 original worker receipts from successful covered PR run
+[42641115451](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42641115451)
+and 45 completed worker receipts from the eleven successful behavioral jobs in
+attempt 1 of failed main run
+[42644169069](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42644169069).
+The enclosing main attempt remains failed; only its complete passed phase triples
+are admitted. Its terminated shard's partial progress journals are not calibration
+receipts. Artifact/API metadata binds each retained receipt to its actual run
+attempt and checkout. Inherited successful-job copies in a rerun API are not new
+worker invocations or new observations.
+
+The complete baseline is the successful 6,178-case covered hosted PR run
+42641115451: source head `245cd35e1c9d2de8f962856df9e117f76fe71442`,
+tested checkout `eed05455b3bdd3a09a4d4315f4829da1aa45d809`, and twelve
+`ubuntu-latest` shards with four remainder workers and one isolated mirror worker.
+Its authentic JUnit case measurements replace the earlier local baseline; previous
+profiles remain in Git history and retained artifacts. The unchanged maximum
+formula retains every older slower admitted observation. All current cases have
+admitted observations, with no baseline-only cases.
+
+Fixture setup observations are worker/order dependent; taking maxima and regrouping
+does not establish new fixture multiplicity, hosted wall time or the fifteen-minute
+goal. Existing module grouping, twelve shards, four-worker dispatch, the cold
+shard-1 role, isolated mirror limit and full coverage requirements remain unchanged.
+Fresh complete correctness/coverage qualification remains mandatory. `--check`
+re-derives every planning cost/selector and the sidecar digest; worker dispatch
+rejects a missing or altered declared sidecar. Run the normal generator command
+above with this sidecar in the output directory to reproduce the manifests.
 
 Every supplied complete baseline JUnit run must cover the current behavioral file inventory. Missing files,
 duplicate cases, failed/skipped cases, invalid durations, and truncated suite counts

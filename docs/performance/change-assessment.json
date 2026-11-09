@@ -1,249 +1,319 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "9b56ebaf840dd815033764a6e42660e7fe40b974",
+  "base": "1e9f2170529bdd2609d05177bdda011950004335",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5c2a39a910500c85b2f56adc78b8c05147188a444c1137bd65a2beb04846dfb5",
   "operation_map_sha256": "cfae5df2478c7f783a7cd853123eaa47e76275c1d6cf97c2b4effddb2d08e199",
   "changes": {
-    ".github/pull_request_template.md": {
-      "before_sha256": "fdea35f3a403f436f47a01fcdf2372849f5b31c039842324ec092b37c63fb7e4",
-      "after_sha256": "d18b413216ec3ec76edb2737b42872b6bd1179f929b5eb7c4c5528b898c554f9",
-      "owners": {
-        "@document": {
-          "before": "fdea35f3a403f436f47a01fcdf2372849f5b31c039842324ec092b37c63fb7e4",
-          "after": "d18b413216ec3ec76edb2737b42872b6bd1179f929b5eb7c4c5528b898c554f9"
-        }
-      }
-    },
-    ".github/workflows/ci.yml": {
-      "before_sha256": "0b5c6a23c3c285cb48a32a653c532e8ba0c0b66e926be10dcc195ac4032a2b07",
-      "after_sha256": "e13e2fa7df19d7a0e852b55de36e54af18dfc6c4d40fa2b8f6a45984303dfb16",
-      "owners": {
-        "@document": {
-          "before": "0b5c6a23c3c285cb48a32a653c532e8ba0c0b66e926be10dcc195ac4032a2b07",
-          "after": "e13e2fa7df19d7a0e852b55de36e54af18dfc6c4d40fa2b8f6a45984303dfb16"
-        }
-      }
-    },
-    "AGENTS.md": {
-      "before_sha256": "e09dccc222ed7e8fe1ae14e934d6e54a61dab13d889473ba61320adc2196c8d9",
-      "after_sha256": "400f86357067ffbaecedb22d4a582ed083a26dcf4cf5de036d208ee7330e7a42",
-      "owners": {
-        "@document": {
-          "before": "e09dccc222ed7e8fe1ae14e934d6e54a61dab13d889473ba61320adc2196c8d9",
-          "after": "400f86357067ffbaecedb22d4a582ed083a26dcf4cf5de036d208ee7330e7a42"
-        }
-      }
-    },
     "README.md": {
-      "before_sha256": "487895d1d6cdb88ca6731d7eee27fd89db9687b4c699f38ccaa3fc8f80e1c061",
-      "after_sha256": "495c65f89d1461a0cb1a0de4bbb8a45b2575528fc40dc222a02c989668fbf28c",
+      "before_sha256": "495c65f89d1461a0cb1a0de4bbb8a45b2575528fc40dc222a02c989668fbf28c",
+      "after_sha256": "86b725f2fa7deb4c9cdff369f11c267d7316f1e23cff638a347e1a6b32a0befa",
       "owners": {
         "@document": {
-          "before": "487895d1d6cdb88ca6731d7eee27fd89db9687b4c699f38ccaa3fc8f80e1c061",
-          "after": "495c65f89d1461a0cb1a0de4bbb8a45b2575528fc40dc222a02c989668fbf28c"
+          "before": "495c65f89d1461a0cb1a0de4bbb8a45b2575528fc40dc222a02c989668fbf28c",
+          "after": "86b725f2fa7deb4c9cdff369f11c267d7316f1e23cff638a347e1a6b32a0befa"
         }
       }
     },
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "82edde9246481c5a66d938cf6098abf59d361c15632df800a99220ad2eefedeb",
-      "after_sha256": "d2b378857123d17be2e166285d729e24531064bfbe5c9ab6122043550184a5f8",
+    "ci/test_shards/durations.json": {
+      "before_sha256": "d2a809d15f16edb66c38f711aeabf64d135c9c8d4b1030459c4769ae6dd0b9a9",
+      "after_sha256": "29d83f94af473afe58a7cefcc80a24ff2a99d4749669e93bb6bc3beb5c5450d6",
       "owners": {
         "@document": {
-          "before": "82edde9246481c5a66d938cf6098abf59d361c15632df800a99220ad2eefedeb",
-          "after": "d2b378857123d17be2e166285d729e24531064bfbe5c9ab6122043550184a5f8"
+          "before": "d2a809d15f16edb66c38f711aeabf64d135c9c8d4b1030459c4769ae6dd0b9a9",
+          "after": "29d83f94af473afe58a7cefcc80a24ff2a99d4749669e93bb6bc3beb5c5450d6"
         }
       }
     },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "before_sha256": "68d2c6d49b947774cde8a76bcd352b08f4e8bef41286d77630e8d577ccbc7d4b",
-      "after_sha256": "b34460c76fbf29206a85b2fe7ea5bc5a3224a8abdcca4d9501d671093dff6a32",
+    "ci/test_shards/hosted-calibration.json": {
+      "before_sha256": "5f8696b47f3520fce5155763f1d4c5ac6013e9e398013ac11b48a76f5b6a8717",
+      "after_sha256": "507c15f68b052713f1cbff8a64d406680faab6927eac7d4de6c06de3db761c70",
       "owners": {
         "@document": {
-          "before": "68d2c6d49b947774cde8a76bcd352b08f4e8bef41286d77630e8d577ccbc7d4b",
-          "after": "b34460c76fbf29206a85b2fe7ea5bc5a3224a8abdcca4d9501d671093dff6a32"
+          "before": "5f8696b47f3520fce5155763f1d4c5ac6013e9e398013ac11b48a76f5b6a8717",
+          "after": "507c15f68b052713f1cbff8a64d406680faab6927eac7d4de6c06de3db761c70"
         }
       }
     },
-    "docs/SOURCE_FIXTURE_HASH_BOUNDARIES.md": {
-      "before_sha256": "2ab1df4bc7455797691ae4d7b412c9efeec20787c864c7c4a10716db9c89eba4",
-      "after_sha256": "f23a44a7952bb374b06d03c7b54ade360860c60db2c3447001372621b62bf120",
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "49e1ac4fc3beccd4d9ffefffe3bf572826887dbf4b2f5c852b62c25e797a4fae",
+      "after_sha256": "dc8c22daa4c771dc43da0d5937731d761d19ead6100192ce1a226166ee8c2166",
       "owners": {
         "@document": {
-          "before": "2ab1df4bc7455797691ae4d7b412c9efeec20787c864c7c4a10716db9c89eba4",
-          "after": "f23a44a7952bb374b06d03c7b54ade360860c60db2c3447001372621b62bf120"
+          "before": "49e1ac4fc3beccd4d9ffefffe3bf572826887dbf4b2f5c852b62c25e797a4fae",
+          "after": "dc8c22daa4c771dc43da0d5937731d761d19ead6100192ce1a226166ee8c2166"
         }
       }
     },
-    "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "19b25afef8f4a108ce13db186141daae8e9f12c8ed85a0185dc9fb2c049641f0",
-      "after_sha256": "439bcc0c19ab88cf56b6296509a4c6f4a8f97cfbc073ed4baf4189cc4df596dc",
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "73af6859e2c719d30b123671ed95ffc5e3107bec6a94c37b22e35ab1c0c5a040",
+      "after_sha256": "7f36c27e2e123c187e98fae24ddec21a86b606d6490d9cc5d562bb892e6f6b04",
       "owners": {
         "@document": {
-          "before": "19b25afef8f4a108ce13db186141daae8e9f12c8ed85a0185dc9fb2c049641f0",
-          "after": "439bcc0c19ab88cf56b6296509a4c6f4a8f97cfbc073ed4baf4189cc4df596dc"
+          "before": "73af6859e2c719d30b123671ed95ffc5e3107bec6a94c37b22e35ab1c0c5a040",
+          "after": "7f36c27e2e123c187e98fae24ddec21a86b606d6490d9cc5d562bb892e6f6b04"
         }
       }
     },
-    "pyproject.toml": {
-      "before_sha256": "4a599834118401428b3716b83566863849d4a9c72b19a2e9d8cb427da901f58a",
-      "after_sha256": "9105612cdd8e91d028b9818440df96fab254bf707609e0e71317a6ae19db87c8",
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "4aa16a296ca21a982666efc1a4cbf622a9f00791b97a457fe0ac2ba9d7651548",
       "owners": {
         "@document": {
-          "before": "4a599834118401428b3716b83566863849d4a9c72b19a2e9d8cb427da901f58a",
-          "after": "9105612cdd8e91d028b9818440df96fab254bf707609e0e71317a6ae19db87c8"
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "4aa16a296ca21a982666efc1a4cbf622a9f00791b97a457fe0ac2ba9d7651548"
         }
       }
     },
-    "tests/code_quality/test_ci_performance_gates.py": {
-      "before_sha256": "43f4137f35f412f6eb3a74a36616bf69f7bcfc5f2a99392f930800693fa8d573",
-      "after_sha256": "2b76e3ff85a9708810c246f4c2954309507a82b1468b36f9d7cf07e9dcd21eb6",
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "7df4dd6c6c00c29899c3eae1ee6942eb41e8a2da3b97104143eb62537e649682",
+      "after_sha256": "b7b4df73ecca120ca578a21b8a45cf6229ad76d07bfdbffd189149bf1c149bae",
       "owners": {
-        "test_cold_source_index_overlaps_startup_inside_the_unchanged_deadline": {
-          "before": "dd94157cf973a32f263880b1f10846bc6731bde91ff7542ba72f1d3e8ec13ecc",
-          "after": "b7fedddfe196da16b40ffae24cbf00064261d675af41caec79e40c24115868ce"
-        },
-        "test_quality_gate_requires_every_independent_lane_even_when_skipped": {
-          "before": "2e4802ae88f16d788166faa5d7b270c816e9784906a478c2d2cd72614a1a8ab3",
-          "after": "f35b294cd1e092eca21ba8e5c17a324aeaa7539a91db6aa97bed0ae88e9ed0f0"
+        "@document": {
+          "before": "7df4dd6c6c00c29899c3eae1ee6942eb41e8a2da3b97104143eb62537e649682",
+          "after": "b7b4df73ecca120ca578a21b8a45cf6229ad76d07bfdbffd189149bf1c149bae"
         }
       }
     },
-    "tests/code_quality/test_quality_runtime.py": {
-      "before_sha256": "f93e72cbfbe5e213723dde09bfb16611beffcc871585cc33829efe0fe72ab6b2",
-      "after_sha256": "64b68643fb3b867db3dac35435c68f3164406412508a9c1b7267e76dfa43d073",
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "b40a24ead88989fa458c0cdbf5339dc62bdd7fd0e0a06bb51f50d1b7612b8221",
+      "after_sha256": "4f6e15c2c757a107d8f1be893051e12a0fdc3585c9975cfcd8be7d2c21df331e",
       "owners": {
-        "test_live_workflow_preserves_required_names_and_all_four_producer_controls": {
-          "before": "600284e2f7287b141bc3ec6e56401d25938c8ea0724068231cd0ab08776ea209",
-          "after": "77a58d03e22d2c31747612929dbbebf2ba5a92ac78f21c25defc7886fc87e1e2"
+        "@document": {
+          "before": "b40a24ead88989fa458c0cdbf5339dc62bdd7fd0e0a06bb51f50d1b7612b8221",
+          "after": "4f6e15c2c757a107d8f1be893051e12a0fdc3585c9975cfcd8be7d2c21df331e"
         }
       }
     },
-    "tests/code_quality/test_section08_native_mission_source.py": {
-      "before_sha256": "3f72650fcb6bf11bbd80f67c58a9e0d0a75ee1074e1c9bd4b619b0eb094a138e",
-      "after_sha256": "1e8696112b6a6cce2a7dde0053b103febf716b626db6bccb9fe5b6373837d1b7",
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "c950a8d3fac4d2a01c20c1b7f5c2c44dd3a77b0b5e543a453ec7e0ee216b09ca",
+      "after_sha256": "36142e44b2fd4929791d2b4da4aa192e6066f499d5b69b942f95b5c71b55a25f",
       "owners": {
-        "test_source_history_guard_precedes_index_and_covered_pytest": {
-          "before": "674e57cacbbd90fa0a1cc05d91b802c584776a9c23bd2f04105f59c5a160054b",
-          "after": "66ef55e74c663c678cda0717423f91c929f0972e291758c63d7bf835dd905438"
+        "@document": {
+          "before": "c950a8d3fac4d2a01c20c1b7f5c2c44dd3a77b0b5e543a453ec7e0ee216b09ca",
+          "after": "36142e44b2fd4929791d2b4da4aa192e6066f499d5b69b942f95b5c71b55a25f"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "9ae860baafebfcf6fa775a040c3920c5f15e795a78a14d8e9bb5f7b0c9ac76ff",
+      "after_sha256": "780440d2ce6ab76411ce4d83afa0b1c747ebd52e5706e46f544b44b203375c3d",
+      "owners": {
+        "@document": {
+          "before": "9ae860baafebfcf6fa775a040c3920c5f15e795a78a14d8e9bb5f7b0c9ac76ff",
+          "after": "780440d2ce6ab76411ce4d83afa0b1c747ebd52e5706e46f544b44b203375c3d"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "29f331bae2d766edc097f6b8d84a30b3df5967f6304b0be35eac6dbac3afdb6d",
+      "after_sha256": "818a5478a6daef2543fffe6061e3f266543a9a2774ab93ce3da93463735208c6",
+      "owners": {
+        "@document": {
+          "before": "29f331bae2d766edc097f6b8d84a30b3df5967f6304b0be35eac6dbac3afdb6d",
+          "after": "818a5478a6daef2543fffe6061e3f266543a9a2774ab93ce3da93463735208c6"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "e6da45e19dbdb1bc2544a839acd45c0a58859ee5dacb6e6fa4163a4629c6bcc6",
+      "after_sha256": "51af39364c1d3e902e0b2df4e88c8abe1844941b213dad0ea041ab0e5b323678",
+      "owners": {
+        "@document": {
+          "before": "e6da45e19dbdb1bc2544a839acd45c0a58859ee5dacb6e6fa4163a4629c6bcc6",
+          "after": "51af39364c1d3e902e0b2df4e88c8abe1844941b213dad0ea041ab0e5b323678"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "7ae2043c09f9a018676f910a6c8f8170adf57a942fe881bae888a8d4e102a2eb",
+      "after_sha256": "0ea3dac4576cb9e747f6ac428f87ca693441eefae29e01086cee89a629a87e2c",
+      "owners": {
+        "@document": {
+          "before": "7ae2043c09f9a018676f910a6c8f8170adf57a942fe881bae888a8d4e102a2eb",
+          "after": "0ea3dac4576cb9e747f6ac428f87ca693441eefae29e01086cee89a629a87e2c"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "680db5bc05934fb622b4469b7f31342d5e0e318c7246b8dc13e5f798392486de",
+      "after_sha256": "9db8ff207f5153d4438bb26799a31cd0b4f4953faf5b8472d1bfca0d6dcdbc03",
+      "owners": {
+        "@document": {
+          "before": "680db5bc05934fb622b4469b7f31342d5e0e318c7246b8dc13e5f798392486de",
+          "after": "9db8ff207f5153d4438bb26799a31cd0b4f4953faf5b8472d1bfca0d6dcdbc03"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "2aac9ba12531b686e69bf9512630ad740a2eacaee48d2441b44d8e35471d99a0",
+      "after_sha256": "e2abb7018e06f6ff73c3951ca7ff5b6c66b08d469985509f5c4f8cecd76dd8da",
+      "owners": {
+        "@document": {
+          "before": "2aac9ba12531b686e69bf9512630ad740a2eacaee48d2441b44d8e35471d99a0",
+          "after": "e2abb7018e06f6ff73c3951ca7ff5b6c66b08d469985509f5c4f8cecd76dd8da"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "9be479a673e5af9bd5348d5adddfa312e41613a85c95948d11cb4bd6c5f1c30c",
-      "after_sha256": "71afe1655bfebfd762acf43633f4849b198f288df0b65acaeddfc3e18835ccee",
+      "before_sha256": "71afe1655bfebfd762acf43633f4849b198f288df0b65acaeddfc3e18835ccee",
+      "after_sha256": "2d7cca0047a1f760e247a0edb2ae0850b7c89a9f7048748e2ceb1659f4029404",
       "owners": {
         "@document": {
-          "before": "9be479a673e5af9bd5348d5adddfa312e41613a85c95948d11cb4bd6c5f1c30c",
-          "after": "71afe1655bfebfd762acf43633f4849b198f288df0b65acaeddfc3e18835ccee"
+          "before": "71afe1655bfebfd762acf43633f4849b198f288df0b65acaeddfc3e18835ccee",
+          "after": "2d7cca0047a1f760e247a0edb2ae0850b7c89a9f7048748e2ceb1659f4029404"
         }
       }
     }
   },
   "rows": {
-    ".github/pull_request_template.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Align maintained contributor coverage commands and the temporary floor with the approved 67 percent gate.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
-    },
-    ".github/workflows/ci.yml": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavioral-worker-progress"
-      ],
-      "selected_families": [],
-      "rationale": "Raise the combined coverage floor to 67 percent and the behavioral setup/test cutoff and internal source-index deadline to fifteen minutes.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
-    },
-    "AGENTS.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Align required active local coverage commands and contributor policy with the approved 67 percent floor.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
-    },
     "README.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the active 67 percent floor and fifteen-minute setup/test and CI goal; retain historical failed fourteen-minute attempts.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "",
+      "unchanged_work": ""
     },
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Align the maintained AI delivery gate reference with the approved 67 percent floor and fifteen-minute allowance.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
-    },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Append the owner-approved CI policy while preserving earlier thresholds, failure outcomes, finite deferrals and all remaining gates.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
-    },
-    "docs/SOURCE_FIXTURE_HASH_BOUNDARIES.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Update active setup/test allowance and coverage guidance without modifying retained fixture evidence or source admission.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Register exactly the existing changed cold-index deadline regression owner so exact-base assessment covers its active timeout assertion without bypassing unknown-owner rejection.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
-    },
-    "pyproject.toml": {
-      "category": "dependency_environment",
-      "operations": [
-        "development-dependency"
-      ],
-      "selected_families": [],
-      "rationale": "Raise only coverage report fail_under to 67 percent; retain branch/source measurement, two-decimal precision, dependency declarations and the lock.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
-    },
-    "tests/code_quality/test_ci_performance_gates.py": {
+    "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
-        "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453",
-        "ci-source-index-deadline-guard"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Align active gate assertions; exercise 66.99 percent rejection and 67.00 percent acceptance through configuration and CI override reporting.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
     },
-    "tests/code_quality/test_quality_runtime.py": {
+    "ci/test_shards/hosted-calibration.json": {
       "category": "rule_semantics",
       "operations": [
-        "ci69-qualification-791593bfe3358a4b2494de163105067ce4a8b0311cd0f91b15629ec6395d030a"
+        "hosted-timing-calibration",
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Align the behavioral cutoff assertion with fifteen minutes while preserving quality and performance lane controls.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
     },
-    "tests/code_quality/test_section08_native_mission_source.py": {
-      "category": "governance",
-      "operations": [],
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
       "selected_families": [],
-      "rationale": "Align the source-history ordering control with the new behavioral allowance without changing the required source guard.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -251,9 +321,9 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Refresh the three current AGENTS.md, README.md and pyproject.toml hashes and active floor text after policy edits; retain the byte-exact historical hash block and every semantic obligation.",
-      "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
-      "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
+      "rationale": "Refresh source-bound hosted scheduling evidence and twelve derived manifests using an authentic complete 6,178-case hosted profile while retaining every prior slower admitted observation; maintain exact supporting guidance/provenance.",
+      "source_obligation": "Current maintained README evidence hash remains bound to its exact bytes.",
+      "unchanged_work": "Engine, gameplay, replay, serialization, benchmark workloads, dependencies and all 6,178 behavioral cases are byte-identical to exact base; only current README provenance metadata changes here."
     }
   },
   "milestone": "ordinary",
