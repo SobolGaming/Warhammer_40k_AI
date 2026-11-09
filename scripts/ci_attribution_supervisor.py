@@ -6,6 +6,9 @@ import os
 import signal
 import subprocess
 import time
+from collections.abc import Callable
+from types import FrameType
+from typing import Any
 
 
 def signal_group(pid: int, signum: int) -> bool:
@@ -39,10 +42,12 @@ def cleanup(
     raise RuntimeError(f"Owned group {process.pid} not confirmed terminated/reaped within bound")
 
 
-def run_owned(command: list[str], *, timeout: float, **popen_kwargs) -> dict[str, object]:
+def run_owned(command: list[str], *, timeout: float, **popen_kwargs: Any) -> dict[str, object]:
     """Signal handlers only set state; finally owns cleanup even if launch/wait raises."""
     cancelled: list[int] = []
-    previous: list[tuple[int, object]] = []
+    previous: list[
+        tuple[signal.Signals, Callable[[int, FrameType | None], object] | int | None]
+    ] = []
     process = None
     timed_out = False
     descendants_remained = False

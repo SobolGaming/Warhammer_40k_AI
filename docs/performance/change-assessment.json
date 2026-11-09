@@ -256,11 +256,19 @@
     },
     "scripts/ci_attribution_supervisor.py": {
       "before_sha256": "efbb32849dbe057f8a7df57c76be881ec69f1353da4d80a018850ee802e05cb9",
-      "after_sha256": "73d345db49d06dc20c8d5d0d9a89957a9229893007329922123931012f003b41",
+      "after_sha256": "4d3bf3cadfb7920745a5d38c07455554040c253084a6f1b90eb5aac646abf79d",
       "owners": {
+        "@module": {
+          "before": "cc8154eee280f221a8ae79487a1cc1263b6284fea9abc29fe6ab30b92c22784c",
+          "after": "09bbfbca3423e8f0e8b3c84859271c333b36388f031544f90ec023be97bc2a21"
+        },
         "cleanup": {
           "before": "f34da8c9e35c2295731e824944cca25476e6a1656cbd05960f61450228aed128",
           "after": "8df00a628c92b832d2289e29962d40b677a699184f592d2bfabb0e73c4d79870"
+        },
+        "run_owned": {
+          "before": "8a19c0bab5bdacb34979f07606ebaf5ba06501af4607f1be817a74bc01c5b89d",
+          "after": "e7fbeb6970e768fe4168baf8b063e8380d04c711f4be75ee5fc4f4eadf2293f8"
         }
       }
     },
@@ -298,7 +306,7 @@
     },
     "tests/code_quality/test_behavioral_deadline.py": {
       "before_sha256": null,
-      "after_sha256": "2723adae0e6f3611d16aa688fe929780ca2cc3cc29d9f73bd51400c886a720bc",
+      "after_sha256": "4da2c6fe9d96bccc5c12481124af96e7dd9d5bb762fb12529ba3e8b15e9d071d",
       "owners": {
         "@module": {
           "before": null,
@@ -310,7 +318,7 @@
         },
         "test_cancellation_after_workload_exit_fails_approval": {
           "before": null,
-          "after": "18de80c829f40ccaf4815be03734a4fd2dc6956c128296e0f6e70a39bc626a50"
+          "after": "9674e853f5f1a3442d363901d34ce27e8e1d6f7309b2e2ed4319d0fd6b7cc0b8"
         },
         "test_execution_timeout_stops_descendants_and_preserves_only_available_partial_results": {
           "before": null,

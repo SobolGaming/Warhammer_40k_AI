@@ -221,8 +221,7 @@ def test_cancellation_after_workload_exit_fails_approval(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     from scripts import behavioral_deadline
-
-    original_cleanup = behavioral_deadline.cleanup
+    from scripts.ci_attribution_supervisor import cleanup as original_cleanup
 
     def cancel_after_cleanup(
         process: subprocess.Popen[bytes] | subprocess.Popen[str],
