@@ -240,12 +240,14 @@ def test_source_history_guard_precedes_index_and_covered_pytest() -> None:
     step = workflow.split("- name: Run behavioral coverage shard", 1)[1].split(
         "- name: Upload shard test report", 1
     )[0]
+    assert "scripts.behavioral_deadline" in step
+    assert "timeout-minutes: 32" in step
+    step = (ROOT / "scripts/run_behavioral_coverage.sh").read_text()
     assert (
         step.index("scripts.validate_source_history")
         < step.index("scripts.ci_source_index")
         < step.index("--cov=warhammer40k_core")
     )
-    assert "timeout-minutes: 15" in step
     builder = (ROOT / "scripts/ci_source_index.py").read_text(encoding="utf-8")
     assert '"tools.ability_support_sources"' in builder
     assert '"-m"' in builder

@@ -214,3 +214,32 @@ attempts 1 and 2 failed behavioral shard 8 at the fourteen-minute limit; combine
 coverage did not run. Incomplete worker progress journals do not establish
 completed tests or passing coverage. This policy update does not reclassify those
 failures or establish that the fifteen-minute limit is sufficient.
+
+## Covered-shard timing amendment - 9 November 2026
+
+The owner's subsequent direction supersedes the fifteen-minute timing target
+above. Every covered behavioral shard must complete successfully within 18 minutes
+(1,080 seconds inclusive) for approval. Timing alone must not terminate a running
+shard at that approval boundary: execution is allowed through exactly 30 minutes,
+with process-group termination only when elapsed time exceeds 1,800 seconds.
+
+A shard whose tests pass after 18 minutes still fails approval. Preserve its full
+JUnit, coverage and timing results. On termination or failure, preserve available
+logs, progress journals, partial reports and coverage fragments as diagnostics;
+never fabricate completed tests, complete coverage or a passing timing result.
+The combined coverage gate continues to fail if any shard is late, failed or
+incomplete, even when available tests passed.
+
+One monotonic supervisor clock includes source-history validation, source-index
+construction, the isolated mirror, parallel tests and child report finalization.
+The cold construction barrier consumes the same exact monotonic execution deadline.
+Supervisor diagnostic copying/log replay is recorded separately from observed
+workload completion. The workflow's 32-minute outer safety guard supplies cleanup
+and reporting grace; it is not an approval allowance.
+
+Keep twelve shards, all existing behavioral tests, the complete 67% branch
+coverage floor, mirror 120-second bound, serial performance 180-second bound and
+quality 600-second limits. Verify exact boundaries, late passing-test result
+retention, descendant cleanup and partial-result failure behavior. Report observed
+durations separately from limits. Earlier fifteen-minute timeout records remain
+historical failures and do not reveal when unfinished tests would have completed.

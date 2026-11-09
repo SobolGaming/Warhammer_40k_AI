@@ -35618,6 +35618,54 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "covered-shard-deadline-controller": {
+      "paths": [
+        "scripts/behavioral_deadline.py"
+      ],
+      "owners": [
+        "@module",
+        "termination_due",
+        "approved",
+        "snapshot_coverage",
+        "supervise",
+        "main",
+        "supervise.interrupt"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "covered-shard-deadline-regression": {
+      "paths": [
+        "tests/code_quality/test_behavioral_deadline.py"
+      ],
+      "owners": [
+        "@module",
+        "test_approval_and_execution_boundaries_are_independent",
+        "test_late_passing_pytest_keeps_complete_reports_and_coverage_but_fails_approval",
+        "test_execution_timeout_stops_descendants_and_preserves_only_available_partial_results",
+        "test_successful_short_workload_is_approved",
+        "test_hosted_workload_uses_supervisor_and_preserves_diagnostics",
+        "test_source_index_barrier_consumes_the_shared_monotonic_deadline",
+        "test_cancellation_after_workload_exit_fails_approval",
+        "test_cancellation_after_workload_exit_fails_approval.cancel_after_cleanup"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "covered-shard-workload": {
+      "paths": [
+        "scripts/run_behavioral_coverage.sh",
+        ".github/workflows/ci.yml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

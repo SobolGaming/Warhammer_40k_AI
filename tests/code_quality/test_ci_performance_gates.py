@@ -1382,8 +1382,9 @@ def test_cold_source_index_overlaps_startup_inside_the_unchanged_deadline() -> N
     step = workflow.split("- name: Run behavioral coverage shard", 1)[1].split(
         "- name: Save completed selected-source index", 1
     )[0]
-    assert "timeout-minutes: 15" in step
-    assert "source_index_deadline=$(( $(date +%s) + 15 * 60 ))" in step
+    assert "timeout-minutes: 32" in step
+    step = (ROOT / "scripts/run_behavioral_coverage.sh").read_text()
+    assert "BEHAVIOR_EXECUTION_DEADLINE" in step
     assert step.index("scripts.validate_source_history") < step.index("scripts.ci_source_index")
     assert '"$SELECTED_INDEX_INPUT_KEY" &' in step
     assert "completion_dir=$(mktemp -d " in step

@@ -35,15 +35,19 @@ class BuildGate:
     index: Path
     input_key: str
     deadline: float
+    monotonic: bool = False
 
     def wait(self) -> None:
         validate_input_key(self.input_key)
         if not math.isfinite(self.deadline):
             raise pytest.UsageError("Source-index completion deadline must be finite.")
-        remaining = self.deadline - time.time()
-        stop = time.monotonic() + max(0.0, remaining)
+        if self.monotonic:
+            stop = self.deadline
+        else:
+            remaining = self.deadline - time.time()
+            stop = time.monotonic() + max(0.0, remaining)
         while not self.result.is_file():
-            if time.monotonic() >= stop:
+            if time.monotonic() > stop:
                 raise pytest.UsageError(
                     "Source-index construction did not complete before deadline."
                 )
@@ -73,7 +77,7 @@ class BuildGate:
             raise pytest.UsageError(
                 f"Source-index construction failed with exit code {record['exit_code']}."
             )
-        if time.monotonic() >= stop:
+        if time.monotonic() > stop:
             raise pytest.UsageError("Source-index completion exceeded the setup/test deadline.")
 
 
@@ -130,6 +134,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption("--ci-source-index-target", type=Path)
     group.addoption("--ci-source-index-key")
     group.addoption("--ci-source-index-deadline", type=float)
+    group.addoption("--ci-source-index-monotonic", action="store_true", default=False)
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -137,7 +142,10 @@ def pytest_configure(config: pytest.Config) -> None:
         config.getoption("ci_source_index_" + name)
         for name in ("result", "target", "key", "deadline")
     )
-    if all(value is None for value in values):
+    monotonic = config.getoption("ci_source_index_monotonic")
+    if type(monotonic) is not bool:
+        raise pytest.UsageError("Invalid source-index clock selection.")
+    if all(value is None for value in values) and not monotonic:
         return  # The plugin is optional for warm-cache and ordinary local invocations.
     if any(value is None for value in values):
         raise pytest.UsageError("All four source-index barrier options are required together.")
@@ -151,7 +159,7 @@ def pytest_configure(config: pytest.Config) -> None:
     validate_input_key(input_key)
     if type(deadline) is not float or not math.isfinite(deadline):
         raise pytest.UsageError("Source-index completion deadline must be finite.")
-    config.stash[_GATE] = BuildGate(result, index, input_key, deadline)
+    config.stash[_GATE] = BuildGate(result, index, input_key, deadline, monotonic=monotonic)
 
 
 class CollectionNode(Protocol):
