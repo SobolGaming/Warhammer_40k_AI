@@ -195,7 +195,7 @@ class PolicyRouter:
         self._registrations = {entry.route: entry for entry in registrations}
         if len(self._registrations) != len(registrations):
             raise PolicyError("Duplicate exact policy route.")
-        self.identity = payload_digest(
+        self._manifest_json = canonical_json(
             [
                 {
                     "route": [
@@ -212,6 +212,14 @@ class PolicyRouter:
                 for r, entry in sorted(self._registrations.items(), key=lambda item: repr(item[0]))
             ]
         )
+
+    @property
+    def identity(self) -> str:
+        return payload_digest(self.to_manifest_payload())
+
+    def to_manifest_payload(self) -> list[JsonValue]:
+        """Detached declared registration/configuration, not authenticated policy code."""
+        return cast(list[JsonValue], json.loads(self._manifest_json))
 
     def resolve(self, route: PolicyRoute) -> PolicyRegistration:
         if route not in self._registrations:

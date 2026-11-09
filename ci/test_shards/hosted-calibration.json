@@ -1,5 +1,14 @@
 {
-  "baseline_only_cases": [],
+  "baseline_only_cases": [
+    "tests/infrastructure/adapters/test_runner_accounting.py::test_failed_choice_retains_actual_seed_binding_and_stage[drift-validation-not_submitted]",
+    "tests/infrastructure/adapters/test_runner_accounting.py::test_failed_choice_retains_actual_seed_binding_and_stage[exhausted-choice-not_submitted]",
+    "tests/infrastructure/adapters/test_runner_accounting.py::test_failed_choice_retains_actual_seed_binding_and_stage[invalid-submission-unverified]",
+    "tests/infrastructure/adapters/test_runner_accounting.py::test_manifest_preserves_declared_routing_seeds_limits_and_detaches_payloads",
+    "tests/infrastructure/adapters/test_runner_accounting.py::test_missing_route_is_a_failed_attempt_without_a_policy_call",
+    "tests/infrastructure/adapters/test_runner_accounting.py::test_ordinary_recorded_movement_rejection_is_not_an_accepted_choice",
+    "tests/infrastructure/adapters/test_runner_accounting.py::test_successful_choice_and_budget_stop_keep_separate_record_accounting",
+    "tests/infrastructure/adapters/test_runner_accounting.py::test_time_limit_before_dispatch_preserves_manifest_without_invented_attempt"
+  ],
   "current_test_sources": {
     "tests/factions/adeptus_custodes/unit/test_adeptus_custodes_army_rule.py": "b57c87563d26c3037d4285d0d03d21aa476f808e4c4c6cd65cfcfcb9661fea41",
     "tests/factions/aeldari/unit/test_aeldari_army_rule.py": "c057292e55f5399d327fda0bf2e7008c08179b75c90e546f5113b738110e5e7a",
@@ -42,6 +51,7 @@
     "tests/infrastructure/adapters/test_deployment_experiment.py": "866059309064c6863bbe16594b3df2748666d99530bd86d33090257776077a6d",
     "tests/infrastructure/adapters/test_deployment_geometry_features.py": "12d4b70e44b1d8678086cac7aeee191579bed3d2aa5e553f6514c5f5cf37a67d",
     "tests/infrastructure/adapters/test_finite_candidates.py": "46f9947f09bea4cb3dbbb0e665f488031c2565f2a3dad2097dd840627f0e2abb",
+    "tests/infrastructure/adapters/test_runner_accounting.py": "c754fb958367a1f52c572b981a148ae5d765108ae9f64be114236e80832afe7c",
     "tests/infrastructure/adapters/test_training_admission.py": "26ec230eb248fb840bae22117c1a802bfd209578f906895ae4e0e182aea5643c",
     "tests/infrastructure/adapters/unit/test_session_commands.py": "573b6b1da1c74dec1a87ba74b76626af4007ae37da81ac1ee7fb9e2936dbc731",
     "tests/infrastructure/decisions/unit/test_opportunity_windows.py": "d4f9da68900a559438204bd2fb9500e12900a5441c2d1cab096127fb309aa1f6",
@@ -407,7 +417,7 @@
     "tests/unit/test_phase10i_terrain_movement.py": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38"
   },
   "formula": "max(complete-baseline-case-seconds, largest-observed-passed-three-phase-total)",
-  "inventory_sha256": "6f8ff0831c0bd1872d23aaa5fb4cea2d7691c13e2e7d4419cdd9f530ccdd5f00",
+  "inventory_sha256": "4778a1959dfeaed11a27765f0b23870b7e9eb847900861a0928d64ac3f8a1e38",
   "observation_fields": [
     "report_index",
     "setup",
