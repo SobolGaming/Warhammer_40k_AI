@@ -21,6 +21,7 @@ from warhammer40k_core.ai.deployment_dataset_split import (
     DeploymentDatasetSplit,
     DeploymentSplitAssignment,
 )
+from warhammer40k_core.ai.deployment_workload import DeploymentWorkloadContract
 from warhammer40k_core.ai.player_policy import (
     CandidateExhaustedError,
     PlayerDecisionContext,
@@ -48,6 +49,7 @@ from warhammer40k_core.ai.training_targets import TargetEpisodeEnd
 from warhammer40k_core.ai.training_transitions import FiniteAcceptedTransition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.replay import ReplayRunner
 
@@ -903,3 +905,136 @@ def test_runner_admission_keeps_failed_suffix_with_verified_accepted_prefix() ->
                 stop_reason="unsupported_route",
             ),
         )
+
+
+def _workload_configs() -> tuple[GameConfig, ...]:
+    return tuple(
+        replace(canonical_setup_prebattle_smoke_config(), private_rng_seed=f"{index:02x}" * 32)
+        for index in range(1, 4)
+    )
+
+
+def test_workload_pins_semantics_access_and_complete_failed_inventory(
+    split_datasets: tuple[DeploymentDatasetAdmission, ...],
+) -> None:
+    split = DeploymentDatasetSplit.from_datasets(
+        split_datasets[:3], assignments=_split_assignments()
+    )
+    _, route = session_and_route()
+    routes = (route, replace(route, actor_id="player-b"))
+    workload = DeploymentWorkloadContract.from_split(
+        split, configs=_workload_configs(), required_routes=routes
+    )
+    payload = workload.to_payload()
+    assert payload["split"] == split.to_payload()
+    assert payload["split_hash"] == split.content_hash
+    assert payload["game_config_hashes"] == sorted(
+        payload_digest(config.to_payload()) for config in _workload_configs()
+    )
+    assert len(cast(list[JsonValue], payload["observed_routes"])) == 1
+    assert len(cast(list[JsonValue], payload["unobserved_routes"])) == 1
+    assert cast(dict[str, JsonValue], payload["reference_contract"])["target_id"] == (
+        "command-point-balance-v1"
+    )
+    access = cast(dict[str, JsonValue], payload["information_access"])
+    assert access["model_inputs"] == "versioned-numeric-semantic-values-only"
+    assert "private-rng-authority" in cast(list[str], access["operator_only"])
+    assert workload.content_hash == payload_digest(payload)
+    assert (
+        DeploymentWorkloadContract.from_payload(
+            json.loads(json.dumps(payload)),
+            split=split,
+            configs=tuple(reversed(_workload_configs())),
+            required_routes=tuple(reversed(routes)),
+        )
+        == workload
+    )
+    payload["split"] = {}
+    assert workload.to_payload()["split"] != {}
+    with pytest.raises(FrozenInstanceError):
+        workload._payload_json = "{}"  # type: ignore[misc]
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "schema_version",
+        "scope",
+        "split",
+        "split_hash",
+        "game_config_hashes",
+        "required_routes",
+        "observed_routes",
+        "unobserved_routes",
+        "semantic_contracts",
+        "reference_contract",
+        "information_access",
+        "qualification",
+        "extra",
+    ],
+)
+def test_workload_closed_loader_rejects_contract_and_inventory_drift(
+    split_datasets: tuple[DeploymentDatasetAdmission, ...],
+    field: str,
+) -> None:
+    split = DeploymentDatasetSplit.from_datasets(
+        split_datasets[:3], assignments=_split_assignments()
+    )
+    _, route = session_and_route()
+    workload = DeploymentWorkloadContract.from_split(
+        split, configs=_workload_configs(), required_routes=(route,)
+    )
+    payload = workload.to_payload()
+    payload[field] = "drift"
+    with pytest.raises(TrainingAdmissionError, match="contract payload drifted"):
+        DeploymentWorkloadContract.from_payload(
+            payload, split=split, configs=_workload_configs(), required_routes=(route,)
+        )
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "missing-config",
+        "extra-config",
+        "duplicate-config",
+        "seed",
+        "wrong-actor",
+        "duplicate-route",
+        "battle",
+        "movement",
+        "empty",
+    ],
+)
+def test_workload_rejects_incompatible_declarations(
+    split_datasets: tuple[DeploymentDatasetAdmission, ...],
+    change: str,
+) -> None:
+    split = DeploymentDatasetSplit.from_datasets(
+        split_datasets[:3], assignments=_split_assignments()
+    )
+    _, route = session_and_route()
+    routes: tuple[PolicyRoute, ...] = (route,)
+    configs = _workload_configs()
+    if change == "missing-config":
+        configs = configs[:-1]
+    elif change == "extra-config":
+        configs += (replace(configs[0], private_rng_seed="ff" * 32),)
+    elif change == "duplicate-config":
+        configs += (configs[0],)
+    elif change == "seed":
+        configs = (replace(configs[0], private_rng_seed="ff" * 32), *configs[1:])
+    elif change == "wrong-actor":
+        routes = (replace(route, actor_id="player-b"),)
+    elif change == "duplicate-route":
+        routes += routes
+    elif change == "battle":
+        routes = (replace(route, stage="battle", setup_step=None, battle_phase="command"),)
+    elif change == "movement":
+        routes = (replace(route, proposal_kind="movement"),)
+    else:
+        routes = ()
+    with pytest.raises(TrainingAdmissionError):
+        DeploymentWorkloadContract.from_split(split, configs=configs, required_routes=routes)
+    with pytest.raises(TrainingAdmissionError):
+        DeploymentWorkloadContract()

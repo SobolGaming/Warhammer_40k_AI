@@ -1,428 +1,388 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "be1bac984d2d97a6dbd67361c43c3a0b31002e1e",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a03a3fe975c4e75c13d2d3a44a30c5df851e1620db0e7086c75f1226be9013ae",
-  "operation_map_sha256": "3ee330173a46e8ed1d28a005b9969513874ee5f8fd75eba9dde08a05286fe35d",
+  "base": "6d9baab04e19cbbf411b9b270c6650f27f0275a2",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:96bb4d3651da798e385277368082c82c563f29593ee2cd350fd82789e5f68c0b",
+  "operation_map_sha256": "c7f1417799fede07f8c91e3fa0f83927d12ab990e409970a27a5e7a8d7094e03",
   "changes": {
     "README.md": {
-      "before_sha256": "6e2de7dda72a7c394ed50235beff89028c9e9c9592d9732c963c67059984c06c",
-      "after_sha256": "2214d57f18ef9d3eafc75007fd7962d96961371c1aba97f9e51ad6bd535ea9e6",
+      "before_sha256": "2214d57f18ef9d3eafc75007fd7962d96961371c1aba97f9e51ad6bd535ea9e6",
+      "after_sha256": "6b759e2c9bec6f949197ff1af23c1c00b6a90873cf4faf68188fd1bf0df51a83",
       "owners": {
         "@document": {
-          "before": "6e2de7dda72a7c394ed50235beff89028c9e9c9592d9732c963c67059984c06c",
-          "after": "2214d57f18ef9d3eafc75007fd7962d96961371c1aba97f9e51ad6bd535ea9e6"
+          "before": "2214d57f18ef9d3eafc75007fd7962d96961371c1aba97f9e51ad6bd535ea9e6",
+          "after": "6b759e2c9bec6f949197ff1af23c1c00b6a90873cf4faf68188fd1bf0df51a83"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "29d83f94af473afe58a7cefcc80a24ff2a99d4749669e93bb6bc3beb5c5450d6",
-      "after_sha256": "242f29fefa9f3cb77a804e499e5e582c35b1ba01d118df2413a731c2941aedc8",
+      "before_sha256": "242f29fefa9f3cb77a804e499e5e582c35b1ba01d118df2413a731c2941aedc8",
+      "after_sha256": "f5e985f716cc2ea20731d4a44ae4530a95f42424c759135b74f90b35f999c0f1",
       "owners": {
         "@document": {
-          "before": "29d83f94af473afe58a7cefcc80a24ff2a99d4749669e93bb6bc3beb5c5450d6",
-          "after": "242f29fefa9f3cb77a804e499e5e582c35b1ba01d118df2413a731c2941aedc8"
+          "before": "242f29fefa9f3cb77a804e499e5e582c35b1ba01d118df2413a731c2941aedc8",
+          "after": "f5e985f716cc2ea20731d4a44ae4530a95f42424c759135b74f90b35f999c0f1"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
-      "before_sha256": "507c15f68b052713f1cbff8a64d406680faab6927eac7d4de6c06de3db761c70",
-      "after_sha256": "0502176043c983581a7a54b4b3041f59c81d229e86d9ede2e1ee5ba779d4fab6",
+      "before_sha256": "0502176043c983581a7a54b4b3041f59c81d229e86d9ede2e1ee5ba779d4fab6",
+      "after_sha256": "bd4674d8de9e72ac8e0c9ff878965feddf7acdda0c3b64bf6a7679e6d2e91c41",
       "owners": {
         "@document": {
-          "before": "507c15f68b052713f1cbff8a64d406680faab6927eac7d4de6c06de3db761c70",
-          "after": "0502176043c983581a7a54b4b3041f59c81d229e86d9ede2e1ee5ba779d4fab6"
+          "before": "0502176043c983581a7a54b4b3041f59c81d229e86d9ede2e1ee5ba779d4fab6",
+          "after": "bd4674d8de9e72ac8e0c9ff878965feddf7acdda0c3b64bf6a7679e6d2e91c41"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "dc8c22daa4c771dc43da0d5937731d761d19ead6100192ce1a226166ee8c2166",
-      "after_sha256": "9c1c8ec6c37d6da34cab07c842b8f417c7ab94cafcf2170fda4d7bca8fc715f3",
+      "before_sha256": "9c1c8ec6c37d6da34cab07c842b8f417c7ab94cafcf2170fda4d7bca8fc715f3",
+      "after_sha256": "aa2f6b47d91b756034a47440684d676a2b1a8427198ee554fe6a973e0e79d4ec",
       "owners": {
         "@document": {
-          "before": "dc8c22daa4c771dc43da0d5937731d761d19ead6100192ce1a226166ee8c2166",
-          "after": "9c1c8ec6c37d6da34cab07c842b8f417c7ab94cafcf2170fda4d7bca8fc715f3"
+          "before": "9c1c8ec6c37d6da34cab07c842b8f417c7ab94cafcf2170fda4d7bca8fc715f3",
+          "after": "aa2f6b47d91b756034a47440684d676a2b1a8427198ee554fe6a973e0e79d4ec"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "7f36c27e2e123c187e98fae24ddec21a86b606d6490d9cc5d562bb892e6f6b04",
-      "after_sha256": "f5133b39854e7edf51c2dd5a34ac4f1aec315d929ddbc2e8bec9f6d19dac1ff0",
+      "before_sha256": "f5133b39854e7edf51c2dd5a34ac4f1aec315d929ddbc2e8bec9f6d19dac1ff0",
+      "after_sha256": "5087f6990fc6c1b6987349b9d37531373e7ab41d3d2149609e91592403fd2f7d",
       "owners": {
         "@document": {
-          "before": "7f36c27e2e123c187e98fae24ddec21a86b606d6490d9cc5d562bb892e6f6b04",
-          "after": "f5133b39854e7edf51c2dd5a34ac4f1aec315d929ddbc2e8bec9f6d19dac1ff0"
+          "before": "f5133b39854e7edf51c2dd5a34ac4f1aec315d929ddbc2e8bec9f6d19dac1ff0",
+          "after": "5087f6990fc6c1b6987349b9d37531373e7ab41d3d2149609e91592403fd2f7d"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "4aa16a296ca21a982666efc1a4cbf622a9f00791b97a457fe0ac2ba9d7651548",
-      "after_sha256": "80ef4e5f16ec87fbe848945ad6454d73500dd3b4ba7ce24ff9062e42ccf68421",
+      "before_sha256": "80ef4e5f16ec87fbe848945ad6454d73500dd3b4ba7ce24ff9062e42ccf68421",
+      "after_sha256": "fdcd848d1b004ee6f43596e2be27675c2f8835b4a3d06646cf53800dedbc885d",
       "owners": {
         "@document": {
-          "before": "4aa16a296ca21a982666efc1a4cbf622a9f00791b97a457fe0ac2ba9d7651548",
-          "after": "80ef4e5f16ec87fbe848945ad6454d73500dd3b4ba7ce24ff9062e42ccf68421"
+          "before": "80ef4e5f16ec87fbe848945ad6454d73500dd3b4ba7ce24ff9062e42ccf68421",
+          "after": "fdcd848d1b004ee6f43596e2be27675c2f8835b4a3d06646cf53800dedbc885d"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "b7b4df73ecca120ca578a21b8a45cf6229ad76d07bfdbffd189149bf1c149bae",
-      "after_sha256": "40bf47848c91e8480509ea80c90df194cae72e0c967f3a2debc731da23a95de6",
+      "before_sha256": "40bf47848c91e8480509ea80c90df194cae72e0c967f3a2debc731da23a95de6",
+      "after_sha256": "2a35fdff362c33f1f959845a4370b35104b2e4d63adda0847332805423097b80",
       "owners": {
         "@document": {
-          "before": "b7b4df73ecca120ca578a21b8a45cf6229ad76d07bfdbffd189149bf1c149bae",
-          "after": "40bf47848c91e8480509ea80c90df194cae72e0c967f3a2debc731da23a95de6"
+          "before": "40bf47848c91e8480509ea80c90df194cae72e0c967f3a2debc731da23a95de6",
+          "after": "2a35fdff362c33f1f959845a4370b35104b2e4d63adda0847332805423097b80"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "4f6e15c2c757a107d8f1be893051e12a0fdc3585c9975cfcd8be7d2c21df331e",
-      "after_sha256": "f317563f31c233658bced853cc57bc807a8059663f403aa9d87d65d55ae8f38a",
+      "before_sha256": "f317563f31c233658bced853cc57bc807a8059663f403aa9d87d65d55ae8f38a",
+      "after_sha256": "9d8c5ea335bc8a18e6c640b157c2ab10e72cb4fc987cced7f039fbc9ebc2bad3",
       "owners": {
         "@document": {
-          "before": "4f6e15c2c757a107d8f1be893051e12a0fdc3585c9975cfcd8be7d2c21df331e",
-          "after": "f317563f31c233658bced853cc57bc807a8059663f403aa9d87d65d55ae8f38a"
+          "before": "f317563f31c233658bced853cc57bc807a8059663f403aa9d87d65d55ae8f38a",
+          "after": "9d8c5ea335bc8a18e6c640b157c2ab10e72cb4fc987cced7f039fbc9ebc2bad3"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "36142e44b2fd4929791d2b4da4aa192e6066f499d5b69b942f95b5c71b55a25f",
-      "after_sha256": "ac3c709a9b5a4774b163b4c40e76c6bc4228663229a71c4db1d94b8d1bc37371",
+      "before_sha256": "ac3c709a9b5a4774b163b4c40e76c6bc4228663229a71c4db1d94b8d1bc37371",
+      "after_sha256": "b47630c0c1660aebdd929c5a9a6d1990d14f6f8b942de08c1ec09167e04786bf",
       "owners": {
         "@document": {
-          "before": "36142e44b2fd4929791d2b4da4aa192e6066f499d5b69b942f95b5c71b55a25f",
-          "after": "ac3c709a9b5a4774b163b4c40e76c6bc4228663229a71c4db1d94b8d1bc37371"
+          "before": "ac3c709a9b5a4774b163b4c40e76c6bc4228663229a71c4db1d94b8d1bc37371",
+          "after": "b47630c0c1660aebdd929c5a9a6d1990d14f6f8b942de08c1ec09167e04786bf"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "780440d2ce6ab76411ce4d83afa0b1c747ebd52e5706e46f544b44b203375c3d",
-      "after_sha256": "e9bfb6d4152127d34c5779ca55d83db4ac43eb7f2b75a522c026c328bfebfccb",
+      "before_sha256": "e9bfb6d4152127d34c5779ca55d83db4ac43eb7f2b75a522c026c328bfebfccb",
+      "after_sha256": "694451765760bdc1b672cac89977ff9bfa9918b16a1972c93986429665956812",
       "owners": {
         "@document": {
-          "before": "780440d2ce6ab76411ce4d83afa0b1c747ebd52e5706e46f544b44b203375c3d",
-          "after": "e9bfb6d4152127d34c5779ca55d83db4ac43eb7f2b75a522c026c328bfebfccb"
+          "before": "e9bfb6d4152127d34c5779ca55d83db4ac43eb7f2b75a522c026c328bfebfccb",
+          "after": "694451765760bdc1b672cac89977ff9bfa9918b16a1972c93986429665956812"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "818a5478a6daef2543fffe6061e3f266543a9a2774ab93ce3da93463735208c6",
-      "after_sha256": "5a8261890bcd335ebb6b1d99da879c80195b14fa5ced5626abcb7e009856403e",
+      "before_sha256": "5a8261890bcd335ebb6b1d99da879c80195b14fa5ced5626abcb7e009856403e",
+      "after_sha256": "d809903f949e0053ea843d52747a8ff2fe090526f873d56be997ec39702601aa",
       "owners": {
         "@document": {
-          "before": "818a5478a6daef2543fffe6061e3f266543a9a2774ab93ce3da93463735208c6",
-          "after": "5a8261890bcd335ebb6b1d99da879c80195b14fa5ced5626abcb7e009856403e"
+          "before": "5a8261890bcd335ebb6b1d99da879c80195b14fa5ced5626abcb7e009856403e",
+          "after": "d809903f949e0053ea843d52747a8ff2fe090526f873d56be997ec39702601aa"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "51af39364c1d3e902e0b2df4e88c8abe1844941b213dad0ea041ab0e5b323678",
-      "after_sha256": "e40d4b3f10f055a014ac1e1afada5ebf733ad0dd73dcae5b404a0396d3e73c55",
+      "before_sha256": "e40d4b3f10f055a014ac1e1afada5ebf733ad0dd73dcae5b404a0396d3e73c55",
+      "after_sha256": "a79ca6d2661738cb58d728eee1324e741aaf58757002f0971bad77b62c7b44d4",
       "owners": {
         "@document": {
-          "before": "51af39364c1d3e902e0b2df4e88c8abe1844941b213dad0ea041ab0e5b323678",
-          "after": "e40d4b3f10f055a014ac1e1afada5ebf733ad0dd73dcae5b404a0396d3e73c55"
+          "before": "e40d4b3f10f055a014ac1e1afada5ebf733ad0dd73dcae5b404a0396d3e73c55",
+          "after": "a79ca6d2661738cb58d728eee1324e741aaf58757002f0971bad77b62c7b44d4"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "0ea3dac4576cb9e747f6ac428f87ca693441eefae29e01086cee89a629a87e2c",
-      "after_sha256": "a9b4831e29d6f237d1667ab868b3dc878a1eacc102c7194b5e345ef26b93b23c",
+      "before_sha256": "a9b4831e29d6f237d1667ab868b3dc878a1eacc102c7194b5e345ef26b93b23c",
+      "after_sha256": "72fc1e24a266d7b5b728acdd1e1807e9002da970308ddd4bfd0ec0b89537f056",
       "owners": {
         "@document": {
-          "before": "0ea3dac4576cb9e747f6ac428f87ca693441eefae29e01086cee89a629a87e2c",
-          "after": "a9b4831e29d6f237d1667ab868b3dc878a1eacc102c7194b5e345ef26b93b23c"
+          "before": "a9b4831e29d6f237d1667ab868b3dc878a1eacc102c7194b5e345ef26b93b23c",
+          "after": "72fc1e24a266d7b5b728acdd1e1807e9002da970308ddd4bfd0ec0b89537f056"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "9db8ff207f5153d4438bb26799a31cd0b4f4953faf5b8472d1bfca0d6dcdbc03",
-      "after_sha256": "6738dd781568b41b1ae7108131aeb64db2a4bf19ef580defee19a45829ddecfc",
+      "before_sha256": "6738dd781568b41b1ae7108131aeb64db2a4bf19ef580defee19a45829ddecfc",
+      "after_sha256": "29407781db7898fa4f0e31d8e1a0a38fb17c4d2731309fe4cbfc5c424e2601b4",
       "owners": {
         "@document": {
-          "before": "9db8ff207f5153d4438bb26799a31cd0b4f4953faf5b8472d1bfca0d6dcdbc03",
-          "after": "6738dd781568b41b1ae7108131aeb64db2a4bf19ef580defee19a45829ddecfc"
+          "before": "6738dd781568b41b1ae7108131aeb64db2a4bf19ef580defee19a45829ddecfc",
+          "after": "29407781db7898fa4f0e31d8e1a0a38fb17c4d2731309fe4cbfc5c424e2601b4"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "e2abb7018e06f6ff73c3951ca7ff5b6c66b08d469985509f5c4f8cecd76dd8da",
-      "after_sha256": "c4077153055ec989ed70e7fbc4f16741a13b2a24a0af4bf669a7db20b94a594c",
+      "before_sha256": "c4077153055ec989ed70e7fbc4f16741a13b2a24a0af4bf669a7db20b94a594c",
+      "after_sha256": "c403bcc198f91ab74382435dc43b546f1986647625cbc0f64c06cc8ea4349420",
       "owners": {
         "@document": {
-          "before": "e2abb7018e06f6ff73c3951ca7ff5b6c66b08d469985509f5c4f8cecd76dd8da",
-          "after": "c4077153055ec989ed70e7fbc4f16741a13b2a24a0af4bf669a7db20b94a594c"
+          "before": "c4077153055ec989ed70e7fbc4f16741a13b2a24a0af4bf669a7db20b94a594c",
+          "after": "c403bcc198f91ab74382435dc43b546f1986647625cbc0f64c06cc8ea4349420"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "64b2037c30bb8e8f9bcdae54e15a77f8b8ed33ec316f62b269c7271e683a910f",
-      "after_sha256": "28798c756b4f476b3d5d180067ac158396ba8b62f45332560eadf21baa2b537b",
+      "before_sha256": "28798c756b4f476b3d5d180067ac158396ba8b62f45332560eadf21baa2b537b",
+      "after_sha256": "66c3e76675041d44d32599bf3416764810c6b368612d64ed6d6f647f5c0638c6",
       "owners": {
         "@document": {
-          "before": "64b2037c30bb8e8f9bcdae54e15a77f8b8ed33ec316f62b269c7271e683a910f",
-          "after": "28798c756b4f476b3d5d180067ac158396ba8b62f45332560eadf21baa2b537b"
+          "before": "28798c756b4f476b3d5d180067ac158396ba8b62f45332560eadf21baa2b537b",
+          "after": "66c3e76675041d44d32599bf3416764810c6b368612d64ed6d6f647f5c0638c6"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "a4a81e74319d2494bdb28dbf4bf4efe4385313869916ae4ad1b4d51458881c37",
-      "after_sha256": "1d5accd84e5eb59db987fe08ea9664aa98d26e833bdef0686f8daff7e16f0a4d",
+      "before_sha256": "1d5accd84e5eb59db987fe08ea9664aa98d26e833bdef0686f8daff7e16f0a4d",
+      "after_sha256": "838f3b5ba4f69f35728e7e25e2d201b118ec142241240a6758bc1920a8bd5ead",
       "owners": {
         "@document": {
-          "before": "a4a81e74319d2494bdb28dbf4bf4efe4385313869916ae4ad1b4d51458881c37",
-          "after": "1d5accd84e5eb59db987fe08ea9664aa98d26e833bdef0686f8daff7e16f0a4d"
+          "before": "1d5accd84e5eb59db987fe08ea9664aa98d26e833bdef0686f8daff7e16f0a4d",
+          "after": "838f3b5ba4f69f35728e7e25e2d201b118ec142241240a6758bc1920a8bd5ead"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "4038ffd0b962a780efeb366ae03d7bd8b6d9edd38361565d51194266a8374a37",
-      "after_sha256": "0e006339974d7e84c53a66d62066bdf33f5d93aab68bf2f028517581ce9a0161",
+      "before_sha256": "0e006339974d7e84c53a66d62066bdf33f5d93aab68bf2f028517581ce9a0161",
+      "after_sha256": "0cb416c46d79e11b6b46908e615e93268bcbaf6726a822106a2613cf93338b09",
       "owners": {
         "@document": {
-          "before": "4038ffd0b962a780efeb366ae03d7bd8b6d9edd38361565d51194266a8374a37",
-          "after": "0e006339974d7e84c53a66d62066bdf33f5d93aab68bf2f028517581ce9a0161"
+          "before": "0e006339974d7e84c53a66d62066bdf33f5d93aab68bf2f028517581ce9a0161",
+          "after": "0cb416c46d79e11b6b46908e615e93268bcbaf6726a822106a2613cf93338b09"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "5607732ed832af4cec6bf13779e9e47cf0b835cc3aa5dd2e7018595e46622a4b",
-      "after_sha256": "f22010a25ce81fc74e0dc50fba1a40d4eb8a539d3dc941873166d2abefe3c9a5",
+      "before_sha256": "f22010a25ce81fc74e0dc50fba1a40d4eb8a539d3dc941873166d2abefe3c9a5",
+      "after_sha256": "8abf85067f6ac4467911b5a1940658fc2d3edcccc13128da95a1728c0f59c6aa",
       "owners": {
         "@document": {
-          "before": "5607732ed832af4cec6bf13779e9e47cf0b835cc3aa5dd2e7018595e46622a4b",
-          "after": "f22010a25ce81fc74e0dc50fba1a40d4eb8a539d3dc941873166d2abefe3c9a5"
+          "before": "f22010a25ce81fc74e0dc50fba1a40d4eb8a539d3dc941873166d2abefe3c9a5",
+          "after": "8abf85067f6ac4467911b5a1940658fc2d3edcccc13128da95a1728c0f59c6aa"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "3467db0b84621d26aaec3038ab3e7d0e7bb0dab123d7b8a06efdc1b780f4203a",
-      "after_sha256": "da3c661fb1da680e8e0c10633eddace0d2a8151c1b3f148f7477c9b68f737695",
+      "before_sha256": "da3c661fb1da680e8e0c10633eddace0d2a8151c1b3f148f7477c9b68f737695",
+      "after_sha256": "825a3a135df243ed0f8dfa320cb088a8d24cdbf7256f08e6b226870f258ff5f3",
       "owners": {
         "@document": {
-          "before": "3467db0b84621d26aaec3038ab3e7d0e7bb0dab123d7b8a06efdc1b780f4203a",
-          "after": "da3c661fb1da680e8e0c10633eddace0d2a8151c1b3f148f7477c9b68f737695"
+          "before": "da3c661fb1da680e8e0c10633eddace0d2a8151c1b3f148f7477c9b68f737695",
+          "after": "825a3a135df243ed0f8dfa320cb088a8d24cdbf7256f08e6b226870f258ff5f3"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "1a6c51120a9fed9bcfecb6aa0d15993f07dff55a49b59cbcbc9f83bfca4097e6",
-      "after_sha256": "53e0fdfe43d26628b4739e01aa640849dcda2bb8e394e9ab474150c0114ee82b",
+      "before_sha256": "53e0fdfe43d26628b4739e01aa640849dcda2bb8e394e9ab474150c0114ee82b",
+      "after_sha256": "a5466640eb5596bcadef9e29b765e48e193106175a3872ec0a488028020a2d67",
       "owners": {
         "@document": {
-          "before": "1a6c51120a9fed9bcfecb6aa0d15993f07dff55a49b59cbcbc9f83bfca4097e6",
-          "after": "53e0fdfe43d26628b4739e01aa640849dcda2bb8e394e9ab474150c0114ee82b"
+          "before": "53e0fdfe43d26628b4739e01aa640849dcda2bb8e394e9ab474150c0114ee82b",
+          "after": "a5466640eb5596bcadef9e29b765e48e193106175a3872ec0a488028020a2d67"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "d0bea3a593c98f8451459a1b43bba8fda2c75771113a75db61dfdd7b88de0fef",
-      "after_sha256": "3d2b6b10eb4825822cb525c77ca152cac36c6aa319fcc81d4a99b76317fb9c3d",
+      "before_sha256": "3d2b6b10eb4825822cb525c77ca152cac36c6aa319fcc81d4a99b76317fb9c3d",
+      "after_sha256": "7c487dac9e8d7b57e0380520b610c008f69dd9beb3891738549c93e78f889672",
       "owners": {
         "@document": {
-          "before": "d0bea3a593c98f8451459a1b43bba8fda2c75771113a75db61dfdd7b88de0fef",
-          "after": "3d2b6b10eb4825822cb525c77ca152cac36c6aa319fcc81d4a99b76317fb9c3d"
+          "before": "3d2b6b10eb4825822cb525c77ca152cac36c6aa319fcc81d4a99b76317fb9c3d",
+          "after": "7c487dac9e8d7b57e0380520b610c008f69dd9beb3891738549c93e78f889672"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "e37746e3fb42c153d6ddd24499e1f94af7a42a5ae6cd32753255b4c09b7b9884",
-      "after_sha256": "11222821dbedf2a454d20bd76210d2bd6cee1f716b40892d4a7c765905a127e9",
+      "before_sha256": "11222821dbedf2a454d20bd76210d2bd6cee1f716b40892d4a7c765905a127e9",
+      "after_sha256": "3e79996ee8a424f0d36ab47b0b355075dda6176c59a04a9b138d0d00305483c3",
       "owners": {
         "@document": {
-          "before": "e37746e3fb42c153d6ddd24499e1f94af7a42a5ae6cd32753255b4c09b7b9884",
-          "after": "11222821dbedf2a454d20bd76210d2bd6cee1f716b40892d4a7c765905a127e9"
+          "before": "11222821dbedf2a454d20bd76210d2bd6cee1f716b40892d4a7c765905a127e9",
+          "after": "3e79996ee8a424f0d36ab47b0b355075dda6176c59a04a9b138d0d00305483c3"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "997f14f408155f5645d992be34c1ba06afcdd6ec86c2c2b7e529c30b603ac9cd",
-      "after_sha256": "7edc78adc91ac2eddb7326595769c6891be909cb0982a95d9cca8019f7b0ff71",
+      "before_sha256": "7edc78adc91ac2eddb7326595769c6891be909cb0982a95d9cca8019f7b0ff71",
+      "after_sha256": "48277e8400648e33119d4f79ef8c3cd18bc4f72718532948776a9a6faa62bb4e",
       "owners": {
         "@document": {
-          "before": "997f14f408155f5645d992be34c1ba06afcdd6ec86c2c2b7e529c30b603ac9cd",
-          "after": "7edc78adc91ac2eddb7326595769c6891be909cb0982a95d9cca8019f7b0ff71"
+          "before": "7edc78adc91ac2eddb7326595769c6891be909cb0982a95d9cca8019f7b0ff71",
+          "after": "48277e8400648e33119d4f79ef8c3cd18bc4f72718532948776a9a6faa62bb4e"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "d2b378857123d17be2e166285d729e24531064bfbe5c9ab6122043550184a5f8",
-      "after_sha256": "3891c9d37e9ba057cbd7daa78b67191deabfdb25580f5d7998c45b821f78cf76",
+      "before_sha256": "3891c9d37e9ba057cbd7daa78b67191deabfdb25580f5d7998c45b821f78cf76",
+      "after_sha256": "ac8f9b2f0ccc04459dbdebd0cc755e58e9d9b75f1feaf899634166aee576ad46",
       "owners": {
         "@document": {
-          "before": "d2b378857123d17be2e166285d729e24531064bfbe5c9ab6122043550184a5f8",
-          "after": "3891c9d37e9ba057cbd7daa78b67191deabfdb25580f5d7998c45b821f78cf76"
+          "before": "3891c9d37e9ba057cbd7daa78b67191deabfdb25580f5d7998c45b821f78cf76",
+          "after": "ac8f9b2f0ccc04459dbdebd0cc755e58e9d9b75f1feaf899634166aee576ad46"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "b3c96c828f18a30f204f8d9fdca685aeca83a6081da248a25fa24ddf05b463c6",
-      "after_sha256": "08fc2fb799fa1caec8540101f5c3cbb8045a542fd315f4bd1f0a81cce933a162",
+      "before_sha256": "08fc2fb799fa1caec8540101f5c3cbb8045a542fd315f4bd1f0a81cce933a162",
+      "after_sha256": "13ead9e48c2d5ae723c19160486abb927747dfca3a46939ce186dd538e789dbe",
       "owners": {
         "@document": {
-          "before": "b3c96c828f18a30f204f8d9fdca685aeca83a6081da248a25fa24ddf05b463c6",
-          "after": "08fc2fb799fa1caec8540101f5c3cbb8045a542fd315f4bd1f0a81cce933a162"
+          "before": "08fc2fb799fa1caec8540101f5c3cbb8045a542fd315f4bd1f0a81cce933a162",
+          "after": "13ead9e48c2d5ae723c19160486abb927747dfca3a46939ce186dd538e789dbe"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "2c288e142fcfc1cc4bf355fa2427a51bd5000197ebb8bcbcb7b943163b83e81e",
-      "after_sha256": "0dd5dd41910f1af971e386ffd310d56c12b3b7108e998924f12e8cdda3bca4bd",
+      "before_sha256": "0dd5dd41910f1af971e386ffd310d56c12b3b7108e998924f12e8cdda3bca4bd",
+      "after_sha256": "d1ff280828f25268d337318b7e003b4bdb23f38aaf2adea08b8b4dce8f634c2a",
       "owners": {
         "@document": {
-          "before": "2c288e142fcfc1cc4bf355fa2427a51bd5000197ebb8bcbcb7b943163b83e81e",
-          "after": "0dd5dd41910f1af971e386ffd310d56c12b3b7108e998924f12e8cdda3bca4bd"
+          "before": "0dd5dd41910f1af971e386ffd310d56c12b3b7108e998924f12e8cdda3bca4bd",
+          "after": "d1ff280828f25268d337318b7e003b4bdb23f38aaf2adea08b8b4dce8f634c2a"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "55e2f7fe3033b2f97ed2b5f8d3ff322db65f7c4b8791638777974c8c95034454",
-      "after_sha256": "92cd879d9acbabf4cfbf38cd3ce2e9c3c1a8f9a4283ca1f09a0be791f7851679",
+      "before_sha256": "92cd879d9acbabf4cfbf38cd3ce2e9c3c1a8f9a4283ca1f09a0be791f7851679",
+      "after_sha256": "abb9c6e2e43f7d4e18c3a06eaa63bf24f33afa25056a9e384c556381dc3be170",
       "owners": {
         "@document": {
-          "before": "55e2f7fe3033b2f97ed2b5f8d3ff322db65f7c4b8791638777974c8c95034454",
-          "after": "92cd879d9acbabf4cfbf38cd3ce2e9c3c1a8f9a4283ca1f09a0be791f7851679"
+          "before": "92cd879d9acbabf4cfbf38cd3ce2e9c3c1a8f9a4283ca1f09a0be791f7851679",
+          "after": "abb9c6e2e43f7d4e18c3a06eaa63bf24f33afa25056a9e384c556381dc3be170"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "7807200de0081a0b500ca69c811ac62644dc9d45e5e2f2bdca43681ecc8dd0fa",
-      "after_sha256": "b2ad8dfd75676751dfe43ac46f2c6f1fcc173e01d107fbf4cbe862bade34a372",
+      "before_sha256": "b2ad8dfd75676751dfe43ac46f2c6f1fcc173e01d107fbf4cbe862bade34a372",
+      "after_sha256": "1446527f1673cf43ed4b9d99788884ec97746ccda8f16cb4fe517d46bea85322",
       "owners": {
         "@document": {
-          "before": "7807200de0081a0b500ca69c811ac62644dc9d45e5e2f2bdca43681ecc8dd0fa",
-          "after": "b2ad8dfd75676751dfe43ac46f2c6f1fcc173e01d107fbf4cbe862bade34a372"
+          "before": "b2ad8dfd75676751dfe43ac46f2c6f1fcc173e01d107fbf4cbe862bade34a372",
+          "after": "1446527f1673cf43ed4b9d99788884ec97746ccda8f16cb4fe517d46bea85322"
         }
       }
     },
-    "src/warhammer40k_core/ai/deployment_dataset_split.py": {
+    "src/warhammer40k_core/ai/deployment_workload.py": {
       "before_sha256": null,
-      "after_sha256": "5a14566879c3f983042d7a1d8dca481705044b55249dcac8e07284a5d47a204b",
+      "after_sha256": "7c3a2300368363b945b84cd845cc378b2ac03c1cdbf57b72678a45a4cf8ba26b",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7afabb7e654cb2172e4f6d8537958f52638913ff2f664e5611fe84cb150ccf13"
+          "after": "401c0bcba6fa76191564d626ca8ec390dd26fc1b6896f080ce416d019af83f80"
         },
-        "DeploymentDatasetPartition": {
+        "DeploymentWorkloadContract": {
           "before": null,
-          "after": "528c8f8dd8331448f7daf38a528cfe07ef793ed45343961dafe057dcc706bd7c"
+          "after": "3ce49e62d2de868bf9489c4aa57612397868b4f07eeeeacd42141a368c9dc37a"
         },
-        "DeploymentDatasetSplit": {
+        "DeploymentWorkloadContract.__init__": {
           "before": null,
-          "after": "ddcf00933e8d92bbb14225d70e78e1c35bd01bcbc6ba188efcb404d07f9e5f7b"
+          "after": "91dd8791712733d2fca0ab6692ea779e6f75de91471cc72989d3e383c340f5f5"
         },
-        "DeploymentDatasetSplit.__init__": {
-          "before": null,
-          "after": "6685c81138b92d6798c49c343d4811492c13a9d12f99e810c8b0e6d2fd001628"
-        },
-        "DeploymentDatasetSplit.content_hash": {
+        "DeploymentWorkloadContract.content_hash": {
           "before": null,
           "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
         },
-        "DeploymentDatasetSplit.from_datasets": {
+        "DeploymentWorkloadContract.from_payload": {
           "before": null,
-          "after": "ed880efbd5cb2c26ab615c6161b5dfc662d4dfc75465e667d2a4e5ed563bf09e"
+          "after": "1b06cd4b7e3d46daf83c9cbc4e9ae03098753a1a821d257685795eb5c468957e"
         },
-        "DeploymentDatasetSplit.from_payload": {
+        "DeploymentWorkloadContract.from_split": {
           "before": null,
-          "after": "b17057af1b25e6674a6d076186d2780bbaedc225891f9ca05c66ad6063ccc4cd"
+          "after": "b4d09e3e260e71b99c2bbeb6234e7e1e10e64ddac5c77a98798c3439dd828b8f"
         },
-        "DeploymentDatasetSplit.to_payload": {
+        "DeploymentWorkloadContract.to_payload": {
           "before": null,
           "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
-        },
-        "DeploymentSplitAssignment": {
-          "before": null,
-          "after": "6c9c27a8f657076083817776ec3df0f09f0c942fcbed067b380a58136a77af17"
-        },
-        "DeploymentSplitAssignment.__post_init__": {
-          "before": null,
-          "after": "5b7c3c2789dcae768fa32b003d4aa40adf91491380d48a029ce4fc5c9ffbb308"
-        },
-        "DeploymentSplitAssignment.to_payload": {
-          "before": null,
-          "after": "1873e5ebe8c6d2c36cbba144becdd99c964b7e4c62bf0e5b871a293fcb6046ee"
-        },
-        "_counts": {
-          "before": null,
-          "after": "276ddc73543125402281437c8b6756bd1217a09c805c9c0c78992750de47bf93"
         },
         "_require": {
           "before": null,
           "after": "3e4e41ff3c8c7f6151e8cfe962471bc5109b5c5a9dd657efb33db1d520d98bee"
+        },
+        "_route": {
+          "before": null,
+          "after": "f4342a34bc4b59b58d43a007b61ca185f05507c2ec834f7f260b8b5a5a721b54"
         }
       }
     },
     "tests/infrastructure/adapters/test_deployment_experiment.py": {
-      "before_sha256": "a5e491b0ec56d9adf661bc35f66a2e3121f9ee5180404b66c82f339b5091aefc",
-      "after_sha256": "d38db01e885eb39e64f1088559b76e90cef1e4fe00404f5bc5de61368b70f32c",
+      "before_sha256": "d38db01e885eb39e64f1088559b76e90cef1e4fe00404f5bc5de61368b70f32c",
+      "after_sha256": "e0c83ccc19f1c2ff2736aacdae10a3a5b0501a92a74aac26732ec52ec342c163",
       "owners": {
         "@module": {
-          "before": "f65227e71fea11c1ab64036f002e4739ffa2ec327790513757d82f3a028cc154",
-          "after": "cde32271d7119749ff748f9c55b9ef0a18c4e9f442994b1513bc80bd6c02e831"
+          "before": "cde32271d7119749ff748f9c55b9ef0a18c4e9f442994b1513bc80bd6c02e831",
+          "after": "38a25d2b7ed72ea68db24234c4bc513d419f17509f66dab8442641dd4a608ab6"
         },
         "test_runner_dataset_joins_ranked_choice_and_keeps_failed_run_rows_excluded": {
-          "before": "dc953ac16a45d0c1e4df0d21d48dd7067bd27638f8cf1dffe1d706e1996fa7c5",
-          "after": "a18935fbc5922bf863e42569b2e5d217b8f9e4eb96b97a525935498e5d60afc1"
+          "before": "a18935fbc5922bf863e42569b2e5d217b8f9e4eb96b97a525935498e5d60afc1",
+          "after": "5c94020c5a76d8e49c71634faad82b380340122ad5ecf5326c9813c3a9e54b86"
         }
       }
     },
     "tests/infrastructure/adapters/test_runner_accounting.py": {
-      "before_sha256": "739a94e3561b7f7dc711f9b98e5b14fa281920d3ff17ff3b9a0986661c927dbb",
-      "after_sha256": "093685b9b42f7709aa381cd2bb0a8e6846e1763b3af4df3cf8df9b505f0ec55d",
+      "before_sha256": "093685b9b42f7709aa381cd2bb0a8e6846e1763b3af4df3cf8df9b505f0ec55d",
+      "after_sha256": "9c50a1ee78e7b79bd7c094b369fcb241336b154b46d54601e21ae087acdbc953",
       "owners": {
         "@module": {
-          "before": "c5124bb4dbe7af506f7098c0d4d8fa2d4fffe9a58e07b40fa9cf933d4f7e6911",
-          "after": "38a187211e7fa30e0c5623ce58375042ab4659882b12b6c68ba5699295c8b7e7"
+          "before": "38a187211e7fa30e0c5623ce58375042ab4659882b12b6c68ba5699295c8b7e7",
+          "after": "cf1a6dca987594e9ed3703bd6436f341b17f8aa016ae09034e751f8ce0feecaf"
         },
-        "_split_assignments": {
+        "_workload_configs": {
           "before": null,
-          "after": "17a642e3a2146f32d979058da4c69f60616fe3edf42c797ec8f56a6831524598"
+          "after": "a09eda8b3899b7f3eeca3589677b3bc1a6ade155ccbc895d9d15acca649782a2"
         },
-        "split_datasets": {
+        "test_workload_closed_loader_rejects_contract_and_inventory_drift": {
           "before": null,
-          "after": "94201c71742ffad09e2c01bb44ca453d4483deb6ac315f12fd48b119fc9e357b"
+          "after": "89e0f37116ed13e21580913008a4b6dddabdcf25c0dee0b81f0f9a0c50607c6b"
         },
-        "test_split_assignment_rejects_inexact_or_missing_declarations": {
+        "test_workload_pins_semantics_access_and_complete_failed_inventory": {
           "before": null,
-          "after": "beac313cc76f1bc337111430f32bc3ce88e6d78fd0be9daf0607df10308c302c"
+          "after": "c5f9a90f44333a65a0fc5e13d13754cf80b07f9b6ca5f65a98d3969e9b5673bf"
         },
-        "test_split_binds_declared_trajectory_ids_across_distinct_verified_startups": {
+        "test_workload_rejects_incompatible_declarations": {
           "before": null,
-          "after": "06abc3c762b94b93ae4b3f88b5d9925e1cda048d253102c216993bc8ac89b6a9"
-        },
-        "test_split_closed_loader_rejects_changed_evidence_or_accounting": {
-          "before": null,
-          "after": "cfc01bc6a1a21b535f20ecb4a5ca0a1547be8fbbc2760f0ef7cad195a7ef1fef"
-        },
-        "test_split_keeps_duplicate_and_replayed_prefix_trajectories_together": {
-          "before": null,
-          "after": "1d641624144323ccd5e3c43c96d505dedff780904bc959cc5df5fe079692808c"
-        },
-        "test_split_preserves_duplicate_occurrences_and_zero_row_failure_denominators": {
-          "before": null,
-          "after": "e2e22e3ed31cab903dcf6ed1b7d184b126227003cb08ffa249a4d4e0ef77cc23"
-        },
-        "test_split_rejects_incomplete_or_ambiguous_occurrence_assignments": {
-          "before": null,
-          "after": "daa148c28835a585a3c6b7ba083697ee1127bf877b1f2665868274db2d0e4f20"
-        },
-        "test_split_rejects_independent_declared_group_leakage": {
-          "before": null,
-          "after": "8cd79b807f51c12a635362c351fc16b2c50edee8243d8c7f888ef840f5d1ddde"
-        },
-        "test_split_requires_typed_admitted_inputs": {
-          "before": null,
-          "after": "4e90c3126b484b93f8de6ae6d8e47e34bc57ca4fdd16cf8ad03e4a35c1c3a215"
+          "after": "daf13d464f0d300d487374c477d294b8bc2f78b8e9571bc33c14709e70894ae3"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "c88bf4d7576aa4fe642c1f7db90aceb1cd03346f265135d753c97b3e57af2888",
-      "after_sha256": "2a348ac1ec1d616052466e6fc49ff1b1d37c6e8073ac26f7c85668e9f563e1fb",
+      "before_sha256": "2a348ac1ec1d616052466e6fc49ff1b1d37c6e8073ac26f7c85668e9f563e1fb",
+      "after_sha256": "9c0f5632d052ef81b4bfe7753382f7a5a64a99c6ec2afeba41595253f002e57a",
       "owners": {
         "@document": {
-          "before": "c88bf4d7576aa4fe642c1f7db90aceb1cd03346f265135d753c97b3e57af2888",
-          "after": "2a348ac1ec1d616052466e6fc49ff1b1d37c6e8073ac26f7c85668e9f563e1fb"
+          "before": "2a348ac1ec1d616052466e6fc49ff1b1d37c6e8073ac26f7c85668e9f563e1fb",
+          "after": "9c0f5632d052ef81b4bfe7753382f7a5a64a99c6ec2afeba41595253f002e57a"
         }
       }
     }
@@ -432,7 +392,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
       "source_obligation": "",
       "unchanged_work": ""
     },
@@ -451,9 +411,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/hosted-calibration.json": {
       "category": "rule_semantics",
@@ -463,9 +423,9 @@
         "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -482,9 +442,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -501,9 +461,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -520,9 +480,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -539,9 +499,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -558,9 +518,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -577,9 +537,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -596,9 +556,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -615,9 +575,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -634,9 +594,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -653,9 +613,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -672,9 +632,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -691,9 +651,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -735,9 +695,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -779,9 +739,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -823,9 +783,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -867,9 +827,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -911,9 +871,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -955,9 +915,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -999,9 +959,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -1043,9 +1003,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -1053,15 +1013,15 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
       "source_obligation": "",
       "unchanged_work": ""
     },
@@ -1069,7 +1029,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
       "source_obligation": "",
       "unchanged_work": ""
     },
@@ -1077,7 +1037,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
       "source_obligation": "",
       "unchanged_work": ""
     },
@@ -1085,7 +1045,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
       "source_obligation": "",
       "unchanged_work": ""
     },
@@ -1098,41 +1058,43 @@
         "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
-    "src/warhammer40k_core/ai/deployment_dataset_split.py": {
+    "src/warhammer40k_core/ai/deployment_workload.py": {
       "category": "rule_semantics",
       "operations": [
-        "deployment-dataset-partitions"
+        "deployment-workload-contract"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "tests/infrastructure/adapters/test_deployment_experiment.py": {
       "category": "rule_semantics",
       "operations": [
         "deployment-experiment-provenance",
-        "deployment-dataset-partitions"
+        "deployment-dataset-partitions",
+        "deployment-workload-contract"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "tests/infrastructure/adapters/test_runner_accounting.py": {
       "category": "rule_semantics",
       "operations": [
         "player-policy-boundary",
-        "deployment-dataset-partitions"
+        "deployment-dataset-partitions",
+        "deployment-workload-contract"
       ],
       "selected_families": [],
-      "rationale": "Add an operator-only split contract over admitted deployment inventories, preserving complete run and row occurrences while rejecting trajectory and declared-group leakage; update derived build, contract and test scheduling evidence.",
-      "source_obligation": "Stage 1 requires whole trajectories and explicitly declared scenario-family/geometry groups to remain in one partition, with complete occurrence and failed-run accounting and fail-closed serialization.",
-      "unchanged_work": "The new operator receipt and focused regressions do not alter gameplay, candidate generation, ranking, adapter authority, native serialization algorithms, source loading, dependencies or measured performance workloads. No detailed comparison family is selected by these nonsensitive owners; serial current-runtime smoke remains required."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -1140,9 +1102,9 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Refresh only the current README authentication fingerprint after the permitted timing-provenance guidance update; preserve every source capture, hierarchy obligation and assertion.",
-      "source_obligation": "The section07 authentication regression requires the current maintained README bytes to match its reviewed current-control fingerprint. Historical source and raw-capture commitments retain their exact original values.",
-      "unchanged_work": "Only one maintained-document SHA256 changes. Runtime and Python test bytes, native hierarchy semantics, raw source captures, behavioral selection, timing formulas and measured performance workloads remain unchanged."
+      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
+      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
+      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
     }
   },
   "milestone": "ordinary",

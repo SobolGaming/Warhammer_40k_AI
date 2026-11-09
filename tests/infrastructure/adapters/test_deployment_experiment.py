@@ -34,6 +34,7 @@ from warhammer40k_core.ai.deployment_experiment import (
     DeploymentExperimentProvenance,
 )
 from warhammer40k_core.ai.deployment_geometry_features import DeploymentGeometryObservation
+from warhammer40k_core.ai.deployment_workload import DeploymentWorkloadContract
 from warhammer40k_core.ai.parameterized_training import (
     DeploymentTrainingCandidateLink,
     RankedDeploymentTrainingLink,
@@ -544,6 +545,51 @@ def test_runner_dataset_joins_ranked_choice_and_keeps_failed_run_rows_excluded(
         for dataset_index, run_index in ((0, 0), (1, 0), (1, 1))
     )
     split = DeploymentDatasetSplit.from_datasets(datasets, assignments=assignments)
+    workload = DeploymentWorkloadContract.from_split(
+        split, configs=(before.lifecycle.config,), required_routes=(context.route,)
+    )
+    workload_payload = workload.to_payload()
+    assert _object(workload_payload["split"])["counts"] == split.to_payload()["counts"]
+    assert (
+        DeploymentWorkloadContract.from_payload(
+            workload_payload,
+            split=split,
+            configs=(before.lifecycle.config,),
+            required_routes=(context.route,),
+        )
+        == workload
+    )
+    with pytest.raises(TrainingAdmissionError, match="registration"):
+        DeploymentWorkloadContract.from_split(
+            split,
+            configs=(before.lifecycle.config,),
+            required_routes=(replace(context.route, actor_id="absent-player"),),
+        )
+    if failure:
+        # Missing targets can legitimately name other reference definitions in
+        # general dataset admission; this selected workload must reject them.
+        other_linked = replace(linked, target=replace(target, target_id="other-reference-v1"))
+        other_admitted = AdmittedTrainingTarget.from_episode(
+            other_linked,
+            episode=episode,
+            transition=transition,
+            link=candidate_link,
+            row=row,
+            context=context,
+            config=before.lifecycle.config,
+            reward_profile_version=row.reward_profile_version,
+            final_session=after,
+        )
+        other_dataset = DeploymentDatasetAdmission.from_runs(
+            (receipt,), choices=((0, experiment, other_linked, other_admitted),)
+        )
+        other_split = DeploymentDatasetSplit.from_datasets(
+            (other_dataset,), assignments=(assignments[0],)
+        )
+        with pytest.raises(TrainingAdmissionError, match="endpoint CP reference"):
+            DeploymentWorkloadContract.from_split(
+                other_split, configs=(before.lifecycle.config,), required_routes=(context.route,)
+            )
     split_payload = split.to_payload()
     split_counts = _object(split_payload["counts"])
     assert split_counts["attempted_runs"] == split_counts["admitted_rows"] == 3
