@@ -4,6 +4,146 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d2fb93e8934b844d75354c537978accb5d083a06a00f864d09f252393f68b56",
   "operation_map_sha256": "609ab19b1a15b2d1560c81f7c484482b06d547c426c2b690a5b78f92e20fcc9b",
   "changes": {
+    "README.md": {
+      "before_sha256": "a341c31eb1bc425edb92824001889119ef4bc31b56bfb46190504f5fc84b4c4e",
+      "after_sha256": "4cd48e0ea7878b8830e3bb3232a40c2b5e0b1aa7fab120192a58442ce3737e2c",
+      "owners": {
+        "@document": {
+          "before": "a341c31eb1bc425edb92824001889119ef4bc31b56bfb46190504f5fc84b4c4e",
+          "after": "4cd48e0ea7878b8830e3bb3232a40c2b5e0b1aa7fab120192a58442ce3737e2c"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "a8f3993ca3e0e5d67f68f99fff2926904b7887901a9db49bb5dbae57c07a63c6",
+      "after_sha256": "b4c0f76da7a385a0cb08b1d92dee0342df0abcd5e1546d0c975516ff68811a8b",
+      "owners": {
+        "@document": {
+          "before": "a8f3993ca3e0e5d67f68f99fff2926904b7887901a9db49bb5dbae57c07a63c6",
+          "after": "b4c0f76da7a385a0cb08b1d92dee0342df0abcd5e1546d0c975516ff68811a8b"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "22fc21e0a63211b097de09f65ace21776e3f862a2442e41ef351a319df7f3e8f",
+      "after_sha256": "eb3d933e81e230616b7437c4792be08020a2975b8d777d75d08bc912ac4e930a",
+      "owners": {
+        "@document": {
+          "before": "22fc21e0a63211b097de09f65ace21776e3f862a2442e41ef351a319df7f3e8f",
+          "after": "eb3d933e81e230616b7437c4792be08020a2975b8d777d75d08bc912ac4e930a"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "c259344f32c10b50142ffbd6fc28a80280e8c9e2f13a0fdd247853236c28a3b1",
+      "after_sha256": "48410533c30ce5bff89628cb572807e2cf0e620f145f8732f51189536b4ebb77",
+      "owners": {
+        "@document": {
+          "before": "c259344f32c10b50142ffbd6fc28a80280e8c9e2f13a0fdd247853236c28a3b1",
+          "after": "48410533c30ce5bff89628cb572807e2cf0e620f145f8732f51189536b4ebb77"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "0128e335b1b8ee9106051a094692ddddf458c00434e4417700273c45ad80585b",
+      "after_sha256": "4121b66f6821e53c2c83e1e42d9ee90c601f720f91d9996cd38c1d136246dc4e",
+      "owners": {
+        "@document": {
+          "before": "0128e335b1b8ee9106051a094692ddddf458c00434e4417700273c45ad80585b",
+          "after": "4121b66f6821e53c2c83e1e42d9ee90c601f720f91d9996cd38c1d136246dc4e"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "9948b8b09f25744f03401d5fca8135191f5bc25d63d1d10c7f5b032d5a7a1b67",
+      "owners": {
+        "@document": {
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "9948b8b09f25744f03401d5fca8135191f5bc25d63d1d10c7f5b032d5a7a1b67"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "d69b988abd9ba8abeae53c5a02d0ce911d337198d793a2bd530d0471942bc01c",
+      "after_sha256": "1b3460830abb80bc770f1b36360fda4fa8773ae347819e3acda345dd2fb5d2c0",
+      "owners": {
+        "@document": {
+          "before": "d69b988abd9ba8abeae53c5a02d0ce911d337198d793a2bd530d0471942bc01c",
+          "after": "1b3460830abb80bc770f1b36360fda4fa8773ae347819e3acda345dd2fb5d2c0"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "85f4173c6adb845693e20959795c94df67091ee7a5021c606ee0402a61dacb8b",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "owners": {
+        "@document": {
+          "before": "85f4173c6adb845693e20959795c94df67091ee7a5021c606ee0402a61dacb8b",
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "dc17b0d48d683da7bd35cc3426ce0191b0f5dec455261056e68d6e9fd42a8921",
+      "after_sha256": "82d391367daff47c789d8cb6cf44ccd10cdb796eff5372c9774a1cadfde7806d",
+      "owners": {
+        "@document": {
+          "before": "dc17b0d48d683da7bd35cc3426ce0191b0f5dec455261056e68d6e9fd42a8921",
+          "after": "82d391367daff47c789d8cb6cf44ccd10cdb796eff5372c9774a1cadfde7806d"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "58567bfa1e07decde80fab91a980a1555cf4222af9f3211f998c7c43829cb54d",
+      "after_sha256": "b030a1015b6ba7dde1e379516fa5d85e06cd44e66c7f15eb1d7a9826313496d9",
+      "owners": {
+        "@document": {
+          "before": "58567bfa1e07decde80fab91a980a1555cf4222af9f3211f998c7c43829cb54d",
+          "after": "b030a1015b6ba7dde1e379516fa5d85e06cd44e66c7f15eb1d7a9826313496d9"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "fca6f8d79c34d1c9fbb3d40780d6e8322f6008383864ada3a468458581b2cf05",
+      "after_sha256": "447bf29e66634407aced7efe2f66c75a1fefb11f7819671ce3311220861f4f83",
+      "owners": {
+        "@document": {
+          "before": "fca6f8d79c34d1c9fbb3d40780d6e8322f6008383864ada3a468458581b2cf05",
+          "after": "447bf29e66634407aced7efe2f66c75a1fefb11f7819671ce3311220861f4f83"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "5f48795e320fea2e9fcb9bbcad7b88463570d30e5f6e5c4b34bfdabb8441c02f",
+      "after_sha256": "49f2687b51d63d8e4ce6ab7f0954ccc8ef8974de03c3d3386f7db2e962c6bc87",
+      "owners": {
+        "@document": {
+          "before": "5f48795e320fea2e9fcb9bbcad7b88463570d30e5f6e5c4b34bfdabb8441c02f",
+          "after": "49f2687b51d63d8e4ce6ab7f0954ccc8ef8974de03c3d3386f7db2e962c6bc87"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "3916137f6da388ed619f65d7f0c782dec7803a792159e823a5781aedd41e35c0",
+      "after_sha256": "5a12264105c4c224f2fa1883182e561cc4d418f965730f3998a975bfa4b8e44c",
+      "owners": {
+        "@document": {
+          "before": "3916137f6da388ed619f65d7f0c782dec7803a792159e823a5781aedd41e35c0",
+          "after": "5a12264105c4c224f2fa1883182e561cc4d418f965730f3998a975bfa4b8e44c"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "75ccbf42a4e42b7e7da91b350dced5a1d47c962f8f0f589d54b4c7183ada647a",
+      "after_sha256": "4c96e32fc6c638a9c9703c7b0af7dd38a720bc4fa232ce770923f51e88d6b2bf",
+      "owners": {
+        "@document": {
+          "before": "75ccbf42a4e42b7e7da91b350dced5a1d47c962f8f0f589d54b4c7183ada647a",
+          "after": "4c96e32fc6c638a9c9703c7b0af7dd38a720bc4fa232ce770923f51e88d6b2bf"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "acfe8bf4e4c954e3d9bb12a8e2e13950389b4a82f92b773347ec92c974c0c99f",
       "after_sha256": "f2f3e9e99ac27903901132140ba17cb340917fca974471038614993f9f2c29ec",
@@ -303,9 +443,157 @@
           "after": "d55a5c0008f16ba20b91b8e0d9083869eafabf07f09b2be478d4c618c4444084"
         }
       }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "703d938c75fc75e27b50632b2e5070c0944cde2fd0a2fddb9a7e225eea99fe3c",
+      "after_sha256": "3733a32f4e26b1d973c35d12f56adc6c1cef79763bde6d3055579f0fc325df51",
+      "owners": {
+        "@document": {
+          "before": "703d938c75fc75e27b50632b2e5070c0944cde2fd0a2fddb9a7e225eea99fe3c",
+          "after": "3733a32f4e26b1d973c35d12f56adc6c1cef79763bde6d3055579f0fc325df51"
+        }
+      }
     }
   },
   "rows": {
+    "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Clarify existing complete local-profile admission, split mirror/remainder report grouping and exact-case refresh requirements without changing the supported generator or dispatch rules.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve shard manifests and their exact node weights from one successful complete local covered 6091-case profile at frozen c8efcf633, restoring admission for new deployment cases without inventing or averaging missing timings.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
@@ -459,6 +747,16 @@
       "rationale": "Extend existing deployment tests for typed configuration, strict provenance rejection, detached parameters, accepted-row joins and unchanged normal commit/replay outcomes.",
       "source_obligation": "AI_IMPLEMENTATION_PLAN.md Stage 1 and AI_POLICY_INTERFACE.md require explicit behavior/configuration and reproducibility provenance. Preserve actor-only scoring inputs, exact accepted score ordering/ties, ordinary engine authority and full training-row/transition joins; deterministic scores are not probabilities and declared artifact IDs do not authenticate weights.",
       "unchanged_work": "No engine legality, geometry/search algorithm, candidate generation/validation budget, gameplay RNG, authoritative mutation, persistence/replay algorithm, cache, dependency, CI scheduler or workload inventory changes. Additional bounded AI JSON/config validation and receipt hashing are explicitly assessed through the existing AI operation owners, which register no detailed comparison families. Required serial current-runtime smoke and live semantic controls remain mandatory; no historical measurement or full-game performance claim is refreshed."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only the current README byte authentication for its complete-profile instructions; preserve every historical input, source clause and executable assertion binding.",
+      "source_obligation": "Required hosted dispatch must admit every collected test exactly once using genuine complete-profile case weights. Preserve strict missing-weight guards, finite S25 case obligations, isolated mirror ownership, source truthfulness and all coverage/timing gates. The original PR643 hosted run remains failed/cancelled evidence.",
+      "unchanged_work": "Only scheduling measurements/assignments and documentation commitments change after c8efcf633. Every production file, executable test/support file, scheduler/guard and external contract remains byte-identical. The supplied mirror/remainder XML bytes are retained, historical profiles remain in Git, and case-partitions.json/worker_benchmark.json are unchanged. Local WSL observations are not mixed with hosted measurements and do not certify hosted costs, speedup or the CI goal. No operation map, detailed-family rule, budget or historical outcome changes."
     }
   },
   "milestone": "ordinary",
