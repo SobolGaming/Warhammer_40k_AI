@@ -359,14 +359,20 @@ not test timings or added scheduling reserves; the model does not guarantee a
 hosted wall time. Empty buckets and committed manifests fail validation, because
 an empty pytest selector list would run the default suite.
 
-A single complete local JUnit XML is also accepted; label its host accurately and
-do not mix local and hosted-runner timings in one representative CI profile.
+A complete local JUnit profile is also accepted, either one XML or one directory
+containing the isolated mirror and remaining-suite XMLs from the same covered run.
+Label its host, worker counts and concurrent validation accurately; do not mix
+local and hosted-runner timings in one representative CI profile. Local timing
+weights do not establish hosted cost accuracy or a speedup.
 Every supplied run must cover the current behavioral file inventory. Missing files,
 duplicate cases, failed/skipped cases, invalid durations, and truncated suite counts
 are rejected. Outside the explicit initial migration seed above, new test files
 require a fresh complete profile; timings are never filled with zero. `durations.json` preserves report SHA-256 hashes and run descriptions.
-Historical profiles measure their recorded case inventory; changed cases within an
-existing file require refreshed successful CI reports to reflect their new cost.
+Historical profiles measure their recorded case inventory; added, renamed or
+changed cases within an existing file require a refreshed successful complete
+profile to provide their exact case weights. Preserve previous measurements in
+Git history and retained source artifacts; never invent missing weights or
+substitute file averages for CI dispatch.
 
 Four-worker behavioral CI uses `BEHAVIORAL_DISPATCH_PROFILE` to distribute measured
 case costs across xdist's initial worker chunks after deselection. Complete case

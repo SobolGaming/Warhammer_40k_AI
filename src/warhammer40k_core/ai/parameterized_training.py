@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import TypedDict, cast
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.ai.deployment_candidate_ranking import RankedDeploymentCandidates
 from warhammer40k_core.ai.deployment_candidate_search import DeploymentCandidateSet
 from warhammer40k_core.ai.deployment_candidate_validation import ValidatedDeploymentCandidates
 from warhammer40k_core.ai.deployment_candidates import (
@@ -20,6 +21,7 @@ from warhammer40k_core.ai.training_candidates import (
     TrainingCandidateLinkError,
 )
 from warhammer40k_core.ai.training_transitions import ParameterizedAcceptedTransition
+from warhammer40k_core.build_identity import current_engine_build_id
 from warhammer40k_core.engine.event_log import (
     EventLogError,
     JsonValue,
@@ -273,6 +275,95 @@ class DeploymentTrainingCandidateLink:
             raise TrainingCandidateLinkError("Malformed deployment set training linkage.") from exc
         if observed != canonical_json(expected.to_payload()):
             raise TrainingCandidateLinkError("Deployment set training linkage evidence drifted.")
+        return expected
+
+
+@dataclass(frozen=True, slots=True, init=False)
+class RankedDeploymentTrainingLink:
+    """Operator-only deterministic behavior evidence for an existing accepted row.
+
+    Targets continue to use candidate_link; this companion does not admit datasets
+    or infer behavior probabilities from deterministic scores.
+    """
+
+    ranking: RankedDeploymentCandidates
+    candidate_link: DeploymentTrainingCandidateLink
+    _evidence_json: str
+
+    def __init__(self) -> None:
+        raise TrainingCandidateLinkError("Link ranked behavior through accepted row evidence.")
+
+    @classmethod
+    def from_row(
+        cls,
+        row: TrainingRow,
+        *,
+        ranking: RankedDeploymentCandidates,
+        candidate_link: DeploymentTrainingCandidateLink,
+        context: PlayerDecisionContext,
+    ) -> RankedDeploymentTrainingLink:
+        if (
+            type(row) is not TrainingRow
+            or type(ranking) is not RankedDeploymentCandidates
+            or type(candidate_link) is not DeploymentTrainingCandidateLink
+            or type(context) is not PlayerDecisionContext
+        ):
+            raise TrainingCandidateLinkError("Ranked training linkage requires typed evidence.")
+        candidate_link.require_matches(row, context=context)
+        receipt = ranking.to_payload()
+        if (
+            ranking.validated != candidate_link.validated
+            or ranking.selected_candidate_id != candidate_link.chosen_action_id
+            or receipt["choice_seed"] != context.choice_seed
+            or receipt["engine_build_id"] != current_engine_build_id()
+            or row.policy_provenance != ranking.configuration.provenance
+        ):
+            raise TrainingCandidateLinkError(
+                "Ranking provenance, selection, validation, build or choice seed drifted."
+            )
+        payload = {
+            "schema_version": "ranked-deployment-training-link-v1",
+            "training_row_hash": payload_digest(row.to_payload()),
+            "ranking_hash": ranking.content_hash,
+            "ranking": receipt,
+            "candidate_link_hash": payload_digest(candidate_link.to_payload()),
+            "candidate_link": candidate_link.to_payload(),
+        }
+        result = object.__new__(cls)
+        object.__setattr__(result, "ranking", ranking)
+        object.__setattr__(result, "candidate_link", candidate_link)
+        object.__setattr__(result, "_evidence_json", canonical_json(payload))
+        return result
+
+    def to_payload(self) -> dict[str, JsonValue]:
+        return cast(dict[str, JsonValue], json.loads(self._evidence_json))
+
+    def require_matches(self, row: TrainingRow, *, context: PlayerDecisionContext) -> None:
+        expected = type(self).from_row(
+            row, ranking=self.ranking, candidate_link=self.candidate_link, context=context
+        )
+        if self != expected:
+            raise TrainingCandidateLinkError("Complete ranked deployment training row drifted.")
+
+    @classmethod
+    def from_payload(
+        cls,
+        payload: object,
+        *,
+        row: TrainingRow,
+        ranking: RankedDeploymentCandidates,
+        candidate_link: DeploymentTrainingCandidateLink,
+        context: PlayerDecisionContext,
+    ) -> RankedDeploymentTrainingLink:
+        expected = cls.from_row(
+            row, ranking=ranking, candidate_link=candidate_link, context=context
+        )
+        try:
+            observed = canonical_json(validate_json_value(payload))
+        except EventLogError as exc:
+            raise TrainingCandidateLinkError("Ranked training linkage must be JSON-safe.") from exc
+        if observed != expected._evidence_json:
+            raise TrainingCandidateLinkError("Ranked training linkage evidence drifted.")
         return expected
 
 
