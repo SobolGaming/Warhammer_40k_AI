@@ -783,8 +783,9 @@ policy returns, before committing. It cannot interrupt a blocking call. Use an
 external process deadline when hard cancellation is required.
 
 `RunReport` now retains an immutable operator-only `RunManifest` as well as
-its deterministic run ID. The `bounded-player-policy-run-v2` manifest preserves
+its deterministic run ID. The `bounded-player-policy-run-v3` manifest preserves
 the engine build, initial checkpoint commitment (including private RNG authority),
+initial decision-record count,
 session/source identity, complete exact route registrations and declared policy
 configuration, separate policy seed, decision/time limits and requested boundary.
 The registry ID is derived from those retained declarations. Policy identifiers
@@ -792,8 +793,9 @@ and configurations are **declared-unverified**: the runner neither authenticates
 arbitrary callback code/weights nor proves that the callback used its declaration.
 Configurations remain registration metadata; they are not new callback arguments.
 
-The detached JSON-safe `bounded-player-policy-report-v2` export records stop and
-failure reasons, elapsed time and an ordered attempt for every dispatched route,
+The detached JSON-safe `bounded-player-policy-report-v3` export records stop and
+failure reasons, elapsed time, final checkpoint commitment and final decision-record
+count, plus an ordered attempt for every dispatched route,
 including missing routes with no policy ID and zero choice/submission durations.
 Each attempt binds authoritative and viewer request IDs, actor/route, observation
 hash and the actual actor-only choice seed, with failure stage and measured call
@@ -820,8 +822,74 @@ payloads. The manifest hash commits to producer declarations, not authenticated 
 or a verified whole-game result. Wall-clock diagnostics do not participate in
 deterministic decisions. Use the existing session replay artifact for authoritative
 execution; the report does not perform independent episode/experiment admission.
-Broader workload manifests, attempt-to-training joins, hard cancellation, dataset
-admission and Stage 1 completion remain open.
+The bounded operator admission below joins supplied run evidence to episodes and
+deployment rows. Broader workload manifests, hard cancellation, dataset splits,
+other feature/target families and Stage 1 completion remain open.
+
+## Runner and bounded deployment dataset admission
+
+`ai.runner_admission.RunnerAdmission.from_report(...)` joins a v3 report to a
+`VerifiedEpisodeOrigin`, exact initial/final `LocalGameSession` checkpoints and
+an ordered tuple of trusted snapshots immediately before every dispatch. The
+origin is the runner's actual starting checkpoint, including any normally
+replayed prefix; it need not be the beginning of the game. This bounded entry
+requires the runner to start at the verified pending decision boundary: the caller
+must ordinarily advance startup before invoking it. A runner started before that
+advance, or from a terminal state, is outside this admission factory. The verifier checks
+current build/config/session identity, the initial count, final commitment/count,
+every snapshot's ordinary persistence replay and complete record-prefix identity.
+It reconstructs each actor context and choice-seed derivation, and checks exact
+authoritative/viewer requests, route, observation hash, declared registration and
+record deltas. Automatic records and recorded rejections remain separate from
+accepted choices. Omitted dispatches, shifted origins, changed endpoints, mismatched
+contexts and incompatible classification fail closed.
+
+An optional tuple of independently reproduced accepted transitions must be a
+contiguous prefix of those attempts, with exact checkpoints, result IDs, ordered
+record hashes, accepted-record intervals and predecessor commitments. An optional
+finite/mixed episode must cover precisely that prefix. At the final run endpoint,
+terminal, requested-boundary, unsupported and other error reports require terminal,
+truncated, unsupported and aborted episode classifications respectively. Nonterminal
+reasons match the report. If a failed suffix changed the endpoint, the admitted
+prefix instead requires `truncated` with
+`accepted-prefix-before-runner-failure`; the complete failed suffix remains in the
+receipt. A successful submission followed by a progress failure supplies no
+verified accepted transition by itself. Runs with no accepted evidence remain
+admissible for accounting, including zero-dispatch cooperative time failures.
+
+`DeploymentDatasetAdmission.from_runs(runs, choices=...)` accepts an explicit
+nonempty tuple of these run receipts and zero or more four-part choice entries:
+run occurrence index, `DeploymentExperimentProvenance`, `LinkedTrainingTarget`
+and `AdmittedTrainingTarget`. Every choice must join the same episode and accepted
+transition, complete ranked-row/candidate link, exact target hash, actor context
+and actual choice seed. To admit a ranked deployment, that attempt's declared
+registration configuration must contain `deployment_ranking_hash` equal to the
+complete ranking receipt's content hash. The wrapper policy ID is separate from
+the ranker artifact ID. A trusted producer can prepare the ranking and its action
+before dispatch, then register that commitment and return the action from an
+ordinary context-bound callback. No session is captured by or passed to the policy.
+This proves consistency with the declared ranking, not execution of arbitrary
+callback internals, authenticity of model weights or causality of a scorer call.
+
+The dataset retains every supplied run/report and all submission outcomes, then
+derives attempted/failed run counts, attempted choices, accepted/rejected/unverified/
+not-submitted counts, admitted rows and eligible rows. Repeated deterministic run
+IDs are distinct tuple occurrences. A choice cannot appear twice within an
+occurrence. Missing targets and every row from an error report are excluded from
+learning; an accepted prefix cannot convert a failed run into a successful outcome.
+Successful terminal rows can retain the existing exact endpoint CP target without
+inventing match utility. Closed loaders rebuild both receipts from their typed
+inputs and reject changed or extra payload data; returned payloads are detached.
+
+All snapshots, registration declarations, attempts, source/build identifiers and
+dataset evidence remain operator-only. Player contexts, scorer inputs, semantic
+model tensors and adapter/wire contracts are unchanged. This is a bounded supplied-
+inventory boundary, not certification of a full dataset or supported full-game
+workload. It cannot count omitted external runs, manifest-less initialization
+failures or arbitrary callback/process crashes that produced no report. Timing and
+failure diagnoses remain producer evidence; wall-clock limits stay cooperative.
+Data splits, artifact authentication, other proposal/feature/target families,
+training and Stage 1 qualification remain open.
 
 The local adapter always projects current authoritative state. It reuses only a
 viewer identity map derived from complete event history and the full viewer

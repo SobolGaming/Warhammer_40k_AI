@@ -395,14 +395,20 @@ and retain their complete baseline measurement. Changed/removed/renamed cases or
 changed test-module bytes require explicit sidecar regeneration, and behavioral
 inventory changes still require a fresh complete successful baseline profile.
 
-The committed calibration contains 99 raw worker receipts and 12,701 passed
-three-phase samples covering the 6,151 pre-existing cases: historical successful run
+The current calibration retains 95 original raw worker receipts and 12,081 passed
+three-phase samples covering 6,126 unchanged cases from historical successful run
 [42549486854](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42549486854)
 and failed attempts 1 and 2 of
 [42556245215](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42556245215).
-The eight new runner-accounting cases retain only their fresh complete local
-baseline timings; no historical hosted observations are invented for them.
-The historical samples remain planning evidence, not a complete current hosted
+Four whole worker receipts whose collected inventory included a changed test
+module were omitted when rederiving the sidecar from the original raw artifacts.
+Retained receipts and phase values keep their original identities and outcomes.
+All 52 cases in the changed runner-accounting and deployment-experiment modules
+use only their fresh complete local baseline timings; no historical observations
+are invented for them. The complete 6,178-case local profile used one isolated
+mirror worker and twelve remainder workers in native WSL2, with type/static gates
+concurrent during the early run. Local and hosted measurements remain separate.
+These historical samples are planning evidence, not complete current hosted
 qualification. Fixture setup observations are
 worker/order dependent; taking maxima and regrouping does not establish new fixture
 multiplicity, hosted wall time or the fourteen-minute goal. Existing module grouping

@@ -2419,16 +2419,16 @@
       "sha256": "12d4b70e44b1d8678086cac7aeee191579bed3d2aa5e553f6514c5f5cf37a67d"
     },
     "tests/infrastructure/adapters/test_deployment_experiment.py": {
-      "blob_sha1": "2c1f1d66dc3adee4c73c91cb8665fa50955e44ee",
-      "bytes": 12807,
       "mode": "100644",
-      "sha256": "866059309064c6863bbe16594b3df2748666d99530bd86d33090257776077a6d"
+      "bytes": 26550,
+      "sha256": "a5e491b0ec56d9adf661bc35f66a2e3121f9ee5180404b66c82f339b5091aefc",
+      "blob_sha1": "cd3cf1445d8a7cf5910280b635492248b2243cff"
     },
     "tests/infrastructure/adapters/test_runner_accounting.py": {
-      "blob_sha1": "6d6d96e0a83cb99a89b0f9d4ed38c2cae12c3bd3",
-      "bytes": 12266,
       "mode": "100644",
-      "sha256": "c754fb958367a1f52c572b981a148ae5d765108ae9f64be114236e80832afe7c"
+      "bytes": 25257,
+      "sha256": "739a94e3561b7f7dc711f9b98e5b14fa281920d3ff17ff3b9a0986661c927dbb",
+      "blob_sha1": "e175fe5d5bd63bfcb4d5ead74d5325251a6c637a"
     }
   },
   "active_roots": [

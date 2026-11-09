@@ -34054,6 +34054,7 @@
       "paths": [
         "src/warhammer40k_core/ai/player_policy.py",
         "src/warhammer40k_core/ai/runner.py",
+        "src/warhammer40k_core/ai/runner_admission.py",
         "src/warhammer40k_core/ai/finite_candidates.py",
         "tests/infrastructure/adapters/test_finite_candidates.py",
         "tests/infrastructure/adapters/test_runner_accounting.py"
