@@ -130,11 +130,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "9be479a673e5af9bd5348d5adddfa312e41613a85c95948d11cb4bd6c5f1c30c",
-      "after_sha256": "f815a7f84d5f6d0cd24517c49921aac3567c0f099df1e205a293202210bbdc58",
+      "after_sha256": "71afe1655bfebfd762acf43633f4849b198f288df0b65acaeddfc3e18835ccee",
       "owners": {
         "@document": {
           "before": "9be479a673e5af9bd5348d5adddfa312e41613a85c95948d11cb4bd6c5f1c30c",
-          "after": "f815a7f84d5f6d0cd24517c49921aac3567c0f099df1e205a293202210bbdc58"
+          "after": "71afe1655bfebfd762acf43633f4849b198f288df0b65acaeddfc3e18835ccee"
         }
       }
     }
@@ -251,7 +251,7 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Refresh only the current README hash after maintained policy text changes; retain the historical README pin and every semantic obligation.",
+      "rationale": "Refresh the three current AGENTS.md, README.md and pyproject.toml hashes and active floor text after policy edits; retain the byte-exact historical hash block and every semantic obligation.",
       "source_obligation": "Owner direction after PR647 raises required coverage to 67 percent and permits a fifteen-minute CI limit. Preserve complete branch coverage, selected tests, exact 260 deferrals, historical thresholds/outcomes and all other gates.",
       "unchanged_work": "No runtime code, algorithms, caches, serialization/replay, workload, dependency declarations or lock changes. The pyproject edit is only a development coverage setting. Preserve the 120-second mirror, 180-second serial smoke, 600-second quality lanes and current test inventories; no speedup or full-game certification is claimed."
     }
