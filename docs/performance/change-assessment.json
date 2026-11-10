@@ -381,6 +381,16 @@
           "after": "276c85f91b2bbe367148103a292ed865b0ba5c171ee67e6666b6881639f68cdf"
         }
       }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "c00f455c45b6effb1f9475658c3b74a0dfd2b662862f00771a489a14efb7facb",
+      "after_sha256": "602901f0f4422d0cacf96e486d2af59d47c5f253cbb0d5b117a01fa56b9c3597",
+      "owners": {
+        "@document": {
+          "before": "c00f455c45b6effb1f9475658c3b74a0dfd2b662862f00771a489a14efb7facb",
+          "after": "602901f0f4422d0cacf96e486d2af59d47c5f253cbb0d5b117a01fa56b9c3597"
+        }
+      }
     }
   },
   "rows": {
@@ -1077,6 +1087,16 @@
       "rationale": "One fixed operator-only preservation prefix and direct real-engine regression controls; reuses ordinary viewer submissions, finite candidates, startup admission and exact replay.",
       "source_obligation": "The pinned canonical configuration and movement-phase move-units source authority require legal Remain Stationary to preserve placement and consume only the selected unit activation. Tactical outcomes remain unqualified.",
       "unchanged_work": "No movement solver, candidate generator, ranking, cache, serialization format, rules mutation, RNG or existing workload is changed. This adds a bounded receipt around existing owners, not a performance optimization."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only the live maintained README authentication pin after its reviewed full-profile update; preserve all historical source, rule-clause and assertion evidence.",
+      "source_obligation": "The existing category-seven authentication control requires the current raw README bytes to equal authenticated_inputs.README.md; its historical README pin has a separate retained meaning.",
+      "unchanged_work": "No runtime code, rule semantics, test assertion, source clause, case selection or timing budget changes; only the exact current documentation byte commitment is reconciled."
     }
   },
   "milestone": "ordinary",
