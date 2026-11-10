@@ -231,20 +231,27 @@ evidence.
 The separate `CanonicalDeploymentCoverage` operator report now reconstructs
 all eleven exact prefix states and validates alternatives on independent ordinary
 viewer-submission forks. It measures eighteen current finite options across seven
-occurrences (all accepted), and the existing five-offset placement generator
-across four occurrences (nineteen accepted of twenty). A separately declared
-reference list uses zero, ±1/±2-inch axis translations and one far invalid probe
-per placement. Thirty-two of forty reference probes are engine-accepted; the
-generator covers nineteen of those thirty-two and misses thirteen. The eight
-invalid references remain outside the legal denominator. Canonical recipe choices
+occurrences (all accepted), and a nine-offset placement generator across four
+occurrences (thirty-two accepted of thirty-six). The independently fixed reference
+list uses zero, ±1/±2-inch axis translations and one far invalid probe per placement.
+Thirty-two of forty reference probes are engine-accepted and now all thirty-two
+are generated and accepted. The eight invalid references remain outside the legal
+denominator. The predecessor five-offset default missed thirteen accepted
+second-ring translations; adding ±2-inch X/Y proposals addresses that demonstrated
+class while preserving the original ordered five-candidate prefix and
+raw/accepted ceilings.
+The coverage interface qualifies every missing direction's geometry and the
+terrain, prior-model overlap and edge/zone rejections. These are distinct feasible
+wider spatial alternatives; their tactical usefulness remains unmeasured.
+Canonical recipe choices
 remain positive controls. Closed report reproduction, endpoint rejection and a
 nonrecipe accepted placement's persistence/exact replay have focused controls.
 
 These are distinct feasible finite/geometry alternatives, not tactical-value
 references. The [coverage interface](AI_POLICY_INTERFACE.md#canonical-candidate-and-reference-alternative-coverage)
 defines exact denominators, per-occurrence results, limits and operator-only
-evidence. This completes one bounded coverage measurement while exposing actual
-generator gaps; it does not qualify exhaustive legal placement, the proposed
+evidence. This closes the demonstrated second-cardinal-ring coverage gap; it does
+not qualify exhaustive legal placement, the proposed
 screen/preserve experiment, ranking quality, redeploy/Scouts, battle or full-game
 learning. Original admission and workload/training contracts remain unchanged.
 
@@ -252,7 +259,8 @@ learning. Original admission and workload/training contracts remain unchanged.
 
 The standalone `scripts/measure_canonical_deployment_costs.py` measures complete
 `CanonicalDeploymentCoverage.measure` and closed `from_payload` reproduction
-first, using the unchanged canonical endpoint and authoritative report. A separate
+first, using the frozen canonical endpoint and current authoritative report.
+A separate
 prepared component pass calls the existing startup, prefix/admission, candidate,
 fresh-fork validation, persistence and replay owners; it checks its candidate sets
 and validation receipts against the complete report. No timing field enters an
@@ -263,9 +271,10 @@ timing boundaries, evidence, repetition/cache semantics and hard campaign limits
 These costs qualify only the disclosed frozen setup/deployment fixture and
 provisional measurement environment. They neither certify the serial performance
 gate nor establish a full-game throughput, tactical-quality or learning result.
-Stage 2 remains open for broader useful reference qualification. Any generator
-expansion or tactical reference work needs a separately scoped decision and fresh
-coverage measurement; the thirteen missing feasible references remain gaps.
+Stage 2 remains open for broader useful reference qualification. The retained
+five-offset campaign is historical; current nine-offset measurements must retain
+their own runtime/workload identities. Further generator expansion or tactical
+reference work needs a separately scoped decision and fresh coverage measurement.
 
 ## 6. First delayed-tradeoff experiment
 

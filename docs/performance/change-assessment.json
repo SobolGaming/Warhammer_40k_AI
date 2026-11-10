@@ -1,332 +1,705 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "bc12417dddf4cd5cc0d0b17a2a78eaf950bd0e5a",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fead332323b81b04f201802bb82a254269cac3569b141b14705a6f971673ad3e",
+  "base": "a3cf8f75331a83e065a2ad08b7d787c3a33ba482",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:edda12efc466e3ea464ceac89263ed39ebeb2d5ac09026aa3dd38ea2c9b2f1ee",
   "operation_map_sha256": "c13a600de46cb64b330324e577ee3acebbf683cb9a77ba5ddee89d3ca3b12323",
   "changes": {
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "4ce39c898fcea5fdcaaafeae6c372777479a7f260e34f96a63781381b6218c67",
-      "after_sha256": "1eb1eb631b711c74be67e901e87422a4ce645f347aafe0396a37493bde1c0e55",
+    "README.md": {
+      "before_sha256": "016235a0377674f4d18da33edeba7117992ddf349b05e65fcc22e8b789fc4671",
+      "after_sha256": "4b4d4082fe1cccad4560c5cd14a19a6e55523e4a7b7029c74230d2b42cb4acf5",
       "owners": {
         "@document": {
-          "before": "4ce39c898fcea5fdcaaafeae6c372777479a7f260e34f96a63781381b6218c67",
-          "after": "1eb1eb631b711c74be67e901e87422a4ce645f347aafe0396a37493bde1c0e55"
+          "before": "016235a0377674f4d18da33edeba7117992ddf349b05e65fcc22e8b789fc4671",
+          "after": "4b4d4082fe1cccad4560c5cd14a19a6e55523e4a7b7029c74230d2b42cb4acf5"
         }
       }
     },
-    "ci/quality_shards/shard-4-modules.txt": {
-      "before_sha256": "326fbf6a1e85a4566684e09daaf8c2d99d2b847206124c7e23283610a1abd2ff",
-      "after_sha256": "0b88d0625d83432a3e2876199a1e55418d7bb3c315e7336240e6af8148306c59",
+    "ci/test_shards/durations.json": {
+      "before_sha256": "66d019b0e5dc34ae0ec9680eb45c84e4791b7c6113b6433291be8c8049d1c6c8",
+      "after_sha256": "0b318bf6c067aa1e7045693d5997d2961e87722420ff240fba15cd46eb0c13e5",
       "owners": {
         "@document": {
-          "before": "326fbf6a1e85a4566684e09daaf8c2d99d2b847206124c7e23283610a1abd2ff",
-          "after": "0b88d0625d83432a3e2876199a1e55418d7bb3c315e7336240e6af8148306c59"
+          "before": "66d019b0e5dc34ae0ec9680eb45c84e4791b7c6113b6433291be8c8049d1c6c8",
+          "after": "0b318bf6c067aa1e7045693d5997d2961e87722420ff240fba15cd46eb0c13e5"
         }
       }
     },
-    "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "69641fe3334df3e023ff3c7368c7e7209ff411be1e7a61b64e85b83563127f8f",
-      "after_sha256": "88f245cca144bc428e91d353d518d85aab1d72dd0e7635024f5b6c5a8ae34397",
+    "ci/test_shards/hosted-calibration.json": {
+      "before_sha256": "3f51275bdca8e720c6ddcdeed6723f59e658c7816abaf37f0130d6d5c4b7d721",
+      "after_sha256": "e837ceaa85b50c6e0c6d682a98a15a3eb13a19f59dddfa49ea2a99947b9c867c",
       "owners": {
         "@document": {
-          "before": "69641fe3334df3e023ff3c7368c7e7209ff411be1e7a61b64e85b83563127f8f",
-          "after": "88f245cca144bc428e91d353d518d85aab1d72dd0e7635024f5b6c5a8ae34397"
+          "before": "3f51275bdca8e720c6ddcdeed6723f59e658c7816abaf37f0130d6d5c4b7d721",
+          "after": "e837ceaa85b50c6e0c6d682a98a15a3eb13a19f59dddfa49ea2a99947b9c867c"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "616250e1c6ad1caa2c9017e755fcac1d60cf7c377fb28b9799e28b77a9c979e9",
+      "after_sha256": "7ef519ac852de2fd5284b49409f05faf05adfb9b3575a1abc45efa7c7e71a412",
+      "owners": {
+        "@document": {
+          "before": "616250e1c6ad1caa2c9017e755fcac1d60cf7c377fb28b9799e28b77a9c979e9",
+          "after": "7ef519ac852de2fd5284b49409f05faf05adfb9b3575a1abc45efa7c7e71a412"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "56b1f411ad69feebc0b077c8c0ebf06c3e02bd7d84006bde2d04e03d228c01f5",
+      "after_sha256": "42349b1f45e27e774810981731cc6c0bdc0925eb1f7a31e5f3b4ad06644dd22b",
+      "owners": {
+        "@document": {
+          "before": "56b1f411ad69feebc0b077c8c0ebf06c3e02bd7d84006bde2d04e03d228c01f5",
+          "after": "42349b1f45e27e774810981731cc6c0bdc0925eb1f7a31e5f3b4ad06644dd22b"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "5802ae0d5e075d901b3a6976f7f88b25fa8881c0da3c5842f57dc9c7e9009ca9",
+      "after_sha256": "6bd7430b9c4e64cb82f9ac6f3d9c8251361e69a9d272f8e0872ce2f79222406b",
+      "owners": {
+        "@document": {
+          "before": "5802ae0d5e075d901b3a6976f7f88b25fa8881c0da3c5842f57dc9c7e9009ca9",
+          "after": "6bd7430b9c4e64cb82f9ac6f3d9c8251361e69a9d272f8e0872ce2f79222406b"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "7eb1a629a9a0eef41083ab9253828c473bd01805d03711e7b8cf1da9a85ae5cb",
+      "after_sha256": "3352e9ef0c09efdba03dc20ebec53ad86c22841e61913dbbbdc62217f3705946",
+      "owners": {
+        "@document": {
+          "before": "7eb1a629a9a0eef41083ab9253828c473bd01805d03711e7b8cf1da9a85ae5cb",
+          "after": "3352e9ef0c09efdba03dc20ebec53ad86c22841e61913dbbbdc62217f3705946"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "1a628864c8eff8b63f31cfa4b143c207715783d21dbd54cbcbbedc85297487ef",
+      "after_sha256": "a32932fc7a0632c723f4ed53c36bcf828ab9d0a5b8b77f7e8fba3d22ccd2f661",
+      "owners": {
+        "@document": {
+          "before": "1a628864c8eff8b63f31cfa4b143c207715783d21dbd54cbcbbedc85297487ef",
+          "after": "a32932fc7a0632c723f4ed53c36bcf828ab9d0a5b8b77f7e8fba3d22ccd2f661"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "d1011ccb784cacee0b6312333394fa5de4ac5728bfd9a81a4df8cfd7b4a0c1b9",
+      "after_sha256": "32665c9f9370d95efc4294f02b5a4c2bc7a3793ed193e9b92c3b55922987afa3",
+      "owners": {
+        "@document": {
+          "before": "d1011ccb784cacee0b6312333394fa5de4ac5728bfd9a81a4df8cfd7b4a0c1b9",
+          "after": "32665c9f9370d95efc4294f02b5a4c2bc7a3793ed193e9b92c3b55922987afa3"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "5a4fd0f4132cf4e32ece57ef9e259884649e742275dbe650e04b3fdd81914071",
+      "after_sha256": "839f1bf714ef24edf032b864e7f4248d00b7be69114af2d58cc1f976a297632b",
+      "owners": {
+        "@document": {
+          "before": "5a4fd0f4132cf4e32ece57ef9e259884649e742275dbe650e04b3fdd81914071",
+          "after": "839f1bf714ef24edf032b864e7f4248d00b7be69114af2d58cc1f976a297632b"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "1b982545a527b06cfa0cfb31e35a9c3d9b569324edd980f564d13edd96c0a13f",
+      "after_sha256": "ba3a45f83e36986f4e5019d24be73a38b45e5d7629368b9ab3c0e1461a4ce285",
+      "owners": {
+        "@document": {
+          "before": "1b982545a527b06cfa0cfb31e35a9c3d9b569324edd980f564d13edd96c0a13f",
+          "after": "ba3a45f83e36986f4e5019d24be73a38b45e5d7629368b9ab3c0e1461a4ce285"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "39bd0eb2b2b6986b1307e5226fd72234eb03f8cd850c6413923f118e3632e99c",
+      "after_sha256": "acb220cd7f5f2afb2b7a903db67095bed022f3f68975d781c9ffded0d2caacea",
+      "owners": {
+        "@document": {
+          "before": "39bd0eb2b2b6986b1307e5226fd72234eb03f8cd850c6413923f118e3632e99c",
+          "after": "acb220cd7f5f2afb2b7a903db67095bed022f3f68975d781c9ffded0d2caacea"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "6ab429094673f67f33a0e54b68c236b55029afec85e5f330e4a6126bfb397e02",
+      "after_sha256": "eb3a9ea06a8307bff87f3ae59c22b8109fc4bc367a2a63bdbe15d1a556c2a806",
+      "owners": {
+        "@document": {
+          "before": "6ab429094673f67f33a0e54b68c236b55029afec85e5f330e4a6126bfb397e02",
+          "after": "eb3a9ea06a8307bff87f3ae59c22b8109fc4bc367a2a63bdbe15d1a556c2a806"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "4e1535a6b07bd71857485a66e460dc8f9186407153bd4058adddbb8720090cd8",
+      "after_sha256": "bc7e345361319c3daaaffb9036fc567957e709d125aebfc3296265db27e07fec",
+      "owners": {
+        "@document": {
+          "before": "4e1535a6b07bd71857485a66e460dc8f9186407153bd4058adddbb8720090cd8",
+          "after": "bc7e345361319c3daaaffb9036fc567957e709d125aebfc3296265db27e07fec"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "330be237077cf38a62719de11f3e8edb85dc8c620b2f42dd380eadf4c41a1450",
+      "after_sha256": "8e1de921da31ac27f586c954d6a1aea20e67bc3f7c5f37618c52e8facf658436",
+      "owners": {
+        "@document": {
+          "before": "330be237077cf38a62719de11f3e8edb85dc8c620b2f42dd380eadf4c41a1450",
+          "after": "8e1de921da31ac27f586c954d6a1aea20e67bc3f7c5f37618c52e8facf658436"
+        }
+      }
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "68728550f58a918969b33e5925201571fbbeebd68c1569e98930492181beb94b",
+      "after_sha256": "ecbbeb18568595ef0bfd3dec9a2c24e9be0592df212aeb342b73ce30f66db74e",
+      "owners": {
+        "@document": {
+          "before": "68728550f58a918969b33e5925201571fbbeebd68c1569e98930492181beb94b",
+          "after": "ecbbeb18568595ef0bfd3dec9a2c24e9be0592df212aeb342b73ce30f66db74e"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "8e62b744d02bf3277ba20809960130fc8dd725c10226fdbb2a67d7d9c19c0e81",
+      "after_sha256": "d05911467f8bbcfed67eb3eb1ca1d4468ecb53ecd3c362f1e395a9b5d56e9fe7",
+      "owners": {
+        "@document": {
+          "before": "8e62b744d02bf3277ba20809960130fc8dd725c10226fdbb2a67d7d9c19c0e81",
+          "after": "d05911467f8bbcfed67eb3eb1ca1d4468ecb53ecd3c362f1e395a9b5d56e9fe7"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "df8061cf7cb374fcb6a6d68c3384548a72f36f272e82284285449482cb2ea732",
+      "after_sha256": "8ff2615cd47016d82643031b751edff5f2b7fa7d96588a0f5ffc64ddbd27d80a",
+      "owners": {
+        "@document": {
+          "before": "df8061cf7cb374fcb6a6d68c3384548a72f36f272e82284285449482cb2ea732",
+          "after": "8ff2615cd47016d82643031b751edff5f2b7fa7d96588a0f5ffc64ddbd27d80a"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "1dfe2df83ab08ea96568c7f8b44f4f1e11dc085bd334d62ec88e0f41ee626f68",
+      "after_sha256": "72081a5977c17959f292f3a73cba4e077df3ae0254aa4eca1a1f8d3567fab5c9",
+      "owners": {
+        "@document": {
+          "before": "1dfe2df83ab08ea96568c7f8b44f4f1e11dc085bd334d62ec88e0f41ee626f68",
+          "after": "72081a5977c17959f292f3a73cba4e077df3ae0254aa4eca1a1f8d3567fab5c9"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "5e09b9c73ed4c53c6de028fdbc8451cdc25e3af582f255ef89b5ae7835698c8d",
+      "after_sha256": "6eaeecefba854f0ca61beb2d87137cb29e254f27e8ee45dbe11cb40cd7ff0c01",
+      "owners": {
+        "@document": {
+          "before": "5e09b9c73ed4c53c6de028fdbc8451cdc25e3af582f255ef89b5ae7835698c8d",
+          "after": "6eaeecefba854f0ca61beb2d87137cb29e254f27e8ee45dbe11cb40cd7ff0c01"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "471325edaa42fec8cf9b589ee6c808a562d2eadfa50ec7a3a31351c2456e58a7",
+      "after_sha256": "790bbcf9c165e28566b1128b0129722b3e7935301a913781027113a036c7368d",
+      "owners": {
+        "@document": {
+          "before": "471325edaa42fec8cf9b589ee6c808a562d2eadfa50ec7a3a31351c2456e58a7",
+          "after": "790bbcf9c165e28566b1128b0129722b3e7935301a913781027113a036c7368d"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "de03c3024d06de926b7e804e79d43dd2716414e05ecb1bdc496354acbfa80bdb",
+      "after_sha256": "1a0daffeffe1a6dc9820e7a6d4a3b9e589003626783c303d497595d2a9baace7",
+      "owners": {
+        "@document": {
+          "before": "de03c3024d06de926b7e804e79d43dd2716414e05ecb1bdc496354acbfa80bdb",
+          "after": "1a0daffeffe1a6dc9820e7a6d4a3b9e589003626783c303d497595d2a9baace7"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "724649b548de22c11f5f1d67b8dcc931b9c9e3c13ed314912c3018309ad24168",
+      "after_sha256": "320ff428887a521696a2c3cc6b8f29ba1f1d79ee789203d682c1195b3560b152",
+      "owners": {
+        "@document": {
+          "before": "724649b548de22c11f5f1d67b8dcc931b9c9e3c13ed314912c3018309ad24168",
+          "after": "320ff428887a521696a2c3cc6b8f29ba1f1d79ee789203d682c1195b3560b152"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "before_sha256": "a71a6f8a2e956fbf3341bda49b3cc28406a34d831e36cd163c16c2463fe18cbb",
+      "after_sha256": "7c48cdeb42c66e7bd94497b7ed13d37c289c6d959b1efa4bcb1b1b69c55c789d",
+      "owners": {
+        "@document": {
+          "before": "a71a6f8a2e956fbf3341bda49b3cc28406a34d831e36cd163c16c2463fe18cbb",
+          "after": "7c48cdeb42c66e7bd94497b7ed13d37c289c6d959b1efa4bcb1b1b69c55c789d"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "2881635264a3aed9e0759ad894a7137eae9380513cfe44b7239fa76783a26000",
-      "after_sha256": "cc759500c11a3767ffc877cdfcfc288722cbd4b62d8a046be38956d22361a3cc",
+      "before_sha256": "cc759500c11a3767ffc877cdfcfc288722cbd4b62d8a046be38956d22361a3cc",
+      "after_sha256": "2c738835f8c62440909fd07b967cc0d399fe2eec078f6b09fa321bf3372c791d",
       "owners": {
         "@document": {
-          "before": "2881635264a3aed9e0759ad894a7137eae9380513cfe44b7239fa76783a26000",
-          "after": "cc759500c11a3767ffc877cdfcfc288722cbd4b62d8a046be38956d22361a3cc"
+          "before": "cc759500c11a3767ffc877cdfcfc288722cbd4b62d8a046be38956d22361a3cc",
+          "after": "2c738835f8c62440909fd07b967cc0d399fe2eec078f6b09fa321bf3372c791d"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "a8ee6e90a1727cb16219eafded8c986811d3e49eb2e341d43f746820f418330e",
-      "after_sha256": "c907de3a81f27a7fdfd24945bd3a5dc61d555a7eea7617f8de361db3d52fad0c",
+      "before_sha256": "c907de3a81f27a7fdfd24945bd3a5dc61d555a7eea7617f8de361db3d52fad0c",
+      "after_sha256": "2be6dcf8b21b21db85a3ddb514377f6cbd97c9dc8a081dd3c50de7be1f5cdda3",
       "owners": {
         "@document": {
-          "before": "a8ee6e90a1727cb16219eafded8c986811d3e49eb2e341d43f746820f418330e",
-          "after": "c907de3a81f27a7fdfd24945bd3a5dc61d555a7eea7617f8de361db3d52fad0c"
+          "before": "c907de3a81f27a7fdfd24945bd3a5dc61d555a7eea7617f8de361db3d52fad0c",
+          "after": "2be6dcf8b21b21db85a3ddb514377f6cbd97c9dc8a081dd3c50de7be1f5cdda3"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "ac92b6a74ce496593d443ee2e09a6f7ce8aa1ae88d65f470145d4de06ee1d47c",
-      "after_sha256": "f367e1f14601cfcc77148e3e5da446eac7926d5b6aea4d6f53bb397a830c55d1",
+      "before_sha256": "f367e1f14601cfcc77148e3e5da446eac7926d5b6aea4d6f53bb397a830c55d1",
+      "after_sha256": "392b8b025cee825817ff8914f62279b7293f97edddf65904f567cbd35839b5aa",
       "owners": {
         "@document": {
-          "before": "ac92b6a74ce496593d443ee2e09a6f7ce8aa1ae88d65f470145d4de06ee1d47c",
-          "after": "f367e1f14601cfcc77148e3e5da446eac7926d5b6aea4d6f53bb397a830c55d1"
+          "before": "f367e1f14601cfcc77148e3e5da446eac7926d5b6aea4d6f53bb397a830c55d1",
+          "after": "392b8b025cee825817ff8914f62279b7293f97edddf65904f567cbd35839b5aa"
         }
       }
     },
     "docs/performance/CANONICAL_DEPLOYMENT_COSTS.md": {
-      "before_sha256": null,
-      "after_sha256": "dee154ce0938381b4072440c487d1b77f2f02045aeff773ac00f8ebbb699006b",
+      "before_sha256": "dee154ce0938381b4072440c487d1b77f2f02045aeff773ac00f8ebbb699006b",
+      "after_sha256": "a5f0785f623d325d0d736fb14a20cd140719238723e030b51c5fef23184a2cb3",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "dee154ce0938381b4072440c487d1b77f2f02045aeff773ac00f8ebbb699006b"
+          "before": "dee154ce0938381b4072440c487d1b77f2f02045aeff773ac00f8ebbb699006b",
+          "after": "a5f0785f623d325d0d736fb14a20cd140719238723e030b51c5fef23184a2cb3"
         }
       }
     },
-    "docs/performance/canonical-deployment-costs-v1/canonical-report.json": {
+    "docs/performance/canonical-placement-second-ring/base-measurement.json": {
       "before_sha256": null,
-      "after_sha256": "d340707d6cdac4e274c11c95bad2fa17a88207b182563677d58c67c2fd667b4a",
+      "after_sha256": "5c798a78f142bf2ae35dbc439d88e104c6ab95bc0c5b390b7749fea244fb14a2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d340707d6cdac4e274c11c95bad2fa17a88207b182563677d58c67c2fd667b4a"
+          "after": "5c798a78f142bf2ae35dbc439d88e104c6ab95bc0c5b390b7749fea244fb14a2"
         }
       }
     },
-    "docs/performance/canonical-deployment-costs-v1/measurement.json": {
+    "docs/performance/canonical-placement-second-ring/head-coverage.json": {
       "before_sha256": null,
-      "after_sha256": "33e8f83f3e92d3ccb82fa7bd57a22c4da512c3d47e66019367b67512b8332456",
+      "after_sha256": "c3a99f9237f6bcae5a792abc13234b1f7b14703f32d19417bd2880ffa66152e0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "33e8f83f3e92d3ccb82fa7bd57a22c4da512c3d47e66019367b67512b8332456"
+          "after": "c3a99f9237f6bcae5a792abc13234b1f7b14703f32d19417bd2880ffa66152e0"
         }
       }
     },
-    "docs/performance/canonical-deployment-costs-v1/pilot-diagnostic.json": {
+    "docs/performance/canonical-placement-second-ring/head-measurement.json": {
       "before_sha256": null,
-      "after_sha256": "2047acfd2951c269e61f7356fc3b5202caf8282543060847cb7473416bed7033",
+      "after_sha256": "789fd4b46322cf239df7668d83df97d39e7e119ab1933a5fa3502b186bed0e32",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2047acfd2951c269e61f7356fc3b5202caf8282543060847cb7473416bed7033"
-        }
-      }
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "45346f4f4128fb34ce71b98052fcc7319965611b16cb00a9d71a628bc10f0a76",
-      "after_sha256": "69f7cfd2b1cd9ca1d501cc49bb95ce706f08e3a01420ad4e8c1ff0955b144cde",
-      "owners": {
-        "@document": {
-          "before": "45346f4f4128fb34ce71b98052fcc7319965611b16cb00a9d71a628bc10f0a76",
-          "after": "69f7cfd2b1cd9ca1d501cc49bb95ce706f08e3a01420ad4e8c1ff0955b144cde"
+          "after": "789fd4b46322cf239df7668d83df97d39e7e119ab1933a5fa3502b186bed0e32"
         }
       }
     },
     "scripts/measure_canonical_deployment_costs.py": {
-      "before_sha256": null,
-      "after_sha256": "f42cc809bcef02445fc1d3651467be2036dd61727cbb3125937db930870e2c1f",
+      "before_sha256": "f42cc809bcef02445fc1d3651467be2036dd61727cbb3125937db930870e2c1f",
+      "after_sha256": "6fd54cf4b931c7b33c96d3dd27133b04a4ee8e0da870d7703dabc64c4a0485bf",
+      "owners": {
+        "worker": {
+          "before": "b4ab8d36057297de1f7d4d0b296949ead15f1608a1cfd00fffa52af3a29e3824",
+          "after": "4a0fdbaf4654dfb8d6c135d528da438bfce0999d9f9a6b3fa2b86d0764684e25"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "2b4f43ab905c6e6d084c7dbb454341ee89ad85dba110f86c338a8428dc688a14",
+      "after_sha256": "221e68074024876335aa30a827eb4b1c3b0773887e97ca8927eb0a65dc3c4bf2",
+      "owners": {
+        "@document": {
+          "before": "2b4f43ab905c6e6d084c7dbb454341ee89ad85dba110f86c338a8428dc688a14",
+          "after": "221e68074024876335aa30a827eb4b1c3b0773887e97ca8927eb0a65dc3c4bf2"
+        }
+      }
+    },
+    "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
+      "before_sha256": "8359f99db29cd9f65dd5d07cff3649f6d3184b02987b0c6f26add1a72c6e3284",
+      "after_sha256": "d3afd9c4931cabeb68154c33c67cafc599497fb903ef7bb51dc414ffd337ba3a",
+      "owners": {
+        "_placement_row": {
+          "before": "3773229c3cda9c97662899a9d7155685e562c41fbe90b5f6ed196a7dbb7c5183",
+          "after": "8c3b83edca2265d8d2de3506cf843434e33a9bcde91969c438c54c421afc17b0"
+        }
+      }
+    },
+    "src/warhammer40k_core/ai/deployment_candidate_search.py": {
+      "before_sha256": "fe63e9d0f1762543769f2b73717aeeb3ea9645d4702dedc7594e6f628fd56f0b",
+      "after_sha256": "e6ede1eb697f088a7a2adf326ad1f22cc49addf93f14ae9a4eee00995f5f0cea",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "dc414b477d10cd29757ab93969baee7294b62de74f98256737888f00976dfb31"
-        },
-        "Journal": {
-          "before": null,
-          "after": "88f80309336bfdfba4434c9debe5a7ea36d0d7d98d7f11ebe02c9f360d9d2a01"
-        },
-        "Journal.__init__": {
-          "before": null,
-          "after": "3a60ad124d73e467a31c39e1b4d18c742bbb4d57497ad0118fdaeee6fdf820f3"
-        },
-        "Journal.append": {
-          "before": null,
-          "after": "b33719ece73dc2747afdcabdd2fc7b231be73628c5e3e17b2d2c03011e0a0335"
-        },
-        "Journal.timed": {
-          "before": null,
-          "after": "83e2806ae712f28b31efc2680dd56c9abe83b54d8ae7287476609200fa5b6e27"
-        },
-        "budget_reason": {
-          "before": null,
-          "after": "16f7a3ba293b12dfa9b56fee45882f56de79437cddf5dd7eb80b1d4540af15d3"
-        },
-        "campaign": {
-          "before": null,
-          "after": "f7e5f523d1b67a7fa9d73411d2220a092f14c4984bc963dbc6eb5b2fae074297"
-        },
-        "digest": {
-          "before": null,
-          "after": "770e1a37c1ae5b7cac0867509fec22e706b537d7623ba9cd60a4ebc9dbde5e5c"
-        },
-        "environment": {
-          "before": null,
-          "after": "0a11f6b70b260c592008d1a5dbf63a3d609f7a8ab8ee4a4400dddb47826111ff"
-        },
-        "generation_parameters": {
-          "before": null,
-          "after": "ede50653d2522810cd53b27ac6abaf20fea01af0270ed0583f8fefb9cc18811f"
-        },
-        "json_roundtrip": {
-          "before": null,
-          "after": "27e33b7136cf5a337f05bd3d010fdc282d2350ff594c7bf1b0ab559a2b51ceb6"
-        },
-        "main": {
-          "before": null,
-          "after": "0404b97662c17e7136310866998ee08274b2d79858673a4e2a542dc35be10e25"
-        },
-        "parser": {
-          "before": null,
-          "after": "13fb79412c19bccdf09949d71f5bcbfa5a25aa5e6d7ffb8cace09ec4b9ca9b09"
-        },
-        "process_cpu": {
-          "before": null,
-          "after": "ea9c05dbc6aa2ebbfb9420b8c9a2940de80a91659e0378f9e42b53272e8d6113"
-        },
-        "read_journal": {
-          "before": null,
-          "after": "4ca944f9ce120096aa6bcb9f2e3b7ea43226f9387cb942fc7ab67c99f66cb4b7"
-        },
-        "summarize": {
-          "before": null,
-          "after": "ffae0f523446c4d8deafa2336e1d575e970f8be1e5e65ec04892547df54379be"
-        },
-        "supervise": {
-          "before": null,
-          "after": "4ed4cc099a058165f6af29d4a62f679ce176af83d027b0089f43f22ee404b1b2"
-        },
-        "worker": {
-          "before": null,
-          "after": "b4ab8d36057297de1f7d4d0b296949ead15f1608a1cfd00fffa52af3a29e3824"
-        },
-        "write_json": {
-          "before": null,
-          "after": "4191e7d216d652a5890c62683a1fdc40901c15fd11c81cf0246a6cbe82e6d8a2"
+          "before": "6539f1b7295e09d1c88fbc56cea30a9ab96a19eb40101dcf37595b418b4d320e",
+          "after": "115a6a45930e2a46f80fec73ba0c0e0622964c670c62a46a8d4dd318fa8f7dc7"
         }
       }
     },
     "tests/code_quality/test_canonical_deployment_costs.py": {
-      "before_sha256": null,
-      "after_sha256": "293c3d46c53907915791ad9b13c0cd913a691b745320c586fe2bf7ae1a051bc3",
+      "before_sha256": "293c3d46c53907915791ad9b13c0cd913a691b745320c586fe2bf7ae1a051bc3",
+      "after_sha256": "1eb2d176087b968f9370f5b09b50632546fead6db5ba2e2095f43c45b614fd66",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "737a88f0a03b5d7b31159eae32457f5ceba295cf6c3d670bb15c0d88eebf7414"
-        },
-        "test_budget_boundary_stops_at_first_exhausted_limit": {
-          "before": null,
-          "after": "b7d378c9a497e692db8629eca8b8c1ec375809dfa902f361a5f92176bce26c25"
-        },
-        "test_cli_refuses_invalid_budgets_and_existing_evidence": {
-          "before": null,
-          "after": "33f0821ec4e2fb94c519096e8c8b17255235ebe305caabce3e2b04e208495395"
-        },
-        "test_component_generator_parameters_preserve_production_raw_budgets": {
-          "before": null,
-          "after": "796bac0cb763e50e37bb6b840a7236c6dff3daf0577e43d30ce04f47c31f9f11"
-        },
-        "test_partial_journal_retains_killed_attempt_and_rejects_interior_damage": {
-          "before": null,
-          "after": "9c9f44e125d204777bb8e7cbb314dcd7faec5415f9c34b0a01876bde52b84f0e"
-        },
-        "test_real_supervisor_retains_failure_and_enforces_wall_and_cpu": {
-          "before": null,
-          "after": "135d3c08a6e508d3e1332ae2dbf5b2461c439d7820c5e4af3aaa1ba8903809dd"
+          "before": "737a88f0a03b5d7b31159eae32457f5ceba295cf6c3d670bb15c0d88eebf7414",
+          "after": "47622b65b4b3b12eeb6df785bd41dfd9a42774dd8b12faf1b575e5721fb58d98"
         },
         "test_retained_canonical_cost_evidence_reconciles_exact_report_and_attempts": {
-          "before": null,
-          "after": "d3d430b41cbdd4b112c0b957ec6cf2b0838615ddc3eb7c7e34fa4677d123e5d6"
+          "before": "d3d430b41cbdd4b112c0b957ec6cf2b0838615ddc3eb7c7e34fa4677d123e5d6",
+          "after": "e38e9b2c634f57764feb1176598592d3301129e6c4400d456c78e500afa2627d"
+        }
+      }
+    },
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
+      "before_sha256": "b7efb48d7aa3ddf3b18364d40fa0f5723a082eba63474046ff578f78e47e84a3",
+      "after_sha256": "545060200efd79ca546bd1ef74acd8144ef98cd2ce3ae4504abb8c952bccae1c",
+      "owners": {
+        "test_complete_canonical_coverage_reconciles_reproduces_and_rejects_false_denominator": {
+          "before": "040c1b2dd65afa81f9a99819338947b7539716ba01e8c1a7e9ae7f0f3cf3b2b7",
+          "after": "1c01fdaa60e7e792cf1d2e801330a661369e37ceec9b8aac079cea3e3509ab66"
         },
-        "test_summary_keeps_warm_cold_and_occurrences_separate": {
-          "before": null,
-          "after": "7cdaba8d214b56de61dea32d22b85a23c22ab3654ed4cd7d4720cb4f0b0d044e"
+        "test_nonrecipe_reference_acceptance_roundtrips_without_changing_canonical_prefix": {
+          "before": "07e5f0d756625eb7eaa3abee2e2c6bf47205aafd20f2d7b673e47cb83d823add",
+          "after": "4001c6dc5941cc3f8801d800b79276e5436b5fa38388406dabad626765ad3ebe"
+        }
+      }
+    },
+    "tests/infrastructure/adapters/test_deployment_candidates.py": {
+      "before_sha256": "9b1c97aec569a9f13242b1d7c7a3ae75df9d5c29b0beee5db1715027c3496404",
+      "after_sha256": "0e9f9cb7e0ffdd09e189a1334ca0f823cc956529d604db59400d24f5d46b27d1",
+      "owners": {
+        "test_deployment_generation_has_distinct_geometry_and_stable_detached_roundtrip": {
+          "before": "309387a4fb35f3ef89e3791010e845339d78c36461d8617a80d104653cbed039",
+          "after": "3cef1abce80e2f32dc3acaf1c8207c75d89ae3e10155389dde9d09a850acc78c"
         },
-        "test_timing_journal_preserves_failure_and_propagates": {
-          "before": null,
-          "after": "04e1ad6f40129192012ea41b92c8676f7bf90da8c0098057ebf9c00d177ab60f"
+        "test_deployment_set_link_rejects_same_view_different_authoritative_checkpoint": {
+          "before": "ccedb4a8f0061ad2a61dedf336505036412402986ce164a2da3ddc3225f8703e",
+          "after": "62a6a538b3aa3fe618e7da41f23ce546323d9c25e8a8226c1df620ceaaa30e47"
+        },
+        "test_deployment_validation_budget_returns_explicit_partial_valid_set": {
+          "before": "fed76878df9b46ee1b85c45f0978c56b86264f9e0d25d811460567638e2428c6",
+          "after": "d027e30c34e8955a46cb73bc5fbe59a0cfc7a89ae9a18105b0b3f8f504b267ca"
+        },
+        "test_deployment_validation_preserves_live_state_and_commits_alternatives_with_replay": {
+          "before": "c7d6b8dbc0238353a3f1a706b111f9ab602c57a8e9e7340269b6eb5b52b56b09",
+          "after": "1b555bea26445417816a5d3dfd8791ac8043fc83d5226318e83555eef96bef2e"
         }
       }
     }
   },
   "rows": {
-    "ci/quality_shards/all.txt": {
+    "README.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
     },
-    "ci/quality_shards/shard-4-modules.txt": {
-      "category": "governance",
-      "operations": [],
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
       "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
     },
-    "ci/quality_shards/shard-4.txt": {
-      "category": "governance",
-      "operations": [],
+    "ci/test_shards/hosted-calibration.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "hosted-timing-calibration"
+      ],
       "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
     },
     "docs/performance/CANONICAL_DEPLOYMENT_COSTS.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
     },
-    "docs/performance/canonical-deployment-costs-v1/canonical-report.json": {
+    "docs/performance/canonical-placement-second-ring/base-measurement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
     },
-    "docs/performance/canonical-deployment-costs-v1/measurement.json": {
+    "docs/performance/canonical-placement-second-ring/head-coverage.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
     },
-    "docs/performance/canonical-deployment-costs-v1/pilot-diagnostic.json": {
+    "docs/performance/canonical-placement-second-ring/head-measurement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
     },
     "scripts/measure_canonical_deployment_costs.py": {
       "category": "measured_workload",
@@ -334,17 +707,67 @@
         "canonical-deployment-component-costs"
       ],
       "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
+      "category": "measured_workload",
+      "operations": [
+        "canonical-deployment-coverage"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "src/warhammer40k_core/ai/deployment_candidate_search.py": {
+      "category": "algorithm_or_search",
+      "operations": [
+        "deployment-bounded-candidates"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
     },
     "tests/code_quality/test_canonical_deployment_costs.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add serial operator measurement of the existing frozen canonical deployment report and its closed reproduction, with separate inclusive component diagnostics, ordered failures, explicit budgets and provisional-host uncertainty.",
-      "source_obligation": "Stage 2 requires reproducible component-cost evidence against the exact admitted setup/deployment fixture and unchanged candidate/reference lists; no tactical, full-game, optimization or broader qualification claim.",
-      "unchanged_work": "No packaged runtime, fixture, candidate generator, validator, geometry algorithm, cache, serializer, dependency or existing benchmark is changed. The new diagnostic workload calls existing owners; its absolute samples are not a base/head speed comparison. Required serial current-runtime smoke and all live gates remain mandatory."
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
+      "category": "measured_workload",
+      "operations": [
+        "canonical-deployment-coverage"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "tests/infrastructure/adapters/test_deployment_candidates.py": {
+      "category": "algorithm_or_search",
+      "operations": [
+        "deployment-bounded-candidates"
+      ],
+      "selected_families": [],
+      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
+      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
+      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
     }
   },
   "milestone": "ordinary",

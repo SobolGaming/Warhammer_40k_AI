@@ -429,7 +429,10 @@ creates `deployment-translation-set-v1` from an existing actor-bound singleton.
 The versioned `actor-formation-xy-translations-v1` generator translates every
 supplied model by the same XY offset in inches, retaining relative formation,
 height, facing and proposal context. Its default ordered offsets are the original
-formation, +X, -X, +Y and -Y by one inch. Explicit ordered offsets are supported,
+formation, +X, -X, +Y and -Y by one inch, followed by the same four directions
+by two inches. The original five-candidate prefix is preserved for smaller raw
+budgets; the translation algorithm and serialized explicit-offset contract remain
+v1. Explicit ordered offsets are supported,
 up to 64 pairs. This supplies real alternative positions, not a general placement
 solver or a guarantee of valid, useful or complete tactical coverage.
 
@@ -1145,13 +1148,13 @@ References and denominators are defined independently of the measured generator:
   is actually submitted; its result is shared when the identical generated choice
   is evaluated. The total finite-attempt ceiling is 512, with an explicit error
   if the frozen inventory exceeds it, never a silently shortened denominator.
-- Placement generation uses the existing default five whole-formation offsets:
-  zero, one inch in either X direction, and one inch in either Y direction.
+- Placement generation uses nine whole-formation offsets: zero, ±1 inch along
+  X/Y, then ±2 inches along X/Y in that order.
   The separately fixed reference list is zero, ±1 and ±2 inches along X or Y,
   plus the deliberately invalid `(100,100)` offset. The same translation owner
   constructs both sets from the original actor-bound recipe formation, but the
   reference list is never selected from generated or accepted outputs.
-- Each placement set is fully validated: five generated and ten reference
+- Each placement set is fully validated: nine generated and ten reference
   attempts per occurrence, accepted cap sixteen. Raw/duplicate counts, actual
   budgets and complete stop reasons remain in the nested receipts. No candidate
   is unvalidated. Identical candidates appearing in both lists are independently
@@ -1170,26 +1173,57 @@ The frozen experiment currently yields:
 | Decision occurrence / placement | Generated accepted / attempted | Legal references / probes | Covered legal references | Missing legal references |
 |---|---:|---:|---:|---:|
 | Seven finite occurrences | 18 / 18 | 18 / 18 | 18 / 18 | 0 |
-| Index 4: player B five-model unit | 5 / 5 | 9 / 10 | 5 / 9 | 4 |
-| Index 6: player A three-model unit | 5 / 5 | 8 / 10 | 5 / 8 | 3 |
-| Index 8: player A five-model unit | 5 / 5 | 8 / 10 | 5 / 8 | 3 |
-| Index 10: player A vehicle | 4 / 5 | 7 / 10 | 4 / 7 | 3 |
-| Four placement occurrences combined | 19 / 20 | 32 / 40 | 19 / 32 | 13 |
+| Index 4: player B five-model unit | 9 / 9 | 9 / 10 | 9 / 9 | 0 |
+| Index 6: player A three-model unit | 8 / 9 | 8 / 10 | 8 / 8 | 0 |
+| Index 8: player A five-model unit | 8 / 9 | 8 / 10 | 8 / 8 | 0 |
+| Index 10: player A vehicle | 7 / 9 | 7 / 10 | 7 / 7 | 0 |
+| Four placement occurrences combined | 32 / 36 | 32 / 40 | 32 / 32 | 0 |
 
 Finite option counts in canonical order are 4, 4, 3, 1, 3, 2 and 1.
-The 95% generated-placement validity yield (19/20) and 59.375% bounded legal
-reference coverage (19/32) answer different questions. Eight rejected reference
-probes are excluded from 32. The vehicle's +1 Y candidate is rejected at the
-battlefield/deployment-zone edge; the full engine diagnostics identify every
-other rejection. All eleven original recipe choices are generated and accepted.
+The 88.889% generated-placement validity yield (32/36) and 100% bounded legal
+reference coverage (32/32) answer different questions. Eight rejected reference
+probes remain outside 32; four of them are now generated rejections. All eleven
+original recipe choices remain generated and accepted. The unchanged reference
+list was fixed before this expansion; it is never derived from the new defaults.
 
-The thirteen accepted ±2-inch references missing from the default generator are
-explicit coverage gaps, not evidence that no legal placement exists. This
-measurement does not expand the generator or rank alternatives. Rotations,
-formation reshaping, other offsets, other orders/prefixes/seeds and all continuous
-placement space remain unmeasured. The fixed-reference list is not a hand-reviewed
-screen/preserve/follow-through tactical benchmark and certifies no tactical
-diversity, utility, scoring, learning, redeploy, Scouts, battle or full game.
+The predecessor five-offset default covered 19/32 legal references (59.375%),
+with validity yield 19/20 (95%). All thirteen misses formed one demonstrated gap
+class: cardinal translations at two inches. Adding this second ring addresses
+the entire observed missing class with four additional proposals per occurrence.
+It takes priority within this tested workload because rotations, reshaping and
+other offsets have no measured reference evidence here. This is a bounded search
+configuration expansion, not a gameplay legality fix or tactical optimization.
+
+Each missing alternative moves every model and the unweighted model-origin
+centroid exactly two inches in the listed direction. All preserve relative
+formation, XYZ spans, height, facing, model ownership and proposal context.
+Coordinates and spans below are model origins in world-frame inches, not physical
+footprints; displayed decimal values round binary floating-point coordinates.
+
+| Occurrence | Seed centroid XYZ | Seed XYZ span / facing | Previously missed engine-accepted directions | New rejection in the second ring |
+|---|---|---|---|---|
+| 4: B five-model unit | (3.72, 4.44, 0) | (1.8, 3.6, 0) / 180° | +X, −X, +Y, −Y: four alternatives | None |
+| 6: A three-model unit | (3, 46.8, 0) | (0, 3.6, 0) / 0° | −X, +Y, −Y: three alternatives | +X intersects layout-3 terrain-area-01 component-01 long/short Solid arms (`terrain_endpoint_illegal`) |
+| 8: A five-model unit | (3.72, 52.44, 0) | (1.8, 3.6, 0) / 0° | +X, −X, +Y: three alternatives | −Y overlaps A's already deployed third Deep Strike model (`model_overlap`) |
+| 10: A vehicle | (7, 57, 0) | (0, 0, 0) / 0° | +X, −X, −Y: three alternatives | +Y crosses battlefield/deployment-zone edge (`battlefield_edge_crossed`, `deployment_zone_violation`) |
+
+The vehicle's pre-existing +1 Y rejection has those same edge/zone codes. The
+four `(100,100)` probes also produce edge/zone violations and remain explicit
+invalid references. Terrain/model blockers and per-model violations remain in
+the complete receipts. None of the forty reference attempts returns unsupported;
+an unsupported status or engine error aborts measurement explicitly, never counts
+as a legal alternative or ordinary rejection. Unsupported/unmeasured proposal
+families remain outside this experiment's denominator.
+
+These thirteen alternatives qualify as distinct feasible wider spatial choices
+at their original prefixes. They do not demonstrate a screen, preservation,
+follow-through, objective-control, line-of-sight or scoring advantage. The same
+synthetic fixture supplies all four occurrences, two players, 32mm infantry and
+one provisional 120mm vehicle; this is not representative sampling across
+factions, layouts, unit sizes or alternate branch continuations. Rotations,
+reshaping, other distances, deployment orders, seeds and continuous placement
+space remain unmeasured. No tactical diversity, utility, ranking quality,
+learning, redeploy, Scouts, battle or full-game qualification follows.
 
 Focused controls preserve a nonrecipe +2 X placement through ordinary acceptance,
 JSON restore and exact replay, reject incompatible/incomplete endpoint inputs,

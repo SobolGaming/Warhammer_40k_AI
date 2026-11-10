@@ -78,7 +78,7 @@ class Journal:
 
 def generation_parameters(translations: tuple[tuple[float, float], ...] | None) -> dict[str, Any]:
     # Default generated search keeps the owner's raw ceiling of 64 even though
-    # only five offsets are supplied. Reference generation explicitly uses ten.
+    # the default offset count is bounded. Reference generation explicitly uses ten.
     return {} if translations is None else {"translations": translations, "raw_budget": 10}
 
 
@@ -103,7 +103,10 @@ def worker(output: Path, repeats: int, components: bool) -> None:
         CanonicalDeploymentCoverage,
         _finite_results,
     )
-    from warhammer40k_core.ai.deployment_candidate_search import DeploymentCandidateSet
+    from warhammer40k_core.ai.deployment_candidate_search import (
+        DEFAULT_TRANSLATIONS,
+        DeploymentCandidateSet,
+    )
     from warhammer40k_core.ai.deployment_candidate_validation import ValidatedDeploymentCandidates
     from warhammer40k_core.ai.deployment_candidates import DeploymentPlacementCandidate
     from warhammer40k_core.ai.finite_candidates import FiniteCandidateSet
@@ -206,7 +209,7 @@ def worker(output: Path, repeats: int, components: bool) -> None:
             else:
                 seed = DeploymentPlacementCandidate.from_action(action, context=actor)
                 for role, translations, budget in (
-                    ("generated", None, 5),
+                    ("generated", None, len(DEFAULT_TRANSLATIONS)),
                     ("reference", REFERENCE_TRANSLATIONS, 10),
                 ):
                     parameters = generation_parameters(translations)
