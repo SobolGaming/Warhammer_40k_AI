@@ -14,6 +14,26 @@
         }
       }
     },
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "1eb1eb631b711c74be67e901e87422a4ce645f347aafe0396a37493bde1c0e55",
+      "after_sha256": "069378b28daa5ebb12ce1f95376ac863ea4a3c3a9f95fc48df810c732d64141d",
+      "owners": {
+        "@document": {
+          "before": "1eb1eb631b711c74be67e901e87422a4ce645f347aafe0396a37493bde1c0e55",
+          "after": "069378b28daa5ebb12ce1f95376ac863ea4a3c3a9f95fc48df810c732d64141d"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "before_sha256": "88f245cca144bc428e91d353d518d85aab1d72dd0e7635024f5b6c5a8ae34397",
+      "after_sha256": "4e5795a25aaf8aac9d4379bcffd422556c54e111a1e368cf1fe974956a490ba7",
+      "owners": {
+        "@document": {
+          "before": "88f245cca144bc428e91d353d518d85aab1d72dd0e7635024f5b6c5a8ae34397",
+          "after": "4e5795a25aaf8aac9d4379bcffd422556c54e111a1e368cf1fe974956a490ba7"
+        }
+      }
+    },
     "ci/test_shards/durations.json": {
       "before_sha256": "0b318bf6c067aa1e7045693d5997d2961e87722420ff240fba15cd46eb0c13e5",
       "after_sha256": "c8b33d12b21ea3dd13fa8d42f39337f292b7e54a58b5660bcc40684b18f15207",
@@ -521,6 +541,22 @@
   },
   "rows": {
     "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+    },
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+    },
+    "ci/quality_shards/shard-4.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
