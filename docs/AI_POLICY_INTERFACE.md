@@ -1109,7 +1109,7 @@ attachments/transports and battle movement/combat/reactions/scoring as unsupport
 The pending redeploy route is distinct from the seven accepted routes. Other
 choices, orders, geometries, seeds and reachable states remain unexercised.
 The separate coverage measurement below reports bounded candidate/reference
-alternatives and their gaps. Component-cost measurements remain a later Stage 2 slice. This admission neither creates a dataset nor changes
+alternatives and their gaps. Separate operator component-cost measurements are described below. This admission neither creates a dataset nor changes
 `DeploymentWorkloadContract` or training eligibility. It claims no exhaustive
 reachability, full-game support, learning, tactical quality or cost certification.
 
@@ -1198,14 +1198,35 @@ Reports and authoritative rejection/checkpoint evidence remain outside player
 views and model inputs. The existing adapter decision contract covers these
 unchanged submissions; no player-facing contract or gameplay semantics change.
 
-Component-cost qualification remains the next separate Stage 2 handoff. Pin this
-same configuration/build and per-occurrence candidate/reference lists; separately
-measure actor-view generation, ordinary fork validation, persistence/replay and
-whole report reproduction on declared hardware, recording cold/warm state,
-attempted/accepted/rejected/unvalidated counts and actual budgets. Treat these
-diagnostic runtimes separately from the serial performance gate and any
-full-game throughput target. This report has no component timers or cost
-certification, creates no dataset and leaves training eligibility unchanged.
+## Canonical component-cost diagnostics
+
+The standalone operator harness
+`scripts/measure_canonical_deployment_costs.py` measures this exact report and its
+closed loader without changing their algorithms or acceptance semantics. It runs
+serial fresh interpreter processes, retaining each process's first iteration and
+optional within-process repeats separately. Each iteration reconstructs the
+endpoint, times full `measure`, converts the report through JSON, and times full
+`from_payload`. The loader sample is already warmed by measurement and conversion;
+it is never labeled an independently cold loader. Process launch-to-exit and
+runtime import are separate costs; OS caches are uncontrolled.
+
+An optional prepared component pass executes after the complete repetitions. It
+times configuration/startup, admission, prefix reconstruction, finite/placement
+generation, fresh-fork validation, persistence encoding/restore and exact replay.
+It calls the current owners, including coverage's finite-probe helper, and checks
+its sets/results against the authoritative report. Whole-method inclusive costs
+and separately timed extra forks overlap semantically and must not be added to
+reconstruct the headline full-report cost. No profiler or runtime monkeypatching
+is used. The [procedure and evidence](performance/CANONICAL_DEPLOYMENT_COSTS.md)
+define the boundaries, environment, ordered failures, budgets and uncertainty.
+
+The authoritative coverage/admission schemas retain their historical
+`pending_stage2_evidence` fields: external timing evidence does not rewrite those
+deterministic receipts or grant broader admission. This report has no component
+timers, creates no dataset and leaves training eligibility unchanged. Component
+measurements apply only to this fixture on the recorded provisional host. Broader
+useful references, tactical quality, later gameplay and full-game throughput
+remain unqualified; Stage 2 remains open.
 
 ## Exact v995 Daemons mirror inventory
 
