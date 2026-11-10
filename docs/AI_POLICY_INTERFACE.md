@@ -1409,3 +1409,53 @@ replay, stopping at round-1 Command. It also checks player detachment/redaction,
 exact routing, action bindings, rejection without retry, seed/config identity and
 bounded stops. The fixture is a reproducible integration workload, not evidence
 of competitive AI, delayed credit assignment or completed-game performance.
+
+## Reachable preservation prefix admission
+
+`ai.preserve_scenario` provides `reproduce_preserve_scenario()` and the closed
+operator-only `PreserveScenarioAdmission.from_session(...)` /
+`from_payload(..., session=...)` receipt. This is one prerequisite admission
+slice for the proposed screen/preserve experiment; useful-reference status is
+explicitly `scoped_gap`.
+
+The independently pinned `canonical-preserve-prefix-v1` definition binds the
+unchanged `canonical-deployment-v1` configuration hash
+`adfdb1ee885d9de34ddbe6ef7fe1be64c728f86d3529dc2e82b7523132926409`, its eleven
+deployment choices, and six fixed ordinary viewer submissions. A/B each choose
+`complete_redeploys`, then A/B each choose `complete_prebattle_actions`; A selects
+`army-alpha:scout-redeploy-unit` and `remain_stationary`. The seventeen-record
+checkpoint stops at round-one player-A Movement's next `select_movement_unit`.
+The design-role E is the separate `army-alpha:deep-strike-unit`; the opponent
+candidate is `army-beta:scout-redeploy-unit`. Their tactical roles remain unproved.
+
+Admission requires exact fresh reproduction, strict startup/save/load replay,
+unchanged battlefield placement through the continuation and a consumed S
+activation. The receipt retains the full configuration, current origin/build/source
+identity, ordered accepted records and actor observation hashes, thirteen required
+and observed prefix routes, pending endpoint, boundary/activation events, and
+replay commitment. Each continuation occurrence records the complete
+`FiniteCandidateSet` and selected ID. S's action options are `advance`,
+`normal_move`, and `remain_stationary`; only the last is executed here. Selecting
+a movement category is not evidence of an accepted path or beneficial outcome.
+
+Required prefix mechanics are reconciled separately from the proposed useful
+reference's unobserved requirements: witnessed screen/exposure movement, enemy
+reachability and attack resolution, E follow-through, later scoring/attack benefit,
+and matched continuations with a local target and declared horizon. The definition
+retains minimum unit-specific pending movement and opponent Shooting routes plus
+the later scoring-boundary obligation; this is not an exhaustive battle plan.
+No positive benefit, threat, attack or later scoring result is invented. The
+scoped gap means missing experiment evidence, not that the engine lacks those
+mechanics. `reference_target` is null and `eligible_for_learning` is false.
+
+The inherited synthetic Core roster, legacy model volumes, provisional geometry,
+July mission/scoring and October layout identities, partial points and public
+test seed remain disclosed. Redeploy and Scouts decline choices are exercised;
+their placement/path mechanics are not. The ordinary first Command boundary
+does not supply a delayed tactical outcome. All admission metadata stays outside
+actor/scorer views. Existing adapter choices and submission contracts are reused
+without modification; no new player choice, observation field or training schema
+is introduced. Incomplete prefixes, changed configurations, extra ordinary
+decisions and changed closed receipts fail admission. This does not certify
+continuous placement coverage, tactical usefulness, full games, performance,
+learning or Stage 2 completion.

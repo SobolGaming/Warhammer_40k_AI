@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8996a426d3399cdd20243a6083d426d7627ac3ef5afd4597710ef16ccab94d6a",
-  "fingerprint": "8996a426d3399cdd20243a6083d426d7627ac3ef5afd4597710ef16ccab94d6a",
-  "resource_count": 3242,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:df5981b2761ed40b8a87daf2adb3ec56fc0527ad66eaf7470b76697b7ad36dad",
+  "fingerprint": "df5981b2761ed40b8a87daf2adb3ec56fc0527ad66eaf7470b76697b7ad36dad",
+  "resource_count": 3243,
   "resources": [
     {
       "byte_length": 113,
@@ -268,6 +268,11 @@
       "byte_length": 26454,
       "path": "warhammer40k_core/ai/policy_contracts.py",
       "sha256": "d20d51af9e8748232f03a3973137f800b3637e336b3f5d9e3284df20d5ed5d09"
+    },
+    {
+      "byte_length": 14993,
+      "path": "warhammer40k_core/ai/preserve_scenario.py",
+      "sha256": "90d32415a69797169dec869d110bbce0897d275c3a85290df13dd7b17cb85724"
     },
     {
       "byte_length": 16900,

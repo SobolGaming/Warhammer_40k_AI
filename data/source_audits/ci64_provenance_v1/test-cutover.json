@@ -2441,6 +2441,12 @@
       "blob_sha1": "21e4c505c9165a12b54f5b116b276586258638e1",
       "sha256": "4445262840af8cf94079b4d697bf7d74fea458ed27a2dbbe33a38b7908b917f3",
       "bytes": 21213
+    },
+    "tests/infrastructure/adapters/test_preserve_scenario.py": {
+      "blob_sha1": "5efb63c278a8211c493305c4367dbc888fda26c3",
+      "bytes": 7366,
+      "mode": "100644",
+      "sha256": "3d348cf932c4430ea470cf0377741771ecc24cf3a7a381d70d364d0590c15fe6"
     }
   },
   "active_roots": [

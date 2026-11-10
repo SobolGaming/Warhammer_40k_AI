@@ -311,6 +311,36 @@ Stage 2 completion. Ranking, screen/preserve/follow-through references and
 broader workload qualification remain open. No dataset or learning eligibility
 changes.
 
+### First reachable preservation prefix
+
+The separate `PreserveScenarioAdmission` extends the unchanged canonical
+deployment recipe through ordinary viewer submissions: both players decline
+redeploy and Scouts, then player A selects S and Remains Stationary. Seventeen
+accepted decisions cover thirteen exact routes and end at the next first-round
+Movement unit selection. S is `army-alpha:scout-redeploy-unit`; the separate E
+candidate is `army-alpha:deep-strike-unit`, and the opponent candidate is
+`army-beta:scout-redeploy-unit`. These are declared design roles, not demonstrated
+screening, exploitation or threat reachability.
+
+The pinned definition/configuration, complete accepted trace, engine-enumerated
+finite candidates, consumed S activation, unchanged battlefield placement,
+automatic Command boundary, strict JSON persistence and exact replay qualify one
+reachable preservation **feasibility** prefix. The operator receipt reconciles
+required/observed prefix routes separately from missing tactical mechanics and
+minimum continuation route obligations. Declining redeploy/Scouts does not
+exercise either movement mechanic. The canonical synthetic roster, legacy
+geometry, July mission/October layout and fixed public test-seed limits persist.
+
+Useful-reference qualification returns `scoped_gap`, with no target and no
+learning eligibility. A witnessed screen/exposure alternative, actual opponent
+threat and attack continuation, E follow-through, and matched later scoring or
+attack outcomes with a declared horizon remain unmeasured. Missing evidence is
+not an engine-unsupported verdict. No tactical advantage, screen/preserve pair,
+candidate continuation coverage, component-cost qualification or Stage 2
+completion follows from selecting a legal Remain Stationary option. The
+[preservation admission interface](AI_POLICY_INTERFACE.md#reachable-preservation-prefix-admission)
+defines this boundary; no ranker, learner or training schema is added.
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.

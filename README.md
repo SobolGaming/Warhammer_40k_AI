@@ -483,14 +483,14 @@ three phases, compared with 485.673 baseline seconds. The maximum-cost formula
 and balancing placed its whole eight-case module alone on shard 3. That shard's
 modeled lower bound was 1,080.002 seconds before startup and finalization; the
 other eleven modeled lower bounds were 993.692-993.708 seconds. Those are historical
-PR656 planning values. The current manifests use the complete diagonal-generator
+PR656 planning values. The PR657 manifests used the complete diagonal-generator
 profile below and the compatible receipts described above. Timing budgets, test
 selection and the scheduling algorithm remain unchanged. Reassignment cannot
 shorten an individual test, and planning metadata does not establish compliance
 with the eighteen-minute limit. A fresh hosted run is required; an over-limit
 result remains a blocker.
 
-The complete baseline is the successful local 6,254-case covered diagonal-generator
+The preceding complete baseline is the successful local 6,254-case covered diagonal-generator
 qualification: Python 3.14.5 under WSL, one isolated mirror worker followed by
 32 remainder workers, using a fresh checkout-bound source index. Static/type/
 contract checks run separately; no competing validation workers ran during
@@ -504,6 +504,19 @@ representative baseline. The unchanged maximum formula retains every compatible
 slower hosted observation; excluded receipts do not become current measurements.
 Local timings do not establish hosted cost accuracy or a speedup; fresh hosted
 qualification remains required.
+
+The current complete baseline is the successful local 6,257-case covered
+preservation-admission qualification on Python 3.14.5 under WSL: one isolated
+mirror worker followed by 32 remainder workers and a fresh checkout-bound source
+index, without competing validation workers. Its exact base is
+`bbba63a57f67b39b2c101d2b07841fb728bc23ef` and its runtime fingerprint is
+`df5981b2761ed40b8a87daf2adb3ec56fc0527ad66eaf7470b76697b7ad36dad`.
+All 284 compatible hosted receipts and 34,836 samples remain unchanged; no
+previously collected test module changed. The three new preservation cases use
+their fresh complete-profile measurements, bringing baseline-only membership to
+142 cases. The unchanged maximum formula preserves every compatible slower
+hosted observation. Local timing is planning evidence, not hosted approval or a
+speedup; the twelve manifests still require a fresh passing hosted run.
 
 Fixture setup observations are worker/order dependent; taking maxima and regrouping
 does not establish new fixture multiplicity, hosted wall time or the eighteen-minute
