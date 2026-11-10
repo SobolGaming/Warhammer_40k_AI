@@ -417,11 +417,12 @@ inventory changes still require a fresh complete successful baseline profile.
 
 The current calibration retains 243 compatible source-bound raw worker receipts
 and 29,721 original passed three-phase samples covering 6,101 cases. The complete
-inventory remains 6,250 cases, with 149 baseline-only cases and no invented hosted
-observations. The second-cardinal-ring update changes two behavioral test modules;
-twenty whole incompatible worker receipts and their 2,916 samples are excluded.
-Every surviving receipt, outcome, source identity and phase tuple is unchanged,
-apart from necessary observation report-index reindexing.
+inventory is now 6,254 cases, with 153 baseline-only cases and no invented hosted
+observations. The deployment reference-suite update changes one behavioral test
+module without retained hosted observations; no additional worker receipts or
+samples are excluded. The earlier second-cardinal-ring update excluded twenty
+incompatible worker receipts and their 2,916 samples. Every surviving receipt,
+outcome, source identity and phase tuple remains unchanged.
 
 All 52 original collected inventories were authenticated by their exact counts
 and hashes. Fifty-one reconstruct completely from retained observation membership;
@@ -459,22 +460,21 @@ it neither promotes this failed run to a passing baseline nor predicts a passing
 rerun. These historical receipt and observation tuples remain unchanged in the
 subsequent canonical-fixture inventory update.
 
-The complete baseline is the successful local 6,250-case covered second-ring
-canonical candidate/reference run: Python 3.14.5 under WSL, one isolated mirror
+The complete baseline is the successful local 6,254-case covered three-order
+deployment reference-suite run: Python 3.14.5 under WSL, one isolated mirror
 worker followed by 32 remainder workers, using a fresh checkout-bound source
-index. Static/type/contract checks and historical calibration verification
-completed separately; no competing validation ran during this complete attempt.
-The tested working source is based on
-`a3cf8f75331a83e065a2ad08b7d787c3a33ba482`, with runtime fingerprint
-`edda12efc466e3ea464ceac89263ed39ebeb2d5ac09026aa3dd38ea2c9b2f1ee`.
+index. Static/type/contract checks completed separately; no competing validation
+workers ran during this complete attempt. The tested working source is based on
+`f95a2c1b66b881dbd52409d8d4c8b703c4d558c4`, with runtime fingerprint
+`66abc9d0afe9ab335e2a80a9d3ea86c2ef53415078cbb5dc922131c5aca232bb`.
 Its complete successful JUnit measurements supply every current case weight,
-including the changed modules. The prior 6,250-case five-offset coverage,
-6,246-case canonical-admission, 6,232-case workload-contract, 6,209-case
-split-contract and 6,178-case hosted baselines remain historical. Local and hosted
-measurements are not mixed into one representative baseline. The unchanged maximum
-formula retains every compatible slower hosted observation. Local timings do not
-establish hosted cost accuracy or a speedup; fresh hosted qualification remains
-required.
+including the changed module. The prior 6,250-case second-cardinal-ring and
+five-offset coverage, 6,246-case canonical-admission, 6,232-case workload-contract,
+6,209-case split-contract and 6,178-case hosted baselines remain historical.
+Local and hosted measurements are not mixed into one representative baseline.
+The unchanged maximum formula retains every compatible slower hosted observation.
+Local timings do not establish hosted cost accuracy or a speedup; fresh hosted
+qualification remains required.
 
 Fixture setup observations are worker/order dependent; taking maxima and regrouping
 does not establish new fixture multiplicity, hosted wall time or the eighteen-minute

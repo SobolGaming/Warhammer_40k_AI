@@ -2438,9 +2438,9 @@
     },
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
       "mode": "100644",
-      "blob_sha1": "79bec0c2391e82dcec9a6cef7fe9294754471867",
-      "sha256": "545060200efd79ca546bd1ef74acd8144ef98cd2ce3ae4504abb8c952bccae1c",
-      "bytes": 11849
+      "blob_sha1": "b13fb4c8cdfeddf74a6df47301f23d5d8779ef38",
+      "sha256": "283f14985e6f32d67b865d1514588ad26b79779cfedc4b902fa895d875bfb5df",
+      "bytes": 19803
     }
   },
   "active_roots": [

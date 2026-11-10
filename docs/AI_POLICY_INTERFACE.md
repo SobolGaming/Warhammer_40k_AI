@@ -1262,6 +1262,109 @@ measurements apply only to this fixture on the recorded provisional host. Broade
 useful references, tactical quality, later gameplay and full-game throughput
 remain unqualified; Stage 2 remains open.
 
+## Deployment-order and diagonal reference suite
+
+`ai.deployment_reference_suite.DeploymentReferenceSuite.measure()` reconstructs
+the entire fixed suite. `from_payload(payload)` first rejects declaration drift,
+then rederives every case and requires exact complete equality. The immutable
+receipt is operator-only: it neither enters actor observations/scorers nor grants
+training admission. `reproduce_reference_case(case_id)` and
+`measure_reference_case(case_id)` accept only the three declared IDs. Original
+canonical admission/coverage schemas and their accepted recipe remain unchanged.
+
+The pre-measurement definition is `deployment-order-diagonal-reference-suite-v1`,
+SHA-256 `10fcfd7c7f3c85118c4a029dd042bbdbc73ed2448a3b78e44874883d45fd2d02`.
+Its complete recipes, reference coordinates, intended constraints, budgets and
+exclusions are serialized in each receipt. Definition drift fails closed. This
+pin preceded the first engine run; no measured acceptance selected the cases or
+reference coordinates.
+
+All cases use the exact [canonical configuration](#frozen-canonical-deployment-admission),
+including its seed, synthetic roster, provisional model geometry and July
+mission/October layout sources. Player B's five scouts always deploy first at
+(3,3). Player A's fixed Deep Strike/scout/vehicle origins remain (3,45), (3,51)
+and (7,57), with the same formation spacing, Z and facing as the canonical recipe.
+
+| Case ID | Player A's ordered placements | Distinct prefix constraint |
+|---|---|---|
+| `deep-scout-vehicle` | Deep Strike, scouts, vehicle | Original Deep Strike models occupy the space before scouts are probed. |
+| `vehicle-scout-deep` | Vehicle, scouts, Deep Strike | Vehicle is already present for scout probes; scouts are already present for Deep Strike probes. |
+| `scout-deep-vehicle` | Scouts, Deep Strike, vehicle | Scouts are probed before either other A unit; they then constrain Deep Strike probes. |
+
+Each case accepts eleven ordinary decisions and independently reconstructs all
+eleven before-choice states by replay. Startup/save/load/replay admission binds
+each case's complete accepted records and endpoint. This yields 33 decision
+occurrences, 21 finite and 12 placement occurrences, with seven distinct routes.
+Repeated cases/routes/geometries are counted per occurrence, not as independent
+samples or unique reachable states. Candidate probes do not play subsequent
+continuations.
+
+Each placement independently references `(0,0), (2,0), (-2,0), (0,2), (0,-2),
+(1,1), (-1,1), (1,-1), (-1,-1), (100,100)` inches relative to its recipe seed.
+The four diagonal offsets translate every model by a Euclidean distance of
+sqrt(2) inches while retaining formation, model identity, facing and height.
+These differ geometrically from the generator's nine cardinal/zero defaults.
+All finite options, all nine generated placements and all ten reference probes
+are submitted on separate ordinary engine forks, with acceptance cap sixteen
+and no unvalidated tail. Finite generated/reference copies share the identical
+submission result as in the original coverage owner. Only engine-accepted
+references enter the denominator; covered means also generated and accepted
+at that exact occurrence. Invalid probes retain exact engine diagnostics.
+
+The [complete receipt](performance/deployment-reference-suite-v1/suite-report.json)
+records these observed results; the definition was not changed after observation:
+
+| Case | Finite accepted / attempts | Generated placements accepted / attempts | Covered / legal placement references | Invalid reference probes | Feasible misses |
+|---|---:|---:|---:|---:|---:|
+| `deep-scout-vehicle` | 18 / 18 | 32 / 36 | 17 / 31 | 9 | 14 |
+| `vehicle-scout-deep` | 18 / 18 | 32 / 36 | 17 / 31 | 9 | 14 |
+| `scout-deep-vehicle` | 18 / 18 | 32 / 36 | 17 / 31 | 9 | 14 |
+| Occurrence-weighted total | 54 / 54 | 96 / 108 | 51 / 93 | 27 | 42 |
+
+The placement reference denominator is 93 accepted probes out of 120, excluding
+27 rejected probes. The default covers 51/93 (54.84%); generated validity is
+96/108 (88.89%). The 42 misses are precisely accepted diagonals: four for each
+B scout, A scout and Deep Strike occurrence, and the two negative-Y diagonals for
+each vehicle occurrence. The six positive-Y vehicle diagonals are rejected,
+remain outside the denominator, and are not feasible misses. Finite coverage is
+54/54. All 282 finite/generated/reference validation submissions complete; none
+is unsupported or unvalidated.
+
+Identical per-case totals conceal an actual occupancy-dependent swap:
+
+| Unit and reference offset | Deep Strike before scouts | Scouts before Deep Strike |
+|---|---|---|
+| A scouts `(0,-2)` | Rejected: `model_overlap` with already placed Deep Strike models (index 8). | Accepted (index 8 in vehicle-first; index 6 in scouts-first). |
+| A Deep Strike `(0,2)` | Accepted (index 6). | Rejected: `model_overlap` with already placed scouts (index 10 in vehicle-first; index 8 in scouts-first). |
+
+All three cases also reject Deep Strike `(2,0)` against terrain
+(`terrain_endpoint_illegal`). Every vehicle rejects `(0,2)`, `(1,1)` and
+`(-1,1)` with both `battlefield_edge_crossed` and
+`deployment_zone_violation`; the twelve far controls have those same codes.
+These account for all 27 reference rejections. Vehicle-first changes prefix
+occupancy but introduces no additional rejection within these particular
+references. The suite therefore demonstrates one infantry occupancy swap,
+diagonal feasibility and the retained terrain/edge constraints, rather than
+three independent tactical situations. A post-scout Deep Strike diagonal also
+has an ordinary-submit, JSON restore, exact replay and both-viewer regression.
+
+Feasible diagonal misses remain queued for a separately scoped generator
+follow-up. No claimed screen, preservation, follow-through, range,
+visibility, objective or scoring benefit follows from a feasible diagonal.
+Three of six A-unit orders are selected; the B-first side/seed, layout, formation
+origins and roster are fixed. Rotations, reshaping, other distances, other
+configurations/layouts/rosters/seeds/opponent responses and continuous placement
+space remain excluded. Redeploy, Scouts, reserve arrival, attachments,
+transports, battle and scoring remain unexercised by these recipes. Tactical
+utility, ranking quality, learning, full games and representative coverage remain
+unqualified, so Stage 2 stays open.
+
+The existing adapter contract covers every unchanged finite/proposal submission.
+The suite adds no player-facing route, wire payload, rule mutation or alternate
+legality path. The [cost procedure](performance/CANONICAL_DEPLOYMENT_COSTS.md)
+records the separate serial observation, its exact source/runtime identities and
+limitations.
+
 ## Exact v995 Daemons mirror inventory
 
 Workload: [the 2,000-point app roster](../data/army_lists/cavalcade-shadow-bloodthirster.json),

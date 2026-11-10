@@ -228,3 +228,157 @@ def test_nonrecipe_reference_acceptance_roundtrips_without_changing_canonical_pr
     assert canonical_json(before.to_persistence_payload()) == original
     with pytest.raises(TrainingAdmissionError, match="complete recipe trace"):
         canonical_deployment_prefixes(probe, report)
+
+
+def test_reference_suite_definition_is_pinned_and_closed() -> None:
+    from warhammer40k_core.ai.deployment_reference_suite import (
+        REFERENCE_SUITE_DEFINITION_HASH,
+        DeploymentReferenceSuite,
+        reference_case_steps,
+        require_reference_suite_definition,
+    )
+    from warhammer40k_core.ai.player_policy import payload_digest
+
+    definition = require_reference_suite_definition()
+    assert (
+        payload_digest(definition)
+        == REFERENCE_SUITE_DEFINITION_HASH
+        == ("10fcfd7c7f3c85118c4a029dd042bbdbc73ed2448a3b78e44874883d45fd2d02")
+    )
+    with pytest.raises(TrainingAdmissionError, match="Unknown deployment reference case"):
+        reference_case_steps("unregistered-order")
+    with pytest.raises(TrainingAdmissionError, match="Measure the declared"):
+        DeploymentReferenceSuite()
+    with pytest.raises(TrainingAdmissionError, match="declaration drifted"):
+        DeploymentReferenceSuite.from_payload({"definition": definition})
+
+
+@pytest.mark.parametrize(
+    "case_id",
+    ["deep-scout-vehicle", "vehicle-scout-deep", "scout-deep-vehicle"],
+)
+def test_reference_case_ordinary_prefixes_geometry_and_feasible_gaps(case_id: str) -> None:
+    from warhammer40k_core.ai.deployment_reference_suite import measure_reference_case
+
+    payload = measure_reference_case(case_id)
+    rows = cast(list[dict[str, JsonValue]], payload["rows"])
+    assert [row["index"] for row in rows] == list(range(11))
+    assert len(cast(list[JsonValue], payload["accepted_records"])) == 11
+    totals = cast(dict[str, dict[str, int]], payload["totals"])
+    assert totals["finite"]["accepted_count"] == totals["finite"]["legal_reference_count"] == 18
+    assert totals["placement"]["generated_count"] == 36
+    assert totals["placement"]["reference_attempts"] == 40
+    assert totals["placement"]["unvalidated_count"] == 0
+    assert totals["placement"]["accepted_count"] == 32
+    assert totals["placement"]["legal_reference_count"] == 31
+    assert totals["placement"]["covered_legal_reference_count"] == 17
+    assert totals["placement"]["invalid_reference_probe_count"] == 9
+    missing = 0
+    violation_codes: set[str] = set()
+    for row in rows:
+        if row["kind"] != "placement":
+            continue
+        reference_set = cast(dict[str, JsonValue], row["reference_set"])
+        candidates = cast(list[dict[str, JsonValue]], reference_set["candidates"])
+        validation = cast(dict[str, JsonValue], row["reference_validation"])
+        results = cast(list[dict[str, JsonValue]], validation["results"])
+        assert validation["stop_reason"] == "complete"
+        counts = cast(dict[str, JsonValue], row["counts"])
+        missing_ids = cast(list[str], counts["missing_legal_reference_ids"])
+        seed = cast(dict[str, JsonValue], reference_set["seed"])
+        proposal = cast(dict[str, JsonValue], seed["proposal"])
+        edge_codes = {"battlefield_edge_crossed", "deployment_zone_violation"}
+        expected_rejections: dict[tuple[float, float], set[str]] = {(100, 100): edge_codes}
+        if proposal["unit_instance_id"] == "army-alpha:deep-strike-unit":
+            expected_rejections[(2, 0)] = {"terrain_endpoint_illegal"}
+            if case_id != "deep-scout-vehicle":
+                expected_rejections[(0, 2)] = {"model_overlap"}
+        elif proposal["unit_instance_id"] == "army-alpha:scout-redeploy-unit":
+            if case_id == "deep-scout-vehicle":
+                expected_rejections[(0, -2)] = {"model_overlap"}
+        elif proposal["unit_instance_id"] == "army-alpha:strategic-reserve-unit":
+            expected_rejections.update(
+                {(0, 2): edge_codes, (1, 1): edge_codes, (-1, 1): edge_codes}
+            )
+        for offset, candidate, result in zip(
+            cast(list[list[float]], reference_set["translations"]), candidates, results, strict=True
+        ):
+            # Independent arithmetic proves exact whole-formation geometry:
+            # all identity/context/Z/facing fields remain those of the seed.
+            expected = cast(dict[str, JsonValue], json.loads(canonical_json(seed["proposal"])))
+            for placement in cast(list[dict[str, JsonValue]], expected["model_placements"]):
+                pose = cast(dict[str, JsonValue], placement["pose"])
+                position = cast(dict[str, float], pose["position"])
+                position["x"] += offset[0]
+                position["y"] += offset[1]
+            assert candidate["proposal"] == expected
+            assert candidate["candidate_id"] == result["candidate_id"]
+            assert result["accepted"] is (tuple(offset) not in expected_rejections)
+            if result["accepted"]:
+                diagonal = abs(offset[0]) == abs(offset[1]) == 1
+                assert (candidate["candidate_id"] in missing_ids) is diagonal
+                missing += int(diagonal)
+            else:
+                diagnostics = cast(dict[str, JsonValue], result["diagnostics"])
+                codes = {
+                    cast(str, violation["violation_code"])
+                    for violation in cast(list[dict[str, JsonValue]], diagnostics["violations"])
+                }
+                assert codes == expected_rejections[(offset[0], offset[1])]
+                violation_codes.update(codes)
+        assert results[0]["accepted"] is True
+        assert results[-1]["accepted"] is False
+    assert missing == (
+        totals["placement"]["legal_reference_count"]
+        - totals["placement"]["covered_legal_reference_count"]
+    )
+    assert {
+        "terrain_endpoint_illegal",
+        "battlefield_edge_crossed",
+        "deployment_zone_violation",
+    } <= (violation_codes)
+
+    if case_id == "scout-deep-vehicle":
+        from warhammer40k_core.ai.canonical_deployment import (
+            _recipe_prefixes,  # pyright: ignore[reportPrivateUsage]
+        )
+        from warhammer40k_core.ai.deployment_reference_suite import (
+            reference_case_steps,
+            reproduce_reference_case,
+        )
+
+        session, recipe = reproduce_reference_case(case_id)
+        prefixes = _recipe_prefixes(session, recipe, steps=reference_case_steps(case_id))
+        prefix, context, _ = prefixes[8]
+        row = rows[8]
+        counts = cast(dict[str, JsonValue], row["counts"])
+        missing_ids = cast(list[str], counts["missing_legal_reference_ids"])
+        references = cast(dict[str, JsonValue], row["reference_set"])
+        candidates = cast(list[dict[str, JsonValue]], references["candidates"])
+        diagonal_candidate = DeploymentPlacementCandidate.from_payload(
+            next(item for item in candidates if item["candidate_id"] in missing_ids),
+            context=context,
+        )
+        action = diagonal_candidate.select(context)
+        before = canonical_json(session.to_persistence_payload())
+        status = prefix.submit_viewer_parameterized_payload(
+            viewer=ViewerContext.for_player(action.actor_id),
+            request_id=action.request_id,
+            payload=json.loads(cast(str, action.proposal_json)),
+            result_id="suite-diagonal-positive",
+        )
+        assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+        checkpoint = canonical_json(prefix.to_persistence_payload())
+        restored = LocalGameSession.from_persistence_payload(json.loads(checkpoint))
+        assert canonical_json(restored.to_persistence_payload()) == checkpoint
+        assert (
+            ReplayRunner.from_payload(
+                restored.replay_artifact(artifact_id="suite-diagonal-positive")
+            )
+            .run()
+            .reproduced_exactly
+        )
+        assert canonical_json(session.to_persistence_payload()) == before
+        for actor in ("player-a", "player-b"):
+            assert restored.view(viewer_player_id=actor) == prefix.view(viewer_player_id=actor)
+            assert "definition_hash" not in canonical_json(restored.view(viewer_player_id=actor))

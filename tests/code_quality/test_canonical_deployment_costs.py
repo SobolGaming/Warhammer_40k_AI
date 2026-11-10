@@ -308,3 +308,143 @@ def test_component_generator_parameters_preserve_production_raw_budgets() -> Non
         "translations": offsets,
         "raw_budget": reference_budget.value,
     }
+
+
+def test_suite_costs_keep_case_identity_and_select_explicit_workload() -> None:
+    args = costs.parser().parse_args(["--reference-suite", "--processes", "1", "--repeats", "1"])
+    assert args.reference_suite is True
+    assert (args.processes, args.repeats) == (1, 1)
+    events = [
+        {
+            "event": "finish",
+            "outcome": "passed",
+            "name": "placement_fresh_fork_validation",
+            "phase": "prepared_component_pass",
+            "case_id": case,
+            "index": 6,
+            "role": "reference",
+            "wall_seconds": seconds,
+        }
+        for case, seconds in (("deep-scout-vehicle", 1), ("vehicle-scout-deep", 3))
+    ]
+    rows = costs.summarize([{"events": events}])
+    assert [(row["case_id"], row["n"], row["mean_seconds"]) for row in rows] == [
+        ("deep-scout-vehicle", 1, 1),
+        ("vehicle-scout-deep", 1, 3),
+    ]
+
+
+def test_retained_reference_suite_costs_bind_definition_report_and_complete_components() -> None:
+    root = Path(__file__).resolve().parents[2]
+    directory = root / "docs/performance/deployment-reference-suite-v1"
+    evidence = json.loads((directory / "measurement.json").read_text())
+    report = json.loads((directory / "suite-report.json").read_text())
+    assert json.loads((directory / "definition.json").read_text()) == report["definition"]
+
+    def payload_hash(value: object) -> str:
+        return hashlib.sha256(
+            json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
+        ).hexdigest()
+
+    assert evidence["status"] == "complete"
+    assert (
+        evidence["report_hash"]
+        == payload_hash(report)
+        == ("69d98b6d0c57c7ee6a07ccf8497f37e40da34c5f78de276eb509f01936904b04")
+    )
+    assert report["schema_version"] == "deployment-reference-suite-v1"
+    assert (
+        report["definition_hash"]
+        == payload_hash(report["definition"])
+        == ("10fcfd7c7f3c85118c4a029dd042bbdbc73ed2448a3b78e44874883d45fd2d02")
+    )
+    case_ids = ["deep-scout-vehicle", "vehicle-scout-deep", "scout-deep-vehicle"]
+    assert [case["case_id"] for case in report["cases"]] == case_ids
+    assert [case["case_id"] for case in report["definition"]["cases"]] == case_ids
+    for kind in ("finite", "placement"):
+        assert report["totals"][kind] == {
+            key: sum(case["totals"][kind][key] for case in report["cases"])
+            for key in report["totals"][kind]
+        }
+    assert report["totals"]["finite"]["accepted_count"] == 54
+    assert report["totals"]["placement"]["generated_count"] == 108
+    assert report["totals"]["placement"]["reference_attempts"] == 120
+    assert report["totals"]["placement"]["unvalidated_count"] == 0
+    assert report["totals"]["placement"]["legal_reference_count"] == 93
+    assert report["totals"]["placement"]["covered_legal_reference_count"] == 51
+    assert report["totals"]["placement"]["invalid_reference_probe_count"] == 27
+    assert report["totals"]["placement"]["accepted_count"] == 96
+    settings = evidence["settings"]
+    assert (settings["processes"], settings["repeats"], settings["components"]) == (1, 1, True)
+    assert settings["workload"] == "reference-suite"
+    assert settings["workers"] == 1
+    assert settings["coverage"] is settings["profiler"] is False
+    assert evidence["elapsed_wall_seconds"] < settings["wall_budget_seconds"]
+    assert evidence["child_cpu_seconds"] < settings["cpu_budget_seconds"]
+    environment = evidence["environment"]
+    assert environment["source_commit"] == "f95a2c1b66b881dbd52409d8d4c8b703c4d558c4"
+    assert environment["harness_sha256"] == (
+        "de857d4c7f37ecb97d68de69dadd70ad3aba49dc4f992878ec98e925e1b7ec92"
+    )
+    assert environment["engine_manifest"]["fingerprint"] == (
+        "66abc9d0afe9ab335e2a80a9d3ea86c2ef53415078cbb5dc922131c5aca232bb"
+    )
+    measured_driver = json.loads((directory / "measured-driver-source.json").read_text())
+    assert measured_driver["schema_version"] == "measured-python-source-v1"
+    assert (
+        hashlib.sha256(measured_driver["utf8"].encode()).hexdigest()
+        == measured_driver["sha256"]
+        == environment["harness_sha256"]
+    )
+    # The only post-measurement driver edits are type-checker comments.
+    # Preserve the exact measured bytes and verify identical executable syntax.
+    assert ast.dump(ast.parse(measured_driver["utf8"])) == ast.dump(
+        ast.parse((root / "scripts/measure_canonical_deployment_costs.py").read_text())
+    )
+    assert len(evidence["attempts"]) == 1
+    attempt = evidence["attempts"][0]
+    assert attempt["returncode"] == 0
+    assert attempt["stop_reason"] is attempt["partial_journal_line"] is None
+    events = attempt["events"]
+    assert events[-1] == {"event": "worker_complete", "report_hash": evidence["report_hash"]}
+    starts = [row for row in events if row["event"] == "start"]
+    finishes = [row for row in events if row["event"] == "finish"]
+    assert [row["sequence"] for row in starts] == list(range(1, len(starts) + 1))
+    assert [row["sequence"] for row in finishes] == [row["sequence"] for row in starts]
+    assert all(row["outcome"] == "passed" and row["exception_type"] is None for row in finishes)
+    assert all(row["wall_seconds"] >= 0 and row["cpu_seconds"] >= 0 for row in finishes)
+    assert [row["name"] for row in finishes if row["phase"] == "full_report"] == [
+        "suite_measure",
+        "report_json_roundtrip",
+        "suite_from_payload",
+    ]
+    for case_id in case_ids:
+        components = [
+            row
+            for row in finishes
+            if row["phase"] == "prepared_component_pass" and row["case_id"] == case_id
+        ]
+        assert [row["index"] for row in components if row["name"] == "fresh_fork"] == list(
+            range(11)
+        )
+        assert {row["name"] for row in components} >= {
+            "endpoint_reproduction",
+            "origin_admission",
+            "prefix_reconstruction",
+            "persistence_encode",
+            "persistence_restore",
+            "replay_load_and_run",
+            "finite_generation",
+            "finite_fresh_fork_validation",
+            "placement_generation",
+            "placement_fresh_fork_validation",
+        }
+        for role, count in (("generated", 9), ("reference", 10)):
+            placements = [
+                row
+                for row in components
+                if row["name"] == "placement_fresh_fork_validation" and row["role"] == role
+            ]
+            assert [row["index"] for row in placements] == [4, 6, 8, 10]
+            assert all(row["candidate_count"] == count for row in placements)
+    assert evidence["summary"] == costs.summarize(evidence["attempts"])

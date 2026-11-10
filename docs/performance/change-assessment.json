@@ -1,416 +1,520 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "a3cf8f75331a83e065a2ad08b7d787c3a33ba482",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:edda12efc466e3ea464ceac89263ed39ebeb2d5ac09026aa3dd38ea2c9b2f1ee",
-  "operation_map_sha256": "c13a600de46cb64b330324e577ee3acebbf683cb9a77ba5ddee89d3ca3b12323",
+  "base": "f95a2c1b66b881dbd52409d8d4c8b703c4d558c4",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:66abc9d0afe9ab335e2a80a9d3ea86c2ef53415078cbb5dc922131c5aca232bb",
+  "operation_map_sha256": "928f2d0a41e2cfc0aa49de35c04c31d6cfe68f0c5d56e39dce2fd2e780206e71",
   "changes": {
     "README.md": {
-      "before_sha256": "016235a0377674f4d18da33edeba7117992ddf349b05e65fcc22e8b789fc4671",
-      "after_sha256": "4b4d4082fe1cccad4560c5cd14a19a6e55523e4a7b7029c74230d2b42cb4acf5",
+      "before_sha256": "4b4d4082fe1cccad4560c5cd14a19a6e55523e4a7b7029c74230d2b42cb4acf5",
+      "after_sha256": "13a4e9032777d5341e622e3e387638bc917fb449537574678a1b44d17958d2b7",
       "owners": {
         "@document": {
-          "before": "016235a0377674f4d18da33edeba7117992ddf349b05e65fcc22e8b789fc4671",
-          "after": "4b4d4082fe1cccad4560c5cd14a19a6e55523e4a7b7029c74230d2b42cb4acf5"
+          "before": "4b4d4082fe1cccad4560c5cd14a19a6e55523e4a7b7029c74230d2b42cb4acf5",
+          "after": "13a4e9032777d5341e622e3e387638bc917fb449537574678a1b44d17958d2b7"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "66d019b0e5dc34ae0ec9680eb45c84e4791b7c6113b6433291be8c8049d1c6c8",
-      "after_sha256": "0b318bf6c067aa1e7045693d5997d2961e87722420ff240fba15cd46eb0c13e5",
+      "before_sha256": "0b318bf6c067aa1e7045693d5997d2961e87722420ff240fba15cd46eb0c13e5",
+      "after_sha256": "c8b33d12b21ea3dd13fa8d42f39337f292b7e54a58b5660bcc40684b18f15207",
       "owners": {
         "@document": {
-          "before": "66d019b0e5dc34ae0ec9680eb45c84e4791b7c6113b6433291be8c8049d1c6c8",
-          "after": "0b318bf6c067aa1e7045693d5997d2961e87722420ff240fba15cd46eb0c13e5"
+          "before": "0b318bf6c067aa1e7045693d5997d2961e87722420ff240fba15cd46eb0c13e5",
+          "after": "c8b33d12b21ea3dd13fa8d42f39337f292b7e54a58b5660bcc40684b18f15207"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
-      "before_sha256": "3f51275bdca8e720c6ddcdeed6723f59e658c7816abaf37f0130d6d5c4b7d721",
-      "after_sha256": "e837ceaa85b50c6e0c6d682a98a15a3eb13a19f59dddfa49ea2a99947b9c867c",
+      "before_sha256": "e837ceaa85b50c6e0c6d682a98a15a3eb13a19f59dddfa49ea2a99947b9c867c",
+      "after_sha256": "fb6d491ad8ac31420b7781fead8c9e468fe8c7d80064e5486da4ccbdc0a5a80f",
       "owners": {
         "@document": {
-          "before": "3f51275bdca8e720c6ddcdeed6723f59e658c7816abaf37f0130d6d5c4b7d721",
-          "after": "e837ceaa85b50c6e0c6d682a98a15a3eb13a19f59dddfa49ea2a99947b9c867c"
+          "before": "e837ceaa85b50c6e0c6d682a98a15a3eb13a19f59dddfa49ea2a99947b9c867c",
+          "after": "fb6d491ad8ac31420b7781fead8c9e468fe8c7d80064e5486da4ccbdc0a5a80f"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "616250e1c6ad1caa2c9017e755fcac1d60cf7c377fb28b9799e28b77a9c979e9",
-      "after_sha256": "7ef519ac852de2fd5284b49409f05faf05adfb9b3575a1abc45efa7c7e71a412",
+      "before_sha256": "7ef519ac852de2fd5284b49409f05faf05adfb9b3575a1abc45efa7c7e71a412",
+      "after_sha256": "ec32ee95e13becdcbf194f0afd2410b5ff429c055e2a81908f2eb9f1c3d94733",
       "owners": {
         "@document": {
-          "before": "616250e1c6ad1caa2c9017e755fcac1d60cf7c377fb28b9799e28b77a9c979e9",
-          "after": "7ef519ac852de2fd5284b49409f05faf05adfb9b3575a1abc45efa7c7e71a412"
+          "before": "7ef519ac852de2fd5284b49409f05faf05adfb9b3575a1abc45efa7c7e71a412",
+          "after": "ec32ee95e13becdcbf194f0afd2410b5ff429c055e2a81908f2eb9f1c3d94733"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "56b1f411ad69feebc0b077c8c0ebf06c3e02bd7d84006bde2d04e03d228c01f5",
-      "after_sha256": "42349b1f45e27e774810981731cc6c0bdc0925eb1f7a31e5f3b4ad06644dd22b",
+      "before_sha256": "42349b1f45e27e774810981731cc6c0bdc0925eb1f7a31e5f3b4ad06644dd22b",
+      "after_sha256": "c782d72fdbbb58f87f2b64679d554c9b05e3a856f727d6547b25cf59227613a9",
       "owners": {
         "@document": {
-          "before": "56b1f411ad69feebc0b077c8c0ebf06c3e02bd7d84006bde2d04e03d228c01f5",
-          "after": "42349b1f45e27e774810981731cc6c0bdc0925eb1f7a31e5f3b4ad06644dd22b"
+          "before": "42349b1f45e27e774810981731cc6c0bdc0925eb1f7a31e5f3b4ad06644dd22b",
+          "after": "c782d72fdbbb58f87f2b64679d554c9b05e3a856f727d6547b25cf59227613a9"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "5802ae0d5e075d901b3a6976f7f88b25fa8881c0da3c5842f57dc9c7e9009ca9",
-      "after_sha256": "6bd7430b9c4e64cb82f9ac6f3d9c8251361e69a9d272f8e0872ce2f79222406b",
+      "before_sha256": "6bd7430b9c4e64cb82f9ac6f3d9c8251361e69a9d272f8e0872ce2f79222406b",
+      "after_sha256": "1d4ff16496c3512f76771434df1240249f616f7b3b97d45046b076b21bd1562e",
       "owners": {
         "@document": {
-          "before": "5802ae0d5e075d901b3a6976f7f88b25fa8881c0da3c5842f57dc9c7e9009ca9",
-          "after": "6bd7430b9c4e64cb82f9ac6f3d9c8251361e69a9d272f8e0872ce2f79222406b"
+          "before": "6bd7430b9c4e64cb82f9ac6f3d9c8251361e69a9d272f8e0872ce2f79222406b",
+          "after": "1d4ff16496c3512f76771434df1240249f616f7b3b97d45046b076b21bd1562e"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "7eb1a629a9a0eef41083ab9253828c473bd01805d03711e7b8cf1da9a85ae5cb",
-      "after_sha256": "3352e9ef0c09efdba03dc20ebec53ad86c22841e61913dbbbdc62217f3705946",
+      "before_sha256": "3352e9ef0c09efdba03dc20ebec53ad86c22841e61913dbbbdc62217f3705946",
+      "after_sha256": "ebb0ec54ba3dcf181522082bc979fcf6ac46a48e6aacb81711fd9f1ed6e5d84d",
       "owners": {
         "@document": {
-          "before": "7eb1a629a9a0eef41083ab9253828c473bd01805d03711e7b8cf1da9a85ae5cb",
-          "after": "3352e9ef0c09efdba03dc20ebec53ad86c22841e61913dbbbdc62217f3705946"
+          "before": "3352e9ef0c09efdba03dc20ebec53ad86c22841e61913dbbbdc62217f3705946",
+          "after": "ebb0ec54ba3dcf181522082bc979fcf6ac46a48e6aacb81711fd9f1ed6e5d84d"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "1a628864c8eff8b63f31cfa4b143c207715783d21dbd54cbcbbedc85297487ef",
-      "after_sha256": "a32932fc7a0632c723f4ed53c36bcf828ab9d0a5b8b77f7e8fba3d22ccd2f661",
+      "before_sha256": "a32932fc7a0632c723f4ed53c36bcf828ab9d0a5b8b77f7e8fba3d22ccd2f661",
+      "after_sha256": "190d07b984b43976fc64111e028de882c9df5e795b47835db0424d0cc7c8c38a",
       "owners": {
         "@document": {
-          "before": "1a628864c8eff8b63f31cfa4b143c207715783d21dbd54cbcbbedc85297487ef",
-          "after": "a32932fc7a0632c723f4ed53c36bcf828ab9d0a5b8b77f7e8fba3d22ccd2f661"
+          "before": "a32932fc7a0632c723f4ed53c36bcf828ab9d0a5b8b77f7e8fba3d22ccd2f661",
+          "after": "190d07b984b43976fc64111e028de882c9df5e795b47835db0424d0cc7c8c38a"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "d1011ccb784cacee0b6312333394fa5de4ac5728bfd9a81a4df8cfd7b4a0c1b9",
-      "after_sha256": "32665c9f9370d95efc4294f02b5a4c2bc7a3793ed193e9b92c3b55922987afa3",
+      "before_sha256": "32665c9f9370d95efc4294f02b5a4c2bc7a3793ed193e9b92c3b55922987afa3",
+      "after_sha256": "a0f11de0f9be75f28d49156a2074a5091a93451c95e23e6cb9f8cf16c65ea0dd",
       "owners": {
         "@document": {
-          "before": "d1011ccb784cacee0b6312333394fa5de4ac5728bfd9a81a4df8cfd7b4a0c1b9",
-          "after": "32665c9f9370d95efc4294f02b5a4c2bc7a3793ed193e9b92c3b55922987afa3"
+          "before": "32665c9f9370d95efc4294f02b5a4c2bc7a3793ed193e9b92c3b55922987afa3",
+          "after": "a0f11de0f9be75f28d49156a2074a5091a93451c95e23e6cb9f8cf16c65ea0dd"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "5a4fd0f4132cf4e32ece57ef9e259884649e742275dbe650e04b3fdd81914071",
-      "after_sha256": "839f1bf714ef24edf032b864e7f4248d00b7be69114af2d58cc1f976a297632b",
+      "before_sha256": "839f1bf714ef24edf032b864e7f4248d00b7be69114af2d58cc1f976a297632b",
+      "after_sha256": "1b8cf9afd3a9e3c3ea0af880cfbb4640a117acbbb8b015e4fbe986ce710980c6",
       "owners": {
         "@document": {
-          "before": "5a4fd0f4132cf4e32ece57ef9e259884649e742275dbe650e04b3fdd81914071",
-          "after": "839f1bf714ef24edf032b864e7f4248d00b7be69114af2d58cc1f976a297632b"
+          "before": "839f1bf714ef24edf032b864e7f4248d00b7be69114af2d58cc1f976a297632b",
+          "after": "1b8cf9afd3a9e3c3ea0af880cfbb4640a117acbbb8b015e4fbe986ce710980c6"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "1b982545a527b06cfa0cfb31e35a9c3d9b569324edd980f564d13edd96c0a13f",
-      "after_sha256": "ba3a45f83e36986f4e5019d24be73a38b45e5d7629368b9ab3c0e1461a4ce285",
+      "before_sha256": "ba3a45f83e36986f4e5019d24be73a38b45e5d7629368b9ab3c0e1461a4ce285",
+      "after_sha256": "03db366eea0a7579237859ab15df6e39701fa710e2adce6539e1a45bafb275c3",
       "owners": {
         "@document": {
-          "before": "1b982545a527b06cfa0cfb31e35a9c3d9b569324edd980f564d13edd96c0a13f",
-          "after": "ba3a45f83e36986f4e5019d24be73a38b45e5d7629368b9ab3c0e1461a4ce285"
+          "before": "ba3a45f83e36986f4e5019d24be73a38b45e5d7629368b9ab3c0e1461a4ce285",
+          "after": "03db366eea0a7579237859ab15df6e39701fa710e2adce6539e1a45bafb275c3"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "39bd0eb2b2b6986b1307e5226fd72234eb03f8cd850c6413923f118e3632e99c",
-      "after_sha256": "acb220cd7f5f2afb2b7a903db67095bed022f3f68975d781c9ffded0d2caacea",
+      "before_sha256": "acb220cd7f5f2afb2b7a903db67095bed022f3f68975d781c9ffded0d2caacea",
+      "after_sha256": "28472c64ad88ae5791a9fc323242665947f669a14cd1fde98194c5e293ba22e1",
       "owners": {
         "@document": {
-          "before": "39bd0eb2b2b6986b1307e5226fd72234eb03f8cd850c6413923f118e3632e99c",
-          "after": "acb220cd7f5f2afb2b7a903db67095bed022f3f68975d781c9ffded0d2caacea"
+          "before": "acb220cd7f5f2afb2b7a903db67095bed022f3f68975d781c9ffded0d2caacea",
+          "after": "28472c64ad88ae5791a9fc323242665947f669a14cd1fde98194c5e293ba22e1"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "6ab429094673f67f33a0e54b68c236b55029afec85e5f330e4a6126bfb397e02",
-      "after_sha256": "eb3a9ea06a8307bff87f3ae59c22b8109fc4bc367a2a63bdbe15d1a556c2a806",
+      "before_sha256": "eb3a9ea06a8307bff87f3ae59c22b8109fc4bc367a2a63bdbe15d1a556c2a806",
+      "after_sha256": "9169e1e8fcb9c7d27b514213a45900476b510e39b8510248ef2bb3c27fda7232",
       "owners": {
         "@document": {
-          "before": "6ab429094673f67f33a0e54b68c236b55029afec85e5f330e4a6126bfb397e02",
-          "after": "eb3a9ea06a8307bff87f3ae59c22b8109fc4bc367a2a63bdbe15d1a556c2a806"
+          "before": "eb3a9ea06a8307bff87f3ae59c22b8109fc4bc367a2a63bdbe15d1a556c2a806",
+          "after": "9169e1e8fcb9c7d27b514213a45900476b510e39b8510248ef2bb3c27fda7232"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "4e1535a6b07bd71857485a66e460dc8f9186407153bd4058adddbb8720090cd8",
-      "after_sha256": "bc7e345361319c3daaaffb9036fc567957e709d125aebfc3296265db27e07fec",
+      "before_sha256": "bc7e345361319c3daaaffb9036fc567957e709d125aebfc3296265db27e07fec",
+      "after_sha256": "01b5dac478f646937c1aa37c5e5fd55c08ffac9c6725330c03bc9b3c1cc95188",
       "owners": {
         "@document": {
-          "before": "4e1535a6b07bd71857485a66e460dc8f9186407153bd4058adddbb8720090cd8",
-          "after": "bc7e345361319c3daaaffb9036fc567957e709d125aebfc3296265db27e07fec"
+          "before": "bc7e345361319c3daaaffb9036fc567957e709d125aebfc3296265db27e07fec",
+          "after": "01b5dac478f646937c1aa37c5e5fd55c08ffac9c6725330c03bc9b3c1cc95188"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "330be237077cf38a62719de11f3e8edb85dc8c620b2f42dd380eadf4c41a1450",
-      "after_sha256": "8e1de921da31ac27f586c954d6a1aea20e67bc3f7c5f37618c52e8facf658436",
+      "before_sha256": "8e1de921da31ac27f586c954d6a1aea20e67bc3f7c5f37618c52e8facf658436",
+      "after_sha256": "eb37a5d31d5ec4c4cb2a0bf387dd93a5edddd3bbb531d626aa8b2346f655e8c9",
       "owners": {
         "@document": {
-          "before": "330be237077cf38a62719de11f3e8edb85dc8c620b2f42dd380eadf4c41a1450",
-          "after": "8e1de921da31ac27f586c954d6a1aea20e67bc3f7c5f37618c52e8facf658436"
+          "before": "8e1de921da31ac27f586c954d6a1aea20e67bc3f7c5f37618c52e8facf658436",
+          "after": "eb37a5d31d5ec4c4cb2a0bf387dd93a5edddd3bbb531d626aa8b2346f655e8c9"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "68728550f58a918969b33e5925201571fbbeebd68c1569e98930492181beb94b",
-      "after_sha256": "ecbbeb18568595ef0bfd3dec9a2c24e9be0592df212aeb342b73ce30f66db74e",
+      "before_sha256": "ecbbeb18568595ef0bfd3dec9a2c24e9be0592df212aeb342b73ce30f66db74e",
+      "after_sha256": "59932a0f08cc069fd15acd7038dcfd4c1f68ed694cdd79a7ee2ba149778e3ff7",
       "owners": {
         "@document": {
-          "before": "68728550f58a918969b33e5925201571fbbeebd68c1569e98930492181beb94b",
-          "after": "ecbbeb18568595ef0bfd3dec9a2c24e9be0592df212aeb342b73ce30f66db74e"
+          "before": "ecbbeb18568595ef0bfd3dec9a2c24e9be0592df212aeb342b73ce30f66db74e",
+          "after": "59932a0f08cc069fd15acd7038dcfd4c1f68ed694cdd79a7ee2ba149778e3ff7"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "8e62b744d02bf3277ba20809960130fc8dd725c10226fdbb2a67d7d9c19c0e81",
-      "after_sha256": "d05911467f8bbcfed67eb3eb1ca1d4468ecb53ecd3c362f1e395a9b5d56e9fe7",
+      "before_sha256": "d05911467f8bbcfed67eb3eb1ca1d4468ecb53ecd3c362f1e395a9b5d56e9fe7",
+      "after_sha256": "0b804c263dfc3c2395cd013686df7ec1244bc4a825e1af9b4fe3e5150f48d1d3",
       "owners": {
         "@document": {
-          "before": "8e62b744d02bf3277ba20809960130fc8dd725c10226fdbb2a67d7d9c19c0e81",
-          "after": "d05911467f8bbcfed67eb3eb1ca1d4468ecb53ecd3c362f1e395a9b5d56e9fe7"
+          "before": "d05911467f8bbcfed67eb3eb1ca1d4468ecb53ecd3c362f1e395a9b5d56e9fe7",
+          "after": "0b804c263dfc3c2395cd013686df7ec1244bc4a825e1af9b4fe3e5150f48d1d3"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "df8061cf7cb374fcb6a6d68c3384548a72f36f272e82284285449482cb2ea732",
-      "after_sha256": "8ff2615cd47016d82643031b751edff5f2b7fa7d96588a0f5ffc64ddbd27d80a",
+      "before_sha256": "8ff2615cd47016d82643031b751edff5f2b7fa7d96588a0f5ffc64ddbd27d80a",
+      "after_sha256": "ca36eff99261ad4d3bab2c91d60b9b8d976ffabf9a52fb9aa88348308a13c512",
       "owners": {
         "@document": {
-          "before": "df8061cf7cb374fcb6a6d68c3384548a72f36f272e82284285449482cb2ea732",
-          "after": "8ff2615cd47016d82643031b751edff5f2b7fa7d96588a0f5ffc64ddbd27d80a"
+          "before": "8ff2615cd47016d82643031b751edff5f2b7fa7d96588a0f5ffc64ddbd27d80a",
+          "after": "ca36eff99261ad4d3bab2c91d60b9b8d976ffabf9a52fb9aa88348308a13c512"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "1dfe2df83ab08ea96568c7f8b44f4f1e11dc085bd334d62ec88e0f41ee626f68",
-      "after_sha256": "72081a5977c17959f292f3a73cba4e077df3ae0254aa4eca1a1f8d3567fab5c9",
+      "before_sha256": "72081a5977c17959f292f3a73cba4e077df3ae0254aa4eca1a1f8d3567fab5c9",
+      "after_sha256": "e34ca60267d2468d3c9a02fdfb38df83712f104ea78e840e3039af2bb75595d0",
       "owners": {
         "@document": {
-          "before": "1dfe2df83ab08ea96568c7f8b44f4f1e11dc085bd334d62ec88e0f41ee626f68",
-          "after": "72081a5977c17959f292f3a73cba4e077df3ae0254aa4eca1a1f8d3567fab5c9"
+          "before": "72081a5977c17959f292f3a73cba4e077df3ae0254aa4eca1a1f8d3567fab5c9",
+          "after": "e34ca60267d2468d3c9a02fdfb38df83712f104ea78e840e3039af2bb75595d0"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "5e09b9c73ed4c53c6de028fdbc8451cdc25e3af582f255ef89b5ae7835698c8d",
-      "after_sha256": "6eaeecefba854f0ca61beb2d87137cb29e254f27e8ee45dbe11cb40cd7ff0c01",
+      "before_sha256": "6eaeecefba854f0ca61beb2d87137cb29e254f27e8ee45dbe11cb40cd7ff0c01",
+      "after_sha256": "573f798809de5b5594ecc65a1e35ced88b966398ec7f5531a062efc30fa388e0",
       "owners": {
         "@document": {
-          "before": "5e09b9c73ed4c53c6de028fdbc8451cdc25e3af582f255ef89b5ae7835698c8d",
-          "after": "6eaeecefba854f0ca61beb2d87137cb29e254f27e8ee45dbe11cb40cd7ff0c01"
+          "before": "6eaeecefba854f0ca61beb2d87137cb29e254f27e8ee45dbe11cb40cd7ff0c01",
+          "after": "573f798809de5b5594ecc65a1e35ced88b966398ec7f5531a062efc30fa388e0"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "471325edaa42fec8cf9b589ee6c808a562d2eadfa50ec7a3a31351c2456e58a7",
-      "after_sha256": "790bbcf9c165e28566b1128b0129722b3e7935301a913781027113a036c7368d",
+      "before_sha256": "790bbcf9c165e28566b1128b0129722b3e7935301a913781027113a036c7368d",
+      "after_sha256": "3e1f9816bddf16172758f52222f29f368ad9ab8b56c93cfbb83ed79ca0e19dde",
       "owners": {
         "@document": {
-          "before": "471325edaa42fec8cf9b589ee6c808a562d2eadfa50ec7a3a31351c2456e58a7",
-          "after": "790bbcf9c165e28566b1128b0129722b3e7935301a913781027113a036c7368d"
+          "before": "790bbcf9c165e28566b1128b0129722b3e7935301a913781027113a036c7368d",
+          "after": "3e1f9816bddf16172758f52222f29f368ad9ab8b56c93cfbb83ed79ca0e19dde"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "de03c3024d06de926b7e804e79d43dd2716414e05ecb1bdc496354acbfa80bdb",
-      "after_sha256": "1a0daffeffe1a6dc9820e7a6d4a3b9e589003626783c303d497595d2a9baace7",
+      "before_sha256": "1a0daffeffe1a6dc9820e7a6d4a3b9e589003626783c303d497595d2a9baace7",
+      "after_sha256": "e469e163cc9b5bed586528b9b852030d39f9c1ccf5f23c81a8ea7e43d35ace8d",
       "owners": {
         "@document": {
-          "before": "de03c3024d06de926b7e804e79d43dd2716414e05ecb1bdc496354acbfa80bdb",
-          "after": "1a0daffeffe1a6dc9820e7a6d4a3b9e589003626783c303d497595d2a9baace7"
+          "before": "1a0daffeffe1a6dc9820e7a6d4a3b9e589003626783c303d497595d2a9baace7",
+          "after": "e469e163cc9b5bed586528b9b852030d39f9c1ccf5f23c81a8ea7e43d35ace8d"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "724649b548de22c11f5f1d67b8dcc931b9c9e3c13ed314912c3018309ad24168",
-      "after_sha256": "320ff428887a521696a2c3cc6b8f29ba1f1d79ee789203d682c1195b3560b152",
+      "before_sha256": "320ff428887a521696a2c3cc6b8f29ba1f1d79ee789203d682c1195b3560b152",
+      "after_sha256": "89d521a52bc21cabcf5348d99009eabcad385cc027d74e8d3d66653075304735",
       "owners": {
         "@document": {
-          "before": "724649b548de22c11f5f1d67b8dcc931b9c9e3c13ed314912c3018309ad24168",
-          "after": "320ff428887a521696a2c3cc6b8f29ba1f1d79ee789203d682c1195b3560b152"
+          "before": "320ff428887a521696a2c3cc6b8f29ba1f1d79ee789203d682c1195b3560b152",
+          "after": "89d521a52bc21cabcf5348d99009eabcad385cc027d74e8d3d66653075304735"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "a71a6f8a2e956fbf3341bda49b3cc28406a34d831e36cd163c16c2463fe18cbb",
-      "after_sha256": "7c48cdeb42c66e7bd94497b7ed13d37c289c6d959b1efa4bcb1b1b69c55c789d",
+      "before_sha256": "7c48cdeb42c66e7bd94497b7ed13d37c289c6d959b1efa4bcb1b1b69c55c789d",
+      "after_sha256": "e48040ec88892e5ee2e2944e1ef72d7ad905cb290c09fbcf494e2e5e415d9b64",
       "owners": {
         "@document": {
-          "before": "a71a6f8a2e956fbf3341bda49b3cc28406a34d831e36cd163c16c2463fe18cbb",
-          "after": "7c48cdeb42c66e7bd94497b7ed13d37c289c6d959b1efa4bcb1b1b69c55c789d"
+          "before": "7c48cdeb42c66e7bd94497b7ed13d37c289c6d959b1efa4bcb1b1b69c55c789d",
+          "after": "e48040ec88892e5ee2e2944e1ef72d7ad905cb290c09fbcf494e2e5e415d9b64"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "cc759500c11a3767ffc877cdfcfc288722cbd4b62d8a046be38956d22361a3cc",
-      "after_sha256": "2c738835f8c62440909fd07b967cc0d399fe2eec078f6b09fa321bf3372c791d",
+      "before_sha256": "2c738835f8c62440909fd07b967cc0d399fe2eec078f6b09fa321bf3372c791d",
+      "after_sha256": "2c81917d7a7ab66f93b5648c4bf4fc90ecdb28347226f253cb174baed0e18e0d",
       "owners": {
         "@document": {
-          "before": "cc759500c11a3767ffc877cdfcfc288722cbd4b62d8a046be38956d22361a3cc",
-          "after": "2c738835f8c62440909fd07b967cc0d399fe2eec078f6b09fa321bf3372c791d"
+          "before": "2c738835f8c62440909fd07b967cc0d399fe2eec078f6b09fa321bf3372c791d",
+          "after": "2c81917d7a7ab66f93b5648c4bf4fc90ecdb28347226f253cb174baed0e18e0d"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "c907de3a81f27a7fdfd24945bd3a5dc61d555a7eea7617f8de361db3d52fad0c",
-      "after_sha256": "2be6dcf8b21b21db85a3ddb514377f6cbd97c9dc8a081dd3c50de7be1f5cdda3",
+      "before_sha256": "2be6dcf8b21b21db85a3ddb514377f6cbd97c9dc8a081dd3c50de7be1f5cdda3",
+      "after_sha256": "d6ee54e0f210911925a670a0bbb3940c467f9bfefa1b6fdf99eeb0040967d048",
       "owners": {
         "@document": {
-          "before": "c907de3a81f27a7fdfd24945bd3a5dc61d555a7eea7617f8de361db3d52fad0c",
-          "after": "2be6dcf8b21b21db85a3ddb514377f6cbd97c9dc8a081dd3c50de7be1f5cdda3"
+          "before": "2be6dcf8b21b21db85a3ddb514377f6cbd97c9dc8a081dd3c50de7be1f5cdda3",
+          "after": "d6ee54e0f210911925a670a0bbb3940c467f9bfefa1b6fdf99eeb0040967d048"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "f367e1f14601cfcc77148e3e5da446eac7926d5b6aea4d6f53bb397a830c55d1",
-      "after_sha256": "392b8b025cee825817ff8914f62279b7293f97edddf65904f567cbd35839b5aa",
+      "before_sha256": "392b8b025cee825817ff8914f62279b7293f97edddf65904f567cbd35839b5aa",
+      "after_sha256": "8abe43a7504a64625b313344436a6b246d4c92ad3bfe3bd694b5c9aad0150045",
       "owners": {
         "@document": {
-          "before": "f367e1f14601cfcc77148e3e5da446eac7926d5b6aea4d6f53bb397a830c55d1",
-          "after": "392b8b025cee825817ff8914f62279b7293f97edddf65904f567cbd35839b5aa"
+          "before": "392b8b025cee825817ff8914f62279b7293f97edddf65904f567cbd35839b5aa",
+          "after": "8abe43a7504a64625b313344436a6b246d4c92ad3bfe3bd694b5c9aad0150045"
         }
       }
     },
     "docs/performance/CANONICAL_DEPLOYMENT_COSTS.md": {
-      "before_sha256": "dee154ce0938381b4072440c487d1b77f2f02045aeff773ac00f8ebbb699006b",
-      "after_sha256": "ffefc17708685697a037238fb70264c2481b71fdc27a74f5fcc6e1839502d731",
+      "before_sha256": "ffefc17708685697a037238fb70264c2481b71fdc27a74f5fcc6e1839502d731",
+      "after_sha256": "abed58814b8bf4282ee3d0cd4d6dc33f3db5ff54630ff6ebc72174e1bc814331",
       "owners": {
         "@document": {
-          "before": "dee154ce0938381b4072440c487d1b77f2f02045aeff773ac00f8ebbb699006b",
-          "after": "ffefc17708685697a037238fb70264c2481b71fdc27a74f5fcc6e1839502d731"
+          "before": "ffefc17708685697a037238fb70264c2481b71fdc27a74f5fcc6e1839502d731",
+          "after": "abed58814b8bf4282ee3d0cd4d6dc33f3db5ff54630ff6ebc72174e1bc814331"
         }
       }
     },
-    "docs/performance/canonical-placement-second-ring/base-measurement.json": {
+    "docs/performance/deployment-reference-suite-v1/definition.json": {
       "before_sha256": null,
-      "after_sha256": "5c798a78f142bf2ae35dbc439d88e104c6ab95bc0c5b390b7749fea244fb14a2",
+      "after_sha256": "8d597246eaa9410fccfe8569cae8d19d6f5c0d5a661bbf7202d427da1e3338d2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5c798a78f142bf2ae35dbc439d88e104c6ab95bc0c5b390b7749fea244fb14a2"
+          "after": "8d597246eaa9410fccfe8569cae8d19d6f5c0d5a661bbf7202d427da1e3338d2"
         }
       }
     },
-    "docs/performance/canonical-placement-second-ring/head-coverage.json": {
+    "docs/performance/deployment-reference-suite-v1/measured-driver-source.json": {
       "before_sha256": null,
-      "after_sha256": "c3a99f9237f6bcae5a792abc13234b1f7b14703f32d19417bd2880ffa66152e0",
+      "after_sha256": "c7d141a15cc18f56203134427d532ee466ffa3bf681a67d436446f394209f3d5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c3a99f9237f6bcae5a792abc13234b1f7b14703f32d19417bd2880ffa66152e0"
+          "after": "c7d141a15cc18f56203134427d532ee466ffa3bf681a67d436446f394209f3d5"
         }
       }
     },
-    "docs/performance/canonical-placement-second-ring/head-measurement.json": {
+    "docs/performance/deployment-reference-suite-v1/measurement.json": {
       "before_sha256": null,
-      "after_sha256": "789fd4b46322cf239df7668d83df97d39e7e119ab1933a5fa3502b186bed0e32",
+      "after_sha256": "61ee949ff9734cb2f0331c86f4c0fddabce7a8625d355a8e14517b5b343bdea8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "789fd4b46322cf239df7668d83df97d39e7e119ab1933a5fa3502b186bed0e32"
+          "after": "61ee949ff9734cb2f0331c86f4c0fddabce7a8625d355a8e14517b5b343bdea8"
+        }
+      }
+    },
+    "docs/performance/deployment-reference-suite-v1/suite-report.json": {
+      "before_sha256": null,
+      "after_sha256": "3309703502205bbd2f83ec887980ecc0b3e904c9a318618f261a43ffa7c50ff5",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "3309703502205bbd2f83ec887980ecc0b3e904c9a318618f261a43ffa7c50ff5"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "69f7cfd2b1cd9ca1d501cc49bb95ce706f08e3a01420ad4e8c1ff0955b144cde",
+      "after_sha256": "8033a1a84fa98c8cfd0edc4c872c031de5cd312adb22c4feabf2ffa5a36aa66e",
+      "owners": {
+        "@document": {
+          "before": "69f7cfd2b1cd9ca1d501cc49bb95ce706f08e3a01420ad4e8c1ff0955b144cde",
+          "after": "8033a1a84fa98c8cfd0edc4c872c031de5cd312adb22c4feabf2ffa5a36aa66e"
         }
       }
     },
     "scripts/measure_canonical_deployment_costs.py": {
-      "before_sha256": "f42cc809bcef02445fc1d3651467be2036dd61727cbb3125937db930870e2c1f",
-      "after_sha256": "6fd54cf4b931c7b33c96d3dd27133b04a4ee8e0da870d7703dabc64c4a0485bf",
+      "before_sha256": "6fd54cf4b931c7b33c96d3dd27133b04a4ee8e0da870d7703dabc64c4a0485bf",
+      "after_sha256": "9dd4e2cf42e060716b950a2ab71ae0ba4f2f5fc429fca170ceeec38da71b300a",
       "owners": {
+        "campaign": {
+          "before": "f7e5f523d1b67a7fa9d73411d2220a092f14c4984bc963dbc6eb5b2fae074297",
+          "after": "bfd9ab4ddd2b04206a5ebab2593e83e72f45678389042d5950e3a7e3af4db76c"
+        },
+        "candidate_components": {
+          "before": null,
+          "after": "e0e85621a815abba6df686028fe2e8c67c27dd22d9a0008c61e93112795af18e"
+        },
+        "main": {
+          "before": "0404b97662c17e7136310866998ee08274b2d79858673a4e2a542dc35be10e25",
+          "after": "a77600c8755b3e0c978558b8a388b96edc3842bb591203e99a3fa69de8de4a61"
+        },
+        "parser": {
+          "before": "13fb79412c19bccdf09949d71f5bcbfa5a25aa5e6d7ffb8cace09ec4b9ca9b09",
+          "after": "f1d44c3581f9cc1f55879e7cddac938deb2e9e6d1b5b03109c164c5dfe14739a"
+        },
+        "reference_suite_worker": {
+          "before": null,
+          "after": "8725373be24943cef0f773279f9a1eff880256a3b11f52e5291702fc8e3bf768"
+        },
+        "summarize": {
+          "before": "ffae0f523446c4d8deafa2336e1d575e970f8be1e5e65ec04892547df54379be",
+          "after": "4b322d8df4cc4435bb6877c64db9cf966a75fd4acbbd02d473fdd1205e10006c"
+        },
         "worker": {
-          "before": "b4ab8d36057297de1f7d4d0b296949ead15f1608a1cfd00fffa52af3a29e3824",
-          "after": "4a0fdbaf4654dfb8d6c135d528da438bfce0999d9f9a6b3fa2b86d0764684e25"
+          "before": "4a0fdbaf4654dfb8d6c135d528da438bfce0999d9f9a6b3fa2b86d0764684e25",
+          "after": "102f174675bcad1a42f946e3d2a3c6f58c93b32b7c6b1cdd734042d10cbf655a"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "2b4f43ab905c6e6d084c7dbb454341ee89ad85dba110f86c338a8428dc688a14",
-      "after_sha256": "221e68074024876335aa30a827eb4b1c3b0773887e97ca8927eb0a65dc3c4bf2",
+      "before_sha256": "221e68074024876335aa30a827eb4b1c3b0773887e97ca8927eb0a65dc3c4bf2",
+      "after_sha256": "2cf0d3ca5cd698ff071b8b7212d2db2b4e0dde1f47e99dfd3638ab9d28b551db",
       "owners": {
         "@document": {
-          "before": "2b4f43ab905c6e6d084c7dbb454341ee89ad85dba110f86c338a8428dc688a14",
-          "after": "221e68074024876335aa30a827eb4b1c3b0773887e97ca8927eb0a65dc3c4bf2"
+          "before": "221e68074024876335aa30a827eb4b1c3b0773887e97ca8927eb0a65dc3c4bf2",
+          "after": "2cf0d3ca5cd698ff071b8b7212d2db2b4e0dde1f47e99dfd3638ab9d28b551db"
+        }
+      }
+    },
+    "src/warhammer40k_core/ai/canonical_deployment.py": {
+      "before_sha256": "13891f341227eee17583d59b314a01622c4b7414b2a4871ef34359050966b2b1",
+      "after_sha256": "d8dc60654a1da1d61b6b640c1480fae5bc8c6721a662c78a6837f1a618bd39ae",
+      "owners": {
+        "_RecipePolicy.__init__": {
+          "before": "9fbedf46b87d64fe9ff163b0bd42c2b928a480df1c870bb1a7639c542f7988b2",
+          "after": "744ed2c8a1ec12e0f6eb6188b4df6347b8c960236da06870223da77cb8b81690"
+        },
+        "_RecipePolicy.choose": {
+          "before": "478e089b7f28edfca837795c3d88e30ca4fef0b514688e9f47a8808c6eac4da2",
+          "after": "6d492140d11d76e078312936a49aa283d8f5f71ef13087eeacbb5085a6956193"
+        },
+        "_recipe_prefixes": {
+          "before": null,
+          "after": "7c7fab6d46713735a7ee37564327ff7edf3d036a759b020181b65aba77163cc2"
+        },
+        "_reproduce_recipe": {
+          "before": null,
+          "after": "0f33158e2b969965cde8978f076adb750d324abd35f9d40247e185e9e708f557"
+        },
+        "canonical_deployment_prefixes": {
+          "before": "89b24a4dac5014b451badfd81305fab6be81d5b653cebf0b30dc89a3cf320771",
+          "after": "00aab0cfcb3708d9579c234f4cd36855892c129eef0514d32dcb24710026827c"
+        },
+        "reproduce_canonical_deployment": {
+          "before": "897ced83391a077995ab3ff2d85e27faa833aa2cf98cb1712fd37b2a6adc10e2",
+          "after": "d78f19d130738f7463e682959a7fb173db68273bc7fdf12a0ad9019796efc97a"
         }
       }
     },
     "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
-      "before_sha256": "8359f99db29cd9f65dd5d07cff3649f6d3184b02987b0c6f26add1a72c6e3284",
-      "after_sha256": "d3afd9c4931cabeb68154c33c67cafc599497fb903ef7bb51dc414ffd337ba3a",
+      "before_sha256": "d3afd9c4931cabeb68154c33c67cafc599497fb903ef7bb51dc414ffd337ba3a",
+      "after_sha256": "d20502870ec4302048bde101a6518bf760258daa5e54d8cd267aa1ebf5940de4",
       "owners": {
+        "CanonicalDeploymentCoverage.measure": {
+          "before": "2c339e59a8b7b7845cb34ee719697f7e0d2b07b3d285d962316605309689a071",
+          "after": "667b7f30a8034cc421bde91487dddd561fa314c30e33819b3f250c8eaf9c740d"
+        },
+        "_measure_prefixes": {
+          "before": null,
+          "after": "1a024b7d4072c2bb9ed242592a7f996de6439bf90d81ef5d441de3ad1426c26a"
+        },
         "_placement_row": {
-          "before": "3773229c3cda9c97662899a9d7155685e562c41fbe90b5f6ed196a7dbb7c5183",
-          "after": "8c3b83edca2265d8d2de3506cf843434e33a9bcde91969c438c54c421afc17b0"
+          "before": "8c3b83edca2265d8d2de3506cf843434e33a9bcde91969c438c54c421afc17b0",
+          "after": "753cf87410cf05351a590ba47b0d69001686ace8d5ebe73c6508440be1838528"
         }
       }
     },
-    "src/warhammer40k_core/ai/deployment_candidate_search.py": {
-      "before_sha256": "fe63e9d0f1762543769f2b73717aeeb3ea9645d4702dedc7594e6f628fd56f0b",
-      "after_sha256": "e6ede1eb697f088a7a2adf326ad1f22cc49addf93f14ae9a4eee00995f5f0cea",
+    "src/warhammer40k_core/ai/deployment_reference_suite.py": {
+      "before_sha256": null,
+      "after_sha256": "eb3fd7f34e9afe75859311972237aff6827c7361be7b6af6777f363c16c7969f",
       "owners": {
         "@module": {
-          "before": "6539f1b7295e09d1c88fbc56cea30a9ab96a19eb40101dcf37595b418b4d320e",
-          "after": "115a6a45930e2a46f80fec73ba0c0e0622964c670c62a46a8d4dd318fa8f7dc7"
+          "before": null,
+          "after": "79bcc33eb409056e6b73556099dd558a72d612eb1b6ba96ad967679ceecee82f"
+        },
+        "DeploymentReferenceSuite": {
+          "before": null,
+          "after": "b80f419e5531e7e99a11557e06cc004d09383b542d36bfe5e848ed06bd8066ee"
+        },
+        "DeploymentReferenceSuite.__init__": {
+          "before": null,
+          "after": "b3a6f1cb5eb00d2acfd3f5c395398943b672a3f115a597b3c5ceb9b9ff3f44d6"
+        },
+        "DeploymentReferenceSuite.content_hash": {
+          "before": null,
+          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
+        },
+        "DeploymentReferenceSuite.from_payload": {
+          "before": null,
+          "after": "90b51d40c52c8e633ea672803bbae9b67b61eb604e6aea7c3bdc0df77eefd067"
+        },
+        "DeploymentReferenceSuite.measure": {
+          "before": null,
+          "after": "971fe18fd56a193e5df3dcb12043f515f49fb0e28d87482b4123161670cbc69a"
+        },
+        "DeploymentReferenceSuite.to_payload": {
+          "before": null,
+          "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
+        },
+        "measure_reference_case": {
+          "before": null,
+          "after": "d76b640a875664f9025ca1a06b1cb52356c1b6e80c54f9e474ae90f24ef18cd4"
+        },
+        "reference_case_steps": {
+          "before": null,
+          "after": "2e289261f635408a0b638bc681cadd0e4f9df580c67c7b70bbc2d39dbab706bb"
+        },
+        "reference_suite_definition": {
+          "before": null,
+          "after": "7d38d60cc75645436297aa22d45f1bd8729bb3ecfb93cff9aaca1d52e70dde99"
+        },
+        "reproduce_reference_case": {
+          "before": null,
+          "after": "9e736051ec8b651af1116690b1bcf940931a963cb80f3c6b33abf7c182253935"
+        },
+        "require_reference_suite_definition": {
+          "before": null,
+          "after": "6fcf498599b6916f6c1593803706c93be438226052a621076d7d610d1ba0fa01"
         }
       }
     },
     "tests/code_quality/test_canonical_deployment_costs.py": {
-      "before_sha256": "293c3d46c53907915791ad9b13c0cd913a691b745320c586fe2bf7ae1a051bc3",
-      "after_sha256": "1eb2d176087b968f9370f5b09b50632546fead6db5ba2e2095f43c45b614fd66",
+      "before_sha256": "1eb2d176087b968f9370f5b09b50632546fead6db5ba2e2095f43c45b614fd66",
+      "after_sha256": "6286a9bd24461377d221f2f536f4184c98a09e5c5182108ed1aa28093b77828d",
       "owners": {
-        "@module": {
-          "before": "737a88f0a03b5d7b31159eae32457f5ceba295cf6c3d670bb15c0d88eebf7414",
-          "after": "47622b65b4b3b12eeb6df785bd41dfd9a42774dd8b12faf1b575e5721fb58d98"
+        "test_retained_reference_suite_costs_bind_definition_report_and_complete_components": {
+          "before": null,
+          "after": "e9b52e7fffc2a9b9d0f8f65b67c39e907f4a42b27fc00ab7b964a30036359383"
         },
-        "test_retained_canonical_cost_evidence_reconciles_exact_report_and_attempts": {
-          "before": "d3d430b41cbdd4b112c0b957ec6cf2b0838615ddc3eb7c7e34fa4677d123e5d6",
-          "after": "e38e9b2c634f57764feb1176598592d3301129e6c4400d456c78e500afa2627d"
+        "test_suite_costs_keep_case_identity_and_select_explicit_workload": {
+          "before": null,
+          "after": "a162510a332364ad8133fe1627e34532281c3c3d7b6fcf2e5949b1b1874f76d2"
         }
       }
     },
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
-      "before_sha256": "b7efb48d7aa3ddf3b18364d40fa0f5723a082eba63474046ff578f78e47e84a3",
-      "after_sha256": "545060200efd79ca546bd1ef74acd8144ef98cd2ce3ae4504abb8c952bccae1c",
+      "before_sha256": "545060200efd79ca546bd1ef74acd8144ef98cd2ce3ae4504abb8c952bccae1c",
+      "after_sha256": "283f14985e6f32d67b865d1514588ad26b79779cfedc4b902fa895d875bfb5df",
       "owners": {
-        "test_complete_canonical_coverage_reconciles_reproduces_and_rejects_false_denominator": {
-          "before": "040c1b2dd65afa81f9a99819338947b7539716ba01e8c1a7e9ae7f0f3cf3b2b7",
-          "after": "1c01fdaa60e7e792cf1d2e801330a661369e37ceec9b8aac079cea3e3509ab66"
+        "test_reference_case_ordinary_prefixes_geometry_and_feasible_gaps": {
+          "before": null,
+          "after": "130d66a61abee8b59ee47cffb064b401fc03c668457075ccc0cb18aec4eecd2c"
         },
-        "test_nonrecipe_reference_acceptance_roundtrips_without_changing_canonical_prefix": {
-          "before": "07e5f0d756625eb7eaa3abee2e2c6bf47205aafd20f2d7b673e47cb83d823add",
-          "after": "4001c6dc5941cc3f8801d800b79276e5436b5fa38388406dabad626765ad3ebe"
-        }
-      }
-    },
-    "tests/infrastructure/adapters/test_deployment_candidates.py": {
-      "before_sha256": "9b1c97aec569a9f13242b1d7c7a3ae75df9d5c29b0beee5db1715027c3496404",
-      "after_sha256": "0e9f9cb7e0ffdd09e189a1334ca0f823cc956529d604db59400d24f5d46b27d1",
-      "owners": {
-        "test_deployment_generation_has_distinct_geometry_and_stable_detached_roundtrip": {
-          "before": "309387a4fb35f3ef89e3791010e845339d78c36461d8617a80d104653cbed039",
-          "after": "3cef1abce80e2f32dc3acaf1c8207c75d89ae3e10155389dde9d09a850acc78c"
-        },
-        "test_deployment_set_link_rejects_same_view_different_authoritative_checkpoint": {
-          "before": "ccedb4a8f0061ad2a61dedf336505036412402986ce164a2da3ddc3225f8703e",
-          "after": "62a6a538b3aa3fe618e7da41f23ce546323d9c25e8a8226c1df620ceaaa30e47"
-        },
-        "test_deployment_validation_budget_returns_explicit_partial_valid_set": {
-          "before": "fed76878df9b46ee1b85c45f0978c56b86264f9e0d25d811460567638e2428c6",
-          "after": "d027e30c34e8955a46cb73bc5fbe59a0cfc7a89ae9a18105b0b3f8f504b267ca"
-        },
-        "test_deployment_validation_preserves_live_state_and_commits_alternatives_with_replay": {
-          "before": "c7d6b8dbc0238353a3f1a706b111f9ab602c57a8e9e7340269b6eb5b52b56b09",
-          "after": "1b555bea26445417816a5d3dfd8791ac8043fc83d5226318e83555eef96bef2e"
+        "test_reference_suite_definition_is_pinned_and_closed": {
+          "before": null,
+          "after": "98be91fa38f4f5614d1b911a688def9296a38a47b2e8812afce16d866832b3d9"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "df05a278c08651fe3ef74b5a7668fddcd1a926215a0d9df996ba0cdd5c52197c",
-      "after_sha256": "429217a414a96524d350fea82ee1f639dc5d93ee53167150555818d1a7e2caff",
+      "before_sha256": "429217a414a96524d350fea82ee1f639dc5d93ee53167150555818d1a7e2caff",
+      "after_sha256": "2f77461df8f988b08b0ab90f04367b8cdb13f2b22b0c47b6a4a9d405226fa2d7",
       "owners": {
         "@document": {
-          "before": "df05a278c08651fe3ef74b5a7668fddcd1a926215a0d9df996ba0cdd5c52197c",
-          "after": "429217a414a96524d350fea82ee1f639dc5d93ee53167150555818d1a7e2caff"
+          "before": "429217a414a96524d350fea82ee1f639dc5d93ee53167150555818d1a7e2caff",
+          "after": "2f77461df8f988b08b0ab90f04367b8cdb13f2b22b0c47b6a4a9d405226fa2d7"
         }
       }
     }
@@ -420,9 +524,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
@@ -430,9 +534,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/hosted-calibration.json": {
       "category": "measured_workload",
@@ -441,9 +545,9 @@
         "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "measured_workload",
@@ -451,9 +555,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "measured_workload",
@@ -461,9 +565,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "measured_workload",
@@ -471,9 +575,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "measured_workload",
@@ -481,9 +585,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "measured_workload",
@@ -491,9 +595,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "measured_workload",
@@ -501,9 +605,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "measured_workload",
@@ -511,9 +615,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "measured_workload",
@@ -521,9 +625,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "measured_workload",
@@ -531,9 +635,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "measured_workload",
@@ -541,9 +645,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "measured_workload",
@@ -551,9 +655,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "measured_workload",
@@ -561,9 +665,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -571,9 +675,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -581,9 +685,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -591,9 +695,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -601,9 +705,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -611,9 +715,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -621,9 +725,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -631,9 +735,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -641,9 +745,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -651,65 +755,81 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
+      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "docs/performance/CANONICAL_DEPLOYMENT_COSTS.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
-    "docs/performance/canonical-placement-second-ring/base-measurement.json": {
+    "docs/performance/deployment-reference-suite-v1/definition.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
-    "docs/performance/canonical-placement-second-ring/head-coverage.json": {
+    "docs/performance/deployment-reference-suite-v1/measured-driver-source.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
-    "docs/performance/canonical-placement-second-ring/head-measurement.json": {
+    "docs/performance/deployment-reference-suite-v1/measurement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+    },
+    "docs/performance/deployment-reference-suite-v1/suite-report.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "scripts/measure_canonical_deployment_costs.py": {
       "category": "measured_workload",
@@ -717,9 +837,9 @@
         "canonical-deployment-component-costs"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -727,9 +847,19 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+    },
+    "src/warhammer40k_core/ai/canonical_deployment.py": {
+      "category": "measured_workload",
+      "operations": [
+        "canonical-deployment-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
       "category": "measured_workload",
@@ -737,27 +867,27 @@
         "canonical-deployment-coverage"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
-    "src/warhammer40k_core/ai/deployment_candidate_search.py": {
-      "category": "algorithm_or_search",
+    "src/warhammer40k_core/ai/deployment_reference_suite.py": {
+      "category": "measured_workload",
       "operations": [
-        "deployment-bounded-candidates"
+        "deployment-reference-suite"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "tests/code_quality/test_canonical_deployment_costs.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
       "category": "measured_workload",
@@ -765,19 +895,9 @@
         "canonical-deployment-coverage"
       ],
       "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
-    },
-    "tests/infrastructure/adapters/test_deployment_candidates.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "deployment-bounded-candidates"
-      ],
-      "selected_families": [],
-      "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
-      "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
-      "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -785,9 +905,9 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Refresh only the active README authentication hash after the reviewed complete-profile documentation update; preserve historical hashes, raw capture authorities and all semantic assertions.",
-      "source_obligation": "Current source-authentication regressions require the README dependency commitment to match the actual maintained README bytes. CI attempt 1 failed this exact current binding and remains a failed attempt.",
-      "unchanged_work": "No runtime, test Python, test inventory, source-rule capture, gameplay assertion, dependency, measurement workload or historical evidence is changed. This JSON repair updates one current dependency digest; all final exact-head gates remain required."
+      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
+      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
+      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
     }
   },
   "milestone": "ordinary",
