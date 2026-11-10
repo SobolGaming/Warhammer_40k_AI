@@ -6,11 +6,11 @@
   "changes": {
     "README.md": {
       "before_sha256": "4b4d4082fe1cccad4560c5cd14a19a6e55523e4a7b7029c74230d2b42cb4acf5",
-      "after_sha256": "13a4e9032777d5341e622e3e387638bc917fb449537574678a1b44d17958d2b7",
+      "after_sha256": "d4bacd37d1900045a2fd36ce68e3a2175334c2744e5021e1430122f82451db62",
       "owners": {
         "@document": {
           "before": "4b4d4082fe1cccad4560c5cd14a19a6e55523e4a7b7029c74230d2b42cb4acf5",
-          "after": "13a4e9032777d5341e622e3e387638bc917fb449537574678a1b44d17958d2b7"
+          "after": "d4bacd37d1900045a2fd36ce68e3a2175334c2744e5021e1430122f82451db62"
         }
       }
     },
@@ -36,141 +36,141 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "0b318bf6c067aa1e7045693d5997d2961e87722420ff240fba15cd46eb0c13e5",
-      "after_sha256": "c8b33d12b21ea3dd13fa8d42f39337f292b7e54a58b5660bcc40684b18f15207",
+      "after_sha256": "1e892e2d461a425253684f780e7949c9fa41d358e1fe288ddee9920c1b6e5327",
       "owners": {
         "@document": {
           "before": "0b318bf6c067aa1e7045693d5997d2961e87722420ff240fba15cd46eb0c13e5",
-          "after": "c8b33d12b21ea3dd13fa8d42f39337f292b7e54a58b5660bcc40684b18f15207"
+          "after": "1e892e2d461a425253684f780e7949c9fa41d358e1fe288ddee9920c1b6e5327"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
       "before_sha256": "e837ceaa85b50c6e0c6d682a98a15a3eb13a19f59dddfa49ea2a99947b9c867c",
-      "after_sha256": "fb6d491ad8ac31420b7781fead8c9e468fe8c7d80064e5486da4ccbdc0a5a80f",
+      "after_sha256": "6a269faa9516a62af015e96650bf2f6d1955a2ea58bc77fbe82b46052e5eb100",
       "owners": {
         "@document": {
           "before": "e837ceaa85b50c6e0c6d682a98a15a3eb13a19f59dddfa49ea2a99947b9c867c",
-          "after": "fb6d491ad8ac31420b7781fead8c9e468fe8c7d80064e5486da4ccbdc0a5a80f"
+          "after": "6a269faa9516a62af015e96650bf2f6d1955a2ea58bc77fbe82b46052e5eb100"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "7ef519ac852de2fd5284b49409f05faf05adfb9b3575a1abc45efa7c7e71a412",
-      "after_sha256": "ec32ee95e13becdcbf194f0afd2410b5ff429c055e2a81908f2eb9f1c3d94733",
+      "after_sha256": "153ed7ed10dc4857a717e54d5ca6e69c7aef5d0032541c2c71a043c4188ffe0c",
       "owners": {
         "@document": {
           "before": "7ef519ac852de2fd5284b49409f05faf05adfb9b3575a1abc45efa7c7e71a412",
-          "after": "ec32ee95e13becdcbf194f0afd2410b5ff429c055e2a81908f2eb9f1c3d94733"
+          "after": "153ed7ed10dc4857a717e54d5ca6e69c7aef5d0032541c2c71a043c4188ffe0c"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "42349b1f45e27e774810981731cc6c0bdc0925eb1f7a31e5f3b4ad06644dd22b",
-      "after_sha256": "c782d72fdbbb58f87f2b64679d554c9b05e3a856f727d6547b25cf59227613a9",
+      "after_sha256": "deac05242bbe96cbf7223897e3e5e52df0ab8c074a5382ae49f6a1b35cd59174",
       "owners": {
         "@document": {
           "before": "42349b1f45e27e774810981731cc6c0bdc0925eb1f7a31e5f3b4ad06644dd22b",
-          "after": "c782d72fdbbb58f87f2b64679d554c9b05e3a856f727d6547b25cf59227613a9"
+          "after": "deac05242bbe96cbf7223897e3e5e52df0ab8c074a5382ae49f6a1b35cd59174"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "6bd7430b9c4e64cb82f9ac6f3d9c8251361e69a9d272f8e0872ce2f79222406b",
-      "after_sha256": "1d4ff16496c3512f76771434df1240249f616f7b3b97d45046b076b21bd1562e",
+      "after_sha256": "7771cb498261fe7fed1e8f7ef179a25bd4b1fa1982cec6b0576a84e13edf583b",
       "owners": {
         "@document": {
           "before": "6bd7430b9c4e64cb82f9ac6f3d9c8251361e69a9d272f8e0872ce2f79222406b",
-          "after": "1d4ff16496c3512f76771434df1240249f616f7b3b97d45046b076b21bd1562e"
+          "after": "7771cb498261fe7fed1e8f7ef179a25bd4b1fa1982cec6b0576a84e13edf583b"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "3352e9ef0c09efdba03dc20ebec53ad86c22841e61913dbbbdc62217f3705946",
-      "after_sha256": "ebb0ec54ba3dcf181522082bc979fcf6ac46a48e6aacb81711fd9f1ed6e5d84d",
+      "after_sha256": "ad46fc323508f08d0b7111b3960fdd30059e9e08337bfbfa705bad8901f1eec2",
       "owners": {
         "@document": {
           "before": "3352e9ef0c09efdba03dc20ebec53ad86c22841e61913dbbbdc62217f3705946",
-          "after": "ebb0ec54ba3dcf181522082bc979fcf6ac46a48e6aacb81711fd9f1ed6e5d84d"
+          "after": "ad46fc323508f08d0b7111b3960fdd30059e9e08337bfbfa705bad8901f1eec2"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "a32932fc7a0632c723f4ed53c36bcf828ab9d0a5b8b77f7e8fba3d22ccd2f661",
-      "after_sha256": "190d07b984b43976fc64111e028de882c9df5e795b47835db0424d0cc7c8c38a",
+      "after_sha256": "0466c03b7e9624a49eeb4a190eb8a8f7cf5802e15530cb24396b67c7fc47e46b",
       "owners": {
         "@document": {
           "before": "a32932fc7a0632c723f4ed53c36bcf828ab9d0a5b8b77f7e8fba3d22ccd2f661",
-          "after": "190d07b984b43976fc64111e028de882c9df5e795b47835db0424d0cc7c8c38a"
+          "after": "0466c03b7e9624a49eeb4a190eb8a8f7cf5802e15530cb24396b67c7fc47e46b"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "32665c9f9370d95efc4294f02b5a4c2bc7a3793ed193e9b92c3b55922987afa3",
-      "after_sha256": "a0f11de0f9be75f28d49156a2074a5091a93451c95e23e6cb9f8cf16c65ea0dd",
+      "after_sha256": "3b82f861830328943d324dfc00bbe1dacddd782542734ad62309b7ac0b960bcb",
       "owners": {
         "@document": {
           "before": "32665c9f9370d95efc4294f02b5a4c2bc7a3793ed193e9b92c3b55922987afa3",
-          "after": "a0f11de0f9be75f28d49156a2074a5091a93451c95e23e6cb9f8cf16c65ea0dd"
+          "after": "3b82f861830328943d324dfc00bbe1dacddd782542734ad62309b7ac0b960bcb"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "839f1bf714ef24edf032b864e7f4248d00b7be69114af2d58cc1f976a297632b",
-      "after_sha256": "1b8cf9afd3a9e3c3ea0af880cfbb4640a117acbbb8b015e4fbe986ce710980c6",
+      "after_sha256": "f03e4314ce7b6cb7e8387de9b5d5c58e5136b3b5e959397ef950d85a837e87e2",
       "owners": {
         "@document": {
           "before": "839f1bf714ef24edf032b864e7f4248d00b7be69114af2d58cc1f976a297632b",
-          "after": "1b8cf9afd3a9e3c3ea0af880cfbb4640a117acbbb8b015e4fbe986ce710980c6"
+          "after": "f03e4314ce7b6cb7e8387de9b5d5c58e5136b3b5e959397ef950d85a837e87e2"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "ba3a45f83e36986f4e5019d24be73a38b45e5d7629368b9ab3c0e1461a4ce285",
-      "after_sha256": "03db366eea0a7579237859ab15df6e39701fa710e2adce6539e1a45bafb275c3",
+      "after_sha256": "f1b4dcf0ae290fc6520a2fe742cb6402af06a599a4cb149b88fabd777e851142",
       "owners": {
         "@document": {
           "before": "ba3a45f83e36986f4e5019d24be73a38b45e5d7629368b9ab3c0e1461a4ce285",
-          "after": "03db366eea0a7579237859ab15df6e39701fa710e2adce6539e1a45bafb275c3"
+          "after": "f1b4dcf0ae290fc6520a2fe742cb6402af06a599a4cb149b88fabd777e851142"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "acb220cd7f5f2afb2b7a903db67095bed022f3f68975d781c9ffded0d2caacea",
-      "after_sha256": "28472c64ad88ae5791a9fc323242665947f669a14cd1fde98194c5e293ba22e1",
+      "after_sha256": "c34778fbc5b65398a44efab9b8482304758734c37e5473ebd3a83f61ddafd0ef",
       "owners": {
         "@document": {
           "before": "acb220cd7f5f2afb2b7a903db67095bed022f3f68975d781c9ffded0d2caacea",
-          "after": "28472c64ad88ae5791a9fc323242665947f669a14cd1fde98194c5e293ba22e1"
+          "after": "c34778fbc5b65398a44efab9b8482304758734c37e5473ebd3a83f61ddafd0ef"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "eb3a9ea06a8307bff87f3ae59c22b8109fc4bc367a2a63bdbe15d1a556c2a806",
-      "after_sha256": "9169e1e8fcb9c7d27b514213a45900476b510e39b8510248ef2bb3c27fda7232",
+      "after_sha256": "c8253b1120cd2bfea84431e2abafea0c98aa6983eca31947ede053bed6169bf9",
       "owners": {
         "@document": {
           "before": "eb3a9ea06a8307bff87f3ae59c22b8109fc4bc367a2a63bdbe15d1a556c2a806",
-          "after": "9169e1e8fcb9c7d27b514213a45900476b510e39b8510248ef2bb3c27fda7232"
+          "after": "c8253b1120cd2bfea84431e2abafea0c98aa6983eca31947ede053bed6169bf9"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "bc7e345361319c3daaaffb9036fc567957e709d125aebfc3296265db27e07fec",
-      "after_sha256": "01b5dac478f646937c1aa37c5e5fd55c08ffac9c6725330c03bc9b3c1cc95188",
+      "after_sha256": "0df6d032b8adf70daf90b18184cbcff50192c8184705f7553cf669197049bf30",
       "owners": {
         "@document": {
           "before": "bc7e345361319c3daaaffb9036fc567957e709d125aebfc3296265db27e07fec",
-          "after": "01b5dac478f646937c1aa37c5e5fd55c08ffac9c6725330c03bc9b3c1cc95188"
+          "after": "0df6d032b8adf70daf90b18184cbcff50192c8184705f7553cf669197049bf30"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "8e1de921da31ac27f586c954d6a1aea20e67bc3f7c5f37618c52e8facf658436",
-      "after_sha256": "eb37a5d31d5ec4c4cb2a0bf387dd93a5edddd3bbb531d626aa8b2346f655e8c9",
+      "after_sha256": "4ef4372198c33cd3afe15b25ba75e33dbe0add1fbaadeece52817d4553a9dead",
       "owners": {
         "@document": {
           "before": "8e1de921da31ac27f586c954d6a1aea20e67bc3f7c5f37618c52e8facf658436",
-          "after": "eb37a5d31d5ec4c4cb2a0bf387dd93a5edddd3bbb531d626aa8b2346f655e8c9"
+          "after": "4ef4372198c33cd3afe15b25ba75e33dbe0add1fbaadeece52817d4553a9dead"
         }
       }
     },
@@ -530,11 +530,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "429217a414a96524d350fea82ee1f639dc5d93ee53167150555818d1a7e2caff",
-      "after_sha256": "2f77461df8f988b08b0ab90f04367b8cdb13f2b22b0c47b6a4a9d405226fa2d7",
+      "after_sha256": "e500c9dc237221a0de4ede68df9a4494e1579cefa5e54d5d35528d4dd4c5eed6",
       "owners": {
         "@document": {
           "before": "429217a414a96524d350fea82ee1f639dc5d93ee53167150555818d1a7e2caff",
-          "after": "2f77461df8f988b08b0ab90f04367b8cdb13f2b22b0c47b6a4a9d405226fa2d7"
+          "after": "e500c9dc237221a0de4ede68df9a4494e1579cefa5e54d5d35528d4dd4c5eed6"
         }
       }
     }
@@ -570,7 +570,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -581,7 +581,7 @@
         "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -591,7 +591,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -601,7 +601,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -611,7 +611,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -621,7 +621,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -631,7 +631,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -641,7 +641,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -651,7 +651,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -661,7 +661,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -671,7 +671,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -681,7 +681,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -691,7 +691,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -701,7 +701,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },
@@ -791,7 +791,7 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Refresh the complete successful current behavioral profile and exact active test-byte bindings after adding suite cases to an existing test file. Keep compatible slower hosted observations, authenticate sources and reject stale module receipts.",
+      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
       "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
       "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
     },

@@ -415,14 +415,16 @@ and retain their complete baseline measurement. Changed/removed/renamed cases or
 changed test-module bytes require explicit sidecar regeneration, and behavioral
 inventory changes still require a fresh complete successful baseline profile.
 
-The current calibration retains 243 compatible source-bound raw worker receipts
-and 29,721 original passed three-phase samples covering 6,101 cases. The complete
-inventory is now 6,254 cases, with 153 baseline-only cases and no invented hosted
-observations. The deployment reference-suite update changes one behavioral test
-module without retained hosted observations; no additional worker receipts or
-samples are excluded. The earlier second-cardinal-ring update excluded twenty
-incompatible worker receipts and their 2,916 samples. Every surviving receipt,
-outcome, source identity and phase tuple remains unchanged.
+The current calibration retains 292 compatible source-bound raw worker receipts
+and 35,975 passed three-phase samples covering all 6,254 current cases. It preserves
+all 243 earlier receipts and their 29,721 samples unchanged, then appends 49
+completed workers and 6,254 samples from PR656 attempt 1. There are no baseline-only
+cases or invented hosted observations. The deployment reference-suite update
+changes one behavioral test module without earlier retained hosted observations;
+no additional worker receipts or samples are excluded. The earlier
+second-cardinal-ring update excluded twenty incompatible worker receipts and
+their 2,916 samples. Every surviving outcome, source identity and phase tuple
+remains unchanged.
 
 All 52 original collected inventories were authenticated by their exact counts
 and hashes. Fifty-one reconstruct completely from retained observation membership;
@@ -459,6 +461,29 @@ trees. The unchanged maximum formula incorporates these observations for plannin
 it neither promotes this failed run to a passing baseline nor predicts a passing
 rerun. These historical receipt and observation tuples remain unchanged in the
 subsequent canonical-fixture inventory update.
+
+The latest appended source is attempt 1 of failed PR656 run
+[42810498143](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42810498143).
+All twelve behavioral workloads completed successfully, including shard 7's 332
+passed tests in 1,178.50 pytest seconds. Its supervisor measured 1,221.417 seconds,
+exceeding the unchanged 1,080-second approval limit; it was not terminated and the
+run remains failed. Independent run/PR/merge/job/artifact APIs and archive digests
+bind its 49 completed workers to source head
+`6f55680b0767eb901eae34cd807a5960a47a10af`, tested merge checkout
+`d99aa9ce1e5d186f05dd6ac8ef999313237c419b`, and the recorded runtime fingerprint.
+The source and merge trees match, and every collected test module matches current
+bytes. The admitted samples cover the exact 6,254-case baseline once.
+
+This run exposed hosted cost variance absent from the local baseline: the existing
+complete canonical-coverage case took 1,080.002 seconds across its three phases,
+compared with 485.673 baseline seconds. The unchanged maximum-cost formula and
+balancing place its whole eight-case module alone on shard 3. That shard's modeled
+lower bound is still 1,080.002 seconds before startup and finalization; the other
+eleven modeled lower bounds are 993.692–993.708 seconds. Reassignment cannot shorten
+an individual test, and this metadata does not establish compliance with the
+eighteen-minute limit. A fresh hosted run is required; an over-limit result remains
+a blocker. No timing budget, test selection, assertion or scheduling algorithm
+changes as part of this calibration refresh.
 
 The complete baseline is the successful local 6,254-case covered three-order
 deployment reference-suite run: Python 3.14.5 under WSL, one isolated mirror
