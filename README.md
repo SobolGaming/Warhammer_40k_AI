@@ -18,6 +18,15 @@ Source-linked model geometry requires representative model height with provenanc
 before runtime catalog use. Explicit provisional estimates retain their uncertainty and
 source identity under [the geometry authority policy](docs/FACTION_RULES_SOURCE_POLICY.md).
 
+The bounded Stage 2 AI operator fixtures now include a
+[witnessed Normal Move alternative](docs/AI_POLICY_INTERFACE.md#witnessed-normal-move-prefix-admission)
+from the preservation fixture's exact fifteen-decision pre-choice prefix.
+Eighteen ordinary viewer decisions move all five S models one inch in negative X
+and consume S's activation, with strict persistence/replay admission. This is
+movement feasibility evidence; screening, exposure, opponent threat, E follow-through,
+later outcomes and learning eligibility remain unqualified. The original
+preservation definition and receipt retain their meaning.
+
 ## 2. Non-negotiable invariants
 
 These rules are enforced from the first commit.
@@ -505,7 +514,7 @@ slower hosted observation; excluded receipts do not become current measurements.
 Local timings do not establish hosted cost accuracy or a speedup; fresh hosted
 qualification remains required.
 
-The current complete baseline is the successful local 6,257-case covered
+The preservation-admission baseline is the successful local 6,257-case covered
 preservation-admission qualification on Python 3.14.5 under WSL: one isolated
 mirror worker followed by 32 remainder workers and a fresh checkout-bound source
 index, without competing validation workers. Its exact base is
@@ -517,6 +526,23 @@ their fresh complete-profile measurements, bringing baseline-only membership to
 142 cases. The unchanged maximum formula preserves every compatible slower
 hosted observation. Local timing is planning evidence, not hosted approval or a
 speedup; the twelve manifests still require a fresh passing hosted run.
+
+The current complete JUnit baseline records 6,261 passed behavioral tests
+for witnessed Normal Move on Python 3.14.5 under WSL: one isolated
+mirror worker followed by 32 worksteal workers, without competing validation
+workers. Its fresh checkout-bound source index was prepared separately. The
+whole-suite controller completed in 1,086.756 seconds, exceeding the unchanged
+1,080-second approval limit; it was not terminated. That local timing approval
+remains failed. Complete passing-test JUnit data supplies planning weights only.
+exact base is `e3620316d36ebd5a2ac910fee8d2d429c2d5ae34` and runtime fingerprint
+is `785ca6f64b746d062d23eca25a55ca0b851f0331d8c392c07f4b1a63ffd9c5e7`.
+All 284 compatible hosted receipts and 34,836 historical samples remain
+unchanged. No existing behavioral test module changed; the four new cases use
+their complete-profile measurements, bringing baseline-only membership to 146.
+The twelve manifests retain the same maximum-cost formula and timing limits.
+These local scheduling observations neither explain the earlier hosted timing
+variability nor establish a performance repair, scenario-cost qualification or
+hosted approval. Fresh complete hosted qualification remains required.
 
 Fixture setup observations are worker/order dependent; taking maxima and regrouping
 does not establish new fixture multiplicity, hosted wall time or the eighteen-minute

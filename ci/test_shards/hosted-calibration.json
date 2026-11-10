@@ -139,6 +139,10 @@
     "tests/infrastructure/adapters/test_deployment_candidates.py::test_ranked_deployment_training_rejects_inexact_join[row]",
     "tests/infrastructure/adapters/test_deployment_candidates.py::test_ranked_deployment_training_rejects_inexact_join[seed]",
     "tests/infrastructure/adapters/test_deployment_candidates.py::test_ranked_deployment_training_rejects_inexact_join[selection]",
+    "tests/infrastructure/adapters/test_normal_move_scenario.py::test_normal_move_branches_from_preservation_prefix_with_actual_witness",
+    "tests/infrastructure/adapters/test_normal_move_scenario.py::test_normal_move_distance_rejection_remains_engine_owned_and_replayable",
+    "tests/infrastructure/adapters/test_normal_move_scenario.py::test_normal_move_json_restore_exact_replay_and_closed_receipt",
+    "tests/infrastructure/adapters/test_normal_move_scenario.py::test_normal_move_rejects_incomplete_and_extra_ordinary_choices",
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_has_exact_routes_candidates_and_scoped_tactical_gaps",
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_persists_replays_and_rejects_changed_closed_evidence",
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_rejects_other_config_incomplete_and_extra_ordinary_choices"
@@ -187,6 +191,7 @@
     "tests/infrastructure/adapters/test_deployment_experiment.py": "e0c83ccc19f1c2ff2736aacdae10a3a5b0501a92a74aac26732ec52ec342c163",
     "tests/infrastructure/adapters/test_deployment_geometry_features.py": "12d4b70e44b1d8678086cac7aeee191579bed3d2aa5e553f6514c5f5cf37a67d",
     "tests/infrastructure/adapters/test_finite_candidates.py": "46f9947f09bea4cb3dbbb0e665f488031c2565f2a3dad2097dd840627f0e2abb",
+    "tests/infrastructure/adapters/test_normal_move_scenario.py": "30bb82e22114deb4d7e6b749b684fabd6e7463c41eb24786e7b7d9e023418917",
     "tests/infrastructure/adapters/test_preserve_scenario.py": "3d348cf932c4430ea470cf0377741771ecc24cf3a7a381d70d364d0590c15fe6",
     "tests/infrastructure/adapters/test_runner_accounting.py": "9c50a1ee78e7b79bd7c094b369fcb241336b154b46d54601e21ae087acdbc953",
     "tests/infrastructure/adapters/test_training_admission.py": "26ec230eb248fb840bae22117c1a802bfd209578f906895ae4e0e182aea5643c",
@@ -554,7 +559,7 @@
     "tests/unit/test_phase10i_terrain_movement.py": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38"
   },
   "formula": "max(complete-baseline-case-seconds, largest-observed-passed-three-phase-total)",
-  "inventory_sha256": "bfeb9da2abf8020465d9c894e2b880ac51351cbe178426ddfee3bee80c3b0a2e",
+  "inventory_sha256": "3db43ad3a62a42e9a9cd4d0c9fde70249508a1bdba2639c364c7b8cf4d4a55ac",
   "observation_fields": [
     "report_index",
     "setup",

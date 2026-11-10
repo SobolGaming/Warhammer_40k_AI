@@ -158,9 +158,11 @@ def _require_definition() -> dict[str, JsonValue]:
     return definition
 
 
-def _continue_preservation(session: LocalGameSession) -> list[dict[str, JsonValue]]:
+def _continue_preservation(
+    session: LocalGameSession, *, choices: tuple[_Choice, ...] = _CONTINUATION
+) -> list[dict[str, JsonValue]]:
     trace: list[dict[str, JsonValue]] = []
-    for index, choice in enumerate(_CONTINUATION):
+    for index, choice in enumerate(choices):
         context = PlayerDecisionContext.from_view(
             session.view(viewer_player_id=choice.route.actor_id), choice_seed=7
         )

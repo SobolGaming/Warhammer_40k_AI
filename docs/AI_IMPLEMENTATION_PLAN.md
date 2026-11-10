@@ -341,6 +341,31 @@ completion follows from selecting a legal Remain Stationary option. The
 [preservation admission interface](AI_POLICY_INTERFACE.md#reachable-preservation-prefix-admission)
 defines this boundary; no ranker, learner or training schema is added.
 
+### First witnessed Normal Move alternative
+
+The separate `NormalMoveScenarioAdmission` branches from the preservation
+fixture's exact fifteen-decision checkpoint before selecting S. It reuses the
+ordinary eleven-decision deployment and four redeploy/Scouts declines, then
+selects S, selects Normal Move, and submits a `PathWitness` translating all five
+models one inch in negative X with unchanged height and facing. Eighteen accepted
+decisions cover fourteen routes and stop at the next Movement unit choice.
+
+The closed operator receipt retains the pinned definition/configuration,
+common-prefix checkpoint commitment, complete accepted trace, actual witness and
+engine activation evidence, required/observed routes and mechanics, current
+source/build identity and strict JSON persistence/exact replay. The original
+preservation definition and receipt are unchanged. The existing `normal_move`
+adapter family owns validation and mutation; no engine mechanic or training
+schema is added.
+
+This demonstrates one legal movement alternative. It does not demonstrate
+screening, exposure, tactical value, opponent threat or attacks, E follow-through,
+or later comparative outcomes. Those requirements remain `scoped_gap`, with no
+reference target or learning eligibility. Missing evidence is not an
+engine-unsupported verdict. Candidate continuation coverage, component costs,
+broader qualification and Stage 2 completion remain open. See the
+[movement admission interface](AI_POLICY_INTERFACE.md#witnessed-normal-move-prefix-admission).
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.
