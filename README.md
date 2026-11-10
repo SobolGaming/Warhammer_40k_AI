@@ -424,16 +424,16 @@ and retain their complete baseline measurement. Changed/removed/renamed cases or
 changed test-module bytes require explicit sidecar regeneration, and behavioral
 inventory changes still require a fresh complete successful baseline profile.
 
-The current calibration retains 284 compatible source-bound raw worker receipts
-and 34,836 passed three-phase samples covering 6,115 current cases. All sixty
+The preceding calibration retained 284 compatible source-bound raw worker receipts
+and 34,836 passed three-phase samples covering 6,115 cases. All sixty
 source collected inventories were authenticated before filtering by exact counts and hashes;
 the original 679-node inventory also matches the three independently retrieved,
 SHA-authenticated workers in artifacts 13649430067 and 13648072478. The diagonal
-generator update changes two behavioral modules, excluding the eight PR656
+generator update changed two behavioral modules, excluding the eight PR656
 worker receipts whose collected inventories include them and all 1,139 samples
 from those receipts. Every surviving outcome, source identity and phase tuple
-is unchanged. The 139 cases in those two modules have no compatible retained
-hosted observation and use the fresh complete local baseline below. No unknown
+is unchanged. At that point, the 139 cases in those two modules had no compatible
+retained hosted observation and used the complete local baseline below. No unknown
 inventory was guessed and no timing sample was invented. Original receipts and
 their outcomes remain in Git history and source artifacts.
 
@@ -473,7 +473,7 @@ it neither promotes this failed run to a passing baseline nor predicts a passing
 rerun. These historical receipt and observation tuples remain unchanged in the
 subsequent canonical-fixture inventory update.
 
-The latest appended source is attempt 1 of failed PR656 run
+An earlier appended source is attempt 1 of failed PR656 run
 [42810498143](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42810498143).
 All twelve behavioral workloads completed successfully, including shard 7's 332
 passed tests in 1,178.50 pytest seconds. Its supervisor measured 1,221.417 seconds,
@@ -534,15 +534,53 @@ workers. Its fresh checkout-bound source index was prepared separately. The
 whole-suite controller completed in 1,086.756 seconds, exceeding the unchanged
 1,080-second approval limit; it was not terminated. That local timing approval
 remains failed. Complete passing-test JUnit data supplies planning weights only.
-exact base is `e3620316d36ebd5a2ac910fee8d2d429c2d5ae34` and runtime fingerprint
+Its exact base is `e3620316d36ebd5a2ac910fee8d2d429c2d5ae34` and runtime fingerprint
 is `785ca6f64b746d062d23eca25a55ca0b851f0331d8c392c07f4b1a63ffd9c5e7`.
-All 284 compatible hosted receipts and 34,836 historical samples remain
-unchanged. No existing behavioral test module changed; the four new cases use
-their complete-profile measurements, bringing baseline-only membership to 146.
+Before the hosted append below, all 284 compatible receipts and 34,836 historical
+samples remained unchanged. No existing behavioral test module changed; the four
+new cases used their complete-profile measurements, bringing baseline-only
+membership to 146 at that point.
 The twelve manifests retain the same maximum-cost formula and timing limits.
 These local scheduling observations neither explain the earlier hosted timing
 variability nor establish a performance repair, scenario-cost qualification or
 hosted approval. Fresh complete hosted qualification remains required.
+
+The current calibration appends exactly 49 complete original worker receipts and
+6,261 passed three-phase samples from attempt 1 of failed PR659 run
+[42898953334](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42898953334).
+It now retains 333 receipts and 41,097 samples covering all 6,261 current cases,
+with zero baseline-only cases. Every prior report and observation tuple remains
+unchanged, including its original outcome and source identity. The existing
+complete local JUnit profile, report hashes and case weights remain the baseline;
+the failed hosted run supplies additional scheduling observations and does not
+replace that baseline or change its failed local timing approval.
+
+Independent run, PR, tested-merge and artifact API metadata plus all twelve
+original artifact ZIP digests bind the 49 original worker receipts to attempt 1,
+source head `7e00f43139ab3328996fbd93d3b4dafbbbaa9509` and tested merge
+`7d88625203e2b7b5a458868b449791483ed305b8`. Both commits have tree
+`cf0b5381df07663e9fb2fdbeb0e902de9a82bce5`; the recorded runtime remains
+`785ca6f64b746d062d23eca25a55ca0b851f0331d8c392c07f4b1a63ffd9c5e7`.
+All 6,261 tests completed with zero failures, errors or skips. Shard 5 completed
+295 passing tests in 1,152.625414316 supervisor seconds, and shard 8 completed
+405 passing tests in 1,162.622728803 supervisor seconds. Both exceeded the unchanged
+1,080-second approval limit without termination. The run and combined coverage
+approval remain failed; no failed enclosing outcome is promoted to a pass.
+
+The unchanged maximum-cost formula and grouping now place canonical coverage on
+shard 4, the Normal Move controls on shard 6, and the entire
+`test_runner_accounting.py` module alone on shard 9. The execution model gives
+shard 9 a test-work wall-time lower bound of 1,052.839 seconds and the other eleven
+shards lower bounds of 998.592-998.609 seconds. These exclude startup and
+finalization and are neither predictions nor approval evidence. The largest
+observed individual three-phase cost is the canonical coverage case at
+899.082576920 seconds; Normal Move restore/closed-receipt evidence took
+584.844613345 seconds including setup. No observed individual case exceeds
+1,080 seconds, but reassignment cannot guarantee a shard finishes within that
+limit. Host variance remains unexplained; this metadata change establishes no
+performance repair or scenario-cost qualification. Test membership, algorithms,
+worker counts, timing limits and coverage requirements are unchanged. Fresh
+complete hosted qualification remains required.
 
 Fixture setup observations are worker/order dependent; taking maxima and regrouping
 does not establish new fixture multiplicity, hosted wall time or the eighteen-minute
