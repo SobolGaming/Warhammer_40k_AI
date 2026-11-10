@@ -13,7 +13,11 @@
     "tests/infrastructure/adapters/test_canonical_deployment.py::test_fixture_discloses_roster_geometry_and_scoring_exceptions",
     "tests/infrastructure/adapters/test_canonical_deployment.py::test_ordinary_incomplete_prefix_is_not_the_deployed_endpoint",
     "tests/infrastructure/adapters/test_canonical_deployment.py::test_other_ordinary_configuration_cannot_inherit_canonical_admission[game-id]",
-    "tests/infrastructure/adapters/test_canonical_deployment.py::test_other_ordinary_configuration_cannot_inherit_canonical_admission[seed]"
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_other_ordinary_configuration_cannot_inherit_canonical_admission[seed]",
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py::test_complete_canonical_coverage_reconciles_reproduces_and_rejects_false_denominator",
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py::test_coverage_counter_keeps_missing_invalid_and_unvalidated_distinct",
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py::test_coverage_rejects_other_configuration_and_ordinary_incomplete_prefix",
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py::test_nonrecipe_reference_acceptance_roundtrips_without_changing_canonical_prefix"
   ],
   "current_test_sources": {
     "tests/factions/adeptus_custodes/unit/test_adeptus_custodes_army_rule.py": "b57c87563d26c3037d4285d0d03d21aa476f808e4c4c6cd65cfcfcb9661fea41",
@@ -54,6 +58,7 @@
     "tests/factions/world_eaters/unit/test_total_carnage_gameplay.py": "bde4595d1cd1c514843e9fb22149939547d706c8a7c2efbfa2e4065cf0331535",
     "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py": "e8548335a237455fce0e5888c15f192a278620aaad31ff2a13139755492e3c56",
     "tests/infrastructure/adapters/test_canonical_deployment.py": "3dcc8f0433797ac4775f23c861b885f96fa3249c315171c72c6d9dfd13b8c518",
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": "b7efb48d7aa3ddf3b18364d40fa0f5723a082eba63474046ff578f78e47e84a3",
     "tests/infrastructure/adapters/test_deployment_candidates.py": "9b1c97aec569a9f13242b1d7c7a3ae75df9d5c29b0beee5db1715027c3496404",
     "tests/infrastructure/adapters/test_deployment_experiment.py": "e0c83ccc19f1c2ff2736aacdae10a3a5b0501a92a74aac26732ec52ec342c163",
     "tests/infrastructure/adapters/test_deployment_geometry_features.py": "12d4b70e44b1d8678086cac7aeee191579bed3d2aa5e553f6514c5f5cf37a67d",
@@ -424,7 +429,7 @@
     "tests/unit/test_phase10i_terrain_movement.py": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38"
   },
   "formula": "max(complete-baseline-case-seconds, largest-observed-passed-three-phase-total)",
-  "inventory_sha256": "2ddc322248aab2c184e3dff12421137bd46d30620841adabe1b4d1e2fd8f1ed1",
+  "inventory_sha256": "b39b7770335d2ebf65ac8027beb9c1a78889c85077f00ca6e5432499049e7ff8",
   "observation_fields": [
     "report_index",
     "setup",

@@ -417,15 +417,16 @@ inventory changes still require a fresh complete successful baseline profile.
 
 The current calibration retains all 263 compatible source-bound raw worker
 receipts and 32,637 passed three-phase samples covering 6,232 previously measured
-cases. The 14 added canonical-deployment cases use their new complete local
-baseline measurements without invented hosted observations. The inventory now
-contains 6,246 cases, including those 14 baseline-only cases. All prior receipt
-and observation tuples are preserved exactly, including the 49 completed workers
-from PR651 attempt 1. The earlier split-contract update omitted 21 whole
-historical worker receipts whose collected test-module bytes changed; this update
-does not reinstate those incompatible receipts. All prior receipts, observations
-and profiles remain in Git history and their original GitHub artifacts. No partial
-progress journal is a calibration receipt.
+cases. Four new canonical-coverage cases join the fourteen canonical-admission
+cases with complete local baseline measurements and no invented hosted
+observations. The inventory now contains 6,250 cases, including those eighteen
+baseline-only cases. All prior receipt and observation tuples are preserved
+exactly, including the 49 completed workers from PR651 attempt 1. The earlier
+split-contract update omitted 21 whole historical worker receipts whose collected
+test-module bytes changed; this update does not reinstate those incompatible
+receipts. All prior receipts, observations and profiles remain in Git history and
+their original GitHub artifacts. No partial progress journal is a calibration
+receipt.
 
 Retained sources include successful historical run
 [42549486854](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42549486854),
@@ -454,18 +455,22 @@ it neither promotes this failed run to a passing baseline nor predicts a passing
 rerun. These historical receipt and observation tuples remain unchanged in the
 subsequent canonical-fixture inventory update.
 
-The complete baseline is the successful local 6,246-case covered canonical
-deployment-admission run: Python 3.14.5 under WSL, one isolated mirror worker
-followed by 32 remainder workers. Static and contract checks completed separately
-before this fresh run. The tested working source is based on
-`0ef1e9ec005566726efb1fb17873f78677b762eb` and has runtime fingerprint
-`6ecfaf06d097553f259c1b2fbb338ae3c98abfae3e80d2eb57ada1032dad51eb`.
-Its authentic complete JUnit measurements include all 14 added cases. The prior
-6,232-case local workload-contract, 6,209-case local split-contract and 6,178-case
-hosted baselines remain historical; local and hosted measurements are not mixed
-into one representative baseline. The unchanged maximum formula still retains
-every compatible slower hosted observation. Local timings do not establish
-hosted cost accuracy or a speedup; fresh hosted qualification remains required.
+The complete baseline is the successful local 6,250-case covered canonical
+candidate/reference-coverage run: Python 3.14.5 under WSL, one isolated mirror
+worker followed by 32 remainder workers, with a fresh checkout-bound source index
+built and validated before the run. Static and contract checks completed
+separately; no competing validation ran during this complete attempt. The tested
+working source is based on `016455aa74a2a3fbb05ffac8b60d4c99400eaa99` and has runtime
+fingerprint `fead332323b81b04f201802bb82a254269cac3569b141b14705a6f971673ad3e`.
+Its authentic complete JUnit measurements include all four new cases. An earlier
+interrupted attempt used an index bound to another checkout's absolute paths;
+its failed/partial results supply neither this baseline nor passing qualification.
+The prior 6,246-case canonical-admission, 6,232-case workload-contract, 6,209-case
+split-contract and 6,178-case hosted baselines remain historical; local and hosted
+measurements are not mixed into one representative baseline. The unchanged
+maximum formula retains every compatible slower hosted observation. Local
+timings do not establish hosted cost accuracy or a speedup; fresh hosted
+qualification remains required.
 
 Fixture setup observations are worker/order dependent; taking maxima and regrouping
 does not establish new fixture multiplicity, hosted wall time or the eighteen-minute

@@ -221,13 +221,40 @@ trace, required versus observed routes, pending endpoint and explicit unexercise
 continuations. No synthetic checkpoint is treated as engine-generated.
 
 This is scoped fixture/prefix admission, subject to required exact-head delivery
-gates, not completion of Stage 2. Useful candidate/reference-alternative coverage
-and component costs remain open. The current fixed recipe supplies neither a
-training dataset nor new scoring targets, tactical alternatives, exhaustive
-reachability or full-game evidence. Its synthetic Core roster, legacy geometry,
+gates, not completion of Stage 2. Its synthetic Core roster, legacy geometry,
 July mission/scoring identity and October layout geometry retain their disclosed
-limits. The next slice should select one remaining measured coverage/cost
-obligation against this frozen fixture, or explicitly review a different fixture.
+limits. The fixed recipe supplies no training dataset, scoring target or full-game
+evidence.
+
+### Bounded Stage 2 candidate/reference measurement
+
+The separate `CanonicalDeploymentCoverage` operator report now reconstructs
+all eleven exact prefix states and validates alternatives on independent ordinary
+viewer-submission forks. It measures eighteen current finite options across seven
+occurrences (all accepted), and the existing five-offset placement generator
+across four occurrences (nineteen accepted of twenty). A separately declared
+reference list uses zero, ±1/±2-inch axis translations and one far invalid probe
+per placement. Thirty-two of forty reference probes are engine-accepted; the
+generator covers nineteen of those thirty-two and misses thirteen. The eight
+invalid references remain outside the legal denominator. Canonical recipe choices
+remain positive controls. Closed report reproduction, endpoint rejection and a
+nonrecipe accepted placement's persistence/exact replay have focused controls.
+
+These are distinct feasible finite/geometry alternatives, not tactical-value
+references. The [coverage interface](AI_POLICY_INTERFACE.md#canonical-candidate-and-reference-alternative-coverage)
+defines exact denominators, per-occurrence results, limits and operator-only
+evidence. This completes one bounded coverage measurement while exposing actual
+generator gaps; it does not qualify exhaustive legal placement, the proposed
+screen/preserve experiment, ranking quality, redeploy/Scouts, battle or full-game
+learning. Original admission and workload/training contracts remain unchanged.
+
+The next bounded handoff is component-cost measurement against these exact
+configurations, candidate lists and engine outcomes: separately time generation,
+fresh-fork validation, persistence/replay and report reproduction, recording
+hardware, cold/warm state and all attempts and budgets. Costs remain unqualified;
+no observed diagnostic duration substitutes for the required serial smoke or
+complete-game throughput evidence. Any generator expansion or tactical reference
+work needs a separately scoped decision and fresh coverage measurement.
 
 ## 6. First delayed-tradeoff experiment
 
