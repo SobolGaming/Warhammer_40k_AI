@@ -82,7 +82,10 @@ def generation_parameters(translations: tuple[tuple[float, float], ...] | None) 
     return {} if translations is None else {"translations": translations, "raw_budget": 10}
 
 
-def worker(output: Path, repeats: int, components: bool) -> None:
+def worker(output: Path, repeats: int, components: bool, reference_suite: bool = False) -> None:
+    if reference_suite:
+        reference_suite_worker(output, repeats, components)
+        return
     journal = Journal(output / "attempts.jsonl")
 
     def imports() -> None:
@@ -101,15 +104,7 @@ def worker(output: Path, repeats: int, components: bool) -> None:
     from warhammer40k_core.ai.canonical_deployment_coverage import (
         REFERENCE_TRANSLATIONS,
         CanonicalDeploymentCoverage,
-        _finite_results,
     )
-    from warhammer40k_core.ai.deployment_candidate_search import (
-        DEFAULT_TRANSLATIONS,
-        DeploymentCandidateSet,
-    )
-    from warhammer40k_core.ai.deployment_candidate_validation import ValidatedDeploymentCandidates
-    from warhammer40k_core.ai.deployment_candidates import DeploymentPlacementCandidate
-    from warhammer40k_core.ai.finite_candidates import FiniteCandidateSet
     from warhammer40k_core.engine.event_log import canonical_json
     from warhammer40k_core.engine.replay import ReplayRunner
 
@@ -164,11 +159,11 @@ def worker(output: Path, repeats: int, components: bool) -> None:
         )
         checkpoint = journal.timed("persistence_encode", session.to_persistence_payload, **context)
         checkpoint = journal.timed(
-            "checkpoint_json_roundtrip", lambda: json.loads(canonical_json(checkpoint)), **context
+            "checkpoint_json_roundtrip", partial(json_roundtrip, checkpoint), **context
         )
         restored = journal.timed(
             "persistence_restore",
-            lambda: LocalGameSession.from_persistence_payload(checkpoint),
+            partial(LocalGameSession.from_persistence_payload, checkpoint),
             **context,
         )
         if canonical_json(restored.to_persistence_payload()) != canonical_json(checkpoint):
@@ -179,77 +174,192 @@ def worker(output: Path, repeats: int, components: bool) -> None:
             **context,
         )
         replay = journal.timed(
-            "replay_load_and_run", lambda: ReplayRunner.from_payload(artifact).run(), **context
+            "replay_load_and_run",
+            lambda artifact=artifact: ReplayRunner.from_payload(artifact).run(),  # type: ignore[misc]
+            **context,
         )
         if not replay.reproduced_exactly:
             raise ValueError("Replay diagnostic failed exact reproduction.")
-        for index, (prefix, actor, action) in enumerate(prefixes):
-            occurrence = {**context, "index": index}
-            authoritative_row = payload["rows"][index]
-            journal.timed("fresh_fork", prefix.fork, **occurrence)
-            if action.option_id is not None:
-                finite_candidates = journal.timed(
-                    "finite_generation",
-                    partial(FiniteCandidateSet.from_context, actor),
+        candidate_components(journal, prefixes, payload["rows"], context, REFERENCE_TRANSLATIONS)
+    journal.append({"event": "worker_complete", "report_hash": expected_hash})
+
+
+def candidate_components(
+    journal: Journal,
+    prefixes: Any,
+    rows: Any,
+    context: dict[str, Any],
+    reference_translations: tuple[tuple[float, float], ...],
+) -> None:
+    from warhammer40k_core.ai.canonical_deployment_coverage import _finite_results
+    from warhammer40k_core.ai.deployment_candidate_search import (
+        DEFAULT_TRANSLATIONS,
+        DeploymentCandidateSet,
+    )
+    from warhammer40k_core.ai.deployment_candidate_validation import ValidatedDeploymentCandidates
+    from warhammer40k_core.ai.deployment_candidates import DeploymentPlacementCandidate
+    from warhammer40k_core.ai.finite_candidates import FiniteCandidateSet
+
+    for index, (prefix, actor, action) in enumerate(prefixes):
+        occurrence = {**context, "index": index}
+        authoritative_row = rows[index]
+        journal.timed("fresh_fork", prefix.fork, **occurrence)
+        if action.option_id is not None:
+            finite_candidates = journal.timed(
+                "finite_generation",
+                partial(FiniteCandidateSet.from_context, actor),
+                **occurrence,
+            )
+            if finite_candidates.to_payload() != authoritative_row["candidate_set"]:
+                raise ValueError("Component finite generation drifted from complete report.")
+            reference_ids = tuple(option["option_id"] for option in actor.request["options"])
+            # Invoke the coverage owner's exact fresh-fork finite procedure;
+            # do not copy its submission/acceptance algorithm into the harness.
+            results = journal.timed(
+                "finite_fresh_fork_validation",
+                partial(_finite_results, prefix, actor, reference_ids),
+                candidate_count=len(reference_ids),
+                **occurrence,
+            )
+            if results != authoritative_row["reference_results"]:
+                raise ValueError("Component finite results drifted from complete report.")
+        else:
+            seed = DeploymentPlacementCandidate.from_action(action, context=actor)
+            for role, translations, budget in (
+                ("generated", None, len(DEFAULT_TRANSLATIONS)),
+                ("reference", reference_translations, 10),
+            ):
+                parameters = generation_parameters(translations)
+                candidates = journal.timed(
+                    "placement_generation",
+                    partial(
+                        DeploymentCandidateSet.generate,
+                        seed,
+                        context=actor,
+                        **parameters,
+                    ),
+                    role=role,
+                    candidate_count=budget,
                     **occurrence,
                 )
-                if finite_candidates.to_payload() != authoritative_row["candidate_set"]:
-                    raise ValueError("Component finite generation drifted from complete report.")
-                reference_ids = tuple(option["option_id"] for option in actor.request["options"])
-                # Invoke the coverage owner's exact fresh-fork finite procedure;
-                # do not copy its submission/acceptance algorithm into the harness.
-                results = journal.timed(
-                    "finite_fresh_fork_validation",
-                    partial(_finite_results, prefix, actor, reference_ids),
-                    candidate_count=len(reference_ids),
+                validated = journal.timed(
+                    "placement_fresh_fork_validation",
+                    partial(
+                        ValidatedDeploymentCandidates.validate,
+                        candidates,
+                        context=actor,
+                        session=prefix,
+                        validation_budget=budget,
+                        accepted_limit=16,
+                    ),
+                    role=role,
+                    candidate_count=budget,
                     **occurrence,
                 )
-                if results != authoritative_row["reference_results"]:
-                    raise ValueError("Component finite results drifted from complete report.")
-            else:
-                seed = DeploymentPlacementCandidate.from_action(action, context=actor)
-                for role, translations, budget in (
-                    ("generated", None, len(DEFAULT_TRANSLATIONS)),
-                    ("reference", REFERENCE_TRANSLATIONS, 10),
+                if validated.to_payload()["stop_reason"] != "complete":
+                    raise ValueError("Component validation did not complete.")
+                set_key = "candidate_set" if role == "generated" else "reference_set"
+                result_key = "validation" if role == "generated" else "reference_validation"
+                if (
+                    candidates.to_payload() != authoritative_row[set_key]
+                    or validated.to_payload() != authoritative_row[result_key]
                 ):
-                    parameters = generation_parameters(translations)
-                    candidates = journal.timed(
-                        "placement_generation",
-                        partial(
-                            DeploymentCandidateSet.generate,
-                            seed,
-                            context=actor,
-                            **parameters,
-                        ),
-                        role=role,
-                        candidate_count=budget,
-                        **occurrence,
-                    )
-                    validated = journal.timed(
-                        "placement_fresh_fork_validation",
-                        partial(
-                            ValidatedDeploymentCandidates.validate,
-                            candidates,
-                            context=actor,
-                            session=prefix,
-                            validation_budget=budget,
-                            accepted_limit=16,
-                        ),
-                        role=role,
-                        candidate_count=budget,
-                        **occurrence,
-                    )
-                    if validated.to_payload()["stop_reason"] != "complete":
-                        raise ValueError("Component validation did not complete.")
-                    set_key = "candidate_set" if role == "generated" else "reference_set"
-                    result_key = "validation" if role == "generated" else "reference_validation"
-                    if (
-                        candidates.to_payload() != authoritative_row[set_key]
-                        or validated.to_payload() != authoritative_row[result_key]
-                    ):
-                        raise ValueError(
-                            "Component placement results drifted from complete report."
-                        )
+                    raise ValueError("Component placement results drifted from complete report.")
+
+
+def reference_suite_worker(output: Path, repeats: int, components: bool) -> None:
+    journal = Journal(output / "attempts.jsonl")
+
+    def imports() -> None:
+        import warhammer40k_core.ai.deployment_reference_suite  # noqa: F401
+
+    journal.timed("runtime_import", imports, phase="bootstrap")
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.ai.canonical_deployment import _recipe_prefixes
+    from warhammer40k_core.ai.deployment_reference_suite import (
+        REFERENCE_CASES,
+        SUITE_REFERENCE_TRANSLATIONS,
+        DeploymentReferenceSuite,
+        reference_case_steps,
+        reproduce_reference_case,
+        require_reference_suite_definition,
+    )
+    from warhammer40k_core.ai.training_admission import VerifiedEpisodeOrigin
+    from warhammer40k_core.engine.event_log import canonical_json
+    from warhammer40k_core.engine.replay import ReplayRunner
+
+    write_json(output / "suite-definition.json", require_reference_suite_definition())
+    expected_hash: str | None = None
+    for repeat in range(repeats):
+        context = {
+            "repeat": repeat,
+            "phase": "full_report",
+            "process_state": "first_iteration" if repeat == 0 else "within_process_repeat",
+        }
+        report = journal.timed("suite_measure", DeploymentReferenceSuite.measure, **context)
+        payload = journal.timed(
+            "report_json_roundtrip", partial(json_roundtrip, report.to_payload()), **context
+        )
+        if repeat == 0:
+            write_json(output / "suite-report.json", payload)
+        loaded = journal.timed(
+            "suite_from_payload", partial(DeploymentReferenceSuite.from_payload, payload), **context
+        )
+        if report.content_hash != loaded.content_hash:
+            raise ValueError("Closed suite reproduction changed its report content hash.")
+        if expected_hash is not None and expected_hash != report.content_hash:
+            raise ValueError("Within-process suite identity drifted.")
+        expected_hash = report.content_hash
+        journal.append({"event": "verified_report", **context, "hash": expected_hash})
+    if components:
+        for case_index, (case_id, _) in enumerate(REFERENCE_CASES):
+            context = {"phase": "prepared_component_pass", "repeat": 0, "case_id": case_id}
+            session, recipe = journal.timed(
+                "endpoint_reproduction", partial(reproduce_reference_case, case_id), **context
+            )
+            authoritative = payload["cases"][case_index]
+            origin = journal.timed(
+                "origin_admission",
+                partial(
+                    VerifiedEpisodeOrigin.from_session, session, config=session.lifecycle.config
+                ),
+                **context,
+            )
+            if origin.to_payload() != authoritative["origin"]:
+                raise ValueError("Component origin drifted from the complete suite.")
+            prefixes = journal.timed(
+                "prefix_reconstruction",
+                partial(_recipe_prefixes, session, recipe, steps=reference_case_steps(case_id)),
+                **context,
+            )
+            checkpoint = journal.timed(
+                "persistence_encode", session.to_persistence_payload, **context
+            )
+            checkpoint = journal.timed(
+                "checkpoint_json_roundtrip", partial(json_roundtrip, checkpoint), **context
+            )
+            restored = journal.timed(
+                "persistence_restore",
+                partial(LocalGameSession.from_persistence_payload, checkpoint),
+                **context,
+            )
+            if canonical_json(restored.to_persistence_payload()) != canonical_json(checkpoint):
+                raise ValueError("Suite component persistence changed its checkpoint.")
+            artifact = journal.timed(
+                "replay_artifact",
+                partial(session.replay_artifact, artifact_id="suite-component-costs"),
+                **context,
+            )
+            replay = journal.timed(
+                "replay_load_and_run",
+                lambda artifact=artifact: ReplayRunner.from_payload(artifact).run(),  # type: ignore[misc]
+                **context,
+            )
+            if not replay.reproduced_exactly:
+                raise ValueError("Suite component replay failed exact reproduction.")
+            candidate_components(
+                journal, prefixes, authoritative["rows"], context, SUITE_REFERENCE_TRANSLATIONS
+            )
     journal.append({"event": "worker_complete", "report_hash": expected_hash})
 
 
@@ -275,12 +385,19 @@ def summarize(attempts: list[dict[str, Any]]) -> list[dict[str, Any]]:
             if row["event"] != "finish" or row["outcome"] != "passed":
                 continue
             key = tuple(
-                row.get(field) for field in ("phase", "process_state", "name", "index", "role")
+                row.get(field)
+                for field in ("phase", "process_state", "name", "index", "role", "case_id")
             )
             groups.setdefault(key, []).append(row["wall_seconds"])
     return [
         {
-            **dict(zip(("phase", "process_state", "name", "index", "role"), key, strict=True)),
+            **{
+                field: value
+                for field, value in zip(
+                    ("phase", "process_state", "name", "index", "role", "case_id"), key, strict=True
+                )
+                if field != "case_id" or value is not None
+            },
             "n": len(values),
             "mean_seconds": statistics.mean(values),
             "median_seconds": statistics.median(values),
@@ -400,6 +517,7 @@ def campaign(args: argparse.Namespace) -> int:
             "processes": args.processes,
             "repeats": args.repeats,
             "components": args.components,
+            "workload": "reference-suite" if args.reference_suite else "canonical",
             "wall_budget_seconds": args.wall_seconds,
             "cpu_budget_seconds": args.cpu_seconds,
             "workers": 1,
@@ -443,6 +561,8 @@ def campaign(args: argparse.Namespace) -> int:
         ]
         if args.components:
             command.append("--components")
+        if args.reference_suite:
+            command.append("--reference-suite")
         attempt_start = time.monotonic()
         # The worker starts a fresh interpreter. Output and failures are retained
         # verbatim, even if a runtime error precedes its first journal record.
@@ -503,6 +623,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--processes", type=int, default=3)
     result.add_argument("--repeats", type=int, default=2)
     result.add_argument("--components", action="store_true")
+    result.add_argument("--reference-suite", action="store_true")
     result.add_argument("--wall-seconds", type=float, default=3600)
     result.add_argument("--cpu-seconds", type=float, default=7200)
     result.add_argument("--worker", type=Path, help=argparse.SUPPRESS)
@@ -522,7 +643,7 @@ def main() -> int:
     ):
         arguments.error("positive finite budgets required; CPU ceiling is eight hours")
     if args.worker:
-        worker(args.worker, args.repeats, args.components)
+        worker(args.worker, args.repeats, args.components, args.reference_suite)
         return 0
     if args.output is None:
         arguments.error("--output is required")

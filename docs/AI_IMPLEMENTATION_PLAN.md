@@ -275,6 +275,40 @@ Stage 2 remains open for broader useful reference qualification. The retained
 five-offset campaign is historical; current nine-offset measurements must retain
 their own runtime/workload identities. Further generator expansion or tactical
 reference work needs a separately scoped decision and fresh coverage measurement.
+The separately pinned order/diagonal suite below broadens feasibility evidence.
+
+### Broader Stage 2 deployment reference suite
+
+The separate `DeploymentReferenceSuite` freezes three ordinary deployment
+orders on the same canonical configuration before measuring any outcome. Player
+B's scouts remain first; player A uses Deep Strike/scouts/vehicle,
+vehicle/scouts/Deep Strike, or scouts/Deep Strike/vehicle. All recipes retain the
+same exact formation origins, secondary/reserve choices, source exceptions and
+before-redeploy endpoint. The independently declared ten-offset reference list
+contains zero, the four two-inch cardinal translations, four one-inch XY
+diagonals, and one far invalid control. It is not derived from generated or
+accepted candidates.
+
+The suite measures actual occupied-prefix constraints and diagonal geometry
+through the shared ordinary submission, fresh-fork and strict replay owners.
+Its definition hash, complete accepted traces, per-occurrence candidate/reference
+receipts, rejection diagnostics and source/build identities are operator-only.
+The [suite interface](AI_POLICY_INTERFACE.md#deployment-order-and-diagonal-reference-suite)
+records measured coverage and the precise scope; the existing serial cost
+harness's `--reference-suite` mode records complete measurement/reload and
+per-case prepared component costs.
+
+The measured suite accepts 54/54 finite choices and 96/108 generated placements;
+it covers 51/93 legal placement references, with 42 feasible diagonal misses and
+27 invalid reference probes excluded. All three cases have equal totals, but
+scout/Deep Strike order swaps which two-inch Y translation fails friendly
+occupancy. This is a bounded feasibility-reference expansion. The nine-offset generator is
+preserved; feasible diagonal misses are explicitly queued for a separate
+generator decision. Three fixed orders in one synthetic fixture are not
+representative sampling, tactical usefulness, continuous placement coverage or
+Stage 2 completion. Ranking, screen/preserve/follow-through references and
+broader workload qualification remain open. No dataset or learning eligibility
+changes.
 
 ## 6. First delayed-tradeoff experiment
 

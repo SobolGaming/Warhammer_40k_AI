@@ -21,6 +21,127 @@ derives generated validation count from the current default offsets; the retaine
 campaign/report below remain byte-exact and are not current-runtime evidence.
 No cost is a tactical usefulness or learning label.
 
+## Three-order diagonal suite
+
+The same harness now accepts `--reference-suite`, selecting the separately
+[predeclared deployment reference suite](../AI_POLICY_INTERFACE.md#deployment-order-and-diagonal-reference-suite).
+The canonical command without this flag retains its original workload. The new
+mode calls `DeploymentReferenceSuite.measure()`, performs a JSON round trip and
+closed `from_payload` reproduction, then optionally executes a separate prepared
+component pass for each of the three declared cases. Candidate generation and
+fresh-fork validation use the same shared component helper as canonical mode;
+all sets/results must equal the complete report. The summary groups by case ID
+as well as phase, process state, operation, occurrence and generated/reference role.
+
+The definition was pinned before measurement at SHA-256
+`10fcfd7c7f3c85118c4a029dd042bbdbc73ed2448a3b78e44874883d45fd2d02`.
+All three ordinary recipes accept eleven decisions and reproduce startup,
+persistence and exact replay. Across their 33 decision occurrences, 54 finite
+probes accept; 96/108 generated placements accept; 93/120 reference placements
+accept and 51 are covered. The 42 feasible diagonal misses and 27 rejected
+reference probes remain explicit. Source/fixture exceptions, seven distinct
+routes, fixed seed, fixed formation origins, one layout and before-redeploy
+boundary are unchanged. These repeated occurrences are not independent samples.
+
+Reproduce the complete serial diagnostic with the locked Linux interpreter:
+
+```bash
+uv run --no-sync python scripts/measure_canonical_deployment_costs.py \
+  --reference-suite --output reports/deployment-reference-suite \
+  --processes 1 --repeats 1 --components \
+  --wall-seconds 2400 --cpu-seconds 4800
+```
+
+The output directory must not already exist. Run without coverage, profilers or
+competing validation workers. A campaign failure retains its completed/partial
+attempts and never becomes a passing cost observation. The worker saves the
+complete report before starting closed reload, preserving that report even if
+reload later fails. Timings are operator diagnostics outside authoritative
+receipts, actor inputs, replay and training eligibility.
+
+The [complete measurement](deployment-reference-suite-v1/measurement.json),
+[deterministic report](deployment-reference-suite-v1/suite-report.json) and
+[original definition](deployment-reference-suite-v1/definition.json) retain
+**one fresh process, one full measurement/reload pair and one prepared pass per
+case** on 10 November 2026. All 151 timed operations completed, with zero failed
+or incomplete operations. Full measurement and closed reload reproduce report
+SHA-256 `69d98b6d0c57c7ee6a07ccf8497f37e40da34c5f78de276eb509f01936904b04`.
+
+| Whole owner call | Wall seconds | CPU seconds |
+|---|---:|---:|
+| Full suite `measure`, first iteration | 478.425776 | 477.960079 |
+| Full suite `from_payload`, after measurement | 467.874505 | 467.577676 |
+
+These are **n=1** observations per owner call. The reload and all components are
+already warm from earlier work; there are no independently cold reload samples
+or warmed measurement repeats. The retained summary's single-sample mean,
+median, min/max and empirical percentiles coincide and do not estimate tail
+latency or confidence. The three different cases are not three replicates.
+
+| Prepared inclusive operation totals (seconds) | Deep/scout/vehicle | Vehicle/scout/deep | Scout/deep/vehicle |
+|---|---:|---:|---:|
+| Endpoint reproduction | 7.459920 | 7.449624 | 7.240087 |
+| Origin admission | 6.853090 | 6.903847 | 6.844093 |
+| All eleven prefixes | 9.576386 | 9.568108 | 9.830978 |
+| Eleven extra standalone forks | 4.784869 | 4.646588 | 4.435175 |
+| Finite generation: seven sets | 0.018467 | 0.018464 | 0.019114 |
+| Finite validation: eighteen probes | 9.729129 | 10.085119 | 9.873090 |
+| Generated placement construction: thirty-six | 0.307263 | 0.313413 | 0.313641 |
+| Generated placement validation: thirty-six | 55.142965 | 49.164024 | 61.030602 |
+| Reference construction: forty | 0.340302 | 0.553707 | 0.547245 |
+| Reference validation: forty | 46.042949 | 42.657499 | 49.779369 |
+| Persistence encoding | 0.153028 | 0.155461 | 0.159099 |
+| Checkpoint JSON round trip | 0.088201 | 0.091281 | 0.094303 |
+| Persistence restore | 4.479465 | 4.651693 | 4.671130 |
+| Replay artifact | 0.737474 | 0.932648 | 0.941154 |
+| Replay load and exact run | 2.498538 | 2.322342 | 2.326628 |
+
+The table sums occurrences within each prepared case, preserving every raw
+per-occurrence sample in the receipt. These inclusive owner calls and extra
+forks overlap semantically and must not be added into a headline decomposition.
+The complete campaign took **1397.771549 seconds wall** and
+**1400.674875 child CPU seconds**, within its declared
+2,400-second wall and 4,800-second CPU ceilings. Runtime import took
+2.861499 seconds separately; campaign wall includes process
+launch, all checks and evidence I/O.
+
+The provisional guest reported an AMD Ryzen Threadripper 3970X, 64 logical CPUs,
+65,780,624 KiB memory, CPython 3.14.5 and
+`Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31`.
+Affinity, cgroups, dependency versions and the exact lock digest are retained.
+No competing validation workers, coverage or profiler ran during the campaign;
+OS/page caches and unrelated host activity were uncontrolled. Reference hardware
+qualification remains provisional.
+
+Measured source was a working tree based on exact PR base
+`f95a2c1b66b881dbd52409d8d4c8b703c4d558c4`, with packaged runtime fingerprint
+`66abc9d0afe9ab335e2a80a9d3ea86c2ef53415078cbb5dc922131c5aca232bb`
+and driver SHA-256
+`de857d4c7f37ecb97d68de69dadd70ad3aba49dc4f992878ec98e925e1b7ec92`.
+The source tree/status, tracked-diff digest and complete runtime resource manifest
+remain in the measurement. Runtime and driver bytes stayed fixed throughout;
+later documentation, evidence and test-profile packaging do not retroactively
+make the final publishing commit the measured commit.
+
+The [measured driver source](deployment-reference-suite-v1/measured-driver-source.json)
+preserves its exact UTF-8 bytes and SHA-256. After measurement, static checking
+required two `# type: ignore[misc]` comments on already-executed replay lambdas;
+the published driver SHA-256 is
+`9dd4e2cf42e060716b950a2ab71ae0ba4f2f5fc429fca170ceeec38da71b300a`.
+A live control verifies the preserved bytes against the measurement hash and
+exact execution-AST equality with the current driver. Only those comments differ;
+runtime, timing boundaries, operations and measured outcomes are unchanged.
+The comment-only correction is not presented as a new timed campaign.
+
+The new suite has no predecessor measurement on the PR base. This observation
+characterizes its disclosed workload; it is not a matched base/head speedup or a
+comparison with the smaller canonical suite. Shared recipe and measurement
+factoring preserves the original canonical choices, candidate inventory and
+validation owners. The nine-offset generator remains unchanged. Tactical
+usefulness, general deployment coverage, full-game throughput, learning and
+Stage 2 completion remain unqualified. The required current-runtime serial smoke
+is a separate delivery gate.
+
 ## Retained five-offset results — 10 November 2026
 
 The retained campaign completed all three fresh processes, each with one full

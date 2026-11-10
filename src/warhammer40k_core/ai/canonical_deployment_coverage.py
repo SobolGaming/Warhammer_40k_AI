@@ -119,7 +119,11 @@ def _coverage(
 
 
 def _placement_row(
-    session: LocalGameSession, context: PlayerDecisionContext, action: PolicyAction
+    session: LocalGameSession,
+    context: PlayerDecisionContext,
+    action: PolicyAction,
+    *,
+    reference_translations: tuple[tuple[float, float], ...] = REFERENCE_TRANSLATIONS,
 ) -> dict[str, JsonValue]:
     seed = DeploymentPlacementCandidate.from_action(action, context=context)
     generated = DeploymentCandidateSet.generate(seed, context=context)
@@ -133,7 +137,7 @@ def _placement_row(
     # References are generated from their declared geometry, never selected from
     # the generated set or its acceptance list. Reuse the same translation owner.
     reference_set = DeploymentCandidateSet.generate(
-        seed, context=context, translations=REFERENCE_TRANSLATIONS, raw_budget=10
+        seed, context=context, translations=reference_translations, raw_budget=10
     )
     reference_validated = ValidatedDeploymentCandidates.validate(
         reference_set, context=context, session=session, validation_budget=10, accepted_limit=16
@@ -161,6 +165,93 @@ def _placement_row(
     }
 
 
+def _measure_prefixes(
+    prefixes: tuple[tuple[LocalGameSession, PlayerDecisionContext, PolicyAction], ...],
+    *,
+    reference_translations: tuple[tuple[float, float], ...] = REFERENCE_TRANSLATIONS,
+) -> tuple[list[dict[str, JsonValue]], dict[str, JsonValue]]:
+    """Measure fixed before-choice states with independent ten-offset references."""
+    _require(len(reference_translations) == 10, "Reference measurement requires ten offsets.")
+    rows: list[dict[str, JsonValue]] = []
+    finite_attempts = 0
+    for index, (prefix, context, action) in enumerate(prefixes):
+        checkpoint_hash = payload_digest(prefix.to_persistence_payload())
+        row: dict[str, JsonValue]
+        if action.option_id is None:
+            row = _placement_row(
+                prefix, context, action, reference_translations=reference_translations
+            )
+        else:
+            candidates = FiniteCandidateSet.from_context(context)
+            reference_ids = tuple(option["option_id"] for option in context.request["options"])
+            finite_attempts += len(reference_ids)
+            _require(
+                finite_attempts <= FINITE_ATTEMPT_LIMIT,
+                "Canonical finite coverage exceeds its explicit total attempt limit.",
+            )
+            reference_results = _finite_results(prefix, context, reference_ids)
+            results = [
+                result
+                for result in reference_results
+                if result["candidate_id"] in candidates.candidate_ids
+            ]
+            _require(
+                any(
+                    result["candidate_id"] == action.option_id and result["accepted"]
+                    for result in results
+                ),
+                "Canonical finite coverage lost its recipe positive control.",
+            )
+            # Finite reference universe is the pending engine option inventory;
+            # it is exact only at this prefix, not over alternate continuations.
+            row = {
+                "kind": "finite",
+                "recipe_candidate_id": action.option_id,
+                "candidate_set": cast(JsonValue, candidates.to_payload()),
+                "results": cast(JsonValue, results),
+                "reference_options": cast(JsonValue, context.request["options"]),
+                "reference_results": cast(JsonValue, reference_results),
+                "counts": _coverage(list(candidates.candidate_ids), results, reference_results),
+            }
+        _require(
+            payload_digest(prefix.to_persistence_payload()) == checkpoint_hash,
+            "Canonical coverage mutated a live prefix.",
+        )
+        row.update(
+            {
+                "index": index,
+                "route": validate_json_value(asdict(context.route)),
+                "observation_hash": context.observation_hash,
+                "checkpoint_hash": checkpoint_hash,
+                "choice_seed": context.choice_seed,
+            }
+        )
+        rows.append(row)
+    totals: dict[str, JsonValue] = {}
+    for kind in ("finite", "placement"):
+        selected = [
+            cast(dict[str, JsonValue], row["counts"]) for row in rows if row["kind"] == kind
+        ]
+        totals[kind] = {
+            "decision_occurrences": len(selected),
+            **{
+                key: sum(cast(int, counts[key]) for counts in selected)
+                for key in (
+                    "generated_count",
+                    "validation_attempts",
+                    "accepted_count",
+                    "rejected_count",
+                    "unvalidated_count",
+                    "reference_attempts",
+                    "legal_reference_count",
+                    "invalid_reference_probe_count",
+                    "covered_legal_reference_count",
+                )
+            },
+        }
+    return rows, totals
+
+
 @dataclass(frozen=True, slots=True, init=False)
 class CanonicalDeploymentCoverage:
     """Closed reproducible evidence for one fixed experiment, never actor input."""
@@ -176,81 +267,7 @@ class CanonicalDeploymentCoverage:
         before = canonical_json(session.to_persistence_payload())
         reproduced, report = reproduce_canonical_deployment()
         prefixes = canonical_deployment_prefixes(reproduced, report)
-        rows: list[dict[str, JsonValue]] = []
-        finite_attempts = 0
-        for index, (prefix, context, action) in enumerate(prefixes):
-            checkpoint_hash = payload_digest(prefix.to_persistence_payload())
-            row: dict[str, JsonValue]
-            if action.option_id is None:
-                row = _placement_row(prefix, context, action)
-            else:
-                candidates = FiniteCandidateSet.from_context(context)
-                reference_ids = tuple(option["option_id"] for option in context.request["options"])
-                finite_attempts += len(reference_ids)
-                _require(
-                    finite_attempts <= FINITE_ATTEMPT_LIMIT,
-                    "Canonical finite coverage exceeds its explicit total attempt limit.",
-                )
-                reference_results = _finite_results(prefix, context, reference_ids)
-                results = [
-                    result
-                    for result in reference_results
-                    if result["candidate_id"] in candidates.candidate_ids
-                ]
-                _require(
-                    any(
-                        result["candidate_id"] == action.option_id and result["accepted"]
-                        for result in results
-                    ),
-                    "Canonical finite coverage lost its recipe positive control.",
-                )
-                # Finite reference universe is the pending engine option inventory;
-                # it is exact only at this prefix, not over alternate continuations.
-                row = {
-                    "kind": "finite",
-                    "recipe_candidate_id": action.option_id,
-                    "candidate_set": cast(JsonValue, candidates.to_payload()),
-                    "results": cast(JsonValue, results),
-                    "reference_options": cast(JsonValue, context.request["options"]),
-                    "reference_results": cast(JsonValue, reference_results),
-                    "counts": _coverage(list(candidates.candidate_ids), results, reference_results),
-                }
-            _require(
-                payload_digest(prefix.to_persistence_payload()) == checkpoint_hash,
-                "Canonical coverage mutated a live prefix.",
-            )
-            row.update(
-                {
-                    "index": index,
-                    "route": validate_json_value(asdict(context.route)),
-                    "observation_hash": context.observation_hash,
-                    "checkpoint_hash": checkpoint_hash,
-                    "choice_seed": context.choice_seed,
-                }
-            )
-            rows.append(row)
-        totals: dict[str, JsonValue] = {}
-        for kind in ("finite", "placement"):
-            selected = [
-                cast(dict[str, JsonValue], row["counts"]) for row in rows if row["kind"] == kind
-            ]
-            totals[kind] = {
-                "decision_occurrences": len(selected),
-                **{
-                    key: sum(cast(int, counts[key]) for counts in selected)
-                    for key in (
-                        "generated_count",
-                        "validation_attempts",
-                        "accepted_count",
-                        "rejected_count",
-                        "unvalidated_count",
-                        "reference_attempts",
-                        "legal_reference_count",
-                        "invalid_reference_probe_count",
-                        "covered_legal_reference_count",
-                    )
-                },
-            }
+        rows, totals = _measure_prefixes(prefixes)
         _require(
             canonical_json(session.to_persistence_payload()) == before,
             "Canonical coverage mutated the supplied endpoint.",

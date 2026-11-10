@@ -159,12 +159,13 @@ def _recipe_payload() -> JsonValue:
 class _RecipePolicy:
     """State is only a fixed recipe cursor; inputs remain detached actor views."""
 
-    def __init__(self) -> None:
+    def __init__(self, steps: tuple[_Step, ...] = _STEPS) -> None:
+        self.steps = steps
         self.index = 0
 
     def choose(self, context: PlayerDecisionContext) -> PolicyAction:
-        _require(self.index < len(_STEPS), "Canonical deployment recipe exhausted.")
-        step = _STEPS[self.index]
+        _require(self.index < len(self.steps), "Canonical deployment recipe exhausted.")
+        step = self.steps[self.index]
         _require(context.route == step.route, "Canonical deployment route order drifted.")
         if step.option_id is not None:
             _require(
@@ -226,16 +227,23 @@ def reproduce_canonical_deployment() -> tuple[LocalGameSession, RunReport]:
     Timing in the returned diagnostic report is not component-cost qualification.
     No input checkpoint, caller policy, state mutation or alternate recipe is admitted.
     """
+    return _reproduce_recipe(_STEPS, recipe_id=CANONICAL_DEPLOYMENT_ID)
+
+
+def _reproduce_recipe(
+    steps: tuple[_Step, ...], *, recipe_id: str
+) -> tuple[LocalGameSession, RunReport]:
+    """Shared ordinary runner for explicitly declared operator recipes."""
     session = LocalGameSession()
     session.start(canonical_deployment_config())
-    policy = _RecipePolicy()
-    routes = tuple(dict.fromkeys(step.route for step in _STEPS))
+    policy = _RecipePolicy(steps)
+    routes = tuple(dict.fromkeys(step.route for step in steps))
     router = PolicyRouter(
         tuple(
             PolicyRegistration(
                 route,
-                CANONICAL_DEPLOYMENT_ID,
-                canonical_json({"recipe": _recipe_payload()}),
+                recipe_id,
+                canonical_json({"recipe": validate_json_value([asdict(step) for step in steps])}),
                 policy,
             )
             for route in routes
@@ -244,17 +252,17 @@ def reproduce_canonical_deployment() -> tuple[LocalGameSession, RunReport]:
     report = BoundedPolicyRunner(
         session=session,
         router=router,
-        limits=RunLimits(policy_seed=7, max_decisions=len(_STEPS), max_seconds=120.0),
+        limits=RunLimits(policy_seed=7, max_decisions=len(steps), max_seconds=120.0),
     ).run(stop_at=RunBoundary("setup", "redeploy_units"))
     _require(
         report.stop_reason == "requested_boundary"
-        and len(report.decisions) == len(_STEPS)
+        and len(report.decisions) == len(steps)
         and tuple(attempt.route for attempt in report.decisions)
-        == tuple(step.route for step in _STEPS)
+        == tuple(step.route for step in steps)
         and all(
             attempt.accepted and attempt.recorded_decisions == 1 for attempt in report.decisions
         )
-        and session.decision_record_count() == len(_STEPS),
+        and session.decision_record_count() == len(steps),
         "Canonical deployment accepted trace drifted.",
     )
     return session, report
@@ -269,13 +277,20 @@ def canonical_deployment_prefixes(
     These private forks are never policy inputs. The final checkpoint must match
     the separately reproduced runner endpoint before any prefix is returned.
     """
+    return _recipe_prefixes(session, report, steps=_STEPS)
+
+
+def _recipe_prefixes(
+    session: LocalGameSession, report: RunReport, *, steps: tuple[_Step, ...]
+) -> tuple[tuple[LocalGameSession, PlayerDecisionContext, PolicyAction], ...]:
+    """Replay every accepted record and bind the independently reproduced endpoint."""
     fresh = LocalGameSession()
     fresh.start(canonical_deployment_config())
     fresh.advance_until_decision_or_terminal()
-    policy = _RecipePolicy()
+    policy = _RecipePolicy(steps)
     records = session.lifecycle.decision_controller.records
     _require(
-        len(records) == len(report.decisions) == len(_STEPS),
+        len(records) == len(report.decisions) == len(steps),
         "Canonical coverage requires the complete recipe trace.",
     )
     prefixes: list[tuple[LocalGameSession, PlayerDecisionContext, PolicyAction]] = []
@@ -284,7 +299,7 @@ def canonical_deployment_prefixes(
             fresh.view(viewer_player_id=attempt.route.actor_id), choice_seed=attempt.choice_seed
         )
         _require(
-            context.route == _STEPS[index].route == attempt.route
+            context.route == steps[index].route == attempt.route
             and context.observation_hash == attempt.observation_hash
             and fresh.decision_record_count() == index,
             "Canonical coverage prefix drifted.",
