@@ -2429,6 +2429,12 @@
       "bytes": 42274,
       "sha256": "9c50a1ee78e7b79bd7c094b369fcb241336b154b46d54601e21ae087acdbc953",
       "blob_sha1": "e546b73a90011e01dccd45687fa2597e13b507e0"
+    },
+    "tests/infrastructure/adapters/test_canonical_deployment.py": {
+      "mode": "100644",
+      "bytes": 8775,
+      "sha256": "3dcc8f0433797ac4775f23c861b885f96fa3249c315171c72c6d9dfd13b8c518",
+      "blob_sha1": "d4c44bae0f48f81620799197b89c84a1f4c23ff6"
     }
   },
   "active_roots": [

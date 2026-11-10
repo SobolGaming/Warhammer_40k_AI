@@ -1021,6 +1021,98 @@ not qualify Stage 2 workload admission, reachable mechanic coverage, useful
 reference alternatives, component costs, full-game performance or learning.
 See the maintained plan's bounded Stage 1 reconciliation for the endpoint.
 
+## Frozen canonical deployment admission
+
+`ai.canonical_deployment` supplies the first bounded Stage 2 admission slice.
+`canonical_deployment_config()` reconstructs the unchanged
+`canonical_setup_prebattle_smoke_config(game_id="canonical-deployment-v1")` and
+requires its full configuration SHA-256 to equal
+`adfdb1ee885d9de34ddbe6ef7fe1be64c728f86d3529dc2e82b7523132926409`.
+This includes the roster, complete executable mission/layout geometry, rules,
+source identities and fixed test private seed (`f0` repeated 32 times). A change
+requires explicit fixture review/versioning; a friendly ID alone cannot admit it.
+The seed is public test data, unsuitable for competitive games.
+
+`reproduce_canonical_deployment()` uses the existing `BoundedPolicyRunner`, exact
+route registrations, detached actor contexts and ordinary viewer submissions.
+Its declared fixed recipe selects Assassination + Bring It Down for both players,
+completes player A's reserve declarations with every unit deploying, and places
+all four units/14 models. No player B reserve request is emitted in this recipe.
+The policy seed is 7; the cooperative runner limit is 11 decisions/120 seconds.
+This is an explicit recipe with no candidate search, alternate-policy recovery
+or inferred legal action. The time limit is a progress guard, not a cost result.
+
+| Accepted indices (zero based) | Required exact route | Observed count |
+|---|---|---|
+| 0 / 1 | `player-a` / `player-b`, `select_secondary_missions`, setup `select_secondary_missions`, finite | 1 each |
+| 2 | `player-a`, `select_reserve_declaration`, setup `declare_battle_formations`, finite | 1 |
+| 3 / 5, 7, 9 | `player-b` / `player-a`, `select_deployment_unit`, setup `deploy_armies`, finite | 1 / 3 |
+| 4 / 6, 8, 10 | `player-b` / `player-a`, `submit_deployment_placement`, setup `deploy_armies`, proposal `deployment_placement` | 1 / 3 |
+
+All seven distinct declared routes are observed; no required route is unobserved.
+The exact actor/order/accepted-record count is checked, not inferred from registry
+size. Model positions are inches in the configured world frame, z=0. For each
+formation, model index `i` adds `(1.8*(i//3), 1.8*(i%3))` to its origin:
+player B's five scouts `(3,3)`, player A's three Deep Strike models `(3,45)`,
+five scouts `(3,51)`, and one vehicle `(7,57)`. Facing is 180 degrees for B and
+0 degrees for A. Unit/model IDs come from the exact fixture and actor proposal.
+Each formation passes normal deployment/coherency/occupancy/terrain validation.
+The endpoint is the first pending setup `redeploy_units` request, before making
+that choice. It is a truncated prefix, not completed setup, Command or a battle.
+
+`CanonicalDeploymentAdmission.from_session(session)` first requires the frozen
+configuration, reproduces the complete recipe, compares the exact checkpoint,
+and verifies ordinary startup plus strict persistence/replay through
+`VerifiedEpisodeOrigin`. Its immutable operator-only receipt retains the full
+configuration and recipe, source/build/checkpoint identity, ordered accepted
+records with actor observation hashes, required/observed/unobserved routes,
+pending endpoint route, replay commitment, fixture exceptions and remaining
+Stage 2 obligations. The closed loader rederives all evidence; changed fields,
+ordinary alternate configurations and incomplete prefixes fail. It does not
+mutate the supplied session. No receipt/private checkpoint is added to actor
+views. The existing adapter contract already covers every finite/proposal choice;
+this adds no player-facing route or wire payload.
+
+Source and fixture limits are part of this admission:
+
+- The synthetic `phase9a-canonical` catalog, setup-smoke REDEPLOY/SCOUTS overlay,
+  and `allow_legacy_non_strict_rosters=True` remain explicit test exceptions.
+  The 32mm infantry/Deep Strike bases and 120mm vehicle base are canonical test
+  profiles. Model volumes use the existing legacy keyword-derived heights,
+  not source-measured model geometry. Only one 300-point reserve value is
+  configured; this is not a complete official points roster or faction admission.
+- Mission/scoring ownership remains Event Companion v1.1 July, source
+  `gw-11e-warhammer-event-companion-v1-1-2026-07`, reviewed import hash
+  `4832f73e470caa4d0906fef06af3f05f53b00a68bbfdbb3d2c639eec6e323fb0`
+  in `rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py`.
+  The retained [July extraction](../data/source_audits/event_companion_2026_06/phase17n_event_companion_battlefields_pages_9_53_extraction.json)
+  identifies `eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf`,
+  SHA-256 `97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20`;
+  that layout extraction is not fresh mission/scoring-wording validation.
+- The actual 44x60 battlefield, Take and Hold versus Purge the Foe layout 3,
+  uses the [current October layout owner](../data/source_audits/event_companion_2026_10/README.md),
+  page 14 of official `eng_14-10_wh40k_event_companion-rdwnqprl4c-nj8oqogadv.pdf`,
+  SHA-256 `187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2`.
+  Its [runtime artifact](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-battlefields.json)
+  has package hash `be19e97db9124271cae2dba2cdc8ef76992526b67c11505cf7c10c00435d36a7`.
+  Retained module/mission names do not change that geometry provenance. The
+  owner's physical component models, quantization and deployment templates remain
+  project assumptions; official layout artwork does not certify model heights.
+- Primary assignments are Immovable Object for A and Unstoppable Force for B.
+  This prefix validates fixed-secondary selection, not scoring windows, victory
+  points, terminal utility or a new training target. July mission/scoring clauses
+  have not thereby been authenticated as October wording.
+
+The receipt records redeploy/Scouts, reserve arrivals, Tactical draws,
+attachments/transports and battle movement/combat/reactions/scoring as unsupported
+**by this recipe**; it makes no claim that the engine lacks those mechanics.
+The pending redeploy route is distinct from the seven accepted routes. Other
+choices, orders, geometries, seeds and reachable states remain unexercised.
+Candidate/reference-alternative coverage and component-cost measurements remain
+later Stage 2 slices. This admission neither creates a dataset nor changes
+`DeploymentWorkloadContract` or training eligibility. It claims no exhaustive
+reachability, full-game support, learning, tactical quality or cost certification.
+
 ## Exact v995 Daemons mirror inventory
 
 Workload: [the 2,000-point app roster](../data/army_lists/cavalcade-shadow-bloodthirster.json),

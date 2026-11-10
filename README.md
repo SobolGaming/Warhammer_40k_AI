@@ -415,14 +415,17 @@ and retain their complete baseline measurement. Changed/removed/renamed cases or
 changed test-module bytes require explicit sidecar regeneration, and behavioral
 inventory changes still require a fresh complete successful baseline profile.
 
-The current calibration retains 263 compatible source-bound raw worker receipts
-and 32,637 passed three-phase samples covering all 6,232 current cases, with no
-baseline-only cases. It preserves the prior 214 receipts and 26,405 sample tuples
-exactly and appends 49 completed worker receipts from PR651 attempt 1. The earlier
-split-contract update omitted 21 whole historical worker receipts whose collected
-test-module bytes changed; this update does not reinstate those incompatible
-receipts. All prior receipts, observations and profiles remain in Git history and
-their original GitHub artifacts. No partial progress journal is a calibration receipt.
+The current calibration retains all 263 compatible source-bound raw worker
+receipts and 32,637 passed three-phase samples covering 6,232 previously measured
+cases. The 14 added canonical-deployment cases use their new complete local
+baseline measurements without invented hosted observations. The inventory now
+contains 6,246 cases, including those 14 baseline-only cases. All prior receipt
+and observation tuples are preserved exactly, including the 49 completed workers
+from PR651 attempt 1. The earlier split-contract update omitted 21 whole
+historical worker receipts whose collected test-module bytes changed; this update
+does not reinstate those incompatible receipts. All prior receipts, observations
+and profiles remain in Git history and their original GitHub artifacts. No partial
+progress journal is a calibration receipt.
 
 Retained sources include successful historical run
 [42549486854](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42549486854),
@@ -448,18 +451,20 @@ remain failed. Independent run/PR/merge/artifact APIs bind attempt 1, source hea
 and the unchanged recorded runtime. The merge and source head have identical
 trees. The unchanged maximum formula incorporates these observations for planning;
 it neither promotes this failed run to a passing baseline nor predicts a passing
-rerun. The local baseline below remains unchanged.
+rerun. These historical receipt and observation tuples remain unchanged in the
+subsequent canonical-fixture inventory update.
 
-The complete baseline is the successful local 6,232-case covered workload-contract
-run: Python 3.14.5 under WSL, one isolated mirror worker followed by 32 remainder
-workers, with static/contract checks concurrent during the enclosing validation.
-The tested working source is based on `6d9baab04e19cbbf411b9b270c6650f27f0275a2`
-and has runtime fingerprint
-`96bb4d3651da798e385277368082c82c563f29593ee2cd350fd82789e5f68c0b`.
-Its authentic complete JUnit measurements include all 23 added cases. The prior
-6,209-case local split-contract and 6,178-case hosted baselines remain historical; local and hosted measurements are
-not mixed into one representative baseline. The unchanged maximum formula still
-retains every compatible slower hosted observation. Local timings do not establish
+The complete baseline is the successful local 6,246-case covered canonical
+deployment-admission run: Python 3.14.5 under WSL, one isolated mirror worker
+followed by 32 remainder workers. Static and contract checks completed separately
+before this fresh run. The tested working source is based on
+`0ef1e9ec005566726efb1fb17873f78677b762eb` and has runtime fingerprint
+`6ecfaf06d097553f259c1b2fbb338ae3c98abfae3e80d2eb57ada1032dad51eb`.
+Its authentic complete JUnit measurements include all 14 added cases. The prior
+6,232-case local workload-contract, 6,209-case local split-contract and 6,178-case
+hosted baselines remain historical; local and hosted measurements are not mixed
+into one representative baseline. The unchanged maximum formula still retains
+every compatible slower hosted observation. Local timings do not establish
 hosted cost accuracy or a speedup; fresh hosted qualification remains required.
 
 Fixture setup observations are worker/order dependent; taking maxima and regrouping
