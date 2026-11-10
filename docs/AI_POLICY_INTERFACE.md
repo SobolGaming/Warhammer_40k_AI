@@ -1459,3 +1459,59 @@ is introduced. Incomplete prefixes, changed configurations, extra ordinary
 decisions and changed closed receipts fail admission. This does not certify
 continuous placement coverage, tactical usefulness, full games, performance,
 learning or Stage 2 completion.
+
+## Witnessed Normal Move prefix admission
+
+`ai.normal_move_scenario` supplies `reproduce_normal_move_scenario()` and the
+closed operator-only `NormalMoveScenarioAdmission.from_session(...)` /
+`from_payload(..., session=...)` receipt. Its `canonical-witnessed-normal-move-v1`
+definition hash is
+`12c50a37c861dbf138e8e89e90fbdd1931283d31ccff3442872582846eaa7c81`.
+It retains the canonical configuration hash above and binds the original
+preservation definition hash. Both execute the same first fifteen ordinary
+choices, ending before S selection; the receipt commits to that full checkpoint,
+and regression controls compare its persistence payload and ordered records
+with an ordinary reconstruction of preservation's prefix.
+
+The alternative selects `army-alpha:scout-redeploy-unit`, selects `normal_move`,
+and submits one typed `MovementProposalPayload` with an actual `PathWitness`.
+The fixed recipe reads all five S model poses from player A's view, preserves
+height and facing, and supplies straight-line paths one inch in negative X in
+observed model order. It submits through `submit_viewer_parameterized_payload`;
+the existing engine validates the complete paths, collision/coherency and movement
+constraints before mutation. There is no endpoint-only acceptance or direct
+placement edit. The old preservation definition and seventeen-record receipt
+retain their exact meaning.
+
+The authoritative path is viewer submission / `ParameterizedSubmission`,
+`GameLifecycle.submit_decision`, movement proposal preflight, the shared
+`movement_resolution_flow._apply_movement_proposal_decision` and
+`movement_rules_units.resolve_rules_unit_normal_move`, then engine placement
+replacement and `movement_activation_completed`. The existing
+[Movement contract](ADAPTER_DECISION_CONTRACT.md) already specifies the finite
+`normal_move` selection, movement mode and follow-up `submit_movement_proposal`
+with a `PathWitness`. No decision type, proposal family, wire shape or visibility
+behavior changes in this slice.
+
+Admission compares the entire eighteen-record endpoint with fresh ordinary
+reproduction and verifies startup, JSON persistence and exact replay through
+`VerifiedEpisodeOrigin`. It retains fourteen required/observed routes, complete
+accepted records and observation hashes, finite choice inventories, the submitted
+witness, Command/Movement boundary events, consumed S activation and the next
+Movement unit request with E still available. The pinned definition inventories
+required prefix mechanics separately from unobserved tactical requirements. S's
+Normal Move route is observed; E's movement and the opponent's Shooting route
+remain minimum continuation obligations, not a complete battle plan.
+
+A legal path does not establish screening, exposure, tactical usefulness, an
+opponent threat, E follow-through or any later scoring/attack outcome. All five
+original tactical obligations remain unobserved, including the tactical meaning
+of screen/exposure movement. `useful_reference_status` is `scoped_gap`,
+`reference_target` is null and `eligible_for_learning` is false. Missing evidence
+is not engine-unsupported. The inherited synthetic roster, legacy/provisional
+geometry, July mission/scoring, October layout, partial points and public seed
+exceptions remain. Candidate/reference continuation coverage, scenario costs,
+full-game qualification and Stage 2 completion remain open. Metadata stays outside
+actor/scorer inputs. Controls retain preservation, genuine invalid-distance
+rejection and replay, strict closed receipt rejection, and incomplete/extra-prefix
+exclusion.
