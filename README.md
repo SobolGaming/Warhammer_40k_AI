@@ -415,16 +415,18 @@ and retain their complete baseline measurement. Changed/removed/renamed cases or
 changed test-module bytes require explicit sidecar regeneration, and behavioral
 inventory changes still require a fresh complete successful baseline profile.
 
-The current calibration retains 292 compatible source-bound raw worker receipts
-and 35,975 passed three-phase samples covering all 6,254 current cases. It preserves
-all 243 earlier receipts and their 29,721 samples unchanged, then appends 49
-completed workers and 6,254 samples from PR656 attempt 1. There are no baseline-only
-cases or invented hosted observations. The deployment reference-suite update
-changes one behavioral test module without earlier retained hosted observations;
-no additional worker receipts or samples are excluded. The earlier
-second-cardinal-ring update excluded twenty incompatible worker receipts and
-their 2,916 samples. Every surviving outcome, source identity and phase tuple
-remains unchanged.
+The current calibration retains 284 compatible source-bound raw worker receipts
+and 34,836 passed three-phase samples covering 6,115 current cases. All sixty
+source collected inventories were authenticated before filtering by exact counts and hashes;
+the original 679-node inventory also matches the three independently retrieved,
+SHA-authenticated workers in artifacts 13649430067 and 13648072478. The diagonal
+generator update changes two behavioral modules, excluding the eight PR656
+worker receipts whose collected inventories include them and all 1,139 samples
+from those receipts. Every surviving outcome, source identity and phase tuple
+is unchanged. The 139 cases in those two modules have no compatible retained
+hosted observation and use the fresh complete local baseline below. No unknown
+inventory was guessed and no timing sample was invented. Original receipts and
+their outcomes remain in Git history and source artifacts.
 
 All 52 original collected inventories were authenticated by their exact counts
 and hashes. Fifty-one reconstruct completely from retained observation membership;
@@ -471,8 +473,9 @@ run remains failed. Independent run/PR/merge/job/artifact APIs and archive diges
 bind its 49 completed workers to source head
 `6f55680b0767eb901eae34cd807a5960a47a10af`, tested merge checkout
 `d99aa9ce1e5d186f05dd6ac8ef999313237c419b`, and the recorded runtime fingerprint.
-The source and merge trees match, and every collected test module matches current
-bytes. The admitted samples cover the exact 6,254-case baseline once.
+The source and merge trees matched, and every collected test module matched the
+then-current bytes. The diagonal-generator update excludes the incompatible
+receipts as described above. The admitted samples cover the exact 6,254-case baseline once.
 
 This run exposed hosted cost variance absent from the local baseline: the existing
 complete canonical-coverage case took 1,080.002 seconds across its three phases,
@@ -485,19 +488,18 @@ eighteen-minute limit. A fresh hosted run is required; an over-limit result rema
 a blocker. No timing budget, test selection, assertion or scheduling algorithm
 changes as part of this calibration refresh.
 
-The complete baseline is the successful local 6,254-case covered three-order
-deployment reference-suite run: Python 3.14.5 under WSL, one isolated mirror
-worker followed by 32 remainder workers, using a fresh checkout-bound source
-index. Static/type/contract checks completed separately; no competing validation
-workers ran during this complete attempt. The tested working source is based on
-`f95a2c1b66b881dbd52409d8d4c8b703c4d558c4`, with runtime fingerprint
-`66abc9d0afe9ab335e2a80a9d3ea86c2ef53415078cbb5dc922131c5aca232bb`.
-Its complete successful JUnit measurements supply every current case weight,
-including the changed module. The prior 6,250-case second-cardinal-ring and
-five-offset coverage, 6,246-case canonical-admission, 6,232-case workload-contract,
-6,209-case split-contract and 6,178-case hosted baselines remain historical.
-Local and hosted measurements are not mixed into one representative baseline.
-The unchanged maximum formula retains every compatible slower hosted observation.
+The complete baseline is the successful local 6,254-case covered diagonal-generator
+qualification: Python 3.14.5 under WSL, one isolated mirror worker followed by
+32 remainder workers, using a fresh checkout-bound source index. Static/type/
+contract checks run separately; no competing validation workers ran during
+the complete attempt. The tested working source is based on
+`a085db23dbef50237398b226cd24328d337d0e3b`, with runtime fingerprint
+`8996a426d3399cdd20243a6083d426d7627ac3ef5afd4597710ef16ccab94d6a`.
+Complete successful JUnit measurements supply every current case weight, including
+both changed modules. The prior three-order, second-cardinal-ring and five-offset
+profiles remain historical. Local and hosted measurements are not mixed into one
+representative baseline. The unchanged maximum formula retains every compatible
+slower hosted observation; excluded receipts do not become current measurements.
 Local timings do not establish hosted cost accuracy or a speedup; fresh hosted
 qualification remains required.
 

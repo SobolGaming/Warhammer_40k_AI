@@ -15,13 +15,81 @@ placements and forty reference placements. Acceptance was 18/18 finite and
 and eight rejected reference probes excluded. The complete deterministic report
 retains exact per-occurrence lists, raw/validation budgets, outcomes, diagnostics,
 configuration/build/source identity and hashes. These remain the authority for
-the historical measured workload. The current second-ring default evaluates 36
-generated placements (32 accepted) and covers 32/32 legal references. Its driver
+the historical measured workload. The current diagonal default evaluates 52
+generated placements (46 accepted) and covers 32/32 legal references. Its driver
 derives generated validation count from the current default offsets; the retained
 campaign/report below remain byte-exact and are not current-runtime evidence.
 No cost is a tactical usefulness or learning label.
 
-## Three-order diagonal suite
+## Current diagonal-offset work observation
+
+Generator `actor-formation-xy-translations-v2` appends
+`(1,1), (-1,1), (1,-1), (-1,-1)` after the original nine offsets. The current
+[suite definition](deployment-reference-suite-v2/definition.json) is explicitly
+versioned for thirteen generated placements; reference coordinates, three orders,
+formation origins and all exclusions remain identical to v1. Its pre-measurement
+definition hash is `7f8b9428acb03cfdce6b86396c520f487bc38369aacd90ce9d4d377dd9e8fa00`.
+
+The [complete current receipt](deployment-reference-suite-v2/suite-report.json)
+records 54/54 accepted finite choices, 138/156 accepted generated placements,
+93/93 covered legal placement references and 27 invalid probes excluded from the
+120-reference denominator. This closes the 42 demonstrated feasible diagonal
+misses; six positive-Y vehicle diagonals remain engine-rejected. All 330
+finite/generated/reference attempts complete, versus 282 at the base. This is
+finite feasibility qualification, with no tactical-usefulness, representative
+coverage, full-game or Stage 2 completion claim.
+
+Separate [exact-base](deployment-reference-suite-v2/base-measurement.json) and
+[head](deployment-reference-suite-v2/head-measurement.json) campaigns use the same
+unmodified harness, locked CPython 3.14.5 environment, WSL Threadripper 3970X host,
+reference geometry and complete-call boundaries. Each is one serial fresh process,
+one measurement/closed-load pair and a subsequent prepared component pass.
+The head deliberately performs 48 additional generated validation attempts per
+complete suite call. These are **n=1 per-arm work-volume observations**, not a
+speedup, statistical tail estimate or byte-identical-workload comparison.
+
+| Inclusive operation | Exact base seconds | Expanded head seconds |
+|---|---:|---:|
+| Complete suite measurement | 499.212494 | 515.850058 |
+| Closed suite reproduction after measurement | 483.505265 | 504.721010 |
+| Prepared generated placement construction, twelve occurrences | 0.952135 | 1.504046 |
+| Prepared generated fresh-fork validation, twelve occurrences | 167.242111 | 234.221813 |
+| Prepared reference fresh-fork validation, twelve occurrences | 139.613745 | 107.419752 |
+
+Prepared rows total twelve placement occurrences across all three cases and
+overlap the complete calls semantically; they must not be summed into a cost
+decomposition. Base campaign wall/child CPU totals are
+1440.258599/1443.486841 seconds; head totals are
+1511.362028/1514.732208 seconds. Both completed
+within their declared 2,400-second wall and 4,800-second CPU ceilings, with no
+failed or incomplete operations. These operator campaign ceilings are separate
+from the unchanged 180-second delivery smoke and covered-shard timing gates.
+
+Both measured source trees are based on exact PR base
+`a085db23dbef50237398b226cd24328d337d0e3b`. Base is the clean checkout, runtime
+`66abc9d0afe9ab335e2a80a9d3ea86c2ef53415078cbb5dc922131c5aca232bb`;
+head is the recorded working source, runtime
+`8996a426d3399cdd20243a6083d426d7627ac3ef5afd4597710ef16ccab94d6a`.
+The identical driver SHA-256 is
+`9dd4e2cf42e060716b950a2ab71ae0ba4f2f5fc429fca170ceeec38da71b300a`.
+The later publication includes evidence, documentation and profile packaging;
+it is not claimed to be the commit sampled before those files existed.
+
+No other test workers, coverage, profiler, source-index build or validation ran
+during either campaign. Focused head checks preceded the second arm; fresh
+interpreters did not reset OS/page caches or unrelated host activity. Closed
+reproduction and prepared components are warm after measurement. Full environment,
+raw operation order, source/diff identity and exact counts remain in the receipts.
+Historical version-one and earlier canonical evidence remain byte-exact with
+their original outcomes. The separate serial smoke and final gates remain required.
+
+
+## Retained version-one three-order diagonal suite
+
+The following observations retain version-one meaning and outcomes. Running the
+command below on the current checkout measures version two; it does not reproduce
+the historical version-one report. The separate exact-base campaign above
+reproduced that report on `a085db23dbef50237398b226cd24328d337d0e3b`.
 
 The same harness now accepts `--reference-suite`, selecting the separately
 [predeclared deployment reference suite](../AI_POLICY_INTERFACE.md#deployment-order-and-diagonal-reference-suite).
@@ -217,7 +285,7 @@ spread only: nearest-rank p90/p95 both equal the observed maximum, not a reliabl
 tail bound. Exact-fixture costs are recorded; broader useful references keep
 Stage 2 open.
 
-## Current second-ring work observation
+## Retained second-ring work observation
 
 The default now adds ±2-inch X/Y translations after the original five offsets.
 The [complete current receipt](canonical-placement-second-ring/head-coverage.json)
@@ -315,7 +383,7 @@ distinct from these operator limits and the normal 180-second serial smoke gate.
 | `report_json_roundtrip` | JSON encode/decode of the already materialized report payload, outside both report timers. |
 | `coverage_from_payload` | Entire closed loader: complete fresh measurement and exact payload comparison; supplied endpoint and JSON report are already prepared. |
 | Prepared component pass | Separate calls after all full iterations. Configuration, start, first advance, admission, prefix reconstruction, persistence encode, JSON checkpoint encode/decode, restore, artifact extraction and replay load/run have individual boundaries. |
-| Per-occurrence components | Extra standalone `fork`; finite-set capture and coverage's actual finite probe owner; placement generator and production fresh-fork validator with current nine/ten generated/reference offsets and attempts (the retained five-offset campaign used five/ten for both; raw ceilings 64/10), accepted cap sixteen. Sets and results must exactly equal the authoritative row. |
+| Per-occurrence components | Extra standalone `fork`; finite-set capture and coverage's actual finite probe owner; placement generator and production fresh-fork validator with current thirteen/ten generated/reference offsets and attempts (the retained five-offset campaign used five/ten for both; raw ceilings 64/10), accepted cap sixteen. Sets and results must exactly equal the authoritative row. |
 
 `first_iteration` means the first workload in a fresh interpreter process. Imports
 and endpoint preparation precede its first `coverage_measure`; the subsequent

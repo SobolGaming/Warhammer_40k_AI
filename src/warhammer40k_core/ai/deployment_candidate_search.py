@@ -23,9 +23,9 @@ from warhammer40k_core.engine.event_log import (
 )
 
 DEPLOYMENT_SET_SCHEMA = "deployment-translation-set-v1"
-DEPLOYMENT_GENERATOR = "actor-formation-xy-translations-v1"
+DEPLOYMENT_GENERATOR = "actor-formation-xy-translations-v2"
 # Preserve the original seed/one-inch prefix for callers with smaller budgets.
-# The second cardinal ring adds wider spatial alternatives; legality still belongs
+# The cardinal rings and one-inch XY diagonals add spatial alternatives; legality belongs
 # exclusively to ordinary engine validation, and no tactical quality is implied.
 DEFAULT_TRANSLATIONS = (
     (0.0, 0.0),
@@ -37,6 +37,10 @@ DEFAULT_TRANSLATIONS = (
     (-2.0, 0.0),
     (0.0, 2.0),
     (0.0, -2.0),
+    (1.0, 1.0),
+    (-1.0, 1.0),
+    (1.0, -1.0),
+    (-1.0, -1.0),
 )
 
 

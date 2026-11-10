@@ -37,11 +37,11 @@ def test_complete_canonical_coverage_reconciles_reproduces_and_rejects_false_den
     totals = cast(dict[str, dict[str, int]], payload["totals"])
     assert totals["finite"]["decision_occurrences"] == 7
     assert totals["placement"]["decision_occurrences"] == 4
-    assert totals["placement"]["generated_count"] == 36
+    assert totals["placement"]["generated_count"] == 52
     assert totals["placement"]["reference_attempts"] == 40
     assert totals["finite"]["generated_count"] == 18
     assert totals["finite"]["accepted_count"] == 18
-    assert totals["placement"]["accepted_count"] == 32
+    assert totals["placement"]["accepted_count"] == 46
     assert totals["placement"]["legal_reference_count"] == 32
     assert totals["placement"]["covered_legal_reference_count"] == 32
     assert totals["placement"]["invalid_reference_probe_count"] == 8
@@ -243,7 +243,7 @@ def test_reference_suite_definition_is_pinned_and_closed() -> None:
     assert (
         payload_digest(definition)
         == REFERENCE_SUITE_DEFINITION_HASH
-        == ("10fcfd7c7f3c85118c4a029dd042bbdbc73ed2448a3b78e44874883d45fd2d02")
+        == ("7f8b9428acb03cfdce6b86396c520f487bc38369aacd90ce9d4d377dd9e8fa00")
     )
     with pytest.raises(TrainingAdmissionError, match="Unknown deployment reference case"):
         reference_case_steps("unregistered-order")
@@ -251,6 +251,19 @@ def test_reference_suite_definition_is_pinned_and_closed() -> None:
         DeploymentReferenceSuite()
     with pytest.raises(TrainingAdmissionError, match="declaration drifted"):
         DeploymentReferenceSuite.from_payload({"definition": definition})
+    predecessor = dict(definition)
+    predecessor["suite_id"] = "deployment-order-diagonal-reference-suite-v1"
+    predecessor["budget"] = (
+        "all-finite-options-and-nine-generated-ten-reference-placements-no-truncation"
+    )
+    with pytest.raises(TrainingAdmissionError, match="declaration drifted"):
+        DeploymentReferenceSuite.from_payload(
+            {
+                "schema_version": "deployment-reference-suite-v1",
+                "definition": predecessor,
+                "definition_hash": payload_digest(predecessor),
+            }
+        )
 
 
 @pytest.mark.parametrize(
@@ -266,12 +279,12 @@ def test_reference_case_ordinary_prefixes_geometry_and_feasible_gaps(case_id: st
     assert len(cast(list[JsonValue], payload["accepted_records"])) == 11
     totals = cast(dict[str, dict[str, int]], payload["totals"])
     assert totals["finite"]["accepted_count"] == totals["finite"]["legal_reference_count"] == 18
-    assert totals["placement"]["generated_count"] == 36
+    assert totals["placement"]["generated_count"] == 52
     assert totals["placement"]["reference_attempts"] == 40
     assert totals["placement"]["unvalidated_count"] == 0
-    assert totals["placement"]["accepted_count"] == 32
+    assert totals["placement"]["accepted_count"] == 46
     assert totals["placement"]["legal_reference_count"] == 31
-    assert totals["placement"]["covered_legal_reference_count"] == 17
+    assert totals["placement"]["covered_legal_reference_count"] == 31
     assert totals["placement"]["invalid_reference_probe_count"] == 9
     missing = 0
     violation_codes: set[str] = set()
@@ -285,6 +298,14 @@ def test_reference_case_ordinary_prefixes_geometry_and_feasible_gaps(case_id: st
         assert validation["stop_reason"] == "complete"
         counts = cast(dict[str, JsonValue], row["counts"])
         missing_ids = cast(list[str], counts["missing_legal_reference_ids"])
+        assert missing_ids == []
+        generated = cast(dict[str, JsonValue], row["candidate_set"])
+        generated_candidates = cast(list[dict[str, JsonValue]], generated["candidates"])
+        generated_validation = cast(dict[str, JsonValue], row["validation"])
+        generated_results = cast(list[dict[str, JsonValue]], generated_validation["results"])
+        assert generated_validation["stop_reason"] == "complete"
+        assert generated["generator_id"] == "actor-formation-xy-translations-v2"
+        assert len(generated_candidates) == len(generated_results) == 13
         seed = cast(dict[str, JsonValue], reference_set["seed"])
         proposal = cast(dict[str, JsonValue], seed["proposal"])
         edge_codes = {"battlefield_edge_crossed", "deployment_zone_violation"}
@@ -315,10 +336,18 @@ def test_reference_case_ordinary_prefixes_geometry_and_feasible_gaps(case_id: st
             assert candidate["candidate_id"] == result["candidate_id"]
             assert result["accepted"] is (tuple(offset) not in expected_rejections)
             if result["accepted"]:
-                diagonal = abs(offset[0]) == abs(offset[1]) == 1
-                assert (candidate["candidate_id"] in missing_ids) is diagonal
-                missing += int(diagonal)
-            else:
+                assert candidate["candidate_id"] not in missing_ids
+                assert candidate in generated_candidates
+            missing += int(candidate["candidate_id"] in missing_ids)
+            if abs(offset[0]) == abs(offset[1]) == 1:
+                generated_index = next(
+                    index
+                    for index, item in enumerate(generated_candidates)
+                    if item["candidate_id"] == candidate["candidate_id"]
+                )
+                assert generated_candidates[generated_index] == candidate
+                assert generated_results[generated_index] == result
+            if not result["accepted"]:
                 diagnostics = cast(dict[str, JsonValue], result["diagnostics"])
                 codes = {
                     cast(str, violation["violation_code"])
@@ -351,12 +380,10 @@ def test_reference_case_ordinary_prefixes_geometry_and_feasible_gaps(case_id: st
         prefixes = _recipe_prefixes(session, recipe, steps=reference_case_steps(case_id))
         prefix, context, _ = prefixes[8]
         row = rows[8]
-        counts = cast(dict[str, JsonValue], row["counts"])
-        missing_ids = cast(list[str], counts["missing_legal_reference_ids"])
-        references = cast(dict[str, JsonValue], row["reference_set"])
-        candidates = cast(list[dict[str, JsonValue]], references["candidates"])
+        generated = cast(dict[str, JsonValue], row["candidate_set"])
+        candidates = cast(list[dict[str, JsonValue]], generated["candidates"])
         diagonal_candidate = DeploymentPlacementCandidate.from_payload(
-            next(item for item in candidates if item["candidate_id"] in missing_ids),
+            candidates[9],
             context=context,
         )
         action = diagonal_candidate.select(context)
