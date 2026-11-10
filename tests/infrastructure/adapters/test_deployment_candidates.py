@@ -126,14 +126,14 @@ def test_deployment_generation_has_distinct_geometry_and_stable_detached_roundtr
     context, seed = _context_seed(deployment_session)
     original_seed = seed.to_payload()
     candidate_set = DeploymentCandidateSet.generate(seed, context=context)
-    assert len(candidate_set.candidates) == 9
-    assert len({candidate.candidate_id for candidate in candidate_set.candidates}) == 9
+    assert len(candidate_set.candidates) == 13
+    assert len({candidate.candidate_id for candidate in candidate_set.candidates}) == 13
     positions: list[str] = []
     for candidate in candidate_set.candidates:
         proposal = cast(dict[str, JsonValue], candidate.to_payload()["proposal"])
         placements = cast(list[dict[str, JsonValue]], proposal["model_placements"])
         positions.append(canonical_json([placement["pose"] for placement in placements]))
-    assert len(set(positions)) == 9
+    assert len(set(positions)) == 13
     old_offsets = ((0.0, 0.0), (1.0, 0.0), (-1.0, 0.0), (0.0, 1.0), (0.0, -1.0))
     old_set = DeploymentCandidateSet.generate(seed, context=context, translations=old_offsets)
     assert candidate_set.candidates[:5] == old_set.candidates
@@ -142,6 +142,24 @@ def test_deployment_generation_has_distinct_geometry_and_stable_detached_roundtr
     assert bounded.to_payload()["stop_reason"] == "raw_budget"
     assert bounded.to_payload()["raw_attempts"] == 5
     assert DeploymentCandidateSet.from_payload(old_set.to_payload(), context=context) == old_set
+    nine_offsets = (*old_offsets, (2.0, 0.0), (-2.0, 0.0), (0.0, 2.0), (0.0, -2.0))
+    nine_set = DeploymentCandidateSet.generate(seed, context=context, translations=nine_offsets)
+    assert candidate_set.candidates[:9] == nine_set.candidates
+    bounded_nine = DeploymentCandidateSet.generate(seed, context=context, raw_budget=9)
+    assert bounded_nine.candidates == nine_set.candidates
+    assert bounded_nine.to_payload()["raw_attempts"] == 9
+    assert bounded_nine.to_payload()["stop_reason"] == "raw_budget"
+    assert candidate_set.to_payload()["generator_id"] == "actor-formation-xy-translations-v2"
+    assert cast(list[JsonValue], candidate_set.to_payload()["translations"])[9:] == [
+        [1.0, 1.0],
+        [-1.0, 1.0],
+        [1.0, -1.0],
+        [-1.0, -1.0],
+    ]
+    stale_generator = candidate_set.to_payload()
+    stale_generator["generator_id"] = "actor-formation-xy-translations-v1"
+    with pytest.raises(PolicyError, match="generation evidence drifted"):
+        DeploymentCandidateSet.from_payload(stale_generator, context=context)
     assert seed.to_payload() == original_seed
     assert candidate_set == DeploymentCandidateSet.generate(seed, context=context)
     assert candidate_set == DeploymentCandidateSet.from_payload(
@@ -164,7 +182,7 @@ def test_deployment_validation_preserves_live_state_and_commits_alternatives_wit
         candidate_set, context=context, session=deployment_session
     )
     assert len(validated.accepted_ids) >= 2
-    assert validated.to_payload()["validation_attempts"] == 9
+    assert validated.to_payload()["validation_attempts"] == 13
     assert validated == ValidatedDeploymentCandidates.from_payload(
         json.loads(canonical_json(validated.to_payload())),
         candidate_set=candidate_set,
@@ -263,7 +281,7 @@ def test_deployment_validation_budget_returns_explicit_partial_valid_set(
     assert receipt["stop_reason"] == stop
     assert receipt["validation_attempts"] == 1
     assert receipt["accepted_count"] == 1
-    assert receipt["unvalidated_count"] == 8
+    assert receipt["unvalidated_count"] == 12
     with pytest.raises(PolicyError, match="not validated"):
         result.select(context, candidates.candidates[-1].candidate_id, session=deployment_session)
 
@@ -829,7 +847,7 @@ def test_deployment_set_link_rejects_same_view_different_authoritative_checkpoin
     )
     assert link.chosen_action_index == 0
     assert link.to_payload()["validation"]["stop_reason"] == "accepted_limit"
-    assert link.to_payload()["validation"]["unvalidated_count"] == 8
+    assert link.to_payload()["validation"]["unvalidated_count"] == 12
     assert link.validated.candidate_set == validated.candidate_set
     assert "checkpoint_hash" not in candidates.to_payload()
 

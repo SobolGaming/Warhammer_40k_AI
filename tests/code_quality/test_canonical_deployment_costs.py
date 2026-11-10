@@ -448,3 +448,71 @@ def test_retained_reference_suite_costs_bind_definition_report_and_complete_comp
             assert [row["index"] for row in placements] == [4, 6, 8, 10]
             assert all(row["candidate_count"] == count for row in placements)
     assert evidence["summary"] == costs.summarize(evidence["attempts"])
+
+    # V2 keeps the predecessor evidence immutable and measures the actual PR base
+    # separately from historical qualification; expanded work is not a speedup.
+    current_directory = root / "docs/performance/deployment-reference-suite-v2"
+    current_report = json.loads((current_directory / "suite-report.json").read_text())
+    current_definition = json.loads((current_directory / "definition.json").read_text())
+    expected_definition = dict(report["definition"])
+    expected_definition["suite_id"] = "deployment-order-diagonal-reference-suite-v2"
+    expected_definition["budget"] = (
+        "all-finite-options-and-thirteen-generated-ten-reference-placements-no-truncation"
+    )
+    assert current_definition == current_report["definition"] == expected_definition
+    assert current_report["definition_hash"] == payload_hash(current_definition)
+    assert current_report["totals"]["finite"]["accepted_count"] == 54
+    placement_totals = current_report["totals"]["placement"]
+    assert placement_totals["generated_count"] == placement_totals["validation_attempts"] == 156
+    assert placement_totals["accepted_count"] == 138
+    assert placement_totals["rejected_count"] == 18
+    assert placement_totals["legal_reference_count"] == 93
+    assert placement_totals["covered_legal_reference_count"] == 93
+    assert placement_totals["invalid_reference_probe_count"] == 27
+    assert placement_totals["reference_attempts"] == 120
+    assert placement_totals["unvalidated_count"] == 0
+    for arm, expected_report, generated_count in (
+        ("base", report, 9),
+        ("head", current_report, 13),
+    ):
+        measured = json.loads((current_directory / f"{arm}-measurement.json").read_text())
+        assert measured["status"] == "complete"
+        assert measured["report_hash"] == payload_hash(expected_report)
+        assert measured["environment"]["source_commit"] == (
+            "a085db23dbef50237398b226cd24328d337d0e3b"
+        )
+        assert measured["environment"]["harness_sha256"] == costs.digest(
+            root / "scripts/measure_canonical_deployment_costs.py"
+        )
+        assert measured["settings"]["workers"] == 1
+        assert measured["settings"]["coverage"] is measured["settings"]["profiler"] is False
+        assert measured["elapsed_wall_seconds"] < measured["settings"]["wall_budget_seconds"]
+        assert measured["child_cpu_seconds"] < measured["settings"]["cpu_budget_seconds"]
+        assert len(measured["attempts"]) == 1
+        arm_attempt = measured["attempts"][0]
+        assert arm_attempt["returncode"] == 0
+        assert arm_attempt["stop_reason"] is arm_attempt["partial_journal_line"] is None
+        arm_events = arm_attempt["events"]
+        assert arm_events[-1] == {
+            "event": "worker_complete",
+            "report_hash": measured["report_hash"],
+        }
+        arm_starts = [event for event in arm_events if event["event"] == "start"]
+        arm_finishes = [event for event in arm_events if event["event"] == "finish"]
+        assert [event["sequence"] for event in arm_starts] == list(range(1, len(arm_starts) + 1))
+        assert [event["sequence"] for event in arm_finishes] == [
+            event["sequence"] for event in arm_starts
+        ]
+        assert all(event["outcome"] == "passed" for event in arm_finishes)
+        assert measured["summary"] == costs.summarize(measured["attempts"])
+        for case_id in case_ids:
+            for role, count in (("generated", generated_count), ("reference", 10)):
+                placements = [
+                    event
+                    for event in arm_finishes
+                    if event["name"] == "placement_fresh_fork_validation"
+                    and event["case_id"] == case_id
+                    and event["role"] == role
+                ]
+                assert [event["index"] for event in placements] == [4, 6, 8, 10]
+                assert all(event["candidate_count"] == count for event in placements)

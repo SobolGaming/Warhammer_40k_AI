@@ -426,13 +426,14 @@ broader references, dataset admission and runner progress accounting remain open
 
 `ai.deployment_candidate_search.DeploymentCandidateSet.generate(seed, context=...)`
 creates `deployment-translation-set-v1` from an existing actor-bound singleton.
-The versioned `actor-formation-xy-translations-v1` generator translates every
+The versioned `actor-formation-xy-translations-v2` generator translates every
 supplied model by the same XY offset in inches, retaining relative formation,
 height, facing and proposal context. Its default ordered offsets are the original
 formation, +X, -X, +Y and -Y by one inch, followed by the same four directions
-by two inches. The original five-candidate prefix is preserved for smaller raw
-budgets; the translation algorithm and serialized explicit-offset contract remain
-v1. Explicit ordered offsets are supported,
+by two inches, then `(1,1), (-1,1), (1,-1), (-1,-1)`. Both original five- and
+nine-candidate prefixes are preserved for smaller raw budgets. The translation
+algorithm and version-one set wire schema are unchanged; closed loading rejects
+predecessor generator identities. Explicit ordered offsets are supported,
 up to 64 pairs. This supplies real alternative positions, not a general placement
 solver or a guarantee of valid, useful or complete tactical coverage.
 
@@ -1148,13 +1149,16 @@ References and denominators are defined independently of the measured generator:
   is actually submitted; its result is shared when the identical generated choice
   is evaluated. The total finite-attempt ceiling is 512, with an explicit error
   if the frozen inventory exceeds it, never a silently shortened denominator.
-- Placement generation uses nine whole-formation offsets: zero, ±1 inch along
-  X/Y, then ±2 inches along X/Y in that order.
+- Placement generation uses thirteen whole-formation offsets: zero, ±1 inch along
+  X/Y, then ±2 inches along X/Y, followed by `(1,1), (-1,1), (1,-1), (-1,-1)`.
+  Generator identity `actor-formation-xy-translations-v2` versions this expansion;
+  the set wire schema stays `deployment-translation-set-v1`. Closed loading rejects
+  predecessor generator identities. The original nine-candidate prefix remains exact.
   The separately fixed reference list is zero, ±1 and ±2 inches along X or Y,
   plus the deliberately invalid `(100,100)` offset. The same translation owner
   constructs both sets from the original actor-bound recipe formation, but the
   reference list is never selected from generated or accepted outputs.
-- Each placement set is fully validated: nine generated and ten reference
+- Each placement set is fully validated: thirteen generated and ten reference
   attempts per occurrence, accepted cap sixteen. Raw/duplicate counts, actual
   budgets and complete stop reasons remain in the nested receipts. No candidate
   is unvalidated. Identical candidates appearing in both lists are independently
@@ -1173,16 +1177,17 @@ The frozen experiment currently yields:
 | Decision occurrence / placement | Generated accepted / attempted | Legal references / probes | Covered legal references | Missing legal references |
 |---|---:|---:|---:|---:|
 | Seven finite occurrences | 18 / 18 | 18 / 18 | 18 / 18 | 0 |
-| Index 4: player B five-model unit | 9 / 9 | 9 / 10 | 9 / 9 | 0 |
-| Index 6: player A three-model unit | 8 / 9 | 8 / 10 | 8 / 8 | 0 |
-| Index 8: player A five-model unit | 8 / 9 | 8 / 10 | 8 / 8 | 0 |
-| Index 10: player A vehicle | 7 / 9 | 7 / 10 | 7 / 7 | 0 |
-| Four placement occurrences combined | 32 / 36 | 32 / 40 | 32 / 32 | 0 |
+| Index 4: player B five-model unit | 13 / 13 | 9 / 10 | 9 / 9 | 0 |
+| Index 6: player A three-model unit | 12 / 13 | 8 / 10 | 8 / 8 | 0 |
+| Index 8: player A five-model unit | 12 / 13 | 8 / 10 | 8 / 8 | 0 |
+| Index 10: player A vehicle | 9 / 13 | 7 / 10 | 7 / 7 | 0 |
+| Four placement occurrences combined | 46 / 52 | 32 / 40 | 32 / 32 | 0 |
 
 Finite option counts in canonical order are 4, 4, 3, 1, 3, 2 and 1.
-The 88.889% generated-placement validity yield (32/36) and 100% bounded legal
+The 88.462% generated-placement validity yield (46/52) and 100% bounded legal
 reference coverage (32/32) answer different questions. Eight rejected reference
-probes remain outside 32; four of them are now generated rejections. All eleven
+probes remain outside 32; four of them also occur among generated rejections.
+The two positive-Y vehicle diagonals add two further generated rejections. All eleven
 original recipe choices remain generated and accepted. The unchanged reference
 list was fixed before this expansion; it is never derived from the new defaults.
 
@@ -1190,8 +1195,8 @@ The predecessor five-offset default covered 19/32 legal references (59.375%),
 with validity yield 19/20 (95%). All thirteen misses formed one demonstrated gap
 class: cardinal translations at two inches. Adding this second ring addresses
 the entire observed missing class with four additional proposals per occurrence.
-It takes priority within this tested workload because rotations, reshaping and
-other offsets have no measured reference evidence here. This is a bounded search
+That expansion addressed its then-demonstrated gap; the broader suite below
+subsequently qualified four diagonal offsets. This is a bounded search
 configuration expansion, not a gameplay legality fix or tactical optimization.
 
 Each missing alternative moves every model and the unweighted model-origin
@@ -1272,8 +1277,11 @@ training admission. `reproduce_reference_case(case_id)` and
 `measure_reference_case(case_id)` accept only the three declared IDs. Original
 canonical admission/coverage schemas and their accepted recipe remain unchanged.
 
-The pre-measurement definition is `deployment-order-diagonal-reference-suite-v1`,
-SHA-256 `10fcfd7c7f3c85118c4a029dd042bbdbc73ed2448a3b78e44874883d45fd2d02`.
+The current pre-measurement definition is `deployment-order-diagonal-reference-suite-v2`,
+SHA-256 `7f8b9428acb03cfdce6b86396c520f487bc38369aacd90ce9d4d377dd9e8fa00`.
+Version two changes the generated budget from nine to thirteen; cases, references,
+origins and exclusions retain their version-one definitions. The historical
+version-one definition, report and cost evidence remain unchanged.
 Its complete recipes, reference coordinates, intended constraints, budgets and
 exclusions are serialized in each receipt. Definition drift fails closed. This
 pin preceded the first engine run; no measured acceptance selected the cases or
@@ -1303,31 +1311,31 @@ Each placement independently references `(0,0), (2,0), (-2,0), (0,2), (0,-2),
 (1,1), (-1,1), (1,-1), (-1,-1), (100,100)` inches relative to its recipe seed.
 The four diagonal offsets translate every model by a Euclidean distance of
 sqrt(2) inches while retaining formation, model identity, facing and height.
-These differ geometrically from the generator's nine cardinal/zero defaults.
-All finite options, all nine generated placements and all ten reference probes
+These now follow the generator's original nine cardinal/zero defaults.
+All finite options, all thirteen generated placements and all ten reference probes
 are submitted on separate ordinary engine forks, with acceptance cap sixteen
 and no unvalidated tail. Finite generated/reference copies share the identical
 submission result as in the original coverage owner. Only engine-accepted
 references enter the denominator; covered means also generated and accepted
 at that exact occurrence. Invalid probes retain exact engine diagnostics.
 
-The [complete receipt](performance/deployment-reference-suite-v1/suite-report.json)
+The [complete receipt](performance/deployment-reference-suite-v2/suite-report.json)
 records these observed results; the definition was not changed after observation:
 
 | Case | Finite accepted / attempts | Generated placements accepted / attempts | Covered / legal placement references | Invalid reference probes | Feasible misses |
 |---|---:|---:|---:|---:|---:|
-| `deep-scout-vehicle` | 18 / 18 | 32 / 36 | 17 / 31 | 9 | 14 |
-| `vehicle-scout-deep` | 18 / 18 | 32 / 36 | 17 / 31 | 9 | 14 |
-| `scout-deep-vehicle` | 18 / 18 | 32 / 36 | 17 / 31 | 9 | 14 |
-| Occurrence-weighted total | 54 / 54 | 96 / 108 | 51 / 93 | 27 | 42 |
+| `deep-scout-vehicle` | 18 / 18 | 46 / 52 | 31 / 31 | 9 | 0 |
+| `vehicle-scout-deep` | 18 / 18 | 46 / 52 | 31 / 31 | 9 | 0 |
+| `scout-deep-vehicle` | 18 / 18 | 46 / 52 | 31 / 31 | 9 | 0 |
+| Occurrence-weighted total | 54 / 54 | 138 / 156 | 93 / 93 | 27 | 0 |
 
 The placement reference denominator is 93 accepted probes out of 120, excluding
-27 rejected probes. The default covers 51/93 (54.84%); generated validity is
-96/108 (88.89%). The 42 misses are precisely accepted diagonals: four for each
+27 rejected probes. The default covers 93/93 (100%); generated validity is
+138/156 (88.46%). The 42 formerly missing accepted diagonals are now covered: four for each
 B scout, A scout and Deep Strike occurrence, and the two negative-Y diagonals for
 each vehicle occurrence. The six positive-Y vehicle diagonals are rejected,
 remain outside the denominator, and are not feasible misses. Finite coverage is
-54/54. All 282 finite/generated/reference validation submissions complete; none
+54/54. All 330 finite/generated/reference validation submissions complete; none
 is unsupported or unvalidated.
 
 Identical per-case totals conceal an actual occupancy-dependent swap:
@@ -1348,8 +1356,8 @@ diagonal feasibility and the retained terrain/edge constraints, rather than
 three independent tactical situations. A post-scout Deep Strike diagonal also
 has an ordinary-submit, JSON restore, exact replay and both-viewer regression.
 
-Feasible diagonal misses remain queued for a separately scoped generator
-follow-up. No claimed screen, preservation, follow-through, range,
+The four demonstrated diagonal offsets now have complete finite feasibility
+coverage in this suite. No claimed screen, preservation, follow-through, range,
 visibility, objective or scoring benefit follows from a feasible diagonal.
 Three of six A-unit orders are selected; the B-first side/seed, layout, formation
 origins and roster are fixed. Rotations, reshaping, other distances, other

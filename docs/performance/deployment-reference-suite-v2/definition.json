@@ -1,0 +1,415 @@
+{
+  "budget": "all-finite-options-and-thirteen-generated-ten-reference-placements-no-truncation",
+  "cases": [
+    {
+      "case_id": "deep-scout-vehicle",
+      "recipe": [
+        {
+          "actor": "player-a",
+          "decision_type": "select_secondary_missions",
+          "model_count": 0,
+          "option_id": "fixed:assassination:bring_it_down",
+          "setup_step": "select_secondary_missions",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-b",
+          "decision_type": "select_secondary_missions",
+          "model_count": 0,
+          "option_id": "fixed:assassination:bring_it_down",
+          "setup_step": "select_secondary_missions",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "select_reserve_declaration",
+          "model_count": 0,
+          "option_id": "complete_reserve_declarations",
+          "setup_step": "declare_battle_formations",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-b",
+          "decision_type": "select_deployment_unit",
+          "model_count": 0,
+          "option_id": "deploy:army-beta:scout-redeploy-unit",
+          "setup_step": "deploy_armies",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-b",
+          "decision_type": "submit_deployment_placement",
+          "model_count": 5,
+          "option_id": null,
+          "setup_step": "deploy_armies",
+          "unit_id": "army-beta:scout-redeploy-unit",
+          "x": 3.0,
+          "y": 3.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "select_deployment_unit",
+          "model_count": 0,
+          "option_id": "deploy:army-alpha:deep-strike-unit",
+          "setup_step": "deploy_armies",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "submit_deployment_placement",
+          "model_count": 3,
+          "option_id": null,
+          "setup_step": "deploy_armies",
+          "unit_id": "army-alpha:deep-strike-unit",
+          "x": 3.0,
+          "y": 45.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "select_deployment_unit",
+          "model_count": 0,
+          "option_id": "deploy:army-alpha:scout-redeploy-unit",
+          "setup_step": "deploy_armies",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "submit_deployment_placement",
+          "model_count": 5,
+          "option_id": null,
+          "setup_step": "deploy_armies",
+          "unit_id": "army-alpha:scout-redeploy-unit",
+          "x": 3.0,
+          "y": 51.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "select_deployment_unit",
+          "model_count": 0,
+          "option_id": "deploy:army-alpha:strategic-reserve-unit",
+          "setup_step": "deploy_armies",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "submit_deployment_placement",
+          "model_count": 1,
+          "option_id": null,
+          "setup_step": "deploy_armies",
+          "unit_id": "army-alpha:strategic-reserve-unit",
+          "x": 7.0,
+          "y": 57.0
+        }
+      ]
+    },
+    {
+      "case_id": "vehicle-scout-deep",
+      "recipe": [
+        {
+          "actor": "player-a",
+          "decision_type": "select_secondary_missions",
+          "model_count": 0,
+          "option_id": "fixed:assassination:bring_it_down",
+          "setup_step": "select_secondary_missions",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-b",
+          "decision_type": "select_secondary_missions",
+          "model_count": 0,
+          "option_id": "fixed:assassination:bring_it_down",
+          "setup_step": "select_secondary_missions",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "select_reserve_declaration",
+          "model_count": 0,
+          "option_id": "complete_reserve_declarations",
+          "setup_step": "declare_battle_formations",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-b",
+          "decision_type": "select_deployment_unit",
+          "model_count": 0,
+          "option_id": "deploy:army-beta:scout-redeploy-unit",
+          "setup_step": "deploy_armies",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-b",
+          "decision_type": "submit_deployment_placement",
+          "model_count": 5,
+          "option_id": null,
+          "setup_step": "deploy_armies",
+          "unit_id": "army-beta:scout-redeploy-unit",
+          "x": 3.0,
+          "y": 3.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "select_deployment_unit",
+          "model_count": 0,
+          "option_id": "deploy:army-alpha:strategic-reserve-unit",
+          "setup_step": "deploy_armies",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "submit_deployment_placement",
+          "model_count": 1,
+          "option_id": null,
+          "setup_step": "deploy_armies",
+          "unit_id": "army-alpha:strategic-reserve-unit",
+          "x": 7.0,
+          "y": 57.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "select_deployment_unit",
+          "model_count": 0,
+          "option_id": "deploy:army-alpha:scout-redeploy-unit",
+          "setup_step": "deploy_armies",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "submit_deployment_placement",
+          "model_count": 5,
+          "option_id": null,
+          "setup_step": "deploy_armies",
+          "unit_id": "army-alpha:scout-redeploy-unit",
+          "x": 3.0,
+          "y": 51.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "select_deployment_unit",
+          "model_count": 0,
+          "option_id": "deploy:army-alpha:deep-strike-unit",
+          "setup_step": "deploy_armies",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "submit_deployment_placement",
+          "model_count": 3,
+          "option_id": null,
+          "setup_step": "deploy_armies",
+          "unit_id": "army-alpha:deep-strike-unit",
+          "x": 3.0,
+          "y": 45.0
+        }
+      ]
+    },
+    {
+      "case_id": "scout-deep-vehicle",
+      "recipe": [
+        {
+          "actor": "player-a",
+          "decision_type": "select_secondary_missions",
+          "model_count": 0,
+          "option_id": "fixed:assassination:bring_it_down",
+          "setup_step": "select_secondary_missions",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-b",
+          "decision_type": "select_secondary_missions",
+          "model_count": 0,
+          "option_id": "fixed:assassination:bring_it_down",
+          "setup_step": "select_secondary_missions",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "select_reserve_declaration",
+          "model_count": 0,
+          "option_id": "complete_reserve_declarations",
+          "setup_step": "declare_battle_formations",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-b",
+          "decision_type": "select_deployment_unit",
+          "model_count": 0,
+          "option_id": "deploy:army-beta:scout-redeploy-unit",
+          "setup_step": "deploy_armies",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-b",
+          "decision_type": "submit_deployment_placement",
+          "model_count": 5,
+          "option_id": null,
+          "setup_step": "deploy_armies",
+          "unit_id": "army-beta:scout-redeploy-unit",
+          "x": 3.0,
+          "y": 3.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "select_deployment_unit",
+          "model_count": 0,
+          "option_id": "deploy:army-alpha:scout-redeploy-unit",
+          "setup_step": "deploy_armies",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "submit_deployment_placement",
+          "model_count": 5,
+          "option_id": null,
+          "setup_step": "deploy_armies",
+          "unit_id": "army-alpha:scout-redeploy-unit",
+          "x": 3.0,
+          "y": 51.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "select_deployment_unit",
+          "model_count": 0,
+          "option_id": "deploy:army-alpha:deep-strike-unit",
+          "setup_step": "deploy_armies",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "submit_deployment_placement",
+          "model_count": 3,
+          "option_id": null,
+          "setup_step": "deploy_armies",
+          "unit_id": "army-alpha:deep-strike-unit",
+          "x": 3.0,
+          "y": 45.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "select_deployment_unit",
+          "model_count": 0,
+          "option_id": "deploy:army-alpha:strategic-reserve-unit",
+          "setup_step": "deploy_armies",
+          "unit_id": null,
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "actor": "player-a",
+          "decision_type": "submit_deployment_placement",
+          "model_count": 1,
+          "option_id": null,
+          "setup_step": "deploy_armies",
+          "unit_id": "army-alpha:strategic-reserve-unit",
+          "x": 7.0,
+          "y": 57.0
+        }
+      ]
+    }
+  ],
+  "configuration_hash": "adfdb1ee885d9de34ddbe6ef7fe1be64c728f86d3529dc2e82b7523132926409",
+  "denominator": "engine-accepted-references-per-case-and-occurrence",
+  "endpoint": "before-redeploy",
+  "exclusions": [
+    "other-orders-configurations-layouts-rosters-seeds-and-opponent-responses",
+    "rotations-reshaping-other-distances-and-continuous-legal-placement-space",
+    "redeploy-scouts-reserve-arrival-attachments-transports-battle-and-scoring",
+    "tactical-utility-ranking-learning-full-game-or-representative-coverage"
+  ],
+  "finite": "all-current-engine-enumerated-options-at-each-declared-prefix",
+  "intended_diversity": [
+    "three-of-six-player-a-deployment-orders",
+    "different-already-occupied-friendly-unit-prefixes",
+    "cardinal-and-diagonal-whole-formation-translations",
+    "one-three-five-model-formations-with-32mm-and-120mm-bases",
+    "terrain-friendly-overlap-battlefield-edge-and-deployment-zone-constraints"
+  ],
+  "invalid_probes": "reported-separately-excluded-from-legal-denominator",
+  "numerator": "references-also-generated-and-engine-accepted-at-that-occurrence",
+  "policy_seed": 7,
+  "qualification": "finite-feasibility-reference-suite-not-tactical-reference",
+  "required_controls": "all-three-complete-recipes-and-every-placement-seed-accepted",
+  "suite_id": "deployment-order-diagonal-reference-suite-v2",
+  "translations": [
+    [
+      0.0,
+      0.0
+    ],
+    [
+      2.0,
+      0.0
+    ],
+    [
+      -2.0,
+      0.0
+    ],
+    [
+      0.0,
+      2.0
+    ],
+    [
+      0.0,
+      -2.0
+    ],
+    [
+      1.0,
+      1.0
+    ],
+    [
+      -1.0,
+      1.0
+    ],
+    [
+      1.0,
+      -1.0
+    ],
+    [
+      -1.0,
+      -1.0
+    ],
+    [
+      100.0,
+      100.0
+    ]
+  ]
+}

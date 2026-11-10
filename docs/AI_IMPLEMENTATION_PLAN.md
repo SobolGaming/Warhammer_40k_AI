@@ -231,8 +231,8 @@ evidence.
 The separate `CanonicalDeploymentCoverage` operator report now reconstructs
 all eleven exact prefix states and validates alternatives on independent ordinary
 viewer-submission forks. It measures eighteen current finite options across seven
-occurrences (all accepted), and a nine-offset placement generator across four
-occurrences (thirty-two accepted of thirty-six). The independently fixed reference
+occurrences (all accepted), and a thirteen-offset placement generator across four
+occurrences (forty-six accepted of fifty-two). The independently fixed reference
 list uses zero, ±1/±2-inch axis translations and one far invalid probe per placement.
 Thirty-two of forty reference probes are engine-accepted and now all thirty-two
 are generated and accepted. The eight invalid references remain outside the legal
@@ -272,7 +272,7 @@ These costs qualify only the disclosed frozen setup/deployment fixture and
 provisional measurement environment. They neither certify the serial performance
 gate nor establish a full-game throughput, tactical-quality or learning result.
 Stage 2 remains open for broader useful reference qualification. The retained
-five-offset campaign is historical; current nine-offset measurements must retain
+five- and nine-offset campaigns are historical; current thirteen-offset measurements retain
 their own runtime/workload identities. Further generator expansion or tactical
 reference work needs a separately scoped decision and fresh coverage measurement.
 The separately pinned order/diagonal suite below broadens feasibility evidence.
@@ -298,13 +298,14 @@ records measured coverage and the precise scope; the existing serial cost
 harness's `--reference-suite` mode records complete measurement/reload and
 per-case prepared component costs.
 
-The measured suite accepts 54/54 finite choices and 96/108 generated placements;
-it covers 51/93 legal placement references, with 42 feasible diagonal misses and
+The version-two suite accepts 54/54 finite choices and 138/156 generated placements;
+it covers all 93 legal placement references, including the 42 previously missed diagonals, with
 27 invalid reference probes excluded. All three cases have equal totals, but
 scout/Deep Strike order swaps which two-inch Y translation fails friendly
-occupancy. This is a bounded feasibility-reference expansion. The nine-offset generator is
-preserved; feasible diagonal misses are explicitly queued for a separate
-generator decision. Three fixed orders in one synthetic fixture are not
+occupancy. The shared generator appends `(1,1), (-1,1), (1,-1), (-1,-1)`
+after its original nine offsets, preserving every smaller-budget prefix. The suite
+versions its generated budget while retaining the exact reference geometry and
+orders. Historical version-one evidence remains unchanged. Three fixed orders in one synthetic fixture are not
 representative sampling, tactical usefulness, continuous placement coverage or
 Stage 2 completion. Ranking, screen/preserve/follow-through references and
 broader workload qualification remain open. No dataset or learning eligibility

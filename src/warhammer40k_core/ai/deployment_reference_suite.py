@@ -23,7 +23,7 @@ from warhammer40k_core.ai.runner import RunReport
 from warhammer40k_core.ai.training_admission import TrainingAdmissionError, VerifiedEpisodeOrigin
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 
-REFERENCE_SUITE_ID = "deployment-order-diagonal-reference-suite-v1"
+REFERENCE_SUITE_ID = "deployment-order-diagonal-reference-suite-v2"
 REFERENCE_SUITE_SCHEMA = "deployment-reference-suite-v1"
 # Fixed before engine measurement. Reordering only complete select/place pairs
 # changes occupied-prefix geometry without editing a lifecycle or its history.
@@ -46,9 +46,10 @@ SUITE_REFERENCE_TRANSLATIONS = (
     (-1.0, -1.0),
     (100.0, 100.0),
 )
-# Set from the declared definition before the first engine run; drift requires
-# deliberate suite versioning, never updating it to fit observed outcomes.
-REFERENCE_SUITE_DEFINITION_HASH = "10fcfd7c7f3c85118c4a029dd042bbdbc73ed2448a3b78e44874883d45fd2d02"
+# V2 changes only suite identity and generated budget; the historical v1 pin and
+# evidence remain under docs/performance/deployment-reference-suite-v1. Set before
+# measuring v2; definition drift requires deliberate versioning.
+REFERENCE_SUITE_DEFINITION_HASH = "7f8b9428acb03cfdce6b86396c520f487bc38369aacd90ce9d4d377dd9e8fa00"
 
 
 def reference_case_steps(case_id: str) -> tuple[_Step, ...]:
@@ -76,7 +77,9 @@ def reference_suite_definition() -> dict[str, JsonValue]:
         "numerator": "references-also-generated-and-engine-accepted-at-that-occurrence",
         "invalid_probes": "reported-separately-excluded-from-legal-denominator",
         "required_controls": "all-three-complete-recipes-and-every-placement-seed-accepted",
-        "budget": "all-finite-options-and-nine-generated-ten-reference-placements-no-truncation",
+        "budget": (
+            "all-finite-options-and-thirteen-generated-ten-reference-placements-no-truncation"
+        ),
         "endpoint": "before-redeploy",
         "intended_diversity": [
             "three-of-six-player-a-deployment-orders",

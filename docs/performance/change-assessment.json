@@ -1,540 +1,420 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "f95a2c1b66b881dbd52409d8d4c8b703c4d558c4",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:66abc9d0afe9ab335e2a80a9d3ea86c2ef53415078cbb5dc922131c5aca232bb",
+  "base": "a085db23dbef50237398b226cd24328d337d0e3b",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8996a426d3399cdd20243a6083d426d7627ac3ef5afd4597710ef16ccab94d6a",
   "operation_map_sha256": "928f2d0a41e2cfc0aa49de35c04c31d6cfe68f0c5d56e39dce2fd2e780206e71",
   "changes": {
     "README.md": {
-      "before_sha256": "4b4d4082fe1cccad4560c5cd14a19a6e55523e4a7b7029c74230d2b42cb4acf5",
-      "after_sha256": "d4bacd37d1900045a2fd36ce68e3a2175334c2744e5021e1430122f82451db62",
+      "before_sha256": "d4bacd37d1900045a2fd36ce68e3a2175334c2744e5021e1430122f82451db62",
+      "after_sha256": "d541b56882b9075a0b638ddcd724551b7d1c586a375cc3db2736d81b050e18ce",
       "owners": {
         "@document": {
-          "before": "4b4d4082fe1cccad4560c5cd14a19a6e55523e4a7b7029c74230d2b42cb4acf5",
-          "after": "d4bacd37d1900045a2fd36ce68e3a2175334c2744e5021e1430122f82451db62"
-        }
-      }
-    },
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "1eb1eb631b711c74be67e901e87422a4ce645f347aafe0396a37493bde1c0e55",
-      "after_sha256": "069378b28daa5ebb12ce1f95376ac863ea4a3c3a9f95fc48df810c732d64141d",
-      "owners": {
-        "@document": {
-          "before": "1eb1eb631b711c74be67e901e87422a4ce645f347aafe0396a37493bde1c0e55",
-          "after": "069378b28daa5ebb12ce1f95376ac863ea4a3c3a9f95fc48df810c732d64141d"
-        }
-      }
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "88f245cca144bc428e91d353d518d85aab1d72dd0e7635024f5b6c5a8ae34397",
-      "after_sha256": "4e5795a25aaf8aac9d4379bcffd422556c54e111a1e368cf1fe974956a490ba7",
-      "owners": {
-        "@document": {
-          "before": "88f245cca144bc428e91d353d518d85aab1d72dd0e7635024f5b6c5a8ae34397",
-          "after": "4e5795a25aaf8aac9d4379bcffd422556c54e111a1e368cf1fe974956a490ba7"
+          "before": "d4bacd37d1900045a2fd36ce68e3a2175334c2744e5021e1430122f82451db62",
+          "after": "d541b56882b9075a0b638ddcd724551b7d1c586a375cc3db2736d81b050e18ce"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "0b318bf6c067aa1e7045693d5997d2961e87722420ff240fba15cd46eb0c13e5",
-      "after_sha256": "1e892e2d461a425253684f780e7949c9fa41d358e1fe288ddee9920c1b6e5327",
+      "before_sha256": "1e892e2d461a425253684f780e7949c9fa41d358e1fe288ddee9920c1b6e5327",
+      "after_sha256": "246df5477f63334a146b136b755493340f4a0fc66c65fbf7fb9c0446d05162bb",
       "owners": {
         "@document": {
-          "before": "0b318bf6c067aa1e7045693d5997d2961e87722420ff240fba15cd46eb0c13e5",
-          "after": "1e892e2d461a425253684f780e7949c9fa41d358e1fe288ddee9920c1b6e5327"
+          "before": "1e892e2d461a425253684f780e7949c9fa41d358e1fe288ddee9920c1b6e5327",
+          "after": "246df5477f63334a146b136b755493340f4a0fc66c65fbf7fb9c0446d05162bb"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
-      "before_sha256": "e837ceaa85b50c6e0c6d682a98a15a3eb13a19f59dddfa49ea2a99947b9c867c",
-      "after_sha256": "6a269faa9516a62af015e96650bf2f6d1955a2ea58bc77fbe82b46052e5eb100",
+      "before_sha256": "6a269faa9516a62af015e96650bf2f6d1955a2ea58bc77fbe82b46052e5eb100",
+      "after_sha256": "7979406c2ab205ae63dad3d57f18ffbbbc430bfba9b910f41722dade396806f2",
       "owners": {
         "@document": {
-          "before": "e837ceaa85b50c6e0c6d682a98a15a3eb13a19f59dddfa49ea2a99947b9c867c",
-          "after": "6a269faa9516a62af015e96650bf2f6d1955a2ea58bc77fbe82b46052e5eb100"
+          "before": "6a269faa9516a62af015e96650bf2f6d1955a2ea58bc77fbe82b46052e5eb100",
+          "after": "7979406c2ab205ae63dad3d57f18ffbbbc430bfba9b910f41722dade396806f2"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "7ef519ac852de2fd5284b49409f05faf05adfb9b3575a1abc45efa7c7e71a412",
-      "after_sha256": "153ed7ed10dc4857a717e54d5ca6e69c7aef5d0032541c2c71a043c4188ffe0c",
+      "before_sha256": "153ed7ed10dc4857a717e54d5ca6e69c7aef5d0032541c2c71a043c4188ffe0c",
+      "after_sha256": "cbc35ab1e38792d723577ace3833ac6d7127f2e801edc967cf3b6a0f8c8a2972",
       "owners": {
         "@document": {
-          "before": "7ef519ac852de2fd5284b49409f05faf05adfb9b3575a1abc45efa7c7e71a412",
-          "after": "153ed7ed10dc4857a717e54d5ca6e69c7aef5d0032541c2c71a043c4188ffe0c"
+          "before": "153ed7ed10dc4857a717e54d5ca6e69c7aef5d0032541c2c71a043c4188ffe0c",
+          "after": "cbc35ab1e38792d723577ace3833ac6d7127f2e801edc967cf3b6a0f8c8a2972"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "42349b1f45e27e774810981731cc6c0bdc0925eb1f7a31e5f3b4ad06644dd22b",
-      "after_sha256": "deac05242bbe96cbf7223897e3e5e52df0ab8c074a5382ae49f6a1b35cd59174",
+      "before_sha256": "deac05242bbe96cbf7223897e3e5e52df0ab8c074a5382ae49f6a1b35cd59174",
+      "after_sha256": "8ad1985b02c68f26620dbeb40464673f40ccdf230175b1ae746b522ede684325",
       "owners": {
         "@document": {
-          "before": "42349b1f45e27e774810981731cc6c0bdc0925eb1f7a31e5f3b4ad06644dd22b",
-          "after": "deac05242bbe96cbf7223897e3e5e52df0ab8c074a5382ae49f6a1b35cd59174"
+          "before": "deac05242bbe96cbf7223897e3e5e52df0ab8c074a5382ae49f6a1b35cd59174",
+          "after": "8ad1985b02c68f26620dbeb40464673f40ccdf230175b1ae746b522ede684325"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "6bd7430b9c4e64cb82f9ac6f3d9c8251361e69a9d272f8e0872ce2f79222406b",
-      "after_sha256": "7771cb498261fe7fed1e8f7ef179a25bd4b1fa1982cec6b0576a84e13edf583b",
+      "before_sha256": "7771cb498261fe7fed1e8f7ef179a25bd4b1fa1982cec6b0576a84e13edf583b",
+      "after_sha256": "eeb2cb3eb6a93569ae016ad42e431c4cf442ad0806d98b12146338252ade45db",
       "owners": {
         "@document": {
-          "before": "6bd7430b9c4e64cb82f9ac6f3d9c8251361e69a9d272f8e0872ce2f79222406b",
-          "after": "7771cb498261fe7fed1e8f7ef179a25bd4b1fa1982cec6b0576a84e13edf583b"
+          "before": "7771cb498261fe7fed1e8f7ef179a25bd4b1fa1982cec6b0576a84e13edf583b",
+          "after": "eeb2cb3eb6a93569ae016ad42e431c4cf442ad0806d98b12146338252ade45db"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "3352e9ef0c09efdba03dc20ebec53ad86c22841e61913dbbbdc62217f3705946",
-      "after_sha256": "ad46fc323508f08d0b7111b3960fdd30059e9e08337bfbfa705bad8901f1eec2",
+      "before_sha256": "ad46fc323508f08d0b7111b3960fdd30059e9e08337bfbfa705bad8901f1eec2",
+      "after_sha256": "d098013739b69f5cc14d1f7bc17a1b7bf900349c7b1ed4431013f3e189afc835",
       "owners": {
         "@document": {
-          "before": "3352e9ef0c09efdba03dc20ebec53ad86c22841e61913dbbbdc62217f3705946",
-          "after": "ad46fc323508f08d0b7111b3960fdd30059e9e08337bfbfa705bad8901f1eec2"
+          "before": "ad46fc323508f08d0b7111b3960fdd30059e9e08337bfbfa705bad8901f1eec2",
+          "after": "d098013739b69f5cc14d1f7bc17a1b7bf900349c7b1ed4431013f3e189afc835"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "a32932fc7a0632c723f4ed53c36bcf828ab9d0a5b8b77f7e8fba3d22ccd2f661",
-      "after_sha256": "0466c03b7e9624a49eeb4a190eb8a8f7cf5802e15530cb24396b67c7fc47e46b",
+      "before_sha256": "0466c03b7e9624a49eeb4a190eb8a8f7cf5802e15530cb24396b67c7fc47e46b",
+      "after_sha256": "c9e6551583f08893aa1d0ba211d3a6b58ecc28416255466a122c7f828163c3b6",
       "owners": {
         "@document": {
-          "before": "a32932fc7a0632c723f4ed53c36bcf828ab9d0a5b8b77f7e8fba3d22ccd2f661",
-          "after": "0466c03b7e9624a49eeb4a190eb8a8f7cf5802e15530cb24396b67c7fc47e46b"
+          "before": "0466c03b7e9624a49eeb4a190eb8a8f7cf5802e15530cb24396b67c7fc47e46b",
+          "after": "c9e6551583f08893aa1d0ba211d3a6b58ecc28416255466a122c7f828163c3b6"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "32665c9f9370d95efc4294f02b5a4c2bc7a3793ed193e9b92c3b55922987afa3",
-      "after_sha256": "3b82f861830328943d324dfc00bbe1dacddd782542734ad62309b7ac0b960bcb",
+      "before_sha256": "3b82f861830328943d324dfc00bbe1dacddd782542734ad62309b7ac0b960bcb",
+      "after_sha256": "a8211892c69a7f6750165a423c731e252cd417d1d7a307433bd49f9359c67c59",
       "owners": {
         "@document": {
-          "before": "32665c9f9370d95efc4294f02b5a4c2bc7a3793ed193e9b92c3b55922987afa3",
-          "after": "3b82f861830328943d324dfc00bbe1dacddd782542734ad62309b7ac0b960bcb"
+          "before": "3b82f861830328943d324dfc00bbe1dacddd782542734ad62309b7ac0b960bcb",
+          "after": "a8211892c69a7f6750165a423c731e252cd417d1d7a307433bd49f9359c67c59"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "839f1bf714ef24edf032b864e7f4248d00b7be69114af2d58cc1f976a297632b",
-      "after_sha256": "f03e4314ce7b6cb7e8387de9b5d5c58e5136b3b5e959397ef950d85a837e87e2",
+      "before_sha256": "f03e4314ce7b6cb7e8387de9b5d5c58e5136b3b5e959397ef950d85a837e87e2",
+      "after_sha256": "622f08094e900c266351df3891b4ab2889859154b18ee4db39cee177b94c6d27",
       "owners": {
         "@document": {
-          "before": "839f1bf714ef24edf032b864e7f4248d00b7be69114af2d58cc1f976a297632b",
-          "after": "f03e4314ce7b6cb7e8387de9b5d5c58e5136b3b5e959397ef950d85a837e87e2"
+          "before": "f03e4314ce7b6cb7e8387de9b5d5c58e5136b3b5e959397ef950d85a837e87e2",
+          "after": "622f08094e900c266351df3891b4ab2889859154b18ee4db39cee177b94c6d27"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "ba3a45f83e36986f4e5019d24be73a38b45e5d7629368b9ab3c0e1461a4ce285",
-      "after_sha256": "f1b4dcf0ae290fc6520a2fe742cb6402af06a599a4cb149b88fabd777e851142",
+      "before_sha256": "f1b4dcf0ae290fc6520a2fe742cb6402af06a599a4cb149b88fabd777e851142",
+      "after_sha256": "3cb89a7abf4a7a07cbd175f3b47d14cac9274ec4ca1256b30e47de3708f27f51",
       "owners": {
         "@document": {
-          "before": "ba3a45f83e36986f4e5019d24be73a38b45e5d7629368b9ab3c0e1461a4ce285",
-          "after": "f1b4dcf0ae290fc6520a2fe742cb6402af06a599a4cb149b88fabd777e851142"
+          "before": "f1b4dcf0ae290fc6520a2fe742cb6402af06a599a4cb149b88fabd777e851142",
+          "after": "3cb89a7abf4a7a07cbd175f3b47d14cac9274ec4ca1256b30e47de3708f27f51"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "acb220cd7f5f2afb2b7a903db67095bed022f3f68975d781c9ffded0d2caacea",
-      "after_sha256": "c34778fbc5b65398a44efab9b8482304758734c37e5473ebd3a83f61ddafd0ef",
+      "before_sha256": "c34778fbc5b65398a44efab9b8482304758734c37e5473ebd3a83f61ddafd0ef",
+      "after_sha256": "92ab9363e7edd76b47954a5062cdda1a1a6c96fe91b74ff67f51e14f995a4ae2",
       "owners": {
         "@document": {
-          "before": "acb220cd7f5f2afb2b7a903db67095bed022f3f68975d781c9ffded0d2caacea",
-          "after": "c34778fbc5b65398a44efab9b8482304758734c37e5473ebd3a83f61ddafd0ef"
+          "before": "c34778fbc5b65398a44efab9b8482304758734c37e5473ebd3a83f61ddafd0ef",
+          "after": "92ab9363e7edd76b47954a5062cdda1a1a6c96fe91b74ff67f51e14f995a4ae2"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "eb3a9ea06a8307bff87f3ae59c22b8109fc4bc367a2a63bdbe15d1a556c2a806",
-      "after_sha256": "c8253b1120cd2bfea84431e2abafea0c98aa6983eca31947ede053bed6169bf9",
+      "before_sha256": "c8253b1120cd2bfea84431e2abafea0c98aa6983eca31947ede053bed6169bf9",
+      "after_sha256": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
       "owners": {
         "@document": {
-          "before": "eb3a9ea06a8307bff87f3ae59c22b8109fc4bc367a2a63bdbe15d1a556c2a806",
-          "after": "c8253b1120cd2bfea84431e2abafea0c98aa6983eca31947ede053bed6169bf9"
+          "before": "c8253b1120cd2bfea84431e2abafea0c98aa6983eca31947ede053bed6169bf9",
+          "after": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "bc7e345361319c3daaaffb9036fc567957e709d125aebfc3296265db27e07fec",
-      "after_sha256": "0df6d032b8adf70daf90b18184cbcff50192c8184705f7553cf669197049bf30",
+      "before_sha256": "0df6d032b8adf70daf90b18184cbcff50192c8184705f7553cf669197049bf30",
+      "after_sha256": "111cfe61a7d98d8c9bfcba6fdfae4382a46563be7d4b0490871e724c96f8184c",
       "owners": {
         "@document": {
-          "before": "bc7e345361319c3daaaffb9036fc567957e709d125aebfc3296265db27e07fec",
-          "after": "0df6d032b8adf70daf90b18184cbcff50192c8184705f7553cf669197049bf30"
+          "before": "0df6d032b8adf70daf90b18184cbcff50192c8184705f7553cf669197049bf30",
+          "after": "111cfe61a7d98d8c9bfcba6fdfae4382a46563be7d4b0490871e724c96f8184c"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "8e1de921da31ac27f586c954d6a1aea20e67bc3f7c5f37618c52e8facf658436",
-      "after_sha256": "4ef4372198c33cd3afe15b25ba75e33dbe0add1fbaadeece52817d4553a9dead",
+      "before_sha256": "4ef4372198c33cd3afe15b25ba75e33dbe0add1fbaadeece52817d4553a9dead",
+      "after_sha256": "bb1a45394784c2c660430640e3af106d5ca521c0ce092a52af8882f914897f8a",
       "owners": {
         "@document": {
-          "before": "8e1de921da31ac27f586c954d6a1aea20e67bc3f7c5f37618c52e8facf658436",
-          "after": "4ef4372198c33cd3afe15b25ba75e33dbe0add1fbaadeece52817d4553a9dead"
+          "before": "4ef4372198c33cd3afe15b25ba75e33dbe0add1fbaadeece52817d4553a9dead",
+          "after": "bb1a45394784c2c660430640e3af106d5ca521c0ce092a52af8882f914897f8a"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "ecbbeb18568595ef0bfd3dec9a2c24e9be0592df212aeb342b73ce30f66db74e",
-      "after_sha256": "59932a0f08cc069fd15acd7038dcfd4c1f68ed694cdd79a7ee2ba149778e3ff7",
+      "before_sha256": "59932a0f08cc069fd15acd7038dcfd4c1f68ed694cdd79a7ee2ba149778e3ff7",
+      "after_sha256": "1f3f2c044e2fa1e2231685bcca892449d2e501dac25faeda3090fe8114ffaf11",
       "owners": {
         "@document": {
-          "before": "ecbbeb18568595ef0bfd3dec9a2c24e9be0592df212aeb342b73ce30f66db74e",
-          "after": "59932a0f08cc069fd15acd7038dcfd4c1f68ed694cdd79a7ee2ba149778e3ff7"
+          "before": "59932a0f08cc069fd15acd7038dcfd4c1f68ed694cdd79a7ee2ba149778e3ff7",
+          "after": "1f3f2c044e2fa1e2231685bcca892449d2e501dac25faeda3090fe8114ffaf11"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "d05911467f8bbcfed67eb3eb1ca1d4468ecb53ecd3c362f1e395a9b5d56e9fe7",
-      "after_sha256": "0b804c263dfc3c2395cd013686df7ec1244bc4a825e1af9b4fe3e5150f48d1d3",
+      "before_sha256": "0b804c263dfc3c2395cd013686df7ec1244bc4a825e1af9b4fe3e5150f48d1d3",
+      "after_sha256": "5625f32bf80cca74ceee8008314a66911ddf5f488f1ef8090dd9476e59dd2f6b",
       "owners": {
         "@document": {
-          "before": "d05911467f8bbcfed67eb3eb1ca1d4468ecb53ecd3c362f1e395a9b5d56e9fe7",
-          "after": "0b804c263dfc3c2395cd013686df7ec1244bc4a825e1af9b4fe3e5150f48d1d3"
+          "before": "0b804c263dfc3c2395cd013686df7ec1244bc4a825e1af9b4fe3e5150f48d1d3",
+          "after": "5625f32bf80cca74ceee8008314a66911ddf5f488f1ef8090dd9476e59dd2f6b"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "8ff2615cd47016d82643031b751edff5f2b7fa7d96588a0f5ffc64ddbd27d80a",
-      "after_sha256": "ca36eff99261ad4d3bab2c91d60b9b8d976ffabf9a52fb9aa88348308a13c512",
+      "before_sha256": "ca36eff99261ad4d3bab2c91d60b9b8d976ffabf9a52fb9aa88348308a13c512",
+      "after_sha256": "542ad24c24822b74406606ea207a10136320cc987a235bced72d9b83e02c3c5f",
       "owners": {
         "@document": {
-          "before": "8ff2615cd47016d82643031b751edff5f2b7fa7d96588a0f5ffc64ddbd27d80a",
-          "after": "ca36eff99261ad4d3bab2c91d60b9b8d976ffabf9a52fb9aa88348308a13c512"
+          "before": "ca36eff99261ad4d3bab2c91d60b9b8d976ffabf9a52fb9aa88348308a13c512",
+          "after": "542ad24c24822b74406606ea207a10136320cc987a235bced72d9b83e02c3c5f"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "72081a5977c17959f292f3a73cba4e077df3ae0254aa4eca1a1f8d3567fab5c9",
-      "after_sha256": "e34ca60267d2468d3c9a02fdfb38df83712f104ea78e840e3039af2bb75595d0",
+      "before_sha256": "e34ca60267d2468d3c9a02fdfb38df83712f104ea78e840e3039af2bb75595d0",
+      "after_sha256": "235a86cbe327abee54900314306ff190ab182adbe4abd5fac69b1a5b14091cc5",
       "owners": {
         "@document": {
-          "before": "72081a5977c17959f292f3a73cba4e077df3ae0254aa4eca1a1f8d3567fab5c9",
-          "after": "e34ca60267d2468d3c9a02fdfb38df83712f104ea78e840e3039af2bb75595d0"
+          "before": "e34ca60267d2468d3c9a02fdfb38df83712f104ea78e840e3039af2bb75595d0",
+          "after": "235a86cbe327abee54900314306ff190ab182adbe4abd5fac69b1a5b14091cc5"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "6eaeecefba854f0ca61beb2d87137cb29e254f27e8ee45dbe11cb40cd7ff0c01",
-      "after_sha256": "573f798809de5b5594ecc65a1e35ced88b966398ec7f5531a062efc30fa388e0",
+      "before_sha256": "573f798809de5b5594ecc65a1e35ced88b966398ec7f5531a062efc30fa388e0",
+      "after_sha256": "d0d501a2d3dbd98ea90b7c734972d7044f87645521bb3afbac65e338e7cc867f",
       "owners": {
         "@document": {
-          "before": "6eaeecefba854f0ca61beb2d87137cb29e254f27e8ee45dbe11cb40cd7ff0c01",
-          "after": "573f798809de5b5594ecc65a1e35ced88b966398ec7f5531a062efc30fa388e0"
+          "before": "573f798809de5b5594ecc65a1e35ced88b966398ec7f5531a062efc30fa388e0",
+          "after": "d0d501a2d3dbd98ea90b7c734972d7044f87645521bb3afbac65e338e7cc867f"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "790bbcf9c165e28566b1128b0129722b3e7935301a913781027113a036c7368d",
-      "after_sha256": "3e1f9816bddf16172758f52222f29f368ad9ab8b56c93cfbb83ed79ca0e19dde",
+      "before_sha256": "3e1f9816bddf16172758f52222f29f368ad9ab8b56c93cfbb83ed79ca0e19dde",
+      "after_sha256": "cc29a7ea90f011bca4b0b85c0b891fdde9aabf64a5c63637a9eba3d02fab872c",
       "owners": {
         "@document": {
-          "before": "790bbcf9c165e28566b1128b0129722b3e7935301a913781027113a036c7368d",
-          "after": "3e1f9816bddf16172758f52222f29f368ad9ab8b56c93cfbb83ed79ca0e19dde"
+          "before": "3e1f9816bddf16172758f52222f29f368ad9ab8b56c93cfbb83ed79ca0e19dde",
+          "after": "cc29a7ea90f011bca4b0b85c0b891fdde9aabf64a5c63637a9eba3d02fab872c"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "1a0daffeffe1a6dc9820e7a6d4a3b9e589003626783c303d497595d2a9baace7",
-      "after_sha256": "e469e163cc9b5bed586528b9b852030d39f9c1ccf5f23c81a8ea7e43d35ace8d",
+      "before_sha256": "e469e163cc9b5bed586528b9b852030d39f9c1ccf5f23c81a8ea7e43d35ace8d",
+      "after_sha256": "041874047782726fb4ccd718e17df471c019ba742a6de4e6136b7ab814321c85",
       "owners": {
         "@document": {
-          "before": "1a0daffeffe1a6dc9820e7a6d4a3b9e589003626783c303d497595d2a9baace7",
-          "after": "e469e163cc9b5bed586528b9b852030d39f9c1ccf5f23c81a8ea7e43d35ace8d"
+          "before": "e469e163cc9b5bed586528b9b852030d39f9c1ccf5f23c81a8ea7e43d35ace8d",
+          "after": "041874047782726fb4ccd718e17df471c019ba742a6de4e6136b7ab814321c85"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "320ff428887a521696a2c3cc6b8f29ba1f1d79ee789203d682c1195b3560b152",
-      "after_sha256": "89d521a52bc21cabcf5348d99009eabcad385cc027d74e8d3d66653075304735",
+      "before_sha256": "89d521a52bc21cabcf5348d99009eabcad385cc027d74e8d3d66653075304735",
+      "after_sha256": "b73133bb8d1109dc890ac90d7ba6182d779932a9ea182ac14cdb9eedc9674671",
       "owners": {
         "@document": {
-          "before": "320ff428887a521696a2c3cc6b8f29ba1f1d79ee789203d682c1195b3560b152",
-          "after": "89d521a52bc21cabcf5348d99009eabcad385cc027d74e8d3d66653075304735"
+          "before": "89d521a52bc21cabcf5348d99009eabcad385cc027d74e8d3d66653075304735",
+          "after": "b73133bb8d1109dc890ac90d7ba6182d779932a9ea182ac14cdb9eedc9674671"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "7c48cdeb42c66e7bd94497b7ed13d37c289c6d959b1efa4bcb1b1b69c55c789d",
-      "after_sha256": "e48040ec88892e5ee2e2944e1ef72d7ad905cb290c09fbcf494e2e5e415d9b64",
+      "before_sha256": "e48040ec88892e5ee2e2944e1ef72d7ad905cb290c09fbcf494e2e5e415d9b64",
+      "after_sha256": "5937c503d4d56a32e00bf786b8b9d9486e3fafbae9fe98c1298e26711dc0b73f",
       "owners": {
         "@document": {
-          "before": "7c48cdeb42c66e7bd94497b7ed13d37c289c6d959b1efa4bcb1b1b69c55c789d",
-          "after": "e48040ec88892e5ee2e2944e1ef72d7ad905cb290c09fbcf494e2e5e415d9b64"
+          "before": "e48040ec88892e5ee2e2944e1ef72d7ad905cb290c09fbcf494e2e5e415d9b64",
+          "after": "5937c503d4d56a32e00bf786b8b9d9486e3fafbae9fe98c1298e26711dc0b73f"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "2c738835f8c62440909fd07b967cc0d399fe2eec078f6b09fa321bf3372c791d",
-      "after_sha256": "2c81917d7a7ab66f93b5648c4bf4fc90ecdb28347226f253cb174baed0e18e0d",
+      "before_sha256": "2c81917d7a7ab66f93b5648c4bf4fc90ecdb28347226f253cb174baed0e18e0d",
+      "after_sha256": "eb511634d8d1bc65d62127831f6b77eb79560dc40745daac0e4211aea7013335",
       "owners": {
         "@document": {
-          "before": "2c738835f8c62440909fd07b967cc0d399fe2eec078f6b09fa321bf3372c791d",
-          "after": "2c81917d7a7ab66f93b5648c4bf4fc90ecdb28347226f253cb174baed0e18e0d"
+          "before": "2c81917d7a7ab66f93b5648c4bf4fc90ecdb28347226f253cb174baed0e18e0d",
+          "after": "eb511634d8d1bc65d62127831f6b77eb79560dc40745daac0e4211aea7013335"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "2be6dcf8b21b21db85a3ddb514377f6cbd97c9dc8a081dd3c50de7be1f5cdda3",
-      "after_sha256": "d6ee54e0f210911925a670a0bbb3940c467f9bfefa1b6fdf99eeb0040967d048",
+      "before_sha256": "d6ee54e0f210911925a670a0bbb3940c467f9bfefa1b6fdf99eeb0040967d048",
+      "after_sha256": "511db71b99b698069a703a92f5e8efd3e9ed8456855c079a4c5a15e8dbf0915e",
       "owners": {
         "@document": {
-          "before": "2be6dcf8b21b21db85a3ddb514377f6cbd97c9dc8a081dd3c50de7be1f5cdda3",
-          "after": "d6ee54e0f210911925a670a0bbb3940c467f9bfefa1b6fdf99eeb0040967d048"
+          "before": "d6ee54e0f210911925a670a0bbb3940c467f9bfefa1b6fdf99eeb0040967d048",
+          "after": "511db71b99b698069a703a92f5e8efd3e9ed8456855c079a4c5a15e8dbf0915e"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "392b8b025cee825817ff8914f62279b7293f97edddf65904f567cbd35839b5aa",
-      "after_sha256": "8abe43a7504a64625b313344436a6b246d4c92ad3bfe3bd694b5c9aad0150045",
+      "before_sha256": "8abe43a7504a64625b313344436a6b246d4c92ad3bfe3bd694b5c9aad0150045",
+      "after_sha256": "7f78b931da71183587d2977a91d8f1aa0f5a86331bd4493adfeece73e654f082",
       "owners": {
         "@document": {
-          "before": "392b8b025cee825817ff8914f62279b7293f97edddf65904f567cbd35839b5aa",
-          "after": "8abe43a7504a64625b313344436a6b246d4c92ad3bfe3bd694b5c9aad0150045"
+          "before": "8abe43a7504a64625b313344436a6b246d4c92ad3bfe3bd694b5c9aad0150045",
+          "after": "7f78b931da71183587d2977a91d8f1aa0f5a86331bd4493adfeece73e654f082"
         }
       }
     },
     "docs/performance/CANONICAL_DEPLOYMENT_COSTS.md": {
-      "before_sha256": "ffefc17708685697a037238fb70264c2481b71fdc27a74f5fcc6e1839502d731",
-      "after_sha256": "abed58814b8bf4282ee3d0cd4d6dc33f3db5ff54630ff6ebc72174e1bc814331",
+      "before_sha256": "abed58814b8bf4282ee3d0cd4d6dc33f3db5ff54630ff6ebc72174e1bc814331",
+      "after_sha256": "cea1f389ff5aba32823df19ab2606003ff238cf4b5be91184b3c6539c4d5990d",
       "owners": {
         "@document": {
-          "before": "ffefc17708685697a037238fb70264c2481b71fdc27a74f5fcc6e1839502d731",
-          "after": "abed58814b8bf4282ee3d0cd4d6dc33f3db5ff54630ff6ebc72174e1bc814331"
+          "before": "abed58814b8bf4282ee3d0cd4d6dc33f3db5ff54630ff6ebc72174e1bc814331",
+          "after": "cea1f389ff5aba32823df19ab2606003ff238cf4b5be91184b3c6539c4d5990d"
         }
       }
     },
-    "docs/performance/deployment-reference-suite-v1/definition.json": {
+    "docs/performance/deployment-reference-suite-v2/base-measurement.json": {
       "before_sha256": null,
-      "after_sha256": "8d597246eaa9410fccfe8569cae8d19d6f5c0d5a661bbf7202d427da1e3338d2",
+      "after_sha256": "b37e5523090a35a7bfc3bac24e46c1677b402c01e9b4fef022d041b5e4c51408",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8d597246eaa9410fccfe8569cae8d19d6f5c0d5a661bbf7202d427da1e3338d2"
+          "after": "b37e5523090a35a7bfc3bac24e46c1677b402c01e9b4fef022d041b5e4c51408"
         }
       }
     },
-    "docs/performance/deployment-reference-suite-v1/measured-driver-source.json": {
+    "docs/performance/deployment-reference-suite-v2/definition.json": {
       "before_sha256": null,
-      "after_sha256": "c7d141a15cc18f56203134427d532ee466ffa3bf681a67d436446f394209f3d5",
+      "after_sha256": "a1f40762eb71f655b28602faa2fa62ca6ea02badd78de3783712edaa5e4ac9a3",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c7d141a15cc18f56203134427d532ee466ffa3bf681a67d436446f394209f3d5"
+          "after": "a1f40762eb71f655b28602faa2fa62ca6ea02badd78de3783712edaa5e4ac9a3"
         }
       }
     },
-    "docs/performance/deployment-reference-suite-v1/measurement.json": {
+    "docs/performance/deployment-reference-suite-v2/head-measurement.json": {
       "before_sha256": null,
-      "after_sha256": "61ee949ff9734cb2f0331c86f4c0fddabce7a8625d355a8e14517b5b343bdea8",
+      "after_sha256": "4e541d281995c98911c16a53c948ecb3d96580f815df645c3b0241ad1f3a5a29",
       "owners": {
         "@document": {
           "before": null,
-          "after": "61ee949ff9734cb2f0331c86f4c0fddabce7a8625d355a8e14517b5b343bdea8"
+          "after": "4e541d281995c98911c16a53c948ecb3d96580f815df645c3b0241ad1f3a5a29"
         }
       }
     },
-    "docs/performance/deployment-reference-suite-v1/suite-report.json": {
+    "docs/performance/deployment-reference-suite-v2/suite-report.json": {
       "before_sha256": null,
-      "after_sha256": "3309703502205bbd2f83ec887980ecc0b3e904c9a318618f261a43ffa7c50ff5",
+      "after_sha256": "86fbe6118ff4b8d0c1ffa61bcef47d793a592e5f7029111f3e855851d6381e1a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "3309703502205bbd2f83ec887980ecc0b3e904c9a318618f261a43ffa7c50ff5"
-        }
-      }
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "69f7cfd2b1cd9ca1d501cc49bb95ce706f08e3a01420ad4e8c1ff0955b144cde",
-      "after_sha256": "8033a1a84fa98c8cfd0edc4c872c031de5cd312adb22c4feabf2ffa5a36aa66e",
-      "owners": {
-        "@document": {
-          "before": "69f7cfd2b1cd9ca1d501cc49bb95ce706f08e3a01420ad4e8c1ff0955b144cde",
-          "after": "8033a1a84fa98c8cfd0edc4c872c031de5cd312adb22c4feabf2ffa5a36aa66e"
-        }
-      }
-    },
-    "scripts/measure_canonical_deployment_costs.py": {
-      "before_sha256": "6fd54cf4b931c7b33c96d3dd27133b04a4ee8e0da870d7703dabc64c4a0485bf",
-      "after_sha256": "9dd4e2cf42e060716b950a2ab71ae0ba4f2f5fc429fca170ceeec38da71b300a",
-      "owners": {
-        "campaign": {
-          "before": "f7e5f523d1b67a7fa9d73411d2220a092f14c4984bc963dbc6eb5b2fae074297",
-          "after": "bfd9ab4ddd2b04206a5ebab2593e83e72f45678389042d5950e3a7e3af4db76c"
-        },
-        "candidate_components": {
-          "before": null,
-          "after": "e0e85621a815abba6df686028fe2e8c67c27dd22d9a0008c61e93112795af18e"
-        },
-        "main": {
-          "before": "0404b97662c17e7136310866998ee08274b2d79858673a4e2a542dc35be10e25",
-          "after": "a77600c8755b3e0c978558b8a388b96edc3842bb591203e99a3fa69de8de4a61"
-        },
-        "parser": {
-          "before": "13fb79412c19bccdf09949d71f5bcbfa5a25aa5e6d7ffb8cace09ec4b9ca9b09",
-          "after": "f1d44c3581f9cc1f55879e7cddac938deb2e9e6d1b5b03109c164c5dfe14739a"
-        },
-        "reference_suite_worker": {
-          "before": null,
-          "after": "8725373be24943cef0f773279f9a1eff880256a3b11f52e5291702fc8e3bf768"
-        },
-        "summarize": {
-          "before": "ffae0f523446c4d8deafa2336e1d575e970f8be1e5e65ec04892547df54379be",
-          "after": "4b322d8df4cc4435bb6877c64db9cf966a75fd4acbbd02d473fdd1205e10006c"
-        },
-        "worker": {
-          "before": "4a0fdbaf4654dfb8d6c135d528da438bfce0999d9f9a6b3fa2b86d0764684e25",
-          "after": "102f174675bcad1a42f946e3d2a3c6f58c93b32b7c6b1cdd734042d10cbf655a"
+          "after": "86fbe6118ff4b8d0c1ffa61bcef47d793a592e5f7029111f3e855851d6381e1a"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "221e68074024876335aa30a827eb4b1c3b0773887e97ca8927eb0a65dc3c4bf2",
-      "after_sha256": "2cf0d3ca5cd698ff071b8b7212d2db2b4e0dde1f47e99dfd3638ab9d28b551db",
+      "before_sha256": "2cf0d3ca5cd698ff071b8b7212d2db2b4e0dde1f47e99dfd3638ab9d28b551db",
+      "after_sha256": "504a62c4257a041d91cc1187811083b8f98119069ded5fa673793226890e8b75",
       "owners": {
         "@document": {
-          "before": "221e68074024876335aa30a827eb4b1c3b0773887e97ca8927eb0a65dc3c4bf2",
-          "after": "2cf0d3ca5cd698ff071b8b7212d2db2b4e0dde1f47e99dfd3638ab9d28b551db"
+          "before": "2cf0d3ca5cd698ff071b8b7212d2db2b4e0dde1f47e99dfd3638ab9d28b551db",
+          "after": "504a62c4257a041d91cc1187811083b8f98119069ded5fa673793226890e8b75"
         }
       }
     },
-    "src/warhammer40k_core/ai/canonical_deployment.py": {
-      "before_sha256": "13891f341227eee17583d59b314a01622c4b7414b2a4871ef34359050966b2b1",
-      "after_sha256": "d8dc60654a1da1d61b6b640c1480fae5bc8c6721a662c78a6837f1a618bd39ae",
+    "src/warhammer40k_core/ai/deployment_candidate_search.py": {
+      "before_sha256": "e6ede1eb697f088a7a2adf326ad1f22cc49addf93f14ae9a4eee00995f5f0cea",
+      "after_sha256": "41b459b992aad39c392e00bccc73d03c9f813ec6893e9380c5d08f6083b21b97",
       "owners": {
-        "_RecipePolicy.__init__": {
-          "before": "9fbedf46b87d64fe9ff163b0bd42c2b928a480df1c870bb1a7639c542f7988b2",
-          "after": "744ed2c8a1ec12e0f6eb6188b4df6347b8c960236da06870223da77cb8b81690"
-        },
-        "_RecipePolicy.choose": {
-          "before": "478e089b7f28edfca837795c3d88e30ca4fef0b514688e9f47a8808c6eac4da2",
-          "after": "6d492140d11d76e078312936a49aa283d8f5f71ef13087eeacbb5085a6956193"
-        },
-        "_recipe_prefixes": {
-          "before": null,
-          "after": "7c7fab6d46713735a7ee37564327ff7edf3d036a759b020181b65aba77163cc2"
-        },
-        "_reproduce_recipe": {
-          "before": null,
-          "after": "0f33158e2b969965cde8978f076adb750d324abd35f9d40247e185e9e708f557"
-        },
-        "canonical_deployment_prefixes": {
-          "before": "89b24a4dac5014b451badfd81305fab6be81d5b653cebf0b30dc89a3cf320771",
-          "after": "00aab0cfcb3708d9579c234f4cd36855892c129eef0514d32dcb24710026827c"
-        },
-        "reproduce_canonical_deployment": {
-          "before": "897ced83391a077995ab3ff2d85e27faa833aa2cf98cb1712fd37b2a6adc10e2",
-          "after": "d78f19d130738f7463e682959a7fb173db68273bc7fdf12a0ad9019796efc97a"
-        }
-      }
-    },
-    "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
-      "before_sha256": "d3afd9c4931cabeb68154c33c67cafc599497fb903ef7bb51dc414ffd337ba3a",
-      "after_sha256": "d20502870ec4302048bde101a6518bf760258daa5e54d8cd267aa1ebf5940de4",
-      "owners": {
-        "CanonicalDeploymentCoverage.measure": {
-          "before": "2c339e59a8b7b7845cb34ee719697f7e0d2b07b3d285d962316605309689a071",
-          "after": "667b7f30a8034cc421bde91487dddd561fa314c30e33819b3f250c8eaf9c740d"
-        },
-        "_measure_prefixes": {
-          "before": null,
-          "after": "1a024b7d4072c2bb9ed242592a7f996de6439bf90d81ef5d441de3ad1426c26a"
-        },
-        "_placement_row": {
-          "before": "8c3b83edca2265d8d2de3506cf843434e33a9bcde91969c438c54c421afc17b0",
-          "after": "753cf87410cf05351a590ba47b0d69001686ace8d5ebe73c6508440be1838528"
+        "@module": {
+          "before": "115a6a45930e2a46f80fec73ba0c0e0622964c670c62a46a8d4dd318fa8f7dc7",
+          "after": "af7fbd4d12d568a7e48cb950cf1e435467b6743b76162be4f588dfed26478e5c"
         }
       }
     },
     "src/warhammer40k_core/ai/deployment_reference_suite.py": {
-      "before_sha256": null,
-      "after_sha256": "eb3fd7f34e9afe75859311972237aff6827c7361be7b6af6777f363c16c7969f",
+      "before_sha256": "eb3fd7f34e9afe75859311972237aff6827c7361be7b6af6777f363c16c7969f",
+      "after_sha256": "cb2e04cc945ddafc76639615e0ed88c39f1a31eb1c97346a57c59fa3112fbd71",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "79bcc33eb409056e6b73556099dd558a72d612eb1b6ba96ad967679ceecee82f"
-        },
-        "DeploymentReferenceSuite": {
-          "before": null,
-          "after": "b80f419e5531e7e99a11557e06cc004d09383b542d36bfe5e848ed06bd8066ee"
-        },
-        "DeploymentReferenceSuite.__init__": {
-          "before": null,
-          "after": "b3a6f1cb5eb00d2acfd3f5c395398943b672a3f115a597b3c5ceb9b9ff3f44d6"
-        },
-        "DeploymentReferenceSuite.content_hash": {
-          "before": null,
-          "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
-        },
-        "DeploymentReferenceSuite.from_payload": {
-          "before": null,
-          "after": "90b51d40c52c8e633ea672803bbae9b67b61eb604e6aea7c3bdc0df77eefd067"
-        },
-        "DeploymentReferenceSuite.measure": {
-          "before": null,
-          "after": "971fe18fd56a193e5df3dcb12043f515f49fb0e28d87482b4123161670cbc69a"
-        },
-        "DeploymentReferenceSuite.to_payload": {
-          "before": null,
-          "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
-        },
-        "measure_reference_case": {
-          "before": null,
-          "after": "d76b640a875664f9025ca1a06b1cb52356c1b6e80c54f9e474ae90f24ef18cd4"
-        },
-        "reference_case_steps": {
-          "before": null,
-          "after": "2e289261f635408a0b638bc681cadd0e4f9df580c67c7b70bbc2d39dbab706bb"
+          "before": "79bcc33eb409056e6b73556099dd558a72d612eb1b6ba96ad967679ceecee82f",
+          "after": "ea4c1eca46967fb6bbb39cba9ff382475d76f85198456ad29039c1cfa4bca1d6"
         },
         "reference_suite_definition": {
-          "before": null,
-          "after": "7d38d60cc75645436297aa22d45f1bd8729bb3ecfb93cff9aaca1d52e70dde99"
-        },
-        "reproduce_reference_case": {
-          "before": null,
-          "after": "9e736051ec8b651af1116690b1bcf940931a963cb80f3c6b33abf7c182253935"
-        },
-        "require_reference_suite_definition": {
-          "before": null,
-          "after": "6fcf498599b6916f6c1593803706c93be438226052a621076d7d610d1ba0fa01"
+          "before": "7d38d60cc75645436297aa22d45f1bd8729bb3ecfb93cff9aaca1d52e70dde99",
+          "after": "edc99aa2824f975e6209c4eb1d01e70effdba86987fd0eb78b43e836d47fe273"
         }
       }
     },
     "tests/code_quality/test_canonical_deployment_costs.py": {
-      "before_sha256": "1eb2d176087b968f9370f5b09b50632546fead6db5ba2e2095f43c45b614fd66",
-      "after_sha256": "6286a9bd24461377d221f2f536f4184c98a09e5c5182108ed1aa28093b77828d",
+      "before_sha256": "6286a9bd24461377d221f2f536f4184c98a09e5c5182108ed1aa28093b77828d",
+      "after_sha256": "4b084b6defbd8ab1bcc870bdc0b3837304eea461668f4849444033653ece3955",
       "owners": {
         "test_retained_reference_suite_costs_bind_definition_report_and_complete_components": {
-          "before": null,
-          "after": "e9b52e7fffc2a9b9d0f8f65b67c39e907f4a42b27fc00ab7b964a30036359383"
-        },
-        "test_suite_costs_keep_case_identity_and_select_explicit_workload": {
-          "before": null,
-          "after": "a162510a332364ad8133fe1627e34532281c3c3d7b6fcf2e5949b1b1874f76d2"
+          "before": "e9b52e7fffc2a9b9d0f8f65b67c39e907f4a42b27fc00ab7b964a30036359383",
+          "after": "cdc736b3601580e749d8b8820897a887d8b9452ce719f3284d8ca0e550e909ac"
         }
       }
     },
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
-      "before_sha256": "545060200efd79ca546bd1ef74acd8144ef98cd2ce3ae4504abb8c952bccae1c",
-      "after_sha256": "283f14985e6f32d67b865d1514588ad26b79779cfedc4b902fa895d875bfb5df",
+      "before_sha256": "283f14985e6f32d67b865d1514588ad26b79779cfedc4b902fa895d875bfb5df",
+      "after_sha256": "4445262840af8cf94079b4d697bf7d74fea458ed27a2dbbe33a38b7908b917f3",
       "owners": {
+        "test_complete_canonical_coverage_reconciles_reproduces_and_rejects_false_denominator": {
+          "before": "1c01fdaa60e7e792cf1d2e801330a661369e37ceec9b8aac079cea3e3509ab66",
+          "after": "dcbdcc4ee0af57334c45e53e10a30ce7faae383b9f89a9103909ebfbaa626187"
+        },
         "test_reference_case_ordinary_prefixes_geometry_and_feasible_gaps": {
-          "before": null,
-          "after": "130d66a61abee8b59ee47cffb064b401fc03c668457075ccc0cb18aec4eecd2c"
+          "before": "130d66a61abee8b59ee47cffb064b401fc03c668457075ccc0cb18aec4eecd2c",
+          "after": "8204b6697446cdaae3be83b7444f7ecb84f1e91f11906955d8c318a9f960cfb7"
         },
         "test_reference_suite_definition_is_pinned_and_closed": {
-          "before": null,
-          "after": "98be91fa38f4f5614d1b911a688def9296a38a47b2e8812afce16d866832b3d9"
+          "before": "98be91fa38f4f5614d1b911a688def9296a38a47b2e8812afce16d866832b3d9",
+          "after": "a4c493efabe9b14924ce62f3e500b59c28e754e705154bd78afb64108de6d5f8"
+        }
+      }
+    },
+    "tests/infrastructure/adapters/test_deployment_candidates.py": {
+      "before_sha256": "0e9f9cb7e0ffdd09e189a1334ca0f823cc956529d604db59400d24f5d46b27d1",
+      "after_sha256": "c1be572edd1ea3b57753c5633ece0017ea1fd688712afb5a0e8193a2c3596900",
+      "owners": {
+        "test_deployment_generation_has_distinct_geometry_and_stable_detached_roundtrip": {
+          "before": "3cef1abce80e2f32dc3acaf1c8207c75d89ae3e10155389dde9d09a850acc78c",
+          "after": "95e9ebf253d74f4fa1be70a1758c456ba2978aa4e1265f5398a737c0ef56a873"
+        },
+        "test_deployment_set_link_rejects_same_view_different_authoritative_checkpoint": {
+          "before": "62a6a538b3aa3fe618e7da41f23ce546323d9c25e8a8226c1df620ceaaa30e47",
+          "after": "9d2d2e64a6605a57c87ca851089d7ffb4e03999740c9ba7cdc7797c386b2bdf3"
+        },
+        "test_deployment_validation_budget_returns_explicit_partial_valid_set": {
+          "before": "d027e30c34e8955a46cb73bc5fbe59a0cfc7a89ae9a18105b0b3f8f504b267ca",
+          "after": "d0ca462363c59c6a643cd0d42fb2de934ad823473c315eddf96dc828f9c36376"
+        },
+        "test_deployment_validation_preserves_live_state_and_commits_alternatives_with_replay": {
+          "before": "1b555bea26445417816a5d3dfd8791ac8043fc83d5226318e83555eef96bef2e",
+          "after": "abf70535291c6e1e7839b86e02d87e230271b957a487a31a15342ee70efe7b5b"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "429217a414a96524d350fea82ee1f639dc5d93ee53167150555818d1a7e2caff",
-      "after_sha256": "e500c9dc237221a0de4ede68df9a4494e1579cefa5e54d5d35528d4dd4c5eed6",
+      "before_sha256": "e500c9dc237221a0de4ede68df9a4494e1579cefa5e54d5d35528d4dd4c5eed6",
+      "after_sha256": "c00f455c45b6effb1f9475658c3b74a0dfd2b662862f00771a489a14efb7facb",
       "owners": {
         "@document": {
-          "before": "429217a414a96524d350fea82ee1f639dc5d93ee53167150555818d1a7e2caff",
-          "after": "e500c9dc237221a0de4ede68df9a4494e1579cefa5e54d5d35528d4dd4c5eed6"
+          "before": "e500c9dc237221a0de4ede68df9a4494e1579cefa5e54d5d35528d4dd4c5eed6",
+          "after": "c00f455c45b6effb1f9475658c3b74a0dfd2b662862f00771a489a14efb7facb"
         }
       }
     }
@@ -544,25 +424,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
-    },
-    "ci/quality_shards/all.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
@@ -570,9 +434,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/hosted-calibration.json": {
       "category": "measured_workload",
@@ -581,9 +445,9 @@
         "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "measured_workload",
@@ -591,9 +455,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "measured_workload",
@@ -601,9 +465,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "measured_workload",
@@ -611,9 +475,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "measured_workload",
@@ -621,9 +485,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "measured_workload",
@@ -631,9 +495,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "measured_workload",
@@ -641,9 +505,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "measured_workload",
@@ -651,9 +515,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "measured_workload",
@@ -661,9 +525,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "measured_workload",
@@ -671,9 +535,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "measured_workload",
@@ -681,9 +545,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "measured_workload",
@@ -691,9 +555,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "measured_workload",
@@ -701,9 +565,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -711,9 +575,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -721,9 +585,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -731,9 +595,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -741,9 +605,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -751,9 +615,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -761,9 +625,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -771,9 +635,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -781,9 +645,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -791,91 +655,73 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Preserve the complete successful local 6254-case baseline and append 49 authenticated workers from failed PR656 attempt 1, retaining all prior receipts and separate passed phase samples. Regenerate shard assignments using the unchanged maximum formula. The observed 1080.002392156-second single-case floor prevents modeled eighteen-minute certification; fresh hosted qualification remains mandatory.",
-      "source_obligation": "Every current test case needs measured dispatch weights and exact inventory. Preserve the original source ledger, test selection, twelve shards, coverage floor, eighteen-minute approval and thirty-minute execution limits.",
-      "unchanged_work": "No gameplay behavior, scheduling algorithm, budget, hard case or semantic assertion is removed. Historical outcomes remain unchanged; profile refresh establishes current inventory costs only, not hosted accuracy or a performance improvement."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "docs/performance/CANONICAL_DEPLOYMENT_COSTS.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
-    "docs/performance/deployment-reference-suite-v1/definition.json": {
+    "docs/performance/deployment-reference-suite-v2/base-measurement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
-    "docs/performance/deployment-reference-suite-v1/measured-driver-source.json": {
+    "docs/performance/deployment-reference-suite-v2/definition.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
-    "docs/performance/deployment-reference-suite-v1/measurement.json": {
+    "docs/performance/deployment-reference-suite-v2/head-measurement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
-    "docs/performance/deployment-reference-suite-v1/suite-report.json": {
+    "docs/performance/deployment-reference-suite-v2/suite-report.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
-    },
-    "scripts/measure_canonical_deployment_costs.py": {
-      "category": "measured_workload",
-      "operations": [
-        "canonical-deployment-component-costs"
-      ],
-      "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -883,29 +729,19 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
-    "src/warhammer40k_core/ai/canonical_deployment.py": {
-      "category": "measured_workload",
+    "src/warhammer40k_core/ai/deployment_candidate_search.py": {
+      "category": "algorithm_or_search",
       "operations": [
-        "canonical-deployment-admission"
+        "deployment-bounded-candidates"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
-    },
-    "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
-      "category": "measured_workload",
-      "operations": [
-        "canonical-deployment-coverage"
-      ],
-      "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "src/warhammer40k_core/ai/deployment_reference_suite.py": {
       "category": "measured_workload",
@@ -913,17 +749,17 @@
         "deployment-reference-suite"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "tests/code_quality/test_canonical_deployment_costs.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
       "category": "measured_workload",
@@ -931,9 +767,19 @@
         "canonical-deployment-coverage"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
+    },
+    "tests/infrastructure/adapters/test_deployment_candidates.py": {
+      "category": "measured_workload",
+      "operations": [
+        "deployment-bounded-candidates"
+      ],
+      "selected_families": [],
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -941,9 +787,9 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Pin and reproduce a bounded three-order deployment reference suite with independent diagonal/cardinal geometry. Shared ordinary recipe, prefix and probe owners preserve canonical behavior; complete suite and prepared component costs are retained separately. The new suite did not exist at the exact base; no matched speedup is asserted.",
-      "source_obligation": "Owner-authorized Stage 2 broader feasibility references: freeze definitions before measurement, use accepted ordinary choices and exact replay, retain every probe and invalid diagnostic, report feasible misses and disclose fixed-fixture exclusions.",
-      "unchanged_work": "The default nine-offset generator, rules validators/mutation, fork/persistence/replay algorithms, fixture configuration, geometry, caches and dependencies are unchanged. Only operator workload composition and diagnostic factoring change; mapped operations have no detailed family. Generated identities and active test bindings refresh exactly. Current serial smoke, live controls and all final local/remote gates remain mandatory."
+      "rationale": "Append the four independently demonstrated one-inch XY diagonal translations after the existing nine defaults. Version generator and suite budget while retaining fixed origins, reference geometry and all three ordinary deployment orders. The separately retained actual-base/head serial campaigns report expanded component work, not a speedup.",
+      "source_obligation": "Owner-authorized Stage2 diagonal qualification: preserve engine-only legality and ordinary viewer submissions, bounded prefix accounting, exact save/load/replay and invalid geometry diagnostics. Preserve historical v1 evidence and distinguish finite feasible coverage from tactical usefulness.",
+      "unchanged_work": "Rules validators, mutation, search algorithm, formation translation arithmetic, checkpoint/fork/replay owners, dependencies and reference coordinates remain unchanged. Only four default offsets and explicit generator/suite identities change. All source, contract, exact-base smoke, full covered behavior and quality gates remain required. Campaign evidence is docs/performance/deployment-reference-suite-v2/{base,head}-measurement.json; this is n=1 per-arm additional-work evidence and no full-game certification."
     }
   },
   "milestone": "ordinary",
