@@ -24,7 +24,20 @@ from warhammer40k_core.engine.event_log import (
 
 DEPLOYMENT_SET_SCHEMA = "deployment-translation-set-v1"
 DEPLOYMENT_GENERATOR = "actor-formation-xy-translations-v1"
-DEFAULT_TRANSLATIONS = ((0.0, 0.0), (1.0, 0.0), (-1.0, 0.0), (0.0, 1.0), (0.0, -1.0))
+# Preserve the original seed/one-inch prefix for callers with smaller budgets.
+# The second cardinal ring adds wider spatial alternatives; legality still belongs
+# exclusively to ordinary engine validation, and no tactical quality is implied.
+DEFAULT_TRANSLATIONS = (
+    (0.0, 0.0),
+    (1.0, 0.0),
+    (-1.0, 0.0),
+    (0.0, 1.0),
+    (0.0, -1.0),
+    (2.0, 0.0),
+    (-2.0, 0.0),
+    (0.0, 2.0),
+    (0.0, -2.0),
+)
 
 
 class DeploymentSearchStop(StrEnum):

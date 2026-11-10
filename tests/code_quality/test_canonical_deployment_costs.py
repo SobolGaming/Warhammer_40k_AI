@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -160,9 +161,18 @@ def test_retained_canonical_cost_evidence_reconciles_exact_report_and_attempts()
     assert evidence["elapsed_wall_seconds"] < settings["wall_budget_seconds"]
     assert evidence["child_cpu_seconds"] < settings["cpu_budget_seconds"]
     environment = evidence["environment"]
-    assert environment["harness_sha256"] == costs.digest(
-        root / "scripts/measure_canonical_deployment_costs.py"
-    )
+    # This retained campaign measured the predecessor harness, not today's defaults.
+    measured_harness = subprocess.run(
+        [
+            "git",
+            "show",
+            "a3cf8f75331a83e065a2ad08b7d787c3a33ba482:scripts/measure_canonical_deployment_costs.py",
+        ],
+        cwd=root,
+        check=True,
+        capture_output=True,
+    ).stdout
+    assert environment["harness_sha256"] == hashlib.sha256(measured_harness).hexdigest()
     assert environment["lock_sha256"] == costs.digest(root / "uv.lock")
     assert environment["cpu_affinity"]
     assert environment["cpuinfo"]

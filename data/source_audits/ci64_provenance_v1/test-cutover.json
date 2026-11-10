@@ -223,10 +223,10 @@
       "sha256": "e8548335a237455fce0e5888c15f192a278620aaad31ff2a13139755492e3c56"
     },
     "tests/infrastructure/adapters/test_deployment_candidates.py": {
-      "blob_sha1": "824e6a61d2840ec0f3e3ed3a84948659ba7401d6",
-      "bytes": 59347,
+      "blob_sha1": "c4280c3912f54561a8d2f6f6ad8cd604efc0165d",
+      "bytes": 59933,
       "mode": "100644",
-      "sha256": "9b1c97aec569a9f13242b1d7c7a3ae75df9d5c29b0beee5db1715027c3496404"
+      "sha256": "0e9f9cb7e0ffdd09e189a1334ca0f823cc956529d604db59400d24f5d46b27d1"
     },
     "tests/infrastructure/adapters/test_finite_candidates.py": {
       "blob_sha1": "c8967072bd63c9cce467b06ffe3853e76d880309",
@@ -2438,9 +2438,9 @@
     },
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
       "mode": "100644",
-      "blob_sha1": "e2843e9632de578973cb5e648e370fa7840b51b5",
-      "sha256": "b7efb48d7aa3ddf3b18364d40fa0f5723a082eba63474046ff578f78e47e84a3",
-      "bytes": 8089
+      "blob_sha1": "79bec0c2391e82dcec9a6cef7fe9294754471867",
+      "sha256": "545060200efd79ca546bd1ef74acd8144ef98cd2ce3ae4504abb8c952bccae1c",
+      "bytes": 11849
     }
   },
   "active_roots": [

@@ -9,15 +9,19 @@ complete setup nor a battle. Source mission/scoring remains July v1.1; actual
 layout geometry is October v1.3 with provisional project model volumes and the
 disclosed synthetic roster. The public test seed is fixed, policy seed is 7.
 
-The unchanged coverage owner evaluates eighteen finite choices, twenty generated
-placements and forty reference placements. Acceptance remains 18/18 finite and
+The retained predecessor coverage owner evaluated eighteen finite choices, twenty generated
+placements and forty reference placements. Acceptance was 18/18 finite and
 19/20 placement; bounded legal reference coverage is 19/32, with thirteen misses
 and eight rejected reference probes excluded. The complete deterministic report
 retains exact per-occurrence lists, raw/validation budgets, outcomes, diagnostics,
 configuration/build/source identity and hashes. These remain the authority for
-the measured workload. No cost is a tactical usefulness or learning label.
+the historical measured workload. The current second-ring default evaluates 36
+generated placements (32 accepted) and covers 32/32 legal references. Its driver
+derives generated validation count from the current default offsets; the retained
+campaign/report below remain byte-exact and are not current-runtime evidence.
+No cost is a tactical usefulness or learning label.
 
-## Observed results — 10 November 2026
+## Retained five-offset results — 10 November 2026
 
 The retained campaign completed all three fresh processes, each with one full
 measurement/reload pair and a subsequent prepared component pass: 56 timed
@@ -92,6 +96,58 @@ spread only: nearest-rank p90/p95 both equal the observed maximum, not a reliabl
 tail bound. Exact-fixture costs are recorded; broader useful references keep
 Stage 2 open.
 
+## Current second-ring work observation
+
+The default now adds ±2-inch X/Y translations after the original five offsets.
+The [complete current receipt](canonical-placement-second-ring/head-coverage.json)
+retains 18/18 finite acceptances, 32/36 generated placement acceptances and 32/32
+bounded legal-reference coverage. All forty references remain independently
+validated; eight invalid probes stay outside the legal denominator. This adds
+sixteen generated validation attempts per complete coverage call (94 total
+finite/generated/reference attempts instead of 78), with no unvalidated tail.
+
+Separate [exact-base](canonical-placement-second-ring/base-measurement.json)
+and [head](canonical-placement-second-ring/head-measurement.json)
+records preserve one serial fresh process per arm, each with one full
+measurement/closed-load pair and its subsequent prepared component pass. Base is
+`a3cf8f75331a83e065a2ad08b7d787c3a33ba482`, runtime
+`fead332323b81b04f201802bb82a254269cac3569b141b14705a6f971673ad3e`;
+head is the measured working source based on that exact commit, runtime
+`edda12efc466e3ea464ceac89263ed39ebeb2d5ac09026aa3dd38ea2c9b2f1ee`.
+The final publication also contains these evidence files and documentation;
+it is not claimed to be the commit sampled before they existed. The base report
+hash matches the retained five-offset report exactly, so its bytes are not duplicated.
+Head report SHA-256 is `3c7fb43012f64d555fe06bbb7bf5242b3597992b9ec3780cd6ca79150dd9d3b1`.
+
+Both arms used the same locked Python 3.14.5 environment, frozen configuration,
+Threadripper 3970X WSL host and complete-call boundaries. No test workers, source
+index build, npm, profiler, coverage or other validation ran during either retained
+arm; OS/page caches and unrelated host work were uncontrolled. The head ran after
+focused tests, with a fresh interpreter but no OS-cache reset. Head disabled new
+Python bytecode writes; base used the interpreter default. The original base
+harness fixes the generated budget at five; the head derives it from the default
+list length, now nine. Driver hashes and source/status/diff identities are retained.
+Thus these are **n=1 per-arm work-volume observations**, not a byte-identical
+workload benchmark, speedup, statistical tail estimate or performance certification.
+
+| Operation | Exact base seconds | Expanded head seconds |
+|---|---:|---:|
+| Complete `measure` | 132.847284 | 145.896339 |
+| Closed `from_payload` after measurement | 105.287964 | 118.390810 |
+| Prepared generated placement construction | 0.181601 | 0.303963 |
+| Prepared generated fresh-fork validation | 21.364480 | 33.714739 |
+| Prepared reference fresh-fork validation | 31.916226 | 32.845191 |
+
+Prepared rows total four occurrences and overlap the complete calls semantically;
+do not sum them into a decomposition. Complete campaign wall times were
+355.274s base and 395.100s head;
+child CPU totals were 358.946s and 395.433s.
+Each completed 56 timed operations with zero failed or incomplete attempts, within
+its declared 1,801-second wall/3,600-second CPU ceilings. More candidate validations
+are deliberate additional work. The formal exact-base assessment and separate
+180-second serial smoke remain mandatory; these observations do not establish
+those gates, tactical quality, complete games or training throughput.
+
 ## Reproduction
 
 Use Linux (including WSL) and the locked Python 3.14 project environment. Stop
@@ -138,7 +194,7 @@ distinct from these operator limits and the normal 180-second serial smoke gate.
 | `report_json_roundtrip` | JSON encode/decode of the already materialized report payload, outside both report timers. |
 | `coverage_from_payload` | Entire closed loader: complete fresh measurement and exact payload comparison; supplied endpoint and JSON report are already prepared. |
 | Prepared component pass | Separate calls after all full iterations. Configuration, start, first advance, admission, prefix reconstruction, persistence encode, JSON checkpoint encode/decode, restore, artifact extraction and replay load/run have individual boundaries. |
-| Per-occurrence components | Extra standalone `fork`; finite-set capture and coverage's actual finite probe owner; placement generator with five/ten offsets (raw ceilings 64/10) and production fresh-fork validator with five/ten attempts, accepted cap sixteen. Sets and results must exactly equal the authoritative row. |
+| Per-occurrence components | Extra standalone `fork`; finite-set capture and coverage's actual finite probe owner; placement generator and production fresh-fork validator with current nine/ten generated/reference offsets and attempts (the retained five-offset campaign used five/ten for both; raw ceilings 64/10), accepted cap sixteen. Sets and results must exactly equal the authoritative row. |
 
 `first_iteration` means the first workload in a fresh interpreter process. Imports
 and endpoint preparation precede its first `coverage_measure`; the subsequent

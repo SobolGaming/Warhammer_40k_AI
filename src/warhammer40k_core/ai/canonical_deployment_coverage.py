@@ -124,7 +124,11 @@ def _placement_row(
     seed = DeploymentPlacementCandidate.from_action(action, context=context)
     generated = DeploymentCandidateSet.generate(seed, context=context)
     validated = ValidatedDeploymentCandidates.validate(
-        generated, context=context, session=session, validation_budget=5, accepted_limit=16
+        generated,
+        context=context,
+        session=session,
+        validation_budget=len(DEFAULT_TRANSLATIONS),
+        accepted_limit=16,
     )
     # References are generated from their declared geometry, never selected from
     # the generated set or its acceptance list. Reuse the same translation owner.

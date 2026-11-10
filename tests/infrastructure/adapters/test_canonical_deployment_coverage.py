@@ -37,18 +37,18 @@ def test_complete_canonical_coverage_reconciles_reproduces_and_rejects_false_den
     totals = cast(dict[str, dict[str, int]], payload["totals"])
     assert totals["finite"]["decision_occurrences"] == 7
     assert totals["placement"]["decision_occurrences"] == 4
-    assert totals["placement"]["generated_count"] == 20
+    assert totals["placement"]["generated_count"] == 36
     assert totals["placement"]["reference_attempts"] == 40
     assert totals["finite"]["generated_count"] == 18
     assert totals["finite"]["accepted_count"] == 18
-    assert totals["placement"]["accepted_count"] == 19
+    assert totals["placement"]["accepted_count"] == 32
     assert totals["placement"]["legal_reference_count"] == 32
-    assert totals["placement"]["covered_legal_reference_count"] == 19
+    assert totals["placement"]["covered_legal_reference_count"] == 32
     assert totals["placement"]["invalid_reference_probe_count"] == 8
     assert (
         0
         < totals["placement"]["covered_legal_reference_count"]
-        < totals["placement"]["legal_reference_count"]
+        == totals["placement"]["legal_reference_count"]
     )
     for kind in ("finite", "placement"):
         counts = totals[kind]
@@ -59,16 +59,79 @@ def test_complete_canonical_coverage_reconciles_reproduces_and_rejects_false_den
             counts["legal_reference_count"] + counts["invalid_reference_probe_count"]
         )
     for row in rows:
-        counts = cast(dict[str, int], row["counts"])
+        row_counts = cast(dict[str, JsonValue], row["counts"])
         if row["kind"] == "finite":
             results = cast(list[dict[str, JsonValue]], row["results"])
-            assert counts["covered_legal_reference_count"] == counts["legal_reference_count"]
+            assert (
+                row_counts["covered_legal_reference_count"] == row_counts["legal_reference_count"]
+            )
         else:
             validation = cast(dict[str, JsonValue], row["validation"])
             results = cast(list[dict[str, JsonValue]], validation["results"])
             references = cast(dict[str, JsonValue], row["reference_validation"])
             assert validation["stop_reason"] == references["stop_reason"] == "complete"
-            assert counts["missing_legal_reference_ids"]
+            assert row_counts["missing_legal_reference_ids"] == []
+            # Independently pin all formerly missing second-ring alternatives,
+            # including the three rejected directions; do not infer usefulness
+            # merely from equality of the generator/reference inventories.
+            accepted_second_ring = {
+                4: {(2, 0), (-2, 0), (0, 2), (0, -2)},
+                6: {(-2, 0), (0, 2), (0, -2)},
+                8: {(2, 0), (-2, 0), (0, 2)},
+                10: {(2, 0), (-2, 0), (0, -2)},
+            }
+            expected_rejections: dict[int, dict[tuple[float, float], set[str]]] = {
+                4: {(100, 100): {"battlefield_edge_crossed", "deployment_zone_violation"}},
+                6: {
+                    (2, 0): {"terrain_endpoint_illegal"},
+                    (100, 100): {"battlefield_edge_crossed", "deployment_zone_violation"},
+                },
+                8: {
+                    (0, -2): {"model_overlap"},
+                    (100, 100): {"battlefield_edge_crossed", "deployment_zone_violation"},
+                },
+                10: {
+                    (0, 1): {"battlefield_edge_crossed", "deployment_zone_violation"},
+                    (0, 2): {"battlefield_edge_crossed", "deployment_zone_violation"},
+                    (100, 100): {"battlefield_edge_crossed", "deployment_zone_violation"},
+                },
+            }
+            reference_set = cast(dict[str, JsonValue], row["reference_set"])
+            reference_results = cast(list[dict[str, JsonValue]], references["results"])
+            reference_candidates = cast(list[dict[str, JsonValue]], reference_set["candidates"])
+            offsets = cast(list[list[float]], reference_set["translations"])
+            seed = cast(dict[str, JsonValue], reference_set["seed"])
+            seed_proposal = cast(dict[str, JsonValue], seed["proposal"])
+            index = cast(int, row["index"])
+            observed_second_ring: set[tuple[float, float]] = set()
+            for offset, candidate, result in zip(
+                offsets, reference_candidates, reference_results, strict=True
+            ):
+                dx, dy = offset
+                expected = cast(dict[str, JsonValue], json.loads(canonical_json(seed_proposal)))
+                model_placements = cast(list[dict[str, JsonValue]], expected["model_placements"])
+                for placement in model_placements:
+                    pose = cast(dict[str, JsonValue], placement["pose"])
+                    position = cast(dict[str, float], pose["position"])
+                    position["x"] += dx
+                    position["y"] += dy
+                # Exact complete-proposal equality preserves model membership,
+                # pairwise formation, Z/facing and context, not just a centroid.
+                assert candidate["proposal"] == expected
+                assert result["candidate_id"] == candidate["candidate_id"]
+                if result["accepted"] and abs(dx) + abs(dy) == 2:
+                    observed_second_ring.add((dx, dy))
+                if (dx, dy) in expected_rejections[index]:
+                    assert result["accepted"] is False
+                    assert result["status"] == "invalid"
+                    diagnostics = cast(dict[str, JsonValue], result["diagnostics"])
+                    violations = cast(list[dict[str, JsonValue]], diagnostics["violations"])
+                    assert {cast(str, item["violation_code"]) for item in violations} == (
+                        expected_rejections[index][(dx, dy)]
+                    )
+                else:
+                    assert result["accepted"] is True
+            assert observed_second_ring == accepted_second_ring[index]
         assert any(
             result["candidate_id"] == row["recipe_candidate_id"] and result["accepted"]
             for result in results
@@ -141,10 +204,9 @@ def test_nonrecipe_reference_acceptance_roundtrips_without_changing_canonical_pr
     before, context, recipe = prefixes[4]
     original = canonical_json(before.to_persistence_payload())
     seed = DeploymentPlacementCandidate.from_action(recipe, context=context)
-    candidates = DeploymentCandidateSet.generate(
-        seed, context=context, translations=((2.0, 0.0),), raw_budget=1
-    )
-    action = candidates.candidates[0].select(context)
+    candidates = DeploymentCandidateSet.generate(seed, context=context)
+    assert cast(list[JsonValue], candidates.to_payload()["translations"])[5] == [2.0, 0.0]
+    action = candidates.candidates[5].select(context)
     assert action.proposal_json is not None
     probe = before.fork()
     status = probe.submit_viewer_parameterized_payload(
