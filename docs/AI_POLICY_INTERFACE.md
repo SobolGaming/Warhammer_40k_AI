@@ -957,6 +957,70 @@ for a missing saved value, silently changes an existing game's future draws, or
 infers a private seed from a public ID. Fresh Python construction may generate
 entropy; restoring an existing game must preserve its recorded seed exactly.
 
+## Bounded deployment workload contract
+
+`ai.deployment_workload.DeploymentWorkloadContract.from_split(...)` supplies
+the operator-only `deployment-workload-contract-v1` reference manifest. The
+selected contract workload is setup finite routing plus bounded deployment
+placement, model-origin summaries and endpoint CP observation. It is deliberately
+different from the proposed screen/preserve delayed-tradeoff experiment and the
+v995 Daemons setup recipe below.
+
+Supply a typed `DeploymentDatasetSplit`, the exact distinct `GameConfig` values
+used by its complete run inventory, and distinct exact required `PolicyRoute`
+declarations. Configuration hashes cover roster, mission, geometry/source inputs,
+rules, private seed and all other serialized configuration fields; the receipt
+stores hashes rather than duplicating raw configuration/private seeds. Every run,
+including duplicate and zero-row failed occurrences, must match that inventory.
+Missing, extra or repeated configuration declarations fail. The retained complete
+split binds verified source/build/startup/episode evidence, experiment generation
+and validation budgets, run seeds/limits, partition membership and every failure
+denominator; the manifest never reclassifies excluded rows.
+
+The bounded route declarations permit setup finite contexts and deployment
+placement proposals only. Every actual attempted route and declared runner
+registration must be included. Observed and unobserved required routes remain
+separate: declarations are not an exhaustive reachable-state graph, and an
+unobserved route is not certified support. A supplied unsupported-route attempt
+can remain recorded without a policy registration. No callback or gameplay is
+executed by this constructor.
+
+The manifest pins the complete existing finite-option-count and deployment
+model-origin feature definitions, including registry versions, units, dimensions,
+aggregation and information scope. Admitted deployment rows already rederive the
+selected geometry through their experiment receipts; supporting finite episode
+transitions are not thereby promoted into a populated semantic training dataset.
+The selected target reference is `command-point-balance-v1`, with its existing
+exact accepted-record endpoint, `command_points` units and verified calculator.
+Missing labels retain the existing episode-boundary producer and exclusions.
+A dataset can legitimately contain other missing reference definitions; this
+narrow workload rejects them rather than silently assigning CP semantics.
+
+Its fixed information-access declaration matches the existing cooperative APIs:
+generation receives detached actor context and supplied formation; ranking
+receives detached actor context, accepted proposals and declared parameters;
+semantic model inputs contain only versioned numeric values. Opaque references
+remain bindings. Checkpoints, private RNG authority, rejected-proposal diagnostics,
+source/build/config commitments, targets and run/split receipts are operator-only.
+This neither authenticates arbitrary callback code/weights nor establishes a
+Python security sandbox or independent-future-chance planning. The constructor
+adds no field or receipt to any player context, scorer argument or adapter view.
+The existing adapter decision contract remains unchanged.
+
+The immutable receipt returns detached JSON. Its closed loader reconstructs from
+the same typed split/configurations/routes and compares all fields; altered
+schema, semantics, information access, split contents or accounting fail.
+Active controls in `test_runner_accounting.py` and
+`test_deployment_experiment.py` retain empty partitions, failed zero-row runs,
+duplicate occurrences, ordinarily accepted geometry-ranked deployment, observed
+or missing CP labels and save/load/replay controls.
+
+This completes the workload reference/access join for the selected Stage 1
+contract audit, subject to final exact-head review and delivery gates. It does
+not qualify Stage 2 workload admission, reachable mechanic coverage, useful
+reference alternatives, component costs, full-game performance or learning.
+See the maintained plan's bounded Stage 1 reconciliation for the endpoint.
+
 ## Exact v995 Daemons mirror inventory
 
 Workload: [the 2,000-point app roster](../data/army_lists/cavalcade-shadow-bloodthirster.json),
