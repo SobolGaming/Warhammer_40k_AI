@@ -248,13 +248,24 @@ generator gaps; it does not qualify exhaustive legal placement, the proposed
 screen/preserve experiment, ranking quality, redeploy/Scouts, battle or full-game
 learning. Original admission and workload/training contracts remain unchanged.
 
-The next bounded handoff is component-cost measurement against these exact
-configurations, candidate lists and engine outcomes: separately time generation,
-fresh-fork validation, persistence/replay and report reproduction, recording
-hardware, cold/warm state and all attempts and budgets. Costs remain unqualified;
-no observed diagnostic duration substitutes for the required serial smoke or
-complete-game throughput evidence. Any generator expansion or tactical reference
-work needs a separately scoped decision and fresh coverage measurement.
+### Bounded Stage 2 component-cost measurement
+
+The standalone `scripts/measure_canonical_deployment_costs.py` measures complete
+`CanonicalDeploymentCoverage.measure` and closed `from_payload` reproduction
+first, using the unchanged canonical endpoint and authoritative report. A separate
+prepared component pass calls the existing startup, prefix/admission, candidate,
+fresh-fork validation, persistence and replay owners; it checks its candidate sets
+and validation receipts against the complete report. No timing field enters an
+actor view, authoritative state, replay, admission or coverage report. The
+[operator procedure](performance/CANONICAL_DEPLOYMENT_COSTS.md) defines exact
+timing boundaries, evidence, repetition/cache semantics and hard campaign limits.
+
+These costs qualify only the disclosed frozen setup/deployment fixture and
+provisional measurement environment. They neither certify the serial performance
+gate nor establish a full-game throughput, tactical-quality or learning result.
+Stage 2 remains open for broader useful reference qualification. Any generator
+expansion or tactical reference work needs a separately scoped decision and fresh
+coverage measurement; the thirteen missing feasible references remain gaps.
 
 ## 6. First delayed-tradeoff experiment
 
