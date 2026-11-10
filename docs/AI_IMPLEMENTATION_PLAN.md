@@ -190,22 +190,44 @@ evidence and the current scoped addition as follows:
 | Selected workload and information-access reference | Exact configuration set, declared/observed/unobserved route inventory, semantic/reference identities and fixed actor/operator access; incompatible declarations and changed closed payloads rejected | Added in this slice. Operator receipts remain outside actor/scorer arguments; declarations do not authenticate callbacks or prove exhaustive reachability. |
 
 No additional semantic feature or local-reference calculator is required by
-this explicitly bounded contract. Its remaining Stage 1 endpoint is final
-exact-head independent review, parent audit and required local/hosted delivery
-gates for the above evidence; a merged schema alone is not that verdict.
-This does not close a different workload's Stage 1 audit. Selecting the proposed
-screen/preserve workload would require a new scoped audit of its actual physical,
-scoring and reference semantics.
+this explicitly bounded contract. [PR651](https://github.com/SobolGaming/Warhammer_40k_AI/pull/651)
+merged as `0ef1e9ec005566726efb1fb17873f78677b762eb` after passing exact-head
+independent review, the parent audit and required delivery gates, including PR
+and main CI. The reconciled evidence closes Stage 1 only for this explicitly
+bounded setup/deployment contract. This does not close a different workload's
+Stage 1 audit. Selecting the proposed screen/preserve workload would require a
+new scoped audit of its actual physical, scoring and reference semantics.
 
 Stage 2 separately owns canonical workload admission, the reachable mechanic and
 route trace, measured component costs and useful candidate/reference-alternative
 coverage. Those are required before claiming that stage complete; they are not
 retroactive missing Stage 1 schema requirements. Optional/future work here includes
 other proposal families, new tactical features/references, authenticated weights,
-hard watchdogs and information-safe search. This slice executes no Stage 2
-measurement, gameplay extension, ranker learning or training. The next scoped
-handoff is to review Stage 2 entry against the frozen bounded contract, disclose
-its fixture limitations and select one admission/measurement obligation.
+hard watchdogs and information-safe search. The Stage 1 contract itself executes no Stage 2
+measurement, gameplay extension, ranker learning or training. The first separate
+Stage 2 slice below admits one canonical prefix; the remaining stage obligations
+retain their separate qualification requirements.
+
+### First Stage 2 canonical prefix admission
+
+`ai.canonical_deployment` now freezes exactly one setup/deployment fixture and
+recipe, documented with its full configuration hash and source/geometry/scoring
+exceptions in [the canonical admission interface](AI_POLICY_INTERFACE.md#frozen-canonical-deployment-admission).
+The ordinary runner accepts eleven decisions over seven exact routes, deploying
+four units/14 models and stopping before the first redeploy choice. Admission
+compares a supplied session to fresh ordinary reproduction and strict startup,
+JSON persistence and replay. The receipt retains the actual ordered accepted
+trace, required versus observed routes, pending endpoint and explicit unexercised
+continuations. No synthetic checkpoint is treated as engine-generated.
+
+This is scoped fixture/prefix admission, subject to required exact-head delivery
+gates, not completion of Stage 2. Useful candidate/reference-alternative coverage
+and component costs remain open. The current fixed recipe supplies neither a
+training dataset nor new scoring targets, tactical alternatives, exhaustive
+reachability or full-game evidence. Its synthetic Core roster, legacy geometry,
+July mission/scoring identity and October layout geometry retain their disclosed
+limits. The next slice should select one remaining measured coverage/cost
+obligation against this frozen fixture, or explicitly review a different fixture.
 
 ## 6. First delayed-tradeoff experiment
 

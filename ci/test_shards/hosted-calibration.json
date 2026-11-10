@@ -1,5 +1,20 @@
 {
-  "baseline_only_cases": [],
+  "baseline_only_cases": [
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_canonical_endpoint_roundtrips_json_save_and_exact_replay",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_canonical_receipt_loader_rejects_closed_evidence_drift[accepted_trace]",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_canonical_receipt_loader_rejects_closed_evidence_drift[configuration]",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_canonical_receipt_loader_rejects_closed_evidence_drift[endpoint_route]",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_canonical_receipt_loader_rejects_closed_evidence_drift[fixture_exceptions]",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_canonical_receipt_loader_rejects_closed_evidence_drift[observed_routes]",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_canonical_receipt_loader_rejects_closed_evidence_drift[pending_stage2_evidence]",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_canonical_receipt_loader_rejects_closed_evidence_drift[recipe]",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_canonical_receipt_loader_rejects_closed_evidence_drift[source_obligations]",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_canonical_recipe_reconciles_exact_accepted_routes_and_endpoint",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_fixture_discloses_roster_geometry_and_scoring_exceptions",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_ordinary_incomplete_prefix_is_not_the_deployed_endpoint",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_other_ordinary_configuration_cannot_inherit_canonical_admission[game-id]",
+    "tests/infrastructure/adapters/test_canonical_deployment.py::test_other_ordinary_configuration_cannot_inherit_canonical_admission[seed]"
+  ],
   "current_test_sources": {
     "tests/factions/adeptus_custodes/unit/test_adeptus_custodes_army_rule.py": "b57c87563d26c3037d4285d0d03d21aa476f808e4c4c6cd65cfcfcb9661fea41",
     "tests/factions/aeldari/unit/test_aeldari_army_rule.py": "c057292e55f5399d327fda0bf2e7008c08179b75c90e546f5113b738110e5e7a",
@@ -38,6 +53,7 @@
     "tests/factions/world_eaters/unit/test_icon_of_khorne.py": "5978709148ceaafad7adc244b16d1f87bad62be96293d8e19a06c8f12b3dba24",
     "tests/factions/world_eaters/unit/test_total_carnage_gameplay.py": "bde4595d1cd1c514843e9fb22149939547d706c8a7c2efbfa2e4065cf0331535",
     "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py": "e8548335a237455fce0e5888c15f192a278620aaad31ff2a13139755492e3c56",
+    "tests/infrastructure/adapters/test_canonical_deployment.py": "3dcc8f0433797ac4775f23c861b885f96fa3249c315171c72c6d9dfd13b8c518",
     "tests/infrastructure/adapters/test_deployment_candidates.py": "9b1c97aec569a9f13242b1d7c7a3ae75df9d5c29b0beee5db1715027c3496404",
     "tests/infrastructure/adapters/test_deployment_experiment.py": "e0c83ccc19f1c2ff2736aacdae10a3a5b0501a92a74aac26732ec52ec342c163",
     "tests/infrastructure/adapters/test_deployment_geometry_features.py": "12d4b70e44b1d8678086cac7aeee191579bed3d2aa5e553f6514c5f5cf37a67d",
@@ -408,7 +424,7 @@
     "tests/unit/test_phase10i_terrain_movement.py": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38"
   },
   "formula": "max(complete-baseline-case-seconds, largest-observed-passed-three-phase-total)",
-  "inventory_sha256": "55ae178493178c0a0331d85643975157db88a011ef7b0a91af10ff2afc2e0dd7",
+  "inventory_sha256": "2ddc322248aab2c184e3dff12421137bd46d30620841adabe1b4d1e2fd8f1ed1",
   "observation_fields": [
     "report_index",
     "setup",
