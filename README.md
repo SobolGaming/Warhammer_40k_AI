@@ -415,14 +415,14 @@ and retain their complete baseline measurement. Changed/removed/renamed cases or
 changed test-module bytes require explicit sidecar regeneration, and behavioral
 inventory changes still require a fresh complete successful baseline profile.
 
-The current calibration retains 214 compatible source-bound raw worker receipts
-and 26,405 passed three-phase samples covering 6,126 current cases. The 106
-cases in the two changed deployment experiment/runner accounting modules use only
-the fresh complete baseline. The earlier split-contract update omitted 21 whole historical
-worker receipts whose collected test-module bytes changed; it never rewrites their
-raw bytes or admits only selected rows from an incompatible worker. All prior
-receipts, observations and profiles remain in Git history and their original
-GitHub artifacts. No partial progress journal is a calibration receipt.
+The current calibration retains 263 compatible source-bound raw worker receipts
+and 32,637 passed three-phase samples covering all 6,232 current cases, with no
+baseline-only cases. It preserves the prior 214 receipts and 26,405 sample tuples
+exactly and appends 49 completed worker receipts from PR651 attempt 1. The earlier
+split-contract update omitted 21 whole historical worker receipts whose collected
+test-module bytes changed; this update does not reinstate those incompatible
+receipts. All prior receipts, observations and profiles remain in Git history and
+their original GitHub artifacts. No partial progress journal is a calibration receipt.
 
 Retained sources include successful historical run
 [42549486854](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42549486854),
@@ -437,6 +437,18 @@ Failed enclosing attempts retain their failed outcomes. Independently downloaded
 artifact/API metadata and exact raw hashes rebind every retained receipt; original
 source heads and recorded engine fingerprints stay unchanged. Controller and
 replacement receipts and inherited successful-job copies remain excluded.
+
+The appended source is attempt 1 of failed PR651 run
+[42722507586](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42722507586).
+Its 49 completed workers recorded all 6,232 passed three-phase samples. Shard 3
+completed all 557 tests but took 1,141.580 seconds, exceeding the 1,080-second
+approval limit; it was not terminated. The run and combined coverage approval
+remain failed. Independent run/PR/merge/artifact APIs bind attempt 1, source head
+`1b50ad339c49231d16b1c07dd9c6165745ef644c`, tested merge checkout `15f6792e5e1a369829825f72d697fbfb197d336f`
+and the unchanged recorded runtime. The merge and source head have identical
+trees. The unchanged maximum formula incorporates these observations for planning;
+it neither promotes this failed run to a passing baseline nor predicts a passing
+rerun. The local baseline below remains unchanged.
 
 The complete baseline is the successful local 6,232-case covered workload-contract
 run: Python 3.14.5 under WSL, one isolated mirror worker followed by 32 remainder

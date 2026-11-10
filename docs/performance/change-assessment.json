@@ -6,151 +6,151 @@
   "changes": {
     "README.md": {
       "before_sha256": "2214d57f18ef9d3eafc75007fd7962d96961371c1aba97f9e51ad6bd535ea9e6",
-      "after_sha256": "6b759e2c9bec6f949197ff1af23c1c00b6a90873cf4faf68188fd1bf0df51a83",
+      "after_sha256": "5d74aa6904fd697600762e4fba1c1762d61c452281aefade3e41e86a15d2d6bf",
       "owners": {
         "@document": {
           "before": "2214d57f18ef9d3eafc75007fd7962d96961371c1aba97f9e51ad6bd535ea9e6",
-          "after": "6b759e2c9bec6f949197ff1af23c1c00b6a90873cf4faf68188fd1bf0df51a83"
+          "after": "5d74aa6904fd697600762e4fba1c1762d61c452281aefade3e41e86a15d2d6bf"
         }
       }
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "242f29fefa9f3cb77a804e499e5e582c35b1ba01d118df2413a731c2941aedc8",
-      "after_sha256": "f5e985f716cc2ea20731d4a44ae4530a95f42424c759135b74f90b35f999c0f1",
+      "after_sha256": "057064698a5d1cb92033b082b245419dd0fd4448a37f4a5d0a62150030bb1b00",
       "owners": {
         "@document": {
           "before": "242f29fefa9f3cb77a804e499e5e582c35b1ba01d118df2413a731c2941aedc8",
-          "after": "f5e985f716cc2ea20731d4a44ae4530a95f42424c759135b74f90b35f999c0f1"
+          "after": "057064698a5d1cb92033b082b245419dd0fd4448a37f4a5d0a62150030bb1b00"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
       "before_sha256": "0502176043c983581a7a54b4b3041f59c81d229e86d9ede2e1ee5ba779d4fab6",
-      "after_sha256": "bd4674d8de9e72ac8e0c9ff878965feddf7acdda0c3b64bf6a7679e6d2e91c41",
+      "after_sha256": "67684efa1898a4cc1010748d118786fbaf93e31e4dd56c93d2c4da61bd9dd876",
       "owners": {
         "@document": {
           "before": "0502176043c983581a7a54b4b3041f59c81d229e86d9ede2e1ee5ba779d4fab6",
-          "after": "bd4674d8de9e72ac8e0c9ff878965feddf7acdda0c3b64bf6a7679e6d2e91c41"
+          "after": "67684efa1898a4cc1010748d118786fbaf93e31e4dd56c93d2c4da61bd9dd876"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "9c1c8ec6c37d6da34cab07c842b8f417c7ab94cafcf2170fda4d7bca8fc715f3",
-      "after_sha256": "aa2f6b47d91b756034a47440684d676a2b1a8427198ee554fe6a973e0e79d4ec",
+      "after_sha256": "7c81ecee1811b4ce2c388bf2717977eced60606536280ddecf9bbf4c9a35793d",
       "owners": {
         "@document": {
           "before": "9c1c8ec6c37d6da34cab07c842b8f417c7ab94cafcf2170fda4d7bca8fc715f3",
-          "after": "aa2f6b47d91b756034a47440684d676a2b1a8427198ee554fe6a973e0e79d4ec"
+          "after": "7c81ecee1811b4ce2c388bf2717977eced60606536280ddecf9bbf4c9a35793d"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "f5133b39854e7edf51c2dd5a34ac4f1aec315d929ddbc2e8bec9f6d19dac1ff0",
-      "after_sha256": "5087f6990fc6c1b6987349b9d37531373e7ab41d3d2149609e91592403fd2f7d",
+      "after_sha256": "f370ccfa835424ab75b0e0f595a2f8038b385da201596a782b83a99d628e43c8",
       "owners": {
         "@document": {
           "before": "f5133b39854e7edf51c2dd5a34ac4f1aec315d929ddbc2e8bec9f6d19dac1ff0",
-          "after": "5087f6990fc6c1b6987349b9d37531373e7ab41d3d2149609e91592403fd2f7d"
+          "after": "f370ccfa835424ab75b0e0f595a2f8038b385da201596a782b83a99d628e43c8"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "80ef4e5f16ec87fbe848945ad6454d73500dd3b4ba7ce24ff9062e42ccf68421",
-      "after_sha256": "fdcd848d1b004ee6f43596e2be27675c2f8835b4a3d06646cf53800dedbc885d",
+      "after_sha256": "2e42320320f8db30d2c1cc4b6e404c20405857175dc21e86b8be96203ef15aee",
       "owners": {
         "@document": {
           "before": "80ef4e5f16ec87fbe848945ad6454d73500dd3b4ba7ce24ff9062e42ccf68421",
-          "after": "fdcd848d1b004ee6f43596e2be27675c2f8835b4a3d06646cf53800dedbc885d"
+          "after": "2e42320320f8db30d2c1cc4b6e404c20405857175dc21e86b8be96203ef15aee"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "40bf47848c91e8480509ea80c90df194cae72e0c967f3a2debc731da23a95de6",
-      "after_sha256": "2a35fdff362c33f1f959845a4370b35104b2e4d63adda0847332805423097b80",
+      "after_sha256": "4817f126d800e1666b790afbe1c0f978e7bba10e18495910c98bbce499b5fa59",
       "owners": {
         "@document": {
           "before": "40bf47848c91e8480509ea80c90df194cae72e0c967f3a2debc731da23a95de6",
-          "after": "2a35fdff362c33f1f959845a4370b35104b2e4d63adda0847332805423097b80"
+          "after": "4817f126d800e1666b790afbe1c0f978e7bba10e18495910c98bbce499b5fa59"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "f317563f31c233658bced853cc57bc807a8059663f403aa9d87d65d55ae8f38a",
-      "after_sha256": "9d8c5ea335bc8a18e6c640b157c2ab10e72cb4fc987cced7f039fbc9ebc2bad3",
+      "after_sha256": "f0600590c01617f6f17ba9f9faf470bdd0aadbfe6180646278b8d7c8e4215880",
       "owners": {
         "@document": {
           "before": "f317563f31c233658bced853cc57bc807a8059663f403aa9d87d65d55ae8f38a",
-          "after": "9d8c5ea335bc8a18e6c640b157c2ab10e72cb4fc987cced7f039fbc9ebc2bad3"
+          "after": "f0600590c01617f6f17ba9f9faf470bdd0aadbfe6180646278b8d7c8e4215880"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "ac3c709a9b5a4774b163b4c40e76c6bc4228663229a71c4db1d94b8d1bc37371",
-      "after_sha256": "b47630c0c1660aebdd929c5a9a6d1990d14f6f8b942de08c1ec09167e04786bf",
+      "after_sha256": "d6fcdf1af5af0a5faa340eff8ad285175e2bcfbd0a5490d50f6113d93de24c4e",
       "owners": {
         "@document": {
           "before": "ac3c709a9b5a4774b163b4c40e76c6bc4228663229a71c4db1d94b8d1bc37371",
-          "after": "b47630c0c1660aebdd929c5a9a6d1990d14f6f8b942de08c1ec09167e04786bf"
+          "after": "d6fcdf1af5af0a5faa340eff8ad285175e2bcfbd0a5490d50f6113d93de24c4e"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "e9bfb6d4152127d34c5779ca55d83db4ac43eb7f2b75a522c026c328bfebfccb",
-      "after_sha256": "694451765760bdc1b672cac89977ff9bfa9918b16a1972c93986429665956812",
+      "after_sha256": "6ffe3fa9a5645bb1d2440c4fdf696ef0e55e4500eb7243d4346c95d4eab4467a",
       "owners": {
         "@document": {
           "before": "e9bfb6d4152127d34c5779ca55d83db4ac43eb7f2b75a522c026c328bfebfccb",
-          "after": "694451765760bdc1b672cac89977ff9bfa9918b16a1972c93986429665956812"
+          "after": "6ffe3fa9a5645bb1d2440c4fdf696ef0e55e4500eb7243d4346c95d4eab4467a"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "5a8261890bcd335ebb6b1d99da879c80195b14fa5ced5626abcb7e009856403e",
-      "after_sha256": "d809903f949e0053ea843d52747a8ff2fe090526f873d56be997ec39702601aa",
+      "after_sha256": "8b795722a69e982a922ad83d310a0dc500505eb78605eb8379d09309917fd578",
       "owners": {
         "@document": {
           "before": "5a8261890bcd335ebb6b1d99da879c80195b14fa5ced5626abcb7e009856403e",
-          "after": "d809903f949e0053ea843d52747a8ff2fe090526f873d56be997ec39702601aa"
+          "after": "8b795722a69e982a922ad83d310a0dc500505eb78605eb8379d09309917fd578"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "e40d4b3f10f055a014ac1e1afada5ebf733ad0dd73dcae5b404a0396d3e73c55",
-      "after_sha256": "a79ca6d2661738cb58d728eee1324e741aaf58757002f0971bad77b62c7b44d4",
+      "after_sha256": "d5b40cfff22308438b560594832d947ad037a41c5c2a921bd377b069ec6f0c2d",
       "owners": {
         "@document": {
           "before": "e40d4b3f10f055a014ac1e1afada5ebf733ad0dd73dcae5b404a0396d3e73c55",
-          "after": "a79ca6d2661738cb58d728eee1324e741aaf58757002f0971bad77b62c7b44d4"
+          "after": "d5b40cfff22308438b560594832d947ad037a41c5c2a921bd377b069ec6f0c2d"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "a9b4831e29d6f237d1667ab868b3dc878a1eacc102c7194b5e345ef26b93b23c",
-      "after_sha256": "72fc1e24a266d7b5b728acdd1e1807e9002da970308ddd4bfd0ec0b89537f056",
+      "after_sha256": "16371d6f99b8fa37d46b5047d937066e0479204a116719f472d0c5c5efdd2fcb",
       "owners": {
         "@document": {
           "before": "a9b4831e29d6f237d1667ab868b3dc878a1eacc102c7194b5e345ef26b93b23c",
-          "after": "72fc1e24a266d7b5b728acdd1e1807e9002da970308ddd4bfd0ec0b89537f056"
+          "after": "16371d6f99b8fa37d46b5047d937066e0479204a116719f472d0c5c5efdd2fcb"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "6738dd781568b41b1ae7108131aeb64db2a4bf19ef580defee19a45829ddecfc",
-      "after_sha256": "29407781db7898fa4f0e31d8e1a0a38fb17c4d2731309fe4cbfc5c424e2601b4",
+      "after_sha256": "9155b14514290a172e8d47629c22e6852ab1b791dd80ad34a5e384ff78f01c75",
       "owners": {
         "@document": {
           "before": "6738dd781568b41b1ae7108131aeb64db2a4bf19ef580defee19a45829ddecfc",
-          "after": "29407781db7898fa4f0e31d8e1a0a38fb17c4d2731309fe4cbfc5c424e2601b4"
+          "after": "9155b14514290a172e8d47629c22e6852ab1b791dd80ad34a5e384ff78f01c75"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "c4077153055ec989ed70e7fbc4f16741a13b2a24a0af4bf669a7db20b94a594c",
-      "after_sha256": "c403bcc198f91ab74382435dc43b546f1986647625cbc0f64c06cc8ea4349420",
+      "after_sha256": "e6b71d6575944d90f818a91dc427318234246b7dc7f0a280be9ad6248b32f152",
       "owners": {
         "@document": {
           "before": "c4077153055ec989ed70e7fbc4f16741a13b2a24a0af4bf669a7db20b94a594c",
-          "after": "c403bcc198f91ab74382435dc43b546f1986647625cbc0f64c06cc8ea4349420"
+          "after": "e6b71d6575944d90f818a91dc427318234246b7dc7f0a280be9ad6248b32f152"
         }
       }
     },
@@ -378,11 +378,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "2a348ac1ec1d616052466e6fc49ff1b1d37c6e8073ac26f7c85668e9f563e1fb",
-      "after_sha256": "9c0f5632d052ef81b4bfe7753382f7a5a64a99c6ec2afeba41595253f002e57a",
+      "after_sha256": "f15341710ba1717433c9c3800dd2cad3ecd8411b316e84953879d759bcf004f9",
       "owners": {
         "@document": {
           "before": "2a348ac1ec1d616052466e6fc49ff1b1d37c6e8073ac26f7c85668e9f563e1fb",
-          "after": "9c0f5632d052ef81b4bfe7753382f7a5a64a99c6ec2afeba41595253f002e57a"
+          "after": "f15341710ba1717433c9c3800dd2cad3ecd8411b316e84953879d759bcf004f9"
         }
       }
     }
@@ -411,9 +411,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/hosted-calibration.json": {
       "category": "rule_semantics",
@@ -423,9 +423,9 @@
         "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -442,9 +442,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -461,9 +461,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -480,9 +480,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -499,9 +499,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -518,9 +518,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -537,9 +537,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -556,9 +556,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -575,9 +575,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -594,9 +594,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -613,9 +613,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -632,9 +632,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -651,9 +651,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the bounded deployment contract workload to its complete supplied split, exact configurations, declared routes, existing semantic registries and CP reference with fixed actor/operator information boundaries; refresh required derived evidence.",
-      "source_obligation": "Stage 1 requires an explicit selected-workload contract, pinned semantic and reference compatibility, negative controls and complete attempted-run accounting without broad runtime or gameplay claims.",
-      "unchanged_work": "This operator-only compatibility receipt and direct regressions preserve engine decisions, legality, gameplay algorithms, candidate generation/ranking, replay implementation, source loading, dependency environment and measured performance workloads. Nonsensitive mapped owners require serial current-runtime smoke, with no detailed comparison family."
+      "rationale": "Preserve the complete passing local 6232-case baseline and append independently source-bound completed worker observations from failed hosted run42722507586, then regenerate assignments with the existing maximum formula after one late passing shard.",
+      "source_obligation": "Retain all existing cases, historical receipts and samples, source/attempt/checkout bindings, failed enclosing outcomes, twelve shards, 67 percent coverage, inclusive1080-second approval and strictly-after1800-second termination.",
+      "unchanged_work": "Only timing evidence and derived assignments change. Test bytes, source algorithms, dispatch and calibration formulas, coverage inventory, all execution limits and gameplay are unchanged; no detailed performance family is selected."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
