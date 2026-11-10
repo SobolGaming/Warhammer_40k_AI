@@ -2453,6 +2453,12 @@
       "bytes": 10093,
       "mode": "100644",
       "sha256": "30bb82e22114deb4d7e6b749b684fabd6e7463c41eb24786e7b7d9e023418917"
+    },
+    "tests/infrastructure/adapters/test_followthrough_scenario.py": {
+      "mode": "100644",
+      "blob_sha1": "40f93d7699af8dc4f666b665705c3ae228ce3eee",
+      "sha256": "3229c0dbfacbdaf1455aa6baf792362770cdca0fa20de8e47d0f74573cd81c51",
+      "bytes": 7622
     }
   },
   "active_roots": [

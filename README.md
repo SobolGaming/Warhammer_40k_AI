@@ -27,6 +27,13 @@ movement feasibility evidence; screening, exposure, opponent threat, E follow-th
 later outcomes and learning eligibility remain unqualified. The original
 preservation definition and receipt retain their meaning.
 
+The separate [paired followthrough admission](docs/AI_POLICY_INTERFACE.md#paired-followthrough-and-opposing-shot-probe)
+continues both branches with the same witnessed E movement and a stationary
+vehicle, reaching B's end-of-Movement Fire Overwatch request. A fixed ordinary
+target-binding probe on an independent fork is rejected because B has no legal
+shooting declaration at that window. This qualifies movement feasibility and a
+specific negative shot result; it supplies no attack outcome or tactical benefit.
+
 ## 2. Non-negotiable invariants
 
 These rules are enforced from the first commit.
@@ -527,7 +534,7 @@ their fresh complete-profile measurements, bringing baseline-only membership to
 hosted observation. Local timing is planning evidence, not hosted approval or a
 speedup; the twelve manifests still require a fresh passing hosted run.
 
-The current complete JUnit baseline records 6,261 passed behavioral tests
+The preceding complete JUnit baseline records 6,261 passed behavioral tests
 for witnessed Normal Move on Python 3.14.5 under WSL: one isolated
 mirror worker followed by 32 worksteal workers, without competing validation
 workers. Its fresh checkout-bound source index was prepared separately. The
@@ -545,11 +552,11 @@ These local scheduling observations neither explain the earlier hosted timing
 variability nor establish a performance repair, scenario-cost qualification or
 hosted approval. Fresh complete hosted qualification remains required.
 
-The current calibration appends exactly 49 complete original worker receipts and
+The PR659 calibration appends exactly 49 complete original worker receipts and
 6,261 passed three-phase samples from attempt 1 of failed PR659 run
 [42898953334](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42898953334).
-It now retains 333 receipts and 41,097 samples covering all 6,261 current cases,
-with zero baseline-only cases. Every prior report and observation tuple remains
+That update retained 333 receipts and 41,097 samples covering all 6,261 then-current cases,
+with zero baseline-only cases at that point. Every prior report and observation tuple remains
 unchanged, including its original outcome and source identity. The existing
 complete local JUnit profile, report hashes and case weights remain the baseline;
 the failed hosted run supplies additional scheduling observations and does not
@@ -567,7 +574,7 @@ All 6,261 tests completed with zero failures, errors or skips. Shard 5 completed
 1,080-second approval limit without termination. The run and combined coverage
 approval remain failed; no failed enclosing outcome is promoted to a pass.
 
-The unchanged maximum-cost formula and grouping now place canonical coverage on
+The PR659 maximum-cost formula and grouping placed canonical coverage on
 shard 4, the Normal Move controls on shard 6, and the entire
 `test_runner_accounting.py` module alone on shard 9. The execution model gives
 shard 9 a test-work wall-time lower bound of 1,052.839 seconds and the other eleven
@@ -581,6 +588,29 @@ limit. Host variance remains unexplained; this metadata change establishes no
 performance repair or scenario-cost qualification. Test membership, algorithms,
 worker counts, timing limits and coverage requirements are unchanged. Fresh
 complete hosted qualification remains required.
+
+The current complete baseline contains 6,264 passed cases from the paired
+followthrough qualification on Python 3.14.5 under WSL Ubuntu. Its exact base is
+`efb3172c4ce1b3a912c3f6fc2c26ebaa465ad9c4` and runtime fingerprint is
+`3174e16c152ba1febdf0e26360df49e75d1951fbc616eced69546bbb598a5f2e`.
+Source-history validation, cold index construction, one isolated mirror worker,
+32 worksteal remainder workers and finalization share one supervisor clock.
+All tests passed with 67.42% full-package branch coverage, but the whole local
+workload took 1,156.755788438 seconds and failed the unchanged 1,080-second timing
+approval without termination. Its successful test JUnit data supplies planning
+weights; its failed timing approval remains failed.
+
+A reviewed local-only stable sort started the existing eight-case canonical
+module first without changing unique node membership; its archived plugin hash
+is `18eda01828a226ae2ffed8851fe983af6c268b2167496743cd130bebb69c37f4`.
+Contract/conformance checks overlapped setup/mirror, and diagnostic archiving
+overlapped part of the remainder. These local observations are not a serial
+performance comparison or hosted approval. All 333 historical receipts and 41,097
+observation tuples remain unchanged. Only inventory/source binding expands for
+the new test module; its three new cases use complete-profile measurements and
+remain baseline-only. The twelve manifests are regenerated from that exact full
+profile with the existing maximum-cost formula and unchanged limits. Fresh
+successful hosted qualification is required for every shard.
 
 Fixture setup observations are worker/order dependent; taking maxima and regrouping
 does not establish new fixture multiplicity, hosted wall time or the eighteen-minute

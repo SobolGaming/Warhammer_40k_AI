@@ -1515,3 +1515,54 @@ full-game qualification and Stage 2 completion remain open. Metadata stays outsi
 actor/scorer inputs. Controls retain preservation, genuine invalid-distance
 rejection and replay, strict closed receipt rejection, and incomplete/extra-prefix
 exclusion.
+
+## Paired followthrough and opposing shot probe
+
+`ai.followthrough_scenario` supplies `reproduce_followthrough_pair()` and the
+closed, operator-only `FollowthroughPairAdmission.from_sessions(stationary, moved)`
+and `from_payload(payload, stationary, moved)` receipt. The pinned
+`canonical-paired-followthrough-v1` definition binds the unchanged canonical
+configuration and both original scenario definition hashes, the exact five-choice
+continuation, the opposing endpoint route and one independently submitted shot
+probe. Neither original admission is extended or relabelled.
+
+Each branch selects E, selects Normal Move and submits straight-line paths moving
+all three observed model poses one inch in negative X with unchanged height and
+facing. It then selects the remaining vehicle and Remains Stationary. The endpoint
+has 22 stationary-branch records or 23 movement-branch records. The full first
+fifteen accepted records are equal, and ordinary-startup verification plus exact
+replay binds their common history. The receipt includes complete accepted
+records/traces and observation commitments, required/observed accepted routes,
+actual movement activation events, endpoint origins and replay-artifact hashes.
+
+Both endpoints are the **opponent's** `submit_stratagem_target_proposal` request
+for Fire Overwatch at the end of A's Movement phase. The active player remains A;
+the requesting actor is B. The fixed diagnostic submits B's nominated unit as
+the friendly shooter on a separate ordinary fork. Engine prevalidation rejects
+it with `fire_overwatch_no_legal_shooting_declaration`. The receipt binds the
+actual request and submitted payload, typed status/message/reason, before/after
+checkpoint hashes and zero record/event deltas. The rejected attempt stays
+outside each accepted trace. No actor receives this operator receipt or a
+counterfactual outcome. Declining the offered reaction is a distinct accepted
+proposal that can continue to A's Shooting phase; it is not attack evidence.
+
+The authoritative owners remain the existing finite Movement choices,
+`MovementProposalPayload`/`PathWitness` validation and movement activation
+mutation, end-Movement reaction routing, `invalid_stratagem_target_proposal_status`
+and `_fire_overwatch_target_binding_error`, and shared session persistence/replay.
+The existing [adapter contract](ADAPTER_DECISION_CONTRACT.md) already specifies
+Normal Move and `stratagem_target_binding`, including the `proposal` envelope and
+decline payload. No decision family, wire shape, viewer policy, game rule,
+generator, ranker or training schema changes.
+
+This establishes paired legal E movement and a negative shot feasibility result
+for one exact shooter/window. It establishes neither tactical exploitation nor
+global threat impossibility, and does not diagnose an engine-unsupported path.
+The same synthetic Core roster, legacy non-strict flag, provisional model volumes,
+July mission/scoring plus October layout, partial points and public test seed
+remain disclosed. Actual enemy attack resolution, E's subsequent benefit,
+matched later outcomes/horizon, screening, timing/cooperation controls, useful
+candidate coverage and scenario costs remain open. The receipt returns
+`useful_reference_status: scoped_gap`, `reference_target: null` and
+`eligible_for_learning: false`; it cannot certify Stage 2 completion, full games
+or throughput.
