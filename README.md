@@ -477,16 +477,18 @@ The source and merge trees matched, and every collected test module matched the
 then-current bytes. The diagonal-generator update excludes the incompatible
 receipts as described above. The admitted samples cover the exact 6,254-case baseline once.
 
-This run exposed hosted cost variance absent from the local baseline: the existing
-complete canonical-coverage case took 1,080.002 seconds across its three phases,
-compared with 485.673 baseline seconds. The unchanged maximum-cost formula and
-balancing place its whole eight-case module alone on shard 3. That shard's modeled
-lower bound is still 1,080.002 seconds before startup and finalization; the other
-eleven modeled lower bounds are 993.692–993.708 seconds. Reassignment cannot shorten
-an individual test, and this metadata does not establish compliance with the
-eighteen-minute limit. A fresh hosted run is required; an over-limit result remains
-a blocker. No timing budget, test selection, assertion or scheduling algorithm
-changes as part of this calibration refresh.
+The historical PR656 run exposed hosted cost variance absent from its local
+baseline: the complete canonical-coverage case took 1,080.002 seconds across its
+three phases, compared with 485.673 baseline seconds. The maximum-cost formula
+and balancing placed its whole eight-case module alone on shard 3. That shard's
+modeled lower bound was 1,080.002 seconds before startup and finalization; the
+other eleven modeled lower bounds were 993.692-993.708 seconds. Those are historical
+PR656 planning values. The current manifests use the complete diagonal-generator
+profile below and the compatible receipts described above. Timing budgets, test
+selection and the scheduling algorithm remain unchanged. Reassignment cannot
+shorten an individual test, and planning metadata does not establish compliance
+with the eighteen-minute limit. A fresh hosted run is required; an over-limit
+result remains a blocker.
 
 The complete baseline is the successful local 6,254-case covered diagonal-generator
 qualification: Python 3.14.5 under WSL, one isolated mirror worker followed by

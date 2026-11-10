@@ -6,11 +6,11 @@
   "changes": {
     "README.md": {
       "before_sha256": "d4bacd37d1900045a2fd36ce68e3a2175334c2744e5021e1430122f82451db62",
-      "after_sha256": "ce1d80d024e46e5196652e9be511daccd322ffa353913c62242dc6898f34eaef",
+      "after_sha256": "d541b56882b9075a0b638ddcd724551b7d1c586a375cc3db2736d81b050e18ce",
       "owners": {
         "@document": {
           "before": "d4bacd37d1900045a2fd36ce68e3a2175334c2744e5021e1430122f82451db62",
-          "after": "ce1d80d024e46e5196652e9be511daccd322ffa353913c62242dc6898f34eaef"
+          "after": "d541b56882b9075a0b638ddcd724551b7d1c586a375cc3db2736d81b050e18ce"
         }
       }
     },
@@ -410,11 +410,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "e500c9dc237221a0de4ede68df9a4494e1579cefa5e54d5d35528d4dd4c5eed6",
-      "after_sha256": "b4f8e46a26f77df7bd638a7edcc75f973b1987b993c50c332f6a4f268a383e1f",
+      "after_sha256": "c00f455c45b6effb1f9475658c3b74a0dfd2b662862f00771a489a14efb7facb",
       "owners": {
         "@document": {
           "before": "e500c9dc237221a0de4ede68df9a4494e1579cefa5e54d5d35528d4dd4c5eed6",
-          "after": "b4f8e46a26f77df7bd638a7edcc75f973b1987b993c50c332f6a4f268a383e1f"
+          "after": "c00f455c45b6effb1f9475658c3b74a0dfd2b662862f00771a489a14efb7facb"
         }
       }
     }
