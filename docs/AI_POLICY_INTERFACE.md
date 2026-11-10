@@ -1108,10 +1108,104 @@ attachments/transports and battle movement/combat/reactions/scoring as unsupport
 **by this recipe**; it makes no claim that the engine lacks those mechanics.
 The pending redeploy route is distinct from the seven accepted routes. Other
 choices, orders, geometries, seeds and reachable states remain unexercised.
-Candidate/reference-alternative coverage and component-cost measurements remain
-later Stage 2 slices. This admission neither creates a dataset nor changes
+The separate coverage measurement below reports bounded candidate/reference
+alternatives and their gaps. Component-cost measurements remain a later Stage 2 slice. This admission neither creates a dataset nor changes
 `DeploymentWorkloadContract` or training eligibility. It claims no exhaustive
 reachability, full-game support, learning, tactical quality or cost certification.
+
+
+## Canonical candidate and reference-alternative coverage
+
+`ai.canonical_deployment_coverage.CanonicalDeploymentCoverage.measure(session=...)`
+is a separate operator-only measurement for the exact admitted endpoint above.
+It preserves the original admission receipt and its schema. Reconstruct the
+endpoint with `reproduce_canonical_deployment()`, measure it, and serialize
+`report.to_payload()`; `from_payload(payload, session=session)` repeats the
+complete experiment and requires exact closed equality. The report's content hash
+binds the nested admission/source/build identity, exact prefix/checkpoint and
+actor-observation hashes, candidate payloads, validation results and denominators.
+No caller-supplied policy, alternate fixture, mutable checkpoint or budget is
+admitted by this version.
+
+The canonical owner reconstructs all eleven before-choice states from ordinary
+startup using the existing replay adapter and exact accepted records. It checks
+each route/actor view against the original runner and the complete endpoint
+against the reproduced checkpoint before returning prefixes. Each finite or
+placement alternative is submitted through the ordinary viewer adapter on its
+own fresh fork. Probes cannot change the canonical continuation, the supplied
+endpoint, live requests or RNG. The seven finite occurrences and four placement
+occurrences cover the same seven exact routes, four units and fourteen models;
+they stop before redeploy. Acceptance means the engine accepts this single
+choice, not that a branch's later continuation was played.
+
+References and denominators are defined independently of the measured generator:
+
+- Finite references are all current engine-enumerated options in each original
+  actor request, retained separately from the generated finite set. Every option
+  is actually submitted; its result is shared when the identical generated choice
+  is evaluated. The total finite-attempt ceiling is 512, with an explicit error
+  if the frozen inventory exceeds it, never a silently shortened denominator.
+- Placement generation uses the existing default five whole-formation offsets:
+  zero, one inch in either X direction, and one inch in either Y direction.
+  The separately fixed reference list is zero, ±1 and ±2 inches along X or Y,
+  plus the deliberately invalid `(100,100)` offset. The same translation owner
+  constructs both sets from the original actor-bound recipe formation, but the
+  reference list is never selected from generated or accepted outputs.
+- Each placement set is fully validated: five generated and ten reference
+  attempts per occurrence, accepted cap sixteen. Raw/duplicate counts, actual
+  budgets and complete stop reasons remain in the nested receipts. No candidate
+  is unvalidated. Identical candidates appearing in both lists are independently
+  submitted on fresh forks.
+- The legal-reference denominator contains only distinct engine-accepted
+  reference candidates at that exact occurrence. The numerator contains those
+  references also generated **and accepted**. Invalid reference probes and
+  rejected generated candidates remain separate counts with engine diagnostics.
+  Summation counts occurrences, including repeated routes; it is not a count of
+  distinct routes, a fraction of continuous deployment space, or a win-rate label.
+  Zero translation deliberately retains the canonical recipe as a positive
+  control. "Useful" here means distinct feasible choices or placements only.
+
+The frozen experiment currently yields:
+
+| Decision occurrence / placement | Generated accepted / attempted | Legal references / probes | Covered legal references | Missing legal references |
+|---|---:|---:|---:|---:|
+| Seven finite occurrences | 18 / 18 | 18 / 18 | 18 / 18 | 0 |
+| Index 4: player B five-model unit | 5 / 5 | 9 / 10 | 5 / 9 | 4 |
+| Index 6: player A three-model unit | 5 / 5 | 8 / 10 | 5 / 8 | 3 |
+| Index 8: player A five-model unit | 5 / 5 | 8 / 10 | 5 / 8 | 3 |
+| Index 10: player A vehicle | 4 / 5 | 7 / 10 | 4 / 7 | 3 |
+| Four placement occurrences combined | 19 / 20 | 32 / 40 | 19 / 32 | 13 |
+
+Finite option counts in canonical order are 4, 4, 3, 1, 3, 2 and 1.
+The 95% generated-placement validity yield (19/20) and 59.375% bounded legal
+reference coverage (19/32) answer different questions. Eight rejected reference
+probes are excluded from 32. The vehicle's +1 Y candidate is rejected at the
+battlefield/deployment-zone edge; the full engine diagnostics identify every
+other rejection. All eleven original recipe choices are generated and accepted.
+
+The thirteen accepted ±2-inch references missing from the default generator are
+explicit coverage gaps, not evidence that no legal placement exists. This
+measurement does not expand the generator or rank alternatives. Rotations,
+formation reshaping, other offsets, other orders/prefixes/seeds and all continuous
+placement space remain unmeasured. The fixed-reference list is not a hand-reviewed
+screen/preserve/follow-through tactical benchmark and certifies no tactical
+diversity, utility, scoring, learning, redeploy, Scouts, battle or full game.
+
+Focused controls preserve a nonrecipe +2 X placement through ordinary acceptance,
+JSON restore and exact replay, reject incompatible/incomplete endpoint inputs,
+reproduce the closed report and reject a fabricated reference denominator.
+Reports and authoritative rejection/checkpoint evidence remain outside player
+views and model inputs. The existing adapter decision contract covers these
+unchanged submissions; no player-facing contract or gameplay semantics change.
+
+Component-cost qualification remains the next separate Stage 2 handoff. Pin this
+same configuration/build and per-occurrence candidate/reference lists; separately
+measure actor-view generation, ordinary fork validation, persistence/replay and
+whole report reproduction on declared hardware, recording cold/warm state,
+attempted/accepted/rejected/unvalidated counts and actual budgets. Treat these
+diagnostic runtimes separately from the serial performance gate and any
+full-game throughput target. This report has no component timers or cost
+certification, creates no dataset and leaves training eligibility unchanged.
 
 ## Exact v995 Daemons mirror inventory
 

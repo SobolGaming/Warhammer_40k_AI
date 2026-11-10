@@ -1,414 +1,396 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "0ef1e9ec005566726efb1fb17873f78677b762eb",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6ecfaf06d097553f259c1b2fbb338ae3c98abfae3e80d2eb57ada1032dad51eb",
-  "operation_map_sha256": "c294e25e682d0615a5f469b8c99cb98bf55cc625f111fbd35c71c01d9d01d7fb",
+  "base": "016455aa74a2a3fbb05ffac8b60d4c99400eaa99",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fead332323b81b04f201802bb82a254269cac3569b141b14705a6f971673ad3e",
+  "operation_map_sha256": "dde48591a446c5791ccbe46bce08cc6d03a6bd1b59e5ffeaf190d91233eb7a86",
   "changes": {
     "README.md": {
-      "before_sha256": "5d74aa6904fd697600762e4fba1c1762d61c452281aefade3e41e86a15d2d6bf",
-      "after_sha256": "eef317b6ece69d65010cc0cdf85f8ca131e24341db9e2d68ce92155b1782801e",
+      "before_sha256": "eef317b6ece69d65010cc0cdf85f8ca131e24341db9e2d68ce92155b1782801e",
+      "after_sha256": "016235a0377674f4d18da33edeba7117992ddf349b05e65fcc22e8b789fc4671",
       "owners": {
         "@document": {
-          "before": "5d74aa6904fd697600762e4fba1c1762d61c452281aefade3e41e86a15d2d6bf",
-          "after": "eef317b6ece69d65010cc0cdf85f8ca131e24341db9e2d68ce92155b1782801e"
+          "before": "eef317b6ece69d65010cc0cdf85f8ca131e24341db9e2d68ce92155b1782801e",
+          "after": "016235a0377674f4d18da33edeba7117992ddf349b05e65fcc22e8b789fc4671"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "057064698a5d1cb92033b082b245419dd0fd4448a37f4a5d0a62150030bb1b00",
-      "after_sha256": "a3d218c3b0a9022bd6cabb43f6d1db83f5fe48cfe5d0c88a48dd8513fb5b67a5",
+      "before_sha256": "a3d218c3b0a9022bd6cabb43f6d1db83f5fe48cfe5d0c88a48dd8513fb5b67a5",
+      "after_sha256": "66d019b0e5dc34ae0ec9680eb45c84e4791b7c6113b6433291be8c8049d1c6c8",
       "owners": {
         "@document": {
-          "before": "057064698a5d1cb92033b082b245419dd0fd4448a37f4a5d0a62150030bb1b00",
-          "after": "a3d218c3b0a9022bd6cabb43f6d1db83f5fe48cfe5d0c88a48dd8513fb5b67a5"
+          "before": "a3d218c3b0a9022bd6cabb43f6d1db83f5fe48cfe5d0c88a48dd8513fb5b67a5",
+          "after": "66d019b0e5dc34ae0ec9680eb45c84e4791b7c6113b6433291be8c8049d1c6c8"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
-      "before_sha256": "67684efa1898a4cc1010748d118786fbaf93e31e4dd56c93d2c4da61bd9dd876",
-      "after_sha256": "17ada9f5e9be30eb62b6d3c6440a4ea46fd33a8e3414848f48fcad42c1bb8f3c",
+      "before_sha256": "17ada9f5e9be30eb62b6d3c6440a4ea46fd33a8e3414848f48fcad42c1bb8f3c",
+      "after_sha256": "3f51275bdca8e720c6ddcdeed6723f59e658c7816abaf37f0130d6d5c4b7d721",
       "owners": {
         "@document": {
-          "before": "67684efa1898a4cc1010748d118786fbaf93e31e4dd56c93d2c4da61bd9dd876",
-          "after": "17ada9f5e9be30eb62b6d3c6440a4ea46fd33a8e3414848f48fcad42c1bb8f3c"
+          "before": "17ada9f5e9be30eb62b6d3c6440a4ea46fd33a8e3414848f48fcad42c1bb8f3c",
+          "after": "3f51275bdca8e720c6ddcdeed6723f59e658c7816abaf37f0130d6d5c4b7d721"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "7c81ecee1811b4ce2c388bf2717977eced60606536280ddecf9bbf4c9a35793d",
-      "after_sha256": "d8e9c787387e733ec73f7126f0c5b87d775c1147a2bc579c45aba23391d7ffe1",
+      "before_sha256": "d8e9c787387e733ec73f7126f0c5b87d775c1147a2bc579c45aba23391d7ffe1",
+      "after_sha256": "616250e1c6ad1caa2c9017e755fcac1d60cf7c377fb28b9799e28b77a9c979e9",
       "owners": {
         "@document": {
-          "before": "7c81ecee1811b4ce2c388bf2717977eced60606536280ddecf9bbf4c9a35793d",
-          "after": "d8e9c787387e733ec73f7126f0c5b87d775c1147a2bc579c45aba23391d7ffe1"
+          "before": "d8e9c787387e733ec73f7126f0c5b87d775c1147a2bc579c45aba23391d7ffe1",
+          "after": "616250e1c6ad1caa2c9017e755fcac1d60cf7c377fb28b9799e28b77a9c979e9"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "f370ccfa835424ab75b0e0f595a2f8038b385da201596a782b83a99d628e43c8",
-      "after_sha256": "1acb2e9db41a778c226151a7a2b76f918c066b2d02bd6f0b83936df53b1501fb",
+      "before_sha256": "1acb2e9db41a778c226151a7a2b76f918c066b2d02bd6f0b83936df53b1501fb",
+      "after_sha256": "56b1f411ad69feebc0b077c8c0ebf06c3e02bd7d84006bde2d04e03d228c01f5",
       "owners": {
         "@document": {
-          "before": "f370ccfa835424ab75b0e0f595a2f8038b385da201596a782b83a99d628e43c8",
-          "after": "1acb2e9db41a778c226151a7a2b76f918c066b2d02bd6f0b83936df53b1501fb"
+          "before": "1acb2e9db41a778c226151a7a2b76f918c066b2d02bd6f0b83936df53b1501fb",
+          "after": "56b1f411ad69feebc0b077c8c0ebf06c3e02bd7d84006bde2d04e03d228c01f5"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "2e42320320f8db30d2c1cc4b6e404c20405857175dc21e86b8be96203ef15aee",
-      "after_sha256": "b18b0dc29b8167c67d254a20757082a44cbc1fea7320958909754143bd469b39",
+      "before_sha256": "b18b0dc29b8167c67d254a20757082a44cbc1fea7320958909754143bd469b39",
+      "after_sha256": "5802ae0d5e075d901b3a6976f7f88b25fa8881c0da3c5842f57dc9c7e9009ca9",
       "owners": {
         "@document": {
-          "before": "2e42320320f8db30d2c1cc4b6e404c20405857175dc21e86b8be96203ef15aee",
-          "after": "b18b0dc29b8167c67d254a20757082a44cbc1fea7320958909754143bd469b39"
+          "before": "b18b0dc29b8167c67d254a20757082a44cbc1fea7320958909754143bd469b39",
+          "after": "5802ae0d5e075d901b3a6976f7f88b25fa8881c0da3c5842f57dc9c7e9009ca9"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "4817f126d800e1666b790afbe1c0f978e7bba10e18495910c98bbce499b5fa59",
-      "after_sha256": "f8457373c7a378c650f5a8b8236d06d300851790d756e7fbcc87c36f2fcc3bc5",
+      "before_sha256": "f8457373c7a378c650f5a8b8236d06d300851790d756e7fbcc87c36f2fcc3bc5",
+      "after_sha256": "7eb1a629a9a0eef41083ab9253828c473bd01805d03711e7b8cf1da9a85ae5cb",
       "owners": {
         "@document": {
-          "before": "4817f126d800e1666b790afbe1c0f978e7bba10e18495910c98bbce499b5fa59",
-          "after": "f8457373c7a378c650f5a8b8236d06d300851790d756e7fbcc87c36f2fcc3bc5"
+          "before": "f8457373c7a378c650f5a8b8236d06d300851790d756e7fbcc87c36f2fcc3bc5",
+          "after": "7eb1a629a9a0eef41083ab9253828c473bd01805d03711e7b8cf1da9a85ae5cb"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "f0600590c01617f6f17ba9f9faf470bdd0aadbfe6180646278b8d7c8e4215880",
-      "after_sha256": "d1b5eb18039b741d4cd829819e9645497e244d2bc927bb9375f9998de74808d8",
+      "before_sha256": "d1b5eb18039b741d4cd829819e9645497e244d2bc927bb9375f9998de74808d8",
+      "after_sha256": "1a628864c8eff8b63f31cfa4b143c207715783d21dbd54cbcbbedc85297487ef",
       "owners": {
         "@document": {
-          "before": "f0600590c01617f6f17ba9f9faf470bdd0aadbfe6180646278b8d7c8e4215880",
-          "after": "d1b5eb18039b741d4cd829819e9645497e244d2bc927bb9375f9998de74808d8"
+          "before": "d1b5eb18039b741d4cd829819e9645497e244d2bc927bb9375f9998de74808d8",
+          "after": "1a628864c8eff8b63f31cfa4b143c207715783d21dbd54cbcbbedc85297487ef"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "d6fcdf1af5af0a5faa340eff8ad285175e2bcfbd0a5490d50f6113d93de24c4e",
-      "after_sha256": "824089b701015a10bc0f3e181a22829abd0144bf6a50ec31ddd654e18cece324",
+      "before_sha256": "824089b701015a10bc0f3e181a22829abd0144bf6a50ec31ddd654e18cece324",
+      "after_sha256": "d1011ccb784cacee0b6312333394fa5de4ac5728bfd9a81a4df8cfd7b4a0c1b9",
       "owners": {
         "@document": {
-          "before": "d6fcdf1af5af0a5faa340eff8ad285175e2bcfbd0a5490d50f6113d93de24c4e",
-          "after": "824089b701015a10bc0f3e181a22829abd0144bf6a50ec31ddd654e18cece324"
+          "before": "824089b701015a10bc0f3e181a22829abd0144bf6a50ec31ddd654e18cece324",
+          "after": "d1011ccb784cacee0b6312333394fa5de4ac5728bfd9a81a4df8cfd7b4a0c1b9"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "6ffe3fa9a5645bb1d2440c4fdf696ef0e55e4500eb7243d4346c95d4eab4467a",
-      "after_sha256": "05062f16d534eb9467bb7f533e1c71db49b4792451d6b999e6bb8cc269332abd",
+      "before_sha256": "05062f16d534eb9467bb7f533e1c71db49b4792451d6b999e6bb8cc269332abd",
+      "after_sha256": "5a4fd0f4132cf4e32ece57ef9e259884649e742275dbe650e04b3fdd81914071",
       "owners": {
         "@document": {
-          "before": "6ffe3fa9a5645bb1d2440c4fdf696ef0e55e4500eb7243d4346c95d4eab4467a",
-          "after": "05062f16d534eb9467bb7f533e1c71db49b4792451d6b999e6bb8cc269332abd"
+          "before": "05062f16d534eb9467bb7f533e1c71db49b4792451d6b999e6bb8cc269332abd",
+          "after": "5a4fd0f4132cf4e32ece57ef9e259884649e742275dbe650e04b3fdd81914071"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "8b795722a69e982a922ad83d310a0dc500505eb78605eb8379d09309917fd578",
-      "after_sha256": "58f07e7506fdc222fdc995975a2ae9e43dfc4846f9219df3c30a045ccacf028d",
+      "before_sha256": "58f07e7506fdc222fdc995975a2ae9e43dfc4846f9219df3c30a045ccacf028d",
+      "after_sha256": "1b982545a527b06cfa0cfb31e35a9c3d9b569324edd980f564d13edd96c0a13f",
       "owners": {
         "@document": {
-          "before": "8b795722a69e982a922ad83d310a0dc500505eb78605eb8379d09309917fd578",
-          "after": "58f07e7506fdc222fdc995975a2ae9e43dfc4846f9219df3c30a045ccacf028d"
+          "before": "58f07e7506fdc222fdc995975a2ae9e43dfc4846f9219df3c30a045ccacf028d",
+          "after": "1b982545a527b06cfa0cfb31e35a9c3d9b569324edd980f564d13edd96c0a13f"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "d5b40cfff22308438b560594832d947ad037a41c5c2a921bd377b069ec6f0c2d",
-      "after_sha256": "fd8e5f56afb450b533b87da85f4d2a12efce85f656bf2eab91c838d0d25d0125",
+      "before_sha256": "fd8e5f56afb450b533b87da85f4d2a12efce85f656bf2eab91c838d0d25d0125",
+      "after_sha256": "39bd0eb2b2b6986b1307e5226fd72234eb03f8cd850c6413923f118e3632e99c",
       "owners": {
         "@document": {
-          "before": "d5b40cfff22308438b560594832d947ad037a41c5c2a921bd377b069ec6f0c2d",
-          "after": "fd8e5f56afb450b533b87da85f4d2a12efce85f656bf2eab91c838d0d25d0125"
+          "before": "fd8e5f56afb450b533b87da85f4d2a12efce85f656bf2eab91c838d0d25d0125",
+          "after": "39bd0eb2b2b6986b1307e5226fd72234eb03f8cd850c6413923f118e3632e99c"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "16371d6f99b8fa37d46b5047d937066e0479204a116719f472d0c5c5efdd2fcb",
-      "after_sha256": "d7b1b90bed174169cf348de4dec89e8b187b338d06d99b7341bda4ba488bc318",
+      "before_sha256": "d7b1b90bed174169cf348de4dec89e8b187b338d06d99b7341bda4ba488bc318",
+      "after_sha256": "6ab429094673f67f33a0e54b68c236b55029afec85e5f330e4a6126bfb397e02",
       "owners": {
         "@document": {
-          "before": "16371d6f99b8fa37d46b5047d937066e0479204a116719f472d0c5c5efdd2fcb",
-          "after": "d7b1b90bed174169cf348de4dec89e8b187b338d06d99b7341bda4ba488bc318"
+          "before": "d7b1b90bed174169cf348de4dec89e8b187b338d06d99b7341bda4ba488bc318",
+          "after": "6ab429094673f67f33a0e54b68c236b55029afec85e5f330e4a6126bfb397e02"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "9155b14514290a172e8d47629c22e6852ab1b791dd80ad34a5e384ff78f01c75",
-      "after_sha256": "c62de3de3daea3682040a48c9a77f5b4eb6e4eeebaf580d35c288cfa24c4abfb",
+      "before_sha256": "c62de3de3daea3682040a48c9a77f5b4eb6e4eeebaf580d35c288cfa24c4abfb",
+      "after_sha256": "4e1535a6b07bd71857485a66e460dc8f9186407153bd4058adddbb8720090cd8",
       "owners": {
         "@document": {
-          "before": "9155b14514290a172e8d47629c22e6852ab1b791dd80ad34a5e384ff78f01c75",
-          "after": "c62de3de3daea3682040a48c9a77f5b4eb6e4eeebaf580d35c288cfa24c4abfb"
+          "before": "c62de3de3daea3682040a48c9a77f5b4eb6e4eeebaf580d35c288cfa24c4abfb",
+          "after": "4e1535a6b07bd71857485a66e460dc8f9186407153bd4058adddbb8720090cd8"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "e6b71d6575944d90f818a91dc427318234246b7dc7f0a280be9ad6248b32f152",
-      "after_sha256": "551a96f105a0881d33122e91002cd67030087e58b1a40ce10d4bf28e5ce946e1",
+      "before_sha256": "551a96f105a0881d33122e91002cd67030087e58b1a40ce10d4bf28e5ce946e1",
+      "after_sha256": "330be237077cf38a62719de11f3e8edb85dc8c620b2f42dd380eadf4c41a1450",
       "owners": {
         "@document": {
-          "before": "e6b71d6575944d90f818a91dc427318234246b7dc7f0a280be9ad6248b32f152",
-          "after": "551a96f105a0881d33122e91002cd67030087e58b1a40ce10d4bf28e5ce946e1"
+          "before": "551a96f105a0881d33122e91002cd67030087e58b1a40ce10d4bf28e5ce946e1",
+          "after": "330be237077cf38a62719de11f3e8edb85dc8c620b2f42dd380eadf4c41a1450"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "66c3e76675041d44d32599bf3416764810c6b368612d64ed6d6f647f5c0638c6",
-      "after_sha256": "9cd9716163fd229eb3bb51f4a71379629831ecd6e53906767fc3403be46b2b8e",
+      "before_sha256": "9cd9716163fd229eb3bb51f4a71379629831ecd6e53906767fc3403be46b2b8e",
+      "after_sha256": "68728550f58a918969b33e5925201571fbbeebd68c1569e98930492181beb94b",
       "owners": {
         "@document": {
-          "before": "66c3e76675041d44d32599bf3416764810c6b368612d64ed6d6f647f5c0638c6",
-          "after": "9cd9716163fd229eb3bb51f4a71379629831ecd6e53906767fc3403be46b2b8e"
+          "before": "9cd9716163fd229eb3bb51f4a71379629831ecd6e53906767fc3403be46b2b8e",
+          "after": "68728550f58a918969b33e5925201571fbbeebd68c1569e98930492181beb94b"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "838f3b5ba4f69f35728e7e25e2d201b118ec142241240a6758bc1920a8bd5ead",
-      "after_sha256": "9e45a2b8408beb3af5e1bc3d60c5c55c0b8b54a8c0cc7ae5a344a8a0633d7622",
+      "before_sha256": "9e45a2b8408beb3af5e1bc3d60c5c55c0b8b54a8c0cc7ae5a344a8a0633d7622",
+      "after_sha256": "8e62b744d02bf3277ba20809960130fc8dd725c10226fdbb2a67d7d9c19c0e81",
       "owners": {
         "@document": {
-          "before": "838f3b5ba4f69f35728e7e25e2d201b118ec142241240a6758bc1920a8bd5ead",
-          "after": "9e45a2b8408beb3af5e1bc3d60c5c55c0b8b54a8c0cc7ae5a344a8a0633d7622"
+          "before": "9e45a2b8408beb3af5e1bc3d60c5c55c0b8b54a8c0cc7ae5a344a8a0633d7622",
+          "after": "8e62b744d02bf3277ba20809960130fc8dd725c10226fdbb2a67d7d9c19c0e81"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "0cb416c46d79e11b6b46908e615e93268bcbaf6726a822106a2613cf93338b09",
-      "after_sha256": "43792b75ec752e04a6c358b65e6c88457be41154d02a2e50933953bbf21ab2e3",
+      "before_sha256": "43792b75ec752e04a6c358b65e6c88457be41154d02a2e50933953bbf21ab2e3",
+      "after_sha256": "df8061cf7cb374fcb6a6d68c3384548a72f36f272e82284285449482cb2ea732",
       "owners": {
         "@document": {
-          "before": "0cb416c46d79e11b6b46908e615e93268bcbaf6726a822106a2613cf93338b09",
-          "after": "43792b75ec752e04a6c358b65e6c88457be41154d02a2e50933953bbf21ab2e3"
+          "before": "43792b75ec752e04a6c358b65e6c88457be41154d02a2e50933953bbf21ab2e3",
+          "after": "df8061cf7cb374fcb6a6d68c3384548a72f36f272e82284285449482cb2ea732"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "8abf85067f6ac4467911b5a1940658fc2d3edcccc13128da95a1728c0f59c6aa",
-      "after_sha256": "a4cda0a432405d8f70b6e338eae777cef19f0c71a0c23aae3fd262000bb15ebf",
+      "before_sha256": "a4cda0a432405d8f70b6e338eae777cef19f0c71a0c23aae3fd262000bb15ebf",
+      "after_sha256": "1dfe2df83ab08ea96568c7f8b44f4f1e11dc085bd334d62ec88e0f41ee626f68",
       "owners": {
         "@document": {
-          "before": "8abf85067f6ac4467911b5a1940658fc2d3edcccc13128da95a1728c0f59c6aa",
-          "after": "a4cda0a432405d8f70b6e338eae777cef19f0c71a0c23aae3fd262000bb15ebf"
+          "before": "a4cda0a432405d8f70b6e338eae777cef19f0c71a0c23aae3fd262000bb15ebf",
+          "after": "1dfe2df83ab08ea96568c7f8b44f4f1e11dc085bd334d62ec88e0f41ee626f68"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "825a3a135df243ed0f8dfa320cb088a8d24cdbf7256f08e6b226870f258ff5f3",
-      "after_sha256": "7fe331e248471ed5e429c3dfcd3d72c23fe40eae3f09feb709c092cccd2df31c",
+      "before_sha256": "7fe331e248471ed5e429c3dfcd3d72c23fe40eae3f09feb709c092cccd2df31c",
+      "after_sha256": "5e09b9c73ed4c53c6de028fdbc8451cdc25e3af582f255ef89b5ae7835698c8d",
       "owners": {
         "@document": {
-          "before": "825a3a135df243ed0f8dfa320cb088a8d24cdbf7256f08e6b226870f258ff5f3",
-          "after": "7fe331e248471ed5e429c3dfcd3d72c23fe40eae3f09feb709c092cccd2df31c"
+          "before": "7fe331e248471ed5e429c3dfcd3d72c23fe40eae3f09feb709c092cccd2df31c",
+          "after": "5e09b9c73ed4c53c6de028fdbc8451cdc25e3af582f255ef89b5ae7835698c8d"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "a5466640eb5596bcadef9e29b765e48e193106175a3872ec0a488028020a2d67",
-      "after_sha256": "8fa78aad0a0d562a53418dd3b1a7a462fe47567b6d2740c3c1d033822247f0f1",
+      "before_sha256": "8fa78aad0a0d562a53418dd3b1a7a462fe47567b6d2740c3c1d033822247f0f1",
+      "after_sha256": "471325edaa42fec8cf9b589ee6c808a562d2eadfa50ec7a3a31351c2456e58a7",
       "owners": {
         "@document": {
-          "before": "a5466640eb5596bcadef9e29b765e48e193106175a3872ec0a488028020a2d67",
-          "after": "8fa78aad0a0d562a53418dd3b1a7a462fe47567b6d2740c3c1d033822247f0f1"
+          "before": "8fa78aad0a0d562a53418dd3b1a7a462fe47567b6d2740c3c1d033822247f0f1",
+          "after": "471325edaa42fec8cf9b589ee6c808a562d2eadfa50ec7a3a31351c2456e58a7"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "7c487dac9e8d7b57e0380520b610c008f69dd9beb3891738549c93e78f889672",
-      "after_sha256": "36b069cad19d424057ca667412bbfdab7391ea606a46060d22b652a9676e29bd",
+      "before_sha256": "36b069cad19d424057ca667412bbfdab7391ea606a46060d22b652a9676e29bd",
+      "after_sha256": "de03c3024d06de926b7e804e79d43dd2716414e05ecb1bdc496354acbfa80bdb",
       "owners": {
         "@document": {
-          "before": "7c487dac9e8d7b57e0380520b610c008f69dd9beb3891738549c93e78f889672",
-          "after": "36b069cad19d424057ca667412bbfdab7391ea606a46060d22b652a9676e29bd"
+          "before": "36b069cad19d424057ca667412bbfdab7391ea606a46060d22b652a9676e29bd",
+          "after": "de03c3024d06de926b7e804e79d43dd2716414e05ecb1bdc496354acbfa80bdb"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "3e79996ee8a424f0d36ab47b0b355075dda6176c59a04a9b138d0d00305483c3",
-      "after_sha256": "98d60f2ad8e749ba1cdae183df39ffc337ab75c411512090329daeb6145c4fc8",
+      "before_sha256": "98d60f2ad8e749ba1cdae183df39ffc337ab75c411512090329daeb6145c4fc8",
+      "after_sha256": "724649b548de22c11f5f1d67b8dcc931b9c9e3c13ed314912c3018309ad24168",
       "owners": {
         "@document": {
-          "before": "3e79996ee8a424f0d36ab47b0b355075dda6176c59a04a9b138d0d00305483c3",
-          "after": "98d60f2ad8e749ba1cdae183df39ffc337ab75c411512090329daeb6145c4fc8"
+          "before": "98d60f2ad8e749ba1cdae183df39ffc337ab75c411512090329daeb6145c4fc8",
+          "after": "724649b548de22c11f5f1d67b8dcc931b9c9e3c13ed314912c3018309ad24168"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "48277e8400648e33119d4f79ef8c3cd18bc4f72718532948776a9a6faa62bb4e",
-      "after_sha256": "a6e4fec536664f2f62533b50d9e463477ab4316effcf40ad2214c3cdc3a99534",
+      "before_sha256": "a6e4fec536664f2f62533b50d9e463477ab4316effcf40ad2214c3cdc3a99534",
+      "after_sha256": "a71a6f8a2e956fbf3341bda49b3cc28406a34d831e36cd163c16c2463fe18cbb",
       "owners": {
         "@document": {
-          "before": "48277e8400648e33119d4f79ef8c3cd18bc4f72718532948776a9a6faa62bb4e",
-          "after": "a6e4fec536664f2f62533b50d9e463477ab4316effcf40ad2214c3cdc3a99534"
+          "before": "a6e4fec536664f2f62533b50d9e463477ab4316effcf40ad2214c3cdc3a99534",
+          "after": "a71a6f8a2e956fbf3341bda49b3cc28406a34d831e36cd163c16c2463fe18cbb"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "ac8f9b2f0ccc04459dbdebd0cc755e58e9d9b75f1feaf899634166aee576ad46",
-      "after_sha256": "3b3bd469ef7183989361ef6b23014ba7dc2fa6337ad438f2e749a1f52b156e9b",
+      "before_sha256": "3b3bd469ef7183989361ef6b23014ba7dc2fa6337ad438f2e749a1f52b156e9b",
+      "after_sha256": "2881635264a3aed9e0759ad894a7137eae9380513cfe44b7239fa76783a26000",
       "owners": {
         "@document": {
-          "before": "ac8f9b2f0ccc04459dbdebd0cc755e58e9d9b75f1feaf899634166aee576ad46",
-          "after": "3b3bd469ef7183989361ef6b23014ba7dc2fa6337ad438f2e749a1f52b156e9b"
+          "before": "3b3bd469ef7183989361ef6b23014ba7dc2fa6337ad438f2e749a1f52b156e9b",
+          "after": "2881635264a3aed9e0759ad894a7137eae9380513cfe44b7239fa76783a26000"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "13ead9e48c2d5ae723c19160486abb927747dfca3a46939ce186dd538e789dbe",
-      "after_sha256": "1bdd228f0f65d7c82e743d02fa6c401e5f8a1729e49b65aec73006c36455d691",
+      "before_sha256": "1bdd228f0f65d7c82e743d02fa6c401e5f8a1729e49b65aec73006c36455d691",
+      "after_sha256": "a8ee6e90a1727cb16219eafded8c986811d3e49eb2e341d43f746820f418330e",
       "owners": {
         "@document": {
-          "before": "13ead9e48c2d5ae723c19160486abb927747dfca3a46939ce186dd538e789dbe",
-          "after": "1bdd228f0f65d7c82e743d02fa6c401e5f8a1729e49b65aec73006c36455d691"
+          "before": "1bdd228f0f65d7c82e743d02fa6c401e5f8a1729e49b65aec73006c36455d691",
+          "after": "a8ee6e90a1727cb16219eafded8c986811d3e49eb2e341d43f746820f418330e"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "d1ff280828f25268d337318b7e003b4bdb23f38aaf2adea08b8b4dce8f634c2a",
-      "after_sha256": "c497f1c5cb75e102e6745f9ff6f3c5664814fd1648e0b8be24e2ea3b4af0bf38",
+      "before_sha256": "c497f1c5cb75e102e6745f9ff6f3c5664814fd1648e0b8be24e2ea3b4af0bf38",
+      "after_sha256": "ac92b6a74ce496593d443ee2e09a6f7ce8aa1ae88d65f470145d4de06ee1d47c",
       "owners": {
         "@document": {
-          "before": "d1ff280828f25268d337318b7e003b4bdb23f38aaf2adea08b8b4dce8f634c2a",
-          "after": "c497f1c5cb75e102e6745f9ff6f3c5664814fd1648e0b8be24e2ea3b4af0bf38"
+          "before": "c497f1c5cb75e102e6745f9ff6f3c5664814fd1648e0b8be24e2ea3b4af0bf38",
+          "after": "ac92b6a74ce496593d443ee2e09a6f7ce8aa1ae88d65f470145d4de06ee1d47c"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "abb9c6e2e43f7d4e18c3a06eaa63bf24f33afa25056a9e384c556381dc3be170",
-      "after_sha256": "f28b8657029a0f08ade3fa92584aace88968ae6f7f61763e8356a9d7d7d9ba30",
+      "before_sha256": "f28b8657029a0f08ade3fa92584aace88968ae6f7f61763e8356a9d7d7d9ba30",
+      "after_sha256": "45346f4f4128fb34ce71b98052fcc7319965611b16cb00a9d71a628bc10f0a76",
       "owners": {
         "@document": {
-          "before": "abb9c6e2e43f7d4e18c3a06eaa63bf24f33afa25056a9e384c556381dc3be170",
-          "after": "f28b8657029a0f08ade3fa92584aace88968ae6f7f61763e8356a9d7d7d9ba30"
+          "before": "f28b8657029a0f08ade3fa92584aace88968ae6f7f61763e8356a9d7d7d9ba30",
+          "after": "45346f4f4128fb34ce71b98052fcc7319965611b16cb00a9d71a628bc10f0a76"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "1446527f1673cf43ed4b9d99788884ec97746ccda8f16cb4fe517d46bea85322",
-      "after_sha256": "425bc9ad6e6b0a1cbb6d7d36195234c411c4b6efb99ee34d08dc056a0fff60fa",
+      "before_sha256": "425bc9ad6e6b0a1cbb6d7d36195234c411c4b6efb99ee34d08dc056a0fff60fa",
+      "after_sha256": "2b4f43ab905c6e6d084c7dbb454341ee89ad85dba110f86c338a8428dc688a14",
       "owners": {
         "@document": {
-          "before": "1446527f1673cf43ed4b9d99788884ec97746ccda8f16cb4fe517d46bea85322",
-          "after": "425bc9ad6e6b0a1cbb6d7d36195234c411c4b6efb99ee34d08dc056a0fff60fa"
+          "before": "425bc9ad6e6b0a1cbb6d7d36195234c411c4b6efb99ee34d08dc056a0fff60fa",
+          "after": "2b4f43ab905c6e6d084c7dbb454341ee89ad85dba110f86c338a8428dc688a14"
         }
       }
     },
     "src/warhammer40k_core/ai/canonical_deployment.py": {
+      "before_sha256": "9cdfaac4d0369c55f04881158e4e28ff4ce8441822aef22fa4070e37d2a10d96",
+      "after_sha256": "13891f341227eee17583d59b314a01622c4b7414b2a4871ef34359050966b2b1",
+      "owners": {
+        "@module": {
+          "before": "e94f71fe7d301948b7275ae8da0dd3eb1926a20ba639ff73c37afdf5466e8738",
+          "after": "48cc9ac4c60e4478b58e7f95303e041b29939917059afc027ba8b14a6ae1a1f8"
+        },
+        "canonical_deployment_prefixes": {
+          "before": null,
+          "after": "89b24a4dac5014b451badfd81305fab6be81d5b653cebf0b30dc89a3cf320771"
+        }
+      }
+    },
+    "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
       "before_sha256": null,
-      "after_sha256": "9cdfaac4d0369c55f04881158e4e28ff4ce8441822aef22fa4070e37d2a10d96",
+      "after_sha256": "8359f99db29cd9f65dd5d07cff3649f6d3184b02987b0c6f26add1a72c6e3284",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e94f71fe7d301948b7275ae8da0dd3eb1926a20ba639ff73c37afdf5466e8738"
+          "after": "2d337e201e65f32294666027d45dfe9f1c9265a2377078ab496fa4fae654e7c0"
         },
-        "CanonicalDeploymentAdmission": {
+        "CanonicalDeploymentCoverage": {
           "before": null,
-          "after": "e0af53c6d54ad3579d27d9c085b83230337a5cad2c93358168f1ea71f6bd4031"
+          "after": "203697824c5545636e72bcc42e95c45d431cda3d8f518e0aee46acdaa15ce10f"
         },
-        "CanonicalDeploymentAdmission.__init__": {
+        "CanonicalDeploymentCoverage.__init__": {
           "before": null,
-          "after": "8230705a19ffa48f84c2c444c7abf7f8caa14c1770ead58b17c2950f5470a129"
+          "after": "21566ae5829d915723ebd7d1f0b8f1e3b1989e9f767de07bafb9f83f6dc187eb"
         },
-        "CanonicalDeploymentAdmission.content_hash": {
+        "CanonicalDeploymentCoverage.content_hash": {
           "before": null,
           "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
         },
-        "CanonicalDeploymentAdmission.from_payload": {
+        "CanonicalDeploymentCoverage.from_payload": {
           "before": null,
-          "after": "d562c29b2421c5159a05ad56a84c7132731201ded09e636ae27a4795926b1881"
+          "after": "f068c1f8a4357b338e4fb5800492d466cb54943d81c9f6caa519de494dd1637f"
         },
-        "CanonicalDeploymentAdmission.from_session": {
+        "CanonicalDeploymentCoverage.measure": {
           "before": null,
-          "after": "b73a49be89f1f0592267d32b7d9d46a5ecadee49093b28192481e581c0764da5"
+          "after": "2c339e59a8b7b7845cb34ee719697f7e0d2b07b3d285d962316605309689a071"
         },
-        "CanonicalDeploymentAdmission.to_payload": {
+        "CanonicalDeploymentCoverage.to_payload": {
           "before": null,
           "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
         },
-        "_RecipePolicy": {
+        "_coverage": {
           "before": null,
-          "after": "53064596d65bd0010973e30a380b1d498bab546b8ca02e17f81d0fb6aabe34cc"
+          "after": "7319af874aee0d985fae827210ba03a2289901d3a9be43bfa5dea710cd68b2e5"
         },
-        "_RecipePolicy.__init__": {
+        "_finite_results": {
           "before": null,
-          "after": "9fbedf46b87d64fe9ff163b0bd42c2b928a480df1c870bb1a7639c542f7988b2"
+          "after": "50042983dcb3103c1453663bab5850b0806506c2cd95c8fbc04cf618f4f5114a"
         },
-        "_RecipePolicy.choose": {
+        "_placement_row": {
           "before": null,
-          "after": "478e089b7f28edfca837795c3d88e30ca4fef0b514688e9f47a8808c6eac4da2"
-        },
-        "_Step": {
-          "before": null,
-          "after": "025972205815db4d3a90194e40118355e251f5e13163a9cb9de77fd68811ebeb"
-        },
-        "_Step.route": {
-          "before": null,
-          "after": "b632b44c44dab6cfdb356071a762fd7e92a6d231e894156519d8497b1ab2ac3f"
-        },
-        "_recipe_payload": {
-          "before": null,
-          "after": "181a90db19ca81b49dfe3bfb93d033400f7ab4f2151e18659cba4e84d67ec79b"
+          "after": "3773229c3cda9c97662899a9d7155685e562c41fbe90b5f6ed196a7dbb7c5183"
         },
         "_require": {
           "before": null,
           "after": "3e4e41ff3c8c7f6151e8cfe962471bc5109b5c5a9dd657efb33db1d520d98bee"
-        },
-        "canonical_deployment_config": {
-          "before": null,
-          "after": "510e749c3e59dcb376cb2a8570aa612156782d96010551e92361dff8c2b06b9d"
-        },
-        "reproduce_canonical_deployment": {
-          "before": null,
-          "after": "897ced83391a077995ab3ff2d85e27faa833aa2cf98cb1712fd37b2a6adc10e2"
         }
       }
     },
-    "tests/infrastructure/adapters/test_canonical_deployment.py": {
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
       "before_sha256": null,
-      "after_sha256": "3dcc8f0433797ac4775f23c861b885f96fa3249c315171c72c6d9dfd13b8c518",
+      "after_sha256": "b7efb48d7aa3ddf3b18364d40fa0f5723a082eba63474046ff578f78e47e84a3",
       "owners": {
         "@module": {
           "before": null,
-          "after": "1dd717f7e2c4292911b7d4fce4fcf9e4eec08e3580a08d89e24e2f3290d7d7b6"
+          "after": "4e951e7e46bc2eb482ec5588e83728336fe14008c509b2f2141d693153ddd634"
         },
-        "canonical": {
+        "test_complete_canonical_coverage_reconciles_reproduces_and_rejects_false_denominator": {
           "before": null,
-          "after": "8a4fba0a7bb5df80d057fada1fa7eaf6fa3f4da71381345f9d67f26be94a4dad"
+          "after": "040c1b2dd65afa81f9a99819338947b7539716ba01e8c1a7e9ae7f0f3cf3b2b7"
         },
-        "test_canonical_endpoint_roundtrips_json_save_and_exact_replay": {
+        "test_coverage_counter_keeps_missing_invalid_and_unvalidated_distinct": {
           "before": null,
-          "after": "c16f19fe814c0ad12585096c9ef4dd5339817b11e4047370c495a4eee2738122"
+          "after": "124630f3a53bc85eb9b30024b25c76e4134d6aa2e910ecd6c12e96baf4af9d6e"
         },
-        "test_canonical_receipt_loader_rejects_closed_evidence_drift": {
+        "test_coverage_rejects_other_configuration_and_ordinary_incomplete_prefix": {
           "before": null,
-          "after": "2472d096cdf560152188a47d92a60b2874df2639622f1690426d43a915ccf258"
+          "after": "bb84da598531b87ebf18f19f4cf86e7bc338537a926cea996bb1acbcaaa55a4d"
         },
-        "test_canonical_recipe_reconciles_exact_accepted_routes_and_endpoint": {
+        "test_nonrecipe_reference_acceptance_roundtrips_without_changing_canonical_prefix": {
           "before": null,
-          "after": "5d4207bcba796320b9d50f14a717f9803797109da4a35fe45341ae758d3c72cc"
-        },
-        "test_fixture_discloses_roster_geometry_and_scoring_exceptions": {
-          "before": null,
-          "after": "28f5a4808b7ecca020958d986229b84bdec0a9cf23edf72af9f5125c87eefa13"
-        },
-        "test_ordinary_incomplete_prefix_is_not_the_deployed_endpoint": {
-          "before": null,
-          "after": "01fdc751d56a29a5db246de2f304b25b05baec5a00b668ed3faa5d58c9f48e2c"
-        },
-        "test_other_ordinary_configuration_cannot_inherit_canonical_admission": {
-          "before": null,
-          "after": "934a133ef0f59363ec8788b3733c537d90508aa73dc9f6ffea6fd394989b06d8"
+          "after": "07e5f0d756625eb7eaa3abee2e2c6bf47205aafd20f2d7b673e47cb83d823add"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "f15341710ba1717433c9c3800dd2cad3ecd8411b316e84953879d759bcf004f9",
-      "after_sha256": "bcf8b7c426eea68b1b1abe9f7bbdbdf0e1380d103ec2676803136d1b67a5195d",
+      "before_sha256": "bcf8b7c426eea68b1b1abe9f7bbdbdf0e1380d103ec2676803136d1b67a5195d",
+      "after_sha256": "df05a278c08651fe3ef74b5a7668fddcd1a926215a0d9df996ba0cdd5c52197c",
       "owners": {
         "@document": {
-          "before": "f15341710ba1717433c9c3800dd2cad3ecd8411b316e84953879d759bcf004f9",
-          "after": "bcf8b7c426eea68b1b1abe9f7bbdbdf0e1380d103ec2676803136d1b67a5195d"
+          "before": "bcf8b7c426eea68b1b1abe9f7bbdbdf0e1380d103ec2676803136d1b67a5195d",
+          "after": "df05a278c08651fe3ef74b5a7668fddcd1a926215a0d9df996ba0cdd5c52197c"
         }
       }
     }
@@ -418,230 +400,620 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/hosted-calibration.json": {
       "category": "rule_semantics",
       "operations": [
         "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission",
         "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
       "operations": [
-        "mfm-current-behavior-profile"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions",
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
+        "order103-contract-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "v963-snap-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -649,51 +1021,54 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "source-record",
+        "order108-terrain-semantics",
+        "order109-unit-control-semantics",
+        "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "src/warhammer40k_core/ai/canonical_deployment.py": {
       "category": "rule_semantics",
@@ -701,19 +1076,29 @@
         "canonical-deployment-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
-    "tests/infrastructure/adapters/test_canonical_deployment.py": {
+    "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
       "category": "rule_semantics",
       "operations": [
-        "canonical-deployment-admission"
+        "canonical-deployment-coverage"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
+    },
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "canonical-deployment-coverage"
+      ],
+      "selected_families": [],
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -721,9 +1106,9 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Admit one exact synthetic canonical setup/deployment fixture through ordinary viewer decisions, verify its accepted prefix and replay, and disclose source, geometry, scoring and roster exceptions with explicit route evidence limits. Refresh only the required derived identity and test-scheduling artifacts.",
-      "source_obligation": "Stage 2 requires exact canonical fixture admission with source/config/geometry/scoring provenance, ordinary accepted decisions and replay, and independently declared versus observed routes. Candidate coverage and component cost qualification remain later bounded slices.",
-      "unchanged_work": "This operator-only fixed-recipe admission uses existing engine authority, placement legality, persistence and replay without changing their algorithms, caches, search, serializers, runtime dependencies or measured performance workloads. Derived identities and measured scheduling metadata retain their evidence meaning. Nonsensitive mapped owners require the serial current-runtime smoke; no detailed performance comparison is claimed."
+      "rationale": "Measure finite and bounded deployment candidate coverage at the exact canonical prefix checkpoints through independent ordinary engine submissions, preserving explicit reference misses and rejected alternatives. Refresh only required derived identities and measured scheduling metadata.",
+      "source_obligation": "Stage 2 requires useful candidate and reference-alternative coverage of the admitted bounded setup/deployment trace. Reference offsets are declared independently of the generator and engine acceptance is measured; tactical utility, continuation and full-game qualification are outside this slice.",
+      "unchanged_work": "The operator-only coverage receipt reuses existing actor-bound candidates, fresh session forks, ordinary viewer submission and replay. It changes no gameplay validator, geometry/search algorithm, cache, serializer, runtime dependency or existing performance workload. Component costs remain a separate explicit handoff; the serial current-runtime smoke remains required."
     }
   },
   "milestone": "ordinary",

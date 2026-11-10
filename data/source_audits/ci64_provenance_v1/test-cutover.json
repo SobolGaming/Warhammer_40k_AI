@@ -2435,6 +2435,12 @@
       "bytes": 8775,
       "sha256": "3dcc8f0433797ac4775f23c861b885f96fa3249c315171c72c6d9dfd13b8c518",
       "blob_sha1": "d4c44bae0f48f81620799197b89c84a1f4c23ff6"
+    },
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
+      "mode": "100644",
+      "blob_sha1": "e2843e9632de578973cb5e648e370fa7840b51b5",
+      "sha256": "b7efb48d7aa3ddf3b18364d40fa0f5723a082eba63474046ff578f78e47e84a3",
+      "bytes": 8089
     }
   },
   "active_roots": [

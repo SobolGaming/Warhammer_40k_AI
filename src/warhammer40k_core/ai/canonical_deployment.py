@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass
 from typing import cast
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.adapters.replay import submit_replay_record
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.ai.player_policy import (
     PlayerDecisionContext,
@@ -20,6 +21,7 @@ from warhammer40k_core.ai.runner import BoundedPolicyRunner, RunBoundary, RunLim
 from warhammer40k_core.ai.training_admission import TrainingAdmissionError, VerifiedEpisodeOrigin
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig
+from warhammer40k_core.engine.phase import LifecycleStatusKind
 
 CANONICAL_DEPLOYMENT_ID = "canonical-deployment-v1"
 CANONICAL_DEPLOYMENT_CONFIG_HASH = (
@@ -256,6 +258,53 @@ def reproduce_canonical_deployment() -> tuple[LocalGameSession, RunReport]:
         "Canonical deployment accepted trace drifted.",
     )
     return session, report
+
+
+def canonical_deployment_prefixes(
+    session: LocalGameSession, report: RunReport
+) -> tuple[tuple[LocalGameSession, PlayerDecisionContext, PolicyAction], ...]:
+    """Reconstruct the exact admitted recipe's before-choice states for operators.
+
+    Replay uses the existing ordinary adapter owner; no lifecycle is edited.
+    These private forks are never policy inputs. The final checkpoint must match
+    the separately reproduced runner endpoint before any prefix is returned.
+    """
+    fresh = LocalGameSession()
+    fresh.start(canonical_deployment_config())
+    fresh.advance_until_decision_or_terminal()
+    policy = _RecipePolicy()
+    records = session.lifecycle.decision_controller.records
+    _require(
+        len(records) == len(report.decisions) == len(_STEPS),
+        "Canonical coverage requires the complete recipe trace.",
+    )
+    prefixes: list[tuple[LocalGameSession, PlayerDecisionContext, PolicyAction]] = []
+    for index, (record, attempt) in enumerate(zip(records, report.decisions, strict=True)):
+        context = PlayerDecisionContext.from_view(
+            fresh.view(viewer_player_id=attempt.route.actor_id), choice_seed=attempt.choice_seed
+        )
+        _require(
+            context.route == _STEPS[index].route == attempt.route
+            and context.observation_hash == attempt.observation_hash
+            and fresh.decision_record_count() == index,
+            "Canonical coverage prefix drifted.",
+        )
+        action = policy.choose(context)
+        prefixes.append((fresh.fork(), context, action))
+        status = submit_replay_record(session=fresh, record=record)
+        if status.status_kind is LifecycleStatusKind.ADVANCED:
+            status = fresh.advance_until_decision_or_terminal()
+        _require(
+            status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+            and fresh.lifecycle.decision_controller.records[-1] == record,
+            "Canonical coverage prefix replay failed.",
+        )
+    _require(
+        canonical_json(fresh.to_persistence_payload())
+        == canonical_json(session.to_persistence_payload()),
+        "Canonical coverage endpoint drifted.",
+    )
+    return tuple(prefixes)
 
 
 @dataclass(frozen=True, slots=True, init=False)
