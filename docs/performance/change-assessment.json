@@ -276,11 +276,11 @@
     },
     "docs/performance/CANONICAL_DEPLOYMENT_COSTS.md": {
       "before_sha256": "dee154ce0938381b4072440c487d1b77f2f02045aeff773ac00f8ebbb699006b",
-      "after_sha256": "a5f0785f623d325d0d736fb14a20cd140719238723e030b51c5fef23184a2cb3",
+      "after_sha256": "ffefc17708685697a037238fb70264c2481b71fdc27a74f5fcc6e1839502d731",
       "owners": {
         "@document": {
           "before": "dee154ce0938381b4072440c487d1b77f2f02045aeff773ac00f8ebbb699006b",
-          "after": "a5f0785f623d325d0d736fb14a20cd140719238723e030b51c5fef23184a2cb3"
+          "after": "ffefc17708685697a037238fb70264c2481b71fdc27a74f5fcc6e1839502d731"
         }
       }
     },
@@ -401,6 +401,16 @@
         "test_deployment_validation_preserves_live_state_and_commits_alternatives_with_replay": {
           "before": "c7d6b8dbc0238353a3f1a706b111f9ab602c57a8e9e7340269b6eb5b52b56b09",
           "after": "1b555bea26445417816a5d3dfd8791ac8043fc83d5226318e83555eef96bef2e"
+        }
+      }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "df05a278c08651fe3ef74b5a7668fddcd1a926215a0d9df996ba0cdd5c52197c",
+      "after_sha256": "429217a414a96524d350fea82ee1f639dc5d93ee53167150555818d1a7e2caff",
+      "owners": {
+        "@document": {
+          "before": "df05a278c08651fe3ef74b5a7668fddcd1a926215a0d9df996ba0cdd5c52197c",
+          "after": "429217a414a96524d350fea82ee1f639dc5d93ee53167150555818d1a7e2caff"
         }
       }
     }
@@ -768,6 +778,16 @@
       "rationale": "Expand the actor-only default with four second-cardinal-ring offsets to cover all thirteen demonstrated feasible misses, fully validate the nine defaults and preserve independent reference/rejection evidence. Exact-base and head serial component observations are retained separately; increased attempts are not a speedup claim.",
       "source_obligation": "Owner-authorized bounded Stage 2 placement coverage: qualify all thirteen missing references as distinct feasible wider spatial alternatives, preserving shared engine legality, recipe controls, explicit invalid/unsupported outcomes and existing budgets. No tactical or full-game qualification.",
       "unchanged_work": "Translation construction, explicit-offset serialization, engine validation/mutation, fork/replay, source fixture, dependencies and geometry/cache algorithms are unchanged. Generated build/contract bytes publish the required current runtime identity. Existing mapped bounded operations have no detailed family; their expanded workload is measured with the same serial harness and provisional host. Required current-runtime smoke and live gates remain mandatory."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only the active README authentication hash after the reviewed complete-profile documentation update; preserve historical hashes, raw capture authorities and all semantic assertions.",
+      "source_obligation": "Current source-authentication regressions require the README dependency commitment to match the actual maintained README bytes. CI attempt 1 failed this exact current binding and remains a failed attempt.",
+      "unchanged_work": "No runtime, test Python, test inventory, source-rule capture, gameplay assertion, dependency, measurement workload or historical evidence is changed. This JSON repair updates one current dependency digest; all final exact-head gates remain required."
     }
   },
   "milestone": "ordinary",

@@ -194,7 +194,7 @@ distinct from these operator limits and the normal 180-second serial smoke gate.
 | `report_json_roundtrip` | JSON encode/decode of the already materialized report payload, outside both report timers. |
 | `coverage_from_payload` | Entire closed loader: complete fresh measurement and exact payload comparison; supplied endpoint and JSON report are already prepared. |
 | Prepared component pass | Separate calls after all full iterations. Configuration, start, first advance, admission, prefix reconstruction, persistence encode, JSON checkpoint encode/decode, restore, artifact extraction and replay load/run have individual boundaries. |
-| Per-occurrence components | Extra standalone `fork`; finite-set capture and coverage's actual finite probe owner; placement generator with five/ten offsets (raw ceilings 64/10) and production fresh-fork validator with five/ten attempts, accepted cap sixteen. Sets and results must exactly equal the authoritative row. |
+| Per-occurrence components | Extra standalone `fork`; finite-set capture and coverage's actual finite probe owner; placement generator and production fresh-fork validator with current nine/ten generated/reference offsets and attempts (the retained five-offset campaign used five/ten for both; raw ceilings 64/10), accepted cap sixteen. Sets and results must exactly equal the authoritative row. |
 
 `first_iteration` means the first workload in a fresh interpreter process. Imports
 and endpoint preparation precede its first `coverage_measure`; the subsequent
