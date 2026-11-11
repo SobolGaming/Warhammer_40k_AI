@@ -13,6 +13,7 @@ from typing import cast
 
 import pytest
 import scripts.build_test_shards as sharding
+import scripts.shard_execution_model as execution_model
 from scripts.hosted_timing_calibration import (
     FILENAME,
     FORMULA,
@@ -693,3 +694,29 @@ def test_declared_allocation_index_cannot_disappear_or_change(tmp_path: Path) ->
     path.unlink()
     with pytest.raises(SystemExit, match="index is missing or changed"):
         sharding.dispatch_case_seconds(summary, tmp_path / "durations.json")
+
+
+def test_mirror_controller_reserve_changes_allocation_without_changing_phases(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    serial = sharding.SERIAL_BEHAVIORAL_CASE
+    costs = {f"tests/{module}.py::test_{index}": 10.0 for module in "abc" for index in range(4)}
+    costs[serial] = 10.0
+    weights = {**dict.fromkeys((f"tests/{module}.py" for module in "abc"), 40.0), serial: 40.0}
+    cohort = Cohort("control", costs, {}, {})
+    before = copy.deepcopy((weights, costs, cohort))
+    reserved = allocate(weights, costs, (cohort,), 2)
+    mirror_index = next(index for index, group in enumerate(reserved) if serial in group)
+    assert reserved[mirror_index] == (serial,)
+    assert cohort_seconds(reserved[mirror_index], costs, (cohort,)) == (10.0,)
+    (tmp_path / PROFILE_FILE).write_text("{}", encoding="utf-8")
+    summary = execution_model.metadata(tmp_path, reserved, costs, (cohort,))
+    assert summary["serial_controller_reserve_seconds"] == 50.0
+    assert "Planning-only" in str(summary["serial_controller_reserve_meaning"])
+    assert summary["cohort_worker_path_seconds"] == {
+        "control": {str(index + 1): 10.0 if index == mirror_index else 30.0 for index in range(2)}
+    }
+    monkeypatch.setattr(execution_model, "SERIAL_CONTROLLER_RESERVE_SECONDS", 0.0)
+    assert allocate(weights, costs, (cohort,), 2) != reserved
+    assert (weights, costs, cohort) == before

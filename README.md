@@ -816,12 +816,16 @@ behavioral profile to provide their exact case weights. Preserve previous measur
 Git history and retained source artifacts; never invent missing weights or
 substitute file averages for CI dispatch.
 
-`allocation-cohorts.json` selects six complete effective hosted cohorts by their
+`allocation-cohorts.json` selects seven complete effective hosted cohorts by their
 original worker-report SHA-256 identities. The allocator scores the actual four
 initial worksteal chunks for every cohort, then makes strictly improving whole
 selector moves. Stable node-identity ties make offline chunks match live dispatch
-independently of collection order. The smallest modeled bucket retains cold shard 1.
-The isolated mirror is charged sequentially before the parallel remainder.
+independently of collection order.
+The isolated mirror is charged sequentially before the parallel remainder. Allocation
+also reserves 50 seconds for its second pytest controller, rounding up the largest
+measured extra controller residual (49.893798646 seconds) across these cohorts.
+This planning allowance does not change raw case/phase costs, reported worker-path
+seconds or actual deadlines. The smallest reserved-score bucket retains cold shard 1.
 
 For directly declared non-parametrized module fixtures, the conditional setup
 estimate is the cohort's largest observed worker setup sum for that fixture group,
@@ -834,8 +838,13 @@ timing qualification. Every actual covered shard still must pass within 1,080 se
 
 The three original complete JUnit sources, hashes and medians remain unchanged.
 The calibration retains its original 627 reports and 78,763 observation tuples as
-exact prefixes and appends 118 reports / 15,496 observations, for totals of 745 /
-94,259. Cohorts include failed enclosing attempts, and inherited successful jobs
+exact prefixes. The subsequent 745 reports / 94,259 observations also remain exact
+prefixes; another 49 reports / 6,282 observations give totals of 794 / 100,541.
+The added complete cohort is run `43038116912`, attempt 1, source PR head
+`0d281c269759b8a74c915bae3a59fa8e211f9fa6`, tested merge checkout
+`d03fb42db79ad431a6fb15801ce6948584bb16fc`. All 6,282 cases passed, but the
+enclosing run failed the unchanged timing gate on shards 2, 8 and 11. That failure
+remains recorded. Cohorts include failed enclosing attempts, and inherited successful jobs
 retain their original producer identities; neither becomes a new passing observation.
 `--check` regenerates the allocation, and dispatch rejects a missing or changed
 declared cohort index. The all-history maximum case weights still drive dispatch;

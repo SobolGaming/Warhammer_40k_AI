@@ -24,7 +24,10 @@ from typing import cast
 from scripts.hosted_timing_calibration import FILENAME, read_json
 
 PROFILE_FILE = "allocation-cohorts.json"
-MODEL = "coherent-worker-chunks-module-setup-v1"
+MODEL = "coherent-worker-chunks-module-setup-serial-reserve-v2"
+# Planning only: ceil(49.893798646s), the largest measured extra controller residual
+# across the seven indexed cohorts. Never added to measured case or phase costs.
+SERIAL_CONTROLLER_RESERVE_SECONDS = 50.0
 
 
 @dataclass(frozen=True)
@@ -221,11 +224,14 @@ def allocate(
     weights: dict[str, float], costs: dict[str, float], cohorts: tuple[Cohort, ...], count: int
 ) -> tuple[tuple[str, ...], ...]:
     """Greedy real-chunk scoring, then strictly improving whole-selector moves."""
+    from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
+
     assignments: list[tuple[str, ...]] = [() for _ in range(count)]
 
     @cache
     def score(selectors: tuple[str, ...]) -> float:
-        return max(cohort_seconds(selectors, costs, cohorts))
+        reserve = SERIAL_CONTROLLER_RESERVE_SECONDS if SERIAL_BEHAVIORAL_CASE in selectors else 0.0
+        return max(cohort_seconds(selectors, costs, cohorts)) + reserve
 
     for selector in sorted(weights, key=lambda name: (-weights[name], name)):
         target = min(
@@ -277,6 +283,10 @@ def metadata(
         "model": MODEL,
         "index": PROFILE_FILE,
         "index_sha256": hashlib.sha256((directory / PROFILE_FILE).read_bytes()).hexdigest(),
+        "serial_controller_reserve_seconds": SERIAL_CONTROLLER_RESERVE_SECONDS,
+        "serial_controller_reserve_meaning": "Planning-only extra controller allowance on the "
+        "isolated-mirror shard; excluded from measured phases and worker-path seconds; "
+        "not a timing bound or qualification",
         "meaning": "Conditional initial chunks and module setup reuse; "
         "excludes controller overhead, work stealing and future variance; not timing qualification",
         "cohort_worker_path_seconds": {
