@@ -1526,7 +1526,7 @@
   "unadopted_gaps": [],
   "authenticated_inputs": {
     "AGENTS.md": "ad3d947ff75713b004de037a26600ce00b6ab5db44b9862a089092580da3c49c",
-    "README.md": "ee451bae304efb492ff3913809db8f8fc0284025c5f8d6c62c6a94638b19f8f6",
+    "README.md": "58dab9dc4dbfad47eb88078c850bcf8cb365578a635398be8b65179074cc5c6f",
     "pyproject.toml": "9105612cdd8e91d028b9818440df96fab254bf707609e0e71317a6ae19db87c8",
     "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
     "data/source_audits/order97/categories/07.json": "52a349cc268a3c3e9cb0348ac9bb101a2c9a4d83ccde60f99a3d2ad071adc80d",

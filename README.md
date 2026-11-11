@@ -712,7 +712,7 @@ API-bound archive digests and byte comparisons bind source head
 `7ce2d3c85f138e0575fd78386bbf0b4ef37a4783`, tested merge checkout
 `24a94682b96a0fe8c85f63a5791c08136b3cc903`, their identical tree and the recorded
 runtime fingerprint. All original 382 receipts and 47,361 observation tuples
-retain their exact values, indices, identities and outcomes. Totals are now 431
+retain their exact values, indices, identities and outcomes. Totals after that append were 431
 receipts and 53,639 observations covering all 6,278 cases, with no baseline-only
 cases. The complete 6,278-case local baseline, source label, JUnit hashes, file
 totals and case measurements remain unchanged.
@@ -743,6 +743,43 @@ assume unchanged case costs across different workers and hosts. They cannot
 predict approval or certify a speedup. No test, scheduler algorithm, runtime,
 worker count, coverage floor or timing limit changes. Fresh complete hosted
 qualification remains required for every shard.
+
+A further PR661 calibration appends 49 authenticated worker receipts and 6,278
+passed three-phase observations from attempt 1 of failed hosted run
+[42969947321](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42969947321).
+API-bound archive digests and raw-worker byte comparisons bind source head
+`566b3cd32fb43a0e96efe878fb0b58482d8d9ea9` and tested merge checkout
+`a9d1b923ca10a1e47ef1fbc0c1ecb60897106ae5` to the identical tree
+`e729b83c874c4be04cbca8026ea256144d3a6b29` and recorded runtime fingerprint.
+The prior 431 receipts and 53,639 observation tuples remain exact prefixes,
+with their indices, identities, measurements and outcomes unchanged. Current
+totals are 480 receipts and 59,917 observations covering all 6,278 cases, with
+zero baseline-only cases. The complete local 6,278-case baseline, source label,
+JUnit hashes, file totals and case measurements remain unchanged.
+
+All 6,278 hosted cases passed across 49 workers. Shard 6 took 1,090.60351343
+supervisor seconds and shard 8 took 1,085.253981572 seconds. Both exited zero
+without termination or remaining descendants but exceeded the unchanged
+1,080-second approval limit; the run and combined coverage gate remain failed.
+The other ten behavioral shards passed timing. Both failed runs remain historical
+evidence and are not relabeled as passing qualifications.
+
+Shard 6's normal-move restore and distance-rejection cases took 677.305 and
+370.138 three-phase seconds versus prior maximum weights of 584.845 and
+293.387. Shard 8's canonical-preflight case took 965.874 seconds versus
+828.223. Comparable S25 cases stayed near prior observations; the concentrated
+gaps do not establish a hardware cause or engine regression. Worker progress
+shows approximately 93 and 96 seconds of wrapper/startup/finalization time,
+excluding worker collection and dispatch.
+
+The unchanged formula and generator regenerate all twelve manifests.
+Normal-move stays on shard 6 with a different surrounding inventory; canonical
+preflight moves to shard 10. Its indivisible 965.874-second observed cost is
+the counterfactual global test-work lower bound. An illustrative 100-second
+wrapper allowance leaves only 14.126 seconds before approval, excluding any
+unaccounted collection, dispatch or changed context costs. Qualification remains
+tight and unproven. No production/test code, scheduler, worker count, coverage
+floor or timing limit changes; fresh complete hosted qualification is required.
 
 Every supplied complete baseline JUnit run must cover the current behavioral file inventory. Missing files,
 duplicate cases, failed/skipped cases, invalid durations, and truncated suite counts
