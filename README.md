@@ -362,9 +362,17 @@ Verify that every selected file or declared case appears exactly once:
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 ```
 
-Download the `behavior-report-*` artifacts from each chosen successful run into a
-separate directory outside the checkout, then regenerate (repeat both options for
-additional runs). Downloaded profiles are supplied inputs, not generated source:
+Download the `behavior-report-*` artifacts from each chosen complete behavioral
+run into a separate directory outside the checkout, then regenerate (repeat both
+options for additional runs). Each profile must contain every selected case with
+passed setup, call and teardown, including the isolated mirror. A complete
+all-passed behavioral JUnit profile may supply scheduling measurements even when
+the enclosing CI run failed its timing approval; its source description must
+retain that failed outcome, run/attempt, tested checkout, source head, runtime,
+host and worker topology. It is not an approved CI run or passing coverage gate.
+Missing, failed, skipped or incomplete cases remain inadmissible. Authenticate
+artifact bytes and attempts independently before use; worker JSON alone does not
+identify the attempt. Downloaded profiles are supplied inputs, not generated source:
 
 ```bash
 uv run --no-sync python scripts/build_test_shards.py \
@@ -417,7 +425,13 @@ A complete local JUnit profile is also accepted, either one XML or one directory
 containing the isolated mirror and remaining-suite XMLs from the same covered run.
 Label its host, worker counts and concurrent validation accurately; do not mix
 local and hosted-runner timings in one representative CI profile. Local timing
-weights do not establish hosted cost accuracy or a speedup.
+weights do not establish hosted cost accuracy or a speedup. For a representative
+CI-only median baseline, use only complete hosted profiles with the actual
+four-worker remainder and isolated one-worker mirror. Preserve replaced local
+profiles, their raw JUnit bytes, hashes, source labels and measurements as
+historical evidence outside the checkout and retain their Git revision; do not
+mix local and hosted measurements or rescale either. A baseline replacement does
+not remove historical calibration observations or relax fresh CI qualification.
 A separate `hosted-calibration.json` may supply historical planning observations.
 It does not replace or alter `profiles`, `case_seconds`, measured file totals, or
 complete-profile admission. The generator and four-worker dispatch both use
@@ -447,7 +461,7 @@ four-worker remainder; repeated observations across artifacts/attempts remain
 separate samples before taking the maximum. Unobserved cases are listed explicitly
 and retain their complete baseline measurement. Changed/removed/renamed cases or
 changed test-module bytes require explicit sidecar regeneration, and behavioral
-inventory changes still require a fresh complete successful baseline profile.
+inventory changes still require a fresh complete all-passed behavioral baseline profile.
 
 The preceding calibration retained 284 compatible source-bound raw worker receipts
 and 34,836 passed three-phase samples covering 6,115 cases. All sixty
@@ -696,7 +710,7 @@ re-derives every planning cost/selector and the sidecar digest; worker dispatch
 rejects a missing or altered declared sidecar. Run the normal generator command
 above with this sidecar in the output directory to reproduce the manifests.
 
-The current complete baseline contains 6,278 passed cases from the opposing-shooter
+The earlier local baseline contained 6,278 passed cases from the opposing-shooter
 qualification on Python 3.14.5 under WSL Ubuntu, against exact base
 `5639ccce458e53e154b1f578548ec7f20dfdec18` and runtime fingerprint
 `575d1f47b62970089d53ec533482c75cbbd7a06bfe7015fe09d99526dcba781c`.
@@ -796,8 +810,8 @@ duplicate cases, failed/skipped cases, invalid durations, and truncated suite co
 are rejected. Outside the explicit initial migration seed above, new test files
 require a fresh complete profile; timings are never filled with zero. `durations.json` preserves report SHA-256 hashes and run descriptions.
 Historical profiles measure their recorded case inventory; added, renamed or
-changed cases within an existing file require a refreshed successful complete
-profile to provide their exact case weights. Preserve previous measurements in
+changed cases within an existing file require a refreshed complete all-passed
+behavioral profile to provide their exact case weights. Preserve previous measurements in
 Git history and retained source artifacts; never invent missing weights or
 substitute file averages for CI dispatch.
 
