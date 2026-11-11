@@ -1,408 +1,486 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "e3620316d36ebd5a2ac910fee8d2d429c2d5ae34",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:785ca6f64b746d062d23eca25a55ca0b851f0331d8c392c07f4b1a63ffd9c5e7",
-  "operation_map_sha256": "9da03eadc21e0ae08709311b72fa0b4967235e2154727c5162c580529f111653",
+  "base": "efb3172c4ce1b3a912c3f6fc2c26ebaa465ad9c4",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0883faa80dd31f2e31d8ba47daf2aaa1b952526f1bfa267b9423b426573e389b",
+  "operation_map_sha256": "200cd8b8cc837b6b01fb4d32664363498c79decb8bad3f5f346401e489652d8f",
   "changes": {
     "README.md": {
-      "before_sha256": "9e3f2eb8efb687ded45c04cd707cfb854b113ca97823ba04fe0c807efcfc46a1",
-      "after_sha256": "ad8ce9f5f1cd75a998bdbc5d2b67962f240edb85d48742b95850b2027cda5b93",
+      "before_sha256": "ad8ce9f5f1cd75a998bdbc5d2b67962f240edb85d48742b95850b2027cda5b93",
+      "after_sha256": "337d3ac35e44a363b46f04b6be423753f55e8693aa2c196d468ad2460936fcc1",
       "owners": {
         "@document": {
-          "before": "9e3f2eb8efb687ded45c04cd707cfb854b113ca97823ba04fe0c807efcfc46a1",
-          "after": "ad8ce9f5f1cd75a998bdbc5d2b67962f240edb85d48742b95850b2027cda5b93"
+          "before": "ad8ce9f5f1cd75a998bdbc5d2b67962f240edb85d48742b95850b2027cda5b93",
+          "after": "337d3ac35e44a363b46f04b6be423753f55e8693aa2c196d468ad2460936fcc1"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "5374c2ff1022054c6a4421fe932a8785c588b231ed62ae0474bc9e5c715e2a94",
-      "after_sha256": "88025c4f5e53c9b5f42a663062f23cec9c5651667ad8f18fe5b46af430b4da6f",
+      "before_sha256": "88025c4f5e53c9b5f42a663062f23cec9c5651667ad8f18fe5b46af430b4da6f",
+      "after_sha256": "68292b457983fee20690067ec452be369beb1c3d82041fbe7477ee131e2fb0e6",
       "owners": {
         "@document": {
-          "before": "5374c2ff1022054c6a4421fe932a8785c588b231ed62ae0474bc9e5c715e2a94",
-          "after": "88025c4f5e53c9b5f42a663062f23cec9c5651667ad8f18fe5b46af430b4da6f"
+          "before": "88025c4f5e53c9b5f42a663062f23cec9c5651667ad8f18fe5b46af430b4da6f",
+          "after": "68292b457983fee20690067ec452be369beb1c3d82041fbe7477ee131e2fb0e6"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
-      "before_sha256": "8cc0ccc1a628a9a05450f5f11743824cf713d8d728852addd6c6e7a3bcc55db9",
-      "after_sha256": "a0b3c0b56e648c595953c9bb5947e9fd45bc1639bc359eb146e9da7067dc0477",
+      "before_sha256": "a0b3c0b56e648c595953c9bb5947e9fd45bc1639bc359eb146e9da7067dc0477",
+      "after_sha256": "b2f94e1591514bf044813c02cd77500ec4935416014ce256f59b36da3dfc3534",
       "owners": {
         "@document": {
-          "before": "8cc0ccc1a628a9a05450f5f11743824cf713d8d728852addd6c6e7a3bcc55db9",
-          "after": "a0b3c0b56e648c595953c9bb5947e9fd45bc1639bc359eb146e9da7067dc0477"
+          "before": "a0b3c0b56e648c595953c9bb5947e9fd45bc1639bc359eb146e9da7067dc0477",
+          "after": "b2f94e1591514bf044813c02cd77500ec4935416014ce256f59b36da3dfc3534"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "b7c2f7a68c73850b1258f1c6281278d3e8a466aac5d4934b1018354310eb8d55",
-      "after_sha256": "a1d04b5b658ef1cd5d7b37fa0967c567eaf87bdb4bdf5ffdbc5afb81145bc7e6",
+      "before_sha256": "a1d04b5b658ef1cd5d7b37fa0967c567eaf87bdb4bdf5ffdbc5afb81145bc7e6",
+      "after_sha256": "b6fddd5695453d7a0e1db52d26a520367d3a506f90b3144ce80f9f6cec6bc4ea",
       "owners": {
         "@document": {
-          "before": "b7c2f7a68c73850b1258f1c6281278d3e8a466aac5d4934b1018354310eb8d55",
-          "after": "a1d04b5b658ef1cd5d7b37fa0967c567eaf87bdb4bdf5ffdbc5afb81145bc7e6"
+          "before": "a1d04b5b658ef1cd5d7b37fa0967c567eaf87bdb4bdf5ffdbc5afb81145bc7e6",
+          "after": "b6fddd5695453d7a0e1db52d26a520367d3a506f90b3144ce80f9f6cec6bc4ea"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "a13d08c84a829213e6318d67ffb539629a36b8c4f1cfa7c15d44112780f52a19",
-      "after_sha256": "c71e01e11f52d18c0e446ae6b8c5c31fbf985c5743dd10f6d62afc7ff3c01ce8",
+      "before_sha256": "c71e01e11f52d18c0e446ae6b8c5c31fbf985c5743dd10f6d62afc7ff3c01ce8",
+      "after_sha256": "5c4fec7109b19f1c6eb0e277bbbb4893a70c7031debba25bdfd0c173ef761636",
       "owners": {
         "@document": {
-          "before": "a13d08c84a829213e6318d67ffb539629a36b8c4f1cfa7c15d44112780f52a19",
-          "after": "c71e01e11f52d18c0e446ae6b8c5c31fbf985c5743dd10f6d62afc7ff3c01ce8"
+          "before": "c71e01e11f52d18c0e446ae6b8c5c31fbf985c5743dd10f6d62afc7ff3c01ce8",
+          "after": "5c4fec7109b19f1c6eb0e277bbbb4893a70c7031debba25bdfd0c173ef761636"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "c94f7c1494298cb4af0ac57db1d12d399fce3e131ad0a718822fac78e871d4a4",
-      "after_sha256": "fae858962800c215d68c9001b1ba5dbabe2a32ca518fe7d9395e726efc3bd98b",
+      "before_sha256": "fae858962800c215d68c9001b1ba5dbabe2a32ca518fe7d9395e726efc3bd98b",
+      "after_sha256": "815abb9a9c35408a2007644b9e6aff843a1798e842837729217fd259ccaf9f48",
       "owners": {
         "@document": {
-          "before": "c94f7c1494298cb4af0ac57db1d12d399fce3e131ad0a718822fac78e871d4a4",
-          "after": "fae858962800c215d68c9001b1ba5dbabe2a32ca518fe7d9395e726efc3bd98b"
+          "before": "fae858962800c215d68c9001b1ba5dbabe2a32ca518fe7d9395e726efc3bd98b",
+          "after": "815abb9a9c35408a2007644b9e6aff843a1798e842837729217fd259ccaf9f48"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "f81a1c5f3d36f4037d0fd996cb5c3f66b42e4586a5239e35dd38d1d032598526",
-      "after_sha256": "d76a9abccaa5f74f283ce3c9497e9a50f1da0670a7ecd36531b71c26fba47360",
-      "owners": {
-        "@document": {
-          "before": "f81a1c5f3d36f4037d0fd996cb5c3f66b42e4586a5239e35dd38d1d032598526",
-          "after": "d76a9abccaa5f74f283ce3c9497e9a50f1da0670a7ecd36531b71c26fba47360"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "3e429b0bcbe1c2b5958a62597db7a0a5ba70004e6401c74bf509e05e10ee0dd8",
-      "after_sha256": "be2f97a4a4b9f123156028ae771819551519711e924de1c001ae78eb8f3d8719",
-      "owners": {
-        "@document": {
-          "before": "3e429b0bcbe1c2b5958a62597db7a0a5ba70004e6401c74bf509e05e10ee0dd8",
-          "after": "be2f97a4a4b9f123156028ae771819551519711e924de1c001ae78eb8f3d8719"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "6efad3a068d7b6a5f931b8a053080f0565e2d587ca8961707071c94184b6166c",
-      "after_sha256": "cb19f8ae764aa20d6fb731174a3915465222effe63ba56889d1d3ab0f43ca29f",
-      "owners": {
-        "@document": {
-          "before": "6efad3a068d7b6a5f931b8a053080f0565e2d587ca8961707071c94184b6166c",
-          "after": "cb19f8ae764aa20d6fb731174a3915465222effe63ba56889d1d3ab0f43ca29f"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "7e74d0bf281b5556942631e22e81104b2c364236ffb9d51aa3c099182f681294",
-      "after_sha256": "b44cbe80458f4bc3d0c3df557b4a32ce0f170590aca60cca6a413d846bf57f79",
-      "owners": {
-        "@document": {
-          "before": "7e74d0bf281b5556942631e22e81104b2c364236ffb9d51aa3c099182f681294",
-          "after": "b44cbe80458f4bc3d0c3df557b4a32ce0f170590aca60cca6a413d846bf57f79"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
-      "after_sha256": "8b7eaf5d90412f8eabcbbda6a1fd9d2e56ea6137748c436589b20a5f6d867230",
-      "owners": {
-        "@document": {
-          "before": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
-          "after": "8b7eaf5d90412f8eabcbbda6a1fd9d2e56ea6137748c436589b20a5f6d867230"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "b12d46861847bb2f27721529b1f89de106c8c39634722d857eeda5700607bdf6",
-      "after_sha256": "75bc20f49ff5f4bf8f3b6d42811610fc8a2693c39ca09a8d4865e3ea9870a4e8",
-      "owners": {
-        "@document": {
-          "before": "b12d46861847bb2f27721529b1f89de106c8c39634722d857eeda5700607bdf6",
-          "after": "75bc20f49ff5f4bf8f3b6d42811610fc8a2693c39ca09a8d4865e3ea9870a4e8"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "8f24a0ec2b07065cd8d867ee0c35723d3bb0d14e81272bf3639acf5d3bd9fde1",
-      "after_sha256": "9c74fcfc3ab9b01b894dffbfa386ae9ee8b18e7ded27c8572a0b4f0e54d3d831",
-      "owners": {
-        "@document": {
-          "before": "8f24a0ec2b07065cd8d867ee0c35723d3bb0d14e81272bf3639acf5d3bd9fde1",
-          "after": "9c74fcfc3ab9b01b894dffbfa386ae9ee8b18e7ded27c8572a0b4f0e54d3d831"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "80c01bc731512f1171003e69fb393d3f5db5b09c4d4b7e562cb4286736196dd1",
-      "after_sha256": "d59c9ef2f3b9a2248998b8c6e2d1ee4e4886f88f3c184a856bf724464cc79ad6",
-      "owners": {
-        "@document": {
-          "before": "80c01bc731512f1171003e69fb393d3f5db5b09c4d4b7e562cb4286736196dd1",
-          "after": "d59c9ef2f3b9a2248998b8c6e2d1ee4e4886f88f3c184a856bf724464cc79ad6"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "eceac99e4849a4d6fe5c48d26daabb702870479cef290c8e6a2c2c3cc361d922",
+      "before_sha256": "d76a9abccaa5f74f283ce3c9497e9a50f1da0670a7ecd36531b71c26fba47360",
       "after_sha256": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
       "owners": {
         "@document": {
-          "before": "eceac99e4849a4d6fe5c48d26daabb702870479cef290c8e6a2c2c3cc361d922",
+          "before": "d76a9abccaa5f74f283ce3c9497e9a50f1da0670a7ecd36531b71c26fba47360",
           "after": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793"
         }
       }
     },
-    "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "a1903fec42039c9852e5726f054d3e57ef3e86c5ec182c9a7561320e33b2e716",
-      "after_sha256": "788f9217109f8274c087ade1de7c873c1d25ba324e5601d478a6aae4abc78e4e",
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "be2f97a4a4b9f123156028ae771819551519711e924de1c001ae78eb8f3d8719",
+      "after_sha256": "703026acec5ec84c12110c0caed34579a1a48bc3a2da7138c8f9667dc3833c57",
       "owners": {
         "@document": {
-          "before": "a1903fec42039c9852e5726f054d3e57ef3e86c5ec182c9a7561320e33b2e716",
-          "after": "788f9217109f8274c087ade1de7c873c1d25ba324e5601d478a6aae4abc78e4e"
+          "before": "be2f97a4a4b9f123156028ae771819551519711e924de1c001ae78eb8f3d8719",
+          "after": "703026acec5ec84c12110c0caed34579a1a48bc3a2da7138c8f9667dc3833c57"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "cb19f8ae764aa20d6fb731174a3915465222effe63ba56889d1d3ab0f43ca29f",
+      "after_sha256": "376637fec673e58f1fc199e4cdc330ac79baabc75e6afdee229c95b6f433aacc",
+      "owners": {
+        "@document": {
+          "before": "cb19f8ae764aa20d6fb731174a3915465222effe63ba56889d1d3ab0f43ca29f",
+          "after": "376637fec673e58f1fc199e4cdc330ac79baabc75e6afdee229c95b6f433aacc"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "b44cbe80458f4bc3d0c3df557b4a32ce0f170590aca60cca6a413d846bf57f79",
+      "after_sha256": "79ac48845700d5a789a412c0c543dbe1439ea45e1af6b15dfed3473f33ec9cd4",
+      "owners": {
+        "@document": {
+          "before": "b44cbe80458f4bc3d0c3df557b4a32ce0f170590aca60cca6a413d846bf57f79",
+          "after": "79ac48845700d5a789a412c0c543dbe1439ea45e1af6b15dfed3473f33ec9cd4"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "8b7eaf5d90412f8eabcbbda6a1fd9d2e56ea6137748c436589b20a5f6d867230",
+      "after_sha256": "61a4e7af64df329d07dae2ef59d8193775781983989c9bad0792bfbbcb072021",
+      "owners": {
+        "@document": {
+          "before": "8b7eaf5d90412f8eabcbbda6a1fd9d2e56ea6137748c436589b20a5f6d867230",
+          "after": "61a4e7af64df329d07dae2ef59d8193775781983989c9bad0792bfbbcb072021"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "75bc20f49ff5f4bf8f3b6d42811610fc8a2693c39ca09a8d4865e3ea9870a4e8",
+      "after_sha256": "94c3c36fe130247df1267000ff61121480c6f57261009cf8c4a13c4ed3465eb8",
+      "owners": {
+        "@document": {
+          "before": "75bc20f49ff5f4bf8f3b6d42811610fc8a2693c39ca09a8d4865e3ea9870a4e8",
+          "after": "94c3c36fe130247df1267000ff61121480c6f57261009cf8c4a13c4ed3465eb8"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "9c74fcfc3ab9b01b894dffbfa386ae9ee8b18e7ded27c8572a0b4f0e54d3d831",
+      "after_sha256": "4eb98eb67d31c2cd591ace7b82010f18f0b7cd0eecf93741f5dfc50fa9cde12f",
+      "owners": {
+        "@document": {
+          "before": "9c74fcfc3ab9b01b894dffbfa386ae9ee8b18e7ded27c8572a0b4f0e54d3d831",
+          "after": "4eb98eb67d31c2cd591ace7b82010f18f0b7cd0eecf93741f5dfc50fa9cde12f"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "d59c9ef2f3b9a2248998b8c6e2d1ee4e4886f88f3c184a856bf724464cc79ad6",
+      "after_sha256": "c0e719375754379377836a026698e14b177baebb9212fb6ce88853ad43ee8370",
+      "owners": {
+        "@document": {
+          "before": "d59c9ef2f3b9a2248998b8c6e2d1ee4e4886f88f3c184a856bf724464cc79ad6",
+          "after": "c0e719375754379377836a026698e14b177baebb9212fb6ce88853ad43ee8370"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
+      "after_sha256": "f13a050ca50d49a41765148231907099a7c0ecbf66ab60e4de4f214ae3d1d3b4",
+      "owners": {
+        "@document": {
+          "before": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
+          "after": "f13a050ca50d49a41765148231907099a7c0ecbf66ab60e4de4f214ae3d1d3b4"
+        }
+      }
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "788f9217109f8274c087ade1de7c873c1d25ba324e5601d478a6aae4abc78e4e",
+      "after_sha256": "6a2badeb9b7ff64e26ad40bf218a557b21c455933de6da3907fc80cf08d34eba",
+      "owners": {
+        "@document": {
+          "before": "788f9217109f8274c087ade1de7c873c1d25ba324e5601d478a6aae4abc78e4e",
+          "after": "6a2badeb9b7ff64e26ad40bf218a557b21c455933de6da3907fc80cf08d34eba"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "a28450cd90e4efbcf056b744b9f0d5816f6f795e7976849734b1badaa2a131fd",
-      "after_sha256": "54834aa7ca125f11b995fd0465c288718bdc06c1a7e706c96520862282a17a8d",
+      "before_sha256": "54834aa7ca125f11b995fd0465c288718bdc06c1a7e706c96520862282a17a8d",
+      "after_sha256": "227cc16d16ddce135ca3272aedc7df7d3cdbcb0e40790781081245c6455ccd9c",
       "owners": {
         "@document": {
-          "before": "a28450cd90e4efbcf056b744b9f0d5816f6f795e7976849734b1badaa2a131fd",
-          "after": "54834aa7ca125f11b995fd0465c288718bdc06c1a7e706c96520862282a17a8d"
+          "before": "54834aa7ca125f11b995fd0465c288718bdc06c1a7e706c96520862282a17a8d",
+          "after": "227cc16d16ddce135ca3272aedc7df7d3cdbcb0e40790781081245c6455ccd9c"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "f79902593ae7243cf47aa45fa66e7c764b68673c40f1e9b9651a5e84b3fadd26",
-      "after_sha256": "b9875f1175f2143d22e32e31ac2c61fc5a599e28c29c07aa59447e3710b3a818",
+      "before_sha256": "b9875f1175f2143d22e32e31ac2c61fc5a599e28c29c07aa59447e3710b3a818",
+      "after_sha256": "0e35b87359278e474071be03779b7ca9cab01b42a40617576372d09d8c640a05",
       "owners": {
         "@document": {
-          "before": "f79902593ae7243cf47aa45fa66e7c764b68673c40f1e9b9651a5e84b3fadd26",
-          "after": "b9875f1175f2143d22e32e31ac2c61fc5a599e28c29c07aa59447e3710b3a818"
+          "before": "b9875f1175f2143d22e32e31ac2c61fc5a599e28c29c07aa59447e3710b3a818",
+          "after": "0e35b87359278e474071be03779b7ca9cab01b42a40617576372d09d8c640a05"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "6bc6687a7ebc47afb48588cee62f20776891362aa42cd0be3964469a898c48a6",
-      "after_sha256": "2e81114ad6d598935f120ed85db96630cdbd10ac5a0bb14d2cd2a973044bb7ce",
+      "before_sha256": "2e81114ad6d598935f120ed85db96630cdbd10ac5a0bb14d2cd2a973044bb7ce",
+      "after_sha256": "4e035b8e3ea35b54f5c1df35c29b124001fac56905881222e1230a2746c8878b",
       "owners": {
         "@document": {
-          "before": "6bc6687a7ebc47afb48588cee62f20776891362aa42cd0be3964469a898c48a6",
-          "after": "2e81114ad6d598935f120ed85db96630cdbd10ac5a0bb14d2cd2a973044bb7ce"
+          "before": "2e81114ad6d598935f120ed85db96630cdbd10ac5a0bb14d2cd2a973044bb7ce",
+          "after": "4e035b8e3ea35b54f5c1df35c29b124001fac56905881222e1230a2746c8878b"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "358822cdec0123bc91d0db8106e7549f0c162b90a7ad2d57f83a48145090973e",
-      "after_sha256": "849db1a0441bae61cb3fb645d2c0ac531e8f0a29fcc0f9564503a1eb08697f9f",
+      "before_sha256": "849db1a0441bae61cb3fb645d2c0ac531e8f0a29fcc0f9564503a1eb08697f9f",
+      "after_sha256": "f50c4eabca575efa3a93a983d2ae662715fe593fe903b4ec2dce89e8932923d5",
       "owners": {
         "@document": {
-          "before": "358822cdec0123bc91d0db8106e7549f0c162b90a7ad2d57f83a48145090973e",
-          "after": "849db1a0441bae61cb3fb645d2c0ac531e8f0a29fcc0f9564503a1eb08697f9f"
+          "before": "849db1a0441bae61cb3fb645d2c0ac531e8f0a29fcc0f9564503a1eb08697f9f",
+          "after": "f50c4eabca575efa3a93a983d2ae662715fe593fe903b4ec2dce89e8932923d5"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "7fb4e6dcdd56191128a44f80065f991a78b3ef0776a22b5bfb5d79778c76184a",
-      "after_sha256": "0aaf1ee49a81b2a94ef0d06abc851d32f644d17b1013b82580495626f3c370f7",
+      "before_sha256": "0aaf1ee49a81b2a94ef0d06abc851d32f644d17b1013b82580495626f3c370f7",
+      "after_sha256": "8036d4d0b2d83ee3a961ca2c896c31b77325981ae927a0a8e98362e76106fa80",
       "owners": {
         "@document": {
-          "before": "7fb4e6dcdd56191128a44f80065f991a78b3ef0776a22b5bfb5d79778c76184a",
-          "after": "0aaf1ee49a81b2a94ef0d06abc851d32f644d17b1013b82580495626f3c370f7"
+          "before": "0aaf1ee49a81b2a94ef0d06abc851d32f644d17b1013b82580495626f3c370f7",
+          "after": "8036d4d0b2d83ee3a961ca2c896c31b77325981ae927a0a8e98362e76106fa80"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "cf82947470df66cc228f25c3245fe257a86fe5e06f00dccf0590e890c6babcf7",
-      "after_sha256": "57a6ba9db5ca64b0fcbf6a95e06979907f8c5d09ca04130ae7f564a30672e2d9",
+      "before_sha256": "57a6ba9db5ca64b0fcbf6a95e06979907f8c5d09ca04130ae7f564a30672e2d9",
+      "after_sha256": "52df197b49f2e22a2b4095b76e91dbcb53620bc651eeba25702c1473a33a764f",
       "owners": {
         "@document": {
-          "before": "cf82947470df66cc228f25c3245fe257a86fe5e06f00dccf0590e890c6babcf7",
-          "after": "57a6ba9db5ca64b0fcbf6a95e06979907f8c5d09ca04130ae7f564a30672e2d9"
+          "before": "57a6ba9db5ca64b0fcbf6a95e06979907f8c5d09ca04130ae7f564a30672e2d9",
+          "after": "52df197b49f2e22a2b4095b76e91dbcb53620bc651eeba25702c1473a33a764f"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "caa76ca6e0790a3aac345af15c00893d56f261ad2c9810889da771fc81b33e5b",
-      "after_sha256": "88a5d60022fdf3b0358ea3c344d8eb0d8707db161a6638df57a5d0318fab38e4",
+      "before_sha256": "88a5d60022fdf3b0358ea3c344d8eb0d8707db161a6638df57a5d0318fab38e4",
+      "after_sha256": "376453b35f9a9ffdca8f00c996ea3fc2ec2cfb1a39bdff3ba45031012684fdb8",
       "owners": {
         "@document": {
-          "before": "caa76ca6e0790a3aac345af15c00893d56f261ad2c9810889da771fc81b33e5b",
-          "after": "88a5d60022fdf3b0358ea3c344d8eb0d8707db161a6638df57a5d0318fab38e4"
+          "before": "88a5d60022fdf3b0358ea3c344d8eb0d8707db161a6638df57a5d0318fab38e4",
+          "after": "376453b35f9a9ffdca8f00c996ea3fc2ec2cfb1a39bdff3ba45031012684fdb8"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "5420b23f775b9bbb45e10b6da04874cf4626664ff01e33110c4abbdc0657b23b",
-      "after_sha256": "40520fdd789b1cd502152ea5baf0c173c62cd038c82d965208617dfba4f0c858",
+      "before_sha256": "40520fdd789b1cd502152ea5baf0c173c62cd038c82d965208617dfba4f0c858",
+      "after_sha256": "e9bb97f7caa519002e8c7f93b67a7c3fd6a3a8e54e9a5e079e5286749b038b77",
       "owners": {
         "@document": {
-          "before": "5420b23f775b9bbb45e10b6da04874cf4626664ff01e33110c4abbdc0657b23b",
-          "after": "40520fdd789b1cd502152ea5baf0c173c62cd038c82d965208617dfba4f0c858"
+          "before": "40520fdd789b1cd502152ea5baf0c173c62cd038c82d965208617dfba4f0c858",
+          "after": "e9bb97f7caa519002e8c7f93b67a7c3fd6a3a8e54e9a5e079e5286749b038b77"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "b6532615f7cf0cba99199bb926cec2d21ea251073398f9aec05a239593030e47",
-      "after_sha256": "5f0deaa6547a844569edc4d1ea28d041e58d24ebae067b27893425692d3cd171",
+      "before_sha256": "5f0deaa6547a844569edc4d1ea28d041e58d24ebae067b27893425692d3cd171",
+      "after_sha256": "f34e543353bb6ebd3ad3a45bec05c030b8228ee490204caa888e2cd4f6b918bd",
       "owners": {
         "@document": {
-          "before": "b6532615f7cf0cba99199bb926cec2d21ea251073398f9aec05a239593030e47",
-          "after": "5f0deaa6547a844569edc4d1ea28d041e58d24ebae067b27893425692d3cd171"
+          "before": "5f0deaa6547a844569edc4d1ea28d041e58d24ebae067b27893425692d3cd171",
+          "after": "f34e543353bb6ebd3ad3a45bec05c030b8228ee490204caa888e2cd4f6b918bd"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "900adaa38016f2a3b5e04958dbd8812dfee6f78153b0029a28a7c602b38571b4",
-      "after_sha256": "8ebdce00df8ed3efe5079310a7819fcfeba0306a46dc633920a2a8784f0c7401",
+      "before_sha256": "8ebdce00df8ed3efe5079310a7819fcfeba0306a46dc633920a2a8784f0c7401",
+      "after_sha256": "ac4a8d24cc3f6d332572f1fa6a518f5eb243f3406ed6780464d71df84eb3cdba",
       "owners": {
         "@document": {
-          "before": "900adaa38016f2a3b5e04958dbd8812dfee6f78153b0029a28a7c602b38571b4",
-          "after": "8ebdce00df8ed3efe5079310a7819fcfeba0306a46dc633920a2a8784f0c7401"
+          "before": "8ebdce00df8ed3efe5079310a7819fcfeba0306a46dc633920a2a8784f0c7401",
+          "after": "ac4a8d24cc3f6d332572f1fa6a518f5eb243f3406ed6780464d71df84eb3cdba"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "4c2e413eea63490a41b77d923307a6a075f44804dfc2fda259edbe493d325b49",
-      "after_sha256": "8a3d4c6fb2ce85e16d0e2502290fdb40cb8d92cd29363b1b5216e1626f3a1ffa",
+      "before_sha256": "8a3d4c6fb2ce85e16d0e2502290fdb40cb8d92cd29363b1b5216e1626f3a1ffa",
+      "after_sha256": "11c271e418fac38de5c4465541d3a69e1169b0ede51ffc793de9585b47470805",
       "owners": {
         "@document": {
-          "before": "4c2e413eea63490a41b77d923307a6a075f44804dfc2fda259edbe493d325b49",
-          "after": "8a3d4c6fb2ce85e16d0e2502290fdb40cb8d92cd29363b1b5216e1626f3a1ffa"
+          "before": "8a3d4c6fb2ce85e16d0e2502290fdb40cb8d92cd29363b1b5216e1626f3a1ffa",
+          "after": "11c271e418fac38de5c4465541d3a69e1169b0ede51ffc793de9585b47470805"
+        }
+      }
+    },
+    "docs/performance/canonical-coverage-preflight/observations.json": {
+      "before_sha256": null,
+      "after_sha256": "6d7b7de7dac49d3d16405307601e8fff84344619a40f5a58360ae3d7cd164714",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6d7b7de7dac49d3d16405307601e8fff84344619a40f5a58360ae3d7cd164714"
+        }
+      }
+    },
+    "docs/performance/canonical-coverage-preflight/workload.json": {
+      "before_sha256": null,
+      "after_sha256": "cb50fcc855c0de0ff4997862d9552d851cc0b6f8bf4dd3aadcf8799f89901825",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "cb50fcc855c0de0ff4997862d9552d851cc0b6f8bf4dd3aadcf8799f89901825"
+        }
+      }
+    },
+    "docs/performance/current/canonical-coverage-preflight.json": {
+      "before_sha256": null,
+      "after_sha256": "91f9061c670ae9cc10ec603fb50f40188a18548410b1d834cf0e7a6488b136a9",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "91f9061c670ae9cc10ec603fb50f40188a18548410b1d834cf0e7a6488b136a9"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "c727d4b72d12a7014a41b312186c4fbd12db6d71191b271c52e9a87fed1c97ed",
-      "after_sha256": "87d294a889bd63579bd36142b13f6035a1372f7bd4024281f20a6083f7e231d8",
+      "before_sha256": "87d294a889bd63579bd36142b13f6035a1372f7bd4024281f20a6083f7e231d8",
+      "after_sha256": "6cc5bee03986fd62a7737b38f5baad5c6765cc89bea1f3143d523eff74b33db9",
       "owners": {
         "@document": {
-          "before": "c727d4b72d12a7014a41b312186c4fbd12db6d71191b271c52e9a87fed1c97ed",
-          "after": "87d294a889bd63579bd36142b13f6035a1372f7bd4024281f20a6083f7e231d8"
+          "before": "87d294a889bd63579bd36142b13f6035a1372f7bd4024281f20a6083f7e231d8",
+          "after": "6cc5bee03986fd62a7737b38f5baad5c6765cc89bea1f3143d523eff74b33db9"
+        }
+      }
+    },
+    "scripts/measure_canonical_coverage_preflight.py": {
+      "before_sha256": null,
+      "after_sha256": "cf1aed013e2d9cea3bb140a4d4ce604150d04624572f5adfec5ec470c6bd0fa8",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e9b25ec020a22fc4147be02da27bd0138b3f58351042429d4b6712e01287ed88"
+        },
+        "main": {
+          "before": null,
+          "after": "91ac680a9615ba50272394477080a5317f78da4d6ccc0eb9fc081d3ed6c48892"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "6b70e448eb6fc77b8d2a8c57f7a039f65c747e241c57e37e881b15a09c6628eb",
-      "after_sha256": "a1d3d485d286af2afb85bc707c5b5127423618cae37e95bdde9a3067d7ad1edd",
+      "before_sha256": "a1d3d485d286af2afb85bc707c5b5127423618cae37e95bdde9a3067d7ad1edd",
+      "after_sha256": "2467bdd46a77208e38fd61be95a50e9f307da74e1b00a26ab1d2145acfec12ce",
       "owners": {
         "@document": {
-          "before": "6b70e448eb6fc77b8d2a8c57f7a039f65c747e241c57e37e881b15a09c6628eb",
-          "after": "a1d3d485d286af2afb85bc707c5b5127423618cae37e95bdde9a3067d7ad1edd"
+          "before": "a1d3d485d286af2afb85bc707c5b5127423618cae37e95bdde9a3067d7ad1edd",
+          "after": "2467bdd46a77208e38fd61be95a50e9f307da74e1b00a26ab1d2145acfec12ce"
         }
       }
     },
-    "src/warhammer40k_core/ai/normal_move_scenario.py": {
+    "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
+      "before_sha256": "d20502870ec4302048bde101a6518bf760258daa5e54d8cd267aa1ebf5940de4",
+      "after_sha256": "10747a3382b89d7a6c55d5624a42fccd052980544689a20805185b2cdd2be311",
+      "owners": {
+        "CanonicalDeploymentCoverage.from_payload": {
+          "before": "f068c1f8a4357b338e4fb5800492d466cb54943d81c9f6caa519de494dd1637f",
+          "after": "1d562e2ba5951018f56c1c7a73cf002dfa00f0d27ec26db4f15362149b56befd"
+        },
+        "_coverage_totals": {
+          "before": null,
+          "after": "578c71908d769d304a0ea4dffa06ddc262287388ab0958bd980aab489e032cde"
+        },
+        "_measure_prefixes": {
+          "before": "1a024b7d4072c2bb9ed242592a7f996de6439bf90d81ef5d441de3ad1426c26a",
+          "after": "690726b90e3aa022478749730a484dc860b217a5cbb02cbb755aff01f9e0befe"
+        }
+      }
+    },
+    "src/warhammer40k_core/ai/followthrough_scenario.py": {
       "before_sha256": null,
-      "after_sha256": "e16b78680d7fb5d31a7ef2cde5c780d9d63418bfe6806b000c1c219f694eb81c",
+      "after_sha256": "2b34da3d67644e1d47fa1f7f5833d0c9bf00dbc20942a1667fe6a36bb28bb675",
       "owners": {
         "@module": {
           "before": null,
-          "after": "3e7aae83bc2b47d8eaaf222a478d1b651749fac787df1673cd74feecbb4237fc"
+          "after": "138ed568023b1d2b719367882da3527524d5c4cdedb2cd73586ea639ddbe1cca"
         },
-        "NormalMoveScenarioAdmission": {
+        "FollowthroughPairAdmission": {
           "before": null,
-          "after": "2a98e87537ee69143f6ab0caae9001322e007b7ffbe15b1a1628037b5a6a4fd5"
+          "after": "86532f6363e46043a0d3d1411172ca1ab6a2cc862efcf2a414293c3be6248864"
         },
-        "NormalMoveScenarioAdmission.__init__": {
+        "FollowthroughPairAdmission.__init__": {
           "before": null,
-          "after": "44954f456e08c6bcfc565c2fdd8d2ba218575061da7e0f1d929fb67b0fa66ebe"
+          "after": "e038bd0690b2b24df06182d97ec472d4e980ace2864ada1766d07ddef55ff2fb"
         },
-        "NormalMoveScenarioAdmission.content_hash": {
+        "FollowthroughPairAdmission.content_hash": {
           "before": null,
           "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
         },
-        "NormalMoveScenarioAdmission.from_payload": {
+        "FollowthroughPairAdmission.from_payload": {
           "before": null,
-          "after": "95af4f3e0591133b6672615186018e2a4d64b5305d5eda384bfbe21d7ec370fc"
+          "after": "c8cc6b6909ea266692f918c660075a1c2742eb6d1962125dd18a8a79950dc6d9"
         },
-        "NormalMoveScenarioAdmission.from_session": {
+        "FollowthroughPairAdmission.from_sessions": {
           "before": null,
-          "after": "7dcf0c5baafd44bb007532f6a4b70b5201fc0d460266354f4a07bbe5239ccf47"
+          "after": "c5028fb9c95faa6d80a6d53916e3586e49565b09415b7bb6e89de7670cd5b0da"
         },
-        "NormalMoveScenarioAdmission.to_payload": {
+        "FollowthroughPairAdmission.to_payload": {
           "before": null,
           "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
         },
-        "_continue_normal_move": {
+        "_continue": {
           "before": null,
-          "after": "aeb7789f8d76b844c3fea34ed7d730b120e9c6cedb9b68caacb6565366e1d8ce"
+          "after": "cfbf7ef43732cf01dfca8f306f8cdef7836ca2b183fd28609212ea1f0a009120"
         },
-        "_proposal": {
+        "_definition": {
           "before": null,
-          "after": "1df16bb144de4323df117f807e9786ab567f515bb7fdb05e8820906f6e1f7633"
+          "after": "0129e4084929188a902b382d6f36192530f2a1ab8941e211164ceafc9dd04dd6"
         },
-        "_require_definition": {
+        "_exploiter_proposal": {
           "before": null,
-          "after": "893ed99b4421883a88f8b2f2c57706d98496ba526af0de9f4ac247f9e238bac1"
+          "after": "31e645d882e1fecd8a9cdf7fc2915fabd2b9d23f9af75bd1cab0cdca913c5c32"
         },
-        "normal_move_scenario_definition": {
+        "_opponent_probe": {
           "before": null,
-          "after": "4a4e974472376170941b8d96cc4d012f0230c729a2c1880f9db5943968250aa1"
+          "after": "5c40c8dc53e10ef241a40ea5cce99e226d420595b37a9ab1cf7e7649a8a61697"
         },
-        "reproduce_normal_move_scenario": {
+        "_reproduce": {
           "before": null,
-          "after": "e33500e412875058eb6db063bbe4b2d2b92ea0200c4557fa7a57b676a26a2545"
+          "after": "83421314bd17aef7db1c07bea146f960ce885487ca9d69704eb6d7415d31107c"
+        },
+        "followthrough_definition": {
+          "before": null,
+          "after": "dc355738829ce5cb7da0149f62733fb5d673adfec8d4606ac169df4bf007a90b"
+        },
+        "reproduce_followthrough_pair": {
+          "before": null,
+          "after": "093d2dc3df30def1587596c5c8f48d2178ae419d16276e02a23543f1e0305d02"
         }
       }
     },
-    "src/warhammer40k_core/ai/preserve_scenario.py": {
-      "before_sha256": "90d32415a69797169dec869d110bbce0897d275c3a85290df13dd7b17cb85724",
-      "after_sha256": "11c72270ae766a4059387d8d348f5e50f6e0c94f7a5b57b1b8ad6cc9f88f7427",
-      "owners": {
-        "_continue_preservation": {
-          "before": "746d8673a85b9f51d7d051c0a9ea2b9bc29c5de2c42b775bbd80ea89fd102eb4",
-          "after": "518e098a7e787fd95dfe8e72fd45a5498e945fc4104b9b71a636c4fa97b5ca03"
-        }
-      }
-    },
-    "tests/infrastructure/adapters/test_normal_move_scenario.py": {
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "30bb82e22114deb4d7e6b749b684fabd6e7463c41eb24786e7b7d9e023418917",
+      "after_sha256": "90b2fbdcaa950cfa3002dc7c1b3172473639b66c94fd9192839162f95d148068",
       "owners": {
         "@module": {
           "before": null,
-          "after": "65b29c43c20af7ffd980528f6e248347e746ec5db3f7855fe15d298e23bf87e1"
+          "after": "3b03e785bd8927ecf35a4db00cba8780701e5af8cc2232b38fb723f4eb9850c1"
         },
-        "_model_placements": {
+        "_counts": {
           "before": null,
-          "after": "b130a17a280ca826072983097a019b1df3ad41390ceafbd0ecea3c81867c2449"
+          "after": "e0eb359728761623ef52d5e5af3d061a670a88cd3f7ddd3325e0fbf89a57cc3b"
         },
-        "_prefix": {
+        "test_consistent_tampering_still_reproduces_the_real_engine": {
           "before": null,
-          "after": "b17fc1e01dcfcfaee70c5918ebcd80263ba8ddd760c92fd2a19e8df429c034a5"
+          "after": "9e7518201a01e5d1cdaec76314170b5740ae37d550b8baef6f1dce0f57bcec72"
         },
-        "moved": {
+        "test_coverage_totals_derive_each_kind_without_fixed_fixture_counts": {
           "before": null,
-          "after": "53e50e5d513750934332394bcbf52de450bf0426f88e5ce43593c9d96ed94bea"
+          "after": "1778adb9b72c268128d1102612ee307a3a5e115121a5e6c315229c1f8846526f"
         },
-        "test_normal_move_branches_from_preservation_prefix_with_actual_witness": {
+        "test_coverage_totals_reject_missing_or_noninteger_counts": {
           "before": null,
-          "after": "1cd400b4bbff399f968164774c328f8a6e95cf3623d1f50ce1f5afa768d81943"
+          "after": "0a52c3a22ed49428ed3831d6b38dba9124fb0be4cf126bfdf3ba53a475cb7eb8"
         },
-        "test_normal_move_distance_rejection_remains_engine_owned_and_replayable": {
+        "test_coverage_totals_require_typed_rows": {
           "before": null,
-          "after": "b78e1ced9182d5a8b070f6f746368c5aabbc38c40ae05033a287b94147aaf12e"
+          "after": "8290f053649f228a6ca6088b29130e3a18670d85be38118d7edc2ac3669579ce"
+        }
+      }
+    },
+    "tests/infrastructure/adapters/test_followthrough_scenario.py": {
+      "before_sha256": null,
+      "after_sha256": "3229c0dbfacbdaf1455aa6baf792362770cdca0fa20de8e47d0f74573cd81c51",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "29d17aca260610ea67a926fee2307155244827f7294e9a90eebcdd1a05aed409"
         },
-        "test_normal_move_json_restore_exact_replay_and_closed_receipt": {
+        "pair": {
           "before": null,
-          "after": "29978a7fd15725145f58630d2481d4d14a578f3982ed5cc1a0c023f9399c4316"
+          "after": "99b2157e1aff20df62d8fc8f5bd1bac3f6fba7b3aac6284bd5519146907833e5"
         },
-        "test_normal_move_rejects_incomplete_and_extra_ordinary_choices": {
+        "test_followthrough_rejects_wrong_configuration_and_unreached_endpoints": {
           "before": null,
-          "after": "a2a1f138ed7948bf95a9e3079fbeb66492caf7489b81093975e3bd6d2971e0df"
+          "after": "1a24f3a2a9733e1244fae4140687bf5564040cbbf57464d8fa7fcb1ee6eb4e1a"
+        },
+        "test_matched_exploiter_movement_and_engine_rejected_opponent_shooter": {
+          "before": null,
+          "after": "2474a52392d5412e849d73b434fdff4e580d63dae5c19db5fcce3326d127e03e"
+        },
+        "test_pair_json_replay_closed_receipt_and_declined_reaction_continuation": {
+          "before": null,
+          "after": "317532b90bbc66e03fefa688702b87fedd4de1866ed6455633557cc71c6dbc0a"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "602901f0f4422d0cacf96e486d2af59d47c5f253cbb0d5b117a01fa56b9c3597",
-      "after_sha256": "3cb67ae31bba624ba100e2f2292d70aced64cffffdb9e8d0e18be8fcf7f4e019",
+      "before_sha256": "3cb67ae31bba624ba100e2f2292d70aced64cffffdb9e8d0e18be8fcf7f4e019",
+      "after_sha256": "b74c4c4893abd3575cb9eac1c43c38d0a47c41800424e1b1acef498aa3504e02",
       "owners": {
         "@document": {
-          "before": "602901f0f4422d0cacf96e486d2af59d47c5f253cbb0d5b117a01fa56b9c3597",
-          "after": "3cb67ae31bba624ba100e2f2292d70aced64cffffdb9e8d0e18be8fcf7f4e019"
+          "before": "3cb67ae31bba624ba100e2f2292d70aced64cffffdb9e8d0e18be8fcf7f4e019",
+          "after": "b74c4c4893abd3575cb9eac1c43c38d0a47c41800424e1b1acef498aa3504e02"
         }
       }
     }
@@ -412,7 +490,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintained scope and reviewed owner registration for one bounded witnessed Normal Move alternative; no engine algorithm, gameplay calculation or timing-budget change.",
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -431,9 +509,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/hosted-calibration.json": {
       "category": "rule_semantics",
@@ -443,9 +521,9 @@
         "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -462,9 +540,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -481,9 +559,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -500,9 +578,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -519,9 +597,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -538,9 +616,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -557,9 +635,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -576,9 +654,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -595,9 +673,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -614,9 +692,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -633,9 +711,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -652,9 +730,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -671,9 +749,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -715,9 +793,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -759,9 +837,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -803,9 +881,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -847,9 +925,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -891,9 +969,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -935,9 +1013,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -979,9 +1057,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -1023,9 +1101,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -1033,15 +1111,15 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintained scope and reviewed owner registration for one bounded witnessed Normal Move alternative; no engine algorithm, gameplay calculation or timing-budget change.",
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -1049,7 +1127,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintained scope and reviewed owner registration for one bounded witnessed Normal Move alternative; no engine algorithm, gameplay calculation or timing-budget change.",
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -1057,17 +1135,53 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintained scope and reviewed owner registration for one bounded witnessed Normal Move alternative; no engine algorithm, gameplay calculation or timing-budget change.",
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
       "source_obligation": null,
       "unchanged_work": null
+    },
+    "docs/performance/canonical-coverage-preflight/observations.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Immutable actual-base/head operation measurements, exact current workload/source/dependency identities, original attempts and explicit single-sample limitations for the bounded receipt preflight optimization.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
+    "docs/performance/canonical-coverage-preflight/workload.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Immutable actual-base/head operation measurements, exact current workload/source/dependency identities, original attempts and explicit single-sample limitations for the bounded receipt preflight optimization.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
+    "docs/performance/current/canonical-coverage-preflight.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Immutable actual-base/head operation measurements, exact current workload/source/dependency identities, original attempts and explicit single-sample limitations for the bounded receipt preflight optimization.",
+      "source_obligation": "",
+      "unchanged_work": ""
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintained scope and reviewed owner registration for one bounded witnessed Normal Move alternative; no engine algorithm, gameplay calculation or timing-budget change.",
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
       "source_obligation": null,
       "unchanged_work": null
+    },
+    "scripts/measure_canonical_coverage_preflight.py": {
+      "category": "measured_workload",
+      "operations": [
+        "canonical-coverage-preflight-measurement"
+      ],
+      "selected_families": [
+        "canonical_coverage_preflight"
+      ],
+      "rationale": "Deliberate bounded optimization rejects internally inconsistent receipt totals before redundant full reproduction. Matched actual-base valid reload and inconsistent-total rejection measurements are mandatory in docs/performance/current/canonical-coverage-preflight.json; the original complete test remains byte-identical.",
+      "source_obligation": "Totals derive from the receipt rows without hardcoded fixture counts. Every internally consistent receipt still executes fresh ordinary engine measurement and exact closed equality; real coordinated-tamper regression delegates that full reproduction and rejects.",
+      "unchanged_work": "No engine rule, fork, geometry, cache, RNG, candidate inventory, consistency acceptance boundary, coverage requirement, worker count or timing limit changes. One newly registered sample per operation is descriptive, with no variance or hosted approval claim."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -1078,39 +1192,53 @@
         "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
-    "src/warhammer40k_core/ai/normal_move_scenario.py": {
+    "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
+      "category": "algorithm_or_search",
+      "operations": [
+        "canonical-deployment-coverage"
+      ],
+      "selected_families": [
+        "canonical_coverage_preflight"
+      ],
+      "rationale": "Deliberate bounded optimization rejects internally inconsistent receipt totals before redundant full reproduction. Matched actual-base valid reload and inconsistent-total rejection measurements are mandatory in docs/performance/current/canonical-coverage-preflight.json; the original complete test remains byte-identical.",
+      "source_obligation": "Totals derive from the receipt rows without hardcoded fixture counts. Every internally consistent receipt still executes fresh ordinary engine measurement and exact closed equality; real coordinated-tamper regression delegates that full reproduction and rejects.",
+      "unchanged_work": "No engine rule, fork, geometry, cache, RNG, candidate inventory, consistency acceptance boundary, coverage requirement, worker count or timing limit changes. One newly registered sample per operation is descriptive, with no variance or hosted approval claim."
+    },
+    "src/warhammer40k_core/ai/followthrough_scenario.py": {
       "category": "rule_semantics",
       "operations": [
-        "normal-move-scenario-admission"
+        "paired-followthrough-admission"
       ],
       "selected_families": [],
-      "rationale": "A fixed operator admission and real-engine controls execute a legal witnessed Normal Move from the same ordinary prefix as preservation, reusing existing viewer submissions, movement validation, persistence and exact replay.",
-      "source_obligation": "The pinned canonical configuration and movement move-units/Normal Move authority require an engine-accepted full-model PathWitness, consuming only S activation. A legal alternative does not establish tactical screening or later value.",
-      "unchanged_work": "No movement solver, generator, cache, ranking, authoritative mutation, RNG or serialization format is changed. The preservation helper only accepts a bounded explicit prefix; its default choices and frozen definition retain their meaning. No performance improvement or full-game qualification is claimed."
+      "rationale": "A fixed operator-only pair reuses ordinary movement and reaction submissions, engine-owned PathWitness validation, strict persistence and exact replay; it qualifies legal E movement and one negative opposing shot probe.",
+      "source_obligation": "Preserve the canonical configuration and unchanged stationary/Normal Move prefixes; require three full-model E paths and the ordinary Fire Overwatch target validator, retaining the actual no-legal-declaration diagnostic without an attack or tactical value label.",
+      "unchanged_work": "No movement or shooting algorithm, generator, cache, authoritative state mutation, RNG, serializer, adapter family, ranker or learning format changes. The bounded receipt repeats existing engine operations; scenario costs and full-game qualification remain open."
     },
-    "src/warhammer40k_core/ai/preserve_scenario.py": {
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
+      "category": "measured_workload",
+      "operations": [
+        "canonical-deployment-coverage"
+      ],
+      "selected_families": [
+        "canonical_coverage_preflight"
+      ],
+      "rationale": "Deliberate bounded optimization rejects internally inconsistent receipt totals before redundant full reproduction. Matched actual-base valid reload and inconsistent-total rejection measurements are mandatory in docs/performance/current/canonical-coverage-preflight.json; the original complete test remains byte-identical.",
+      "source_obligation": "Totals derive from the receipt rows without hardcoded fixture counts. Every internally consistent receipt still executes fresh ordinary engine measurement and exact closed equality; real coordinated-tamper regression delegates that full reproduction and rejects.",
+      "unchanged_work": "No engine rule, fork, geometry, cache, RNG, candidate inventory, consistency acceptance boundary, coverage requirement, worker count or timing limit changes. One newly registered sample per operation is descriptive, with no variance or hosted approval claim."
+    },
+    "tests/infrastructure/adapters/test_followthrough_scenario.py": {
       "category": "rule_semantics",
       "operations": [
-        "preserve-scenario-admission"
+        "paired-followthrough-admission"
       ],
       "selected_families": [],
-      "rationale": "A fixed operator admission and real-engine controls execute a legal witnessed Normal Move from the same ordinary prefix as preservation, reusing existing viewer submissions, movement validation, persistence and exact replay.",
-      "source_obligation": "The pinned canonical configuration and movement move-units/Normal Move authority require an engine-accepted full-model PathWitness, consuming only S activation. A legal alternative does not establish tactical screening or later value.",
-      "unchanged_work": "No movement solver, generator, cache, ranking, authoritative mutation, RNG or serialization format is changed. The preservation helper only accepts a bounded explicit prefix; its default choices and frozen definition retain their meaning. No performance improvement or full-game qualification is claimed."
-    },
-    "tests/infrastructure/adapters/test_normal_move_scenario.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "normal-move-scenario-admission"
-      ],
-      "selected_families": [],
-      "rationale": "A fixed operator admission and real-engine controls execute a legal witnessed Normal Move from the same ordinary prefix as preservation, reusing existing viewer submissions, movement validation, persistence and exact replay.",
-      "source_obligation": "The pinned canonical configuration and movement move-units/Normal Move authority require an engine-accepted full-model PathWitness, consuming only S activation. A legal alternative does not establish tactical screening or later value.",
-      "unchanged_work": "No movement solver, generator, cache, ranking, authoritative mutation, RNG or serialization format is changed. The preservation helper only accepts a bounded explicit prefix; its default choices and frozen definition retain their meaning. No performance improvement or full-game qualification is claimed."
+      "rationale": "A fixed operator-only pair reuses ordinary movement and reaction submissions, engine-owned PathWitness validation, strict persistence and exact replay; it qualifies legal E movement and one negative opposing shot probe.",
+      "source_obligation": "Preserve the canonical configuration and unchanged stationary/Normal Move prefixes; require three full-model E paths and the ordinary Fire Overwatch target validator, retaining the actual no-legal-declaration diagnostic without an attack or tactical value label.",
+      "unchanged_work": "No movement or shooting algorithm, generator, cache, authoritative state mutation, RNG, serializer, adapter family, ranker or learning format changes. The bounded receipt repeats existing engine operations; scenario costs and full-game qualification remain open."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -1118,12 +1246,14 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Required generated runtime publication, exact current test/source authentication or measured scheduling metadata companion to the bounded admission; all existing behavior and validation selection remain intact.",
-      "source_obligation": "Preserve exact runtime identity, existing adapter wire contracts, active and historical test evidence, complete twelve-shard selection and the 67-percent full-package branch coverage boundary.",
-      "unchanged_work": "Only generated identity references, explicit new test membership, current source pins or measured scheduling metadata change. Existing algorithms, generators, serializers, tests, historical observations and all timing budgets remain unchanged."
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
+      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "canonical_coverage_preflight": "docs/performance/current/canonical-coverage-preflight.json"
+  },
   "full_game": null
 }

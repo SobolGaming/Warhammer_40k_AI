@@ -366,6 +366,45 @@ engine-unsupported verdict. Candidate continuation coverage, component costs,
 broader qualification and Stage 2 completion remain open. See the
 [movement admission interface](AI_POLICY_INTERFACE.md#witnessed-normal-move-prefix-admission).
 
+### Paired E movement and first opposing shot probe
+
+`FollowthroughPairAdmission` continues the unchanged stationary and Normal Move
+prefixes through five ordinary player-A decisions each. E moves all three models
+one inch in negative X using full straight-line `PathWitness` paths; the remaining
+vehicle stays stationary. The two traces end after 22 and 23 accepted records at
+player B's end-of-Movement Fire Overwatch target-binding request. Ordinary
+startup and exact replay verify both branches; their first fifteen records are
+identical, under the same configuration, build and seed. This is a matched
+movement continuation, not E exploiting an opposing response.
+
+The operator receipt independently forks each endpoint and submits the nominated
+B unit as the Overwatch shooter through the existing viewer proposal path.
+The engine returns `fire_overwatch_no_legal_shooting_declaration`, with the entire
+checkpoint, records and events unchanged. The offered reaction window therefore
+does not establish an executable shot. This negative evidence applies to one
+shooter at this exact window; it does not establish general threat unreachability
+or unsupported shooting mechanics. A control declines the reaction through the
+ordinary proposal path and reaches player A's Shooting unit selection.
+
+The [paired interface](AI_POLICY_INTERFACE.md#paired-followthrough-and-opposing-shot-probe)
+retains the synthetic roster, provisional geometry, mission/layout and public-seed
+limitations. `scoped_gap`, a null target and no learning eligibility remain.
+An ordinary approach or a separately admitted geometry that enables a real enemy
+attack must precede the opponent-response/E-benefit comparison. Screening,
+attack resolution, E's benefit after that response, declared-horizon outcomes,
+timing/cooperation controls, useful candidate coverage and scenario costs remain
+open. The unchanged original admissions keep their narrower meanings; Stage 2
+is not complete.
+
+Canonical coverage receipt loading now rejects totals that contradict its own
+row counts through shared pure aggregation before repeating engine work. Every
+internally consistent receipt still requires complete fresh reproduction and
+exact equality; coordinated false rows/totals remain rejected. This bounded
+operator-boundary optimization preserves the original full coverage regression
+and adds a separate real reproduction control. It does not qualify Stage 2,
+scenario costs or hosted timing; matched actual-base evidence is recorded
+separately from final CI approval.
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.

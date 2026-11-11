@@ -27,6 +27,13 @@ movement feasibility evidence; screening, exposure, opponent threat, E follow-th
 later outcomes and learning eligibility remain unqualified. The original
 preservation definition and receipt retain their meaning.
 
+The separate [paired followthrough admission](docs/AI_POLICY_INTERFACE.md#paired-followthrough-and-opposing-shot-probe)
+continues both branches with the same witnessed E movement and a stationary
+vehicle, reaching B's end-of-Movement Fire Overwatch request. A fixed ordinary
+target-binding probe on an independent fork is rejected because B has no legal
+shooting declaration at that window. This qualifies movement feasibility and a
+specific negative shot result; it supplies no attack outcome or tactical benefit.
+
 ## 2. Non-negotiable invariants
 
 These rules are enforced from the first commit.
@@ -527,7 +534,7 @@ their fresh complete-profile measurements, bringing baseline-only membership to
 hosted observation. Local timing is planning evidence, not hosted approval or a
 speedup; the twelve manifests still require a fresh passing hosted run.
 
-The current complete JUnit baseline records 6,261 passed behavioral tests
+The preceding complete JUnit baseline records 6,261 passed behavioral tests
 for witnessed Normal Move on Python 3.14.5 under WSL: one isolated
 mirror worker followed by 32 worksteal workers, without competing validation
 workers. Its fresh checkout-bound source index was prepared separately. The
@@ -545,11 +552,11 @@ These local scheduling observations neither explain the earlier hosted timing
 variability nor establish a performance repair, scenario-cost qualification or
 hosted approval. Fresh complete hosted qualification remains required.
 
-The current calibration appends exactly 49 complete original worker receipts and
+The PR659 calibration appends exactly 49 complete original worker receipts and
 6,261 passed three-phase samples from attempt 1 of failed PR659 run
 [42898953334](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42898953334).
-It now retains 333 receipts and 41,097 samples covering all 6,261 current cases,
-with zero baseline-only cases. Every prior report and observation tuple remains
+That update retained 333 receipts and 41,097 samples covering all 6,261 then-current cases,
+with zero baseline-only cases at that point. Every prior report and observation tuple remains
 unchanged, including its original outcome and source identity. The existing
 complete local JUnit profile, report hashes and case weights remain the baseline;
 the failed hosted run supplies additional scheduling observations and does not
@@ -567,7 +574,7 @@ All 6,261 tests completed with zero failures, errors or skips. Shard 5 completed
 1,080-second approval limit without termination. The run and combined coverage
 approval remain failed; no failed enclosing outcome is promoted to a pass.
 
-The unchanged maximum-cost formula and grouping now place canonical coverage on
+The PR659 maximum-cost formula and grouping placed canonical coverage on
 shard 4, the Normal Move controls on shard 6, and the entire
 `test_runner_accounting.py` module alone on shard 9. The execution model gives
 shard 9 a test-work wall-time lower bound of 1,052.839 seconds and the other eleven
@@ -581,6 +588,85 @@ limit. Host variance remains unexplained; this metadata change establishes no
 performance repair or scenario-cost qualification. Test membership, algorithms,
 worker counts, timing limits and coverage requirements are unchanged. Fresh
 complete hosted qualification remains required.
+
+The current complete baseline contains 6,264 passed cases from the paired
+followthrough qualification on Python 3.14.5 under WSL Ubuntu. Its exact base is
+`efb3172c4ce1b3a912c3f6fc2c26ebaa465ad9c4` and runtime fingerprint is
+`3174e16c152ba1febdf0e26360df49e75d1951fbc616eced69546bbb598a5f2e`.
+Source-history validation, cold index construction, one isolated mirror worker,
+32 worksteal remainder workers and finalization share one supervisor clock.
+All tests passed with 67.42% full-package branch coverage, but the whole local
+workload took 1,156.755788438 seconds and failed the unchanged 1,080-second timing
+approval without termination. Its successful test JUnit data supplies planning
+weights; its failed timing approval remains failed.
+
+A reviewed local-only stable sort started the existing eight-case canonical
+module first without changing unique node membership; its archived plugin hash
+is `18eda01828a226ae2ffed8851fe983af6c268b2167496743cd130bebb69c37f4`.
+Contract/conformance checks overlapped setup/mirror, and diagnostic archiving
+overlapped part of the remainder. These local observations are not a serial
+performance comparison or hosted approval. All 333 historical receipts and 41,097
+observation tuples remain unchanged. Only inventory/source binding expands for
+the new test module; its three new cases use complete-profile measurements and
+remain baseline-only. The twelve manifests are regenerated from that exact full
+profile with the existing maximum-cost formula and unchanged limits. Fresh
+successful hosted qualification is required for every shard.
+
+The PR660 calibration now appends exactly 49 original worker receipts and 6,264
+passed three-phase samples from attempt 1 of failed hosted run
+[42928611158](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42928611158).
+Independent run/PR/job/artifact APIs and original ZIP digests bind source head
+`6a83d934e2f792d5e84b60517e4035dd4d7f1bec`, tested merge checkout
+`9ebcd3885efd3a4ea37a78472b324c8823e6373b`, their identical tree, and the recorded
+runtime fingerprint. Every extracted worker matches its authenticated archive.
+All original 333 receipts and 41,097 observation tuples retain their identities,
+values and outcomes. Totals are now 382 receipts and 47,361 samples covering all
+6,264 cases, with no baseline-only cases. The complete corrected local baseline,
+its source label, JUnit hashes, file totals and case measurements remain unchanged;
+the failed hosted run is additional historical planning evidence only.
+
+All 6,264 hosted cases passed without errors or skips. Shard 10 completed its
+398 tests in 1,124.426420638 supervisor seconds and failed the unchanged
+1,080-second approval limit without termination; shard 9 passed in
+1,079.584697890 seconds. The run and combined coverage approval remain failed.
+Shard 10's isolated mirror contributed 225.044133079 three-phase seconds before
+the parallel remainder. Its longest individual remainder case was preservation
+receipt persistence/replay at 433.886318618 seconds on worker gw0. Worker gw3
+finished last at 750.782377348 elapsed seconds: its first case was the S25
+unused-wound-player-a control (403.703151489 three-phase seconds), followed by
+preservation, source-description and canonical-deployment controls. The largest
+individual case across the run was complete canonical coverage on shard 1 at
+854.437291701 three-phase seconds. These observations distinguish serial work,
+case cost and worker order; they do not establish the cause of hosted variance.
+
+The unchanged maximum-cost formula and grouping regenerate all twelve manifests.
+The isolated mirror moves to shard 1, canonical coverage to shard 4, Normal Move
+to shard 6, paired followthrough to shard 7 and preservation to shard 9. Modeled
+test-work wall-time lower bounds are 1,043.481-1,043.496 seconds across the twelve
+shards, excluding startup and finalization. These bounds do not predict approval,
+qualify scenario costs or demonstrate a performance improvement. Tests, worker
+counts, algorithms, coverage and timing limits remain unchanged. Fresh successful
+hosted qualification remains required for every shard.
+
+The subsequent PR660 run
+[42932156443](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42932156443)
+again completed all 6,264 tests, but shard 4 took 1,414.340765547 supervisor
+seconds and failed approval without termination. Its complete canonical-coverage
+case ran first on its worker and took 1,300.468117872 three-phase seconds by
+itself; calibrated dispatch was active. The other eleven shards passed timing.
+This failure is retained separately and is not silently promoted into passing
+qualification or substituted for the complete local baseline.
+
+The bounded loader repair derives totals from receipt rows before reproduction,
+rejecting an internally contradictory total without repeating the engine
+campaign. Every internally consistent receipt still receives fresh measurement
+and exact comparison. The existing complete test is unchanged; a separate real
+coordinated-tampering control preserves that boundary. Matched actual-base
+[operation evidence](docs/performance/current/canonical-coverage-preflight.json)
+records valid reload and inconsistent-total rejection separately. One serial
+sample per arm cannot establish variance, hosted approval or full-game costs.
+All existing 382 historical receipts and 47,361 phase observations retain their
+original identities, values and outcomes; no historical timing limit changes.
 
 Fixture setup observations are worker/order dependent; taking maxima and regrouping
 does not establish new fixture multiplicity, hosted wall time or the eighteen-minute

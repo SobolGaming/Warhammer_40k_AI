@@ -239,6 +239,17 @@
       "samples_per_case": 7,
       "budget_profile": "current-change-relative-v1",
       "workload_id": "native-player-boundary-v2"
+    },
+    "canonical_coverage_preflight": {
+      "driver": "scripts/measure_canonical_coverage_preflight.py",
+      "historical_workload_reference": "docs/performance/canonical-coverage-preflight/workload.json",
+      "cases": [
+        "valid_reload",
+        "inconsistent_totals_rejection"
+      ],
+      "samples_per_case": 1,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "canonical-coverage-preflight-v1"
     }
   },
   "operations": {
@@ -35708,12 +35719,15 @@
     "canonical-deployment-coverage": {
       "paths": [
         "src/warhammer40k_core/ai/canonical_deployment_coverage.py",
-        "tests/infrastructure/adapters/test_canonical_deployment_coverage.py"
+        "tests/infrastructure/adapters/test_canonical_deployment_coverage.py",
+        "tests/infrastructure/adapters/test_canonical_coverage_preflight.py"
       ],
       "owners": [
         "*"
       ],
-      "families": [],
+      "families": [
+        "canonical_coverage_preflight"
+      ],
       "sensitive": false,
       "mandatory": true
     },
@@ -35760,6 +35774,31 @@
         "*"
       ],
       "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "paired-followthrough-admission": {
+      "paths": [
+        "src/warhammer40k_core/ai/followthrough_scenario.py",
+        "tests/infrastructure/adapters/test_followthrough_scenario.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "canonical-coverage-preflight-measurement": {
+      "paths": [
+        "scripts/measure_canonical_coverage_preflight.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "canonical_coverage_preflight"
+      ],
       "sensitive": false,
       "mandatory": true
     }
