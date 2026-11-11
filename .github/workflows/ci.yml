@@ -462,7 +462,7 @@ jobs:
 
       - name: Run behavioral coverage shard
         id: behavior
-        # Controller owns 18-minute approval and strict >30-minute termination.
+        # Controller owns 27-minute approval and strict >30-minute termination.
         # Outer guard leaves cleanup/reporting grace; it is not the approval gate.
         timeout-minutes: 32
         env:
@@ -477,7 +477,7 @@ jobs:
           SELECTED_INDEX_INPUT_KEY: ${{ steps.source-inputs.outputs.key }}
         run: >-
           uv run --no-sync python -B -m scripts.behavioral_deadline
-          --approval-seconds 1080 --execution-seconds 1800
+          --approval-seconds 1620 --execution-seconds 1800
           -- bash scripts/run_behavioral_coverage.sh
 
       - name: Save completed selected-source index

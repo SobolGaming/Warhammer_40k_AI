@@ -7601,7 +7601,7 @@
     "fixed_shard": 5,
     "known_cases": 6281,
     "known_nodes_sha256": "d89f74b4f5121933d4506cf2b9ef93c319014c9958bd3b57f8746f02e254c5fc",
-    "meaning": "Raw partial scores stay null where observations are missing. The separate derived stress reserves one unknown case using other complete observations and dispatch maxima; it is not a measured complete cohort or timing qualification. Offsets align planning budgets only. Actual coverage, timing, worker counts and test outcomes are unchanged.",
+    "meaning": "Raw partial scores stay null where observations are missing. The separate derived stress reserves one unknown case using other complete observations and dispatch maxima; it is not a measured complete cohort or timing qualification. Offsets align planning budgets only. Planning offsets do not set actual coverage or timing thresholds, worker counts or test outcomes; required CI policy enforces them independently.",
     "mirror_role_residual_seconds": 130.2812700949994,
     "original_reference": {
       "file": "allocation-scope.json",

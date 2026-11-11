@@ -188,8 +188,8 @@ An unresolved computation or timeout must never become a visibility/rules answer
 
 Stubs are allowed only for pure functions and must be marked `stubbed`.
 
-Covered behavioral CI approval requires successful completion within 18 minutes
-(1,080 seconds inclusive). Timing alone must not terminate a workload until elapsed
+Covered behavioral CI approval requires successful completion within 27 minutes
+(1,620 seconds inclusive). Timing alone must not terminate a workload until elapsed
 time exceeds 30 minutes (1,800 seconds). Preserve complete results for late passing
 workloads but fail approval; preserve available partial diagnostics on termination.
 The controller includes source history, index construction, mirror, parallel tests

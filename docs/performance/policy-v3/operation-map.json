@@ -35678,7 +35678,10 @@
         "test_hosted_workload_uses_supervisor_and_preserves_diagnostics",
         "test_source_index_barrier_consumes_the_shared_monotonic_deadline",
         "test_cancellation_after_workload_exit_fails_approval",
-        "test_cancellation_after_workload_exit_fails_approval.cancel_after_cleanup"
+        "test_cancellation_after_workload_exit_fails_approval.cancel_after_cleanup",
+        "test_current_27_minute_approval_preserves_strict_30_minute_stop",
+        "test_cli_defaults_use_current_approval_and_unchanged_execution",
+        "test_cli_defaults_use_current_approval_and_unchanged_execution.capture"
       ],
       "families": [],
       "sensitive": false,

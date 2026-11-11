@@ -159,8 +159,6 @@ def test_successful_short_workload_is_approved(tmp_path: Path) -> None:
         supervise(
             [sys.executable, "-c", "print('completed')"],
             report_dir=tmp_path,
-            approval_seconds=10,
-            execution_seconds=20,
         )
         == 0
     )
@@ -168,6 +166,8 @@ def test_successful_short_workload_is_approved(tmp_path: Path) -> None:
     assert receipt["approved"]
     assert receipt["reason"] == "passed"
     assert receipt["workload_exit_code"] == 0
+    assert receipt["approval_seconds"] == 1620
+    assert receipt["execution_seconds"] == 1800
 
 
 def test_hosted_workload_uses_supervisor_and_preserves_diagnostics() -> None:
@@ -178,7 +178,7 @@ def test_hosted_workload_uses_supervisor_and_preserves_diagnostics() -> None:
     )[0]
     assert "timeout-minutes: 32" in step
     assert "scripts.behavioral_deadline" in step
-    assert "--approval-seconds 1080 --execution-seconds 1800" in step
+    assert "--approval-seconds 1620 --execution-seconds 1800" in step
     assert "-- bash scripts/run_behavioral_coverage.sh" in step
     upload = workflow.split("- name: Upload shard test report", 1)[1].split(
         "- name: Upload shard coverage", 1
@@ -249,3 +249,52 @@ def test_cancellation_after_workload_exit_fails_approval(
     assert receipt["interrupt_signal"] == signal.SIGTERM
     assert receipt["reason"] == "interrupted"
     assert receipt["approved"] is False
+
+
+@pytest.mark.parametrize(
+    ("elapsed", "passes", "terminate"),
+    [
+        (1619.999, True, False),
+        (1620.0, True, False),
+        (1620.001, False, False),
+        (1799.999, False, False),
+        (1800.0, False, False),
+        (1800.001, False, True),
+    ],
+)
+def test_current_27_minute_approval_preserves_strict_30_minute_stop(
+    elapsed: float, passes: bool, terminate: bool
+) -> None:
+    from scripts.behavioral_deadline import APPROVAL_SECONDS, EXECUTION_SECONDS
+
+    assert APPROVAL_SECONDS == 1620
+    assert EXECUTION_SECONDS == 1800
+    assert (
+        approved(elapsed, exit_code=0, terminated=False, approval_seconds=APPROVAL_SECONDS)
+        is passes
+    )
+    assert termination_due(elapsed, running=True, execution_seconds=EXECUTION_SECONDS) is terminate
+    assert not termination_due(elapsed, running=False, execution_seconds=EXECUTION_SECONDS)
+    assert not approved(elapsed, exit_code=1, terminated=False, approval_seconds=APPROVAL_SECONDS)
+    assert not approved(elapsed, exit_code=0, terminated=True, approval_seconds=APPROVAL_SECONDS)
+
+
+def test_cli_defaults_use_current_approval_and_unchanged_execution(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from scripts import behavioral_deadline
+
+    seen: list[tuple[list[str], Path, float, float]] = []
+
+    def capture(
+        command: list[str], *, report_dir: Path, approval_seconds: float, execution_seconds: float
+    ) -> int:
+        seen.append((command, report_dir, approval_seconds, execution_seconds))
+        return 0
+
+    monkeypatch.setattr(behavioral_deadline, "supervise", capture)
+    monkeypatch.setattr(sys, "argv", ["behavioral_deadline", "--", "workload"])
+    with pytest.raises(SystemExit) as stopped:
+        behavioral_deadline.main()
+    assert stopped.value.code == 0
+    assert seen == [(["workload"], Path("reports"), 1620, 1800)]

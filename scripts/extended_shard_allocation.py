@@ -232,6 +232,6 @@ def extended_metadata(
         "meaning": "Raw partial scores stay null where observations are missing. The separate "
         "derived stress reserves one unknown case using other complete observations and dispatch "
         "maxima; it is not a measured complete cohort or timing qualification. Offsets align "
-        "planning budgets only. Actual coverage, timing, worker counts and test outcomes "
-        "are unchanged.",
+        "planning budgets only. Planning offsets do not set actual coverage or timing thresholds, "
+        "worker counts or test outcomes; required CI policy enforces them independently.",
     }

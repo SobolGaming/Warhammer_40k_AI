@@ -318,13 +318,16 @@ gate after every shard succeeds. Full type checking and architecture checks also
 in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
 format for a shorter edit/commit loop.
 
-Each covered behavioral shard must finish successfully within 18 minutes
-(1,080 seconds, inclusive) for approval. Timing alone does not terminate it then:
+Each covered behavioral shard must finish successfully within 27 minutes
+(1,620 seconds, inclusive) for approval. Timing alone does not terminate it then:
 the supervisor permits execution through exactly 30 minutes and terminates the
 workload process group only after 1,800 seconds. A passing workload that finishes
-after 18 minutes still fails the gate while retaining its complete results.
+after 27 minutes still fails the gate while retaining its complete results.
 Source-history validation, cold index construction, the isolated mirror, parallel
 tests and their report finalization all run inside the same supervisor clock.
+The 27-minute amendment took effect only after hosted run `43105204846` and its
+concurrent local covered run finished under the former 18-minute limit. Their
+original outcomes and all historical receipts remain unchanged.
 Approval uses observed workload completion; later supervisor log replay and
 diagnostic copying have a separately recorded elapsed time. Abnormal exit or
 controller cancellation also cleans up the owned process group and fails approval.
@@ -848,7 +851,8 @@ owned by its first test. Function-scoped setup can increase with relocated case 
 overlapping groups can double-charge dependencies. Observed phase-to-supervisor role
 residuals are included; unobserved overhead, work stealing and future host variance
 are not bounded by this estimate. It is not an upper bound or
-timing qualification. Every actual covered shard still must pass within 1,080 seconds.
+timing qualification. Every actual covered shard must pass within the current
+1,620-second inclusive approval limit.
 
 The three original complete JUnit sources, hashes and medians remain unchanged.
 The calibration retains its original 627 reports and 78,763 observation tuples as
@@ -908,8 +912,10 @@ improving moves. Planning offsets of 0 for the eight earlier complete cohorts,
 1,076 / 1,054 / 1,050 seconds. Feasible groups remain feasible; initially infeasible
 groups may only improve or retain their guarded score. Refinement stops when all
 bounds fit. Cold normalization excludes pinned/fixed/mirror roles, keeping parallel
-shard 1 and the separate mirror on shard 2. These planning ceilings do not change
-the actual inclusive 1,080-second approval or strict-above-1,800-second termination.
+shard 1 and the separate mirror on shard 2. These finite planning ceilings retain
+their original 18-minute approval basis; the accepted allocation is unchanged.
+The owner subsequently raised actual approval to 1,620 seconds inclusive, while
+termination remains strictly above 1,800 seconds.
 
 The existing S25 and preflight partition files and every baseline case median remain
 unchanged. The two step5g partitions preserve raw Git source bytes, including their
@@ -919,9 +925,11 @@ tests or observations. All 504 selectors still cover exactly 6,282 cases once.
 
 The chosen conditional peaks are 1,075.779 seconds across the earlier eight cohorts,
 1,052.864 seconds for derived stress, and 1,049.687 seconds for the latest complete
-cohort: margins of 4.221 / 27.136 / 30.313 seconds to actual approval. The latest
+cohort: margins of 4.221 / 27.136 / 30.313 seconds to the former 1,080-second
+approval limit used during allocation review. The latest
 phase paths with the largest retained matching-role residual reach 1,058.166 seconds;
-another 20 seconds reaches 1,078.166, while 50 seconds would fail. Increasing only
+another 20 seconds reaches 1,078.166, while 50 seconds would exceed that former
+limit. These retained sensitivities are not new timing observations. Increasing only
 the unknown-case reserve by 20 or 50 seconds leaves the overall derived stress peak
 unchanged. These conditional estimates and preserved per-shard regressions do not
 certify robust future headroom or passing CI. All real exact-head gates and independent
