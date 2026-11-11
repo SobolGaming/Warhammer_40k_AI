@@ -351,7 +351,7 @@ all required tests and other gates must still succeed. See the
 [active review policy](docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md).
 
 The twelve behavioral manifests in `ci/test_shards/` use deterministic coherent
-cohort worker-path scoring, starting with largest selectors and then improving
+cohort phase-and-role-residual scoring, starting with largest selectors and then improving
 whole-selector moves. One heavy, source-bound module is partitioned
 into its twenty exact collected cases. The bounded mirror setup case is a separate
 selector; its file selector denotes the remaining cases. CI always deselects that
@@ -816,16 +816,29 @@ behavioral profile to provide their exact case weights. Preserve previous measur
 Git history and retained source artifacts; never invent missing weights or
 substitute file averages for CI dispatch.
 
-`allocation-cohorts.json` selects seven complete effective hosted cohorts by their
+`allocation-cohorts.json` selects eight complete effective hosted cohorts by their
 original worker-report SHA-256 identities. The allocator scores the actual four
-initial worksteal chunks for every cohort, then makes strictly improving whole
-selector moves. Stable node-identity ties make offline chunks match live dispatch
-independently of collection order.
-The isolated mirror is charged sequentially before the parallel remainder. Allocation
-also reserves 50 seconds for its second pytest controller, rounding up the largest
-measured extra controller residual (49.893798646 seconds) across these cohorts.
-This planning allowance does not change raw case/phase costs, reported worker-path
-seconds or actual deadlines. The smallest reserved-score bucket retains cold shard 1.
+initial worksteal chunks for every cohort. Stable node-identity ties make offline
+chunks match live dispatch independently of collection order. The isolated mirror
+is charged sequentially before the parallel remainder.
+
+For each coherent cohort, artifact-bound supervisor receipts and original worker
+phase sums derive the observed maximum phase-to-supervisor residual separately
+for parallel-only and isolated-mirror shards. Planning adds the matching role's
+residual to that same cohort's phase path, takes the largest coherent estimate,
+and rounds it upward to a whole second. It never mixes one cohort's largest phase
+path with another's residual. This replaces the earlier fixed 50-second extra
+controller allowance. Raw phase costs and reported worker paths remain unchanged.
+
+Whole-selector moves strictly improve the descending rounded planning scores.
+The search continues past an indivisible or non-improving worst bucket and may
+use space on a higher-scored bucket when the complete objective improves. The
+smallest final planning-score bucket retains cold shard 1. Whole-second planning
+avoids optimizing below the scale of observed host variation; unrounded scores
+can regress within a rounded bucket. In the retained preview, eighteen such moves
+occurred and the older main cohort's projected margin changed from 4.819 to 4.013
+seconds, while the newest cohort's margin was 37.826 seconds. These conditional
+sensitivities are not robust future headroom or actual timing qualification.
 
 For directly declared non-parametrized module fixtures, the conditional setup
 estimate is the cohort's largest observed worker setup sum for that fixture group,
@@ -839,16 +852,21 @@ timing qualification. Every actual covered shard still must pass within 1,080 se
 The three original complete JUnit sources, hashes and medians remain unchanged.
 The calibration retains its original 627 reports and 78,763 observation tuples as
 exact prefixes. The subsequent 745 reports / 94,259 observations also remain exact
-prefixes; another 49 reports / 6,282 observations give totals of 794 / 100,541.
-The added complete cohort is run `43038116912`, attempt 1, source PR head
+prefixes. The next 794 reports / 100,541 observations remain exact prefixes too;
+another 49 reports / 6,282 observations give totals of 843 / 106,823.
+The earlier complete cohort is run `43038116912`, attempt 1, source PR head
 `0d281c269759b8a74c915bae3a59fa8e211f9fa6`, tested merge checkout
 `d03fb42db79ad431a6fb15801ce6948584bb16fc`. All 6,282 cases passed, but the
 enclosing run failed the unchanged timing gate on shards 2, 8 and 11. That failure
-remains recorded. Cohorts include failed enclosing attempts, and inherited successful jobs
+remains recorded. The newest complete cohort is run `43047121648`, attempt 1,
+source PR head `ae751d09ad28b2486d60104e0c753b2d0ef0731b`, tested merge checkout
+`831fe9377faaf90b1e3b4787820947c78f19c2a7`. Its 6,282 cases also passed, while
+shard 11 exceeded the timing limit at 1,127.106 seconds; that enclosing failure
+remains recorded too. Cohorts include failed enclosing attempts, and inherited successful jobs
 retain their original producer identities; neither becomes a new passing observation.
 `--check` regenerates the allocation, and dispatch rejects a missing or changed
 declared cohort index. The all-history maximum case weights still drive dispatch;
-coherent cohort phases drive allocation, with their distinct limitations recorded.
+coherent phases and observed role residuals drive allocation, with their distinct limitations recorded.
 
 Four-worker behavioral CI uses `BEHAVIORAL_DISPATCH_PROFILE` to distribute measured
 case costs across xdist's initial worker chunks after deselection. Complete case

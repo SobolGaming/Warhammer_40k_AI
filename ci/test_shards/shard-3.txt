@@ -1,1 +1,6 @@
 tests/infrastructure/adapters/test_matched_attack_scenario.py
+tests/infrastructure/source_governance/unit/test_support_evidence_inventories.py
+tests/rules/section04/test_completion_boundaries.py
+tests/rules/section05/test_coverage_map.py
+tests/rules/section16/test_turn_end_review.py
+tests/rules/section22/test_psychic.py

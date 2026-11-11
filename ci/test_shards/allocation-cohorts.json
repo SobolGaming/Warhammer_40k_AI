@@ -53,7 +53,93 @@
         "831c07f4d6458ec87a9cd17c7813d8af7807b54878998c2293852fee1e5034e8",
         "36887666814a999251f5edf88131e80edf74a730bbbccdac86004c5935e46f84"
       ],
-      "run_id": 42989149674
+      "run_id": 42989149674,
+      "supervisors": [
+        {
+          "approved": true,
+          "artifact_id": 13840699674,
+          "elapsed_seconds": 610.0809910700001,
+          "reason": "passed",
+          "sha256": "ff2a3ad94c01d7a569e65b709fafedd674399e679a63f56ffc7160405488c235"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13840728604,
+          "elapsed_seconds": 640.995048805,
+          "reason": "passed",
+          "sha256": "b375f21cd4e3e2b536c42a39eb095d31ef938fcaecdc5e7d254accc7045cea3f"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13840764793,
+          "elapsed_seconds": 1141.693076755,
+          "reason": "approval_limit_exceeded",
+          "sha256": "3fbc2052d27adeccb811e48ed076429f9a2024584e4fbb6e8b5ed90e1b013d3d"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13840924104,
+          "elapsed_seconds": 616.9797846160001,
+          "reason": "passed",
+          "sha256": "19e90a5f4271807fd9ae52818d6a59c51662f82df0a31c58319b00185b368556"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13841048246,
+          "elapsed_seconds": 770.876328457,
+          "reason": "passed",
+          "sha256": "b62700c73d73893f13e21e702cd1aabba8423108cadf7769295479738c61b5cc"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13841234627,
+          "elapsed_seconds": 896.933760338,
+          "reason": "passed",
+          "sha256": "de92860784a0fbf34abf56224635ee25f893313b53ba96ed6191ab27629ab21b"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13841422306,
+          "elapsed_seconds": 642.82969165,
+          "reason": "passed",
+          "sha256": "1953ad9717aa288b927bfd8585fc5384553ff8ae341838f63140a146f85a28c1"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13841554016,
+          "elapsed_seconds": 1031.091022796,
+          "reason": "passed",
+          "sha256": "552b15d26b767dbb689f42443cbe27d04c19e01080b00cc25b7c76a19c7b1080"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13841599608,
+          "elapsed_seconds": 1155.057840965,
+          "reason": "approval_limit_exceeded",
+          "sha256": "9f7ceaad5b18f0ef4b02ef1953effcac4338986f4a7108690b963f884ada715f"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13841772218,
+          "elapsed_seconds": 800.532590301,
+          "reason": "passed",
+          "sha256": "1064a170021c14d2fa380be0f1cb44e37615893bd8301e01f032125b51154c98"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13842120240,
+          "elapsed_seconds": 677.605927204,
+          "reason": "passed",
+          "sha256": "18b10cb471fdbf610c7ea948be4dababdf877ffa39ad26097b12ae3dadecab05"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13842260408,
+          "elapsed_seconds": 836.8622739140001,
+          "reason": "passed",
+          "sha256": "1a594496c65e376e19581b0e822d0c27e411de9fefecd4badb1f9c4e542947fb"
+        }
+      ]
     },
     {
       "effective_attempt": 1,
@@ -108,7 +194,93 @@
         "1b25d0f84f423047b16276e1e54034af70141840179668242222709db65b6ed0",
         "c8911c334dbd17a6c36f22b1c4e4fb2a32353650cd3ec94e7fe70bab2a0a32ae"
       ],
-      "run_id": 42994368911
+      "run_id": 42994368911,
+      "supervisors": [
+        {
+          "approved": true,
+          "artifact_id": 13842604490,
+          "elapsed_seconds": 590.917656795,
+          "reason": "passed",
+          "sha256": "3328491dbcaebbcfd841626687f454402c72e7aa4c55efe129836892dbde1c2e"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13842724563,
+          "elapsed_seconds": 711.208976592,
+          "reason": "passed",
+          "sha256": "c073fa35c2221ec43652f41d1a8d3b2471b2dbb8ee802332d5ac010c7fc9770d"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13843738203,
+          "elapsed_seconds": 1086.9802532639999,
+          "reason": "approval_limit_exceeded",
+          "sha256": "5189f0ac8d118ea24df3b35392b356b0a34e17cfde84f8b0478cd86e34ab6bfb"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13843768006,
+          "elapsed_seconds": 789.01183892,
+          "reason": "passed",
+          "sha256": "cc18702ebbdc935aed7e68e19afae284ba649b57151c532525059458a5e4850c"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13844003399,
+          "elapsed_seconds": 1130.036151774,
+          "reason": "approval_limit_exceeded",
+          "sha256": "339d3eb0ebb86252c800abf611710cd2f7ba17f45f7d48368d1dcd09cadf744a"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13844060968,
+          "elapsed_seconds": 438.394614915,
+          "reason": "passed",
+          "sha256": "a55f957fa74a3e3a12bbe8f2e62d861b5a9cb60ce237ce38e8965a69b5dc2262"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13844097346,
+          "elapsed_seconds": 910.665955112,
+          "reason": "passed",
+          "sha256": "2c60f349410434445e5814314bcbe080ca2333d83fbbab59f8ced434119336e3"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13844151834,
+          "elapsed_seconds": 754.878059214,
+          "reason": "passed",
+          "sha256": "45973bfdcf9cee252efb8f65c42b9c50f968bf7200cd28dcf3edd55fbf964b34"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13844406120,
+          "elapsed_seconds": 907.554726065,
+          "reason": "passed",
+          "sha256": "7aa8d26243b423e2f28625a1abde1f32f90281ab0aa41620fc865e287d112b55"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13844610306,
+          "elapsed_seconds": 917.3910601939999,
+          "reason": "passed",
+          "sha256": "41ab985f957fac5f46eb47f2082e7009c061143967190a9cb7db01a653add2d3"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13844730900,
+          "elapsed_seconds": 1095.038161409,
+          "reason": "approval_limit_exceeded",
+          "sha256": "b8d150fbda799f77b31d675d699e0a35743f7b4f6bbd9f8cc6d3a14651cb7259"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13844780916,
+          "elapsed_seconds": 1110.4798213899999,
+          "reason": "approval_limit_exceeded",
+          "sha256": "a6fb66fd8ffad8fe6c2652ba447e6481963c5cee79f36de2596cee3c50af021a"
+        }
+      ]
     },
     {
       "effective_attempt": 2,
@@ -163,7 +335,93 @@
         "4d321eadfaf93e43ba78125d99aa569a5ab5af72a8f4c6f59a693cb2c8ec4c6a",
         "3cdf0cdeacda1d68e87b350928aa092036f94b665fd85d73a97023de2f901498"
       ],
-      "run_id": 42994368911
+      "run_id": 42994368911,
+      "supervisors": [
+        {
+          "approved": true,
+          "artifact_id": 13844934279,
+          "elapsed_seconds": 827.011853185,
+          "reason": "passed",
+          "sha256": "5af6990d083310e487ab9a8debca40fbb345c3a827ea41f3a0cf3bc409d09abc"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13845223941,
+          "elapsed_seconds": 676.40446068,
+          "reason": "passed",
+          "sha256": "eab578e2505f5aec2963651afdce104b17e6288fb147dbc1dc0b667539061a66"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13845353692,
+          "elapsed_seconds": 778.328920199,
+          "reason": "passed",
+          "sha256": "8e4fd511113786b2121d7f4e194265ac60ec61c36b78106b989b920bf450090d"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13845368022,
+          "elapsed_seconds": 611.2239356079999,
+          "reason": "passed",
+          "sha256": "97d8f47ad1fc9664e70b3cda6623cc2ed2195a7cec686c3cf72908f8301b3b3c"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13845417890,
+          "elapsed_seconds": 643.522389764,
+          "reason": "passed",
+          "sha256": "09d229fce4a683b113ffb082ffa88ae26b8731682a7c0d342a7f3b796667876a"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13845528275,
+          "elapsed_seconds": 775.213588823,
+          "reason": "passed",
+          "sha256": "18dba7127f42dfa5d4b41767429080d2544ccfa62127de87df745bcff1286b32"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13845742125,
+          "elapsed_seconds": 594.831298325,
+          "reason": "passed",
+          "sha256": "65964575846022f9ae616f4881041f7021bc3d91e8d49f44673f8d10d03b34a4"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13845977121,
+          "elapsed_seconds": 937.504708685,
+          "reason": "passed",
+          "sha256": "8eee5c412ef939151ba2f3e2de4105de18cc3ccff0e9fd86b30a1384a8505b09"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13846071030,
+          "elapsed_seconds": 798.689793305,
+          "reason": "passed",
+          "sha256": "6a53058b8cd7a419a232634ad9119d2fc6aa888bd1e03d7d3c541da9ab5ee78b"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13846230540,
+          "elapsed_seconds": 768.0207888,
+          "reason": "passed",
+          "sha256": "69194040d8160aa3127374349625d074e63b85a3826639ccad0b1c50d770554c"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13846370067,
+          "elapsed_seconds": 739.357667062,
+          "reason": "passed",
+          "sha256": "b4e9b8557b8fdb26fb8994fa4f8376a2e3a2f69d6a15ba0a228936fc306a893b"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13846430952,
+          "elapsed_seconds": 1104.080302502,
+          "reason": "approval_limit_exceeded",
+          "sha256": "935ca727945717a25f96e2a71404ab627e7b3fe293deb6d79c07d16b7d93458d"
+        }
+      ]
     },
     {
       "effective_attempt": 2,
@@ -218,7 +476,93 @@
         "430c1bed3604678eed60a387802b0057fd9058c0a5339bfc2afad355c4570cb7",
         "af18f5e2ed1b6f6423d8d7d5aa8fc91da6192e239a3f09bb69ed49f8bc4f4545"
       ],
-      "run_id": 43004731948
+      "run_id": 43004731948,
+      "supervisors": [
+        {
+          "approved": true,
+          "artifact_id": 13847664345,
+          "elapsed_seconds": 600.8572254000001,
+          "reason": "passed",
+          "sha256": "895a7fbecfb6b3f299863ef073f9a26c661b1d78fae1642504f4081c26b3990b"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13847759790,
+          "elapsed_seconds": 887.806640657,
+          "reason": "passed",
+          "sha256": "9f23bc0c2ce2cd0538cbb486e63c7310b56e5fe4f2304219235ba67db32744d5"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13848242516,
+          "elapsed_seconds": 795.239332872,
+          "reason": "passed",
+          "sha256": "0ffe7c2d765e62448c6170e51f1f0eed38aaca324fe8c9d3791922c78d500365"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13848547450,
+          "elapsed_seconds": 1068.2496184059999,
+          "reason": "passed",
+          "sha256": "88791749fe5fe8cfa7aea9c9c8a9e8ea4bbc40ca7428df3eaebcef109ff85c30"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13848666543,
+          "elapsed_seconds": 761.11977455,
+          "reason": "passed",
+          "sha256": "cc58a9e3de0b55b6eb046f8e8fdd2c88c57385c7e4fcd5c9b69f0cab705b63bb"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13848951473,
+          "elapsed_seconds": 886.2684000309999,
+          "reason": "passed",
+          "sha256": "d4e75510934a38696b7982a8035c1496a87d5a30417e3fbdc1ec2d818c4e3d9c"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13849025806,
+          "elapsed_seconds": 736.921634987,
+          "reason": "passed",
+          "sha256": "f92a62196f002e0854571700d3fa00794cc5fa52d8b77f9fca1571671a6d3427"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13849080694,
+          "elapsed_seconds": 604.94802159,
+          "reason": "passed",
+          "sha256": "0e26dffd32899414fca85400e680b76dbee541e69ee2ac5eb2e1b9f84db6ff85"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13849196274,
+          "elapsed_seconds": 953.387323996,
+          "reason": "passed",
+          "sha256": "4415d1cf540f8b95199e7fd571ca0917de924b84658dbd11c2238a189d37039d"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13849271230,
+          "elapsed_seconds": 926.205826253,
+          "reason": "passed",
+          "sha256": "86b26aa42593011dcece31387dc883934ec6d7f61a7c92c15f2feae32a519a62"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13849294966,
+          "elapsed_seconds": 789.88710683,
+          "reason": "passed",
+          "sha256": "f7eb2ab802734e38e0797c4e035deebffb4cc7dc1f4a5c688b7353e33db4b3d9"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13850371185,
+          "elapsed_seconds": 1063.1976551559999,
+          "reason": "passed",
+          "sha256": "fe0cc432436368a902337c33de57b9eae0bc4156bbee11b9abf979ea34f58e54"
+        }
+      ]
     },
     {
       "effective_attempt": 1,
@@ -273,7 +617,93 @@
         "22fe751b08d2dc3ad01a07267eec91320ff0a462b89acb67992d1992122a403f",
         "dfeb685e95a53512305ad41f97476edfe2e13808b8f40cd057d17612211425ed"
       ],
-      "run_id": 43011140338
+      "run_id": 43011140338,
+      "supervisors": [
+        {
+          "approved": true,
+          "artifact_id": 13850309684,
+          "elapsed_seconds": 595.889358773,
+          "reason": "passed",
+          "sha256": "f9e4b2bbb2a129f07ada70555920c0b338353e8444a9e0989a117236af639081"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13850414057,
+          "elapsed_seconds": 552.7664847570001,
+          "reason": "passed",
+          "sha256": "f5d27207f8dda8e4f8d8137f5f953acfb94844c203cfb7a6491102fbb33d0525"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13850544303,
+          "elapsed_seconds": 593.986853848,
+          "reason": "passed",
+          "sha256": "2cbf16341de8ef427fb665d08a53d4963dacecc7ca141f1d1aee8aa09a48fbd1"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13850663637,
+          "elapsed_seconds": 654.5087231829999,
+          "reason": "passed",
+          "sha256": "a33c3e01e26ea410eb5caa27fba10c83e307ebba06018fc15633ddb3a9a33874"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13851024785,
+          "elapsed_seconds": 1091.093346951,
+          "reason": "approval_limit_exceeded",
+          "sha256": "7a853163c7ad854f9fc0ef104e9487dc7b6ac944f743cc8fed736e40cf2bb275"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13851491902,
+          "elapsed_seconds": 809.134896091,
+          "reason": "passed",
+          "sha256": "a01f659177d6d0aa453c6caea5caa2341a27d00441aad171aba672248b07ea39"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13851766916,
+          "elapsed_seconds": 1113.4123439769999,
+          "reason": "approval_limit_exceeded",
+          "sha256": "c73c61d78612162d5488405573d8b166ae3362d54bad95309bd4e522b12cfd24"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13851900160,
+          "elapsed_seconds": 719.3763192050001,
+          "reason": "passed",
+          "sha256": "dfe4d5864f9c649df738ec42e96396965b76318f71d9b83103af905d162053ac"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13852027037,
+          "elapsed_seconds": 1490.244179989,
+          "reason": "approval_limit_exceeded",
+          "sha256": "5ceccdecf6178ba0467c7407f2831cc2db10dc7d056856b17b0aac1e9e842b6b"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13852035790,
+          "elapsed_seconds": 992.9628611269999,
+          "reason": "passed",
+          "sha256": "c6e9c6efa122599d46517b64e7293c7b510fc56a0d49156fe3a6f3a0b2678a80"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13852300086,
+          "elapsed_seconds": 1026.266959338,
+          "reason": "passed",
+          "sha256": "5c78c36b99abbf8037bd2a0e13430b9d235031c14f1d4fea94f916390bf706cc"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13852565077,
+          "elapsed_seconds": 1097.748014082,
+          "reason": "approval_limit_exceeded",
+          "sha256": "2b029dafa9dc3ab38e5cb1671db2b58b17921886f487108f1fec2b993dd7f068"
+        }
+      ]
     },
     {
       "effective_attempt": 2,
@@ -328,7 +758,93 @@
         "22fe751b08d2dc3ad01a07267eec91320ff0a462b89acb67992d1992122a403f",
         "dfeb685e95a53512305ad41f97476edfe2e13808b8f40cd057d17612211425ed"
       ],
-      "run_id": 43011140338
+      "run_id": 43011140338,
+      "supervisors": [
+        {
+          "approved": true,
+          "artifact_id": 13850309684,
+          "elapsed_seconds": 595.889358773,
+          "reason": "passed",
+          "sha256": "f9e4b2bbb2a129f07ada70555920c0b338353e8444a9e0989a117236af639081"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13850414057,
+          "elapsed_seconds": 552.7664847570001,
+          "reason": "passed",
+          "sha256": "f5d27207f8dda8e4f8d8137f5f953acfb94844c203cfb7a6491102fbb33d0525"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13850544303,
+          "elapsed_seconds": 593.986853848,
+          "reason": "passed",
+          "sha256": "2cbf16341de8ef427fb665d08a53d4963dacecc7ca141f1d1aee8aa09a48fbd1"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13850663637,
+          "elapsed_seconds": 654.5087231829999,
+          "reason": "passed",
+          "sha256": "a33c3e01e26ea410eb5caa27fba10c83e307ebba06018fc15633ddb3a9a33874"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13851491902,
+          "elapsed_seconds": 809.134896091,
+          "reason": "passed",
+          "sha256": "a01f659177d6d0aa453c6caea5caa2341a27d00441aad171aba672248b07ea39"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13851900160,
+          "elapsed_seconds": 719.3763192050001,
+          "reason": "passed",
+          "sha256": "dfe4d5864f9c649df738ec42e96396965b76318f71d9b83103af905d162053ac"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13852035790,
+          "elapsed_seconds": 992.9628611269999,
+          "reason": "passed",
+          "sha256": "c6e9c6efa122599d46517b64e7293c7b510fc56a0d49156fe3a6f3a0b2678a80"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13852300086,
+          "elapsed_seconds": 1026.266959338,
+          "reason": "passed",
+          "sha256": "5c78c36b99abbf8037bd2a0e13430b9d235031c14f1d4fea94f916390bf706cc"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13853462933,
+          "elapsed_seconds": 1100.492199302,
+          "reason": "approval_limit_exceeded",
+          "sha256": "4d015a7ba10d909976e9e7f5a390655fc4fa2cd3a312b85a1c5214f5ebde0613"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13853507420,
+          "elapsed_seconds": 1050.102108861,
+          "reason": "passed",
+          "sha256": "7498ec7f06717e30be680f8089e813baa9570ff246fdb02b8c8c47d185d96d9e"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13854265261,
+          "elapsed_seconds": 1115.383767624,
+          "reason": "approval_limit_exceeded",
+          "sha256": "a73e219c6f7b29b009027c3a9b8794cb66405c24cd5ff4dc280918856fed79d6"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13854520971,
+          "elapsed_seconds": 1502.452650464,
+          "reason": "approval_limit_exceeded",
+          "sha256": "25e16b01ac70e538abeb7d8b3bfe992dd0e8325415cc58d525e3d27f21340709"
+        }
+      ]
     },
     {
       "effective_attempt": 1,
@@ -383,8 +899,235 @@
         "ffe932e6e0bcec7cf86d2544717cf7e61d7bba608bd9d4821182be7a01e76640",
         "9fc19846c6818a622214560a6e68071777304ae8aa52c72b2ba71334f4fd7306"
       ],
-      "run_id": 43038116912
+      "run_id": 43038116912,
+      "supervisors": [
+        {
+          "approved": false,
+          "artifact_id": 13863914985,
+          "elapsed_seconds": 1148.516418494,
+          "reason": "approval_limit_exceeded",
+          "sha256": "a3f6612da3f21247cf579a169bf437f278afe7d38ad41effc5768c98f320858b"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13864144232,
+          "elapsed_seconds": 1095.437420505,
+          "reason": "approval_limit_exceeded",
+          "sha256": "2fb3f7492957905fe3827aa8b92a19b1cdca79935c8aeb7a37a622248d92b7af"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13864339198,
+          "elapsed_seconds": 1029.445587024,
+          "reason": "passed",
+          "sha256": "6ff2609c63d25e24d51db90718a9b40c03f003107629aac7d318c876bfc079ed"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13864493748,
+          "elapsed_seconds": 946.1060827340001,
+          "reason": "passed",
+          "sha256": "4bcd4374762315b480c0c6fcb8daa48dcb3aad265a4af8b43876d1e364ea9f75"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13864507828,
+          "elapsed_seconds": 656.968111804,
+          "reason": "passed",
+          "sha256": "5b7d0b88bc38d9ef03adb91ba6ec639ea5b2fc42de8febfd31db257b9f956cc0"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13864658512,
+          "elapsed_seconds": 945.10786581,
+          "reason": "passed",
+          "sha256": "f42f1bb116f917ea9d50bae43ebf56e2199d9cce93f2a7a9ab246ed79f3446c5"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13864786378,
+          "elapsed_seconds": 461.03343789199994,
+          "reason": "passed",
+          "sha256": "bb156e2c12ddd99fca58cf846ea7107e928590c051d16665da1b4e9c30bd701a"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13865022033,
+          "elapsed_seconds": 830.110536873,
+          "reason": "passed",
+          "sha256": "a4b9616a680a02755bb25ada29248de9076a52de31d78b1403c3b1d83ca28856"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13865157177,
+          "elapsed_seconds": 1072.126473673,
+          "reason": "passed",
+          "sha256": "c7ec87af3409bf52e121854f9f6ae2a24b951929f6c8ee1613ac396ba9c4fd14"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13865170959,
+          "elapsed_seconds": 621.448968992,
+          "reason": "passed",
+          "sha256": "c982dff7c6228aca879c153e9e0d5518ff66dfec4173df9f99b48f87645234ac"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13865625064,
+          "elapsed_seconds": 826.77052496,
+          "reason": "passed",
+          "sha256": "2e5f9b6d14b16a0b70d1aa2394cf7d862ad863684300d02cf81743935b0f62ab"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13865930697,
+          "elapsed_seconds": 1257.116954302,
+          "reason": "approval_limit_exceeded",
+          "sha256": "21e848772aed5376b9ce81c55d3bf7c49ec905c842f71291f328583ec2cba854"
+        }
+      ]
+    },
+    {
+      "effective_attempt": 1,
+      "reports": [
+        "6e2b57932a65a9b6fc37911ab65511ffe3e3ee7c0e1108a6b9dd242e91bf409e",
+        "7d65fc0cd4e8f02205e7435e153e0e822114d4e3ff7a69c665c712656c30015f",
+        "28d047570be7d661aac361e3316a2e6b38bde94e568f815c49dfadd4b1861ca6",
+        "07d8e5e6ac2a6a7191ce3cc497dcf95f18f642cb0c41bc0a368d9f868014888a",
+        "6296371cc318d7dc4951d0ab43034d19963b3fc63a4a92a60a855e410585df46",
+        "2094536bf5388d5182b506ac2b11ec67b138f1d670b72f3e7efb6de50af52d2e",
+        "c8710bb5d4459fd5d217ccf3f208e284428b9a88185e4996d98679cc26aa918e",
+        "908d244d41e290d0e450a5d518aa8106bf3956528ab426f9a1b6992cbb10a9a4",
+        "ca7eb4e9946d03732bb07ef8d99ad19ef0c0e0b4ccb7651340d95e0d18ef5bac",
+        "54a118ee8e7f14456d47cb96a4e60afba997c2b075d25419cdbdd3de5ebb1165",
+        "3cf2c37650ef3adadeda1ea823d3cf4b5f43f9ffae3c94708b4c1443dfa8aebe",
+        "4e26eb276d542653d278a374be09ba1d7d4580aa6f3a8e78599d97280a3001b1",
+        "2196b0eccadbfd06b1645942cc773b05021093b3c186ec3c65da264a40da07bb",
+        "19c888c9342b7628936cdf6fbd0235f54ffaa455a1e53bba53f6f94db115a642",
+        "b580ec18724827685965a7767bfb2248b478705d04bf98022829cff36b480bc2",
+        "e733381145bd7c26ae2954202ce8ac56bf980795b13e9815322d7798ab7499b9",
+        "57708066ec5554d2266c810118d39de13d431a23412d44e778995031f0458090",
+        "fbb396c21068cb8a6b68d60aef08c0996dbcf3d9c3b97b81246d5665a37d3c92",
+        "d28a65b8bf3c519f2a582167774524e30ebbef954a78424d38d69046e08da083",
+        "aef7b6a9d3d5b554e9b77f40c5d45c1d7adb5e786d4dab81e7cfd0767357b527",
+        "599a5187ca67650cb9846e50b9f639bd1181222967c61d71ea66861edd0495f0",
+        "e1fa3984ca2b9a743bf887fbe9481cf41e87eb96e093defed4a32415cb4e8436",
+        "35fd4fd9e6d79ef5b90a84d8935947e83dd42a0b40c3cd75bf7845ba040c3638",
+        "8b112cd87544ab6631b92049f04d7a19bc2a16e6542f39f436a0142a6a349561",
+        "1ce7177a2a53fab86ce7c70785975dbf3fb3c345524f723a9366620efe6901a3",
+        "3cf298205b39e7af8ce1dbf4a579cd153f1fd0310d5481f35420028589adcdc5",
+        "dd2d207cce9c248b923bdae1a870871dd4d0c44cc29615a2b810a2c013d8833e",
+        "0578b23e4e547ca8614be7780c146c98a4001f837d8823e61dae058c893b0e35",
+        "ec157f0c0dbfd765fb97dd182883347224dc51f4e9f7ac3be02e8281fcfa9115",
+        "c4476bfcf9c7769e890583084c40ffb4d87cba6ccf07b58be5fa22ca7020d5b7",
+        "c4bba8ba98b6489fed6d2cf5cf8acf727f79efe318da27135c1dcd1936116d29",
+        "946b48862a61e9a7cf403e2a3fab3c8b2cf9aaad04d30c31a8ed68189e80b1e2",
+        "49c344c724b36cfc591977d19153018b1448efc99b52fce5c7ffe4b6c5215777",
+        "1cb46fd600046c186a38873a21b13d6c1fec121848b32dcb439643dc38bc66d5",
+        "9348f74efbe44349dc7587079e7a03e977e648e7f30f7872fce72242bf6ead4d",
+        "cd512201f6b0b6ecf69fdcdbe86b313a9c581499425e1ddc4bdb261c93f03942",
+        "5c581ccce2b4d3b5b235236dac230a39fdcabdcd71181fd459a5ef2a19a66ca1",
+        "8b3381bd3073561d87df243155e2e2e08895de1b9a16aa7c35f904e166fd3958",
+        "f5572f17bca2e82d0c97b455f4a398f3d8ca6178bcab8ee8e47c7a50fc8f2778",
+        "911b2a65edb047fb9aee9b57802f4860ecaf948ca8fd4c1fece1b27f635e7947",
+        "02561bb1d71ecb1a4af6f4c2ecf0b3e22bdde15f9df9769da6a6bf5ae28e8494",
+        "7cb66c899c8d08190298c7dcb47534da598101d0052533eaa02c41d29f78a7ee",
+        "c460acdbf876e84b2f93d8c5777aa4dc103ca3c52a0450b5c4f12bcec1d9156e",
+        "faf0f648e08af1bf66dc5d699006b3fc44a30db0b6f3c00846ec0576ab78f9b4",
+        "94b72bf8015ac28bb6ec17352fe1d56fe6512d78cd722032767c3f353bc3b6c2",
+        "29e0e122c181289e20b24b37af4be0cc26f2ee4b9f7c0298cd27dd28cc328bf2",
+        "e1674494bd492cd0d589a0440fb697597227c4bc3463464be6176c2c33c78cb3",
+        "4f1bdcc14744f9bc8e027dd26ab505b8bc97297dade809869740c9438bd08d46",
+        "a5511bf548d53c6636d6ff394854aade5f06226558d59b0e07882f96edf3a26c"
+      ],
+      "run_id": 43047121648,
+      "supervisors": [
+        {
+          "approved": true,
+          "artifact_id": 13867333365,
+          "elapsed_seconds": 492.466109137,
+          "reason": "passed",
+          "sha256": "ff9947c596344e93e44fc6f84c37681a4b56f29f5386977cdfcf5c40dfa8c542"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13867578746,
+          "elapsed_seconds": 882.5050573699999,
+          "reason": "passed",
+          "sha256": "bb08055b385c9e468b1827bc1986eed2ea1e18fb6b5b68844f32e6ad434ce965"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13867794209,
+          "elapsed_seconds": 1065.627083977,
+          "reason": "passed",
+          "sha256": "72b8c60db9717092639a05c7821d2c56ec96b8fdf3a99527f6d29d57be746731"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13868313039,
+          "elapsed_seconds": 857.416252363,
+          "reason": "passed",
+          "sha256": "486fe2a0865363466547f5731a5bd2c1994f61854404c6bf85b2cbcac76131c7"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13868333514,
+          "elapsed_seconds": 925.0425961000001,
+          "reason": "passed",
+          "sha256": "f73d2ac0b05ae219dd80ff6708b0f7d9b231e0abf3212397d49d1aaba8b6a9fb"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13868378578,
+          "elapsed_seconds": 1061.793539363,
+          "reason": "passed",
+          "sha256": "4ea1dbb3b0436db927e98d6c2b365cf3c3fefd6c3f538260539f230e05f9e275"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13868397853,
+          "elapsed_seconds": 731.918471859,
+          "reason": "passed",
+          "sha256": "652f365739d15a72a0dfd7a7fc854f71c50363737bf88b5c6ae7d1a79dd4237c"
+        },
+        {
+          "approved": false,
+          "artifact_id": 13868803318,
+          "elapsed_seconds": 1127.1057227,
+          "reason": "approval_limit_exceeded",
+          "sha256": "ae187b9dfeaf9302b116a07df78f4f25b1e5370e401903403494482e35f67ec7"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13868812977,
+          "elapsed_seconds": 1007.472041644,
+          "reason": "passed",
+          "sha256": "8cd9ec93b421a3e054627c2caebdbc07fbd49053e6f173d1a3c7a0c6a3b9f780"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13869261377,
+          "elapsed_seconds": 1002.7848114219998,
+          "reason": "passed",
+          "sha256": "b531dc121990fd2db5e441fded9ad8e19d81f6de5e3f79e0a6af497e5f3fe27e"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13869315482,
+          "elapsed_seconds": 685.5990344850001,
+          "reason": "passed",
+          "sha256": "112ceafac4f9e399299aca2428f56bc26bc54b5a6879dc1626619e7d9550437a"
+        },
+        {
+          "approved": true,
+          "artifact_id": 13869440276,
+          "elapsed_seconds": 739.60639039,
+          "reason": "passed",
+          "sha256": "7242c1e49af7ed5ca4f34fac989b3fa2cc7df34736050ec2063096572640810f"
+        }
+      ]
     }
   ],
-  "schema": "coherent-worker-chunks-module-setup-serial-reserve-v2"
+  "schema": "coherent-worker-chunks-role-residual-ceil-v3"
 }

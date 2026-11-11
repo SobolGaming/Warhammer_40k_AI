@@ -1154,10 +1154,10 @@ def _add_allocation_summary(
     if cohorts:
         if cases is None:
             raise SystemExit("Cohort allocation requires complete case scheduling weights.")
-        summary["strategy"] = "coherent-worker-chunks-with-serial-reserve-and-selector-moves-v2"
+        summary["strategy"] = "coherent-worker-chunks-with-role-residual-ceil-and-selector-moves-v3"
         execution = cast(dict[str, object], summary["execution_model"])
         execution["cold_shard_assignment"] = (
-            "minimum-unrounded-reserved-worker-path-existing-bucket-v2"
+            "minimum-rounded-role-residual-score-existing-bucket-v3"
         )
         summary["allocation_model"] = metadata(
             directory, tuple(shard.test_files for shard in shards), cases, cohorts

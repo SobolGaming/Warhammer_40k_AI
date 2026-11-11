@@ -6,191 +6,191 @@
   "changes": {
     "README.md": {
       "before_sha256": "1567ed82732f88ef76e7789339db929c59ee8f2f9bf620d69b32c9139d553db1",
-      "after_sha256": "b2ad660d0a2eaf707c79f183e9041a01e0130c63f1fc6792cd1502d19010f060",
+      "after_sha256": "0934589ee5d644eae6edb77b437c26dbafc9f04b5b3e2190ac519a4c002e8334",
       "owners": {
         "@document": {
           "before": "1567ed82732f88ef76e7789339db929c59ee8f2f9bf620d69b32c9139d553db1",
-          "after": "b2ad660d0a2eaf707c79f183e9041a01e0130c63f1fc6792cd1502d19010f060"
+          "after": "0934589ee5d644eae6edb77b437c26dbafc9f04b5b3e2190ac519a4c002e8334"
         }
       }
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": "069378b28daa5ebb12ce1f95376ac863ea4a3c3a9f95fc48df810c732d64141d",
-      "after_sha256": "1866c1855774116901619ad95520490c7b57364e99fdb2ec081f73c81ecac318",
+      "after_sha256": "2cfceefb845f897cc3c96083e42f479dbc90211cf1350d0f7ccfbf62b0939d05",
       "owners": {
         "@document": {
           "before": "069378b28daa5ebb12ce1f95376ac863ea4a3c3a9f95fc48df810c732d64141d",
-          "after": "1866c1855774116901619ad95520490c7b57364e99fdb2ec081f73c81ecac318"
+          "after": "2cfceefb845f897cc3c96083e42f479dbc90211cf1350d0f7ccfbf62b0939d05"
         }
       }
     },
     "ci/quality_shards/shard-2.txt": {
       "before_sha256": "3b4cc42316454754c8f9054fd3aabceb92dbd35955ec7451ff3de83b33ccef0b",
-      "after_sha256": "20ee2a275c4eef8346bb7927bbc9ee5651d419cb64a44a8e9461cfd9b24d6d37",
+      "after_sha256": "b0acb55b349e07c360ebf50be788ec35ae7747a91f79d1117d3d81a6b7129401",
       "owners": {
         "@document": {
           "before": "3b4cc42316454754c8f9054fd3aabceb92dbd35955ec7451ff3de83b33ccef0b",
-          "after": "20ee2a275c4eef8346bb7927bbc9ee5651d419cb64a44a8e9461cfd9b24d6d37"
+          "after": "b0acb55b349e07c360ebf50be788ec35ae7747a91f79d1117d3d81a6b7129401"
         }
       }
     },
     "ci/test_shards/allocation-cohorts.json": {
       "before_sha256": null,
-      "after_sha256": "668a368c6e6ea28e81d74a696bb669ce4c1e781ddd688a8fbdca314f49750d12",
+      "after_sha256": "703aefcc4bcb06073a459a20ecb905166e5d3d127075b67926225388ed736043",
       "owners": {
         "@document": {
           "before": null,
-          "after": "668a368c6e6ea28e81d74a696bb669ce4c1e781ddd688a8fbdca314f49750d12"
+          "after": "703aefcc4bcb06073a459a20ecb905166e5d3d127075b67926225388ed736043"
         }
       }
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "58ea9bd35fd1083dc064177d67c1e52ecb28a1803e8476053a4a77a381a7d732",
-      "after_sha256": "d9813074751b78b609b5a07e9523e3a3442684a3b987ea1a1ea98369e4f03f27",
+      "after_sha256": "5f4491ea86e836ce3269ec6d7b38b56b9ebddd316af610023cc985a9fedb0754",
       "owners": {
         "@document": {
           "before": "58ea9bd35fd1083dc064177d67c1e52ecb28a1803e8476053a4a77a381a7d732",
-          "after": "d9813074751b78b609b5a07e9523e3a3442684a3b987ea1a1ea98369e4f03f27"
+          "after": "5f4491ea86e836ce3269ec6d7b38b56b9ebddd316af610023cc985a9fedb0754"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
       "before_sha256": "4170c290b0201b080964064491dc71577d99a36852e66cf7df00eca24dbf29cc",
-      "after_sha256": "072a84bb16db75db411d4293d525cd70ecdf598bd2f529de4a58cc61f64827e3",
+      "after_sha256": "ba4c88b3174e8d31eec10a2da239d10a0dc5b63e48b05acd25cf7bd496eeb841",
       "owners": {
         "@document": {
           "before": "4170c290b0201b080964064491dc71577d99a36852e66cf7df00eca24dbf29cc",
-          "after": "072a84bb16db75db411d4293d525cd70ecdf598bd2f529de4a58cc61f64827e3"
+          "after": "ba4c88b3174e8d31eec10a2da239d10a0dc5b63e48b05acd25cf7bd496eeb841"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "f66407735b0e61236dfd25df4c5e948ffc807fbcda6dd6e9a6238e5448d5abb7",
-      "after_sha256": "c6b99c417c0b21b5fdd7d6b4edce625afdb4b2905d418a0f4b1091a94cb44679",
+      "after_sha256": "662b83210689f21e4cbfbdc4c736efd18bed057a099a2b533367e3d8af1cbb70",
       "owners": {
         "@document": {
           "before": "f66407735b0e61236dfd25df4c5e948ffc807fbcda6dd6e9a6238e5448d5abb7",
-          "after": "c6b99c417c0b21b5fdd7d6b4edce625afdb4b2905d418a0f4b1091a94cb44679"
+          "after": "662b83210689f21e4cbfbdc4c736efd18bed057a099a2b533367e3d8af1cbb70"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "8e7618d159658855028a4b59fca8ad310a7f1808a3d71ecd4c587c3a05e43c7b",
-      "after_sha256": "8c4ec8961dbce89457de7d0d3f0d2ed2ff045f1b6012e742d742f5edeaf553d7",
+      "after_sha256": "e7f783767d7a54df6e62ccbaa13899e1adbfaa4bc8ae3561d9c25d8233f20191",
       "owners": {
         "@document": {
           "before": "8e7618d159658855028a4b59fca8ad310a7f1808a3d71ecd4c587c3a05e43c7b",
-          "after": "8c4ec8961dbce89457de7d0d3f0d2ed2ff045f1b6012e742d742f5edeaf553d7"
+          "after": "e7f783767d7a54df6e62ccbaa13899e1adbfaa4bc8ae3561d9c25d8233f20191"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "5ead7122b43ecfe9ad6874a967343c9c7e1c2f6718a3053dcb8db01d27b5d3d8",
-      "after_sha256": "19b9ca24af951c1fa9bccd72a97f6192cf1a2ca3d52dd38520583be272c78efb",
+      "after_sha256": "1f5efafd5e9f46930be0a39443280e62029c4f11ff1086d64cb19461217b2271",
       "owners": {
         "@document": {
           "before": "5ead7122b43ecfe9ad6874a967343c9c7e1c2f6718a3053dcb8db01d27b5d3d8",
-          "after": "19b9ca24af951c1fa9bccd72a97f6192cf1a2ca3d52dd38520583be272c78efb"
+          "after": "1f5efafd5e9f46930be0a39443280e62029c4f11ff1086d64cb19461217b2271"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "361be70df066b3c05fc79fdf36b88834a22d116fad25b19f3b60f66683f769d9",
-      "after_sha256": "17867f66a105b44fd69125cfebc3b7c8244e4cee8584a9f38f8137b9df1a4871",
+      "after_sha256": "600763aaa22de3f2bdf937aa782095caeceaf4137720a19d56118cb3b3c816a3",
       "owners": {
         "@document": {
           "before": "361be70df066b3c05fc79fdf36b88834a22d116fad25b19f3b60f66683f769d9",
-          "after": "17867f66a105b44fd69125cfebc3b7c8244e4cee8584a9f38f8137b9df1a4871"
+          "after": "600763aaa22de3f2bdf937aa782095caeceaf4137720a19d56118cb3b3c816a3"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "47aa2c90028df8c82315a41a430ff06502aa1aa4854e8065b1b2ec30a4108f11",
-      "after_sha256": "6642ba18003b6dd6dbb0da8cac506d449289991d668f5a95a95674ebec2675ab",
+      "after_sha256": "fbc0b7df66640a904ae6f9fd2e21ba4695dd9f8c3fb922779f46b6693805bc30",
       "owners": {
         "@document": {
           "before": "47aa2c90028df8c82315a41a430ff06502aa1aa4854e8065b1b2ec30a4108f11",
-          "after": "6642ba18003b6dd6dbb0da8cac506d449289991d668f5a95a95674ebec2675ab"
+          "after": "fbc0b7df66640a904ae6f9fd2e21ba4695dd9f8c3fb922779f46b6693805bc30"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "96ff1f4779e9eae21cbb98f43dfbf7f31fe8f14fad280d3ddde7ac6af1409c08",
-      "after_sha256": "27b37dc45c94b3c49769b2348e91744791095022660b06e2cf8b5a9d0f990e75",
+      "after_sha256": "a48e7259b6f5536a8ff246a91b09bb5fc2f314b083595c2411332e8365d0fe0e",
       "owners": {
         "@document": {
           "before": "96ff1f4779e9eae21cbb98f43dfbf7f31fe8f14fad280d3ddde7ac6af1409c08",
-          "after": "27b37dc45c94b3c49769b2348e91744791095022660b06e2cf8b5a9d0f990e75"
+          "after": "a48e7259b6f5536a8ff246a91b09bb5fc2f314b083595c2411332e8365d0fe0e"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "ff8491024ba896aa2131fdf3eab476c70b564f2a339ef98a83b8376822b2b107",
-      "after_sha256": "0a074604d7df078456b3f07c58ff8302838e2b68db80cb3b1c4d69030e8edc2e",
+      "after_sha256": "51247a890710f6afddb52d6346342e17736d1b5f6389d0661da9f720de453257",
       "owners": {
         "@document": {
           "before": "ff8491024ba896aa2131fdf3eab476c70b564f2a339ef98a83b8376822b2b107",
-          "after": "0a074604d7df078456b3f07c58ff8302838e2b68db80cb3b1c4d69030e8edc2e"
+          "after": "51247a890710f6afddb52d6346342e17736d1b5f6389d0661da9f720de453257"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "9e58fdff80342804c95954d6ee3b08c21e399c9eb8ddad3d620745bb5df3205c",
-      "after_sha256": "b30e70de3c224f859d2b1949feb710d80bdb045cf6171bc488eeb88b249b509e",
+      "after_sha256": "f44203fa6ce5cbe1712301bb93d47dc48e5346d6ecf5de5092a04f6109621d9d",
       "owners": {
         "@document": {
           "before": "9e58fdff80342804c95954d6ee3b08c21e399c9eb8ddad3d620745bb5df3205c",
-          "after": "b30e70de3c224f859d2b1949feb710d80bdb045cf6171bc488eeb88b249b509e"
+          "after": "f44203fa6ce5cbe1712301bb93d47dc48e5346d6ecf5de5092a04f6109621d9d"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "dd0d2cf7fb98d77d308aeb2fb52c3824877b10320dc6fbe2d03a4747a8db272f",
-      "after_sha256": "0dea25d0e3f2cabe0f33902d6883fde30b6abb4df58e20005a1e2c4478f398f8",
+      "after_sha256": "c7a820cd999d4f9bd19653cd31eeb5fc0f00f3307eeaa17ae88712370ae79216",
       "owners": {
         "@document": {
           "before": "dd0d2cf7fb98d77d308aeb2fb52c3824877b10320dc6fbe2d03a4747a8db272f",
-          "after": "0dea25d0e3f2cabe0f33902d6883fde30b6abb4df58e20005a1e2c4478f398f8"
+          "after": "c7a820cd999d4f9bd19653cd31eeb5fc0f00f3307eeaa17ae88712370ae79216"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "61dca701c907d2b6f10a8c7467269944df7d89df5c1fe009440feb837bc9f73c",
-      "after_sha256": "5180b0521c5bce116c52d5a50c2ad75a53689462567d9942f4c2a5a3efa96e23",
+      "after_sha256": "0a2f4c343a5b59955487e22ee66a13916368c134c4db02cc28e3027cce281606",
       "owners": {
         "@document": {
           "before": "61dca701c907d2b6f10a8c7467269944df7d89df5c1fe009440feb837bc9f73c",
-          "after": "5180b0521c5bce116c52d5a50c2ad75a53689462567d9942f4c2a5a3efa96e23"
+          "after": "0a2f4c343a5b59955487e22ee66a13916368c134c4db02cc28e3027cce281606"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "95f99d37a8c68a91366e4ec2a8604806dacfac1035e1ce612ed06a582e35313e",
-      "after_sha256": "7eee64963df6c0f50e8ca2023ab10a62240e6f8a1d2e77250deee4781e36e9ec",
+      "after_sha256": "53f94ee2eac7f8ac10996e5b534cd3ccd6abad581f368e0613e4b93bc60e187b",
       "owners": {
         "@document": {
           "before": "95f99d37a8c68a91366e4ec2a8604806dacfac1035e1ce612ed06a582e35313e",
-          "after": "7eee64963df6c0f50e8ca2023ab10a62240e6f8a1d2e77250deee4781e36e9ec"
+          "after": "53f94ee2eac7f8ac10996e5b534cd3ccd6abad581f368e0613e4b93bc60e187b"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "13a7edf1198b9ba62aad50f975529376a2a2282b6feba8dd3d449adea3e1cd57",
-      "after_sha256": "e6880d0e360e82a6f8f92fdaa812ed6394ae40d9eee4bd87abf7d8cfca6c5afc",
+      "after_sha256": "9a5ffbaa95197694c8db0b4e550d084c66c696188a4307658ac654ed96eb1a26",
       "owners": {
         "@document": {
           "before": "13a7edf1198b9ba62aad50f975529376a2a2282b6feba8dd3d449adea3e1cd57",
-          "after": "e6880d0e360e82a6f8f92fdaa812ed6394ae40d9eee4bd87abf7d8cfca6c5afc"
+          "after": "9a5ffbaa95197694c8db0b4e550d084c66c696188a4307658ac654ed96eb1a26"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "caf567dace03fba2b93a6072020774e180c58b560fefce0694db1073e43d996f",
-      "after_sha256": "e41364b982466cf9250abcf4ff0cbd3688ae0bf2f8115ce2fb3a1e1eb31faf64",
+      "after_sha256": "cc16435c0d3dcc3cb7e9da0e1118b8171b4129e12cec4ef6594aece9d483494c",
       "owners": {
         "@document": {
           "before": "caf567dace03fba2b93a6072020774e180c58b560fefce0694db1073e43d996f",
-          "after": "e41364b982466cf9250abcf4ff0cbd3688ae0bf2f8115ce2fb3a1e1eb31faf64"
+          "after": "cc16435c0d3dcc3cb7e9da0e1118b8171b4129e12cec4ef6594aece9d483494c"
         }
       }
     },
@@ -206,7 +206,7 @@
     },
     "scripts/build_test_shards.py": {
       "before_sha256": "fcc9a251a577d207fa1aab63aae2015195e1d45833a9214495dc47537eb8c04f",
-      "after_sha256": "fd8e112033a352a3dd1bd056ebae45032c3962a5a16bec90957b95fb59b32d73",
+      "after_sha256": "52e64f992937173091837e369d3979589d2701fd28f9daa0f387f6afd1ad23eb",
       "owners": {
         "@module": {
           "before": "fd5f54bcf41f4cf478c0859edb0af1853c9abdbb9d4a6b4998940f91f287fa01",
@@ -214,7 +214,7 @@
         },
         "_add_allocation_summary": {
           "before": null,
-          "after": "812055f5103336685f188f49d08850bec87874709063b33d5013a6ce062eae00"
+          "after": "3b504861fc48de9254479dc0ba8d61bce04662a5e699584c675f6b5bdd0407aa"
         },
         "_allocation_cohorts": {
           "before": null,
@@ -248,23 +248,27 @@
     },
     "scripts/shard_execution_model.py": {
       "before_sha256": null,
-      "after_sha256": "b7b6288cdf225aefea17026042caf7226cc77c876ea527441497e014e27ed281",
+      "after_sha256": "8f2ea610a65dc858eeb7075e6c0477db21e7cf6d8a0f0447e8b0c21172e76367",
       "owners": {
         "@module": {
           "before": null,
-          "after": "1e353e0b119731097306e13e7fdcb115d39abecda7c4c5914fe2eb4ee8587eba"
+          "after": "0722c2ad2068483c9975cce4f59134e25b330419a24eff23da951de27543aaca"
         },
         "Cohort": {
           "before": null,
-          "after": "4cfd91538485186d29fca6e31da60d3a1a429ae02cc0951d4f0ae59052aa9a87"
+          "after": "858cf977861b85a381c692163b3dd37b21f3deca66d002dc1a9ece28b9d24215"
         },
         "_fixture_groups": {
           "before": null,
           "after": "a84f049866df3d843526d41f9db97477efe4747587b9d419f72fa08743a9153c"
         },
+        "_role_residuals": {
+          "before": null,
+          "after": "36d9f52c19d7ac37b4cef1ff69b2abb60d80eaa9f75f4c59714334dfabf90440"
+        },
         "allocate": {
           "before": null,
-          "after": "4354487f0c66ae82d5b4b45da5def0f6d51ab9c921df0fdf08038968774881e4"
+          "after": "315eafe55b3e25faf00e3246f3267b1cff48bd0d403392ca71519de4b0019a2c"
         },
         "cohort_seconds": {
           "before": null,
@@ -272,11 +276,15 @@
         },
         "load_cohorts": {
           "before": null,
-          "after": "b9ef58813ec2d59503b2fbf6d52f786d3bf5dcc72fb89035e7d6e7b00efdc5f5"
+          "after": "fe96d3925bd8c31b3be941ba6abec7af9aaed15a4978951f77254e5059c6cf14"
         },
         "metadata": {
           "before": null,
-          "after": "92f1cdfd82e49f0cbaf2e228bd1c45354b5b5c75ea806992c48de97b5b17e13a"
+          "after": "ac99afc7dbd1932db3070c4321e97f0b5523d040f4fc93b249026d4713cb5ebb"
+        },
+        "planning_score": {
+          "before": null,
+          "after": "359eb3dac97e3e664acb09ffd2ef52df39abc12e44fdc828eee1f5eb58265c02"
         },
         "worker_chunks": {
           "before": null,
@@ -296,7 +304,7 @@
     },
     "tests/code_quality/test_hosted_timing_calibration.py": {
       "before_sha256": "d6d97d4bc6cb09337d703e65b5f48d404badbaa4e82d9e553d49fafa0e297085",
-      "after_sha256": "724988504a22c8db122e0ee35f87d291b929e00360ccaddb827201a1748f7fb3",
+      "after_sha256": "c6a2c4d6c307d1e05a456ca42d27a3cc259b135eca1684522163543d7238b76e",
       "owners": {
         "@module": {
           "before": "97da043b0b924cf854c73adb7be6103cd67ccf633f1c0e320d2567a159023f49",
@@ -304,7 +312,11 @@
         },
         "cohort_input": {
           "before": null,
-          "after": "1b9dc168017296a80d617ca3f8e0b08ed940b23acaf1efe1402866ab12435822"
+          "after": "0e7df760d53ecf88d097f13f08737355d6e037c0b98592b7eca824cb3b03a75d"
+        },
+        "test_allocator_continues_past_fixed_and_nonimproving_worst": {
+          "before": null,
+          "after": "fd4252c4993a32e2ded0fe251d5aa0bac158fee24ee3669ad2b437a29111e99f"
         },
         "test_allocator_preserves_selectors_measurements_and_determinism": {
           "before": null,
@@ -320,29 +332,37 @@
         },
         "test_effective_cohort_keeps_original_attempts_and_measured_setup": {
           "before": null,
-          "after": "bb152c916a6f35739fc912096732f52870ed01facaa8f652b317794bc9592375"
+          "after": "177da4019907e7b6db154925cb39f4076dd3ad6cac3fd02d085d0010d8f95f88"
         },
         "test_mirror_controller_reserve_changes_allocation_without_changing_phases": {
           "before": null,
-          "after": "69540236e9badf94df40cd5efc0de9498cfa9e5ce741925e88753f750b6544a7"
+          "after": "e11ed07e0c8739be38bc163f2bf73c96da633b4df739559bc81a340197784c85"
         },
         "test_model_charges_fixture_once_per_worker_and_mirror_sequentially": {
           "before": null,
           "after": "aa113c5a154bea93fbe5cd24ecd7c2ace31983dab373c88ce1484d7870a70749"
         },
+        "test_planning_ceiling_keeps_coherent_roles_and_raw_phases_separate": {
+          "before": null,
+          "after": "7d43d1b8f91e9032f2c2f613cc665507d84badba26ee821ad7fe29781a2e8d0e"
+        },
         "test_real_dispatch_and_modeled_chunks_have_collection_independent_ties": {
           "before": null,
           "after": "d857d60b6f40e598fb4c890d0933e7d403f5f2de356dcbb2fa96059af5605112"
+        },
+        "test_supervisor_profiles_fail_closed": {
+          "before": null,
+          "after": "6fec0b32544860953edd270081e21976b6697a66e7365fbdc04ac43d5f03e509"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "6218eceefc5e1cf141a8d2f8daeb0110121075f15adb39e42a6164fe948d3cac",
-      "after_sha256": "5d5025422db3d76d4d1328a0dd78b37c50eb6bead44656152f91b68174b6a05e",
+      "after_sha256": "d2640ad71a72aa9ce02f858415e6aa333f5ad329ed05a6fd674be91feac88da7",
       "owners": {
         "@document": {
           "before": "6218eceefc5e1cf141a8d2f8daeb0110121075f15adb39e42a6164fe948d3cac",
-          "after": "5d5025422db3d76d4d1328a0dd78b37c50eb6bead44656152f91b68174b6a05e"
+          "after": "d2640ad71a72aa9ce02f858415e6aa333f5ad329ed05a6fd674be91feac88da7"
         }
       }
     }
@@ -352,7 +372,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -360,7 +380,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -368,7 +388,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -380,7 +400,7 @@
         "coherent-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -399,7 +419,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -411,7 +431,7 @@
         "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -430,7 +450,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -449,7 +469,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -468,7 +488,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -487,7 +507,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -506,7 +526,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -525,7 +545,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -544,7 +564,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -563,7 +583,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -582,7 +602,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -601,7 +621,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -620,7 +640,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -639,7 +659,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -647,7 +667,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -655,7 +675,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -666,7 +686,7 @@
         "behavioral-worksteal-dispatch"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -676,7 +696,7 @@
         "coherent-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -686,7 +706,7 @@
         "behavioral-worksteal-dispatch-tests"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -698,7 +718,7 @@
         "coherent-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -708,7 +728,7 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
+      "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks, order-dependent fixture reuse and artifact-bound role residuals. Whole-second planning scores remain separate from raw measurements and actual timing gates. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     }

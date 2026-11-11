@@ -24,10 +24,7 @@ from typing import cast
 from scripts.hosted_timing_calibration import FILENAME, read_json
 
 PROFILE_FILE = "allocation-cohorts.json"
-MODEL = "coherent-worker-chunks-module-setup-serial-reserve-v2"
-# Planning only: ceil(49.893798646s), the largest measured extra controller residual
-# across the seven indexed cohorts. Never added to measured case or phase costs.
-SERIAL_CONTROLLER_RESERVE_SECONDS = 50.0
+MODEL = "coherent-worker-chunks-role-residual-ceil-v3"
 
 
 @dataclass(frozen=True)
@@ -36,6 +33,8 @@ class Cohort:
     cases: dict[str, float]
     groups: dict[str, str]
     setup: dict[str, float]
+    parallel_residual: float = 0.0
+    mirror_residual: float = 0.0
 
 
 def _fixture_groups(root: Path, nodes: set[str]) -> dict[str, str]:
@@ -79,6 +78,71 @@ def _fixture_groups(root: Path, nodes: set[str]) -> dict[str, str]:
     return groups
 
 
+def _role_residuals(
+    receipts: object,
+    digests: list[str],
+    reports: list[dict[str, object]],
+    by_hash: dict[object, int],
+    phases: dict[int, dict[str, tuple[float, float, float]]],
+    *,
+    requires_mirror: bool,
+) -> tuple[float, float]:
+    """Derive observed phase-to-supervisor residuals from original artifact roles."""
+    workers: dict[int, dict[str, list[float]]] = {}
+    for digest in digests:
+        index = by_hash[digest]
+        report = reports[index]
+        source = cast(dict[str, object], report["source"])
+        artifact = source["artifact_id"]
+        count = report["worker_count"]
+        if (
+            type(artifact) is not int
+            or artifact < 1
+            or type(count) is not int
+            or count not in (1, 4)
+        ):
+            raise SystemExit("Invalid allocation worker artifact or role.")
+        roles = workers.setdefault(artifact, {"parallel": [], "mirror": []})
+        roles["mirror" if count == 1 else "parallel"].append(
+            math.fsum(math.fsum(values) for values in phases[index].values())
+        )
+    if not isinstance(receipts, list) or len(receipts) != len(workers):
+        raise SystemExit("Allocation supervisor receipts are incomplete.")
+    residuals: dict[str, list[float]] = {"parallel": [], "mirror": []}
+    seen: set[int] = set()
+    for receipt in receipts:
+        if (
+            not isinstance(receipt, dict)
+            or receipt.keys() != {"artifact_id", "sha256", "elapsed_seconds", "approved", "reason"}
+            or type(receipt["artifact_id"]) is not int
+            or receipt["artifact_id"] not in workers
+            or receipt["artifact_id"] in seen
+            or not isinstance(receipt["sha256"], str)
+            or len(receipt["sha256"]) != 64
+            or any(char not in "0123456789abcdef" for char in receipt["sha256"])
+            or type(receipt["elapsed_seconds"]) not in (int, float)
+            or not math.isfinite(receipt["elapsed_seconds"])
+            or receipt["elapsed_seconds"] < 0
+            or type(receipt["approved"]) is not bool
+            or receipt["reason"] != ("passed" if receipt["approved"] else "approval_limit_exceeded")
+        ):
+            raise SystemExit("Invalid allocation supervisor receipt.")
+        artifact = receipt["artifact_id"]
+        seen.add(artifact)
+        roles = workers[artifact]
+        if not roles["parallel"] or len(roles["mirror"]) > 1:
+            raise SystemExit("Invalid allocation supervisor worker roles.")
+        residual = receipt["elapsed_seconds"] - (
+            max(roles["parallel"]) + math.fsum(roles["mirror"])
+        )
+        if not math.isfinite(residual) or residual < 0:
+            raise SystemExit("Allocation supervisor predates its measured phases.")
+        residuals["mirror" if roles["mirror"] else "parallel"].append(residual)
+    if not residuals["parallel"] or (requires_mirror and len(residuals["mirror"]) != 1):
+        raise SystemExit("Allocation supervisor role profile is incomplete.")
+    return max(residuals["parallel"]), max(residuals["mirror"], default=0.0)
+
+
 def load_cohorts(directory: Path, *, root: Path, nodes: set[str]) -> tuple[Cohort, ...]:
     """Resolve explicit effective cohorts into already authenticated phase tuples.
 
@@ -86,6 +150,8 @@ def load_cohorts(directory: Path, *, root: Path, nodes: set[str]) -> tuple[Cohor
     An inherited successful job may participate in an effective cohort, but is
     never appended or relabeled as a new worker observation.
     """
+    from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
+
     path = directory / PROFILE_FILE
     if not path.exists():
         return ()
@@ -115,7 +181,7 @@ def load_cohorts(directory: Path, *, root: Path, nodes: set[str]) -> tuple[Cohor
     for row in value["cohorts"]:
         if (
             not isinstance(row, dict)
-            or row.keys() != {"run_id", "effective_attempt", "reports"}
+            or row.keys() != {"run_id", "effective_attempt", "reports", "supervisors"}
             or any(
                 type(row[key]) is not int or row[key] < 1 for key in ("run_id", "effective_attempt")
             )
@@ -161,8 +227,23 @@ def load_cohorts(directory: Path, *, root: Path, nodes: set[str]) -> tuple[Cohor
                 setup_costs[group] = max(setup_costs.get(group, 0.0), seconds)
         if cases.keys() != nodes:
             raise SystemExit("Allocation cohort case inventory is not exact.")
+        parallel_residual, mirror_residual = _role_residuals(
+            row["supervisors"],
+            row["reports"],
+            reports,
+            by_hash,
+            phases,
+            requires_mirror=SERIAL_BEHAVIORAL_CASE in nodes,
+        )
         cohorts.append(
-            Cohort(f"{identity[0]}-effective-attempt-{identity[1]}", cases, groups, setup_costs)
+            Cohort(
+                f"{identity[0]}-effective-attempt-{identity[1]}",
+                cases,
+                groups,
+                setup_costs,
+                parallel_residual,
+                mirror_residual,
+            )
         )
     return tuple(cohorts)
 
@@ -220,57 +301,83 @@ def cohort_seconds(
     return tuple(values)
 
 
+def planning_score(
+    selectors: tuple[str, ...], costs: dict[str, float], cohorts: tuple[Cohort, ...]
+) -> float:
+    """Ceil the coherent phase-plus-role estimate, without rounding measurements."""
+    from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
+
+    mirror = SERIAL_BEHAVIORAL_CASE in selectors
+    return float(
+        math.ceil(
+            max(
+                value + (cohort.mirror_residual if mirror else cohort.parallel_residual)
+                for cohort, value in zip(
+                    cohorts, cohort_seconds(selectors, costs, cohorts), strict=True
+                )
+            )
+        )
+    )
+
+
 def allocate(
     weights: dict[str, float], costs: dict[str, float], cohorts: tuple[Cohort, ...], count: int
 ) -> tuple[tuple[str, ...], ...]:
-    """Greedy real-chunk scoring, then strictly improving whole-selector moves."""
-    from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
+    """Greedy chunks, then strict descending planning-score improvements.
 
+    An immovable worst bucket does not prevent improving subsequent buckets.
+    Whole-second ceilings avoid optimizing below the scale of observed variation;
+    raw scores may regress within a rounded bucket and remain separate diagnostics.
+    """
     assignments: list[tuple[str, ...]] = [() for _ in range(count)]
 
     @cache
     def score(selectors: tuple[str, ...]) -> float:
-        reserve = SERIAL_CONTROLLER_RESERVE_SECONDS if SERIAL_BEHAVIORAL_CASE in selectors else 0.0
-        return max(cohort_seconds(selectors, costs, cohorts)) + reserve
+        return planning_score(selectors, costs, cohorts)
 
     for selector in sorted(weights, key=lambda name: (-weights[name], name)):
         target = min(
             range(count),
             key=lambda index: (
-                score((*assignments[index], selector)),
+                score(tuple(sorted((*assignments[index], selector)))),
                 len(assignments[index]),
                 index,
             ),
         )
-        assignments[target] = (*assignments[target], selector)
+        assignments[target] = tuple(sorted((*assignments[target], selector)))
     if any(not group for group in assignments):
         raise SystemExit("Every behavioral shard must be nonempty.")
     while True:
         peaks = [score(group) for group in assignments]
-        worst = max(range(count), key=lambda index: (peaks[index], -index))
-        best = tuple(sorted(peaks, reverse=True))
-        move: tuple[str, int] | None = None
-        if len(assignments[worst]) == 1:
-            break  # An indivisible selector owns the peak; do not hide it.
-        for selector in sorted(assignments[worst]):
-            removed = score(tuple(name for name in assignments[worst] if name != selector))
-            for target in range(count):
-                if target == worst:
-                    continue
-                candidate = peaks.copy()
-                candidate[worst] = removed
-                candidate[target] = score((*assignments[target], selector))
-                objective = tuple(sorted(candidate, reverse=True))
-                if objective < best:
-                    best, move = objective, (selector, target)
-        if move is None:
+        baseline = tuple(sorted(peaks, reverse=True))
+        found: tuple[int, str, int] | None = None
+        for source in sorted(range(count), key=lambda index: (-peaks[index], index)):
+            if len(assignments[source]) == 1:
+                continue
+            best = baseline
+            move: tuple[str, int] | None = None
+            for selector in assignments[source]:
+                removed = score(tuple(name for name in assignments[source] if name != selector))
+                for target in range(count):
+                    if target == source:
+                        continue
+                    candidate = peaks.copy()
+                    candidate[source] = removed
+                    candidate[target] = score(tuple(sorted((*assignments[target], selector))))
+                    objective = tuple(sorted(candidate, reverse=True))
+                    if objective < best:
+                        best, move = objective, (selector, target)
+            if move is not None:
+                found = (source, *move)
+                break
+        if found is None:
             break
-        selector, target = move
-        assignments[worst] = tuple(name for name in assignments[worst] if name != selector)
-        assignments[target] = (*assignments[target], selector)
+        source, selector, target = found
+        assignments[source] = tuple(name for name in assignments[source] if name != selector)
+        assignments[target] = tuple(sorted((*assignments[target], selector)))
     cold = min(range(count), key=lambda index: (score(assignments[index]), index))
     assignments[0], assignments[cold] = assignments[cold], assignments[0]
-    return tuple(tuple(sorted(group)) for group in assignments)
+    return tuple(assignments)
 
 
 def metadata(
@@ -283,10 +390,20 @@ def metadata(
         "model": MODEL,
         "index": PROFILE_FILE,
         "index_sha256": hashlib.sha256((directory / PROFILE_FILE).read_bytes()).hexdigest(),
-        "serial_controller_reserve_seconds": SERIAL_CONTROLLER_RESERVE_SECONDS,
-        "serial_controller_reserve_meaning": "Planning-only extra controller allowance on the "
-        "isolated-mirror shard; excluded from measured phases and worker-path seconds; "
-        "not a timing bound or qualification",
+        "planning_score_rule": "Ceiling to whole seconds of the largest coherent phase path "
+        "plus its observed maximum phase-to-supervisor role residual; planning only, "
+        "not a timing bound or qualification; raw scores can regress within rounded buckets",
+        "cohort_role_residual_seconds": {
+            cohort.label: {
+                "parallel": cohort.parallel_residual,
+                "isolated_mirror": cohort.mirror_residual,
+            }
+            for cohort in cohorts
+        },
+        "planning_score_seconds": {
+            str(index + 1): planning_score(group, costs, cohorts)
+            for index, group in enumerate(shards)
+        },
         "meaning": "Conditional initial chunks and module setup reuse; "
         "excludes controller overhead, work stealing and future variance; not timing qualification",
         "cohort_worker_path_seconds": {
