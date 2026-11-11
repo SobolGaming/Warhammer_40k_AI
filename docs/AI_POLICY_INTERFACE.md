@@ -1569,3 +1569,61 @@ candidate coverage and scenario costs remain open. The receipt returns
 `useful_reference_status: scoped_gap`, `reference_target: null` and
 `eligible_for_learning: false`; it cannot certify Stage 2 completion, full games
 or throughput.
+
+
+## Opposing shooter qualification
+
+`ai.opposing_shooter_scenario.OpposingShooterQualification.from_sessions(stationary,
+moved)` adds a separate operator-only, immutable report. It requires the exact
+22/23-record endpoints reproduced by `reproduce_followthrough_pair()` under the
+current runtime and canonical configuration. The original followthrough definition
+and admission retain their historical scope and bytes. Serialized report exports
+are evidence for inspection; this report has no serialized-evidence importer or
+training consumer. It cannot admit a caller-edited export as a qualified result.
+
+At both endpoints, the shared Fire Overwatch shooter check returns no ineligibility
+reason for B's five living infantry. Every model carries `core-bolt-rifle`, whose
+complete equipped profile is retained: 24-inch range, two attacks, BS 3+, Strength
+4, AP -1, Damage 1, Assault and Rapid Fire 1. All fifteen model/target candidates
+are rejected as out of range. Separate living-model LOS queries use the actual
+terrain features and terrain areas: E is visible, while S and the vehicle are not.
+Range-short-circuited target candidates supply no visibility finding. This explains
+the original negative shot without claiming shooter ineligibility, universal
+occlusion, unsupported shooting or global threat impossibility.
+
+The report independently reproduces the stationary branch and continues it through
+ordinary viewer decisions. A skips Shooting and Remains Stationary in rounds two
+and three; both players decline offered movement reaction windows. B's complete
+Normal Move witnesses translate all models by (-2,+5) inches in round one and
+(0,+6) in round two. In round three, models in the x=1 column move six inches in
+positive Y and those in x=2.8 move three inches, with paths ordered front to back
+(descending initial Y, stable ties). Height and facing stay unchanged. The path
+avoids the ruin and model-overlap rejections encountered by simpler proposals;
+those rejections do not establish unreachability or an engine defect.
+
+B skips Shooting in rounds one and two, selects Normal shooting in round three,
+and declares only model `:003`'s equipped rifle against E using the observed weapon
+identity and current proposal context. The fixed resolution declines Command
+Re-roll opportunities and allocates to the lowest offered model ID when required.
+The horizon ends after this attack sequence completes, at the next ordinary
+pending decision. Complete accepted continuation records, observation commitments,
+actual attack events and a replay artifact bind the witness. Strict ordinary-startup
+persistence/replay verification covers the attack branch and the unchanged moved
+endpoint. Both caller-owned checkpoints remain byte-equivalent and the operator
+report stays outside viewer/policy inputs.
+
+The existing [adapter contract](ADAPTER_DECISION_CONTRACT.md) covers the finite
+movement/shooting choices, witnessed movement, stratagem decline, shooting
+declaration and attack-resolution choices. No decision family, wire shape, visibility
+policy or engine rule changes. The owning queries remain `fire_overwatch`,
+`shooting_selection_range`, `shooting_targets` and the shared shooting/attack
+lifecycle; the new module only composes their existing public behavior.
+
+This is a single cooperative attack-feasibility witness on the stationary branch,
+not a matched response or evidence that either initial S choice is better. Screening,
+exposure, E's benefit, matched later outcomes, timing/cooperation controls, useful
+candidate coverage and scenario costs remain open. The synthetic Core roster,
+non-strict roster flag, provisional model geometry, July mission/October layout,
+partial points and public test-seed exceptions remain. `useful_reference_status`
+is `scoped_gap`, `reference_target` is null and `eligible_for_learning` is false.
+Stage 2, full-game qualification and throughput certification remain incomplete.

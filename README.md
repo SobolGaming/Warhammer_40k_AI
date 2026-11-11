@@ -34,6 +34,14 @@ target-binding probe on an independent fork is rejected because B has no legal
 shooting declaration at that window. This qualifies movement feasibility and a
 specific negative shot result; it supplies no attack outcome or tactical benefit.
 
+The separate [opposing shooter qualification](docs/AI_POLICY_INTERFACE.md#opposing-shooter-qualification)
+checks the equipped rifles, shooter eligibility, range and visibility at both exact
+endpoints. B is eligible; every A target is outside 24 inches, while E is visible.
+A fixed continuation of the stationary branch then approaches through ordinary
+Normal Moves and resolves one B rifle attack against E in round three. A remains
+stationary and declines reactions. This is one attack-feasibility witness; paired
+outcomes, tactical benefit, Stage 2 completion and learning remain unqualified.
+
 ## 2. Non-negotiable invariants
 
 These rules are enforced from the first commit.
@@ -589,8 +597,9 @@ performance repair or scenario-cost qualification. Test membership, algorithms,
 worker counts, timing limits and coverage requirements are unchanged. Fresh
 complete hosted qualification remains required.
 
-The current complete baseline contains 6,264 passed cases from the paired
-followthrough qualification on Python 3.14.5 under WSL Ubuntu. Its exact base is
+The historical paired-followthrough baseline contains 6,264 passed cases
+measured on Python 3.14.5 under WSL Ubuntu. This retained planning profile is not
+the current test inventory or a current-head qualification. Its exact base is
 `efb3172c4ce1b3a912c3f6fc2c26ebaa465ad9c4` and runtime fingerprint is
 `3174e16c152ba1febdf0e26360df49e75d1951fbc616eced69546bbb598a5f2e`.
 Source-history validation, cold index construction, one isolated mirror worker,
@@ -676,6 +685,24 @@ Fresh complete correctness/coverage qualification remains mandatory. `--check`
 re-derives every planning cost/selector and the sidecar digest; worker dispatch
 rejects a missing or altered declared sidecar. Run the normal generator command
 above with this sidecar in the output directory to reproduce the manifests.
+
+The current complete baseline contains 6,278 passed cases from the opposing-shooter
+qualification on Python 3.14.5 under WSL Ubuntu, against exact base
+`5639ccce458e53e154b1f578548ec7f20dfdec18` and runtime fingerprint
+`575d1f47b62970089d53ec533482c75cbbd7a06bfe7015fe09d99526dcba781c`.
+One isolated mirror worker precedes 32 worksteal remainder workers. A local-only
+collection-order hook starts the known long canonical case and the new campaign
+early without changing membership or assertions; CI retains its normal calibrated
+four-worker dispatch. The complete local workload passed all tests with 67.46%
+full-package coverage with branch measurement enabled, but took 1,158.728893934
+supervisor seconds and failed the unchanged 1,080-second approval limit without
+termination. That failed timing result remains failed. Complete JUnit measurements
+supply every current case weight; the new two-case module is included in the
+twelve regenerated manifests. All 382 historical receipts and 47,361 observation
+tuples retain their exact identities, values and outcomes. The fourteen cases
+without a compatible hosted observation use their complete-baseline measurements.
+This profile is local planning evidence, not hosted timing approval, tactical
+usefulness, scenario-cost qualification or full-game performance.
 
 Every supplied complete baseline JUnit run must cover the current behavioral file inventory. Missing files,
 duplicate cases, failed/skipped cases, invalid durations, and truncated suite counts

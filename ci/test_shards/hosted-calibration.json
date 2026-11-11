@@ -11,7 +11,9 @@
     "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_require_typed_rows[rows1]",
     "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_require_typed_rows[rows2]",
     "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_require_typed_rows[rows3]",
-    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_require_typed_rows[rows4]"
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_require_typed_rows[rows4]",
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_exact_pair_shooter_diagnostics_and_ordinary_opposing_attack_replay",
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_opposing_qualification_rejects_unreached_and_wrong_configuration"
   ],
   "current_test_sources": {
     "tests/factions/adeptus_custodes/unit/test_adeptus_custodes_army_rule.py": "b57c87563d26c3037d4285d0d03d21aa476f808e4c4c6cd65cfcfcb9661fea41",
@@ -60,6 +62,7 @@
     "tests/infrastructure/adapters/test_finite_candidates.py": "46f9947f09bea4cb3dbbb0e665f488031c2565f2a3dad2097dd840627f0e2abb",
     "tests/infrastructure/adapters/test_followthrough_scenario.py": "3229c0dbfacbdaf1455aa6baf792362770cdca0fa20de8e47d0f74573cd81c51",
     "tests/infrastructure/adapters/test_normal_move_scenario.py": "30bb82e22114deb4d7e6b749b684fabd6e7463c41eb24786e7b7d9e023418917",
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": "b194cc112d8218eac3c08c984cdfa2ecf0c78abf9db9edec61f0d9ad2a0a73d3",
     "tests/infrastructure/adapters/test_preserve_scenario.py": "3d348cf932c4430ea470cf0377741771ecc24cf3a7a381d70d364d0590c15fe6",
     "tests/infrastructure/adapters/test_runner_accounting.py": "9c50a1ee78e7b79bd7c094b369fcb241336b154b46d54601e21ae087acdbc953",
     "tests/infrastructure/adapters/test_training_admission.py": "26ec230eb248fb840bae22117c1a802bfd209578f906895ae4e0e182aea5643c",
@@ -427,7 +430,7 @@
     "tests/unit/test_phase10i_terrain_movement.py": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38"
   },
   "formula": "max(complete-baseline-case-seconds, largest-observed-passed-three-phase-total)",
-  "inventory_sha256": "0bb358ff7d0c4236fd0708f42349aede034bf3c2c0ff2538d8fe2e3439a5bfed",
+  "inventory_sha256": "c2e4190d07d697ad4647587b73f7339ac9c92cfc8b7d8fdc8648e452aa01e7af",
   "observation_fields": [
     "report_index",
     "setup",
