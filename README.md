@@ -34,6 +34,14 @@ target-binding probe on an independent fork is rejected because B has no legal
 shooting declaration at that window. This qualifies movement feasibility and a
 specific negative shot result; it supplies no attack outcome or tactical benefit.
 
+The separate [opposing shooter qualification](docs/AI_POLICY_INTERFACE.md#opposing-shooter-qualification)
+checks the equipped rifles, shooter eligibility, range and visibility at both exact
+endpoints. B is eligible; every A target is outside 24 inches, while E is visible.
+A fixed continuation of the stationary branch then approaches through ordinary
+Normal Moves and resolves one B rifle attack against E in round three. A remains
+stationary and declines reactions. This is one attack-feasibility witness; paired
+outcomes, tactical benefit, Stage 2 completion and learning remain unqualified.
+
 ## 2. Non-negotiable invariants
 
 These rules are enforced from the first commit.
@@ -589,8 +597,9 @@ performance repair or scenario-cost qualification. Test membership, algorithms,
 worker counts, timing limits and coverage requirements are unchanged. Fresh
 complete hosted qualification remains required.
 
-The current complete baseline contains 6,264 passed cases from the paired
-followthrough qualification on Python 3.14.5 under WSL Ubuntu. Its exact base is
+The historical paired-followthrough baseline contains 6,264 passed cases
+measured on Python 3.14.5 under WSL Ubuntu. This retained planning profile is not
+the current test inventory or a current-head qualification. Its exact base is
 `efb3172c4ce1b3a912c3f6fc2c26ebaa465ad9c4` and runtime fingerprint is
 `3174e16c152ba1febdf0e26360df49e75d1951fbc616eced69546bbb598a5f2e`.
 Source-history validation, cold index construction, one isolated mirror worker,
@@ -676,6 +685,101 @@ Fresh complete correctness/coverage qualification remains mandatory. `--check`
 re-derives every planning cost/selector and the sidecar digest; worker dispatch
 rejects a missing or altered declared sidecar. Run the normal generator command
 above with this sidecar in the output directory to reproduce the manifests.
+
+The current complete baseline contains 6,278 passed cases from the opposing-shooter
+qualification on Python 3.14.5 under WSL Ubuntu, against exact base
+`5639ccce458e53e154b1f578548ec7f20dfdec18` and runtime fingerprint
+`575d1f47b62970089d53ec533482c75cbbd7a06bfe7015fe09d99526dcba781c`.
+One isolated mirror worker precedes 32 worksteal remainder workers. A local-only
+collection-order hook starts the known long canonical case and the new campaign
+early without changing membership or assertions; CI retains its normal calibrated
+four-worker dispatch. The complete local workload passed all tests with 67.46%
+full-package coverage with branch measurement enabled, but took 1,158.728893934
+supervisor seconds and failed the unchanged 1,080-second approval limit without
+termination. That failed timing result remains failed. Complete JUnit measurements
+supply every current case weight; the new two-case module is included in the
+twelve regenerated manifests. All 382 historical receipts and 47,361 observation
+tuples retain their exact identities, values and outcomes. At this baseline
+construction, fourteen cases had no compatible hosted observation and used
+their complete-baseline measurements.
+This profile is local planning evidence, not hosted timing approval, tactical
+usefulness, scenario-cost qualification or full-game performance.
+
+The subsequent PR661 calibration appends exactly 49 authenticated worker receipts
+and 6,278 passed three-phase observations from attempt 1 of failed hosted run
+[42965700288](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42965700288).
+API-bound archive digests and byte comparisons bind source head
+`7ce2d3c85f138e0575fd78386bbf0b4ef37a4783`, tested merge checkout
+`24a94682b96a0fe8c85f63a5791c08136b3cc903`, their identical tree and the recorded
+runtime fingerprint. All original 382 receipts and 47,361 observation tuples
+retain their exact values, indices, identities and outcomes. Totals after that append were 431
+receipts and 53,639 observations covering all 6,278 cases, with no baseline-only
+cases. The complete 6,278-case local baseline, source label, JUnit hashes, file
+totals and case measurements remain unchanged.
+
+Every hosted case passed without errors or skips. Shard 4 took
+1,220.530580016 supervisor seconds and shard 12 took 1,186.5076281 seconds;
+both exceeded the unchanged 1,080-second approval limit, exited successfully
+without termination and still failed approval. The run and combined coverage
+gate remain failed. Other shards passed timing. These receipts are historical
+planning evidence, not a passing qualification or a timing-limit amendment.
+
+All four workers were busy through the late shards' final workload interval.
+Shard 4's three canonical-prefix cases took 538.586, 465.533 and 465.781
+three-phase seconds versus prior maximum weights of 356.344, 304.077 and
+306.313. Complete canonical coverage took 951.861 seconds versus 899.083.
+On shard 12, the new attack witness took 661.544 seconds versus its local-only
+319.266 weight; the two followthrough cases took 582.007 and 313.674 seconds
+versus prior weights of 386.433 and 162.136. These are observed weight gaps;
+they do not establish a hardware cause or a runtime regression.
+
+The existing maximum-cost formula regenerates all twelve manifests and the
+same calibrated four-worker dispatch. Canonical coverage moves from shard 4 to
+shard 3; followthrough and the opposing attack remain on shard 12 with a revised
+surrounding inventory. Reusing the observed case costs gives illustrative
+test-work lower bounds of 994.386 and 895.574 seconds for those two new groups.
+Those bounds exclude source/history setup, collection and finalization and
+assume unchanged case costs across different workers and hosts. They cannot
+predict approval or certify a speedup. No test, scheduler algorithm, runtime,
+worker count, coverage floor or timing limit changes. Fresh complete hosted
+qualification remains required for every shard.
+
+A further PR661 calibration appends 49 authenticated worker receipts and 6,278
+passed three-phase observations from attempt 1 of failed hosted run
+[42969947321](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42969947321).
+API-bound archive digests and raw-worker byte comparisons bind source head
+`566b3cd32fb43a0e96efe878fb0b58482d8d9ea9` and tested merge checkout
+`a9d1b923ca10a1e47ef1fbc0c1ecb60897106ae5` to the identical tree
+`e729b83c874c4be04cbca8026ea256144d3a6b29` and recorded runtime fingerprint.
+The prior 431 receipts and 53,639 observation tuples remain exact prefixes,
+with their indices, identities, measurements and outcomes unchanged. Current
+totals are 480 receipts and 59,917 observations covering all 6,278 cases, with
+zero baseline-only cases. The complete local 6,278-case baseline, source label,
+JUnit hashes, file totals and case measurements remain unchanged.
+
+All 6,278 hosted cases passed across 49 workers. Shard 6 took 1,090.60351343
+supervisor seconds and shard 8 took 1,085.253981572 seconds. Both exited zero
+without termination or remaining descendants but exceeded the unchanged
+1,080-second approval limit; the run and combined coverage gate remain failed.
+The other ten behavioral shards passed timing. Both failed runs remain historical
+evidence and are not relabeled as passing qualifications.
+
+Shard 6's normal-move restore and distance-rejection cases took 677.305 and
+370.138 three-phase seconds versus prior maximum weights of 584.845 and
+293.387. Shard 8's canonical-preflight case took 965.874 seconds versus
+828.223. Comparable S25 cases stayed near prior observations; the concentrated
+gaps do not establish a hardware cause or engine regression. Worker progress
+shows approximately 93 and 96 seconds of wrapper/startup/finalization time,
+excluding worker collection and dispatch.
+
+The unchanged formula and generator regenerate all twelve manifests.
+Normal-move stays on shard 6 with a different surrounding inventory; canonical
+preflight moves to shard 10. Its indivisible 965.874-second observed cost is
+the counterfactual global test-work lower bound. An illustrative 100-second
+wrapper allowance leaves only 14.126 seconds before approval, excluding any
+unaccounted collection, dispatch or changed context costs. Qualification remains
+tight and unproven. No production/test code, scheduler, worker count, coverage
+floor or timing limit changes; fresh complete hosted qualification is required.
 
 Every supplied complete baseline JUnit run must cover the current behavioral file inventory. Missing files,
 duplicate cases, failed/skipped cases, invalid durations, and truncated suite counts

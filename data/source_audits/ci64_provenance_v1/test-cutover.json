@@ -2465,6 +2465,12 @@
       "blob_sha1": "3c9f4f50f405d5703b5dccb3f519681b0d3a6688",
       "sha256": "90b2fbdcaa950cfa3002dc7c1b3172473639b66c94fd9192839162f95d148068",
       "bytes": 4342
+    },
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": {
+      "mode": "100644",
+      "blob_sha1": "bb20cc50fd3baa4b5075307c5bb670c86f09262e",
+      "sha256": "b194cc112d8218eac3c08c984cdfa2ecf0c78abf9db9edec61f0d9ad2a0a73d3",
+      "bytes": 8047
     }
   },
   "active_roots": [

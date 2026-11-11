@@ -405,6 +405,34 @@ and adds a separate real reproduction control. It does not qualify Stage 2,
 scenario costs or hosted timing; matched actual-base evidence is recorded
 separately from final CI approval.
 
+### Opposing shooter diagnosis and one reachable attack
+
+The separate `OpposingShooterQualification` compares both original 22/23-record
+endpoints to fresh ordinary reproduction. Shared shooter eligibility, complete
+equipped weapon profiles, per-model target candidates and independent living-model
+range/visibility queries explain the negative Overwatch result: B is eligible,
+all A targets are outside its rifles' 24-inch range, and E is visible at both
+endpoints. Range-short-circuited candidate payloads are not negative LOS evidence.
+
+A fixed stationary-branch continuation now supplies one ordinary opposing attack
+witness. B approaches via three fully witnessed Normal Moves, then uses model
+`:003`'s rifle against E in round-three Normal shooting. A Remains Stationary,
+skips shooting and declines reactions; both players decline their Command
+Re-Rolls, and A selects E model `:001` at the damage-allocation request. The 65-record
+endpoint includes two engine-generated target/group selections. The immutable
+operator report retains accepted records, observation commitments, actual attack
+events and current source/build-bound startup/persistence/replay evidence, leaving
+both original supplied checkpoints unchanged. The report supports JSON export,
+not serialized-evidence admission or a learning consumer.
+
+This closes one attack-feasibility gap, not the paired opponent-response/E-benefit
+experiment. The historical FollowthroughPairAdmission remains unchanged. Tactical
+screening/exposure, comparative outcomes, timing/cooperation controls, useful
+candidate coverage and scenario costs remain open, with the inherited synthetic
+roster/geometry/mission/points/seed limitations. Stage 2 remains incomplete,
+`reference_target` remains null and learning remains excluded. See the
+[qualification interface](AI_POLICY_INTERFACE.md#opposing-shooter-qualification).
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.

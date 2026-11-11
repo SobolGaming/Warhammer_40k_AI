@@ -1,486 +1,382 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "efb3172c4ce1b3a912c3f6fc2c26ebaa465ad9c4",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0883faa80dd31f2e31d8ba47daf2aaa1b952526f1bfa267b9423b426573e389b",
-  "operation_map_sha256": "200cd8b8cc837b6b01fb4d32664363498c79decb8bad3f5f346401e489652d8f",
+  "base": "5639ccce458e53e154b1f578548ec7f20dfdec18",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:575d1f47b62970089d53ec533482c75cbbd7a06bfe7015fe09d99526dcba781c",
+  "operation_map_sha256": "89656cb8a4a48f84aaff1f2d37c607010f831cb972f957b94be56d0f53e944aa",
   "changes": {
     "README.md": {
-      "before_sha256": "ad8ce9f5f1cd75a998bdbc5d2b67962f240edb85d48742b95850b2027cda5b93",
-      "after_sha256": "337d3ac35e44a363b46f04b6be423753f55e8693aa2c196d468ad2460936fcc1",
+      "before_sha256": "337d3ac35e44a363b46f04b6be423753f55e8693aa2c196d468ad2460936fcc1",
+      "after_sha256": "58dab9dc4dbfad47eb88078c850bcf8cb365578a635398be8b65179074cc5c6f",
       "owners": {
         "@document": {
-          "before": "ad8ce9f5f1cd75a998bdbc5d2b67962f240edb85d48742b95850b2027cda5b93",
-          "after": "337d3ac35e44a363b46f04b6be423753f55e8693aa2c196d468ad2460936fcc1"
+          "before": "337d3ac35e44a363b46f04b6be423753f55e8693aa2c196d468ad2460936fcc1",
+          "after": "58dab9dc4dbfad47eb88078c850bcf8cb365578a635398be8b65179074cc5c6f"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "88025c4f5e53c9b5f42a663062f23cec9c5651667ad8f18fe5b46af430b4da6f",
-      "after_sha256": "68292b457983fee20690067ec452be369beb1c3d82041fbe7477ee131e2fb0e6",
+      "before_sha256": "68292b457983fee20690067ec452be369beb1c3d82041fbe7477ee131e2fb0e6",
+      "after_sha256": "1a1b2f2a1fb08879d351a9594a8a10281dd7f6781bcec3669185171fbdca61ce",
       "owners": {
         "@document": {
-          "before": "88025c4f5e53c9b5f42a663062f23cec9c5651667ad8f18fe5b46af430b4da6f",
-          "after": "68292b457983fee20690067ec452be369beb1c3d82041fbe7477ee131e2fb0e6"
+          "before": "68292b457983fee20690067ec452be369beb1c3d82041fbe7477ee131e2fb0e6",
+          "after": "1a1b2f2a1fb08879d351a9594a8a10281dd7f6781bcec3669185171fbdca61ce"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
-      "before_sha256": "a0b3c0b56e648c595953c9bb5947e9fd45bc1639bc359eb146e9da7067dc0477",
-      "after_sha256": "b2f94e1591514bf044813c02cd77500ec4935416014ce256f59b36da3dfc3534",
+      "before_sha256": "b2f94e1591514bf044813c02cd77500ec4935416014ce256f59b36da3dfc3534",
+      "after_sha256": "670548544281f59623f7cc72ee3b24e63be764ace7a7cebf0b7e662aa570bacc",
       "owners": {
         "@document": {
-          "before": "a0b3c0b56e648c595953c9bb5947e9fd45bc1639bc359eb146e9da7067dc0477",
-          "after": "b2f94e1591514bf044813c02cd77500ec4935416014ce256f59b36da3dfc3534"
+          "before": "b2f94e1591514bf044813c02cd77500ec4935416014ce256f59b36da3dfc3534",
+          "after": "670548544281f59623f7cc72ee3b24e63be764ace7a7cebf0b7e662aa570bacc"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "a1d04b5b658ef1cd5d7b37fa0967c567eaf87bdb4bdf5ffdbc5afb81145bc7e6",
-      "after_sha256": "b6fddd5695453d7a0e1db52d26a520367d3a506f90b3144ce80f9f6cec6bc4ea",
+      "before_sha256": "b6fddd5695453d7a0e1db52d26a520367d3a506f90b3144ce80f9f6cec6bc4ea",
+      "after_sha256": "3301d3d397736d4453ed650828d59585c65b3347b03e06181468692cd5841079",
       "owners": {
         "@document": {
-          "before": "a1d04b5b658ef1cd5d7b37fa0967c567eaf87bdb4bdf5ffdbc5afb81145bc7e6",
-          "after": "b6fddd5695453d7a0e1db52d26a520367d3a506f90b3144ce80f9f6cec6bc4ea"
+          "before": "b6fddd5695453d7a0e1db52d26a520367d3a506f90b3144ce80f9f6cec6bc4ea",
+          "after": "3301d3d397736d4453ed650828d59585c65b3347b03e06181468692cd5841079"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "c71e01e11f52d18c0e446ae6b8c5c31fbf985c5743dd10f6d62afc7ff3c01ce8",
-      "after_sha256": "5c4fec7109b19f1c6eb0e277bbbb4893a70c7031debba25bdfd0c173ef761636",
+      "before_sha256": "5c4fec7109b19f1c6eb0e277bbbb4893a70c7031debba25bdfd0c173ef761636",
+      "after_sha256": "64a5e71ead52cc68f2a99aa24d5d76acd17bce5ef37ea039de2bdb3e98e80191",
       "owners": {
         "@document": {
-          "before": "c71e01e11f52d18c0e446ae6b8c5c31fbf985c5743dd10f6d62afc7ff3c01ce8",
-          "after": "5c4fec7109b19f1c6eb0e277bbbb4893a70c7031debba25bdfd0c173ef761636"
+          "before": "5c4fec7109b19f1c6eb0e277bbbb4893a70c7031debba25bdfd0c173ef761636",
+          "after": "64a5e71ead52cc68f2a99aa24d5d76acd17bce5ef37ea039de2bdb3e98e80191"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "fae858962800c215d68c9001b1ba5dbabe2a32ca518fe7d9395e726efc3bd98b",
-      "after_sha256": "815abb9a9c35408a2007644b9e6aff843a1798e842837729217fd259ccaf9f48",
+      "before_sha256": "815abb9a9c35408a2007644b9e6aff843a1798e842837729217fd259ccaf9f48",
+      "after_sha256": "2b03566ad165c11b33579e1c53693e054f6a60c4ee64bcb8b77e1d5480958927",
       "owners": {
         "@document": {
-          "before": "fae858962800c215d68c9001b1ba5dbabe2a32ca518fe7d9395e726efc3bd98b",
-          "after": "815abb9a9c35408a2007644b9e6aff843a1798e842837729217fd259ccaf9f48"
+          "before": "815abb9a9c35408a2007644b9e6aff843a1798e842837729217fd259ccaf9f48",
+          "after": "2b03566ad165c11b33579e1c53693e054f6a60c4ee64bcb8b77e1d5480958927"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "d76a9abccaa5f74f283ce3c9497e9a50f1da0670a7ecd36531b71c26fba47360",
-      "after_sha256": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
+      "before_sha256": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
+      "after_sha256": "8851ea8bc789f186489a1cd5790aacc0a9bc80a2d9170f48ad2b4965d5f28637",
       "owners": {
         "@document": {
-          "before": "d76a9abccaa5f74f283ce3c9497e9a50f1da0670a7ecd36531b71c26fba47360",
-          "after": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793"
+          "before": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
+          "after": "8851ea8bc789f186489a1cd5790aacc0a9bc80a2d9170f48ad2b4965d5f28637"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "be2f97a4a4b9f123156028ae771819551519711e924de1c001ae78eb8f3d8719",
-      "after_sha256": "703026acec5ec84c12110c0caed34579a1a48bc3a2da7138c8f9667dc3833c57",
+      "before_sha256": "703026acec5ec84c12110c0caed34579a1a48bc3a2da7138c8f9667dc3833c57",
+      "after_sha256": "e894ef5f995f2efe68979d0ea8644590dd60828f3b48bf51c41eb0a02f9a95cd",
       "owners": {
         "@document": {
-          "before": "be2f97a4a4b9f123156028ae771819551519711e924de1c001ae78eb8f3d8719",
-          "after": "703026acec5ec84c12110c0caed34579a1a48bc3a2da7138c8f9667dc3833c57"
+          "before": "703026acec5ec84c12110c0caed34579a1a48bc3a2da7138c8f9667dc3833c57",
+          "after": "e894ef5f995f2efe68979d0ea8644590dd60828f3b48bf51c41eb0a02f9a95cd"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "cb19f8ae764aa20d6fb731174a3915465222effe63ba56889d1d3ab0f43ca29f",
-      "after_sha256": "376637fec673e58f1fc199e4cdc330ac79baabc75e6afdee229c95b6f433aacc",
+      "before_sha256": "376637fec673e58f1fc199e4cdc330ac79baabc75e6afdee229c95b6f433aacc",
+      "after_sha256": "6a8b25216097734b24b5f0b4f9ab8ccdc94d5799705cc462e405f77e818ce9f0",
       "owners": {
         "@document": {
-          "before": "cb19f8ae764aa20d6fb731174a3915465222effe63ba56889d1d3ab0f43ca29f",
-          "after": "376637fec673e58f1fc199e4cdc330ac79baabc75e6afdee229c95b6f433aacc"
+          "before": "376637fec673e58f1fc199e4cdc330ac79baabc75e6afdee229c95b6f433aacc",
+          "after": "6a8b25216097734b24b5f0b4f9ab8ccdc94d5799705cc462e405f77e818ce9f0"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "b44cbe80458f4bc3d0c3df557b4a32ce0f170590aca60cca6a413d846bf57f79",
-      "after_sha256": "79ac48845700d5a789a412c0c543dbe1439ea45e1af6b15dfed3473f33ec9cd4",
+      "before_sha256": "79ac48845700d5a789a412c0c543dbe1439ea45e1af6b15dfed3473f33ec9cd4",
+      "after_sha256": "e49ea52684ffbfafb5d694fabf00f43161de4f5133a6e7bc5f0da2001fff3a0d",
       "owners": {
         "@document": {
-          "before": "b44cbe80458f4bc3d0c3df557b4a32ce0f170590aca60cca6a413d846bf57f79",
-          "after": "79ac48845700d5a789a412c0c543dbe1439ea45e1af6b15dfed3473f33ec9cd4"
+          "before": "79ac48845700d5a789a412c0c543dbe1439ea45e1af6b15dfed3473f33ec9cd4",
+          "after": "e49ea52684ffbfafb5d694fabf00f43161de4f5133a6e7bc5f0da2001fff3a0d"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "8b7eaf5d90412f8eabcbbda6a1fd9d2e56ea6137748c436589b20a5f6d867230",
-      "after_sha256": "61a4e7af64df329d07dae2ef59d8193775781983989c9bad0792bfbbcb072021",
+      "before_sha256": "61a4e7af64df329d07dae2ef59d8193775781983989c9bad0792bfbbcb072021",
+      "after_sha256": "b3fbdbb0fd28c68b5fcdb357f84b306ab84103446217bd386fafccb150d9fd51",
       "owners": {
         "@document": {
-          "before": "8b7eaf5d90412f8eabcbbda6a1fd9d2e56ea6137748c436589b20a5f6d867230",
-          "after": "61a4e7af64df329d07dae2ef59d8193775781983989c9bad0792bfbbcb072021"
+          "before": "61a4e7af64df329d07dae2ef59d8193775781983989c9bad0792bfbbcb072021",
+          "after": "b3fbdbb0fd28c68b5fcdb357f84b306ab84103446217bd386fafccb150d9fd51"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "75bc20f49ff5f4bf8f3b6d42811610fc8a2693c39ca09a8d4865e3ea9870a4e8",
-      "after_sha256": "94c3c36fe130247df1267000ff61121480c6f57261009cf8c4a13c4ed3465eb8",
+      "before_sha256": "94c3c36fe130247df1267000ff61121480c6f57261009cf8c4a13c4ed3465eb8",
+      "after_sha256": "1b8d7524d3c01e360a9213fd2d5efff1c21ba934279f499330d2808aba708121",
       "owners": {
         "@document": {
-          "before": "75bc20f49ff5f4bf8f3b6d42811610fc8a2693c39ca09a8d4865e3ea9870a4e8",
-          "after": "94c3c36fe130247df1267000ff61121480c6f57261009cf8c4a13c4ed3465eb8"
+          "before": "94c3c36fe130247df1267000ff61121480c6f57261009cf8c4a13c4ed3465eb8",
+          "after": "1b8d7524d3c01e360a9213fd2d5efff1c21ba934279f499330d2808aba708121"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "9c74fcfc3ab9b01b894dffbfa386ae9ee8b18e7ded27c8572a0b4f0e54d3d831",
-      "after_sha256": "4eb98eb67d31c2cd591ace7b82010f18f0b7cd0eecf93741f5dfc50fa9cde12f",
+      "before_sha256": "4eb98eb67d31c2cd591ace7b82010f18f0b7cd0eecf93741f5dfc50fa9cde12f",
+      "after_sha256": "083099fa8b281cff26909ac22d26e1452671f13e83d8891eb95a7bc79102162d",
       "owners": {
         "@document": {
-          "before": "9c74fcfc3ab9b01b894dffbfa386ae9ee8b18e7ded27c8572a0b4f0e54d3d831",
-          "after": "4eb98eb67d31c2cd591ace7b82010f18f0b7cd0eecf93741f5dfc50fa9cde12f"
+          "before": "4eb98eb67d31c2cd591ace7b82010f18f0b7cd0eecf93741f5dfc50fa9cde12f",
+          "after": "083099fa8b281cff26909ac22d26e1452671f13e83d8891eb95a7bc79102162d"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "d59c9ef2f3b9a2248998b8c6e2d1ee4e4886f88f3c184a856bf724464cc79ad6",
-      "after_sha256": "c0e719375754379377836a026698e14b177baebb9212fb6ce88853ad43ee8370",
+      "before_sha256": "c0e719375754379377836a026698e14b177baebb9212fb6ce88853ad43ee8370",
+      "after_sha256": "a9db5d8d8018bde358db1d789104acaaed1af936efe31c0a46f11d032d06889d",
       "owners": {
         "@document": {
-          "before": "d59c9ef2f3b9a2248998b8c6e2d1ee4e4886f88f3c184a856bf724464cc79ad6",
-          "after": "c0e719375754379377836a026698e14b177baebb9212fb6ce88853ad43ee8370"
+          "before": "c0e719375754379377836a026698e14b177baebb9212fb6ce88853ad43ee8370",
+          "after": "a9db5d8d8018bde358db1d789104acaaed1af936efe31c0a46f11d032d06889d"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
-      "after_sha256": "f13a050ca50d49a41765148231907099a7c0ecbf66ab60e4de4f214ae3d1d3b4",
+      "before_sha256": "f13a050ca50d49a41765148231907099a7c0ecbf66ab60e4de4f214ae3d1d3b4",
+      "after_sha256": "65a00b490ae2f4d39c57ce4979e9de417b3012bf00fd638ddc4b65c0e56a80e8",
       "owners": {
         "@document": {
-          "before": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
-          "after": "f13a050ca50d49a41765148231907099a7c0ecbf66ab60e4de4f214ae3d1d3b4"
+          "before": "f13a050ca50d49a41765148231907099a7c0ecbf66ab60e4de4f214ae3d1d3b4",
+          "after": "65a00b490ae2f4d39c57ce4979e9de417b3012bf00fd638ddc4b65c0e56a80e8"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "788f9217109f8274c087ade1de7c873c1d25ba324e5601d478a6aae4abc78e4e",
-      "after_sha256": "6a2badeb9b7ff64e26ad40bf218a557b21c455933de6da3907fc80cf08d34eba",
+      "before_sha256": "6a2badeb9b7ff64e26ad40bf218a557b21c455933de6da3907fc80cf08d34eba",
+      "after_sha256": "89b3b38a0e7acd607db04b2c0a9d0589714454973539fc66584aadd7a000df82",
       "owners": {
         "@document": {
-          "before": "788f9217109f8274c087ade1de7c873c1d25ba324e5601d478a6aae4abc78e4e",
-          "after": "6a2badeb9b7ff64e26ad40bf218a557b21c455933de6da3907fc80cf08d34eba"
+          "before": "6a2badeb9b7ff64e26ad40bf218a557b21c455933de6da3907fc80cf08d34eba",
+          "after": "89b3b38a0e7acd607db04b2c0a9d0589714454973539fc66584aadd7a000df82"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "54834aa7ca125f11b995fd0465c288718bdc06c1a7e706c96520862282a17a8d",
-      "after_sha256": "227cc16d16ddce135ca3272aedc7df7d3cdbcb0e40790781081245c6455ccd9c",
+      "before_sha256": "227cc16d16ddce135ca3272aedc7df7d3cdbcb0e40790781081245c6455ccd9c",
+      "after_sha256": "ae5798ae0c1ba678f6b5ffbca45627eded0ceb22f64ba72219fef71e908273af",
       "owners": {
         "@document": {
-          "before": "54834aa7ca125f11b995fd0465c288718bdc06c1a7e706c96520862282a17a8d",
-          "after": "227cc16d16ddce135ca3272aedc7df7d3cdbcb0e40790781081245c6455ccd9c"
+          "before": "227cc16d16ddce135ca3272aedc7df7d3cdbcb0e40790781081245c6455ccd9c",
+          "after": "ae5798ae0c1ba678f6b5ffbca45627eded0ceb22f64ba72219fef71e908273af"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "b9875f1175f2143d22e32e31ac2c61fc5a599e28c29c07aa59447e3710b3a818",
-      "after_sha256": "0e35b87359278e474071be03779b7ca9cab01b42a40617576372d09d8c640a05",
+      "before_sha256": "0e35b87359278e474071be03779b7ca9cab01b42a40617576372d09d8c640a05",
+      "after_sha256": "a812f24bb1f0c8c0b98151497ead8a6fc29ea3ad4512cbaa6deec97e6967fe34",
       "owners": {
         "@document": {
-          "before": "b9875f1175f2143d22e32e31ac2c61fc5a599e28c29c07aa59447e3710b3a818",
-          "after": "0e35b87359278e474071be03779b7ca9cab01b42a40617576372d09d8c640a05"
+          "before": "0e35b87359278e474071be03779b7ca9cab01b42a40617576372d09d8c640a05",
+          "after": "a812f24bb1f0c8c0b98151497ead8a6fc29ea3ad4512cbaa6deec97e6967fe34"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "2e81114ad6d598935f120ed85db96630cdbd10ac5a0bb14d2cd2a973044bb7ce",
-      "after_sha256": "4e035b8e3ea35b54f5c1df35c29b124001fac56905881222e1230a2746c8878b",
+      "before_sha256": "4e035b8e3ea35b54f5c1df35c29b124001fac56905881222e1230a2746c8878b",
+      "after_sha256": "698fd3e6ad3a8730f73a131d2108a80b20674fe999b5a39a738ca5e2d736e9bb",
       "owners": {
         "@document": {
-          "before": "2e81114ad6d598935f120ed85db96630cdbd10ac5a0bb14d2cd2a973044bb7ce",
-          "after": "4e035b8e3ea35b54f5c1df35c29b124001fac56905881222e1230a2746c8878b"
+          "before": "4e035b8e3ea35b54f5c1df35c29b124001fac56905881222e1230a2746c8878b",
+          "after": "698fd3e6ad3a8730f73a131d2108a80b20674fe999b5a39a738ca5e2d736e9bb"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "849db1a0441bae61cb3fb645d2c0ac531e8f0a29fcc0f9564503a1eb08697f9f",
-      "after_sha256": "f50c4eabca575efa3a93a983d2ae662715fe593fe903b4ec2dce89e8932923d5",
+      "before_sha256": "f50c4eabca575efa3a93a983d2ae662715fe593fe903b4ec2dce89e8932923d5",
+      "after_sha256": "a1ddb45ed98ae4f70ddb9e00a0ea397784eb71df40e65b4d7be3318b960707c3",
       "owners": {
         "@document": {
-          "before": "849db1a0441bae61cb3fb645d2c0ac531e8f0a29fcc0f9564503a1eb08697f9f",
-          "after": "f50c4eabca575efa3a93a983d2ae662715fe593fe903b4ec2dce89e8932923d5"
+          "before": "f50c4eabca575efa3a93a983d2ae662715fe593fe903b4ec2dce89e8932923d5",
+          "after": "a1ddb45ed98ae4f70ddb9e00a0ea397784eb71df40e65b4d7be3318b960707c3"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "0aaf1ee49a81b2a94ef0d06abc851d32f644d17b1013b82580495626f3c370f7",
-      "after_sha256": "8036d4d0b2d83ee3a961ca2c896c31b77325981ae927a0a8e98362e76106fa80",
+      "before_sha256": "8036d4d0b2d83ee3a961ca2c896c31b77325981ae927a0a8e98362e76106fa80",
+      "after_sha256": "242fb6b990b04d1efc026c15a8163b1db5aa9a1d90f631650c8d98b3defc864f",
       "owners": {
         "@document": {
-          "before": "0aaf1ee49a81b2a94ef0d06abc851d32f644d17b1013b82580495626f3c370f7",
-          "after": "8036d4d0b2d83ee3a961ca2c896c31b77325981ae927a0a8e98362e76106fa80"
+          "before": "8036d4d0b2d83ee3a961ca2c896c31b77325981ae927a0a8e98362e76106fa80",
+          "after": "242fb6b990b04d1efc026c15a8163b1db5aa9a1d90f631650c8d98b3defc864f"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "57a6ba9db5ca64b0fcbf6a95e06979907f8c5d09ca04130ae7f564a30672e2d9",
-      "after_sha256": "52df197b49f2e22a2b4095b76e91dbcb53620bc651eeba25702c1473a33a764f",
+      "before_sha256": "52df197b49f2e22a2b4095b76e91dbcb53620bc651eeba25702c1473a33a764f",
+      "after_sha256": "3737982ec8ba440841164f6d7e831d1ae1e856f92e36171de6d6a2f0f427f956",
       "owners": {
         "@document": {
-          "before": "57a6ba9db5ca64b0fcbf6a95e06979907f8c5d09ca04130ae7f564a30672e2d9",
-          "after": "52df197b49f2e22a2b4095b76e91dbcb53620bc651eeba25702c1473a33a764f"
+          "before": "52df197b49f2e22a2b4095b76e91dbcb53620bc651eeba25702c1473a33a764f",
+          "after": "3737982ec8ba440841164f6d7e831d1ae1e856f92e36171de6d6a2f0f427f956"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "88a5d60022fdf3b0358ea3c344d8eb0d8707db161a6638df57a5d0318fab38e4",
-      "after_sha256": "376453b35f9a9ffdca8f00c996ea3fc2ec2cfb1a39bdff3ba45031012684fdb8",
+      "before_sha256": "376453b35f9a9ffdca8f00c996ea3fc2ec2cfb1a39bdff3ba45031012684fdb8",
+      "after_sha256": "8edfc3b874c78f43851d6a2050730a1c9c3b1cc57afbec95bda4c1354429637c",
       "owners": {
         "@document": {
-          "before": "88a5d60022fdf3b0358ea3c344d8eb0d8707db161a6638df57a5d0318fab38e4",
-          "after": "376453b35f9a9ffdca8f00c996ea3fc2ec2cfb1a39bdff3ba45031012684fdb8"
+          "before": "376453b35f9a9ffdca8f00c996ea3fc2ec2cfb1a39bdff3ba45031012684fdb8",
+          "after": "8edfc3b874c78f43851d6a2050730a1c9c3b1cc57afbec95bda4c1354429637c"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "40520fdd789b1cd502152ea5baf0c173c62cd038c82d965208617dfba4f0c858",
-      "after_sha256": "e9bb97f7caa519002e8c7f93b67a7c3fd6a3a8e54e9a5e079e5286749b038b77",
+      "before_sha256": "e9bb97f7caa519002e8c7f93b67a7c3fd6a3a8e54e9a5e079e5286749b038b77",
+      "after_sha256": "e9c936e7fc56aee557e652dcbd047304eb80941c6653f8f36712fdd3f9c49910",
       "owners": {
         "@document": {
-          "before": "40520fdd789b1cd502152ea5baf0c173c62cd038c82d965208617dfba4f0c858",
-          "after": "e9bb97f7caa519002e8c7f93b67a7c3fd6a3a8e54e9a5e079e5286749b038b77"
+          "before": "e9bb97f7caa519002e8c7f93b67a7c3fd6a3a8e54e9a5e079e5286749b038b77",
+          "after": "e9c936e7fc56aee557e652dcbd047304eb80941c6653f8f36712fdd3f9c49910"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "5f0deaa6547a844569edc4d1ea28d041e58d24ebae067b27893425692d3cd171",
-      "after_sha256": "f34e543353bb6ebd3ad3a45bec05c030b8228ee490204caa888e2cd4f6b918bd",
+      "before_sha256": "f34e543353bb6ebd3ad3a45bec05c030b8228ee490204caa888e2cd4f6b918bd",
+      "after_sha256": "1bab9eee4fa1d362bd7fc33f3712279b18fd5d971f92d11bcb0dc113536ec4cc",
       "owners": {
         "@document": {
-          "before": "5f0deaa6547a844569edc4d1ea28d041e58d24ebae067b27893425692d3cd171",
-          "after": "f34e543353bb6ebd3ad3a45bec05c030b8228ee490204caa888e2cd4f6b918bd"
+          "before": "f34e543353bb6ebd3ad3a45bec05c030b8228ee490204caa888e2cd4f6b918bd",
+          "after": "1bab9eee4fa1d362bd7fc33f3712279b18fd5d971f92d11bcb0dc113536ec4cc"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "8ebdce00df8ed3efe5079310a7819fcfeba0306a46dc633920a2a8784f0c7401",
-      "after_sha256": "ac4a8d24cc3f6d332572f1fa6a518f5eb243f3406ed6780464d71df84eb3cdba",
+      "before_sha256": "ac4a8d24cc3f6d332572f1fa6a518f5eb243f3406ed6780464d71df84eb3cdba",
+      "after_sha256": "9cab50ac81a5cf224f2748028ccdfa7c30f75788b2d706f15b760f1ed293634f",
       "owners": {
         "@document": {
-          "before": "8ebdce00df8ed3efe5079310a7819fcfeba0306a46dc633920a2a8784f0c7401",
-          "after": "ac4a8d24cc3f6d332572f1fa6a518f5eb243f3406ed6780464d71df84eb3cdba"
+          "before": "ac4a8d24cc3f6d332572f1fa6a518f5eb243f3406ed6780464d71df84eb3cdba",
+          "after": "9cab50ac81a5cf224f2748028ccdfa7c30f75788b2d706f15b760f1ed293634f"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "8a3d4c6fb2ce85e16d0e2502290fdb40cb8d92cd29363b1b5216e1626f3a1ffa",
-      "after_sha256": "11c271e418fac38de5c4465541d3a69e1169b0ede51ffc793de9585b47470805",
+      "before_sha256": "11c271e418fac38de5c4465541d3a69e1169b0ede51ffc793de9585b47470805",
+      "after_sha256": "4f8f8b020b67ac7c0282e99418fe89e7bfd57b23c2f05a0d4e0e8de08da9d0e0",
       "owners": {
         "@document": {
-          "before": "8a3d4c6fb2ce85e16d0e2502290fdb40cb8d92cd29363b1b5216e1626f3a1ffa",
-          "after": "11c271e418fac38de5c4465541d3a69e1169b0ede51ffc793de9585b47470805"
-        }
-      }
-    },
-    "docs/performance/canonical-coverage-preflight/observations.json": {
-      "before_sha256": null,
-      "after_sha256": "6d7b7de7dac49d3d16405307601e8fff84344619a40f5a58360ae3d7cd164714",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "6d7b7de7dac49d3d16405307601e8fff84344619a40f5a58360ae3d7cd164714"
-        }
-      }
-    },
-    "docs/performance/canonical-coverage-preflight/workload.json": {
-      "before_sha256": null,
-      "after_sha256": "cb50fcc855c0de0ff4997862d9552d851cc0b6f8bf4dd3aadcf8799f89901825",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "cb50fcc855c0de0ff4997862d9552d851cc0b6f8bf4dd3aadcf8799f89901825"
-        }
-      }
-    },
-    "docs/performance/current/canonical-coverage-preflight.json": {
-      "before_sha256": null,
-      "after_sha256": "91f9061c670ae9cc10ec603fb50f40188a18548410b1d834cf0e7a6488b136a9",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "91f9061c670ae9cc10ec603fb50f40188a18548410b1d834cf0e7a6488b136a9"
+          "before": "11c271e418fac38de5c4465541d3a69e1169b0ede51ffc793de9585b47470805",
+          "after": "4f8f8b020b67ac7c0282e99418fe89e7bfd57b23c2f05a0d4e0e8de08da9d0e0"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "87d294a889bd63579bd36142b13f6035a1372f7bd4024281f20a6083f7e231d8",
-      "after_sha256": "6cc5bee03986fd62a7737b38f5baad5c6765cc89bea1f3143d523eff74b33db9",
+      "before_sha256": "6cc5bee03986fd62a7737b38f5baad5c6765cc89bea1f3143d523eff74b33db9",
+      "after_sha256": "fbcb71e0acb8a462c85d85dee98e798e65b3f88759b4ab43d9583592eb9e8a59",
       "owners": {
         "@document": {
-          "before": "87d294a889bd63579bd36142b13f6035a1372f7bd4024281f20a6083f7e231d8",
-          "after": "6cc5bee03986fd62a7737b38f5baad5c6765cc89bea1f3143d523eff74b33db9"
-        }
-      }
-    },
-    "scripts/measure_canonical_coverage_preflight.py": {
-      "before_sha256": null,
-      "after_sha256": "cf1aed013e2d9cea3bb140a4d4ce604150d04624572f5adfec5ec470c6bd0fa8",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "e9b25ec020a22fc4147be02da27bd0138b3f58351042429d4b6712e01287ed88"
-        },
-        "main": {
-          "before": null,
-          "after": "91ac680a9615ba50272394477080a5317f78da4d6ccc0eb9fc081d3ed6c48892"
+          "before": "6cc5bee03986fd62a7737b38f5baad5c6765cc89bea1f3143d523eff74b33db9",
+          "after": "fbcb71e0acb8a462c85d85dee98e798e65b3f88759b4ab43d9583592eb9e8a59"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "a1d3d485d286af2afb85bc707c5b5127423618cae37e95bdde9a3067d7ad1edd",
-      "after_sha256": "2467bdd46a77208e38fd61be95a50e9f307da74e1b00a26ab1d2145acfec12ce",
+      "before_sha256": "2467bdd46a77208e38fd61be95a50e9f307da74e1b00a26ab1d2145acfec12ce",
+      "after_sha256": "6677542843eaea16f4d8bb5c7b0d96085b4dc4ea2bf496f49f26f68c03873638",
       "owners": {
         "@document": {
-          "before": "a1d3d485d286af2afb85bc707c5b5127423618cae37e95bdde9a3067d7ad1edd",
-          "after": "2467bdd46a77208e38fd61be95a50e9f307da74e1b00a26ab1d2145acfec12ce"
+          "before": "2467bdd46a77208e38fd61be95a50e9f307da74e1b00a26ab1d2145acfec12ce",
+          "after": "6677542843eaea16f4d8bb5c7b0d96085b4dc4ea2bf496f49f26f68c03873638"
         }
       }
     },
-    "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
-      "before_sha256": "d20502870ec4302048bde101a6518bf760258daa5e54d8cd267aa1ebf5940de4",
-      "after_sha256": "10747a3382b89d7a6c55d5624a42fccd052980544689a20805185b2cdd2be311",
-      "owners": {
-        "CanonicalDeploymentCoverage.from_payload": {
-          "before": "f068c1f8a4357b338e4fb5800492d466cb54943d81c9f6caa519de494dd1637f",
-          "after": "1d562e2ba5951018f56c1c7a73cf002dfa00f0d27ec26db4f15362149b56befd"
-        },
-        "_coverage_totals": {
-          "before": null,
-          "after": "578c71908d769d304a0ea4dffa06ddc262287388ab0958bd980aab489e032cde"
-        },
-        "_measure_prefixes": {
-          "before": "1a024b7d4072c2bb9ed242592a7f996de6439bf90d81ef5d441de3ad1426c26a",
-          "after": "690726b90e3aa022478749730a484dc860b217a5cbb02cbb755aff01f9e0befe"
-        }
-      }
-    },
-    "src/warhammer40k_core/ai/followthrough_scenario.py": {
+    "src/warhammer40k_core/ai/opposing_shooter_scenario.py": {
       "before_sha256": null,
-      "after_sha256": "2b34da3d67644e1d47fa1f7f5833d0c9bf00dbc20942a1667fe6a36bb28bb675",
+      "after_sha256": "240d92e95a494efdc711e57cf414c45d1f29b2cb500cbd5223fa473a7233ef66",
       "owners": {
         "@module": {
           "before": null,
-          "after": "138ed568023b1d2b719367882da3527524d5c4cdedb2cd73586ea639ddbe1cca"
+          "after": "7924e9fe4b5e50b2eb7d184ac11e37fd5c1d1f2aed4dfbac2c8078aa4ec18149"
         },
-        "FollowthroughPairAdmission": {
+        "OpposingShooterQualification": {
           "before": null,
-          "after": "86532f6363e46043a0d3d1411172ca1ab6a2cc862efcf2a414293c3be6248864"
+          "after": "793371284b81638b0c3e03671dc3bb4d6995e03d9cbab68f16c62a7b8f7718c9"
         },
-        "FollowthroughPairAdmission.__init__": {
+        "OpposingShooterQualification.__init__": {
           "before": null,
-          "after": "e038bd0690b2b24df06182d97ec472d4e980ace2864ada1766d07ddef55ff2fb"
+          "after": "47eb562e298358bc1dd65719e8049ef7b02a6efd473b563f390436e2eba10221"
         },
-        "FollowthroughPairAdmission.content_hash": {
+        "OpposingShooterQualification.content_hash": {
           "before": null,
           "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
         },
-        "FollowthroughPairAdmission.from_payload": {
+        "OpposingShooterQualification.from_sessions": {
           "before": null,
-          "after": "c8cc6b6909ea266692f918c660075a1c2742eb6d1962125dd18a8a79950dc6d9"
+          "after": "d722e3d0ca4ea3866cd7a538e238dba95fe185d7660fd441a339a5b284321b3f"
         },
-        "FollowthroughPairAdmission.from_sessions": {
-          "before": null,
-          "after": "c5028fb9c95faa6d80a6d53916e3586e49565b09415b7bb6e89de7670cd5b0da"
-        },
-        "FollowthroughPairAdmission.to_payload": {
+        "OpposingShooterQualification.to_payload": {
           "before": null,
           "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
         },
-        "_continue": {
+        "_approach": {
           "before": null,
-          "after": "cfbf7ef43732cf01dfca8f306f8cdef7836ca2b183fd28609212ea1f0a009120"
+          "after": "a2cb85023388a3c7768957aa86f4e750661ec38b0fcfd11d3eb65996f1d80691"
         },
-        "_definition": {
+        "_approach_proposal": {
           "before": null,
-          "after": "0129e4084929188a902b382d6f36192530f2a1ab8941e211164ceafc9dd04dd6"
+          "after": "f6fb3eea426382168241b1fb2000c3b030a847cff98762a5bfea2f12d8e7ff6b"
         },
-        "_exploiter_proposal": {
+        "_declaration": {
           "before": null,
-          "after": "31e645d882e1fecd8a9cdf7fc2915fabd2b9d23f9af75bd1cab0cdca913c5c32"
+          "after": "a244fc44c7131806da42d0d4a47d9e576bf31dbb47e7ba2e24d2edf9225039fb"
         },
-        "_opponent_probe": {
+        "_diagnose_endpoint": {
           "before": null,
-          "after": "5c40c8dc53e10ef241a40ea5cce99e226d420595b37a9ab1cf7e7649a8a61697"
+          "after": "5847ad22c06cff4e99a1e18db86a0f61747e427c2ef2b5a60aed0ad511801857"
         },
-        "_reproduce": {
+        "_finish_attack": {
           "before": null,
-          "after": "83421314bd17aef7db1c07bea146f960ce885487ca9d69704eb6d7415d31107c"
+          "after": "a38f00d4506780470935b626d10ee91baa886486a90731c411b3b7d0b3116865"
         },
-        "followthrough_definition": {
+        "_submit": {
           "before": null,
-          "after": "dc355738829ce5cb7da0149f62733fb5d673adfec8d4606ac169df4bf007a90b"
+          "after": "7b1ad9d8910101e6b0e1b1104a399c1367aefc5ed394a589c076dd192845c7c1"
         },
-        "reproduce_followthrough_pair": {
+        "opposing_shooter_definition": {
           "before": null,
-          "after": "093d2dc3df30def1587596c5c8f48d2178ae419d16276e02a23543f1e0305d02"
+          "after": "63fcb0c8bd339700d264fc2300f79491229315c12a444f72c9fd35476d9ccc42"
         }
       }
     },
-    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": {
       "before_sha256": null,
-      "after_sha256": "90b2fbdcaa950cfa3002dc7c1b3172473639b66c94fd9192839162f95d148068",
+      "after_sha256": "b194cc112d8218eac3c08c984cdfa2ecf0c78abf9db9edec61f0d9ad2a0a73d3",
       "owners": {
         "@module": {
           "before": null,
-          "after": "3b03e785bd8927ecf35a4db00cba8780701e5af8cc2232b38fb723f4eb9850c1"
+          "after": "09cc5b7e9d839b0d8575940f54fa90cba0ab05f7d997f70c4f5b234786fd5917"
         },
-        "_counts": {
+        "test_exact_pair_shooter_diagnostics_and_ordinary_opposing_attack_replay": {
           "before": null,
-          "after": "e0eb359728761623ef52d5e5af3d061a670a88cd3f7ddd3325e0fbf89a57cc3b"
+          "after": "47bfb735ea47a5fcdb133d264f3eed3b8f1314a44df070bef9fb4520c2526009"
         },
-        "test_consistent_tampering_still_reproduces_the_real_engine": {
+        "test_opposing_qualification_rejects_unreached_and_wrong_configuration": {
           "before": null,
-          "after": "9e7518201a01e5d1cdaec76314170b5740ae37d550b8baef6f1dce0f57bcec72"
-        },
-        "test_coverage_totals_derive_each_kind_without_fixed_fixture_counts": {
-          "before": null,
-          "after": "1778adb9b72c268128d1102612ee307a3a5e115121a5e6c315229c1f8846526f"
-        },
-        "test_coverage_totals_reject_missing_or_noninteger_counts": {
-          "before": null,
-          "after": "0a52c3a22ed49428ed3831d6b38dba9124fb0be4cf126bfdf3ba53a475cb7eb8"
-        },
-        "test_coverage_totals_require_typed_rows": {
-          "before": null,
-          "after": "8290f053649f228a6ca6088b29130e3a18670d85be38118d7edc2ac3669579ce"
-        }
-      }
-    },
-    "tests/infrastructure/adapters/test_followthrough_scenario.py": {
-      "before_sha256": null,
-      "after_sha256": "3229c0dbfacbdaf1455aa6baf792362770cdca0fa20de8e47d0f74573cd81c51",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "29d17aca260610ea67a926fee2307155244827f7294e9a90eebcdd1a05aed409"
-        },
-        "pair": {
-          "before": null,
-          "after": "99b2157e1aff20df62d8fc8f5bd1bac3f6fba7b3aac6284bd5519146907833e5"
-        },
-        "test_followthrough_rejects_wrong_configuration_and_unreached_endpoints": {
-          "before": null,
-          "after": "1a24f3a2a9733e1244fae4140687bf5564040cbbf57464d8fa7fcb1ee6eb4e1a"
-        },
-        "test_matched_exploiter_movement_and_engine_rejected_opponent_shooter": {
-          "before": null,
-          "after": "2474a52392d5412e849d73b434fdff4e580d63dae5c19db5fcce3326d127e03e"
-        },
-        "test_pair_json_replay_closed_receipt_and_declined_reaction_continuation": {
-          "before": null,
-          "after": "317532b90bbc66e03fefa688702b87fedd4de1866ed6455633557cc71c6dbc0a"
+          "after": "513350952a46a701bcc6106f642956dce98bd7c1794d4cdd5cfbb50085bd6522"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "3cb67ae31bba624ba100e2f2292d70aced64cffffdb9e8d0e18be8fcf7f4e019",
-      "after_sha256": "b74c4c4893abd3575cb9eac1c43c38d0a47c41800424e1b1acef498aa3504e02",
+      "before_sha256": "b74c4c4893abd3575cb9eac1c43c38d0a47c41800424e1b1acef498aa3504e02",
+      "after_sha256": "c87a2376946e82f7574d6070d633290bac4730b047df11d78ae66c3d338e35cc",
       "owners": {
         "@document": {
-          "before": "3cb67ae31bba624ba100e2f2292d70aced64cffffdb9e8d0e18be8fcf7f4e019",
-          "after": "b74c4c4893abd3575cb9eac1c43c38d0a47c41800424e1b1acef498aa3504e02"
+          "before": "b74c4c4893abd3575cb9eac1c43c38d0a47c41800424e1b1acef498aa3504e02",
+          "after": "c87a2376946e82f7574d6070d633290bac4730b047df11d78ae66c3d338e35cc"
         }
       }
     }
@@ -490,7 +386,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -509,9 +405,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/hosted-calibration.json": {
       "category": "rule_semantics",
@@ -521,9 +417,9 @@
         "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -540,9 +436,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -559,9 +455,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -578,9 +474,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -597,9 +493,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -616,9 +512,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -635,9 +531,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -654,9 +550,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -673,9 +569,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -692,9 +588,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -711,9 +607,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -730,9 +626,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -749,9 +645,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -793,9 +689,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -837,9 +733,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -881,9 +777,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -925,9 +821,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -969,9 +865,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -1013,9 +909,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -1057,9 +953,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -1101,9 +997,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -1111,15 +1007,15 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -1127,7 +1023,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -1135,53 +1031,17 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
       "source_obligation": null,
       "unchanged_work": null
-    },
-    "docs/performance/canonical-coverage-preflight/observations.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Immutable actual-base/head operation measurements, exact current workload/source/dependency identities, original attempts and explicit single-sample limitations for the bounded receipt preflight optimization.",
-      "source_obligation": "",
-      "unchanged_work": ""
-    },
-    "docs/performance/canonical-coverage-preflight/workload.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Immutable actual-base/head operation measurements, exact current workload/source/dependency identities, original attempts and explicit single-sample limitations for the bounded receipt preflight optimization.",
-      "source_obligation": "",
-      "unchanged_work": ""
-    },
-    "docs/performance/current/canonical-coverage-preflight.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Immutable actual-base/head operation measurements, exact current workload/source/dependency identities, original attempts and explicit single-sample limitations for the bounded receipt preflight optimization.",
-      "source_obligation": "",
-      "unchanged_work": ""
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
       "source_obligation": null,
       "unchanged_work": null
-    },
-    "scripts/measure_canonical_coverage_preflight.py": {
-      "category": "measured_workload",
-      "operations": [
-        "canonical-coverage-preflight-measurement"
-      ],
-      "selected_families": [
-        "canonical_coverage_preflight"
-      ],
-      "rationale": "Deliberate bounded optimization rejects internally inconsistent receipt totals before redundant full reproduction. Matched actual-base valid reload and inconsistent-total rejection measurements are mandatory in docs/performance/current/canonical-coverage-preflight.json; the original complete test remains byte-identical.",
-      "source_obligation": "Totals derive from the receipt rows without hardcoded fixture counts. Every internally consistent receipt still executes fresh ordinary engine measurement and exact closed equality; real coordinated-tamper regression delegates that full reproduction and rejects.",
-      "unchanged_work": "No engine rule, fork, geometry, cache, RNG, candidate inventory, consistency acceptance boundary, coverage requirement, worker count or timing limit changes. One newly registered sample per operation is descriptive, with no variance or hosted approval claim."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -1192,53 +1052,29 @@
         "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
-    "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "canonical-deployment-coverage"
-      ],
-      "selected_families": [
-        "canonical_coverage_preflight"
-      ],
-      "rationale": "Deliberate bounded optimization rejects internally inconsistent receipt totals before redundant full reproduction. Matched actual-base valid reload and inconsistent-total rejection measurements are mandatory in docs/performance/current/canonical-coverage-preflight.json; the original complete test remains byte-identical.",
-      "source_obligation": "Totals derive from the receipt rows without hardcoded fixture counts. Every internally consistent receipt still executes fresh ordinary engine measurement and exact closed equality; real coordinated-tamper regression delegates that full reproduction and rejects.",
-      "unchanged_work": "No engine rule, fork, geometry, cache, RNG, candidate inventory, consistency acceptance boundary, coverage requirement, worker count or timing limit changes. One newly registered sample per operation is descriptive, with no variance or hosted approval claim."
-    },
-    "src/warhammer40k_core/ai/followthrough_scenario.py": {
+    "src/warhammer40k_core/ai/opposing_shooter_scenario.py": {
       "category": "rule_semantics",
       "operations": [
-        "paired-followthrough-admission"
+        "opposing-shooter-qualification"
       ],
       "selected_families": [],
-      "rationale": "A fixed operator-only pair reuses ordinary movement and reaction submissions, engine-owned PathWitness validation, strict persistence and exact replay; it qualifies legal E movement and one negative opposing shot probe.",
-      "source_obligation": "Preserve the canonical configuration and unchanged stationary/Normal Move prefixes; require three full-model E paths and the ordinary Fire Overwatch target validator, retaining the actual no-legal-declaration diagnostic without an attack or tactical value label.",
-      "unchanged_work": "No movement or shooting algorithm, generator, cache, authoritative state mutation, RNG, serializer, adapter family, ranker or learning format changes. The bounded receipt repeats existing engine operations; scenario costs and full-game qualification remain open."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
-    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
-      "category": "measured_workload",
-      "operations": [
-        "canonical-deployment-coverage"
-      ],
-      "selected_families": [
-        "canonical_coverage_preflight"
-      ],
-      "rationale": "Deliberate bounded optimization rejects internally inconsistent receipt totals before redundant full reproduction. Matched actual-base valid reload and inconsistent-total rejection measurements are mandatory in docs/performance/current/canonical-coverage-preflight.json; the original complete test remains byte-identical.",
-      "source_obligation": "Totals derive from the receipt rows without hardcoded fixture counts. Every internally consistent receipt still executes fresh ordinary engine measurement and exact closed equality; real coordinated-tamper regression delegates that full reproduction and rejects.",
-      "unchanged_work": "No engine rule, fork, geometry, cache, RNG, candidate inventory, consistency acceptance boundary, coverage requirement, worker count or timing limit changes. One newly registered sample per operation is descriptive, with no variance or hosted approval claim."
-    },
-    "tests/infrastructure/adapters/test_followthrough_scenario.py": {
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": {
       "category": "rule_semantics",
       "operations": [
-        "paired-followthrough-admission"
+        "opposing-shooter-qualification"
       ],
       "selected_families": [],
-      "rationale": "A fixed operator-only pair reuses ordinary movement and reaction submissions, engine-owned PathWitness validation, strict persistence and exact replay; it qualifies legal E movement and one negative opposing shot probe.",
-      "source_obligation": "Preserve the canonical configuration and unchanged stationary/Normal Move prefixes; require three full-model E paths and the ordinary Fire Overwatch target validator, retaining the actual no-legal-declaration diagnostic without an attack or tactical value label.",
-      "unchanged_work": "No movement or shooting algorithm, generator, cache, authoritative state mutation, RNG, serializer, adapter family, ranker or learning format changes. The bounded receipt repeats existing engine operations; scenario costs and full-game qualification remain open."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -1246,14 +1082,12 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
-      "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
-      "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
+      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
+      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "canonical_coverage_preflight": "docs/performance/current/canonical-coverage-preflight.json"
-  },
+  "comparisons": {},
   "full_game": null
 }

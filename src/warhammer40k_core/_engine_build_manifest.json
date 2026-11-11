@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0883faa80dd31f2e31d8ba47daf2aaa1b952526f1bfa267b9423b426573e389b",
-  "fingerprint": "0883faa80dd31f2e31d8ba47daf2aaa1b952526f1bfa267b9423b426573e389b",
-  "resource_count": 3245,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:575d1f47b62970089d53ec533482c75cbbd7a06bfe7015fe09d99526dcba781c",
+  "fingerprint": "575d1f47b62970089d53ec533482c75cbbd7a06bfe7015fe09d99526dcba781c",
+  "resource_count": 3246,
   "resources": [
     {
       "byte_length": 113,
@@ -263,6 +263,11 @@
       "byte_length": 16247,
       "path": "warhammer40k_core/ai/normal_move_scenario.py",
       "sha256": "e16b78680d7fb5d31a7ef2cde5c780d9d63418bfe6806b000c1c219f694eb81c"
+    },
+    {
+      "byte_length": 24575,
+      "path": "warhammer40k_core/ai/opposing_shooter_scenario.py",
+      "sha256": "240d92e95a494efdc711e57cf414c45d1f29b2cb500cbd5223fa473a7233ef66"
     },
     {
       "byte_length": 16932,
