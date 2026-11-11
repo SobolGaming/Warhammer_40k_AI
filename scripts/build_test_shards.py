@@ -14,7 +14,10 @@ from dataclasses import dataclass
 from itertools import product
 from pathlib import Path, PurePosixPath
 from statistics import median
-from typing import TypedDict, cast
+from typing import TYPE_CHECKING, TypedDict, cast
+
+if TYPE_CHECKING:
+    from scripts.shard_execution_model import Cohort
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 TESTS_ROOT = REPOSITORY_ROOT / "tests"
@@ -81,7 +84,10 @@ def main() -> int:
     durations = _rounded_durations(_partitioned_durations(durations, case_seconds=case_seconds))
     planning, calibrated, _ = _planning_inputs(output_dir, durations, case_seconds)
     shards = _balanced_shards(
-        durations=planning, shard_count=args.shard_count, case_seconds=calibrated
+        durations=planning,
+        shard_count=args.shard_count,
+        case_seconds=calibrated,
+        cohorts=_allocation_cohorts(output_dir, calibrated),
     )
     _write_manifests(
         output_dir=output_dir,
@@ -643,7 +649,7 @@ def duration_worksteal_order(
         remaining -= capacity
     buckets: list[list[int]] = [[] for _ in range(workers)]
     totals = [0.0] * workers
-    for index in sorted(range(len(nodeids)), key=lambda index: (-costs[index], index)):
+    for index in sorted(range(len(nodeids)), key=lambda index: (-costs[index], nodeids[index])):
         worker = min(
             (worker for worker in range(workers) if len(buckets[worker]) < capacities[worker]),
             key=lambda worker: (totals[worker], worker),
@@ -652,7 +658,7 @@ def duration_worksteal_order(
         totals[worker] += costs[index]
     for bucket in buckets:
         modules: dict[str, list[int]] = {}
-        # Buckets already have descending costs and original-index ties. First
+        # Buckets already have descending costs and stable node-identity ties. First
         # occurrence prioritizes each module's longest case and keeps that case
         # first; grouping changes neither worker membership nor capacity.
         for index in bucket:
@@ -925,7 +931,20 @@ def _balanced_shards(
     durations: dict[str, float],
     shard_count: int,
     case_seconds: dict[str, float] | None = None,
+    cohorts: tuple[Cohort, ...] = (),
 ) -> tuple[Shard, ...]:
+    if cohorts:
+        from scripts.shard_execution_model import allocate
+
+        if case_seconds is None:
+            raise SystemExit("Cohort allocation requires complete case scheduling weights.")
+        groups = allocate(
+            _execution_weights(durations, case_seconds), case_seconds, cohorts, shard_count
+        )
+        return tuple(
+            Shard(index + 1, math.fsum(durations[name] for name in group), group)
+            for index, group in enumerate(groups)
+        )
     assignments: list[list[str]] = [[] for _ in range(shard_count)]
     totals = [0.0] * shard_count
     weights = _execution_weights(durations, case_seconds)
@@ -1033,6 +1052,7 @@ def _write_manifests(
         planning_seconds=planning_seconds,
         calibration_sha256=calibration_sha256,
     )
+    _add_allocation_summary(summary, output_dir, shards, planning_seconds)
     (output_dir / "durations.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -1086,7 +1106,12 @@ def _check_manifests(*, output_dir: Path, shard_count: int) -> None:
         else None
     )
     planning, calibrated, calibration_sha256 = _planning_inputs(output_dir, durations, case_seconds)
-    shards = _balanced_shards(durations=planning, shard_count=shard_count, case_seconds=calibrated)
+    shards = _balanced_shards(
+        durations=planning,
+        shard_count=shard_count,
+        case_seconds=calibrated,
+        cohorts=_allocation_cohorts(output_dir, calibrated),
+    )
     for shard in shards:
         if manifest_entries[shard.shard_id] != shard.test_files:
             manifest_path = output_dir / f"shard-{shard.shard_id}.txt"
@@ -1102,8 +1127,41 @@ def _check_manifests(*, output_dir: Path, shard_count: int) -> None:
         planning_seconds=calibrated,
         calibration_sha256=calibration_sha256,
     )
+    _add_allocation_summary(expected_summary, output_dir, shards, calibrated)
     if summary != expected_summary:
         raise SystemExit("Shard duration summary does not match the committed manifests.")
+
+
+def _allocation_cohorts(directory: Path, cases: dict[str, float] | None) -> tuple[Cohort, ...]:
+    from scripts.shard_execution_model import PROFILE_FILE, load_cohorts
+
+    if cases is None:
+        if (directory / PROFILE_FILE).exists():
+            raise SystemExit("Cohort allocation requires complete case scheduling weights.")
+        return ()
+    return load_cohorts(directory, root=REPOSITORY_ROOT, nodes=set(cases))
+
+
+def _add_allocation_summary(
+    summary: dict[str, object],
+    directory: Path,
+    shards: tuple[Shard, ...],
+    cases: dict[str, float] | None,
+) -> None:
+    from scripts.shard_execution_model import metadata
+
+    cohorts = _allocation_cohorts(directory, cases)
+    if cohorts:
+        if cases is None:
+            raise SystemExit("Cohort allocation requires complete case scheduling weights.")
+        summary["strategy"] = "coherent-worker-chunks-with-improving-selector-moves-v1"
+        execution = cast(dict[str, object], summary["execution_model"])
+        execution["cold_shard_assignment"] = (
+            "minimum-unrounded-coherent-worker-path-existing-bucket-v1"
+        )
+        summary["allocation_model"] = metadata(
+            directory, tuple(shard.test_files for shard in shards), cases, cohorts
+        )
 
 
 def _summary_payload(
@@ -1262,6 +1320,19 @@ def dispatch_case_seconds(summary: object, profile: Path) -> dict[str, float]:
 
     baseline = summary_case_seconds(summary)
     fields = cast(dict[str, object], summary)
+    if "allocation_model" in fields:
+        from scripts.shard_execution_model import MODEL, PROFILE_FILE
+
+        allocation = fields["allocation_model"]
+        path = profile.parent / PROFILE_FILE
+        if (
+            not isinstance(allocation, dict)
+            or allocation.get("model") != MODEL
+            or allocation.get("index") != PROFILE_FILE
+            or not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != allocation.get("index_sha256")
+        ):
+            raise SystemExit("Allocation cohort index is missing or changed.")
     if "calibration" not in fields:
         return baseline
     metadata = fields["calibration"]

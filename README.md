@@ -350,8 +350,9 @@ omissions or exclusions. This policy change does not claim either threshold has 
 all required tests and other gates must still succeed. See the
 [active review policy](docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md).
 
-The twelve behavioral manifests in `ci/test_shards/` use deterministic
-largest-processing-time balancing. One heavy, source-bound module is partitioned
+The twelve behavioral manifests in `ci/test_shards/` use deterministic coherent
+cohort worker-path scoring, starting with largest selectors and then improving
+whole-selector moves. One heavy, source-bound module is partitioned
 into its twenty exact collected cases. The bounded mirror setup case is a separate
 selector; its file selector denotes the remaining cases. CI always deselects that
 node from parallel work and runs it once on its owning shard. Other files remain
@@ -394,9 +395,9 @@ cases retained authentic older measurements. The exact derivation and timing has
 are recorded in `ci/test_shards/case-partitions.json` under `evidence.weight_refresh`.
 
 Within each worker's initial duration-balanced bucket, cases from the same module
-run together so pytest can reuse module-scoped fixtures. Worker assignments and
-capacities remain unchanged. Modules start in descending order of their longest
-case, with descending case costs inside each module and original collection order
+run together so pytest can reuse module-scoped fixtures. Grouping preserves each
+bucket's worker membership and capacity. Modules start in descending order of their longest
+case, with descending case costs inside each module and stable node identity
 breaking ties. Later work stealing can still split a module group. This scheduling
 change preserves every case and does not certify the eighteen-minute approval goal.
 
@@ -814,6 +815,31 @@ changed cases within an existing file require a refreshed complete all-passed
 behavioral profile to provide their exact case weights. Preserve previous measurements in
 Git history and retained source artifacts; never invent missing weights or
 substitute file averages for CI dispatch.
+
+`allocation-cohorts.json` selects six complete effective hosted cohorts by their
+original worker-report SHA-256 identities. The allocator scores the actual four
+initial worksteal chunks for every cohort, then makes strictly improving whole
+selector moves. Stable node-identity ties make offline chunks match live dispatch
+independently of collection order. The smallest modeled bucket retains cold shard 1.
+The isolated mirror is charged sequentially before the parallel remainder.
+
+For directly declared non-parametrized module fixtures, the conditional setup
+estimate is the cohort's largest observed worker setup sum for that fixture group,
+charged once per new worker group. Calls and teardown remain their recorded costs.
+This accounts for fixture reuse without treating historical cold setup as permanently
+owned by its first test. Function-scoped setup can increase with relocated case counts;
+overlapping groups can double-charge dependencies. Work stealing, controller overhead
+and future host variance remain outside this estimate. It is not an upper bound or
+timing qualification. Every actual covered shard still must pass within 1,080 seconds.
+
+The three original complete JUnit sources, hashes and medians remain unchanged.
+The calibration retains its original 627 reports and 78,763 observation tuples as
+exact prefixes and appends 118 reports / 15,496 observations, for totals of 745 /
+94,259. Cohorts include failed enclosing attempts, and inherited successful jobs
+retain their original producer identities; neither becomes a new passing observation.
+`--check` regenerates the allocation, and dispatch rejects a missing or changed
+declared cohort index. The all-history maximum case weights still drive dispatch;
+coherent cohort phases drive allocation, with their distinct limitations recorded.
 
 Four-worker behavioral CI uses `BEHAVIORAL_DISPATCH_PROFILE` to distribute measured
 case costs across xdist's initial worker chunks after deselection. Complete case

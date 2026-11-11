@@ -23,6 +23,15 @@ from scripts.hosted_timing_calibration import (
     passed_phases,
     read_json,
 )
+from scripts.shard_execution_model import (
+    MODEL,
+    PROFILE_FILE,
+    Cohort,
+    allocate,
+    cohort_seconds,
+    load_cohorts,
+    worker_chunks,
+)
 
 
 @pytest.fixture
@@ -534,3 +543,153 @@ def test_progress_journal_requires_explicit_valid_opt_in(tmp_path: Path) -> None
             in result.stdout + result.stderr
         )
         assert not tuple(timing.glob("*.jsonl"))
+
+
+@pytest.fixture
+def cohort_input(tmp_path: Path) -> tuple[Path, set[str], dict[str, object]]:
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests/a.py").write_text(
+        "import pytest\n@pytest.fixture(scope='module')\ndef shared(): return 1\n"
+        "def test_a(shared): assert shared == 1\n"
+        "def test_b(shared): assert shared == 1\n",
+        encoding="utf-8",
+    )
+    manifest = tmp_path / "src/warhammer40k_core/_engine_build_manifest.json"
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(json.dumps({"fingerprint": "c" * 64}), encoding="utf-8")
+    nodes = {"tests/a.py::test_a", "tests/a.py::test_b"}
+    calibration: dict[str, object] = {
+        "reports": [
+            {
+                "sha256": digest * 64,
+                "source": {"run_id": 17, "attempt": attempt, "runtime_fingerprint": "c" * 64},
+                "incomplete_or_unsuccessful_cases": 0,
+            }
+            for digest, attempt in (("a", 1), ("b", 2))
+        ],
+        "observations": {
+            "tests/a.py::test_a": [[0, 10.0, 1.0, 0.5]],
+            "tests/a.py::test_b": [[1, 12.0, 2.0, 0.5]],
+        },
+    }
+    (tmp_path / FILENAME).write_text(json.dumps(calibration), encoding="utf-8")
+    (tmp_path / PROFILE_FILE).write_text(
+        json.dumps(
+            {
+                "schema": MODEL,
+                "cohorts": [
+                    {"run_id": 17, "effective_attempt": 2, "reports": ["a" * 64, "b" * 64]}
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    return tmp_path, nodes, calibration
+
+
+def test_effective_cohort_keeps_original_attempts_and_measured_setup(
+    cohort_input: tuple[Path, set[str], dict[str, object]],
+) -> None:
+    root, nodes, _ = cohort_input
+    before = (root / FILENAME).read_bytes()
+    (cohort,) = load_cohorts(root, root=root, nodes=nodes)
+    assert cohort.label == "17-effective-attempt-2"
+    assert cohort.cases == {"tests/a.py::test_a": 1.5, "tests/a.py::test_b": 2.5}
+    assert cohort.setup == {"tests/a.py::fixtures::shared": 12.0}
+    assert set(cohort.groups) == nodes
+    assert (root / FILENAME).read_bytes() == before
+
+
+@pytest.mark.parametrize("change", ["missing", "duplicate", "unknown", "future", "nan", "runtime"])
+def test_cohort_rejects_incomplete_or_invalid_evidence(
+    cohort_input: tuple[Path, set[str], dict[str, object]], change: str
+) -> None:
+    root, nodes, calibration = cohort_input
+    data = json.loads(json.dumps(calibration))
+    index = json.loads((root / PROFILE_FILE).read_bytes())
+    if change == "missing":
+        del data["observations"]["tests/a.py::test_a"]
+    elif change == "duplicate":
+        index["cohorts"][0]["reports"].append("a" * 64)
+    elif change == "unknown":
+        index["cohorts"][0]["reports"][0] = "d" * 64
+    elif change == "future":
+        index["cohorts"][0]["effective_attempt"] = 1
+    elif change == "nan":
+        data["observations"]["tests/a.py::test_a"][0][1] = float("nan")
+    else:
+        data["reports"][0]["source"]["runtime_fingerprint"] = "d" * 64
+    (root / FILENAME).write_text(json.dumps(data), encoding="utf-8")
+    (root / PROFILE_FILE).write_text(json.dumps(index), encoding="utf-8")
+    with pytest.raises(SystemExit, match=r"[Aa]llocation"):
+        load_cohorts(root, root=root, nodes=nodes)
+
+
+def test_real_dispatch_and_modeled_chunks_have_collection_independent_ties() -> None:
+    nodes = tuple(f"tests/{module}.py::test_{index}" for index in range(6) for module in "ab")
+    costs = dict.fromkeys(nodes, 3.0)
+    selectors = ("tests/a.py", "tests/b.py")
+    expected = tuple(node for chunk in worker_chunks(selectors, costs) for node in chunk)
+    for collected in (nodes, tuple(reversed(nodes))):
+        order = sharding.duration_worksteal_order(collected, workers=4, selector_seconds=costs)
+        assert tuple(collected[index] for index in order) == expected
+    assert sorted(expected) == sorted(nodes)
+    assert [len(chunk) for chunk in worker_chunks(selectors, costs)] == [3, 3, 3, 3]
+
+
+def test_model_charges_fixture_once_per_worker_and_mirror_sequentially() -> None:
+    nodes = tuple(f"tests/a.py::test_{index}" for index in range(8))
+    serial = sharding.SERIAL_BEHAVIORAL_CASE
+    costs = {**dict.fromkeys(nodes, 11.0), serial: 7.0}
+    cohort = Cohort(
+        "control",
+        {**dict.fromkeys(nodes, 1.0), serial: 7.0},
+        dict.fromkeys(nodes, "fixture"),
+        {"fixture": 10.0},
+    )
+    assert cohort_seconds(("tests/a.py",), costs, (cohort,)) == (12.0,)
+    assert cohort_seconds(("tests/a.py", serial), costs, (cohort,)) == (19.0,)
+    assert cohort_seconds((serial,), costs, (cohort,)) == (7.0,)
+
+
+def test_allocator_preserves_selectors_measurements_and_determinism() -> None:
+    costs = {
+        f"tests/{module}.py::test_{index}": float(20 - index)
+        for module in "abcd"
+        for index in range(8)
+    }
+    weights = {f"tests/{module}.py": 132.0 for module in "abcd"}
+    cohort = Cohort("control", costs, {}, {})
+    before = copy.deepcopy((weights, costs, cohort))
+    result = allocate(weights, costs, (cohort,), 2)
+    assert sorted(selector for group in result for selector in group) == sorted(weights)
+    assert all(result)
+    assert result == allocate(dict(reversed(tuple(weights.items()))), costs, (cohort,), 2)
+    assert (weights, costs, cohort) == before
+
+
+def test_declared_allocation_index_cannot_disappear_or_change(tmp_path: Path) -> None:
+    path = tmp_path / PROFILE_FILE
+    path.write_text("original", encoding="utf-8")
+    summary = {
+        "case_seconds": {"tests/a.py::test_a": 1.0},
+        "files": {"tests/a.py": 1.0},
+        "profiles": [
+            {"source": "control", "junit_sha256": ["a" * 64], "test_cases": 1, "test_files": 1}
+        ],
+        "allocation_model": {
+            "model": MODEL,
+            "index": PROFILE_FILE,
+            "index_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        },
+    }
+    assert (
+        sharding.dispatch_case_seconds(summary, tmp_path / "durations.json")
+        == summary["case_seconds"]
+    )
+    path.write_text("changed", encoding="utf-8")
+    with pytest.raises(SystemExit, match="index is missing or changed"):
+        sharding.dispatch_case_seconds(summary, tmp_path / "durations.json")
+    path.unlink()
+    with pytest.raises(SystemExit, match="index is missing or changed"):
+        sharding.dispatch_case_seconds(summary, tmp_path / "durations.json")

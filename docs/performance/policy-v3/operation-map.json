@@ -34217,7 +34217,9 @@
         "summary_case_seconds",
         "_calibrated_selectors",
         "_planning_inputs",
-        "dispatch_case_seconds"
+        "dispatch_case_seconds",
+        "_allocation_cohorts",
+        "_add_allocation_summary"
       ],
       "families": [],
       "sensitive": false,
@@ -35818,6 +35820,19 @@
       "paths": [
         "src/warhammer40k_core/ai/opposing_shooter_scenario.py",
         "tests/infrastructure/adapters/test_opposing_shooter_scenario.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "coherent-shard-allocation": {
+      "paths": [
+        "scripts/shard_execution_model.py",
+        "ci/test_shards/allocation-cohorts.json",
+        "tests/code_quality/test_hosted_timing_calibration.py"
       ],
       "owners": [
         "*"
