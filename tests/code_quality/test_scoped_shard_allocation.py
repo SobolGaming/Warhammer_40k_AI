@@ -17,7 +17,13 @@ from scripts.preflight_case_partition import (
 )
 from scripts.preflight_case_partition import NODES, OWNER, partition, validate_case_inventory
 from scripts.scoped_shard_allocation import allocate_scoped, role_scores, scoped_metadata
-from scripts.scoped_shard_evidence import EVIDENCE_FILE, FILENAME, ScopedEvidence, load_scope
+from scripts.scoped_shard_evidence import (
+    EVIDENCE_FILE,
+    FILENAME,
+    ScopedEvidence,
+    load_declared_scope,
+    load_scope,
+)
 from scripts.shard_execution_model import Cohort, load_cohorts, worker_chunks
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -39,8 +45,12 @@ def test_partial_scope_is_complete_only_within_its_declared_known_inventory(
     costs, summary, scope = inputs
     before = (DIRECTORY / "hosted-calibration.json").read_bytes()
     ordinary = json.loads(before)
-    assert len(ordinary["reports"]) == 843
-    assert sum(len(rows) for rows in ordinary["observations"].values()) == 106823
+    assert len(ordinary["reports"]) == 892
+    assert sum(len(rows) for rows in ordinary["observations"].values()) == 113105
+    assert (
+        sum(sum(row[0] < 843 for row in rows) for rows in ordinary["observations"].values())
+        == 106823
+    )
     assert len(scope.known_nodes) == 6014
     assert len(scope.frozen_nodes) == 268
     assert scope.known_nodes | scope.frozen_nodes == costs.keys()
@@ -51,13 +61,22 @@ def test_partial_scope_is_complete_only_within_its_declared_known_inventory(
         tuple((DIRECTORY / f"shard-{number}.txt").read_text().splitlines())
         for number in range(1, 13)
     )
-    assert shards[3] == scope.frozen_selectors
-    assert worker_chunks(shards[3], costs) == worker_chunks(scope.frozen_selectors, costs)
+    historical = json.loads((DIRECTORY / FILENAME).read_bytes())
+    assert list(scope.frozen_selectors) == historical["frozen_selectors"]
+    assert (
+        hashlib.sha256(("\n".join(scope.frozen_selectors) + "\n").encode()).hexdigest()
+        == (historical["frozen_manifest_sha256"])
+    )
+    assert sum(map(len, worker_chunks(scope.frozen_selectors, costs))) == 268
     cohorts = load_cohorts(DIRECTORY, root=ROOT, nodes=set(costs))
-    assert len(cohorts) == 8
-    actual = scoped_metadata(shards, costs, cohorts, scope)
+    assert len(cohorts) == 9
+    current = load_declared_scope(DIRECTORY, root=ROOT, costs=costs)
+    assert current is not None
+    assert current.extension is not None
+    actual = scoped_metadata(shards, costs, cohorts, current)
     assert actual == summary["scoped_allocation"]
-    assert cast(dict[str, object], actual["shards"])["4"] is None
+    row = cast(dict[str, dict[str, object]], actual["shards"])["4"]
+    assert cast(dict[str, object], row["expanded_6281_partial_raw"])["full_raw_role_score"] is None
     assert (DIRECTORY / "hosted-calibration.json").read_bytes() == before
 
 

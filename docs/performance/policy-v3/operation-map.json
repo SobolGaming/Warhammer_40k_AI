@@ -35852,7 +35852,14 @@
         "ci/test_shards/allocation-scope.json",
         "ci/test_shards/scoped-worker-evidence.json",
         "ci/test_shards/preflight-case-partition.json",
-        "tests/code_quality/test_scoped_shard_allocation.py"
+        "tests/code_quality/test_scoped_shard_allocation.py",
+        "scripts/scoped_shard_extension.py",
+        "scripts/extended_shard_allocation.py",
+        "scripts/finite_case_partitions.py",
+        "ci/test_shards/scoped-worker-extension.json",
+        "ci/test_shards/allocation-stress.json",
+        "ci/test_shards/step5g-case-partitions.json",
+        "tests/code_quality/test_extended_shard_allocation.py"
       ],
       "owners": [
         "*"

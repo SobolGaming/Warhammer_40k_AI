@@ -5,13 +5,16 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from scripts.hosted_timing_calibration import calibrated_seconds, read_json
 from scripts.shard_execution_model import Cohort, _fixture_groups, _role_residuals
+
+if TYPE_CHECKING:
+    from scripts.scoped_shard_extension import ExtendedScope
 
 SCHEMA = "scoped-hosted-allocation-v1"
 FILENAME = "allocation-scope.json"
@@ -29,6 +32,7 @@ class ScopedEvidence:
     known_nodes: frozenset[str]
     frozen_nodes: frozenset[str]
     reference: dict[str, str]
+    extension: ExtendedScope | None = None
 
 
 def node_digest(nodes: set[str] | frozenset[str]) -> str:
@@ -351,4 +355,12 @@ def load_declared_scope(
         return None
     if costs is None:
         raise SystemExit("Scoped allocation requires complete dispatch costs.")
-    return load_scope(directory, root=root, costs=costs, reference=index["scoped_evidence"])
+    base = load_scope(directory, root=root, costs=costs, reference=index["scoped_evidence"])
+    if "scoped_extension" in index:
+        from scripts.scoped_shard_extension import load_extension
+
+        extension = load_extension(
+            directory, root=root, costs=costs, base=base, reference=index["scoped_extension"]
+        )
+        return replace(base, extension=extension)
+    return base

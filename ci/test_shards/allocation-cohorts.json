@@ -1127,11 +1127,156 @@
           "sha256": "7242c1e49af7ed5ca4f34fac989b3fa2cc7df34736050ec2063096572640810f"
         }
       ]
+    },
+    {
+      "run_id": 43081418293,
+      "effective_attempt": 1,
+      "reports": [
+        "6f54a02a15d28d365b98e1cc73bb8517fc0bad9293abe499d0ca6f982a89cf56",
+        "67090f78c9d4eba0e7714131dd64c309907b478cf86e084487db667d2ef921b8",
+        "b2eb3273b6f7c2a7f23bbb5a1e7e0490cca69fee764e6895fcf707316e078767",
+        "728f48e6a21549756238ecc54a7b36a210b24ac066eed165753a1ba6ac195858",
+        "991c11eb1656008a31181b21e1c46ef66625fd59c3313a15b8d5acca694dfc6e",
+        "e7e1255bd9380b803375cc3aead07206a795e89398c65c705224af338bd49288",
+        "3fec9bc045a12e7fd271cd6d69bfc36836aad5d3ba4481a727c6230b254a7a62",
+        "61e9a19e497ab6e6ad2be3dc2b8f0deab70f22eccf2479e4522a29bf4375e25f",
+        "d8d834d2d4f7037d484e37e1afc8a16cc6df232872658c7f7004bf4573ceb2f9",
+        "f871d1a60bf86547dc471dd8c2f451ef75f28cf1a8e43884937699cf17683a31",
+        "b7122228be7ef8506bea166cc0bd85c909d43174da54abdae08f0768859d6b30",
+        "7db0ddeaeb2711b2e220d009a78a4d6ca761264ed1a5a648e9581b0879765c04",
+        "436fb5e78580cba67269d5bc941af6b40c16219a258404cf1184b7bbf188a1fe",
+        "7ef72ff01f3d7af98cb512b885ce8f5d31fd7271711e9f0c8aaede1e73831f3d",
+        "656eec06706fb2d9c63b61e029c6b231bafc796feb9ec4641ba5efbd096c25a5",
+        "042f623a553c0e404b792c9baeee16d676b78843bef6b7b53f32669a5246179a",
+        "55aed409b2329b44366799e869e3f629921aa0c88f97a3ea6d36975e48c8a62a",
+        "edf008f4a027beaf1cd0ad7002e0ddc8c16142ca16f14c82d6c859c90c297523",
+        "85ad70f67472155a23577e6187e685a11a7af61a62e9b607e270298fec8b145a",
+        "8c0a7830bb2968781ae2a46e8f9077e760f7297caa25f0a0b08e88a62bfbbdab",
+        "aa5274f2822675646ea8727eb07d5c3b0873b93668df3846aa6ff1788728f7f9",
+        "7f3a2a6e2a5463367caa5226b77664657391dfc0093f147a87e53eeaf3e360b9",
+        "98a86c5696e149f6369f2af46ddb0601125954b725c6faf5b7ea6ee23c58669d",
+        "52ac8f78908a5df03d419efbeb9b08f586dcc0e997e46ad87e1aeb792787326c",
+        "7521eef799dbbdedb4b4b40d24a12197cea36e32049bde9fe79b1e2ac7ae5750",
+        "d522f852570db1efad7f93070c839c78463dfa5d3e4a60cb88f1a0debdf886c4",
+        "00259d0eba500eb86b314932ff8705243ff980d9aacabf0ede4b7a6c137e8e4e",
+        "c6a16d49c273e7f42090c5dc7b4bcabce91158b3df7d1bcd3581a61219d15bea",
+        "6576a0b7b56767193a23a6b442361cca3c97bf856a9cc332466daa112fd05d10",
+        "1b54ad5d1708358d0168686b7d6b7673b8466584cf9e5985314ffd3dbab515f5",
+        "6ce7405c7ae4979ffd3de53cd5abeff41d4b9b4a27609d5154a51b38f4b56ac9",
+        "687a3e10fa0469e161b7865b53992754a7eb1ee37ff3614d834857db6e142e35",
+        "59a1ccf6a01cfe15e83d00e1af278ac2b641f64f6ca7db40b473f6f5a5a8b096",
+        "4331b806a775cb3534f9cf22e4f3af6de83d87d5e852da4bce4c1351a757933e",
+        "8e8e9747716b40468ad5520523538a49839280cca1b2a39e0554dc42a41f321b",
+        "83ea47d21b4e9220e01077483f98d5bd5d29f4135843a46e8f8368794eb04038",
+        "0925fb644d10a8308a5428e036afed74c25e29ecd72f6abbee8e86170b334b09",
+        "d2ff653a866d1a5e985ec214c51c3c0cef3ed7737ba508040c80d03379e07ebc",
+        "6d812c6b366c0344392beaff6665bbb8eb4b56622bd0f05d8773b32103896b15",
+        "8de7dcbfbc511e7e3a0ed3dffd502f291936250ea961b240e577f7be947f051d",
+        "90d4ff58ee24c66be8e1e667de58e1e5c5dd16f6a361c0c11c6077d4703d3a81",
+        "8516803ee6886e0f86becbec18b592eca8f121956037d0bab580dc847420728d",
+        "6158c84a3f40d3643470574f3d51f649333a3c8f586a5108da5a9ee7290e8875",
+        "c5c0ae981239bca0367c0b812edb1e4a120e87e148ddda9ba85e8e3a763b6d9d",
+        "ba3e409f41ac8955150b0e3fab64f141d41848f3ffd255f8da865145cba6f97e",
+        "80478822bc6c8a36e8406372551b79082b75698166b19a5d3f7a0a654554d3ba",
+        "8da0d1294af480c5f7e9bf15fd3369cfbef567fa3818b0539295a87fc376e41f",
+        "dc12ff577ad5feef92394fb55db992a85cc710e08f04feab7efc6bcb3aaf110f",
+        "d77d3ce4a74bbf2910bf913a59d9d28aa532678215741038323986c51ba97cc7"
+      ],
+      "supervisors": [
+        {
+          "artifact_id": 13884933307,
+          "sha256": "ada9ce0ea9f2d8b62815bc5ef853f9ef18b4d247570916691b3c707b17e02298",
+          "elapsed_seconds": 913.249012682,
+          "approved": true,
+          "reason": "passed"
+        },
+        {
+          "artifact_id": 13886026199,
+          "sha256": "f178df29627af29a4bd990a580da82007279d64c5c477ae5b26f3c153ae290cd",
+          "elapsed_seconds": 1183.68560431,
+          "approved": false,
+          "reason": "approval_limit_exceeded"
+        },
+        {
+          "artifact_id": 13885862357,
+          "sha256": "af93df19d36ed03ff91f5a585c6857368db179cd5f49e067be02e5d0f8d61d19",
+          "elapsed_seconds": 1025.5305511200002,
+          "approved": true,
+          "reason": "passed"
+        },
+        {
+          "artifact_id": 13885481983,
+          "sha256": "a0bb129aa372c9c03e7c535714313cd2465997a58dd073e921df7b6ce8148714",
+          "elapsed_seconds": 630.2810444940001,
+          "approved": true,
+          "reason": "passed"
+        },
+        {
+          "artifact_id": 13884783165,
+          "sha256": "e50c81ac1123cce6b6c77a9d09185126892779430b11505ae3613766a75773d1",
+          "elapsed_seconds": 745.32195555,
+          "approved": true,
+          "reason": "passed"
+        },
+        {
+          "artifact_id": 13885617618,
+          "sha256": "6265d70bc67004d447a2377e46033046c7f9fede42aaa3accab73c17261b2e22",
+          "elapsed_seconds": 1026.0212979869998,
+          "approved": true,
+          "reason": "passed"
+        },
+        {
+          "artifact_id": 13884563703,
+          "sha256": "e09ecfd93eb06fb94dc2c0a0937f3a525f6a7dc60c46d89ea81d20b26e492564",
+          "elapsed_seconds": 648.476285987,
+          "approved": true,
+          "reason": "passed"
+        },
+        {
+          "artifact_id": 13885412079,
+          "sha256": "cd49a17291c03207feb396980811376d53edebc126645445c15c1fb4ebe6c7a7",
+          "elapsed_seconds": 788.311198644,
+          "approved": true,
+          "reason": "passed"
+        },
+        {
+          "artifact_id": 13884059431,
+          "sha256": "2f025b8b5cd11c62381d5d417695758abff6052d44cebe495a03a6ee74d8148e",
+          "elapsed_seconds": 767.470760972,
+          "approved": true,
+          "reason": "passed"
+        },
+        {
+          "artifact_id": 13886250729,
+          "sha256": "5feadedec9480e409eda975d05334dd897e282e8dd05f9cbf39d26ccdb4b39e9",
+          "elapsed_seconds": 1090.456661195,
+          "approved": false,
+          "reason": "approval_limit_exceeded"
+        },
+        {
+          "artifact_id": 13885098589,
+          "sha256": "098def9f1aeb7eff231996353eddb33420581875d40e62af1f815de7067fd30c",
+          "elapsed_seconds": 1050.5554401519998,
+          "approved": true,
+          "reason": "passed"
+        },
+        {
+          "artifact_id": 13885616953,
+          "sha256": "cba36631184581d02e19c9173118fad6f748fb946f048aa9c4ec5f58a29218db",
+          "elapsed_seconds": 789.927740094,
+          "approved": true,
+          "reason": "passed"
+        }
+      ]
     }
   ],
   "schema": "coherent-worker-chunks-role-residual-ceil-v3",
   "scoped_evidence": {
     "file": "allocation-scope.json",
     "sha256": "420e7d929e1d920827e5ef8d25e5ebe4e326ffb6bee7ccd79ed9b26d797df1b9"
+  },
+  "scoped_extension": {
+    "file": "allocation-stress.json",
+    "sha256": "c36606578369084c2ad1f51ae0fb1b2e740573ee342645dda3ff721259cd8740"
   }
 }

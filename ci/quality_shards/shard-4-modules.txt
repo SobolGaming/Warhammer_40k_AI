@@ -45,3 +45,4 @@ tests/code_quality/test_later_ir_icon_source.py
 tests/code_quality/test_behavioral_deadline.py
 tests/code_quality/test_canonical_deployment_costs.py
 tests/code_quality/test_ci_resource_diagnostics.py
+tests/code_quality/test_extended_shard_allocation.py

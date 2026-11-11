@@ -1,0 +1,76 @@
+{
+  "schema": "explicit-unknown-case-planning-reserve-v1",
+  "role": "Derived stress only; never a measured phase or complete cohort",
+  "extension": {
+    "file": "scoped-worker-extension.json",
+    "sha256": "51c3d5ee98e12c0ce4b46d7384108190b18457312d9a214f0e7d85947b5dc1ed"
+  },
+  "unknown_node": "tests/infrastructure/adapters/test_canonical_deployment_coverage.py::test_reference_case_ordinary_prefixes_geometry_and_feasible_gaps[vehicle-scout-deep]",
+  "unknown_owner": "tests/infrastructure/adapters/test_canonical_deployment_coverage.py",
+  "pinned_shard": 4,
+  "fixed_selector": "tests/infrastructure/adapters/test_matched_attack_scenario.py",
+  "fixed_shard": 5,
+  "reservation_seconds": 465.533262819,
+  "formula": "max(same-case actual complete-cohort setup+call+teardown totals, unchanged843-report dispatch cost)",
+  "sources": [
+    {
+      "report_sha256": "e1a55eaea6e9a6aecda090018a12123429de251f2c785fbc8f32f793245260be",
+      "setup": 0.0013320409999835192,
+      "call": 344.049006137,
+      "teardown": 0.00023144300007515994
+    },
+    {
+      "report_sha256": "7d35c3e91c319702ff0fa6d7429ccc22656906e67f7160450084342f04f95870",
+      "setup": 0.0013221600000008493,
+      "call": 307.603240496,
+      "teardown": 0.00023877999996102517
+    },
+    {
+      "report_sha256": "39df2ffe55aa6e668f39c5eb0824d33c8c1a4c315fc6612dfd1e587ac423b0df",
+      "setup": 0.0010363500000067916,
+      "call": 243.44949578,
+      "teardown": 0.00025452300002370976
+    },
+    {
+      "report_sha256": "94998d4068ca4a20f9c8a053d023e80b848f2d0d5ef2835c05d570f282d36154",
+      "setup": 0.001325444999991987,
+      "call": 301.401720388,
+      "teardown": 0.00027513600002748717
+    },
+    {
+      "report_sha256": "1d1f313e4546578a083e046a316bde4f02c619ea44c282ea3d69736393a4ffe1",
+      "setup": 0.0018772349999949256,
+      "call": 418.78581118299996,
+      "teardown": 0.00029925000001185253
+    },
+    {
+      "report_sha256": "52a5f488cfdec6a548d680e04e6645276fd6ee709cffb8fe3afcea06e4b5ec7a",
+      "setup": 0.0016867080000224632,
+      "call": 434.03459778300004,
+      "teardown": 0.0002884620000713767
+    },
+    {
+      "report_sha256": "376d34d92991b4953386aee56fc4d4cde3f9b087161952fe8c5d3410eb4e9580",
+      "setup": 0.0018832829999837486,
+      "call": 425.387511453,
+      "teardown": 0.00030308899999909045
+    },
+    {
+      "report_sha256": "ca7eb4e9946d03732bb07ef8d99ad19ef0c0e0b4ccb7651340d95e0d18ef5bac",
+      "setup": 0.0020025739999880443,
+      "call": 428.45658616500003,
+      "teardown": 0.0003007100000331775
+    },
+    {
+      "report_sha256": "7ef72ff01f3d7af98cb512b885ce8f5d31fd7271711e9f0c8aaede1e73831f3d",
+      "setup": 0.0011031840000157445,
+      "call": 253.981441769,
+      "teardown": 0.0002297549999639159
+    }
+  ],
+  "dispatch_floor": 465.533262819,
+  "source_bindings": {
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": "4445262840af8cf94079b4d697bf7d74fea458ed27a2dbbe33a38b7908b917f3",
+    "tests/infrastructure/adapters/test_matched_attack_scenario.py": "9431a05971747a3dffb3215688e790c4c79accfa74e24e772be834e0c3d14c9a"
+  }
+}

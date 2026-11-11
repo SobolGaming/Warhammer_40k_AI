@@ -32,6 +32,10 @@ def allocate_scoped(
 ) -> tuple[tuple[str, ...], ...]:
     from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
 
+    if scope.extension is not None:
+        from scripts.extended_shard_allocation import allocate_extended
+
+        return allocate_extended(weights, costs, cohorts, count, scope.extension)
     frozen = scope.frozen_shard - 1
     if (
         not cohorts
@@ -136,6 +140,10 @@ def scoped_metadata(
     cohorts: tuple[Cohort, ...],
     scope: ScopedEvidence,
 ) -> dict[str, object]:
+    if scope.extension is not None:
+        from scripts.extended_shard_allocation import extended_metadata
+
+        return extended_metadata(shards, costs, cohorts, scope)
     known: dict[str, object] = {}
     for index, group in enumerate(shards, 1):
         if index == scope.frozen_shard:

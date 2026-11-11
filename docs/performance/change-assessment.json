@@ -2,25 +2,25 @@
   "policy": "rules-engine-performance-v3",
   "base": "e02369d8952feb91690994f4fa3071b43f9dbede",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:870d2370b0f71a646d7e20e9e998efa7c914fc187745f97830d81487d262115f",
-  "operation_map_sha256": "dc31364e31c7e40ff51fdbf7446cf8db9b3f480869fde7c859b0d6d2d8008f4b",
+  "operation_map_sha256": "5ab324326a2e4bba065df00a44018ea4ce919b6be4f80c5afbc733f1d4f0d32f",
   "changes": {
     "README.md": {
       "before_sha256": "1567ed82732f88ef76e7789339db929c59ee8f2f9bf620d69b32c9139d553db1",
-      "after_sha256": "0a89ba9929729a190f3768dab788de00ddbe8ef8c75da5fc638ce04d05a1702a",
+      "after_sha256": "cf336fd61e06e9a7f0aa527ba4e88b38dbad0acd732a48d94d750139b4cac6ee",
       "owners": {
         "@document": {
           "before": "1567ed82732f88ef76e7789339db929c59ee8f2f9bf620d69b32c9139d553db1",
-          "after": "0a89ba9929729a190f3768dab788de00ddbe8ef8c75da5fc638ce04d05a1702a"
+          "after": "cf336fd61e06e9a7f0aa527ba4e88b38dbad0acd732a48d94d750139b4cac6ee"
         }
       }
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": "069378b28daa5ebb12ce1f95376ac863ea4a3c3a9f95fc48df810c732d64141d",
-      "after_sha256": "fb35950fc46b14308846b8e02b92f611fcfe8a9b550f2e8fe903b941ddc61249",
+      "after_sha256": "ab13dde503372a7e529586d11081206f80ef5279f795e2af8ed2bdf7350030c7",
       "owners": {
         "@document": {
           "before": "069378b28daa5ebb12ce1f95376ac863ea4a3c3a9f95fc48df810c732d64141d",
-          "after": "fb35950fc46b14308846b8e02b92f611fcfe8a9b550f2e8fe903b941ddc61249"
+          "after": "ab13dde503372a7e529586d11081206f80ef5279f795e2af8ed2bdf7350030c7"
         }
       }
     },
@@ -56,31 +56,31 @@
     },
     "ci/quality_shards/shard-4-modules.txt": {
       "before_sha256": "0b88d0625d83432a3e2876199a1e55418d7bb3c315e7336240e6af8148306c59",
-      "after_sha256": "873cb5535367e9adccc9fe303470bbce4f8d7c0c75cf0912784ef4aea1cfa6c3",
+      "after_sha256": "616ecd789568a5cfd95aed25ed1da6117d66616e9b4eb197ec562ba27939c6ce",
       "owners": {
         "@document": {
           "before": "0b88d0625d83432a3e2876199a1e55418d7bb3c315e7336240e6af8148306c59",
-          "after": "873cb5535367e9adccc9fe303470bbce4f8d7c0c75cf0912784ef4aea1cfa6c3"
+          "after": "616ecd789568a5cfd95aed25ed1da6117d66616e9b4eb197ec562ba27939c6ce"
         }
       }
     },
     "ci/quality_shards/shard-4.txt": {
       "before_sha256": "4e5795a25aaf8aac9d4379bcffd422556c54e111a1e368cf1fe974956a490ba7",
-      "after_sha256": "8b26b98485cfdddc9481a978c99791736e215efa2170fc06650b48c43bc983b3",
+      "after_sha256": "be9824350dccc8c98d0795ef65029a76ac4107e22a85a902dd123f0b75a8726c",
       "owners": {
         "@document": {
           "before": "4e5795a25aaf8aac9d4379bcffd422556c54e111a1e368cf1fe974956a490ba7",
-          "after": "8b26b98485cfdddc9481a978c99791736e215efa2170fc06650b48c43bc983b3"
+          "after": "be9824350dccc8c98d0795ef65029a76ac4107e22a85a902dd123f0b75a8726c"
         }
       }
     },
     "ci/test_shards/allocation-cohorts.json": {
       "before_sha256": null,
-      "after_sha256": "24cbf59dba7b8495bb0d12622fc57f371aa54bb1f1a819207b7129c752cecb87",
+      "after_sha256": "09881cc9f2d242b4ccce02bb50b98453919b800f1f0086cb7627e4654ce3b9c9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "24cbf59dba7b8495bb0d12622fc57f371aa54bb1f1a819207b7129c752cecb87"
+          "after": "09881cc9f2d242b4ccce02bb50b98453919b800f1f0086cb7627e4654ce3b9c9"
         }
       }
     },
@@ -94,23 +94,33 @@
         }
       }
     },
+    "ci/test_shards/allocation-stress.json": {
+      "before_sha256": null,
+      "after_sha256": "c36606578369084c2ad1f51ae0fb1b2e740573ee342645dda3ff721259cd8740",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c36606578369084c2ad1f51ae0fb1b2e740573ee342645dda3ff721259cd8740"
+        }
+      }
+    },
     "ci/test_shards/durations.json": {
       "before_sha256": "58ea9bd35fd1083dc064177d67c1e52ecb28a1803e8476053a4a77a381a7d732",
-      "after_sha256": "441bed5d8778d9a748d75573f59b619ad890ac96490db748c0ea5a64bf802658",
+      "after_sha256": "dda1d75dca006e8e63d220ef663737dda36fa7eecebd4daeb3acb7ccc72d2396",
       "owners": {
         "@document": {
           "before": "58ea9bd35fd1083dc064177d67c1e52ecb28a1803e8476053a4a77a381a7d732",
-          "after": "441bed5d8778d9a748d75573f59b619ad890ac96490db748c0ea5a64bf802658"
+          "after": "dda1d75dca006e8e63d220ef663737dda36fa7eecebd4daeb3acb7ccc72d2396"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
       "before_sha256": "4170c290b0201b080964064491dc71577d99a36852e66cf7df00eca24dbf29cc",
-      "after_sha256": "ba4c88b3174e8d31eec10a2da239d10a0dc5b63e48b05acd25cf7bd496eeb841",
+      "after_sha256": "777750b5797facf90b9c8b9fd7d7c0bb5fd2bb63d10e3dd9917c8f0ccb997ece",
       "owners": {
         "@document": {
           "before": "4170c290b0201b080964064491dc71577d99a36852e66cf7df00eca24dbf29cc",
-          "after": "ba4c88b3174e8d31eec10a2da239d10a0dc5b63e48b05acd25cf7bd496eeb841"
+          "after": "777750b5797facf90b9c8b9fd7d7c0bb5fd2bb63d10e3dd9917c8f0ccb997ece"
         }
       }
     },
@@ -134,149 +144,169 @@
         }
       }
     },
+    "ci/test_shards/scoped-worker-extension.json": {
+      "before_sha256": null,
+      "after_sha256": "51c3d5ee98e12c0ce4b46d7384108190b18457312d9a214f0e7d85947b5dc1ed",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "51c3d5ee98e12c0ce4b46d7384108190b18457312d9a214f0e7d85947b5dc1ed"
+        }
+      }
+    },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "f66407735b0e61236dfd25df4c5e948ffc807fbcda6dd6e9a6238e5448d5abb7",
-      "after_sha256": "fa21aacab74c81fe2336bf37bb492546833c6b1a26953b9ed82b60e57102b247",
+      "after_sha256": "58de40932ce6f2c034b579c16337674b1515c0c14992d9f1b4f1580ece51ab69",
       "owners": {
         "@document": {
           "before": "f66407735b0e61236dfd25df4c5e948ffc807fbcda6dd6e9a6238e5448d5abb7",
-          "after": "fa21aacab74c81fe2336bf37bb492546833c6b1a26953b9ed82b60e57102b247"
+          "after": "58de40932ce6f2c034b579c16337674b1515c0c14992d9f1b4f1580ece51ab69"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "8e7618d159658855028a4b59fca8ad310a7f1808a3d71ecd4c587c3a05e43c7b",
-      "after_sha256": "76692a4a967146fbe01f9b53b8fb4a07826fc0a20a670956f31ae1214205b944",
+      "after_sha256": "ac1a6c0e67da2e48229debb3db74effa5e0f2392de0645792bfb835001c939fa",
       "owners": {
         "@document": {
           "before": "8e7618d159658855028a4b59fca8ad310a7f1808a3d71ecd4c587c3a05e43c7b",
-          "after": "76692a4a967146fbe01f9b53b8fb4a07826fc0a20a670956f31ae1214205b944"
+          "after": "ac1a6c0e67da2e48229debb3db74effa5e0f2392de0645792bfb835001c939fa"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "5ead7122b43ecfe9ad6874a967343c9c7e1c2f6718a3053dcb8db01d27b5d3d8",
-      "after_sha256": "008831eeb5f1d6ac7d452723863fcaac9e069d560f7e1b277d210427670e69ce",
+      "after_sha256": "4a6ad9df8dc0cbb39a12e09fb564470eeac3de44e9042be72be5e0bc76e3a4ee",
       "owners": {
         "@document": {
           "before": "5ead7122b43ecfe9ad6874a967343c9c7e1c2f6718a3053dcb8db01d27b5d3d8",
-          "after": "008831eeb5f1d6ac7d452723863fcaac9e069d560f7e1b277d210427670e69ce"
+          "after": "4a6ad9df8dc0cbb39a12e09fb564470eeac3de44e9042be72be5e0bc76e3a4ee"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "361be70df066b3c05fc79fdf36b88834a22d116fad25b19f3b60f66683f769d9",
-      "after_sha256": "aa9ac4b90ff45111d7fb54be286b7fe074f5cc895e0b49312273359fdcdcfc59",
+      "after_sha256": "a95b0d1f6284311c11b103418bb52d641efd6dc65daa8a72c9692e75e7467359",
       "owners": {
         "@document": {
           "before": "361be70df066b3c05fc79fdf36b88834a22d116fad25b19f3b60f66683f769d9",
-          "after": "aa9ac4b90ff45111d7fb54be286b7fe074f5cc895e0b49312273359fdcdcfc59"
+          "after": "a95b0d1f6284311c11b103418bb52d641efd6dc65daa8a72c9692e75e7467359"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "47aa2c90028df8c82315a41a430ff06502aa1aa4854e8065b1b2ec30a4108f11",
-      "after_sha256": "93c4574abaf41c217ceeaf2d46844b167e9463e1fe6f69a1b4abc8bc46186dd6",
+      "after_sha256": "5bfc784826d62ca0a4667955cbfa86de08095aa8c1c65c5f17230b5a01f599ce",
       "owners": {
         "@document": {
           "before": "47aa2c90028df8c82315a41a430ff06502aa1aa4854e8065b1b2ec30a4108f11",
-          "after": "93c4574abaf41c217ceeaf2d46844b167e9463e1fe6f69a1b4abc8bc46186dd6"
+          "after": "5bfc784826d62ca0a4667955cbfa86de08095aa8c1c65c5f17230b5a01f599ce"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "96ff1f4779e9eae21cbb98f43dfbf7f31fe8f14fad280d3ddde7ac6af1409c08",
-      "after_sha256": "3f61951dfb09d7832a212063e749795727a2709294898a83dabb0a0dd2ed429d",
+      "after_sha256": "df369d4765a44e5d322e0948af0254fd0424c5046fa06f81a67e5779ee3bdc66",
       "owners": {
         "@document": {
           "before": "96ff1f4779e9eae21cbb98f43dfbf7f31fe8f14fad280d3ddde7ac6af1409c08",
-          "after": "3f61951dfb09d7832a212063e749795727a2709294898a83dabb0a0dd2ed429d"
+          "after": "df369d4765a44e5d322e0948af0254fd0424c5046fa06f81a67e5779ee3bdc66"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "ff8491024ba896aa2131fdf3eab476c70b564f2a339ef98a83b8376822b2b107",
-      "after_sha256": "51247a890710f6afddb52d6346342e17736d1b5f6389d0661da9f720de453257",
+      "after_sha256": "89c13828c11c89bcf730939526315e897468ae0d974f3baf4a2515813eed2aa5",
       "owners": {
         "@document": {
           "before": "ff8491024ba896aa2131fdf3eab476c70b564f2a339ef98a83b8376822b2b107",
-          "after": "51247a890710f6afddb52d6346342e17736d1b5f6389d0661da9f720de453257"
+          "after": "89c13828c11c89bcf730939526315e897468ae0d974f3baf4a2515813eed2aa5"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "9e58fdff80342804c95954d6ee3b08c21e399c9eb8ddad3d620745bb5df3205c",
-      "after_sha256": "d030035cb933109950ef15d9b8c9747b10a9780b40d806ee2f74f42195ccd662",
+      "after_sha256": "27b37dc45c94b3c49769b2348e91744791095022660b06e2cf8b5a9d0f990e75",
       "owners": {
         "@document": {
           "before": "9e58fdff80342804c95954d6ee3b08c21e399c9eb8ddad3d620745bb5df3205c",
-          "after": "d030035cb933109950ef15d9b8c9747b10a9780b40d806ee2f74f42195ccd662"
+          "after": "27b37dc45c94b3c49769b2348e91744791095022660b06e2cf8b5a9d0f990e75"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "dd0d2cf7fb98d77d308aeb2fb52c3824877b10320dc6fbe2d03a4747a8db272f",
-      "after_sha256": "a0e0231bcdd79cc18a5ba98a2ef0e60885cde49600b5052b9daed30d0c041b7a",
+      "after_sha256": "dae8db8022cbb1e6a93618fdcc3c46a16d09854038243c898d49976f265536f4",
       "owners": {
         "@document": {
           "before": "dd0d2cf7fb98d77d308aeb2fb52c3824877b10320dc6fbe2d03a4747a8db272f",
-          "after": "a0e0231bcdd79cc18a5ba98a2ef0e60885cde49600b5052b9daed30d0c041b7a"
+          "after": "dae8db8022cbb1e6a93618fdcc3c46a16d09854038243c898d49976f265536f4"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "61dca701c907d2b6f10a8c7467269944df7d89df5c1fe009440feb837bc9f73c",
-      "after_sha256": "a6b3b48a32d5fd9b7053718e4457d9bf2cb4eedef06f7f762a1aeaa6ced77300",
+      "after_sha256": "27e1b1af9dd677c88cb3c777f299748f31062d083e5ae9995d1534c9075d4cf2",
       "owners": {
         "@document": {
           "before": "61dca701c907d2b6f10a8c7467269944df7d89df5c1fe009440feb837bc9f73c",
-          "after": "a6b3b48a32d5fd9b7053718e4457d9bf2cb4eedef06f7f762a1aeaa6ced77300"
+          "after": "27e1b1af9dd677c88cb3c777f299748f31062d083e5ae9995d1534c9075d4cf2"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "95f99d37a8c68a91366e4ec2a8604806dacfac1035e1ce612ed06a582e35313e",
-      "after_sha256": "6aaad30dad967bfac6fbeb04116814e65bce3257f78fe21da7230fd9c79dd39d",
+      "after_sha256": "a624ee270458cf56ea8b5808c4d2c04463bec8acdedc3abc62396cf5d90d55e7",
       "owners": {
         "@document": {
           "before": "95f99d37a8c68a91366e4ec2a8604806dacfac1035e1ce612ed06a582e35313e",
-          "after": "6aaad30dad967bfac6fbeb04116814e65bce3257f78fe21da7230fd9c79dd39d"
+          "after": "a624ee270458cf56ea8b5808c4d2c04463bec8acdedc3abc62396cf5d90d55e7"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "13a7edf1198b9ba62aad50f975529376a2a2282b6feba8dd3d449adea3e1cd57",
-      "after_sha256": "aaf9fc44843cf311e686b847d49e4ac495a61a3741b5ba24541ad1991e40f1b0",
+      "after_sha256": "9764a2010cc1efa7f19d9db6765702be5128d1066595d52eceafee679964a80f",
       "owners": {
         "@document": {
           "before": "13a7edf1198b9ba62aad50f975529376a2a2282b6feba8dd3d449adea3e1cd57",
-          "after": "aaf9fc44843cf311e686b847d49e4ac495a61a3741b5ba24541ad1991e40f1b0"
+          "after": "9764a2010cc1efa7f19d9db6765702be5128d1066595d52eceafee679964a80f"
+        }
+      }
+    },
+    "ci/test_shards/step5g-case-partitions.json": {
+      "before_sha256": null,
+      "after_sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "caf567dace03fba2b93a6072020774e180c58b560fefce0694db1073e43d996f",
-      "after_sha256": "0689dbbb39b52a50905102e7af528cd9dc73b908b3beeeba642f91c4b474bffc",
+      "after_sha256": "69aff919540734f97dd5b450169a79dcb27af51d5bbabb20d4227f70817a8e8f",
       "owners": {
         "@document": {
           "before": "caf567dace03fba2b93a6072020774e180c58b560fefce0694db1073e43d996f",
-          "after": "0689dbbb39b52a50905102e7af528cd9dc73b908b3beeeba642f91c4b474bffc"
+          "after": "69aff919540734f97dd5b450169a79dcb27af51d5bbabb20d4227f70817a8e8f"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "bb26704d92ea54b9ca7f4a92b5fa82758f0bb119444a7d0458e22344feefdcd1",
-      "after_sha256": "81f56cab4980443413bf7892ac5685086843ea6798dd7f0f047e3344675206a7",
+      "after_sha256": "85c54b67f467e292b1488f8a82f2193133fb5d6f46b102067acda3f46d068592",
       "owners": {
         "@document": {
           "before": "bb26704d92ea54b9ca7f4a92b5fa82758f0bb119444a7d0458e22344feefdcd1",
-          "after": "81f56cab4980443413bf7892ac5685086843ea6798dd7f0f047e3344675206a7"
+          "after": "85c54b67f467e292b1488f8a82f2193133fb5d6f46b102067acda3f46d068592"
         }
       }
     },
     "scripts/build_test_shards.py": {
       "before_sha256": "fcc9a251a577d207fa1aab63aae2015195e1d45833a9214495dc47537eb8c04f",
-      "after_sha256": "629d2596d06ff62197712f9ac6c62c8f43a7fe9f6b9b5375898ff32ebe9819e2",
+      "after_sha256": "d7d2d463c13b1e6e7dd7ee2fb0ffaef85c9478a451f20eb3453870d77cf6e06b",
       "owners": {
         "@module": {
           "before": "fd5f54bcf41f4cf478c0859edb0af1853c9abdbb9d4a6b4998940f91f287fa01",
@@ -284,7 +314,7 @@
         },
         "_add_allocation_summary": {
           "before": null,
-          "after": "5f96fb88dd69d0a70680f1510888ffd191f1b9f0ced24a9191de944e74e6abb6"
+          "after": "57134d3b06542eb02cad69b6f6a901689f79eadb192786abb5a3b0427b1b682a"
         },
         "_allocation_cohorts": {
           "before": null,
@@ -296,7 +326,7 @@
         },
         "_behavioral_shard_selectors": {
           "before": "e443fcaa0db30a3f9ed73c71b299b722094eae368f71f7d412f141bddabf6e65",
-          "after": "98179b17966627bb6e92f318964275ddc75bcb3dc17b8995214c268adc1fba95"
+          "after": "65b76cdc75c65ed54edeaa805fec456416e3caff888ec710445235f1df68d175"
         },
         "_check_manifests": {
           "before": "9ec7f0fc83dabfec597b83c1fa068a1e3d5a02070400c46ca57239a3f0cf40ef",
@@ -304,7 +334,7 @@
         },
         "_partitioned_durations": {
           "before": "89fa0ab9931f5350dd233546b6e3f3ed7033dde3423fcfef1b4663d61462f5e7",
-          "after": "0049fdae48facb005468f978ffd02f95a074ad11ffd0291146edcb2b82640f8c"
+          "after": "0875fe5bd888e83fbec2d9838f50c6dc62ac5e2b6a65063d8aa5eeadd768f474"
         },
         "_scoped_evidence": {
           "before": null,
@@ -312,7 +342,7 @@
         },
         "_summary_payload": {
           "before": "ad21cd38b91905c43138cad3120a92ce159f44ee64f46e5412afe7865d91fbff",
-          "after": "8bbd0497794ef408d7099ea0f46a5f9cfdaca5665f11a4a65b8c2c0f8b885f3c"
+          "after": "4d3029d622611f31aefd6a4a98332ffc4fce125eda3619ce539db0ad28818bbe"
         },
         "_write_manifests": {
           "before": "530bb7aa0767196b25c2144455534e5020c432ed98dfdc615739b31969c9b364",
@@ -320,7 +350,7 @@
         },
         "dispatch_case_seconds": {
           "before": "52aa0002f1dd70bb8dfe70b7dfd484abbd257fa79062209ab55b3c0638409b20",
-          "after": "57afbaebe7d511bd006591073e03abada98176a56a61a62587d002a9a26ca06f"
+          "after": "453a894fc33bbeb0306e2c49f8137b54aaa2f09ea9bf2d099124f0e4c257942b"
         },
         "duration_worksteal_order": {
           "before": "e3bfbb628bcaad3d38635995462c39933595c835d7066c6cafdf091c26581665",
@@ -351,6 +381,78 @@
         "snapshot": {
           "before": null,
           "after": "7c065644b2e50d3a689e021df35c44abbd806a007a245770020a7d81f02866fb"
+        }
+      }
+    },
+    "scripts/extended_shard_allocation.py": {
+      "before_sha256": null,
+      "after_sha256": "2ae2d323b516ff6fbcf009f50b08480c6edec1d3f8b09d20bc5c92bf6d0e3aa5",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "c1f534e5eace9835f26d32598a38f3881fb76f27aed390157f812661005b0fea"
+        },
+        "_peak": {
+          "before": null,
+          "after": "deb0994693ffde7d5ba44b02829df5058d32db336910962fd5297a6d2a1dc681"
+        },
+        "_retained": {
+          "before": null,
+          "after": "ecd53f5fbfcfe3dfc24a9f3c27738d114c7999c52d33abc1d0549a9bc5eb1ca0"
+        },
+        "allocate_extended": {
+          "before": null,
+          "after": "01c578c62c0a47a12a07faf4bfd02369e2aedda839c46cb6860ab6d0b1518879"
+        },
+        "extended_metadata": {
+          "before": null,
+          "after": "7c2167c9246d3dd11aea47de58318ed611bd24e35d4fe7b66830afdf17c055cb"
+        },
+        "partial_projection": {
+          "before": null,
+          "after": "554206d201d5bf1996959c51aa6940cc92eb94eea83744d01cd60138cad78aac"
+        },
+        "planning_profiles": {
+          "before": null,
+          "after": "9d4a60f24826626028e55bb09e3ca9eaf8d96865e5dc5b99c568edb18b47e648"
+        }
+      }
+    },
+    "scripts/finite_case_partitions.py": {
+      "before_sha256": null,
+      "after_sha256": "a46270dad0727a5baf7fcc884f8b7e349f2a008f7dce30f36ae4b772b1c6983d",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e1af54a9eb4336a23b6e0e5faa229fb0fd4af6dea53cbb1d5474b9cb87279ac1"
+        },
+        "add_metadata": {
+          "before": null,
+          "after": "8278eb7a9b4486e512743ad8cd65b70b0c71712ebd0947042a64bb4244110e9c"
+        },
+        "partition_durations": {
+          "before": null,
+          "after": "a7f76c4ebdfd58cbba6e03afe0c7990c4ccf79c290872fd9421392a411cc62fe"
+        },
+        "partition_selectors": {
+          "before": null,
+          "after": "6b4450ae5f96c28dda3be07e26ca9b1acba166af9c5533f99103d08683f28129"
+        },
+        "partitions": {
+          "before": null,
+          "after": "749f22e1ce3cc7e29267071fe1b0c5ecf47e1aaf57f8b24a3132c1003c88be9f"
+        },
+        "source_metadata": {
+          "before": null,
+          "after": "399dced13b4a7400113aff6cc0b185879cc738d6398617755a56de8513d79787"
+        },
+        "validate_cases": {
+          "before": null,
+          "after": "63db078acb3c2c754cfc514b8b266c3cf8283bd78ac1703145be3750b62ddb03"
+        },
+        "validate_metadata": {
+          "before": null,
+          "after": "ee9f9fc2be1548dddc3a9bcd9ae83b3a71e370909e777f329814d12937d77e24"
         }
       }
     },
@@ -400,7 +502,7 @@
     },
     "scripts/scoped_shard_allocation.py": {
       "before_sha256": null,
-      "after_sha256": "f2bff7170d7821ffa045ef50be1a558843d1b9e0d798341f415c8584791ab110",
+      "after_sha256": "9cbf66571a056adeb69f20e5b340c36ddb9937fd6f0103fcd7a968190366deac",
       "owners": {
         "@module": {
           "before": null,
@@ -408,7 +510,7 @@
         },
         "allocate_scoped": {
           "before": null,
-          "after": "ce16b0b43090f416757d800bdebc748e24a5762fa500127e1ec2198a67822302"
+          "after": "f7441930124b2852dc4b74cb56d1a11ecf6597d1be94a7c1ef34c25b9acdc401"
         },
         "role_scores": {
           "before": null,
@@ -416,21 +518,21 @@
         },
         "scoped_metadata": {
           "before": null,
-          "after": "1d4a133d8a905a10fc7d496b95debf3561012cb3d963b684d22e0564d9f1e356"
+          "after": "9d93ffa76624c35a875a2c68e5b13085f0ba14197a2f5c4fcaa607303c5cd21b"
         }
       }
     },
     "scripts/scoped_shard_evidence.py": {
       "before_sha256": null,
-      "after_sha256": "dec081b4ca54b35c1cf37fa9c49dc4f56a17647dd45c50409c7653acca77eb97",
+      "after_sha256": "38b8aedb2131b30d2b12b02db40cb2c051b91887b67f62240fa9e9f971232e85",
       "owners": {
         "@module": {
           "before": null,
-          "after": "244098bf625656e2b5deda257fc8141812234c25a0853beded46453720a5bce5"
+          "after": "8d2f5b75436a979d4ac2e5f4a1773e741528b662bcab23aea264a2b8c565c731"
         },
         "ScopedEvidence": {
           "before": null,
-          "after": "17f8dea6e58b1f7d8d2cb564271679d61a71ad13e1c8ed6cb957c349a8620898"
+          "after": "ba91b4d5325c3bed760565c9b89b01fae641f7f1c59c4f970eb3baf38c9b4492"
         },
         "_mapping": {
           "before": null,
@@ -450,7 +552,7 @@
         },
         "load_declared_scope": {
           "before": null,
-          "after": "56705384d016a5ca593620f617b0bc75e2e2a3bd69761dcf04b367b47e1d9aa3"
+          "after": "2d5a29063b2316b05f075543011f811b256a3e0d89d672fe64f89634adbfce21"
         },
         "load_scope": {
           "before": null,
@@ -466,9 +568,47 @@
         }
       }
     },
+    "scripts/scoped_shard_extension.py": {
+      "before_sha256": null,
+      "after_sha256": "a377cd958f19724008bf68edadef3c0c4c68c8bf1ba51f9df7556c94d033e992",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "dc909cdf233c9cf31d68a6740be468a438d712495a0e88ed791eb6cb9947a9a7"
+        },
+        "ExtendedScope": {
+          "before": null,
+          "after": "5bbdac723c13314a535bc94e798531d87551243089790262ad396b872d8df76a"
+        },
+        "_artifact": {
+          "before": null,
+          "after": "262a826199a70ead5df5631369d685247ccaaf6d99b1162aa6619de9192adc8c"
+        },
+        "_phases": {
+          "before": null,
+          "after": "00352e4e1e8bc3682169f4dbce4cf0de0c400bef5528c2681801cafd3ab1297f"
+        },
+        "_reference": {
+          "before": null,
+          "after": "6fef42d15e42b85f12d7023f6c2e0331c85931ce386d7216a4d3b91072dce177"
+        },
+        "_reserve": {
+          "before": null,
+          "after": "046d1b958b0a50057433027c55b916ec8d5a618572e96fcfd79eb681d4f7105c"
+        },
+        "load_extension": {
+          "before": null,
+          "after": "70b824f63b6e0d43826a35f6fa8f3456e443b4e3573c0f6a4da955dc01625836"
+        },
+        "validate_reference": {
+          "before": null,
+          "after": "59dd2cbfe25b30428af006e5fb9f97cb0dd352a2c60cc01b1914c5004b4fac0e"
+        }
+      }
+    },
     "scripts/shard_execution_model.py": {
       "before_sha256": null,
-      "after_sha256": "dec317b9e8111a1cf280ab8f38138a429831d7e46e940da40549e16dd013bf4f",
+      "after_sha256": "0d3136023f39dd83008640dd84dca3f5048c1d83aff7335410c121e0583c28db",
       "owners": {
         "@module": {
           "before": null,
@@ -496,11 +636,11 @@
         },
         "load_cohorts": {
           "before": null,
-          "after": "0b58c54971acd9847eaedc7834cfe6777dd5fc76a0a38d21c6ae7206c2e4d967"
+          "after": "49c5c5f0abb826380ced0a3024f645991be61a54054c612e45a1887432acff3b"
         },
         "metadata": {
           "before": null,
-          "after": "ac99afc7dbd1932db3070c4321e97f0b5523d040f4fc93b249026d4713cb5ebb"
+          "after": "5ebadbd345fef7b530b743dcc0485db3c4b51559df5c3d076b0e682b62bc036b"
         },
         "planning_score": {
           "before": null,
@@ -545,6 +685,48 @@
         "test_unavailable_or_unsupported_resource_scope_is_explicit": {
           "before": null,
           "after": "b1ba2095b11701fa7a8236268d318c34a7f7e75b976f13b931c21aaeb655fd4b"
+        }
+      }
+    },
+    "tests/code_quality/test_extended_shard_allocation.py": {
+      "before_sha256": null,
+      "after_sha256": "7ddab24b43d6d278c9bdf494f403abaaa993e7bd87b125d762f8df464f85f4ae",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "66987efe9bbad94bd6d14a8bad45d37a7926539c2995e8e67d9c01de599d5f05"
+        },
+        "inputs": {
+          "before": null,
+          "after": "f02e2a324f1cf636d12f808ef14752bb2cc471ef540fb67ddd38f6ff7cd7894f"
+        },
+        "test_complete_append_preserves_every_prior_observation_and_baseline": {
+          "before": null,
+          "after": "ff751e248852cdd133c638a9d979410f22541a6fca8579871e53710203aa3b9b"
+        },
+        "test_current_allocation_matches_reviewed_candidate_and_preserves_raw_null": {
+          "before": null,
+          "after": "69eb565a6024b4c7bdab8214758f398c011fbb5d3b992da7e44b1caf13331cd2"
+        },
+        "test_extended_allocator_keeps_pins_roles_and_measurements": {
+          "before": null,
+          "after": "23a6b11ce028bab1be3862e78e2eeb43e1054e4c167dbb08dc1ccda50534883a"
+        },
+        "test_extension_and_planning_reserve_fail_closed": {
+          "before": null,
+          "after": "788061f08159fe96b362a940f7ebb574e83a0568183a7e583cf13bf8d1e7a263"
+        },
+        "test_extension_retains_unknown_and_failed_job_without_changing_original_scope": {
+          "before": null,
+          "after": "4285d4715c26469d0828cd9bd910f7b5a42bc6efa6360d2959a419eb1b662b80"
+        },
+        "test_step5g_partition_source_and_inventory_fail_closed": {
+          "before": null,
+          "after": "3c899f2b487c9fcb4676bf29efd04c473143cf5a4e6a3005256b3cb7436b95a6"
+        },
+        "test_step5g_partitions_match_real_collection_and_original_git_bytes": {
+          "before": null,
+          "after": "f069d635bc68bb27e14ea9b7642e224a956bfac81624e083572e379954e7f894"
         }
       }
     },
@@ -604,11 +786,11 @@
     },
     "tests/code_quality/test_scoped_shard_allocation.py": {
       "before_sha256": null,
-      "after_sha256": "09e367c84cee94ee707c12238f49751e8c5d1395159daf38cb32a645ef5cf93b",
+      "after_sha256": "ee7d974c1914ed9871e281c0578885ef043f3fb04aa0bd122d43aa812c6f9368",
       "owners": {
         "@module": {
           "before": null,
-          "after": "f9c32b750068f7bc82db3f63b328180215b1ced03ae1da1eb2929392edfb7fce"
+          "after": "ac265c04db65da8f449a5a751ff2fe37b663aab6c95b459e6905bd2cbdca3eff"
         },
         "inputs": {
           "before": null,
@@ -616,7 +798,7 @@
         },
         "test_partial_scope_is_complete_only_within_its_declared_known_inventory": {
           "before": null,
-          "after": "799779faba487d4c2b322332b5e4af776f05f53741042a80a5e5b07032e03b24"
+          "after": "ae56a078be55821bbca8837a926891051c6f9060f30e3279dc1dbc3f15d1da8e"
         },
         "test_preflight_inventory_and_partition_changes_fail_closed": {
           "before": null,
@@ -638,11 +820,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "6218eceefc5e1cf141a8d2f8daeb0110121075f15adb39e42a6164fe948d3cac",
-      "after_sha256": "e09cbd51811a5ccdaeb9e3ff8ff2f35d1b1d92d673b93ba5fab502e7268bf33e",
+      "after_sha256": "e1c42756a1ac6f8c82c26b3df978c7232a360c2399778a4f1d5c8095881fd484",
       "owners": {
         "@document": {
           "before": "6218eceefc5e1cf141a8d2f8daeb0110121075f15adb39e42a6164fe948d3cac",
-          "after": "e09cbd51811a5ccdaeb9e3ff8ff2f35d1b1d92d673b93ba5fab502e7268bf33e"
+          "after": "e1c42756a1ac6f8c82c26b3df978c7232a360c2399778a4f1d5c8095881fd484"
         }
       }
     }
@@ -652,7 +834,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -660,7 +842,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -668,7 +850,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -676,7 +858,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -684,7 +866,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -692,7 +874,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -700,7 +882,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -712,7 +894,7 @@
         "coherent-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -724,7 +906,19 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
+      "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
+    },
+    "ci/test_shards/allocation-stress.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -743,7 +937,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -755,7 +949,7 @@
         "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -767,7 +961,7 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -779,7 +973,19 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
+      "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
+    },
+    "ci/test_shards/scoped-worker-extension.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -798,7 +1004,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -817,7 +1023,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -836,7 +1042,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -855,7 +1061,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -874,7 +1080,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -893,7 +1099,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -912,7 +1118,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -931,7 +1137,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -950,7 +1156,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -969,7 +1175,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -988,7 +1194,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1007,7 +1213,19 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
+      "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
+    },
+    "ci/test_shards/step5g-case-partitions.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "cavalcade-v995-roster-admission",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1015,7 +1233,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -1023,7 +1241,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -1034,7 +1252,7 @@
         "behavioral-worksteal-dispatch"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1044,7 +1262,27 @@
         "covered-resource-diagnostics"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
+      "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
+    },
+    "scripts/extended_shard_allocation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
+      "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
+    },
+    "scripts/finite_case_partitions.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1054,7 +1292,7 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1065,7 +1303,7 @@
         "covered-resource-diagnostics"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1075,7 +1313,7 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1085,7 +1323,17 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
+      "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
+    },
+    "scripts/scoped_shard_extension.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1095,7 +1343,7 @@
         "coherent-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1105,7 +1353,7 @@
         "behavioral-worksteal-dispatch-tests"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1115,7 +1363,17 @@
         "covered-resource-diagnostics"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
+      "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
+    },
+    "tests/code_quality/test_extended_shard_allocation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1127,7 +1385,7 @@
         "coherent-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1137,7 +1395,7 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     },
@@ -1147,7 +1405,7 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses eight complete cohorts plus separately authenticated partial stress evidence with the failed shard frozen and unknown. A finite source-bound preflight partition preserves baseline totals. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
+      "rationale": "Bounded CI scheduling repair preserves the complete workload and historical measurements. Mirror-first allocation uses nine complete cohorts, an unchanged original6014-case scope and a separately authenticated267-case extension. One unknown actual cost remains null; an explicit derived stress reserve is separate. The unknown-containing whole file stays pinned while known work can move, and the matched module runs alone with ordinary workers. Two finite source-bound step5g partitions preserve baseline totals. Latest49reports append without rewriting any prefix; updated max dispatch costs reproduce the reviewed allocation. Whole-second role-aware planning remains separate from raw phases and deadlines; read-only resource snapshots preserve original workload outcomes. No engine computation or source-contract generation changes.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
     }

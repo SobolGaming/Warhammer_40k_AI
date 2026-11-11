@@ -354,10 +354,11 @@ The twelve behavioral manifests in `ci/test_shards/` use deterministic coherent
 cohort phase-and-role-residual scoring. The existing isolated mirror is seeded
 first, followed by largest selectors and improving whole-selector moves. The
 source-bound S25 module retains its twenty exact cases; canonical coverage
-preflight has a separate source-bound partition of its twelve exact collected cases. The bounded mirror setup case is a separate
+preflight retains its twelve-case partition. Two finite step5g modules add source-bound
+partitions of 32 and 30 exact cases. The bounded mirror setup case is a separate
 selector; its file selector denotes the remaining cases. CI always deselects that
 node from parallel work and runs it once on its owning shard. All other files remain
-intact. The resulting 444 selectors still select exactly 6,282 cases. The required guards verify the exact selected inventory and partition.
+intact. The resulting 504 selectors still select exactly 6,282 cases. The required guards verify the exact selected inventory and partition.
 Verify that every selected file or declared case appears exactly once:
 
 ```bash
@@ -818,7 +819,7 @@ behavioral profile to provide their exact case weights. Preserve previous measur
 Git history and retained source artifacts; never invent missing weights or
 substitute file averages for CI dispatch.
 
-`allocation-cohorts.json` selects eight complete effective hosted cohorts by their
+`allocation-cohorts.json` selects nine complete effective hosted cohorts by their
 original worker-report SHA-256 identities. The allocator scores the actual four
 initial worksteal chunks for every cohort. Stable node-identity ties make offline
 chunks match live dispatch independently of collection order. The isolated mirror
@@ -844,8 +845,9 @@ estimate is the cohort's largest observed worker setup sum for that fixture grou
 charged once per new worker group. Calls and teardown remain their recorded costs.
 This accounts for fixture reuse without treating historical cold setup as permanently
 owned by its first test. Function-scoped setup can increase with relocated case counts;
-overlapping groups can double-charge dependencies. Work stealing, controller overhead
-and future host variance remain outside this estimate. It is not an upper bound or
+overlapping groups can double-charge dependencies. Observed phase-to-supervisor role
+residuals are included; unobserved overhead, work stealing and future host variance
+are not bounded by this estimate. It is not an upper bound or
 timing qualification. Every actual covered shard still must pass within 1,080 seconds.
 
 The three original complete JUnit sources, hashes and medians remain unchanged.
@@ -857,45 +859,73 @@ The earlier complete cohort is run `43038116912`, attempt 1, source PR head
 `0d281c269759b8a74c915bae3a59fa8e211f9fa6`, tested merge checkout
 `d03fb42db79ad431a6fb15801ce6948584bb16fc`. All 6,282 cases passed, but the
 enclosing run failed the unchanged timing gate on shards 2, 8 and 11. That failure
-remains recorded. The newest complete cohort is run `43047121648`, attempt 1,
+remains recorded. The following complete cohort is run `43047121648`, attempt 1,
 source PR head `ae751d09ad28b2486d60104e0c753b2d0ef0731b`, tested merge checkout
 `831fe9377faaf90b1e3b4787820947c78f19c2a7`. Its 6,282 cases also passed, while
 shard 11 exceeded the timing limit at 1,127.106 seconds; that enclosing failure
 remains recorded too. Cohorts include failed enclosing attempts, and inherited successful jobs
 retain their original producer identities; neither becomes a new passing observation.
+The latest complete cohort is run `43081418293`, attempt 1, source head
+`b9b1c97a6a2da6fca624c7f30c471d6cfab56320`, tested checkout
+`adabf49b8844b26a49c1e87f22c736f69f10f13f`. Its 49 workers completed all 6,282
+cases, but shards 2 and 10 exceeded approval at 1,183.686 and 1,090.457 seconds.
+The enclosing failure remains recorded. Appending these 49 reports and 6,282
+observations gives 892 reports / 113,105 observations, preserving the entire
+843 / 106,823 prefix. The unchanged max-with-baseline formula increases 425
+case weights; this changes initial dispatch membership without changing raw times.
 `--check` regenerates the allocation, and dispatch rejects a missing or changed
 declared cohort index. The all-history maximum case weights still drive dispatch;
 coherent phases and observed role residuals drive allocation, with their distinct limitations recorded.
 
-The separate `allocation-scope.json` and `scoped-worker-evidence.json` bind 45
-completed workers and 6,014 passed cases from failed run `43059076830`, attempt 1,
-source head `7963b663dd8fcfd0906f8fb3de26c67b0ca74812`, tested checkout
-`9a141902bde5b428c041bf82cea0e5ffb2a47313`. Artifact/archive identities, producer
-windows and eleven original supervisor receipts remain bound. Shard 4 lost a
-worker after its current case passed setup; its call result and death cause are
-unknown. Its entire 28-selector / 268-case selection stays fixed and has no partial
-projection. Known plus frozen inventories equal the complete 6,282-case inventory.
-This scoped scenario is not a ninth complete cohort and never changes ordinary
-dispatch calibration or fills missing observations. All 843 global reports and
-106,823 observation tuples retain their values, order and indices.
+The original `allocation-scope.json` and `scoped-worker-evidence.json` remain
+byte-identical: 45 completed workers and 6,014 passed cases from failed run
+`43059076830`, attempt 1, source head `7963b663dd8fcfd0906f8fb3de26c67b0ca74812`,
+tested checkout `9a141902bde5b428c041bf82cea0e5ffb2a47313`. That original scope
+excluded all 268 cases of shard 4. The separate versioned `scoped-worker-extension.json`
+retains four final worker reports, including replacement `gw4`, with 267 unique
+passed setup/call/teardown triples. ZIP/member hashes, producer windows, exact
+tested source-tree identity and identical collected inventories bind those reports.
+The failed shard's exit code remains 1. Its lost `vehicle-scout-deep` case remains
+unknown; no progress journal becomes a completed timing observation and no failed-job
+role residual is derived. The combined raw scope has 6,281 known cases and one
+unknown. Its full score remains null wherever that unknown case is selected.
 
-The scoped allocator reserves the existing serial mirror first using the unchanged
-execution weights, then constructs the eleven eligible groups and refines their
-whole selectors. The frozen group's historical projections still use all eight
-complete cohorts. A 1,076-second historical planning ceiling preserves the prior
-modeled floor; it is separate from the actual 1,080-second approval requirement.
-Cold normalization leaves shard 1 cold and places the mirror on shard 2. Source-bound
-preflight ratios preserve its original 551.905-second baseline file total; the
-active calibrated twelve node weights sum to the unchanged 966.184812329-second
-module weight. All baseline case medians and the original S25 partition remain intact.
+`allocation-stress.json` separately reserves 465.533262819 seconds for the unknown
+case using the maximum of its other complete-cohort phase totals and original
+dispatch cost. This is a derived stress assumption, never a measured case or a
+complete cohort. Known-only phase contributions retain full dispatch chunks while
+filtering missing observations. Role residuals remain derived solely from the
+original eleven complete workloads. No recognized shared module-fixture group is
+added by the extension, so the original known-scope setup maxima stay unchanged.
 
-The chosen conditional projections peak at 1,075.847 seconds across the eight
-complete cohorts and 1,053.382 seconds over the known partial scope: margins of
-4.153 and 26.618 seconds. Applying the largest retained matching-role residuals
-to the partial phases gives 1,064.983 seconds and 15.017 seconds of margin; another
-20 seconds of phase delay would fail. The frozen shard remains unknown in that
-scenario. These estimates do not certify robust future headroom or passing CI.
-Every required exact-head gate and the unresolved worker-loss outcome remain visible.
+The whole eight-case canonical deployment coverage file stays pinned on shard 4,
+which can also receive known work. The whole four-case matched attack module runs
+alone on shard 5 with the ordinary four workers. The other 260 newly evidenced
+cases can move. Mirror-first construction uses updated measured dispatch maxima
+and serial execution weights, then descending selectors and strict whole-second
+improving moves. Planning offsets of 0 for the eight earlier complete cohorts,
+22 for derived stress, and 26 for the latest complete cohort align ceilings of
+1,076 / 1,054 / 1,050 seconds. Feasible groups remain feasible; initially infeasible
+groups may only improve or retain their guarded score. Refinement stops when all
+bounds fit. Cold normalization excludes pinned/fixed/mirror roles, keeping parallel
+shard 1 and the separate mirror on shard 2. These planning ceilings do not change
+the actual inclusive 1,080-second approval or strict-above-1,800-second termination.
+
+The existing S25 and preflight partition files and every baseline case median remain
+unchanged. The two step5g partitions preserve raw Git source bytes, including their
+CRLF lines, and original baseline file totals of 645.801 and 504.883 seconds through
+derived ratios. Their 62 exact collected nodes add flexibility without changing
+tests or observations. All 504 selectors still cover exactly 6,282 cases once.
+
+The chosen conditional peaks are 1,075.779 seconds across the earlier eight cohorts,
+1,052.864 seconds for derived stress, and 1,049.687 seconds for the latest complete
+cohort: margins of 4.221 / 27.136 / 30.313 seconds to actual approval. The latest
+phase paths with the largest retained matching-role residual reach 1,058.166 seconds;
+another 20 seconds reaches 1,078.166, while 50 seconds would fail. Increasing only
+the unknown-case reserve by 20 or 50 seconds leaves the overall derived stress peak
+unchanged. These conditional estimates and preserved per-shard regressions do not
+certify robust future headroom or passing CI. All real exact-head gates and independent
+reviews remain required; the earlier worker-loss cause is still unknown.
 
 The inner covered-workload shell also captures separate before/after resource
 JSON files. Linux host OOM counters and available cgroup-v2 events/current/peak

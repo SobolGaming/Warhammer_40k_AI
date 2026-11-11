@@ -739,7 +739,7 @@ def _case_partition(root: Path, files: frozenset[str]) -> dict[str, float]:
 
 
 def _behavioral_shard_selectors() -> tuple[str, ...]:
-    from scripts.preflight_case_partition import partition_selectors
+    from scripts.finite_case_partitions import partition_selectors
 
     files = frozenset(_behavioral_test_files())
     partition = _case_partition(REPOSITORY_ROOT, files)
@@ -754,7 +754,7 @@ def _partitioned_durations(
     durations: dict[str, float], *, case_seconds: dict[str, float] | None = None
 ) -> dict[str, float]:
     """Preserve file totals; node ratios are derived scheduling weights, not case profiles."""
-    from scripts.preflight_case_partition import partition_durations
+    from scripts.finite_case_partitions import partition_durations
 
     partition = _case_partition(REPOSITORY_ROOT, frozenset(durations))
     result = dict(durations)
@@ -1184,12 +1184,20 @@ def _add_allocation_summary(
         if scope is not None:
             from scripts.scoped_shard_allocation import scoped_metadata
 
-            summary["strategy"] = "scoped-mirror-first-coherent-selector-moves-v1"
-            execution["cold_shard_assignment"] = "minimum-rounded-known-score-eligible-bucket-v1"
+            summary["strategy"] = (
+                "extended-partial-mirror-first-budgeted-selector-moves-v1"
+                if scope.extension
+                else "scoped-mirror-first-coherent-selector-moves-v1"
+            )
+            execution["cold_shard_assignment"] = (
+                "minimum-rounded-planning-score-eligible-parallel-bucket-v2"
+                if scope.extension
+                else "minimum-rounded-known-score-eligible-bucket-v1"
+            )
             complete_model = cast(dict[str, object], summary["allocation_model"])
             complete_model["planning_score_scope"] = (
-                "Eight complete cohorts only; active known-scope scores and explicit unknowns "
-                "are separate in scoped_allocation.shards"
+                f"{len(cohorts)} complete cohorts only; raw partial scores, explicit unknowns "
+                "and separately derived stress are in scoped_allocation.shards"
             )
             summary["scoped_allocation"] = scoped_metadata(
                 tuple(shard.test_files for shard in shards), cases, cohorts, scope
@@ -1221,8 +1229,10 @@ def _summary_payload(
         ],
     }
     if case_seconds is not None:
+        from scripts.finite_case_partitions import add_metadata
         from scripts.preflight_case_partition import OWNER, source_metadata, validate_case_inventory
 
+        add_metadata(REPOSITORY_ROOT, summary, case_seconds)
         validate_case_inventory(case_seconds)
         if any(node.split("::", 1)[0] == OWNER for node in case_seconds):
             summary["preflight_partition"] = source_metadata(REPOSITORY_ROOT)
@@ -1357,8 +1367,10 @@ def dispatch_case_seconds(summary: object, profile: Path) -> dict[str, float]:
 
     baseline = summary_case_seconds(summary)
     fields = cast(dict[str, object], summary)
+    from scripts.finite_case_partitions import validate_metadata as validate_finite_metadata
     from scripts.preflight_case_partition import OWNER, validate_case_inventory, validate_metadata
 
+    validate_finite_metadata(REPOSITORY_ROOT, fields, baseline)
     validate_case_inventory(baseline)
     if any(node.split("::", 1)[0] == OWNER for node in baseline):
         validate_metadata(REPOSITORY_ROOT, fields.get("preflight_partition"))
@@ -1380,6 +1392,10 @@ def dispatch_case_seconds(summary: object, profile: Path) -> dict[str, float]:
 
             index = json.loads(path.read_bytes())
             validate_reference(profile.parent, index.get("scoped_evidence"))
+            if "scoped_extension" in index:
+                from scripts.scoped_shard_extension import validate_reference as validate_extension
+
+                validate_extension(profile.parent, index["scoped_extension"])
     if "calibration" not in fields:
         return baseline
     metadata = fields["calibration"]

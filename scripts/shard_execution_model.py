@@ -158,7 +158,12 @@ def load_cohorts(directory: Path, *, root: Path, nodes: set[str]) -> tuple[Cohor
     value = read_json(path)
     if (
         not isinstance(value, dict)
-        or value.keys() not in ({"schema", "cohorts"}, {"schema", "cohorts", "scoped_evidence"})
+        or value.keys()
+        not in (
+            {"schema", "cohorts"},
+            {"schema", "cohorts", "scoped_evidence"},
+            {"schema", "cohorts", "scoped_evidence", "scoped_extension"},
+        )
         or value["schema"] != MODEL
         or not isinstance(value["cohorts"], list)
         or not value["cohorts"]
@@ -168,6 +173,10 @@ def load_cohorts(directory: Path, *, root: Path, nodes: set[str]) -> tuple[Cohor
         from scripts.scoped_shard_evidence import validate_reference
 
         validate_reference(directory, value["scoped_evidence"])
+    if "scoped_extension" in value:
+        from scripts.scoped_shard_extension import validate_reference as validate_extension
+
+        validate_extension(directory, value["scoped_extension"])
     calibration = cast(dict[str, object], read_json(directory / FILENAME))
     reports = cast(list[dict[str, object]], calibration["reports"])
     observations = cast(dict[str, list[list[int | float]]], calibration["observations"])
@@ -408,8 +417,9 @@ def metadata(
             str(index + 1): planning_score(group, costs, cohorts)
             for index, group in enumerate(shards)
         },
-        "meaning": "Conditional initial chunks and module setup reuse; "
-        "excludes controller overhead, work stealing and future variance; not timing qualification",
+        "meaning": "Conditional initial chunks and module setup reuse include observed "
+        "phase-to-supervisor role residuals. Unobserved overhead, later work stealing and "
+        "future variance are not bounded; not timing qualification.",
         "cohort_worker_path_seconds": {
             cohort.label: {
                 str(index + 1): round(cohort_seconds(group, costs, (cohort,))[0], 3)

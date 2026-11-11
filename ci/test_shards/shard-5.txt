@@ -1,8 +1,1 @@
-tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py
 tests/infrastructure/adapters/test_matched_attack_scenario.py
-tests/infrastructure/missions/unit/test_lifecycle.py
-tests/rules/section04/test_completion_boundaries.py
-tests/rules/section04/test_facade.py
-tests/rules/section18/test_embark.py
-tests/rules/section21/test_clarifications.py
-tests/rules/section22/test_auras.py
