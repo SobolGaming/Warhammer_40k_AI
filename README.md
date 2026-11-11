@@ -699,10 +699,50 @@ supervisor seconds and failed the unchanged 1,080-second approval limit without
 termination. That failed timing result remains failed. Complete JUnit measurements
 supply every current case weight; the new two-case module is included in the
 twelve regenerated manifests. All 382 historical receipts and 47,361 observation
-tuples retain their exact identities, values and outcomes. The fourteen cases
-without a compatible hosted observation use their complete-baseline measurements.
+tuples retain their exact identities, values and outcomes. At this baseline
+construction, fourteen cases had no compatible hosted observation and used
+their complete-baseline measurements.
 This profile is local planning evidence, not hosted timing approval, tactical
 usefulness, scenario-cost qualification or full-game performance.
+
+The subsequent PR661 calibration appends exactly 49 authenticated worker receipts
+and 6,278 passed three-phase observations from attempt 1 of failed hosted run
+[42965700288](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42965700288).
+API-bound archive digests and byte comparisons bind source head
+`7ce2d3c85f138e0575fd78386bbf0b4ef37a4783`, tested merge checkout
+`24a94682b96a0fe8c85f63a5791c08136b3cc903`, their identical tree and the recorded
+runtime fingerprint. All original 382 receipts and 47,361 observation tuples
+retain their exact values, indices, identities and outcomes. Totals are now 431
+receipts and 53,639 observations covering all 6,278 cases, with no baseline-only
+cases. The complete 6,278-case local baseline, source label, JUnit hashes, file
+totals and case measurements remain unchanged.
+
+Every hosted case passed without errors or skips. Shard 4 took
+1,220.530580016 supervisor seconds and shard 12 took 1,186.5076281 seconds;
+both exceeded the unchanged 1,080-second approval limit, exited successfully
+without termination and still failed approval. The run and combined coverage
+gate remain failed. Other shards passed timing. These receipts are historical
+planning evidence, not a passing qualification or a timing-limit amendment.
+
+All four workers were busy through the late shards' final workload interval.
+Shard 4's three canonical-prefix cases took 538.586, 465.533 and 465.781
+three-phase seconds versus prior maximum weights of 356.344, 304.077 and
+306.313. Complete canonical coverage took 951.861 seconds versus 899.083.
+On shard 12, the new attack witness took 661.544 seconds versus its local-only
+319.266 weight; the two followthrough cases took 582.007 and 313.674 seconds
+versus prior weights of 386.433 and 162.136. These are observed weight gaps;
+they do not establish a hardware cause or a runtime regression.
+
+The existing maximum-cost formula regenerates all twelve manifests and the
+same calibrated four-worker dispatch. Canonical coverage moves from shard 4 to
+shard 3; followthrough and the opposing attack remain on shard 12 with a revised
+surrounding inventory. Reusing the observed case costs gives illustrative
+test-work lower bounds of 994.386 and 895.574 seconds for those two new groups.
+Those bounds exclude source/history setup, collection and finalization and
+assume unchanged case costs across different workers and hosts. They cannot
+predict approval or certify a speedup. No test, scheduler algorithm, runtime,
+worker count, coverage floor or timing limit changes. Fresh complete hosted
+qualification remains required for every shard.
 
 Every supplied complete baseline JUnit run must cover the current behavioral file inventory. Missing files,
 duplicate cases, failed/skipped cases, invalid durations, and truncated suite counts
