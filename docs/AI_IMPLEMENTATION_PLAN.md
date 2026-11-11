@@ -433,6 +433,35 @@ roster/geometry/mission/points/seed limitations. Stage 2 remains incomplete,
 `reference_target` remains null and learning remains excluded. See the
 [qualification interface](AI_POLICY_INTERFACE.md#opposing-shooter-qualification).
 
+### Matched opposing attack at a common local horizon
+
+`MatchedAttackComparison` now extends both exact followthrough endpoints with the
+unchanged opposing-shooter approach and attack recipe. Fresh ordinary reproduction
+rejects configuration, endpoint and record-count drift before continuation, and
+leaves both caller sessions unchanged. The stationary and moved branches reach
+65 and 66 accepted records respectively, at the same round-four player-A Movement
+unit-selection boundary. Both final prefixes retain verified ordinary startup,
+strict persistence and exact replay evidence in a separate export-only report.
+
+The report compares actual semantic choices and movement paths across branches,
+including six A Remain Stationary choices, five skipped Shooting phases, six
+declined movement reaction windows, four B hit/wound Command Re-Roll declines,
+one A armour-save Command Re-Roll decline and the same E model allocation. B
+approaches in rounds one through three and attacks with the same rifle in round
+three. Before/attack/final boundaries and the full accepted traces expose those
+cooperation and timing controls; they do not constitute adversarial or alternative
+timing policies.
+
+E has identical positions and three surviving models with two wounds each in both
+branches before and after the attack. The measured wound loss and matched outcome
+differences are zero. This closes one bounded matched-response/horizon evidence
+gap, without demonstrating screening, exposure or a useful E benefit. Alternative
+timing/cooperation policies, useful candidate coverage and scenario costs remain
+open. Historical followthrough and single-branch qualification definitions,
+implementations and tests retain their meanings. The inherited synthetic fixture
+exceptions, `scoped_gap`, null target, learning exclusion and incomplete Stage 2
+status remain. See the [comparison interface](AI_POLICY_INTERFACE.md#matched-opposing-attack-comparison).
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.

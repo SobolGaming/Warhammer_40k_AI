@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:575d1f47b62970089d53ec533482c75cbbd7a06bfe7015fe09d99526dcba781c",
-  "fingerprint": "575d1f47b62970089d53ec533482c75cbbd7a06bfe7015fe09d99526dcba781c",
-  "resource_count": 3246,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:870d2370b0f71a646d7e20e9e998efa7c914fc187745f97830d81487d262115f",
+  "fingerprint": "870d2370b0f71a646d7e20e9e998efa7c914fc187745f97830d81487d262115f",
+  "resource_count": 3247,
   "resources": [
     {
       "byte_length": 113,
@@ -258,6 +258,11 @@
       "byte_length": 19765,
       "path": "warhammer40k_core/ai/followthrough_scenario.py",
       "sha256": "2b34da3d67644e1d47fa1f7f5833d0c9bf00dbc20942a1667fe6a36bb28bb675"
+    },
+    {
+      "byte_length": 14021,
+      "path": "warhammer40k_core/ai/matched_attack_scenario.py",
+      "sha256": "bbf9f5124a3dc6e3842ee0b39798c86bcfa44ff6510b48047bda5803c32d5789"
     },
     {
       "byte_length": 16247,

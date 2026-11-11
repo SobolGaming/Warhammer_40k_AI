@@ -1,5 +1,10 @@
 {
-  "baseline_only_cases": [],
+  "baseline_only_cases": [
+    "tests/infrastructure/adapters/test_matched_attack_scenario.py::test_both_ordinary_attacks_have_matched_timing_cooperation_and_local_outcomes",
+    "tests/infrastructure/adapters/test_matched_attack_scenario.py::test_matched_report_rejects_same_count_endpoint_drift",
+    "tests/infrastructure/adapters/test_matched_attack_scenario.py::test_matched_report_rejects_wrong_config_unreached_and_extra_ordinary_decisions",
+    "tests/infrastructure/adapters/test_matched_attack_scenario.py::test_matched_report_replays_both_branches_and_stays_export_only"
+  ],
   "current_test_sources": {
     "tests/factions/adeptus_custodes/unit/test_adeptus_custodes_army_rule.py": "b57c87563d26c3037d4285d0d03d21aa476f808e4c4c6cd65cfcfcb9661fea41",
     "tests/factions/aeldari/unit/test_aeldari_army_rule.py": "c057292e55f5399d327fda0bf2e7008c08179b75c90e546f5113b738110e5e7a",
@@ -46,6 +51,7 @@
     "tests/infrastructure/adapters/test_deployment_geometry_features.py": "12d4b70e44b1d8678086cac7aeee191579bed3d2aa5e553f6514c5f5cf37a67d",
     "tests/infrastructure/adapters/test_finite_candidates.py": "46f9947f09bea4cb3dbbb0e665f488031c2565f2a3dad2097dd840627f0e2abb",
     "tests/infrastructure/adapters/test_followthrough_scenario.py": "3229c0dbfacbdaf1455aa6baf792362770cdca0fa20de8e47d0f74573cd81c51",
+    "tests/infrastructure/adapters/test_matched_attack_scenario.py": "9431a05971747a3dffb3215688e790c4c79accfa74e24e772be834e0c3d14c9a",
     "tests/infrastructure/adapters/test_normal_move_scenario.py": "30bb82e22114deb4d7e6b749b684fabd6e7463c41eb24786e7b7d9e023418917",
     "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": "b194cc112d8218eac3c08c984cdfa2ecf0c78abf9db9edec61f0d9ad2a0a73d3",
     "tests/infrastructure/adapters/test_preserve_scenario.py": "3d348cf932c4430ea470cf0377741771ecc24cf3a7a381d70d364d0590c15fe6",
@@ -415,7 +421,7 @@
     "tests/unit/test_phase10i_terrain_movement.py": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38"
   },
   "formula": "max(complete-baseline-case-seconds, largest-observed-passed-three-phase-total)",
-  "inventory_sha256": "c2e4190d07d697ad4647587b73f7339ac9c92cfc8b7d8fdc8648e452aa01e7af",
+  "inventory_sha256": "36abc69ca7b3581117e926ce00df90d4ca1f104a9b1b9a6e59ec376726bc799b",
   "observation_fields": [
     "report_index",
     "setup",

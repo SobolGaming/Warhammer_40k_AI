@@ -42,6 +42,16 @@ Normal Moves and resolves one B rifle attack against E in round three. A remains
 stationary and declines reactions. This is one attack-feasibility witness; paired
 outcomes, tactical benefit, Stage 2 completion and learning remain unqualified.
 
+The separate [matched attack comparison](docs/AI_POLICY_INTERFACE.md#matched-opposing-attack-comparison)
+extends both original endpoints through the same cooperative approach and rifle
+attack to round-four player-A Movement. It verifies both complete prefixes by
+strict persistence/replay and compares E's wounds, survival and positions at that
+common horizon. Both branches retain all three E models with two wounds each and
+identical E positions: the observed wound and survival differences are zero.
+The report records the shared timing, stationary choices and declined reactions;
+adversarial alternatives, tactical benefit, broader costs, Stage 2 completion and
+learning remain unqualified. Historical reports retain their narrower meanings.
+
 ## 2. Non-negotiable invariants
 
 These rules are enforced from the first commit.
