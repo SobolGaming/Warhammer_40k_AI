@@ -1627,3 +1627,55 @@ non-strict roster flag, provisional model geometry, July mission/October layout,
 partial points and public test-seed exceptions remain. `useful_reference_status`
 is `scoped_gap`, `reference_target` is null and `eligible_for_learning` is false.
 Stage 2, full-game qualification and throughput certification remain incomplete.
+
+## Matched opposing attack comparison
+
+`ai.matched_attack_scenario.MatchedAttackComparison.from_sessions(stationary,
+moved)` supplies a separate immutable operator report from the exact 22/23-record
+followthrough endpoints. It rejects wrong configurations, unreached or advanced
+prefixes and same-count checkpoint drift against fresh ordinary reproduction.
+It extends the reproduced pair, preserving both caller-owned sessions. The
+historical `FollowthroughPairAdmission` and `OpposingShooterQualification`, their
+definitions and tests retain their original scope. The new report supports JSON
+export and a content hash, with no serialized-evidence importer or training
+consumer; edited exports cannot admit evidence.
+
+Both branches use the unchanged `_approach` and `_finish_attack` helpers from
+the opposing shooter module. B performs the same three witnessed approaches in
+rounds one through three, skips Shooting in rounds one and two, then declares
+model `:003`'s rifle against E in round-three Normal shooting. A skips its three
+Shooting phases and chooses Remain Stationary for all three units in rounds two
+and three. Both players decline all six offered movement reaction windows; B
+declines four hit/wound Command Re-Rolls, A declines its armour-save Command
+Re-Roll and allocates to E model `:001`. The report requires identical actual
+route/option sequences, movement witnesses and weapon/target/round declarations,
+excluding branch-specific proposal linkage from that semantic comparison while
+retaining complete accepted records and observation hashes in each trace.
+
+The initial, before-attack and final round/active-player/pending-route boundaries
+must match across branches. Both branches stop at round-four player-A Movement's
+`select_movement_unit`, after exactly one completed attack sequence each. They
+contain 65 and 66 accepted records respectively, including the two engine-generated
+target/group selections. `VerifiedEpisodeOrigin` independently verifies ordinary
+startup and strict persistence replay for each complete prefix. Each branch
+exports its source/build-bound origin, full continuation trace, actual attack
+events, replay artifact/hash and E model identities, health, survival and poses
+at the initial, before-attack and final checkpoints. Poses are null only for
+models absent from the battlefield placement inventory.
+
+The fixed-seed result is equal: all three E models remain alive at two wounds
+each, six total, with unchanged and identical E poses. Neither branch loses
+wounds. The computed moved-minus-stationary wound and living-model differences
+are zero. This is one bounded cooperative comparison; it does not show that
+either initial S choice is better or that S screened/exposed E. Shared controls
+record the recipe's timing and cooperation; adversarial responses and alternate
+timings remain unmeasured. Useful candidate coverage and scenario costs remain
+open, along with the inherited synthetic roster, geometry, mission/layout,
+partial points and public seed limitations. The report retains `scoped_gap`, a
+null reference target and no learning eligibility. Stage 2, full-game and
+throughput qualification remain incomplete.
+
+All choices use the existing adapter contract and shared engine movement,
+shooting, attack, persistence and replay owners. This adds no engine rule,
+player-facing route, proposal family, wire contract, policy or learner. Report
+metadata stays outside actor views and scorer inputs.

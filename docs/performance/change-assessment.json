@@ -1,382 +1,382 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "5639ccce458e53e154b1f578548ec7f20dfdec18",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:575d1f47b62970089d53ec533482c75cbbd7a06bfe7015fe09d99526dcba781c",
-  "operation_map_sha256": "89656cb8a4a48f84aaff1f2d37c607010f831cb972f957b94be56d0f53e944aa",
+  "base": "7d3f82acc3e11553673de0bd7e900bcfcc994f43",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:870d2370b0f71a646d7e20e9e998efa7c914fc187745f97830d81487d262115f",
+  "operation_map_sha256": "89ad55625e879759d323705bbcb985d097917fe35ce441c6089ff3e99129c097",
   "changes": {
     "README.md": {
-      "before_sha256": "337d3ac35e44a363b46f04b6be423753f55e8693aa2c196d468ad2460936fcc1",
-      "after_sha256": "58dab9dc4dbfad47eb88078c850bcf8cb365578a635398be8b65179074cc5c6f",
+      "before_sha256": "58dab9dc4dbfad47eb88078c850bcf8cb365578a635398be8b65179074cc5c6f",
+      "after_sha256": "1567ed82732f88ef76e7789339db929c59ee8f2f9bf620d69b32c9139d553db1",
       "owners": {
         "@document": {
-          "before": "337d3ac35e44a363b46f04b6be423753f55e8693aa2c196d468ad2460936fcc1",
-          "after": "58dab9dc4dbfad47eb88078c850bcf8cb365578a635398be8b65179074cc5c6f"
+          "before": "58dab9dc4dbfad47eb88078c850bcf8cb365578a635398be8b65179074cc5c6f",
+          "after": "1567ed82732f88ef76e7789339db929c59ee8f2f9bf620d69b32c9139d553db1"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "68292b457983fee20690067ec452be369beb1c3d82041fbe7477ee131e2fb0e6",
-      "after_sha256": "1a1b2f2a1fb08879d351a9594a8a10281dd7f6781bcec3669185171fbdca61ce",
+      "before_sha256": "1a1b2f2a1fb08879d351a9594a8a10281dd7f6781bcec3669185171fbdca61ce",
+      "after_sha256": "58ea9bd35fd1083dc064177d67c1e52ecb28a1803e8476053a4a77a381a7d732",
       "owners": {
         "@document": {
-          "before": "68292b457983fee20690067ec452be369beb1c3d82041fbe7477ee131e2fb0e6",
-          "after": "1a1b2f2a1fb08879d351a9594a8a10281dd7f6781bcec3669185171fbdca61ce"
+          "before": "1a1b2f2a1fb08879d351a9594a8a10281dd7f6781bcec3669185171fbdca61ce",
+          "after": "58ea9bd35fd1083dc064177d67c1e52ecb28a1803e8476053a4a77a381a7d732"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
-      "before_sha256": "b2f94e1591514bf044813c02cd77500ec4935416014ce256f59b36da3dfc3534",
-      "after_sha256": "670548544281f59623f7cc72ee3b24e63be764ace7a7cebf0b7e662aa570bacc",
+      "before_sha256": "670548544281f59623f7cc72ee3b24e63be764ace7a7cebf0b7e662aa570bacc",
+      "after_sha256": "4170c290b0201b080964064491dc71577d99a36852e66cf7df00eca24dbf29cc",
       "owners": {
         "@document": {
-          "before": "b2f94e1591514bf044813c02cd77500ec4935416014ce256f59b36da3dfc3534",
-          "after": "670548544281f59623f7cc72ee3b24e63be764ace7a7cebf0b7e662aa570bacc"
+          "before": "670548544281f59623f7cc72ee3b24e63be764ace7a7cebf0b7e662aa570bacc",
+          "after": "4170c290b0201b080964064491dc71577d99a36852e66cf7df00eca24dbf29cc"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "b6fddd5695453d7a0e1db52d26a520367d3a506f90b3144ce80f9f6cec6bc4ea",
-      "after_sha256": "3301d3d397736d4453ed650828d59585c65b3347b03e06181468692cd5841079",
+      "before_sha256": "3301d3d397736d4453ed650828d59585c65b3347b03e06181468692cd5841079",
+      "after_sha256": "f66407735b0e61236dfd25df4c5e948ffc807fbcda6dd6e9a6238e5448d5abb7",
       "owners": {
         "@document": {
-          "before": "b6fddd5695453d7a0e1db52d26a520367d3a506f90b3144ce80f9f6cec6bc4ea",
-          "after": "3301d3d397736d4453ed650828d59585c65b3347b03e06181468692cd5841079"
+          "before": "3301d3d397736d4453ed650828d59585c65b3347b03e06181468692cd5841079",
+          "after": "f66407735b0e61236dfd25df4c5e948ffc807fbcda6dd6e9a6238e5448d5abb7"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "5c4fec7109b19f1c6eb0e277bbbb4893a70c7031debba25bdfd0c173ef761636",
-      "after_sha256": "64a5e71ead52cc68f2a99aa24d5d76acd17bce5ef37ea039de2bdb3e98e80191",
+      "before_sha256": "64a5e71ead52cc68f2a99aa24d5d76acd17bce5ef37ea039de2bdb3e98e80191",
+      "after_sha256": "8e7618d159658855028a4b59fca8ad310a7f1808a3d71ecd4c587c3a05e43c7b",
       "owners": {
         "@document": {
-          "before": "5c4fec7109b19f1c6eb0e277bbbb4893a70c7031debba25bdfd0c173ef761636",
-          "after": "64a5e71ead52cc68f2a99aa24d5d76acd17bce5ef37ea039de2bdb3e98e80191"
+          "before": "64a5e71ead52cc68f2a99aa24d5d76acd17bce5ef37ea039de2bdb3e98e80191",
+          "after": "8e7618d159658855028a4b59fca8ad310a7f1808a3d71ecd4c587c3a05e43c7b"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "815abb9a9c35408a2007644b9e6aff843a1798e842837729217fd259ccaf9f48",
-      "after_sha256": "2b03566ad165c11b33579e1c53693e054f6a60c4ee64bcb8b77e1d5480958927",
+      "before_sha256": "2b03566ad165c11b33579e1c53693e054f6a60c4ee64bcb8b77e1d5480958927",
+      "after_sha256": "5ead7122b43ecfe9ad6874a967343c9c7e1c2f6718a3053dcb8db01d27b5d3d8",
       "owners": {
         "@document": {
-          "before": "815abb9a9c35408a2007644b9e6aff843a1798e842837729217fd259ccaf9f48",
-          "after": "2b03566ad165c11b33579e1c53693e054f6a60c4ee64bcb8b77e1d5480958927"
+          "before": "2b03566ad165c11b33579e1c53693e054f6a60c4ee64bcb8b77e1d5480958927",
+          "after": "5ead7122b43ecfe9ad6874a967343c9c7e1c2f6718a3053dcb8db01d27b5d3d8"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
-      "after_sha256": "8851ea8bc789f186489a1cd5790aacc0a9bc80a2d9170f48ad2b4965d5f28637",
+      "before_sha256": "8851ea8bc789f186489a1cd5790aacc0a9bc80a2d9170f48ad2b4965d5f28637",
+      "after_sha256": "361be70df066b3c05fc79fdf36b88834a22d116fad25b19f3b60f66683f769d9",
       "owners": {
         "@document": {
-          "before": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
-          "after": "8851ea8bc789f186489a1cd5790aacc0a9bc80a2d9170f48ad2b4965d5f28637"
+          "before": "8851ea8bc789f186489a1cd5790aacc0a9bc80a2d9170f48ad2b4965d5f28637",
+          "after": "361be70df066b3c05fc79fdf36b88834a22d116fad25b19f3b60f66683f769d9"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "703026acec5ec84c12110c0caed34579a1a48bc3a2da7138c8f9667dc3833c57",
-      "after_sha256": "e894ef5f995f2efe68979d0ea8644590dd60828f3b48bf51c41eb0a02f9a95cd",
+      "before_sha256": "e894ef5f995f2efe68979d0ea8644590dd60828f3b48bf51c41eb0a02f9a95cd",
+      "after_sha256": "47aa2c90028df8c82315a41a430ff06502aa1aa4854e8065b1b2ec30a4108f11",
       "owners": {
         "@document": {
-          "before": "703026acec5ec84c12110c0caed34579a1a48bc3a2da7138c8f9667dc3833c57",
-          "after": "e894ef5f995f2efe68979d0ea8644590dd60828f3b48bf51c41eb0a02f9a95cd"
+          "before": "e894ef5f995f2efe68979d0ea8644590dd60828f3b48bf51c41eb0a02f9a95cd",
+          "after": "47aa2c90028df8c82315a41a430ff06502aa1aa4854e8065b1b2ec30a4108f11"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "376637fec673e58f1fc199e4cdc330ac79baabc75e6afdee229c95b6f433aacc",
-      "after_sha256": "6a8b25216097734b24b5f0b4f9ab8ccdc94d5799705cc462e405f77e818ce9f0",
+      "before_sha256": "6a8b25216097734b24b5f0b4f9ab8ccdc94d5799705cc462e405f77e818ce9f0",
+      "after_sha256": "96ff1f4779e9eae21cbb98f43dfbf7f31fe8f14fad280d3ddde7ac6af1409c08",
       "owners": {
         "@document": {
-          "before": "376637fec673e58f1fc199e4cdc330ac79baabc75e6afdee229c95b6f433aacc",
-          "after": "6a8b25216097734b24b5f0b4f9ab8ccdc94d5799705cc462e405f77e818ce9f0"
+          "before": "6a8b25216097734b24b5f0b4f9ab8ccdc94d5799705cc462e405f77e818ce9f0",
+          "after": "96ff1f4779e9eae21cbb98f43dfbf7f31fe8f14fad280d3ddde7ac6af1409c08"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "79ac48845700d5a789a412c0c543dbe1439ea45e1af6b15dfed3473f33ec9cd4",
-      "after_sha256": "e49ea52684ffbfafb5d694fabf00f43161de4f5133a6e7bc5f0da2001fff3a0d",
+      "before_sha256": "e49ea52684ffbfafb5d694fabf00f43161de4f5133a6e7bc5f0da2001fff3a0d",
+      "after_sha256": "ff8491024ba896aa2131fdf3eab476c70b564f2a339ef98a83b8376822b2b107",
       "owners": {
         "@document": {
-          "before": "79ac48845700d5a789a412c0c543dbe1439ea45e1af6b15dfed3473f33ec9cd4",
-          "after": "e49ea52684ffbfafb5d694fabf00f43161de4f5133a6e7bc5f0da2001fff3a0d"
+          "before": "e49ea52684ffbfafb5d694fabf00f43161de4f5133a6e7bc5f0da2001fff3a0d",
+          "after": "ff8491024ba896aa2131fdf3eab476c70b564f2a339ef98a83b8376822b2b107"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "61a4e7af64df329d07dae2ef59d8193775781983989c9bad0792bfbbcb072021",
-      "after_sha256": "b3fbdbb0fd28c68b5fcdb357f84b306ab84103446217bd386fafccb150d9fd51",
+      "before_sha256": "b3fbdbb0fd28c68b5fcdb357f84b306ab84103446217bd386fafccb150d9fd51",
+      "after_sha256": "9e58fdff80342804c95954d6ee3b08c21e399c9eb8ddad3d620745bb5df3205c",
       "owners": {
         "@document": {
-          "before": "61a4e7af64df329d07dae2ef59d8193775781983989c9bad0792bfbbcb072021",
-          "after": "b3fbdbb0fd28c68b5fcdb357f84b306ab84103446217bd386fafccb150d9fd51"
+          "before": "b3fbdbb0fd28c68b5fcdb357f84b306ab84103446217bd386fafccb150d9fd51",
+          "after": "9e58fdff80342804c95954d6ee3b08c21e399c9eb8ddad3d620745bb5df3205c"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "94c3c36fe130247df1267000ff61121480c6f57261009cf8c4a13c4ed3465eb8",
-      "after_sha256": "1b8d7524d3c01e360a9213fd2d5efff1c21ba934279f499330d2808aba708121",
+      "before_sha256": "1b8d7524d3c01e360a9213fd2d5efff1c21ba934279f499330d2808aba708121",
+      "after_sha256": "dd0d2cf7fb98d77d308aeb2fb52c3824877b10320dc6fbe2d03a4747a8db272f",
       "owners": {
         "@document": {
-          "before": "94c3c36fe130247df1267000ff61121480c6f57261009cf8c4a13c4ed3465eb8",
-          "after": "1b8d7524d3c01e360a9213fd2d5efff1c21ba934279f499330d2808aba708121"
+          "before": "1b8d7524d3c01e360a9213fd2d5efff1c21ba934279f499330d2808aba708121",
+          "after": "dd0d2cf7fb98d77d308aeb2fb52c3824877b10320dc6fbe2d03a4747a8db272f"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "4eb98eb67d31c2cd591ace7b82010f18f0b7cd0eecf93741f5dfc50fa9cde12f",
-      "after_sha256": "083099fa8b281cff26909ac22d26e1452671f13e83d8891eb95a7bc79102162d",
+      "before_sha256": "083099fa8b281cff26909ac22d26e1452671f13e83d8891eb95a7bc79102162d",
+      "after_sha256": "61dca701c907d2b6f10a8c7467269944df7d89df5c1fe009440feb837bc9f73c",
       "owners": {
         "@document": {
-          "before": "4eb98eb67d31c2cd591ace7b82010f18f0b7cd0eecf93741f5dfc50fa9cde12f",
-          "after": "083099fa8b281cff26909ac22d26e1452671f13e83d8891eb95a7bc79102162d"
+          "before": "083099fa8b281cff26909ac22d26e1452671f13e83d8891eb95a7bc79102162d",
+          "after": "61dca701c907d2b6f10a8c7467269944df7d89df5c1fe009440feb837bc9f73c"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "c0e719375754379377836a026698e14b177baebb9212fb6ce88853ad43ee8370",
-      "after_sha256": "a9db5d8d8018bde358db1d789104acaaed1af936efe31c0a46f11d032d06889d",
+      "before_sha256": "a9db5d8d8018bde358db1d789104acaaed1af936efe31c0a46f11d032d06889d",
+      "after_sha256": "95f99d37a8c68a91366e4ec2a8604806dacfac1035e1ce612ed06a582e35313e",
       "owners": {
         "@document": {
-          "before": "c0e719375754379377836a026698e14b177baebb9212fb6ce88853ad43ee8370",
-          "after": "a9db5d8d8018bde358db1d789104acaaed1af936efe31c0a46f11d032d06889d"
+          "before": "a9db5d8d8018bde358db1d789104acaaed1af936efe31c0a46f11d032d06889d",
+          "after": "95f99d37a8c68a91366e4ec2a8604806dacfac1035e1ce612ed06a582e35313e"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "f13a050ca50d49a41765148231907099a7c0ecbf66ab60e4de4f214ae3d1d3b4",
-      "after_sha256": "65a00b490ae2f4d39c57ce4979e9de417b3012bf00fd638ddc4b65c0e56a80e8",
+      "before_sha256": "65a00b490ae2f4d39c57ce4979e9de417b3012bf00fd638ddc4b65c0e56a80e8",
+      "after_sha256": "13a7edf1198b9ba62aad50f975529376a2a2282b6feba8dd3d449adea3e1cd57",
       "owners": {
         "@document": {
-          "before": "f13a050ca50d49a41765148231907099a7c0ecbf66ab60e4de4f214ae3d1d3b4",
-          "after": "65a00b490ae2f4d39c57ce4979e9de417b3012bf00fd638ddc4b65c0e56a80e8"
+          "before": "65a00b490ae2f4d39c57ce4979e9de417b3012bf00fd638ddc4b65c0e56a80e8",
+          "after": "13a7edf1198b9ba62aad50f975529376a2a2282b6feba8dd3d449adea3e1cd57"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "6a2badeb9b7ff64e26ad40bf218a557b21c455933de6da3907fc80cf08d34eba",
-      "after_sha256": "89b3b38a0e7acd607db04b2c0a9d0589714454973539fc66584aadd7a000df82",
+      "before_sha256": "89b3b38a0e7acd607db04b2c0a9d0589714454973539fc66584aadd7a000df82",
+      "after_sha256": "245f6cafd6d9784e5d6a7a30d63f19376f5a818e355b44acc567e67609371aa6",
       "owners": {
         "@document": {
-          "before": "6a2badeb9b7ff64e26ad40bf218a557b21c455933de6da3907fc80cf08d34eba",
-          "after": "89b3b38a0e7acd607db04b2c0a9d0589714454973539fc66584aadd7a000df82"
+          "before": "89b3b38a0e7acd607db04b2c0a9d0589714454973539fc66584aadd7a000df82",
+          "after": "245f6cafd6d9784e5d6a7a30d63f19376f5a818e355b44acc567e67609371aa6"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "227cc16d16ddce135ca3272aedc7df7d3cdbcb0e40790781081245c6455ccd9c",
-      "after_sha256": "ae5798ae0c1ba678f6b5ffbca45627eded0ceb22f64ba72219fef71e908273af",
+      "before_sha256": "ae5798ae0c1ba678f6b5ffbca45627eded0ceb22f64ba72219fef71e908273af",
+      "after_sha256": "93e8658ff60fe57ec673bdd2047c8faf3a8ff77551549445ef6def70a5b98741",
       "owners": {
         "@document": {
-          "before": "227cc16d16ddce135ca3272aedc7df7d3cdbcb0e40790781081245c6455ccd9c",
-          "after": "ae5798ae0c1ba678f6b5ffbca45627eded0ceb22f64ba72219fef71e908273af"
+          "before": "ae5798ae0c1ba678f6b5ffbca45627eded0ceb22f64ba72219fef71e908273af",
+          "after": "93e8658ff60fe57ec673bdd2047c8faf3a8ff77551549445ef6def70a5b98741"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "0e35b87359278e474071be03779b7ca9cab01b42a40617576372d09d8c640a05",
-      "after_sha256": "a812f24bb1f0c8c0b98151497ead8a6fc29ea3ad4512cbaa6deec97e6967fe34",
+      "before_sha256": "a812f24bb1f0c8c0b98151497ead8a6fc29ea3ad4512cbaa6deec97e6967fe34",
+      "after_sha256": "098b847fb3e38463e35623f0ea7f9afa35bd028756d787b8da280e7d7a6d28cd",
       "owners": {
         "@document": {
-          "before": "0e35b87359278e474071be03779b7ca9cab01b42a40617576372d09d8c640a05",
-          "after": "a812f24bb1f0c8c0b98151497ead8a6fc29ea3ad4512cbaa6deec97e6967fe34"
+          "before": "a812f24bb1f0c8c0b98151497ead8a6fc29ea3ad4512cbaa6deec97e6967fe34",
+          "after": "098b847fb3e38463e35623f0ea7f9afa35bd028756d787b8da280e7d7a6d28cd"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "4e035b8e3ea35b54f5c1df35c29b124001fac56905881222e1230a2746c8878b",
-      "after_sha256": "698fd3e6ad3a8730f73a131d2108a80b20674fe999b5a39a738ca5e2d736e9bb",
+      "before_sha256": "698fd3e6ad3a8730f73a131d2108a80b20674fe999b5a39a738ca5e2d736e9bb",
+      "after_sha256": "fe447d1460a5f5dea216db6250d6243ef3eeaeaca70b0cfd60915ad3e7aeac42",
       "owners": {
         "@document": {
-          "before": "4e035b8e3ea35b54f5c1df35c29b124001fac56905881222e1230a2746c8878b",
-          "after": "698fd3e6ad3a8730f73a131d2108a80b20674fe999b5a39a738ca5e2d736e9bb"
+          "before": "698fd3e6ad3a8730f73a131d2108a80b20674fe999b5a39a738ca5e2d736e9bb",
+          "after": "fe447d1460a5f5dea216db6250d6243ef3eeaeaca70b0cfd60915ad3e7aeac42"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "f50c4eabca575efa3a93a983d2ae662715fe593fe903b4ec2dce89e8932923d5",
-      "after_sha256": "a1ddb45ed98ae4f70ddb9e00a0ea397784eb71df40e65b4d7be3318b960707c3",
+      "before_sha256": "a1ddb45ed98ae4f70ddb9e00a0ea397784eb71df40e65b4d7be3318b960707c3",
+      "after_sha256": "60dd12fe2b3ce8ee735ba48f556773227dc30dcc20ba3c695ce4a2cea8afe880",
       "owners": {
         "@document": {
-          "before": "f50c4eabca575efa3a93a983d2ae662715fe593fe903b4ec2dce89e8932923d5",
-          "after": "a1ddb45ed98ae4f70ddb9e00a0ea397784eb71df40e65b4d7be3318b960707c3"
+          "before": "a1ddb45ed98ae4f70ddb9e00a0ea397784eb71df40e65b4d7be3318b960707c3",
+          "after": "60dd12fe2b3ce8ee735ba48f556773227dc30dcc20ba3c695ce4a2cea8afe880"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "8036d4d0b2d83ee3a961ca2c896c31b77325981ae927a0a8e98362e76106fa80",
-      "after_sha256": "242fb6b990b04d1efc026c15a8163b1db5aa9a1d90f631650c8d98b3defc864f",
+      "before_sha256": "242fb6b990b04d1efc026c15a8163b1db5aa9a1d90f631650c8d98b3defc864f",
+      "after_sha256": "840b501abb7f748a547a2ed3a849e55dd2d815b810ed6ff896d6ec60e2f3f7c8",
       "owners": {
         "@document": {
-          "before": "8036d4d0b2d83ee3a961ca2c896c31b77325981ae927a0a8e98362e76106fa80",
-          "after": "242fb6b990b04d1efc026c15a8163b1db5aa9a1d90f631650c8d98b3defc864f"
+          "before": "242fb6b990b04d1efc026c15a8163b1db5aa9a1d90f631650c8d98b3defc864f",
+          "after": "840b501abb7f748a547a2ed3a849e55dd2d815b810ed6ff896d6ec60e2f3f7c8"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "52df197b49f2e22a2b4095b76e91dbcb53620bc651eeba25702c1473a33a764f",
-      "after_sha256": "3737982ec8ba440841164f6d7e831d1ae1e856f92e36171de6d6a2f0f427f956",
+      "before_sha256": "3737982ec8ba440841164f6d7e831d1ae1e856f92e36171de6d6a2f0f427f956",
+      "after_sha256": "1a1802484febc6539240002e17853d50e777f1cfdb19a9bf409d7b98e5d3a71d",
       "owners": {
         "@document": {
-          "before": "52df197b49f2e22a2b4095b76e91dbcb53620bc651eeba25702c1473a33a764f",
-          "after": "3737982ec8ba440841164f6d7e831d1ae1e856f92e36171de6d6a2f0f427f956"
+          "before": "3737982ec8ba440841164f6d7e831d1ae1e856f92e36171de6d6a2f0f427f956",
+          "after": "1a1802484febc6539240002e17853d50e777f1cfdb19a9bf409d7b98e5d3a71d"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "376453b35f9a9ffdca8f00c996ea3fc2ec2cfb1a39bdff3ba45031012684fdb8",
-      "after_sha256": "8edfc3b874c78f43851d6a2050730a1c9c3b1cc57afbec95bda4c1354429637c",
+      "before_sha256": "8edfc3b874c78f43851d6a2050730a1c9c3b1cc57afbec95bda4c1354429637c",
+      "after_sha256": "c3ed8b3ee1b2ac5326d612e5854ee43e7e6cad689fac085d172921224707a305",
       "owners": {
         "@document": {
-          "before": "376453b35f9a9ffdca8f00c996ea3fc2ec2cfb1a39bdff3ba45031012684fdb8",
-          "after": "8edfc3b874c78f43851d6a2050730a1c9c3b1cc57afbec95bda4c1354429637c"
+          "before": "8edfc3b874c78f43851d6a2050730a1c9c3b1cc57afbec95bda4c1354429637c",
+          "after": "c3ed8b3ee1b2ac5326d612e5854ee43e7e6cad689fac085d172921224707a305"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "e9bb97f7caa519002e8c7f93b67a7c3fd6a3a8e54e9a5e079e5286749b038b77",
-      "after_sha256": "e9c936e7fc56aee557e652dcbd047304eb80941c6653f8f36712fdd3f9c49910",
+      "before_sha256": "e9c936e7fc56aee557e652dcbd047304eb80941c6653f8f36712fdd3f9c49910",
+      "after_sha256": "51d584a3865e6f1b885b86a28dbfb0cded6b19d09fbe2e3fe57b7caef7685953",
       "owners": {
         "@document": {
-          "before": "e9bb97f7caa519002e8c7f93b67a7c3fd6a3a8e54e9a5e079e5286749b038b77",
-          "after": "e9c936e7fc56aee557e652dcbd047304eb80941c6653f8f36712fdd3f9c49910"
+          "before": "e9c936e7fc56aee557e652dcbd047304eb80941c6653f8f36712fdd3f9c49910",
+          "after": "51d584a3865e6f1b885b86a28dbfb0cded6b19d09fbe2e3fe57b7caef7685953"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "f34e543353bb6ebd3ad3a45bec05c030b8228ee490204caa888e2cd4f6b918bd",
-      "after_sha256": "1bab9eee4fa1d362bd7fc33f3712279b18fd5d971f92d11bcb0dc113536ec4cc",
+      "before_sha256": "1bab9eee4fa1d362bd7fc33f3712279b18fd5d971f92d11bcb0dc113536ec4cc",
+      "after_sha256": "642e1b31c8dfea04df1b110985e55fa11c581c598395f42ee1ac93c403947eba",
       "owners": {
         "@document": {
-          "before": "f34e543353bb6ebd3ad3a45bec05c030b8228ee490204caa888e2cd4f6b918bd",
-          "after": "1bab9eee4fa1d362bd7fc33f3712279b18fd5d971f92d11bcb0dc113536ec4cc"
+          "before": "1bab9eee4fa1d362bd7fc33f3712279b18fd5d971f92d11bcb0dc113536ec4cc",
+          "after": "642e1b31c8dfea04df1b110985e55fa11c581c598395f42ee1ac93c403947eba"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "ac4a8d24cc3f6d332572f1fa6a518f5eb243f3406ed6780464d71df84eb3cdba",
-      "after_sha256": "9cab50ac81a5cf224f2748028ccdfa7c30f75788b2d706f15b760f1ed293634f",
+      "before_sha256": "9cab50ac81a5cf224f2748028ccdfa7c30f75788b2d706f15b760f1ed293634f",
+      "after_sha256": "59987ef3fee1f7d99c2ce2768a945670b46c45c18aa0797673c11f70202e2aee",
       "owners": {
         "@document": {
-          "before": "ac4a8d24cc3f6d332572f1fa6a518f5eb243f3406ed6780464d71df84eb3cdba",
-          "after": "9cab50ac81a5cf224f2748028ccdfa7c30f75788b2d706f15b760f1ed293634f"
+          "before": "9cab50ac81a5cf224f2748028ccdfa7c30f75788b2d706f15b760f1ed293634f",
+          "after": "59987ef3fee1f7d99c2ce2768a945670b46c45c18aa0797673c11f70202e2aee"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "11c271e418fac38de5c4465541d3a69e1169b0ede51ffc793de9585b47470805",
-      "after_sha256": "4f8f8b020b67ac7c0282e99418fe89e7bfd57b23c2f05a0d4e0e8de08da9d0e0",
+      "before_sha256": "4f8f8b020b67ac7c0282e99418fe89e7bfd57b23c2f05a0d4e0e8de08da9d0e0",
+      "after_sha256": "caf567dace03fba2b93a6072020774e180c58b560fefce0694db1073e43d996f",
       "owners": {
         "@document": {
-          "before": "11c271e418fac38de5c4465541d3a69e1169b0ede51ffc793de9585b47470805",
-          "after": "4f8f8b020b67ac7c0282e99418fe89e7bfd57b23c2f05a0d4e0e8de08da9d0e0"
+          "before": "4f8f8b020b67ac7c0282e99418fe89e7bfd57b23c2f05a0d4e0e8de08da9d0e0",
+          "after": "caf567dace03fba2b93a6072020774e180c58b560fefce0694db1073e43d996f"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "6cc5bee03986fd62a7737b38f5baad5c6765cc89bea1f3143d523eff74b33db9",
-      "after_sha256": "fbcb71e0acb8a462c85d85dee98e798e65b3f88759b4ab43d9583592eb9e8a59",
+      "before_sha256": "fbcb71e0acb8a462c85d85dee98e798e65b3f88759b4ab43d9583592eb9e8a59",
+      "after_sha256": "bb26704d92ea54b9ca7f4a92b5fa82758f0bb119444a7d0458e22344feefdcd1",
       "owners": {
         "@document": {
-          "before": "6cc5bee03986fd62a7737b38f5baad5c6765cc89bea1f3143d523eff74b33db9",
-          "after": "fbcb71e0acb8a462c85d85dee98e798e65b3f88759b4ab43d9583592eb9e8a59"
+          "before": "fbcb71e0acb8a462c85d85dee98e798e65b3f88759b4ab43d9583592eb9e8a59",
+          "after": "bb26704d92ea54b9ca7f4a92b5fa82758f0bb119444a7d0458e22344feefdcd1"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "2467bdd46a77208e38fd61be95a50e9f307da74e1b00a26ab1d2145acfec12ce",
-      "after_sha256": "6677542843eaea16f4d8bb5c7b0d96085b4dc4ea2bf496f49f26f68c03873638",
+      "before_sha256": "6677542843eaea16f4d8bb5c7b0d96085b4dc4ea2bf496f49f26f68c03873638",
+      "after_sha256": "2652e5149d2999a077ffa58effa00ff53b80e5d25517eb65ba6d0dcee6f536d9",
       "owners": {
         "@document": {
-          "before": "2467bdd46a77208e38fd61be95a50e9f307da74e1b00a26ab1d2145acfec12ce",
-          "after": "6677542843eaea16f4d8bb5c7b0d96085b4dc4ea2bf496f49f26f68c03873638"
+          "before": "6677542843eaea16f4d8bb5c7b0d96085b4dc4ea2bf496f49f26f68c03873638",
+          "after": "2652e5149d2999a077ffa58effa00ff53b80e5d25517eb65ba6d0dcee6f536d9"
         }
       }
     },
-    "src/warhammer40k_core/ai/opposing_shooter_scenario.py": {
+    "src/warhammer40k_core/ai/matched_attack_scenario.py": {
       "before_sha256": null,
-      "after_sha256": "240d92e95a494efdc711e57cf414c45d1f29b2cb500cbd5223fa473a7233ef66",
+      "after_sha256": "bbf9f5124a3dc6e3842ee0b39798c86bcfa44ff6510b48047bda5803c32d5789",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7924e9fe4b5e50b2eb7d184ac11e37fd5c1d1f2aed4dfbac2c8078aa4ec18149"
+          "after": "c8b9b375016d1eff4a50b105423d4997a2d38a7edf65d5d43ff91a48968ccdfe"
         },
-        "OpposingShooterQualification": {
+        "MatchedAttackComparison": {
           "before": null,
-          "after": "793371284b81638b0c3e03671dc3bb4d6995e03d9cbab68f16c62a7b8f7718c9"
+          "after": "3637141faf9f3ce90a16ee5009002a46cf9c349139fd42c7fbb74c6c0646c747"
         },
-        "OpposingShooterQualification.__init__": {
+        "MatchedAttackComparison.__init__": {
           "before": null,
-          "after": "47eb562e298358bc1dd65719e8049ef7b02a6efd473b563f390436e2eba10221"
+          "after": "65c237cf7ed6ba840458c33c5bcb4fbaa0680143573338f5507022778fbbffd9"
         },
-        "OpposingShooterQualification.content_hash": {
+        "MatchedAttackComparison.content_hash": {
           "before": null,
           "after": "c4ca793e6a7108ad8e442bcf78ea6c2d55f8806998e8f89311afc73ec8f799a4"
         },
-        "OpposingShooterQualification.from_sessions": {
+        "MatchedAttackComparison.from_sessions": {
           "before": null,
-          "after": "d722e3d0ca4ea3866cd7a538e238dba95fe185d7660fd441a339a5b284321b3f"
+          "after": "a7db815a28b8a2a56de9cfeb5456f2067be116a5366d1ccf6f2fc472608734b9"
         },
-        "OpposingShooterQualification.to_payload": {
+        "MatchedAttackComparison.to_payload": {
           "before": null,
           "after": "457ce7fcabaf3deebd66f52505b3791dda6aad3af64f90739d6ccbbc241fa0f7"
         },
-        "_approach": {
+        "_boundary": {
           "before": null,
-          "after": "a2cb85023388a3c7768957aa86f4e750661ec38b0fcfd11d3eb65996f1d80691"
+          "after": "839d1fb33ea62a112ab1fbc40391313272dcebc6bc57fcda29df3e13dece9a2a"
         },
-        "_approach_proposal": {
+        "_controlled_choices": {
           "before": null,
-          "after": "f6fb3eea426382168241b1fb2000c3b030a847cff98762a5bfea2f12d8e7ff6b"
+          "after": "f2dfd3517ad117592ee70ca3285d69369582864cbdbad84f2fc886349aab9478"
         },
-        "_declaration": {
+        "_exploiter_state": {
           "before": null,
-          "after": "a244fc44c7131806da42d0d4a47d9e576bf31dbb47e7ba2e24d2edf9225039fb"
+          "after": "9dcc26c16b2b358bdc45394410f9ad1b2415092d76897ea20c6feba74715966c"
         },
-        "_diagnose_endpoint": {
+        "matched_attack_definition": {
           "before": null,
-          "after": "5847ad22c06cff4e99a1e18db86a0f61747e427c2ef2b5a60aed0ad511801857"
-        },
-        "_finish_attack": {
-          "before": null,
-          "after": "a38f00d4506780470935b626d10ee91baa886486a90731c411b3b7d0b3116865"
-        },
-        "_submit": {
-          "before": null,
-          "after": "7b1ad9d8910101e6b0e1b1104a399c1367aefc5ed394a589c076dd192845c7c1"
-        },
-        "opposing_shooter_definition": {
-          "before": null,
-          "after": "63fcb0c8bd339700d264fc2300f79491229315c12a444f72c9fd35476d9ccc42"
+          "after": "d023f14acc796418b7c97451a608d96d789e156bb085e6b9e2270e40f4a5619d"
         }
       }
     },
-    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": {
+    "tests/infrastructure/adapters/test_matched_attack_scenario.py": {
       "before_sha256": null,
-      "after_sha256": "b194cc112d8218eac3c08c984cdfa2ecf0c78abf9db9edec61f0d9ad2a0a73d3",
+      "after_sha256": "9431a05971747a3dffb3215688e790c4c79accfa74e24e772be834e0c3d14c9a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "09cc5b7e9d839b0d8575940f54fa90cba0ab05f7d997f70c4f5b234786fd5917"
+          "after": "f67fbdb8b0b784cbb7c061bbd5ba0422bf82a39dfcc3d640ebc3a6b86d7e5703"
         },
-        "test_exact_pair_shooter_diagnostics_and_ordinary_opposing_attack_replay": {
+        "comparison": {
           "before": null,
-          "after": "47bfb735ea47a5fcdb133d264f3eed3b8f1314a44df070bef9fb4520c2526009"
+          "after": "79abe20df493565b3e17c6ca972f77239944deb816e99f4ce31f82951ca7f8c9"
         },
-        "test_opposing_qualification_rejects_unreached_and_wrong_configuration": {
+        "test_both_ordinary_attacks_have_matched_timing_cooperation_and_local_outcomes": {
           "before": null,
-          "after": "513350952a46a701bcc6106f642956dce98bd7c1794d4cdd5cfbb50085bd6522"
+          "after": "a0c4f69965309526d140dd77d6db17e454bd00d270e690bdc5a473187297f5c1"
+        },
+        "test_matched_report_rejects_same_count_endpoint_drift": {
+          "before": null,
+          "after": "76b2c8c00aa4626c0e4d7c6d250a6f6925e656882972822136031f4ec7fdda64"
+        },
+        "test_matched_report_rejects_wrong_config_unreached_and_extra_ordinary_decisions": {
+          "before": null,
+          "after": "23e87328a3f0c41deb10f88da6ce5ebbd2527a37ce9b3e772998cae96431b53f"
+        },
+        "test_matched_report_replays_both_branches_and_stays_export_only": {
+          "before": null,
+          "after": "150aa9476e78326deb3c25420dcb6a894445cd1a7577ab37b08229a5b11adf03"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "b74c4c4893abd3575cb9eac1c43c38d0a47c41800424e1b1acef498aa3504e02",
-      "after_sha256": "c87a2376946e82f7574d6070d633290bac4730b047df11d78ae66c3d338e35cc",
+      "before_sha256": "c87a2376946e82f7574d6070d633290bac4730b047df11d78ae66c3d338e35cc",
+      "after_sha256": "6218eceefc5e1cf141a8d2f8daeb0110121075f15adb39e42a6164fe948d3cac",
       "owners": {
         "@document": {
-          "before": "b74c4c4893abd3575cb9eac1c43c38d0a47c41800424e1b1acef498aa3504e02",
-          "after": "c87a2376946e82f7574d6070d633290bac4730b047df11d78ae66c3d338e35cc"
+          "before": "c87a2376946e82f7574d6070d633290bac4730b047df11d78ae66c3d338e35cc",
+          "after": "6218eceefc5e1cf141a8d2f8daeb0110121075f15adb39e42a6164fe948d3cac"
         }
       }
     }
@@ -386,7 +386,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -405,9 +405,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/hosted-calibration.json": {
       "category": "rule_semantics",
@@ -417,9 +417,9 @@
         "hosted-timing-calibration"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -436,9 +436,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -455,9 +455,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -474,9 +474,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -493,9 +493,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -512,9 +512,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -531,9 +531,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -550,9 +550,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -569,9 +569,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -588,9 +588,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -607,9 +607,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -626,9 +626,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -645,9 +645,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -689,9 +689,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -733,9 +733,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -777,9 +777,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -821,9 +821,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -865,9 +865,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -909,9 +909,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -953,9 +953,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -997,9 +997,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -1007,15 +1007,15 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -1023,7 +1023,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -1031,7 +1031,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -1039,7 +1039,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -1052,29 +1052,29 @@
         "order110-action-battle-shock-semantics"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
-    "src/warhammer40k_core/ai/opposing_shooter_scenario.py": {
+    "src/warhammer40k_core/ai/matched_attack_scenario.py": {
       "category": "rule_semantics",
       "operations": [
-        "opposing-shooter-qualification"
+        "matched-opposing-attack-comparison"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
-    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": {
+    "tests/infrastructure/adapters/test_matched_attack_scenario.py": {
       "category": "rule_semantics",
       "operations": [
-        "opposing-shooter-qualification"
+        "matched-opposing-attack-comparison"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -1082,9 +1082,9 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Bounded Stage 2 operator qualification of the exact paired shooter endpoints and one ordinary later opposing attack, with maintained documentation, generated publication identities and complete measured test inventory.",
-      "source_obligation": "Use equipped profiles and shared live shooter, range and visibility authorities with actual terrain; all state changes use ordinary viewer decisions, exact replay and current source identities. Preserve historical #660 admission, all tests, 67-percent full-package branch coverage and unchanged timing limits.",
-      "unchanged_work": "No engine geometry, shooting, movement, RNG, serialization, candidate generation, cache policy or learning behavior changes. New operator composition repeats existing shared operations. Historical measurements and outcomes retain their identities; no speedup, scenario-cost or full-game qualification is claimed."
+      "rationale": "Bounded matched opposing attack witness from the exact historical paired endpoints, with shared ordinary decisions, explicit cooperative response controls and a common local horizon; maintained documentation and generated identities describe only the verified scoped outcome.",
+      "source_obligation": "Preserve ordinary viewer decision authority, shared terrain-aware shooting and movement validation, exact replay and supplied checkpoint isolation. Match shooter, target, approach, timing and declared responses across both branches; observe E outcomes without inferring benefit or learning eligibility.",
+      "unchanged_work": "No engine rule, RNG, geometry, serializer, candidate generation or cache algorithm changes. The new operator-only report composes existing engine operations. Historical evidence is retained; no speedup, general tactical benefit, full-game throughput or Stage 2 completion is claimed."
     }
   },
   "milestone": "ordinary",

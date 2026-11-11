@@ -35802,6 +35802,18 @@
       "sensitive": false,
       "mandatory": true
     },
+    "matched-opposing-attack-comparison": {
+      "paths": [
+        "src/warhammer40k_core/ai/matched_attack_scenario.py",
+        "tests/infrastructure/adapters/test_matched_attack_scenario.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "opposing-shooter-qualification": {
       "paths": [
         "src/warhammer40k_core/ai/opposing_shooter_scenario.py",

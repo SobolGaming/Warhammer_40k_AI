@@ -2471,6 +2471,12 @@
       "blob_sha1": "bb20cc50fd3baa4b5075307c5bb670c86f09262e",
       "sha256": "b194cc112d8218eac3c08c984cdfa2ecf0c78abf9db9edec61f0d9ad2a0a73d3",
       "bytes": 8047
+    },
+    "tests/infrastructure/adapters/test_matched_attack_scenario.py": {
+      "mode": "100644",
+      "blob_sha1": "f103a5018b75586d03c2c652068bcad80471404c",
+      "sha256": "9431a05971747a3dffb3215688e790c4c79accfa74e24e772be834e0c3d14c9a",
+      "bytes": 10424
     }
   },
   "active_roots": [
