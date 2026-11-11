@@ -28,6 +28,114 @@ from scripts.shard_execution_model import Cohort, load_cohorts
 ROOT = Path(__file__).resolve().parents[2]
 DIRECTORY = ROOT / "ci/test_shards"
 PRIOR = "b9b1c97a6a2da6fca624c7f30c471d6cfab56320"
+CALIBRATION_FETCH = "git fetch --no-tags --no-recurse-submodules origin " + PRIOR
+
+
+def test_quality_producers_fetch_exact_pre_squash_calibration_before_validation() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    step = (
+        "      - name: Fetch pre-squash calibration validation input\n"
+        "        run: " + CALIBRATION_FETCH + "\n\n"
+    )
+    assert workflow.count(step) == 2
+    for name, following in (
+        ("quality-policy", "quality-shards"),
+        ("quality-shards", "semantic-audit-macos"),
+    ):
+        lane = workflow.split("  " + name + ":\n", 1)[1].split("  " + following + ":\n", 1)[0]
+        assert lane.count(step) == 1
+        assert lane.index("name: Checkout repository") < lane.index(step)
+        assert lane.index(step) < lane.index("scripts.quality_runner run")
+        assert "continue-on-error" not in lane
+        if name == "quality-policy":
+            assert lane.index(step) < lane.index("scripts.check_performance_policy")
+
+
+def test_exact_fetch_restores_squashed_away_calibration_in_main_only_checkout(
+    tmp_path: Path,
+) -> None:
+    """Exercise the workflow command on real, small main/topic/squash Git history."""
+
+    def git(root: Path, *args: str) -> bytes:
+        return subprocess.check_output(
+            [
+                "git",
+                "-c",
+                "user.name=CI history test",
+                "-c",
+                "user.email=ci@example.invalid",
+                *args,
+            ],
+            cwd=root,
+            stderr=subprocess.PIPE,
+            timeout=30,
+        )
+
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    git(origin, "init", "--initial-branch=main", "--quiet")
+    git(origin, "config", "core.autocrlf", "false")
+    directory = origin / "ci/test_shards"
+    directory.mkdir(parents=True)
+    files = (
+        "hosted-calibration.json",
+        "durations.json",
+        "allocation-scope.json",
+        "scoped-worker-evidence.json",
+        "case-partitions.json",
+        "preflight-case-partition.json",
+    )
+    for name in files:
+        (directory / name).write_bytes(b'{"observation":"original"}\n')
+    git(origin, "add", ".")
+    git(origin, "commit", "--quiet", "-m", "Original history")
+    anchor = git(origin, "rev-parse", "HEAD").decode().strip()
+    git(origin, "checkout", "--quiet", "-b", "topic")
+    for name in files:
+        (directory / name).write_bytes(b'{"observation":"prior calibration"}\n')
+    git(origin, "commit", "--quiet", "-am", "Pre-append calibration")
+    prior = git(origin, "rev-parse", "HEAD").decode().strip()
+    original = {name: git(origin, "show", prior + ":ci/test_shards/" + name) for name in files}
+    (directory / files[0]).write_bytes(b'{"observation":"appended calibration"}\n')
+    git(origin, "commit", "--quiet", "-am", "Append observations")
+    git(origin, "checkout", "--quiet", "main")
+    git(origin, "merge", "--squash", "topic")
+    git(origin, "commit", "--quiet", "-m", "Squashed calibration repair")
+    checkout = tmp_path / "checkout"
+    git(
+        tmp_path,
+        "clone",
+        "--quiet",
+        "--no-local",
+        "--single-branch",
+        "--branch",
+        "main",
+        str(origin),
+        str(checkout),
+    )
+    head = git(checkout, "rev-parse", "HEAD")
+    assert not (checkout / ".git/objects/info/alternates").exists()
+    # Full main history and the older anchor do not include the squashed topic commit.
+    command = CALIBRATION_FETCH.split()
+    git(checkout, *command[1:-1], anchor)
+    for name in files:
+        missing = subprocess.run(
+            ["git", "show", prior + ":ci/test_shards/" + name],
+            cwd=checkout,
+            capture_output=True,
+            check=False,
+            timeout=30,
+        )
+        assert missing.returncode == 128
+        assert missing.stdout == b""
+    # Substitute only the fixture's exact commit identity in the production command.
+    assert command[-1] == PRIOR
+    git(checkout, *command[1:-1], prior)
+    assert git(checkout, "rev-parse", "FETCH_HEAD").decode().strip() == prior
+    assert git(checkout, "rev-parse", "HEAD") == head
+    assert git(checkout, "status", "--porcelain") == b""
+    for name in files:
+        assert git(checkout, "show", prior + ":ci/test_shards/" + name) == original[name]
 
 
 @pytest.fixture(scope="module")
