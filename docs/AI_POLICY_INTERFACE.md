@@ -1124,8 +1124,11 @@ reachability, full-game support, learning, tactical quality or cost certificatio
 is a separate operator-only measurement for the exact admitted endpoint above.
 It preserves the original admission receipt and its schema. Reconstruct the
 endpoint with `reproduce_canonical_deployment()`, measure it, and serialize
-`report.to_payload()`; `from_payload(payload, session=session)` repeats the
-complete experiment and requires exact closed equality. The report's content hash
+`report.to_payload()`. The closed loader first derives aggregate counts from the
+receipt rows and rejects internally inconsistent totals without engine work.
+This pure preflight authenticates no row or claimed legality: every internally
+consistent `from_payload(payload, session=session)` still repeats the complete
+experiment and requires exact closed equality. The report's content hash
 binds the nested admission/source/build identity, exact prefix/checkpoint and
 actor-observation hashes, candidate payloads, validation results and denominators.
 No caller-supplied policy, alternate fixture, mutable checkpoint or budget is

@@ -396,6 +396,15 @@ timing/cooperation controls, useful candidate coverage and scenario costs remain
 open. The unchanged original admissions keep their narrower meanings; Stage 2
 is not complete.
 
+Canonical coverage receipt loading now rejects totals that contradict its own
+row counts through shared pure aggregation before repeating engine work. Every
+internally consistent receipt still requires complete fresh reproduction and
+exact equality; coordinated false rows/totals remain rejected. This bounded
+operator-boundary optimization preserves the original full coverage regression
+and adds a separate real reproduction control. It does not qualify Stage 2,
+scenario costs or hosted timing; matched actual-base evidence is recorded
+separately from final CI approval.
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.

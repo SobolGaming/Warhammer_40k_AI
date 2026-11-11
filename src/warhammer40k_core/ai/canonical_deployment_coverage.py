@@ -52,6 +52,42 @@ def _require(condition: bool, message: str) -> None:
         raise TrainingAdmissionError(message)
 
 
+def _coverage_totals(rows: object) -> dict[str, JsonValue]:
+    """Aggregate receipt rows without treating their counts as engine evidence."""
+    fields = (
+        "generated_count",
+        "validation_attempts",
+        "accepted_count",
+        "rejected_count",
+        "unvalidated_count",
+        "reference_attempts",
+        "legal_reference_count",
+        "invalid_reference_probe_count",
+        "covered_legal_reference_count",
+    )
+    message = "Canonical deployment coverage payload drifted: invalid row counts."
+    _require(isinstance(rows, list), message)
+    totals: dict[str, JsonValue] = {
+        kind: {"decision_occurrences": 0, **dict.fromkeys(fields, 0)}
+        for kind in ("finite", "placement")
+    }
+    for row in cast(list[object], rows):
+        _require(isinstance(row, dict), message)
+        item = cast(dict[str, object], row)
+        kind = item.get("kind")
+        _require(kind in ("finite", "placement"), message)
+        counts = item.get("counts")
+        _require(isinstance(counts, dict), message)
+        values = cast(dict[str, object], counts)
+        aggregate = cast(dict[str, int], totals[cast(str, kind)])
+        aggregate["decision_occurrences"] += 1
+        for field in fields:
+            value = values.get(field)
+            _require(type(value) is int and value >= 0, message)
+            aggregate[field] += cast(int, value)
+    return totals
+
+
 def _finite_results(
     session: LocalGameSession, context: PlayerDecisionContext, reference_ids: tuple[str, ...]
 ) -> list[dict[str, JsonValue]]:
@@ -227,29 +263,7 @@ def _measure_prefixes(
             }
         )
         rows.append(row)
-    totals: dict[str, JsonValue] = {}
-    for kind in ("finite", "placement"):
-        selected = [
-            cast(dict[str, JsonValue], row["counts"]) for row in rows if row["kind"] == kind
-        ]
-        totals[kind] = {
-            "decision_occurrences": len(selected),
-            **{
-                key: sum(cast(int, counts[key]) for counts in selected)
-                for key in (
-                    "generated_count",
-                    "validation_attempts",
-                    "accepted_count",
-                    "rejected_count",
-                    "unvalidated_count",
-                    "reference_attempts",
-                    "legal_reference_count",
-                    "invalid_reference_probe_count",
-                    "covered_legal_reference_count",
-                )
-            },
-        }
-    return rows, totals
+    return rows, _coverage_totals(rows)
 
 
 @dataclass(frozen=True, slots=True, init=False)
@@ -314,9 +328,19 @@ class CanonicalDeploymentCoverage:
     def from_payload(
         cls, payload: object, *, session: LocalGameSession
     ) -> CanonicalDeploymentCoverage:
+        value = validate_json_value(payload)
+        _require(isinstance(value, dict), "Canonical deployment coverage payload drifted.")
+        receipt = cast(dict[str, JsonValue], value)
+        _require(
+            canonical_json(receipt.get("totals"))
+            == canonical_json(_coverage_totals(receipt.get("rows"))),
+            "Canonical deployment coverage payload drifted: totals differ from row counts.",
+        )
+        # Internal consistency cannot authenticate rows or their claimed legality.
+        # Every consistent receipt still requires complete fresh engine reproduction.
         expected = cls.measure(session=session)
         _require(
-            canonical_json(validate_json_value(payload)) == expected._payload_json,
+            canonical_json(value) == expected._payload_json,
             "Canonical deployment coverage payload drifted from reproduction.",
         )
         return expected

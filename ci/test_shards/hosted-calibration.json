@@ -1,5 +1,18 @@
 {
-  "baseline_only_cases": [],
+  "baseline_only_cases": [
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_consistent_tampering_still_reproduces_the_real_engine",
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_derive_each_kind_without_fixed_fixture_counts",
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_reject_missing_or_noninteger_counts[-1]",
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_reject_missing_or_noninteger_counts[1.0]",
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_reject_missing_or_noninteger_counts[1]",
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_reject_missing_or_noninteger_counts[None]",
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_reject_missing_or_noninteger_counts[True]",
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_require_typed_rows[None]",
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_require_typed_rows[rows1]",
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_require_typed_rows[rows2]",
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_require_typed_rows[rows3]",
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_require_typed_rows[rows4]"
+  ],
   "current_test_sources": {
     "tests/factions/adeptus_custodes/unit/test_adeptus_custodes_army_rule.py": "b57c87563d26c3037d4285d0d03d21aa476f808e4c4c6cd65cfcfcb9661fea41",
     "tests/factions/aeldari/unit/test_aeldari_army_rule.py": "c057292e55f5399d327fda0bf2e7008c08179b75c90e546f5113b738110e5e7a",
@@ -38,6 +51,7 @@
     "tests/factions/world_eaters/unit/test_icon_of_khorne.py": "5978709148ceaafad7adc244b16d1f87bad62be96293d8e19a06c8f12b3dba24",
     "tests/factions/world_eaters/unit/test_total_carnage_gameplay.py": "bde4595d1cd1c514843e9fb22149939547d706c8a7c2efbfa2e4065cf0331535",
     "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py": "e8548335a237455fce0e5888c15f192a278620aaad31ff2a13139755492e3c56",
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": "90b2fbdcaa950cfa3002dc7c1b3172473639b66c94fd9192839162f95d148068",
     "tests/infrastructure/adapters/test_canonical_deployment.py": "3dcc8f0433797ac4775f23c861b885f96fa3249c315171c72c6d9dfd13b8c518",
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": "4445262840af8cf94079b4d697bf7d74fea458ed27a2dbbe33a38b7908b917f3",
     "tests/infrastructure/adapters/test_deployment_candidates.py": "c1be572edd1ea3b57753c5633ece0017ea1fd688712afb5a0e8193a2c3596900",
@@ -413,7 +427,7 @@
     "tests/unit/test_phase10i_terrain_movement.py": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38"
   },
   "formula": "max(complete-baseline-case-seconds, largest-observed-passed-three-phase-total)",
-  "inventory_sha256": "1273d6f6f521ce3cdd2bff160be6cd4f68ea8e9f187169185091db209e521d81",
+  "inventory_sha256": "0bb358ff7d0c4236fd0708f42349aede034bf3c2c0ff2538d8fe2e3439a5bfed",
   "observation_fields": [
     "report_index",
     "setup",

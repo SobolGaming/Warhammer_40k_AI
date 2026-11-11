@@ -648,6 +648,26 @@ qualify scenario costs or demonstrate a performance improvement. Tests, worker
 counts, algorithms, coverage and timing limits remain unchanged. Fresh successful
 hosted qualification remains required for every shard.
 
+The subsequent PR660 run
+[42932156443](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42932156443)
+again completed all 6,264 tests, but shard 4 took 1,414.340765547 supervisor
+seconds and failed approval without termination. Its complete canonical-coverage
+case ran first on its worker and took 1,300.468117872 three-phase seconds by
+itself; calibrated dispatch was active. The other eleven shards passed timing.
+This failure is retained separately and is not silently promoted into passing
+qualification or substituted for the complete local baseline.
+
+The bounded loader repair derives totals from receipt rows before reproduction,
+rejecting an internally contradictory total without repeating the engine
+campaign. Every internally consistent receipt still receives fresh measurement
+and exact comparison. The existing complete test is unchanged; a separate real
+coordinated-tampering control preserves that boundary. Matched actual-base
+[operation evidence](docs/performance/current/canonical-coverage-preflight.json)
+records valid reload and inconsistent-total rejection separately. One serial
+sample per arm cannot establish variance, hosted approval or full-game costs.
+All existing 382 historical receipts and 47,361 phase observations retain their
+original identities, values and outcomes; no historical timing limit changes.
+
 Fixture setup observations are worker/order dependent; taking maxima and regrouping
 does not establish new fixture multiplicity, hosted wall time or the eighteen-minute
 approval goal. Existing module grouping, twelve shards, four-worker dispatch, the cold

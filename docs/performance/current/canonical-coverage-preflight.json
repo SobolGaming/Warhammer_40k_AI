@@ -1,0 +1,88 @@
+{
+  "base": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "5e30188b4cc547b9d0205e87eb2458f2ce5768e40f6e7b968a9cb7ef36675563",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359354880,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:785ca6f64b746d062d23eca25a55ca0b851f0331d8c392c07f4b1a63ffd9c5e7",
+    "samples": {
+      "inconsistent_totals_rejection": [
+        175.88811146800003
+      ],
+      "valid_reload": [
+        175.01702778799995
+      ]
+    },
+    "workload_sha256": "cf1aed013e2d9cea3bb140a4d4ce604150d04624572f5adfec5ec470c6bd0fa8"
+  },
+  "base_revision": "efb3172c4ce1b3a912c3f6fc2c26ebaa465ad9c4",
+  "budget_profile": "current-change-relative-v1",
+  "family": "canonical_coverage_preflight",
+  "head": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "5e30188b4cc547b9d0205e87eb2458f2ce5768e40f6e7b968a9cb7ef36675563",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359354880,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0883faa80dd31f2e31d8ba47daf2aaa1b952526f1bfa267b9423b426573e389b",
+    "samples": {
+      "inconsistent_totals_rejection": [
+        0.011022749999938242
+      ],
+      "valid_reload": [
+        175.44146826399992
+      ]
+    },
+    "workload_sha256": "cf1aed013e2d9cea3bb140a4d4ce604150d04624572f5adfec5ec470c6bd0fa8"
+  },
+  "head_input_digest": "2fd1dd0999c35a64369dcda77876de80664b6e1a4f29b684fff1928ec984ef7f",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0883faa80dd31f2e31d8ba47daf2aaa1b952526f1bfa267b9423b426573e389b",
+  "historical_failures": [
+    {
+      "approval_passed": false,
+      "elapsed_seconds": 1156.755788438,
+      "evidence": "corrected local complete covered run before this repair",
+      "passed_tests": 6264,
+      "qualification": "Exceeded unchanged 1080-second approval allowance; complete diagnostics retained in Library.",
+      "terminated": false
+    },
+    {
+      "approval_passed": false,
+      "attempt": 1,
+      "elapsed_seconds": 1124.426420638,
+      "qualification": "All 6264 cases passed across twelve shards; original authenticated reports remain unchanged.",
+      "run_id": 42928611158,
+      "shard": 10,
+      "terminated": false
+    },
+    {
+      "approval_passed": false,
+      "attempt": 1,
+      "case_three_phase_seconds": 1300.468117872,
+      "elapsed_seconds": 1414.340765547,
+      "qualification": "All 6264 cases passed across twelve shards. Canonical complete case alone exceeded approval; metadata-only rebalance did not qualify. Complete authenticated diagnostics retained in Library.",
+      "run_id": 42932156443,
+      "shard": 4,
+      "terminated": false
+    }
+  ],
+  "policy": "rules-engine-performance-v3",
+  "workload_id": "canonical-coverage-preflight-v1"
+}

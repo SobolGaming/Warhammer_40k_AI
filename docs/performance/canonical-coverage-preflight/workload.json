@@ -1,0 +1,27 @@
+{
+  "schema": "canonical-coverage-preflight-workload-v1",
+  "workload_id": "canonical-coverage-preflight-v1",
+  "status": "Initial workload registration; no prior measurement samples are reclassified or reduced.",
+  "base_revision": "efb3172c4ce1b3a912c3f6fc2c26ebaa465ad9c4",
+  "driver": "scripts/measure_canonical_coverage_preflight.py",
+  "cases": [
+    "valid_reload",
+    "inconsistent_totals_rejection"
+  ],
+  "samples_per_case": 1,
+  "sample_qualification": "One fresh serial process per arm, one operation sample per case after separately recorded endpoint/report preparation; no variance or tail qualification.",
+  "fixture": "Unchanged canonical deployment configuration and all current tests/scripts supplied identically to both arms; actual-base src retained.",
+  "semantic_controls": [
+    "ordinary endpoint and report measurement",
+    "18 accepted finite choices, 46 accepted generated placements, 32 legal references and 8 invalid reference probes",
+    "valid receipt exact content-hash equality with one fresh measure",
+    "one inconsistent aggregate rejected and live checkpoint unchanged",
+    "new separate regression retains real reproduction for coordinated row/total tampering"
+  ],
+  "budget_profile": "current-change-relative-v1",
+  "limitations": [
+    "Serial without coverage on one provisional WSL host.",
+    "No hosted timing, full-game cost or Stage 2 qualification.",
+    "Existing historical timing failures and measurements remain unchanged."
+  ]
+}

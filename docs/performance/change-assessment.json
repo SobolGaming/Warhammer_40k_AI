@@ -1,296 +1,358 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "efb3172c4ce1b3a912c3f6fc2c26ebaa465ad9c4",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3174e16c152ba1febdf0e26360df49e75d1951fbc616eced69546bbb598a5f2e",
-  "operation_map_sha256": "a00d1209b18a5ae126cad320f757b4c028f5bb1688eef6539e40379419d2b596",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0883faa80dd31f2e31d8ba47daf2aaa1b952526f1bfa267b9423b426573e389b",
+  "operation_map_sha256": "200cd8b8cc837b6b01fb4d32664363498c79decb8bad3f5f346401e489652d8f",
   "changes": {
     "README.md": {
       "before_sha256": "ad8ce9f5f1cd75a998bdbc5d2b67962f240edb85d48742b95850b2027cda5b93",
-      "after_sha256": "3b7cf524728c14a002c930535d5d8492b445657c081ab5dbaf40ff34b0ada445",
+      "after_sha256": "337d3ac35e44a363b46f04b6be423753f55e8693aa2c196d468ad2460936fcc1",
       "owners": {
         "@document": {
           "before": "ad8ce9f5f1cd75a998bdbc5d2b67962f240edb85d48742b95850b2027cda5b93",
-          "after": "3b7cf524728c14a002c930535d5d8492b445657c081ab5dbaf40ff34b0ada445"
+          "after": "337d3ac35e44a363b46f04b6be423753f55e8693aa2c196d468ad2460936fcc1"
         }
       }
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "88025c4f5e53c9b5f42a663062f23cec9c5651667ad8f18fe5b46af430b4da6f",
-      "after_sha256": "43b84b7644d736ba50f52c60ca9606a9096d1041b52466d9cc3226b66730422a",
+      "after_sha256": "68292b457983fee20690067ec452be369beb1c3d82041fbe7477ee131e2fb0e6",
       "owners": {
         "@document": {
           "before": "88025c4f5e53c9b5f42a663062f23cec9c5651667ad8f18fe5b46af430b4da6f",
-          "after": "43b84b7644d736ba50f52c60ca9606a9096d1041b52466d9cc3226b66730422a"
+          "after": "68292b457983fee20690067ec452be369beb1c3d82041fbe7477ee131e2fb0e6"
         }
       }
     },
     "ci/test_shards/hosted-calibration.json": {
       "before_sha256": "a0b3c0b56e648c595953c9bb5947e9fd45bc1639bc359eb146e9da7067dc0477",
-      "after_sha256": "501fd66b2954cb9b19e02f945b6435505f8cc1a3455740f86505d16d4830fe9d",
+      "after_sha256": "b2f94e1591514bf044813c02cd77500ec4935416014ce256f59b36da3dfc3534",
       "owners": {
         "@document": {
           "before": "a0b3c0b56e648c595953c9bb5947e9fd45bc1639bc359eb146e9da7067dc0477",
-          "after": "501fd66b2954cb9b19e02f945b6435505f8cc1a3455740f86505d16d4830fe9d"
+          "after": "b2f94e1591514bf044813c02cd77500ec4935416014ce256f59b36da3dfc3534"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "a1d04b5b658ef1cd5d7b37fa0967c567eaf87bdb4bdf5ffdbc5afb81145bc7e6",
-      "after_sha256": "32beaf0aa51e06b661caece20b79d30c996cf0af969ad743c4be039026bb08f1",
+      "after_sha256": "b6fddd5695453d7a0e1db52d26a520367d3a506f90b3144ce80f9f6cec6bc4ea",
       "owners": {
         "@document": {
           "before": "a1d04b5b658ef1cd5d7b37fa0967c567eaf87bdb4bdf5ffdbc5afb81145bc7e6",
-          "after": "32beaf0aa51e06b661caece20b79d30c996cf0af969ad743c4be039026bb08f1"
+          "after": "b6fddd5695453d7a0e1db52d26a520367d3a506f90b3144ce80f9f6cec6bc4ea"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "c71e01e11f52d18c0e446ae6b8c5c31fbf985c5743dd10f6d62afc7ff3c01ce8",
-      "after_sha256": "df48e42f55b44ba90bcea690f9975e4d59f6a78371a53875f1edbe25d43bb8ff",
+      "after_sha256": "5c4fec7109b19f1c6eb0e277bbbb4893a70c7031debba25bdfd0c173ef761636",
       "owners": {
         "@document": {
           "before": "c71e01e11f52d18c0e446ae6b8c5c31fbf985c5743dd10f6d62afc7ff3c01ce8",
-          "after": "df48e42f55b44ba90bcea690f9975e4d59f6a78371a53875f1edbe25d43bb8ff"
+          "after": "5c4fec7109b19f1c6eb0e277bbbb4893a70c7031debba25bdfd0c173ef761636"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "fae858962800c215d68c9001b1ba5dbabe2a32ca518fe7d9395e726efc3bd98b",
-      "after_sha256": "425d39a4dfe98b592b4a47a69ce668a51080e7840b52fd837409989b91c01d74",
+      "after_sha256": "815abb9a9c35408a2007644b9e6aff843a1798e842837729217fd259ccaf9f48",
       "owners": {
         "@document": {
           "before": "fae858962800c215d68c9001b1ba5dbabe2a32ca518fe7d9395e726efc3bd98b",
-          "after": "425d39a4dfe98b592b4a47a69ce668a51080e7840b52fd837409989b91c01d74"
+          "after": "815abb9a9c35408a2007644b9e6aff843a1798e842837729217fd259ccaf9f48"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "d76a9abccaa5f74f283ce3c9497e9a50f1da0670a7ecd36531b71c26fba47360",
-      "after_sha256": "7fb41729adad62659d13edb8038810282f6b43aaca4bd779c86dd4c8cbb4b1a7",
+      "after_sha256": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
       "owners": {
         "@document": {
           "before": "d76a9abccaa5f74f283ce3c9497e9a50f1da0670a7ecd36531b71c26fba47360",
-          "after": "7fb41729adad62659d13edb8038810282f6b43aaca4bd779c86dd4c8cbb4b1a7"
+          "after": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "be2f97a4a4b9f123156028ae771819551519711e924de1c001ae78eb8f3d8719",
-      "after_sha256": "61f98359cef1e4772260ae7c2d7ff7ea0caadd1c81debd4b02d259fd667aa5e2",
+      "after_sha256": "703026acec5ec84c12110c0caed34579a1a48bc3a2da7138c8f9667dc3833c57",
       "owners": {
         "@document": {
           "before": "be2f97a4a4b9f123156028ae771819551519711e924de1c001ae78eb8f3d8719",
-          "after": "61f98359cef1e4772260ae7c2d7ff7ea0caadd1c81debd4b02d259fd667aa5e2"
+          "after": "703026acec5ec84c12110c0caed34579a1a48bc3a2da7138c8f9667dc3833c57"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "cb19f8ae764aa20d6fb731174a3915465222effe63ba56889d1d3ab0f43ca29f",
-      "after_sha256": "aab3eae8b753371813d6c1a92b35a1d53eb7805d555291c2102a38f939381d1f",
+      "after_sha256": "376637fec673e58f1fc199e4cdc330ac79baabc75e6afdee229c95b6f433aacc",
       "owners": {
         "@document": {
           "before": "cb19f8ae764aa20d6fb731174a3915465222effe63ba56889d1d3ab0f43ca29f",
-          "after": "aab3eae8b753371813d6c1a92b35a1d53eb7805d555291c2102a38f939381d1f"
+          "after": "376637fec673e58f1fc199e4cdc330ac79baabc75e6afdee229c95b6f433aacc"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "b44cbe80458f4bc3d0c3df557b4a32ce0f170590aca60cca6a413d846bf57f79",
-      "after_sha256": "9e1129aca8fa742d4b57ec21ba80e340baf9afd2a3baced92733c67ed0d16f3a",
+      "after_sha256": "79ac48845700d5a789a412c0c543dbe1439ea45e1af6b15dfed3473f33ec9cd4",
       "owners": {
         "@document": {
           "before": "b44cbe80458f4bc3d0c3df557b4a32ce0f170590aca60cca6a413d846bf57f79",
-          "after": "9e1129aca8fa742d4b57ec21ba80e340baf9afd2a3baced92733c67ed0d16f3a"
+          "after": "79ac48845700d5a789a412c0c543dbe1439ea45e1af6b15dfed3473f33ec9cd4"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "8b7eaf5d90412f8eabcbbda6a1fd9d2e56ea6137748c436589b20a5f6d867230",
-      "after_sha256": "cce22b5aa4ee24b593f92587334cf7c7350217d6737c000e0e4ce01fd67a7524",
+      "after_sha256": "61a4e7af64df329d07dae2ef59d8193775781983989c9bad0792bfbbcb072021",
       "owners": {
         "@document": {
           "before": "8b7eaf5d90412f8eabcbbda6a1fd9d2e56ea6137748c436589b20a5f6d867230",
-          "after": "cce22b5aa4ee24b593f92587334cf7c7350217d6737c000e0e4ce01fd67a7524"
+          "after": "61a4e7af64df329d07dae2ef59d8193775781983989c9bad0792bfbbcb072021"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "75bc20f49ff5f4bf8f3b6d42811610fc8a2693c39ca09a8d4865e3ea9870a4e8",
-      "after_sha256": "3a418165696ba335dd3c2db0bf4ffcdfb0c0284ef8771bbc66432e0da27563d1",
+      "after_sha256": "94c3c36fe130247df1267000ff61121480c6f57261009cf8c4a13c4ed3465eb8",
       "owners": {
         "@document": {
           "before": "75bc20f49ff5f4bf8f3b6d42811610fc8a2693c39ca09a8d4865e3ea9870a4e8",
-          "after": "3a418165696ba335dd3c2db0bf4ffcdfb0c0284ef8771bbc66432e0da27563d1"
+          "after": "94c3c36fe130247df1267000ff61121480c6f57261009cf8c4a13c4ed3465eb8"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "9c74fcfc3ab9b01b894dffbfa386ae9ee8b18e7ded27c8572a0b4f0e54d3d831",
-      "after_sha256": "75eabe1782ed3b2d5b8c98574bf1c97aff9028958de0f7dcf309a084f22fa918",
+      "after_sha256": "4eb98eb67d31c2cd591ace7b82010f18f0b7cd0eecf93741f5dfc50fa9cde12f",
       "owners": {
         "@document": {
           "before": "9c74fcfc3ab9b01b894dffbfa386ae9ee8b18e7ded27c8572a0b4f0e54d3d831",
-          "after": "75eabe1782ed3b2d5b8c98574bf1c97aff9028958de0f7dcf309a084f22fa918"
+          "after": "4eb98eb67d31c2cd591ace7b82010f18f0b7cd0eecf93741f5dfc50fa9cde12f"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "d59c9ef2f3b9a2248998b8c6e2d1ee4e4886f88f3c184a856bf724464cc79ad6",
-      "after_sha256": "d30c9d0f60cff7fb0289ec4f4a3a66163e13dd58718896bab04ac3f2803cc51c",
+      "after_sha256": "c0e719375754379377836a026698e14b177baebb9212fb6ce88853ad43ee8370",
       "owners": {
         "@document": {
           "before": "d59c9ef2f3b9a2248998b8c6e2d1ee4e4886f88f3c184a856bf724464cc79ad6",
-          "after": "d30c9d0f60cff7fb0289ec4f4a3a66163e13dd58718896bab04ac3f2803cc51c"
+          "after": "c0e719375754379377836a026698e14b177baebb9212fb6ce88853ad43ee8370"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
-      "after_sha256": "f974bc1b90f628032bdb0e298ad63e8b0f9e270b774d3cc37813c1a1c59ae9e8",
+      "after_sha256": "f13a050ca50d49a41765148231907099a7c0ecbf66ab60e4de4f214ae3d1d3b4",
       "owners": {
         "@document": {
           "before": "afa8fcdfd5aa3d431e32a6d4eaa796c64d4f8ee7dbb2349abe9352f86086b793",
-          "after": "f974bc1b90f628032bdb0e298ad63e8b0f9e270b774d3cc37813c1a1c59ae9e8"
+          "after": "f13a050ca50d49a41765148231907099a7c0ecbf66ab60e4de4f214ae3d1d3b4"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "788f9217109f8274c087ade1de7c873c1d25ba324e5601d478a6aae4abc78e4e",
-      "after_sha256": "f8bed5ba0beb2b560770ef6e2aca24de672080f5d04430222bf4d82942873cab",
+      "after_sha256": "6a2badeb9b7ff64e26ad40bf218a557b21c455933de6da3907fc80cf08d34eba",
       "owners": {
         "@document": {
           "before": "788f9217109f8274c087ade1de7c873c1d25ba324e5601d478a6aae4abc78e4e",
-          "after": "f8bed5ba0beb2b560770ef6e2aca24de672080f5d04430222bf4d82942873cab"
+          "after": "6a2badeb9b7ff64e26ad40bf218a557b21c455933de6da3907fc80cf08d34eba"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "54834aa7ca125f11b995fd0465c288718bdc06c1a7e706c96520862282a17a8d",
-      "after_sha256": "a7cd93dfab6b89c860e6ea3f6726960cdee0c816cdcec9c2f151aec6ad2e8059",
+      "after_sha256": "227cc16d16ddce135ca3272aedc7df7d3cdbcb0e40790781081245c6455ccd9c",
       "owners": {
         "@document": {
           "before": "54834aa7ca125f11b995fd0465c288718bdc06c1a7e706c96520862282a17a8d",
-          "after": "a7cd93dfab6b89c860e6ea3f6726960cdee0c816cdcec9c2f151aec6ad2e8059"
+          "after": "227cc16d16ddce135ca3272aedc7df7d3cdbcb0e40790781081245c6455ccd9c"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "b9875f1175f2143d22e32e31ac2c61fc5a599e28c29c07aa59447e3710b3a818",
-      "after_sha256": "fd4826aee0db11fddde7beb7e71e3ee1bc751436071e9a4dd79844e7ca98d4ae",
+      "after_sha256": "0e35b87359278e474071be03779b7ca9cab01b42a40617576372d09d8c640a05",
       "owners": {
         "@document": {
           "before": "b9875f1175f2143d22e32e31ac2c61fc5a599e28c29c07aa59447e3710b3a818",
-          "after": "fd4826aee0db11fddde7beb7e71e3ee1bc751436071e9a4dd79844e7ca98d4ae"
+          "after": "0e35b87359278e474071be03779b7ca9cab01b42a40617576372d09d8c640a05"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "2e81114ad6d598935f120ed85db96630cdbd10ac5a0bb14d2cd2a973044bb7ce",
-      "after_sha256": "ede0616b96be32dd1910207abbd6fba224c02e11919a01696e30de6e0d696ac8",
+      "after_sha256": "4e035b8e3ea35b54f5c1df35c29b124001fac56905881222e1230a2746c8878b",
       "owners": {
         "@document": {
           "before": "2e81114ad6d598935f120ed85db96630cdbd10ac5a0bb14d2cd2a973044bb7ce",
-          "after": "ede0616b96be32dd1910207abbd6fba224c02e11919a01696e30de6e0d696ac8"
+          "after": "4e035b8e3ea35b54f5c1df35c29b124001fac56905881222e1230a2746c8878b"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "849db1a0441bae61cb3fb645d2c0ac531e8f0a29fcc0f9564503a1eb08697f9f",
-      "after_sha256": "bdc044da39b2529e38f6f761fab52eac2455473ce99c1b9a9a7beceb406664d7",
+      "after_sha256": "f50c4eabca575efa3a93a983d2ae662715fe593fe903b4ec2dce89e8932923d5",
       "owners": {
         "@document": {
           "before": "849db1a0441bae61cb3fb645d2c0ac531e8f0a29fcc0f9564503a1eb08697f9f",
-          "after": "bdc044da39b2529e38f6f761fab52eac2455473ce99c1b9a9a7beceb406664d7"
+          "after": "f50c4eabca575efa3a93a983d2ae662715fe593fe903b4ec2dce89e8932923d5"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "0aaf1ee49a81b2a94ef0d06abc851d32f644d17b1013b82580495626f3c370f7",
-      "after_sha256": "0bb92df0cc73f8cb3ff4e0fd9eec89edba0a4274598f1f1e81e937213f245a1c",
+      "after_sha256": "8036d4d0b2d83ee3a961ca2c896c31b77325981ae927a0a8e98362e76106fa80",
       "owners": {
         "@document": {
           "before": "0aaf1ee49a81b2a94ef0d06abc851d32f644d17b1013b82580495626f3c370f7",
-          "after": "0bb92df0cc73f8cb3ff4e0fd9eec89edba0a4274598f1f1e81e937213f245a1c"
+          "after": "8036d4d0b2d83ee3a961ca2c896c31b77325981ae927a0a8e98362e76106fa80"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "57a6ba9db5ca64b0fcbf6a95e06979907f8c5d09ca04130ae7f564a30672e2d9",
-      "after_sha256": "e866b53a85783681f63eb8936027a4613ace6dd9406e198a4831a2e8e99f4340",
+      "after_sha256": "52df197b49f2e22a2b4095b76e91dbcb53620bc651eeba25702c1473a33a764f",
       "owners": {
         "@document": {
           "before": "57a6ba9db5ca64b0fcbf6a95e06979907f8c5d09ca04130ae7f564a30672e2d9",
-          "after": "e866b53a85783681f63eb8936027a4613ace6dd9406e198a4831a2e8e99f4340"
+          "after": "52df197b49f2e22a2b4095b76e91dbcb53620bc651eeba25702c1473a33a764f"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "88a5d60022fdf3b0358ea3c344d8eb0d8707db161a6638df57a5d0318fab38e4",
-      "after_sha256": "d19246a31a8f50ae99f9dcaf85d596b57fc95f99eb962602839d8a740c12709d",
+      "after_sha256": "376453b35f9a9ffdca8f00c996ea3fc2ec2cfb1a39bdff3ba45031012684fdb8",
       "owners": {
         "@document": {
           "before": "88a5d60022fdf3b0358ea3c344d8eb0d8707db161a6638df57a5d0318fab38e4",
-          "after": "d19246a31a8f50ae99f9dcaf85d596b57fc95f99eb962602839d8a740c12709d"
+          "after": "376453b35f9a9ffdca8f00c996ea3fc2ec2cfb1a39bdff3ba45031012684fdb8"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "40520fdd789b1cd502152ea5baf0c173c62cd038c82d965208617dfba4f0c858",
-      "after_sha256": "bab09a7e58105d8510748938f5768057cf996e3f169b39ef822821a5866c5e6a",
+      "after_sha256": "e9bb97f7caa519002e8c7f93b67a7c3fd6a3a8e54e9a5e079e5286749b038b77",
       "owners": {
         "@document": {
           "before": "40520fdd789b1cd502152ea5baf0c173c62cd038c82d965208617dfba4f0c858",
-          "after": "bab09a7e58105d8510748938f5768057cf996e3f169b39ef822821a5866c5e6a"
+          "after": "e9bb97f7caa519002e8c7f93b67a7c3fd6a3a8e54e9a5e079e5286749b038b77"
         }
       }
     },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "before_sha256": "5f0deaa6547a844569edc4d1ea28d041e58d24ebae067b27893425692d3cd171",
-      "after_sha256": "716c7d23f9bb4c191acf0e13f2e506a18d20cfc927522e51e4a8c03ccaa54598",
+      "after_sha256": "f34e543353bb6ebd3ad3a45bec05c030b8228ee490204caa888e2cd4f6b918bd",
       "owners": {
         "@document": {
           "before": "5f0deaa6547a844569edc4d1ea28d041e58d24ebae067b27893425692d3cd171",
-          "after": "716c7d23f9bb4c191acf0e13f2e506a18d20cfc927522e51e4a8c03ccaa54598"
+          "after": "f34e543353bb6ebd3ad3a45bec05c030b8228ee490204caa888e2cd4f6b918bd"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "8ebdce00df8ed3efe5079310a7819fcfeba0306a46dc633920a2a8784f0c7401",
-      "after_sha256": "a1d07d3bea280b1e1030a991dee0724ac018f2c8c20882fba86cb7aad904492c",
+      "after_sha256": "ac4a8d24cc3f6d332572f1fa6a518f5eb243f3406ed6780464d71df84eb3cdba",
       "owners": {
         "@document": {
           "before": "8ebdce00df8ed3efe5079310a7819fcfeba0306a46dc633920a2a8784f0c7401",
-          "after": "a1d07d3bea280b1e1030a991dee0724ac018f2c8c20882fba86cb7aad904492c"
+          "after": "ac4a8d24cc3f6d332572f1fa6a518f5eb243f3406ed6780464d71df84eb3cdba"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "8a3d4c6fb2ce85e16d0e2502290fdb40cb8d92cd29363b1b5216e1626f3a1ffa",
-      "after_sha256": "0a4a1dfe2e9523b4c397903613b6faacd52e692944201ac74c7abec626be00d1",
+      "after_sha256": "11c271e418fac38de5c4465541d3a69e1169b0ede51ffc793de9585b47470805",
       "owners": {
         "@document": {
           "before": "8a3d4c6fb2ce85e16d0e2502290fdb40cb8d92cd29363b1b5216e1626f3a1ffa",
-          "after": "0a4a1dfe2e9523b4c397903613b6faacd52e692944201ac74c7abec626be00d1"
+          "after": "11c271e418fac38de5c4465541d3a69e1169b0ede51ffc793de9585b47470805"
+        }
+      }
+    },
+    "docs/performance/canonical-coverage-preflight/observations.json": {
+      "before_sha256": null,
+      "after_sha256": "6d7b7de7dac49d3d16405307601e8fff84344619a40f5a58360ae3d7cd164714",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6d7b7de7dac49d3d16405307601e8fff84344619a40f5a58360ae3d7cd164714"
+        }
+      }
+    },
+    "docs/performance/canonical-coverage-preflight/workload.json": {
+      "before_sha256": null,
+      "after_sha256": "cb50fcc855c0de0ff4997862d9552d851cc0b6f8bf4dd3aadcf8799f89901825",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "cb50fcc855c0de0ff4997862d9552d851cc0b6f8bf4dd3aadcf8799f89901825"
+        }
+      }
+    },
+    "docs/performance/current/canonical-coverage-preflight.json": {
+      "before_sha256": null,
+      "after_sha256": "91f9061c670ae9cc10ec603fb50f40188a18548410b1d834cf0e7a6488b136a9",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "91f9061c670ae9cc10ec603fb50f40188a18548410b1d834cf0e7a6488b136a9"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "87d294a889bd63579bd36142b13f6035a1372f7bd4024281f20a6083f7e231d8",
-      "after_sha256": "72d290e1cad4f071c1317efca074092fdb793c6c8b64cf027d3e47bc43529a5f",
+      "after_sha256": "6cc5bee03986fd62a7737b38f5baad5c6765cc89bea1f3143d523eff74b33db9",
       "owners": {
         "@document": {
           "before": "87d294a889bd63579bd36142b13f6035a1372f7bd4024281f20a6083f7e231d8",
-          "after": "72d290e1cad4f071c1317efca074092fdb793c6c8b64cf027d3e47bc43529a5f"
+          "after": "6cc5bee03986fd62a7737b38f5baad5c6765cc89bea1f3143d523eff74b33db9"
+        }
+      }
+    },
+    "scripts/measure_canonical_coverage_preflight.py": {
+      "before_sha256": null,
+      "after_sha256": "cf1aed013e2d9cea3bb140a4d4ce604150d04624572f5adfec5ec470c6bd0fa8",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e9b25ec020a22fc4147be02da27bd0138b3f58351042429d4b6712e01287ed88"
+        },
+        "main": {
+          "before": null,
+          "after": "91ac680a9615ba50272394477080a5317f78da4d6ccc0eb9fc081d3ed6c48892"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "a1d3d485d286af2afb85bc707c5b5127423618cae37e95bdde9a3067d7ad1edd",
-      "after_sha256": "0f15b6aa91cf4487858093fc5422454d6085880b8e6ac5095d368fe72d2d7306",
+      "after_sha256": "2467bdd46a77208e38fd61be95a50e9f307da74e1b00a26ab1d2145acfec12ce",
       "owners": {
         "@document": {
           "before": "a1d3d485d286af2afb85bc707c5b5127423618cae37e95bdde9a3067d7ad1edd",
-          "after": "0f15b6aa91cf4487858093fc5422454d6085880b8e6ac5095d368fe72d2d7306"
+          "after": "2467bdd46a77208e38fd61be95a50e9f307da74e1b00a26ab1d2145acfec12ce"
+        }
+      }
+    },
+    "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
+      "before_sha256": "d20502870ec4302048bde101a6518bf760258daa5e54d8cd267aa1ebf5940de4",
+      "after_sha256": "10747a3382b89d7a6c55d5624a42fccd052980544689a20805185b2cdd2be311",
+      "owners": {
+        "CanonicalDeploymentCoverage.from_payload": {
+          "before": "f068c1f8a4357b338e4fb5800492d466cb54943d81c9f6caa519de494dd1637f",
+          "after": "1d562e2ba5951018f56c1c7a73cf002dfa00f0d27ec26db4f15362149b56befd"
+        },
+        "_coverage_totals": {
+          "before": null,
+          "after": "578c71908d769d304a0ea4dffa06ddc262287388ab0958bd980aab489e032cde"
+        },
+        "_measure_prefixes": {
+          "before": "1a024b7d4072c2bb9ed242592a7f996de6439bf90d81ef5d441de3ad1426c26a",
+          "after": "690726b90e3aa022478749730a484dc860b217a5cbb02cbb755aff01f9e0befe"
         }
       }
     },
@@ -356,6 +418,36 @@
         }
       }
     },
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
+      "before_sha256": null,
+      "after_sha256": "90b2fbdcaa950cfa3002dc7c1b3172473639b66c94fd9192839162f95d148068",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "3b03e785bd8927ecf35a4db00cba8780701e5af8cc2232b38fb723f4eb9850c1"
+        },
+        "_counts": {
+          "before": null,
+          "after": "e0eb359728761623ef52d5e5af3d061a670a88cd3f7ddd3325e0fbf89a57cc3b"
+        },
+        "test_consistent_tampering_still_reproduces_the_real_engine": {
+          "before": null,
+          "after": "9e7518201a01e5d1cdaec76314170b5740ae37d550b8baef6f1dce0f57bcec72"
+        },
+        "test_coverage_totals_derive_each_kind_without_fixed_fixture_counts": {
+          "before": null,
+          "after": "1778adb9b72c268128d1102612ee307a3a5e115121a5e6c315229c1f8846526f"
+        },
+        "test_coverage_totals_reject_missing_or_noninteger_counts": {
+          "before": null,
+          "after": "0a52c3a22ed49428ed3831d6b38dba9124fb0be4cf126bfdf3ba53a475cb7eb8"
+        },
+        "test_coverage_totals_require_typed_rows": {
+          "before": null,
+          "after": "8290f053649f228a6ca6088b29130e3a18670d85be38118d7edc2ac3669579ce"
+        }
+      }
+    },
     "tests/infrastructure/adapters/test_followthrough_scenario.py": {
       "before_sha256": null,
       "after_sha256": "3229c0dbfacbdaf1455aa6baf792362770cdca0fa20de8e47d0f74573cd81c51",
@@ -384,11 +476,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "3cb67ae31bba624ba100e2f2292d70aced64cffffdb9e8d0e18be8fcf7f4e019",
-      "after_sha256": "3a7c100a3b861df14a254595b4c8fa2dd2239569380a2d27161641e7a8f5fd29",
+      "after_sha256": "b74c4c4893abd3575cb9eac1c43c38d0a47c41800424e1b1acef498aa3504e02",
       "owners": {
         "@document": {
           "before": "3cb67ae31bba624ba100e2f2292d70aced64cffffdb9e8d0e18be8fcf7f4e019",
-          "after": "3a7c100a3b861df14a254595b4c8fa2dd2239569380a2d27161641e7a8f5fd29"
+          "after": "b74c4c4893abd3575cb9eac1c43c38d0a47c41800424e1b1acef498aa3504e02"
         }
       }
     }
@@ -1047,6 +1139,30 @@
       "source_obligation": null,
       "unchanged_work": null
     },
+    "docs/performance/canonical-coverage-preflight/observations.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Immutable actual-base/head operation measurements, exact current workload/source/dependency identities, original attempts and explicit single-sample limitations for the bounded receipt preflight optimization.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
+    "docs/performance/canonical-coverage-preflight/workload.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Immutable actual-base/head operation measurements, exact current workload/source/dependency identities, original attempts and explicit single-sample limitations for the bounded receipt preflight optimization.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
+    "docs/performance/current/canonical-coverage-preflight.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Immutable actual-base/head operation measurements, exact current workload/source/dependency identities, original attempts and explicit single-sample limitations for the bounded receipt preflight optimization.",
+      "source_obligation": "",
+      "unchanged_work": ""
+    },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
@@ -1054,6 +1170,18 @@
       "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
       "source_obligation": null,
       "unchanged_work": null
+    },
+    "scripts/measure_canonical_coverage_preflight.py": {
+      "category": "measured_workload",
+      "operations": [
+        "canonical-coverage-preflight-measurement"
+      ],
+      "selected_families": [
+        "canonical_coverage_preflight"
+      ],
+      "rationale": "Deliberate bounded optimization rejects internally inconsistent receipt totals before redundant full reproduction. Matched actual-base valid reload and inconsistent-total rejection measurements are mandatory in docs/performance/current/canonical-coverage-preflight.json; the original complete test remains byte-identical.",
+      "source_obligation": "Totals derive from the receipt rows without hardcoded fixture counts. Every internally consistent receipt still executes fresh ordinary engine measurement and exact closed equality; real coordinated-tamper regression delegates that full reproduction and rejects.",
+      "unchanged_work": "No engine rule, fork, geometry, cache, RNG, candidate inventory, consistency acceptance boundary, coverage requirement, worker count or timing limit changes. One newly registered sample per operation is descriptive, with no variance or hosted approval claim."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -1068,6 +1196,18 @@
       "source_obligation": "Preserve exact runtime and source identity, existing wire contracts and full test membership, all retained historical evidence, the 67-percent full-package branch floor and unchanged 18-minute approval/30-minute execution boundaries.",
       "unchanged_work": "Only generated identities, the explicit new test membership and exact current input pins or measured scheduling metadata change. No algorithm, gameplay calculation, serialization format, historical result or budget is altered."
     },
+    "src/warhammer40k_core/ai/canonical_deployment_coverage.py": {
+      "category": "algorithm_or_search",
+      "operations": [
+        "canonical-deployment-coverage"
+      ],
+      "selected_families": [
+        "canonical_coverage_preflight"
+      ],
+      "rationale": "Deliberate bounded optimization rejects internally inconsistent receipt totals before redundant full reproduction. Matched actual-base valid reload and inconsistent-total rejection measurements are mandatory in docs/performance/current/canonical-coverage-preflight.json; the original complete test remains byte-identical.",
+      "source_obligation": "Totals derive from the receipt rows without hardcoded fixture counts. Every internally consistent receipt still executes fresh ordinary engine measurement and exact closed equality; real coordinated-tamper regression delegates that full reproduction and rejects.",
+      "unchanged_work": "No engine rule, fork, geometry, cache, RNG, candidate inventory, consistency acceptance boundary, coverage requirement, worker count or timing limit changes. One newly registered sample per operation is descriptive, with no variance or hosted approval claim."
+    },
     "src/warhammer40k_core/ai/followthrough_scenario.py": {
       "category": "rule_semantics",
       "operations": [
@@ -1077,6 +1217,18 @@
       "rationale": "A fixed operator-only pair reuses ordinary movement and reaction submissions, engine-owned PathWitness validation, strict persistence and exact replay; it qualifies legal E movement and one negative opposing shot probe.",
       "source_obligation": "Preserve the canonical configuration and unchanged stationary/Normal Move prefixes; require three full-model E paths and the ordinary Fire Overwatch target validator, retaining the actual no-legal-declaration diagnostic without an attack or tactical value label.",
       "unchanged_work": "No movement or shooting algorithm, generator, cache, authoritative state mutation, RNG, serializer, adapter family, ranker or learning format changes. The bounded receipt repeats existing engine operations; scenario costs and full-game qualification remain open."
+    },
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
+      "category": "measured_workload",
+      "operations": [
+        "canonical-deployment-coverage"
+      ],
+      "selected_families": [
+        "canonical_coverage_preflight"
+      ],
+      "rationale": "Deliberate bounded optimization rejects internally inconsistent receipt totals before redundant full reproduction. Matched actual-base valid reload and inconsistent-total rejection measurements are mandatory in docs/performance/current/canonical-coverage-preflight.json; the original complete test remains byte-identical.",
+      "source_obligation": "Totals derive from the receipt rows without hardcoded fixture counts. Every internally consistent receipt still executes fresh ordinary engine measurement and exact closed equality; real coordinated-tamper regression delegates that full reproduction and rejects.",
+      "unchanged_work": "No engine rule, fork, geometry, cache, RNG, candidate inventory, consistency acceptance boundary, coverage requirement, worker count or timing limit changes. One newly registered sample per operation is descriptive, with no variance or hosted approval claim."
     },
     "tests/infrastructure/adapters/test_followthrough_scenario.py": {
       "category": "rule_semantics",
@@ -1100,6 +1252,8 @@
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "canonical_coverage_preflight": "docs/performance/current/canonical-coverage-preflight.json"
+  },
   "full_game": null
 }
