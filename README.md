@@ -612,6 +612,42 @@ remain baseline-only. The twelve manifests are regenerated from that exact full
 profile with the existing maximum-cost formula and unchanged limits. Fresh
 successful hosted qualification is required for every shard.
 
+The PR660 calibration now appends exactly 49 original worker receipts and 6,264
+passed three-phase samples from attempt 1 of failed hosted run
+[42928611158](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/42928611158).
+Independent run/PR/job/artifact APIs and original ZIP digests bind source head
+`6a83d934e2f792d5e84b60517e4035dd4d7f1bec`, tested merge checkout
+`9ebcd3885efd3a4ea37a78472b324c8823e6373b`, their identical tree, and the recorded
+runtime fingerprint. Every extracted worker matches its authenticated archive.
+All original 333 receipts and 41,097 observation tuples retain their identities,
+values and outcomes. Totals are now 382 receipts and 47,361 samples covering all
+6,264 cases, with no baseline-only cases. The complete corrected local baseline,
+its source label, JUnit hashes, file totals and case measurements remain unchanged;
+the failed hosted run is additional historical planning evidence only.
+
+All 6,264 hosted cases passed without errors or skips. Shard 10 completed its
+398 tests in 1,124.426420638 supervisor seconds and failed the unchanged
+1,080-second approval limit without termination; shard 9 passed in
+1,079.584697890 seconds. The run and combined coverage approval remain failed.
+Shard 10's isolated mirror contributed 225.044133079 three-phase seconds before
+the parallel remainder. Its longest individual remainder case was preservation
+receipt persistence/replay at 433.886318618 seconds on worker gw0. Worker gw3
+finished last at 750.782377348 elapsed seconds: its first case was the S25
+unused-wound-player-a control (403.703151489 three-phase seconds), followed by
+preservation, source-description and canonical-deployment controls. The largest
+individual case across the run was complete canonical coverage on shard 1 at
+854.437291701 three-phase seconds. These observations distinguish serial work,
+case cost and worker order; they do not establish the cause of hosted variance.
+
+The unchanged maximum-cost formula and grouping regenerate all twelve manifests.
+The isolated mirror moves to shard 1, canonical coverage to shard 4, Normal Move
+to shard 6, paired followthrough to shard 7 and preservation to shard 9. Modeled
+test-work wall-time lower bounds are 1,043.481-1,043.496 seconds across the twelve
+shards, excluding startup and finalization. These bounds do not predict approval,
+qualify scenario costs or demonstrate a performance improvement. Tests, worker
+counts, algorithms, coverage and timing limits remain unchanged. Fresh successful
+hosted qualification remains required for every shard.
+
 Fixture setup observations are worker/order dependent; taking maxima and regrouping
 does not establish new fixture multiplicity, hosted wall time or the eighteen-minute
 approval goal. Existing module grouping, twelve shards, four-worker dispatch, the cold
