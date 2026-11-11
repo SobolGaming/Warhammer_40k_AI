@@ -752,7 +752,7 @@ def test_allocator_continues_past_fixed_and_nonimproving_worst(
 ) -> None:
     # The fixed peak cannot move. Neither move out of b+d helps, but moving c
     # out of the next bucket a+c improves the complete descending objective.
-    scores = {
+    scores: dict[tuple[str, ...], float] = {
         (): 0.0,
         ("fixed",): 100.0,
         ("a",): 30.0,
@@ -766,9 +766,13 @@ def test_allocator_continues_past_fixed_and_nonimproving_worst(
         ("a", "c", "d"): 70.0,
         ("b", "c", "d"): 40.0,
     }
-    monkeypatch.setattr(
-        execution_model, "planning_score", lambda group, *_: scores.get(group, 200.0)
-    )
+
+    def score(
+        group: tuple[str, ...], _costs: dict[str, float], _cohorts: tuple[Cohort, ...]
+    ) -> float:
+        return scores.get(group, 200.0)
+
+    monkeypatch.setattr(execution_model, "planning_score", score)
     weights = {"fixed": 100.0, "a": 90.0, "b": 80.0, "c": 70.0, "d": 60.0}
     result = allocate(weights, {}, (), 3)
     assert set(result) == {("fixed",), ("a",), ("b", "c", "d")}

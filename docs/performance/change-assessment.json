@@ -304,7 +304,7 @@
     },
     "tests/code_quality/test_hosted_timing_calibration.py": {
       "before_sha256": "d6d97d4bc6cb09337d703e65b5f48d404badbaa4e82d9e553d49fafa0e297085",
-      "after_sha256": "c6a2c4d6c307d1e05a456ca42d27a3cc259b135eca1684522163543d7238b76e",
+      "after_sha256": "e42f6c4bd983d1a84acc666acbd67da5c0a1665c157e8c1af2156ee6b3e11353",
       "owners": {
         "@module": {
           "before": "97da043b0b924cf854c73adb7be6103cd67ccf633f1c0e320d2567a159023f49",
@@ -316,7 +316,7 @@
         },
         "test_allocator_continues_past_fixed_and_nonimproving_worst": {
           "before": null,
-          "after": "fd4252c4993a32e2ded0fe251d5aa0bac158fee24ee3669ad2b437a29111e99f"
+          "after": "f8a0d0db5f168efc8897cb19ab48a6a0fd268efd92870e8b1173b1e3ec66c052"
         },
         "test_allocator_preserves_selectors_measurements_and_determinism": {
           "before": null,
