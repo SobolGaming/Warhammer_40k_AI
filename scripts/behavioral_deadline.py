@@ -16,7 +16,7 @@ from types import FrameType
 
 from scripts.ci_attribution_supervisor import cleanup
 
-APPROVAL_SECONDS = 18 * 60
+APPROVAL_SECONDS = 27 * 60
 EXECUTION_SECONDS = 30 * 60
 
 

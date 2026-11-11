@@ -13,6 +13,7 @@ from typing import cast
 
 import pytest
 import scripts.build_test_shards as sharding
+import scripts.shard_execution_model as execution_model
 from scripts.hosted_timing_calibration import (
     FILENAME,
     FORMULA,
@@ -22,6 +23,15 @@ from scripts.hosted_timing_calibration import (
     load_planning_seconds,
     passed_phases,
     read_json,
+)
+from scripts.shard_execution_model import (
+    MODEL,
+    PROFILE_FILE,
+    Cohort,
+    allocate,
+    cohort_seconds,
+    load_cohorts,
+    worker_chunks,
 )
 
 
@@ -534,3 +544,275 @@ def test_progress_journal_requires_explicit_valid_opt_in(tmp_path: Path) -> None
             in result.stdout + result.stderr
         )
         assert not tuple(timing.glob("*.jsonl"))
+
+
+@pytest.fixture
+def cohort_input(tmp_path: Path) -> tuple[Path, set[str], dict[str, object]]:
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests/a.py").write_text(
+        "import pytest\n@pytest.fixture(scope='module')\ndef shared(): return 1\n"
+        "def test_a(shared): assert shared == 1\n"
+        "def test_b(shared): assert shared == 1\n",
+        encoding="utf-8",
+    )
+    manifest = tmp_path / "src/warhammer40k_core/_engine_build_manifest.json"
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(json.dumps({"fingerprint": "c" * 64}), encoding="utf-8")
+    nodes = {"tests/a.py::test_a", "tests/a.py::test_b"}
+    calibration: dict[str, object] = {
+        "reports": [
+            {
+                "sha256": digest * 64,
+                "source": {
+                    "run_id": 17,
+                    "attempt": attempt,
+                    "runtime_fingerprint": "c" * 64,
+                    "artifact_id": attempt,
+                },
+                "worker_count": 4,
+                "incomplete_or_unsuccessful_cases": 0,
+            }
+            for digest, attempt in (("a", 1), ("b", 2))
+        ],
+        "observations": {
+            "tests/a.py::test_a": [[0, 10.0, 1.0, 0.5]],
+            "tests/a.py::test_b": [[1, 12.0, 2.0, 0.5]],
+        },
+    }
+    (tmp_path / FILENAME).write_text(json.dumps(calibration), encoding="utf-8")
+    (tmp_path / PROFILE_FILE).write_text(
+        json.dumps(
+            {
+                "schema": MODEL,
+                "cohorts": [
+                    {
+                        "run_id": 17,
+                        "effective_attempt": 2,
+                        "reports": ["a" * 64, "b" * 64],
+                        "supervisors": [
+                            {
+                                "artifact_id": artifact,
+                                "sha256": str(artifact) * 64,
+                                "elapsed_seconds": elapsed,
+                                "approved": True,
+                                "reason": "passed",
+                            }
+                            for artifact, elapsed in ((1, 20.0), (2, 30.0))
+                        ],
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    return tmp_path, nodes, calibration
+
+
+def test_effective_cohort_keeps_original_attempts_and_measured_setup(
+    cohort_input: tuple[Path, set[str], dict[str, object]],
+) -> None:
+    root, nodes, _ = cohort_input
+    before = (root / FILENAME).read_bytes()
+    (cohort,) = load_cohorts(root, root=root, nodes=nodes)
+    assert cohort.label == "17-effective-attempt-2"
+    assert cohort.cases == {"tests/a.py::test_a": 1.5, "tests/a.py::test_b": 2.5}
+    assert cohort.setup == {"tests/a.py::fixtures::shared": 12.0}
+    assert cohort.parallel_residual == 15.5
+    assert cohort.mirror_residual == 0.0
+    assert set(cohort.groups) == nodes
+    assert (root / FILENAME).read_bytes() == before
+
+
+@pytest.mark.parametrize("change", ["missing", "duplicate", "unknown", "future", "nan", "runtime"])
+def test_cohort_rejects_incomplete_or_invalid_evidence(
+    cohort_input: tuple[Path, set[str], dict[str, object]], change: str
+) -> None:
+    root, nodes, calibration = cohort_input
+    data = json.loads(json.dumps(calibration))
+    index = json.loads((root / PROFILE_FILE).read_bytes())
+    if change == "missing":
+        del data["observations"]["tests/a.py::test_a"]
+    elif change == "duplicate":
+        index["cohorts"][0]["reports"].append("a" * 64)
+    elif change == "unknown":
+        index["cohorts"][0]["reports"][0] = "d" * 64
+    elif change == "future":
+        index["cohorts"][0]["effective_attempt"] = 1
+    elif change == "nan":
+        data["observations"]["tests/a.py::test_a"][0][1] = float("nan")
+    else:
+        data["reports"][0]["source"]["runtime_fingerprint"] = "d" * 64
+    (root / FILENAME).write_text(json.dumps(data), encoding="utf-8")
+    (root / PROFILE_FILE).write_text(json.dumps(index), encoding="utf-8")
+    with pytest.raises(SystemExit, match=r"[Aa]llocation"):
+        load_cohorts(root, root=root, nodes=nodes)
+
+
+def test_real_dispatch_and_modeled_chunks_have_collection_independent_ties() -> None:
+    nodes = tuple(f"tests/{module}.py::test_{index}" for index in range(6) for module in "ab")
+    costs = dict.fromkeys(nodes, 3.0)
+    selectors = ("tests/a.py", "tests/b.py")
+    expected = tuple(node for chunk in worker_chunks(selectors, costs) for node in chunk)
+    for collected in (nodes, tuple(reversed(nodes))):
+        order = sharding.duration_worksteal_order(collected, workers=4, selector_seconds=costs)
+        assert tuple(collected[index] for index in order) == expected
+    assert sorted(expected) == sorted(nodes)
+    assert [len(chunk) for chunk in worker_chunks(selectors, costs)] == [3, 3, 3, 3]
+
+
+def test_model_charges_fixture_once_per_worker_and_mirror_sequentially() -> None:
+    nodes = tuple(f"tests/a.py::test_{index}" for index in range(8))
+    serial = sharding.SERIAL_BEHAVIORAL_CASE
+    costs = {**dict.fromkeys(nodes, 11.0), serial: 7.0}
+    cohort = Cohort(
+        "control",
+        {**dict.fromkeys(nodes, 1.0), serial: 7.0},
+        dict.fromkeys(nodes, "fixture"),
+        {"fixture": 10.0},
+    )
+    assert cohort_seconds(("tests/a.py",), costs, (cohort,)) == (12.0,)
+    assert cohort_seconds(("tests/a.py", serial), costs, (cohort,)) == (19.0,)
+    assert cohort_seconds((serial,), costs, (cohort,)) == (7.0,)
+
+
+def test_allocator_preserves_selectors_measurements_and_determinism() -> None:
+    costs = {
+        f"tests/{module}.py::test_{index}": float(20 - index)
+        for module in "abcd"
+        for index in range(8)
+    }
+    weights = {f"tests/{module}.py": 132.0 for module in "abcd"}
+    cohort = Cohort("control", costs, {}, {})
+    before = copy.deepcopy((weights, costs, cohort))
+    result = allocate(weights, costs, (cohort,), 2)
+    assert sorted(selector for group in result for selector in group) == sorted(weights)
+    assert all(result)
+    assert result == allocate(dict(reversed(tuple(weights.items()))), costs, (cohort,), 2)
+    assert (weights, costs, cohort) == before
+
+
+def test_declared_allocation_index_cannot_disappear_or_change(tmp_path: Path) -> None:
+    path = tmp_path / PROFILE_FILE
+    path.write_text("original", encoding="utf-8")
+    summary = {
+        "case_seconds": {"tests/a.py::test_a": 1.0},
+        "files": {"tests/a.py": 1.0},
+        "profiles": [
+            {"source": "control", "junit_sha256": ["a" * 64], "test_cases": 1, "test_files": 1}
+        ],
+        "allocation_model": {
+            "model": MODEL,
+            "index": PROFILE_FILE,
+            "index_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        },
+    }
+    assert (
+        sharding.dispatch_case_seconds(summary, tmp_path / "durations.json")
+        == summary["case_seconds"]
+    )
+    path.write_text("changed", encoding="utf-8")
+    with pytest.raises(SystemExit, match="index is missing or changed"):
+        sharding.dispatch_case_seconds(summary, tmp_path / "durations.json")
+    path.unlink()
+    with pytest.raises(SystemExit, match="index is missing or changed"):
+        sharding.dispatch_case_seconds(summary, tmp_path / "durations.json")
+
+
+def test_mirror_controller_reserve_changes_allocation_without_changing_phases(
+    tmp_path: Path,
+) -> None:
+    serial = sharding.SERIAL_BEHAVIORAL_CASE
+    costs = {f"tests/{module}.py::test_{index}": 10.0 for module in "abc" for index in range(4)}
+    costs[serial] = 10.0
+    weights = {**dict.fromkeys((f"tests/{module}.py" for module in "abc"), 40.0), serial: 40.0}
+    cohort = Cohort("control", costs, {}, {}, 0.0, 50.0)
+    before = copy.deepcopy((weights, costs, cohort))
+    reserved = allocate(weights, costs, (cohort,), 2)
+    mirror_index = next(index for index, group in enumerate(reserved) if serial in group)
+    assert reserved[mirror_index] == (serial,)
+    assert cohort_seconds(reserved[mirror_index], costs, (cohort,)) == (10.0,)
+    (tmp_path / PROFILE_FILE).write_text("{}", encoding="utf-8")
+    summary = execution_model.metadata(tmp_path, reserved, costs, (cohort,))
+    assert summary["cohort_role_residual_seconds"] == {
+        "control": {"parallel": 0.0, "isolated_mirror": 50.0}
+    }
+    assert "planning only" in str(summary["planning_score_rule"])
+    assert cast(dict[str, float], summary["planning_score_seconds"])[str(mirror_index + 1)] == 60.0
+    assert summary["cohort_worker_path_seconds"] == {
+        "control": {str(index + 1): 10.0 if index == mirror_index else 30.0 for index in range(2)}
+    }
+    unreserved = Cohort("control", costs, {}, {})
+    assert allocate(weights, costs, (unreserved,), 2) != reserved
+    assert (weights, costs, cohort) == before
+
+
+@pytest.mark.stubbed
+def test_allocator_continues_past_fixed_and_nonimproving_worst(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The fixed peak cannot move. Neither move out of b+d helps, but moving c
+    # out of the next bucket a+c improves the complete descending objective.
+    scores: dict[tuple[str, ...], float] = {
+        (): 0.0,
+        ("fixed",): 100.0,
+        ("a",): 30.0,
+        ("b",): 30.0,
+        ("c",): 10.0,
+        ("d",): 10.0,
+        ("a", "c"): 50.0,
+        ("b", "c"): 60.0,
+        ("b", "d"): 55.0,
+        ("c", "d"): 20.0,
+        ("a", "c", "d"): 70.0,
+        ("b", "c", "d"): 40.0,
+    }
+
+    def score(
+        group: tuple[str, ...], _costs: dict[str, float], _cohorts: tuple[Cohort, ...]
+    ) -> float:
+        return scores.get(group, 200.0)
+
+    monkeypatch.setattr(execution_model, "planning_score", score)
+    weights = {"fixed": 100.0, "a": 90.0, "b": 80.0, "c": 70.0, "d": 60.0}
+    result = allocate(weights, {}, (), 3)
+    assert set(result) == {("fixed",), ("a",), ("b", "c", "d")}
+    assert sorted(scores[group] for group in result) == [30.0, 40.0, 100.0]
+    assert sorted(node for group in result for node in group) == sorted(weights)
+
+
+def test_planning_ceiling_keeps_coherent_roles_and_raw_phases_separate() -> None:
+    nodes = tuple(f"tests/a.py::test_{index}" for index in range(4))
+    serial = sharding.SERIAL_BEHAVIORAL_CASE
+    costs = {**dict.fromkeys(nodes, 5.1), serial: 0.4}
+    cohorts = (
+        Cohort("first", {**dict.fromkeys(nodes, 5.1), serial: 0.2}, {}, {}, 0.2, 0.3),
+        Cohort("second", {**dict.fromkeys(nodes, 1.1), serial: 0.4}, {}, {}, 4.1, 8.2),
+    )
+    before = copy.deepcopy((costs, cohorts))
+    assert cohort_seconds(("tests/a.py",), costs, cohorts) == (5.1, 1.1)
+    assert execution_model.planning_score(("tests/a.py",), costs, cohorts) == 6.0
+    assert execution_model.planning_score(("tests/a.py", serial), costs, cohorts) == 10.0
+    assert (costs, cohorts) == before
+
+
+@pytest.mark.parametrize("change", ["missing", "duplicate", "unbound", "nan", "negative"])
+def test_supervisor_profiles_fail_closed(
+    cohort_input: tuple[Path, set[str], dict[str, object]],
+    change: str,
+) -> None:
+    root, nodes, _ = cohort_input
+    index = json.loads((root / PROFILE_FILE).read_bytes())
+    receipts = index["cohorts"][0]["supervisors"]
+    if change == "missing":
+        receipts.pop()
+    elif change == "duplicate":
+        receipts[1] = copy.deepcopy(receipts[0])
+    elif change == "unbound":
+        receipts[0]["artifact_id"] = 999
+    elif change == "nan":
+        receipts[0]["elapsed_seconds"] = float("nan")
+    else:
+        receipts[0]["elapsed_seconds"] = 0.0
+    (root / PROFILE_FILE).write_text(json.dumps(index), encoding="utf-8")
+    with pytest.raises(SystemExit, match=r"[Aa]llocation"):
+        load_cohorts(root, root=root, nodes=nodes)

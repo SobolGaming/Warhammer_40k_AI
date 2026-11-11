@@ -243,3 +243,24 @@ quality 600-second limits. Verify exact boundaries, late passing-test result
 retention, descendant cleanup and partial-result failure behavior. Report observed
 durations separately from limits. Earlier fifteen-minute timeout records remain
 historical failures and do not reveal when unfinished tests would have completed.
+
+## Covered-shard timing amendment - 11 November 2026
+
+After the current hosted run `43105204846` and concurrent local covered run
+finished, the owner raised covered behavioral approval to 27 minutes
+(1,620 seconds inclusive). This supersedes the active 18-minute approval target
+above. Timing alone still permits execution through exactly 30 minutes and
+terminates the owned process group only when elapsed time exceeds 1,800 seconds.
+A successful workload completing after 1,620 seconds fails approval while its
+complete results are retained. Failed, interrupted, terminated or incomplete
+workloads still fail, and the combined coverage gate still requires every shard
+to succeed. The monotonic clock scope and 32-minute outer cleanup guard are unchanged.
+
+Earlier 1,080-second receipts, validators of that historical evidence and all
+original run outcomes remain unchanged; this amendment does not reclassify any
+prior failure. The accepted allocation retains its finite 1,076 / 1,054 / 1,050
+planning budgets on their original 18-minute basis. Keep all 6,282 behavioral
+cases, twelve shards, four hosted workers, local 32-worker qualification, 67%
+full-package branch coverage, exact 260 deferred quality cases, mirror 120-second
+bound, serial performance 180-second bound and quality 600-second limits. Fresh
+exact-head local and hosted gates and both independent reviews remain required.

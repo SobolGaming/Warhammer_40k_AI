@@ -34217,7 +34217,12 @@
         "summary_case_seconds",
         "_calibrated_selectors",
         "_planning_inputs",
-        "dispatch_case_seconds"
+        "dispatch_case_seconds",
+        "_allocation_cohorts",
+        "_add_allocation_summary",
+        "_scoped_evidence",
+        "_behavioral_shard_selectors",
+        "_partitioned_durations"
       ],
       "families": [],
       "sensitive": false,
@@ -35673,7 +35678,10 @@
         "test_hosted_workload_uses_supervisor_and_preserves_diagnostics",
         "test_source_index_barrier_consumes_the_shared_monotonic_deadline",
         "test_cancellation_after_workload_exit_fails_approval",
-        "test_cancellation_after_workload_exit_fails_approval.cancel_after_cleanup"
+        "test_cancellation_after_workload_exit_fails_approval.cancel_after_cleanup",
+        "test_current_27_minute_approval_preserves_strict_30_minute_stop",
+        "test_cli_defaults_use_current_approval_and_unchanged_execution",
+        "test_cli_defaults_use_current_approval_and_unchanged_execution.capture"
       ],
       "families": [],
       "sensitive": false,
@@ -35818,6 +35826,56 @@
       "paths": [
         "src/warhammer40k_core/ai/opposing_shooter_scenario.py",
         "tests/infrastructure/adapters/test_opposing_shooter_scenario.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "coherent-shard-allocation": {
+      "paths": [
+        "scripts/shard_execution_model.py",
+        "ci/test_shards/allocation-cohorts.json",
+        "tests/code_quality/test_hosted_timing_calibration.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "scoped-shard-allocation": {
+      "paths": [
+        "scripts/scoped_shard_allocation.py",
+        "scripts/scoped_shard_evidence.py",
+        "scripts/preflight_case_partition.py",
+        "ci/test_shards/allocation-scope.json",
+        "ci/test_shards/scoped-worker-evidence.json",
+        "ci/test_shards/preflight-case-partition.json",
+        "tests/code_quality/test_scoped_shard_allocation.py",
+        "scripts/scoped_shard_extension.py",
+        "scripts/extended_shard_allocation.py",
+        "scripts/finite_case_partitions.py",
+        "ci/test_shards/scoped-worker-extension.json",
+        "ci/test_shards/allocation-stress.json",
+        "ci/test_shards/step5g-case-partitions.json",
+        "tests/code_quality/test_extended_shard_allocation.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "covered-resource-diagnostics": {
+      "paths": [
+        "scripts/ci_resource_diagnostics.py",
+        "tests/code_quality/test_ci_resource_diagnostics.py",
+        "scripts/run_behavioral_coverage.sh"
       ],
       "owners": [
         "*"
