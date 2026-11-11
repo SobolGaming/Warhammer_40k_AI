@@ -331,6 +331,16 @@
           "after": "d857d60b6f40e598fb4c890d0933e7d403f5f2de356dcbb2fa96059af5605112"
         }
       }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "6218eceefc5e1cf141a8d2f8daeb0110121075f15adb39e42a6164fe948d3cac",
+      "after_sha256": "25ee997deadd9c14cac9387733f6551fa3ef6a7211874e3f2b60ea0074f65d76",
+      "owners": {
+        "@document": {
+          "before": "6218eceefc5e1cf141a8d2f8daeb0110121075f15adb39e42a6164fe948d3cac",
+          "after": "25ee997deadd9c14cac9387733f6551fa3ef6a7211874e3f2b60ea0074f65d76"
+        }
+      }
     }
   },
   "rows": {
@@ -687,6 +697,16 @@
       "rationale": "Bounded CI scheduling repair preserves the complete selected workload and measured historical inputs while modeling coherent initial worker chunks and order-dependent fixture reuse. It changes test allocation, not engine computation or source-contract generation.",
       "source_obligation": "Preserve all 6282 behavioral cases and their semantics, twelve shards and four hosted workers, complete coverage, unchanged approval/termination limits, original baseline identities and append-only timing observations.",
       "unchanged_work": "No engine algorithm, rule branch, RNG, replay, geometry, runtime dependency, workload assertion or source-contract bytes change. Historical phase evidence informs CI allocation only; current serial smoke, full correctness and exact-head hosted timing gates remain required."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only the current README governance hash after the reviewed CI scheduling documentation changed; all raw source captures, historical authenticated inputs, clause obligations and assertion bodies remain byte-exact.",
+      "source_obligation": "The existing Section 07 complete-hierarchy/source-authentication test must bind the current maintained README bytes while retaining its historical governance, source and gameplay evidence unchanged.",
+      "unchanged_work": "This single current hash refresh changes no engine, test body, source capture, selected case inventory, calibration observation or runtime algorithm. The existing full exact-head correctness and coverage gates remain required."
     }
   },
   "milestone": "ordinary",
