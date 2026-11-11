@@ -264,6 +264,16 @@
         }
       }
     },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "before_sha256": "8a3d4c6fb2ce85e16d0e2502290fdb40cb8d92cd29363b1b5216e1626f3a1ffa",
+      "after_sha256": "0a4a1dfe2e9523b4c397903613b6faacd52e692944201ac74c7abec626be00d1",
+      "owners": {
+        "@document": {
+          "before": "8a3d4c6fb2ce85e16d0e2502290fdb40cb8d92cd29363b1b5216e1626f3a1ffa",
+          "after": "0a4a1dfe2e9523b4c397903613b6faacd52e692944201ac74c7abec626be00d1"
+        }
+      }
+    },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "87d294a889bd63579bd36142b13f6035a1372f7bd4024281f20a6083f7e231d8",
       "after_sha256": "72d290e1cad4f071c1317efca074092fdb793c6c8b64cf027d3e47bc43529a5f",
@@ -1022,6 +1032,14 @@
       "unchanged_work": null
     },
     "docs/AI_POLICY_INTERFACE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Required maintained scope, current source authentication, generated runtime publication or complete measured shard metadata for the bounded paired followthrough admission. Existing gameplay algorithms, test selection, historical diagnostics and delivery limits remain intact.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
