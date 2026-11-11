@@ -158,12 +158,16 @@ def load_cohorts(directory: Path, *, root: Path, nodes: set[str]) -> tuple[Cohor
     value = read_json(path)
     if (
         not isinstance(value, dict)
-        or value.keys() != {"schema", "cohorts"}
+        or value.keys() not in ({"schema", "cohorts"}, {"schema", "cohorts", "scoped_evidence"})
         or value["schema"] != MODEL
         or not isinstance(value["cohorts"], list)
         or not value["cohorts"]
     ):
         raise SystemExit("Invalid allocation cohort index.")
+    if "scoped_evidence" in value:
+        from scripts.scoped_shard_evidence import validate_reference
+
+        validate_reference(directory, value["scoped_evidence"])
     calibration = cast(dict[str, object], read_json(directory / FILENAME))
     reports = cast(list[dict[str, object]], calibration["reports"])
     observations = cast(dict[str, list[list[int | float]]], calibration["observations"])

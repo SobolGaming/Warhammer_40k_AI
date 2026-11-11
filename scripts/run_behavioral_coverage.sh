@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 mkdir -p reports
+capture_resources() {
+  if ! uv run --no-sync python -B -m scripts.ci_resource_diagnostics \
+    --phase "$1" --output "reports/resource-${1}.json"; then
+    echo "Resource diagnostic capture failed for phase $1; workload status is unchanged." >&2
+  fi
+}
+finish_resources() {
+  workload_status=$?
+  trap - EXIT
+  capture_resources after
+  exit "$workload_status"
+}
+trap finish_resources EXIT
+capture_resources before
 mapfile -t shard_paths < "$SHARD_MANIFEST"
 source_index_deadline="$BEHAVIOR_EXECUTION_DEADLINE"
 uv run --no-sync python -B -m scripts.validate_source_history

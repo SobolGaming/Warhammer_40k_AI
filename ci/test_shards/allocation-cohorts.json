@@ -1129,5 +1129,9 @@
       ]
     }
   ],
-  "schema": "coherent-worker-chunks-role-residual-ceil-v3"
+  "schema": "coherent-worker-chunks-role-residual-ceil-v3",
+  "scoped_evidence": {
+    "file": "allocation-scope.json",
+    "sha256": "420e7d929e1d920827e5ef8d25e5ebe4e326ffb6bee7ccd79ed9b26d797df1b9"
+  }
 }

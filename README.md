@@ -351,12 +351,13 @@ all required tests and other gates must still succeed. See the
 [active review policy](docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md).
 
 The twelve behavioral manifests in `ci/test_shards/` use deterministic coherent
-cohort phase-and-role-residual scoring, starting with largest selectors and then improving
-whole-selector moves. One heavy, source-bound module is partitioned
-into its twenty exact collected cases. The bounded mirror setup case is a separate
+cohort phase-and-role-residual scoring. The existing isolated mirror is seeded
+first, followed by largest selectors and improving whole-selector moves. The
+source-bound S25 module retains its twenty exact cases; canonical coverage
+preflight has a separate source-bound partition of its twelve exact collected cases. The bounded mirror setup case is a separate
 selector; its file selector denotes the remaining cases. CI always deselects that
-node from parallel work and runs it once on its owning shard. Other files remain
-intact. The required guards verify the exact selected inventory and partition.
+node from parallel work and runs it once on its owning shard. All other files remain
+intact. The resulting 444 selectors still select exactly 6,282 cases. The required guards verify the exact selected inventory and partition.
 Verify that every selected file or declared case appears exactly once:
 
 ```bash
@@ -413,13 +414,14 @@ and index path. Failure, malformed completion and deadline expiry stop dispatch.
 Shard 1 deliberately bypasses source-index cache restore/save on PRs and main so
 every run verifies this cold path. Other shards retain exact-key reuse and the
 normal source/partition validation; a warm-cache retry is not cold qualification.
-After balancing, the generator swaps the bucket with the lowest unrounded modeled
-test load into shard 1, breaking ties by its original bucket number. This final
+After balancing, the generator swaps the eligible bucket with the lowest
+whole-second phase-plus-role planning score into shard 1, breaking ties by its
+original bucket number. The explicitly frozen shard is ineligible for this swap. This final
 permutation preserves every bucket's selectors and all measured case/selector
 weights, while avoiding assigning the cold role by largest-first insertion order.
 The execution metadata records this policy. Startup and report finalization are
-not test timings or added scheduling reserves; the model does not guarantee a
-hosted wall time. Empty buckets and committed manifests fail validation, because
+measured separately; observed role residuals supply conditional planning reserves.
+The model does not guarantee a hosted wall time. Empty buckets and committed manifests fail validation, because
 an empty pytest selector list would run the default suite.
 
 A complete local JUnit profile is also accepted, either one XML or one directory
@@ -832,13 +834,10 @@ controller allowance. Raw phase costs and reported worker paths remain unchanged
 
 Whole-selector moves strictly improve the descending rounded planning scores.
 The search continues past an indivisible or non-improving worst bucket and may
-use space on a higher-scored bucket when the complete objective improves. The
-smallest final planning-score bucket retains cold shard 1. Whole-second planning
-avoids optimizing below the scale of observed host variation; unrounded scores
-can regress within a rounded bucket. In the retained preview, eighteen such moves
-occurred and the older main cohort's projected margin changed from 4.819 to 4.013
-seconds, while the newest cohort's margin was 37.826 seconds. These conditional
-sensitivities are not robust future headroom or actual timing qualification.
+use space on a higher-scored bucket when the complete objective improves.
+Whole-second planning can regress unrounded estimates within a rounded bucket;
+raw values remain separate. The earlier eighteen-move sensitivity and its 4.013 /
+37.826-second projected margins remain historical diagnostics, not qualification.
 
 For directly declared non-parametrized module fixtures, the conditional setup
 estimate is the cohort's largest observed worker setup sum for that fixture group,
@@ -867,6 +866,46 @@ retain their original producer identities; neither becomes a new passing observa
 `--check` regenerates the allocation, and dispatch rejects a missing or changed
 declared cohort index. The all-history maximum case weights still drive dispatch;
 coherent phases and observed role residuals drive allocation, with their distinct limitations recorded.
+
+The separate `allocation-scope.json` and `scoped-worker-evidence.json` bind 45
+completed workers and 6,014 passed cases from failed run `43059076830`, attempt 1,
+source head `7963b663dd8fcfd0906f8fb3de26c67b0ca74812`, tested checkout
+`9a141902bde5b428c041bf82cea0e5ffb2a47313`. Artifact/archive identities, producer
+windows and eleven original supervisor receipts remain bound. Shard 4 lost a
+worker after its current case passed setup; its call result and death cause are
+unknown. Its entire 28-selector / 268-case selection stays fixed and has no partial
+projection. Known plus frozen inventories equal the complete 6,282-case inventory.
+This scoped scenario is not a ninth complete cohort and never changes ordinary
+dispatch calibration or fills missing observations. All 843 global reports and
+106,823 observation tuples retain their values, order and indices.
+
+The scoped allocator reserves the existing serial mirror first using the unchanged
+execution weights, then constructs the eleven eligible groups and refines their
+whole selectors. The frozen group's historical projections still use all eight
+complete cohorts. A 1,076-second historical planning ceiling preserves the prior
+modeled floor; it is separate from the actual 1,080-second approval requirement.
+Cold normalization leaves shard 1 cold and places the mirror on shard 2. Source-bound
+preflight ratios preserve its original 551.905-second baseline file total; the
+active calibrated twelve node weights sum to the unchanged 966.184812329-second
+module weight. All baseline case medians and the original S25 partition remain intact.
+
+The chosen conditional projections peak at 1,075.847 seconds across the eight
+complete cohorts and 1,053.382 seconds over the known partial scope: margins of
+4.153 and 26.618 seconds. Applying the largest retained matching-role residuals
+to the partial phases gives 1,064.983 seconds and 15.017 seconds of margin; another
+20 seconds of phase delay would fail. The frozen shard remains unknown in that
+scenario. These estimates do not certify robust future headroom or passing CI.
+Every required exact-head gate and the unresolved worker-loss outcome remain visible.
+
+The inner covered-workload shell also captures separate before/after resource
+JSON files. Linux host OOM counters and available cgroup-v2 events/current/peak
+readings are read without resetting counters or changing worker behavior. Host
+counters may include unrelated work; cgroup peaks cover their lifetime, and missing
+or unsupported readings are explicit. Worker exit codes remain unknown without a
+public nonblocking source. These observations can help diagnose a recurrence but
+cannot identify a worker's death cause by themselves. Diagnostic capture failure
+preserves the workload's original exit status and does not change supervisor clocks,
+cleanup, approval or execution limits.
 
 Four-worker behavioral CI uses `BEHAVIORAL_DISPATCH_PROFILE` to distribute measured
 case costs across xdist's initial worker chunks after deselection. Complete case

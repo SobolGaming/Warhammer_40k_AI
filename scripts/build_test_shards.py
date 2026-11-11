@@ -17,6 +17,7 @@ from statistics import median
 from typing import TYPE_CHECKING, TypedDict, cast
 
 if TYPE_CHECKING:
+    from scripts.scoped_shard_evidence import ScopedEvidence
     from scripts.shard_execution_model import Cohort
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -88,6 +89,7 @@ def main() -> int:
         shard_count=args.shard_count,
         case_seconds=calibrated,
         cohorts=_allocation_cohorts(output_dir, calibrated),
+        scope=_scoped_evidence(output_dir, calibrated),
     )
     _write_manifests(
         output_dir=output_dir,
@@ -737,19 +739,23 @@ def _case_partition(root: Path, files: frozenset[str]) -> dict[str, float]:
 
 
 def _behavioral_shard_selectors() -> tuple[str, ...]:
+    from scripts.preflight_case_partition import partition_selectors
+
     files = frozenset(_behavioral_test_files())
     partition = _case_partition(REPOSITORY_ROOT, files)
     selectors = (files - {CASE_PARTITION_FILE}) | partition.keys() if partition else set(files)
     if SERIAL_BEHAVIORAL_CASE.split("::", 1)[0] in files:
         # That file selector is its remainder; CI deselects this separately owned node.
         selectors = set(selectors) | {SERIAL_BEHAVIORAL_CASE}
-    return tuple(sorted(selectors))
+    return tuple(sorted(partition_selectors(REPOSITORY_ROOT, set(selectors))))
 
 
 def _partitioned_durations(
     durations: dict[str, float], *, case_seconds: dict[str, float] | None = None
 ) -> dict[str, float]:
     """Preserve file totals; node ratios are derived scheduling weights, not case profiles."""
+    from scripts.preflight_case_partition import partition_durations
+
     partition = _case_partition(REPOSITORY_ROOT, frozenset(durations))
     result = dict(durations)
     if partition:
@@ -765,7 +771,7 @@ def _partitioned_durations(
             raise SystemExit("Serial mirror cost exceeds its measured file total.")
         result[owner] -= serial
         result[SERIAL_BEHAVIORAL_CASE] = serial
-    return result
+    return partition_durations(REPOSITORY_ROOT, result)
 
 
 def _profile_medians(
@@ -932,15 +938,20 @@ def _balanced_shards(
     shard_count: int,
     case_seconds: dict[str, float] | None = None,
     cohorts: tuple[Cohort, ...] = (),
+    scope: ScopedEvidence | None = None,
 ) -> tuple[Shard, ...]:
     if cohorts:
         from scripts.shard_execution_model import allocate
 
         if case_seconds is None:
             raise SystemExit("Cohort allocation requires complete case scheduling weights.")
-        groups = allocate(
-            _execution_weights(durations, case_seconds), case_seconds, cohorts, shard_count
-        )
+        weights = _execution_weights(durations, case_seconds)
+        if scope is None:
+            groups = allocate(weights, case_seconds, cohorts, shard_count)
+        else:
+            from scripts.scoped_shard_allocation import allocate_scoped
+
+            groups = allocate_scoped(weights, case_seconds, cohorts, shard_count, scope)
         return tuple(
             Shard(index + 1, math.fsum(durations[name] for name in group), group)
             for index, group in enumerate(groups)
@@ -1111,6 +1122,7 @@ def _check_manifests(*, output_dir: Path, shard_count: int) -> None:
         shard_count=shard_count,
         case_seconds=calibrated,
         cohorts=_allocation_cohorts(output_dir, calibrated),
+        scope=_scoped_evidence(output_dir, calibrated),
     )
     for shard in shards:
         if manifest_entries[shard.shard_id] != shard.test_files:
@@ -1142,6 +1154,12 @@ def _allocation_cohorts(directory: Path, cases: dict[str, float] | None) -> tupl
     return load_cohorts(directory, root=REPOSITORY_ROOT, nodes=set(cases))
 
 
+def _scoped_evidence(directory: Path, cases: dict[str, float] | None) -> ScopedEvidence | None:
+    from scripts.scoped_shard_evidence import load_declared_scope
+
+    return load_declared_scope(directory, root=REPOSITORY_ROOT, costs=cases)
+
+
 def _add_allocation_summary(
     summary: dict[str, object],
     directory: Path,
@@ -1162,6 +1180,20 @@ def _add_allocation_summary(
         summary["allocation_model"] = metadata(
             directory, tuple(shard.test_files for shard in shards), cases, cohorts
         )
+        scope = _scoped_evidence(directory, cases)
+        if scope is not None:
+            from scripts.scoped_shard_allocation import scoped_metadata
+
+            summary["strategy"] = "scoped-mirror-first-coherent-selector-moves-v1"
+            execution["cold_shard_assignment"] = "minimum-rounded-known-score-eligible-bucket-v1"
+            complete_model = cast(dict[str, object], summary["allocation_model"])
+            complete_model["planning_score_scope"] = (
+                "Eight complete cohorts only; active known-scope scores and explicit unknowns "
+                "are separate in scoped_allocation.shards"
+            )
+            summary["scoped_allocation"] = scoped_metadata(
+                tuple(shard.test_files for shard in shards), cases, cohorts, scope
+            )
 
 
 def _summary_payload(
@@ -1189,6 +1221,11 @@ def _summary_payload(
         ],
     }
     if case_seconds is not None:
+        from scripts.preflight_case_partition import OWNER, source_metadata, validate_case_inventory
+
+        validate_case_inventory(case_seconds)
+        if any(node.split("::", 1)[0] == OWNER for node in case_seconds):
+            summary["preflight_partition"] = source_metadata(REPOSITORY_ROOT)
         summary["case_seconds"] = dict(sorted(case_seconds.items()))
         if calibration_sha256 is not None:
             from scripts.hosted_timing_calibration import FILENAME, FORMULA, ROLE
@@ -1320,6 +1357,11 @@ def dispatch_case_seconds(summary: object, profile: Path) -> dict[str, float]:
 
     baseline = summary_case_seconds(summary)
     fields = cast(dict[str, object], summary)
+    from scripts.preflight_case_partition import OWNER, validate_case_inventory, validate_metadata
+
+    validate_case_inventory(baseline)
+    if any(node.split("::", 1)[0] == OWNER for node in baseline):
+        validate_metadata(REPOSITORY_ROOT, fields.get("preflight_partition"))
     if "allocation_model" in fields:
         from scripts.shard_execution_model import MODEL, PROFILE_FILE
 
@@ -1333,6 +1375,11 @@ def dispatch_case_seconds(summary: object, profile: Path) -> dict[str, float]:
             or hashlib.sha256(path.read_bytes()).hexdigest() != allocation.get("index_sha256")
         ):
             raise SystemExit("Allocation cohort index is missing or changed.")
+        if "scoped_allocation" in fields:
+            from scripts.scoped_shard_evidence import validate_reference
+
+            index = json.loads(path.read_bytes())
+            validate_reference(profile.parent, index.get("scoped_evidence"))
     if "calibration" not in fields:
         return baseline
     metadata = fields["calibration"]

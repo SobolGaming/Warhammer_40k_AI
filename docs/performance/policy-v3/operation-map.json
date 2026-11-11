@@ -34219,7 +34219,10 @@
         "_planning_inputs",
         "dispatch_case_seconds",
         "_allocation_cohorts",
-        "_add_allocation_summary"
+        "_add_allocation_summary",
+        "_scoped_evidence",
+        "_behavioral_shard_selectors",
+        "_partitioned_durations"
       ],
       "families": [],
       "sensitive": false,
@@ -35833,6 +35836,36 @@
         "scripts/shard_execution_model.py",
         "ci/test_shards/allocation-cohorts.json",
         "tests/code_quality/test_hosted_timing_calibration.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "scoped-shard-allocation": {
+      "paths": [
+        "scripts/scoped_shard_allocation.py",
+        "scripts/scoped_shard_evidence.py",
+        "scripts/preflight_case_partition.py",
+        "ci/test_shards/allocation-scope.json",
+        "ci/test_shards/scoped-worker-evidence.json",
+        "ci/test_shards/preflight-case-partition.json",
+        "tests/code_quality/test_scoped_shard_allocation.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "covered-resource-diagnostics": {
+      "paths": [
+        "scripts/ci_resource_diagnostics.py",
+        "tests/code_quality/test_ci_resource_diagnostics.py",
+        "scripts/run_behavioral_coverage.sh"
       ],
       "owners": [
         "*"
