@@ -1801,9 +1801,67 @@ payload, policy, target calculator or training consumer. Existing finite,
 movement, reaction, viewer and replay contracts already cover its submissions.
 
 The contrast does not certify a globally blocked path, best response, useful
-screen, sacrifice value, E benefit, full game, throughput or learning. Alternative
-charges/interventions, detours, timing, geometry and opponents remain open. The
+screen, sacrifice value, E benefit, full game, throughput or learning. Wider charge/intervention
+continuations, detours, timing, geometry and opponents remain open; the bounded
+extension below measures only its declared paths and declaration eligibility. The
 inherited synthetic roster, provisional geometry, mixed mission/layout, partial
 points and public fixed seed remain limitations. `useful_reference_status` stays
 `scoped_gap`, `reference_target` is null and `eligible_for_learning` is false.
 Historical controls retain their original meanings and Stage 2 remains incomplete.
+
+## Bounded opposing-response operator evidence
+
+`stage2-bounded-screen-responses-v1` extends the edge-column access question with five
+predeclared independent B paths per position. The original canonical configuration and fixed
+public seed, fifteen-record common setup, three S moves versus preservation and two common B
+approaches remain unchanged. The six-, two-and one-inch forward witnesses remain explicit
+controls. The added detour has four inches positive X followed by two positive Y; the added
+approach has 1.4 inches positive Y. Every leg uses the existing Normal Move proposal and full
+`PathWitness`, all five observed models in descending initial Y, unchanged height/facing and an
+inclusive native-M distance check. Declaration-byte SHA-256:
+`6ed8aca07220e509948c5d0953d2d9cd06fa9689cbec2ece22ed5c3097ffb16c`.
+
+The six-/two-inch controls retain screen transit/endpoint Engagement Range rejections and
+preservation acceptances. The one-inch control, detour and approach are accepted in both
+positions. The detour's screen gap to S is 3.622780 inches; the approach's is 2.140157. They
+remain unengaged under the retained two-inch threshold. The detour advances two inches in Y at
+X=5; it is not a complete passage beyond S. Every accepted paired response has identical B
+witness and endpoint poses in screen/preservation.
+
+The one-inch, detour and approach continuations decline A's movement reaction, skip B Shooting
+and retain charge target-query diagnostics together with the actual pending viewer request. In
+the screen position S is within twelve-inch declaration range and B is offered as a charging
+unit; E/vehicle are out of range. In preservation all three targets are out of range and B is
+not offered a charge. The query uses the lifecycle's loaded charge-target restriction registry,
+and the ordinary request confirms full declaration eligibility. No Charge roll or charge target
+selection occurs; eligibility does not establish a legal charge endpoint, a successful
+engagement or a Fight. Offered Charge and Heroic Intervention choices are explicitly declined,
+reaching the common round-four A Movement unit-selection horizon at 62/54 records.
+
+At that horizon B receives three VP after the detour in both positions for the same new-objective turn-end Primary rule; A remains at zero. The one-inch control and 1.4-inch approach
+leave both ledgers at zero in both positions. The paired screen-minus-preservation VP difference
+is zero for all three responses. No wounds/models are lost, and all ten histories retain full
+records, observed views, movement witnesses, rejection/retry diagnostics, checkpoint/replay
+artifacts and unmodified natural RNG commitments. Both viewers' projections and event streams
+are equal after strict persistence restoration. Ordinary-startup verification and exact
+`ReplayRunner` reproduction apply to each complete history; each original response origin
+remains unchanged. The positions' RNG hashes differ. No independent future-chance service or
+matched stochastic benefit is inferred.
+
+The first operator attempt stopped on a nonexistent registry attribute after the one-inch
+movement and reaction decline. Its checkpoint/progress and original harness remain retained.
+Reading the existing loaded registry corrects the harness without changing
+engine/source/configuration, declaration, paths or RNG; the completed invalid-control evidence
+is reused. Operator evidence stays outside actor/scorer inputs. No runtime/admission factory,
+player decision family, wire payload, policy, target calculator or learning consumer is added.
+Existing finite, movement, charge, reaction, viewer and replay adapter contracts cover all
+choices.
+
+Source obligations are retained 03.01, 03.04, 09.05 and 11.02 with their maintained mirror
+provenance limits; no fresh official-App certification is asserted. Charge movement (11.04),
+attacks, alternative timings/cooperation, wider routes, held-out opponents/geometry, useful E
+follow-through and scenario/full-game costs remain unqualified. The synthetic roster,
+provisional geometry, mixed mission/layout, partial points and public-seed caveats persist.
+These finite observations establish neither exhaustive denial nor a best response, useful
+sacrifice or tactical superiority. `useful_reference_status` remains `scoped_gap`,
+`reference_target` is null and `eligible_for_learning` is false; Stage 2 is open.
