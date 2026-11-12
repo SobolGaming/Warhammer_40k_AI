@@ -1959,3 +1959,40 @@ matched semantics and work evidence. This profile establishes no optimization,
 successful charge, impossibility, tactical label or game throughput. Timing stays
 operator-only; Stage 2 remains open, `useful_reference_status` is `scoped_gap`,
 `reference_target` is null and `eligible_for_learning` is false.
+
+## Complete corrected charge-witness operator boundary
+
+The [complete optimized-main evaluation](AI_IMPLEMENTATION_PLAN.md#complete-corrected-charge-witness-evaluation-on-optimized-main)
+restores the identical 63-record checkpoint and reproduces 63 decisions/641
+events through separate ordinary replay. The corrected physical 005→001 witness,
+geometry, seed, search budgets and endpoint obligations remain unchanged. One
+serial unprofiled resolver invocation returns in 556.705 seconds; its fresh
+whole-worker supervisor observes 633.069 seconds under the original 1,800-second
+experiment ceiling. Restore/replay, query bookkeeping, witness revalidation and
+the separate slowest-query profile have distinct recorded boundaries. No primary
+timing run is repeated to confirm a deadline.
+
+All five models' ten obligations are evaluated: seven searches return, while
+three are already satisfied. Six searches remain unresolved and model 001 has a
+reachable engagement alternative. The completed resolution is invalid with
+`charge_reachability_unresolved`; full candidate path/terrain/coherency checks do
+not excuse its mandatory endpoints. Exact post-evaluation checkpoint equality
+holds and no movement is submitted. The complete returned alternative is checked
+against its original full path, terrain and endpoint context outside timing.
+
+Model 003 and model 002 engagement account for 46.5% of resolver wall time; the
+seven distinct full-query keys produce no cache hits. A separate 307.836-second
+cProfile query preserves the model-003 unresolved/57-node result; 23,248 complete
+witness validations include 13,108 terrain validations and 1,729,628 terrain
+footprint constructions. Its cold-cache/profiled boundary is separate from
+primary timing and does not isolate profiler overhead. All diagnosis finishes
+within the original allowance. The next bounded geometry-owner experiment is
+reuse of immutable terrain geometry across complete-prefix validations, preserving
+all path, endpoint, cache/isolation and search obligations. This evidence identifies
+remaining mandatory endpoint-search cost without admitting an operator result
+to an actor, scorer, useful-reference factory or learning consumer. Historical
+censored evidence remains censored. Existing restore/replay/resolver contracts
+cover this diagnostic; no runtime/schema/decision change is introduced. A legal
+Charge Move, tactical benefit, common horizon, Stage 2 and full-game throughput
+remain open, with `scoped_gap`, null target, learning exclusion and the inherited
+source/roster/provisional geometry/mission/points/public-seed limits intact.
