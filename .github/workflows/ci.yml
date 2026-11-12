@@ -52,6 +52,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fetch exact scheduling source objects
+        run: python3 -B scripts/fetch_scheduling_sources.py
+
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -189,6 +192,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fetch exact scheduling source objects
+        run: python3 -B scripts/fetch_scheduling_sources.py
+
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -263,6 +269,9 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 0
+
+      - name: Fetch exact scheduling source objects
+        run: python3 -B scripts/fetch_scheduling_sources.py
 
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -422,6 +431,9 @@ jobs:
 
       - name: Fetch retained Core description baseline
         run: git fetch --depth=1 --no-tags --no-recurse-submodules origin b27c5d4e5f75dd7f89353a968a88d1b24b2681a4
+
+      - name: Fetch exact scheduling source objects
+        run: python3 -B scripts/fetch_scheduling_sources.py
 
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6

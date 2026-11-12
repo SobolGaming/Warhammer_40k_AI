@@ -35862,7 +35862,15 @@
         "ci/test_shards/scoped-worker-extension.json",
         "ci/test_shards/allocation-stress.json",
         "ci/test_shards/step5g-case-partitions.json",
-        "tests/code_quality/test_extended_shard_allocation.py"
+        "tests/code_quality/test_extended_shard_allocation.py",
+        "scripts/historical_shard_snapshot.py",
+        "scripts/current_shard_compatibility.py",
+        "scripts/current_shard_assignment.py",
+        "scripts/fetch_scheduling_sources.py",
+        "ci/test_shards/current-covered-baseline.json",
+        "ci/test_shards/current-runtime-compatibility.json",
+        "ci/test_shards/current-derived-assignment.json",
+        "tests/code_quality/test_current_shard_compatibility.py"
       ],
       "owners": [
         "*"
@@ -35876,6 +35884,17 @@
         "scripts/ci_resource_diagnostics.py",
         "tests/code_quality/test_ci_resource_diagnostics.py",
         "scripts/run_behavioral_coverage.sh"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "terrain-preparation-regressions": {
+      "paths": [
+        "tests/rules/section03/test_terrain_path_preparation.py"
       ],
       "owners": [
         "*"

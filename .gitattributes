@@ -85,3 +85,6 @@ data/source_audits/later_ir_icon_2026_11/* -text whitespace=cr-at-eol
 
 # Preserve the existing Command test module CRLF convention.
 tests/rules/section08/test_command_flow.py -text whitespace=cr-at-eol
+
+# Keep the new active regression member byte-identical across checkouts.
+tests/rules/section03/test_terrain_path_preparation.py text eol=lf

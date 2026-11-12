@@ -2477,6 +2477,12 @@
       "blob_sha1": "f103a5018b75586d03c2c652068bcad80471404c",
       "sha256": "9431a05971747a3dffb3215688e790c4c79accfa74e24e772be834e0c3d14c9a",
       "bytes": 10424
+    },
+    "tests/rules/section03/test_terrain_path_preparation.py": {
+      "blob_sha1": "3bfde5443635c152d79c58c077cffacbba035e6e",
+      "bytes": 7692,
+      "mode": "100644",
+      "sha256": "80d1c500ec4c77de9d78725ab1f76e86ca44cf35961eaa1e0f082d8fd3e830f3"
     }
   },
   "active_roots": [

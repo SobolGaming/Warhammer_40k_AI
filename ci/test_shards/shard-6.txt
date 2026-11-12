@@ -23,10 +23,7 @@ tests/rules/section01/test_01_06_07_morale.py
 tests/rules/section01/test_integration_roundtrip.py
 tests/rules/section02/test_02_02_01_weapon_scope.py
 tests/rules/section02/test_02_02_constructed_contracts.py
-tests/rules/section03/test_isolation.py
-tests/rules/section04/test_completion_boundaries.py
 tests/rules/section05/test_destruction_credit.py
-tests/rules/section05/test_saves.py
 tests/rules/section07/test_facade.py
 tests/rules/section09/test_fall_back.py
 tests/rules/section09/test_isolation.py
@@ -43,5 +40,6 @@ tests/rules/section21/test_inventory.py
 tests/rules/section22/test_auras.py
 tests/rules/section22/test_wargear.py
 tests/rules/section23/test_deployment_return.py
+tests/rules/section24/test_damaged.py
 tests/rules/section24/test_facade.py
 tests/rules/section25/test_enhancements.py

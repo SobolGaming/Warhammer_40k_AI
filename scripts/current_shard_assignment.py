@@ -1,0 +1,109 @@
+"""Admit reviewed derived allocation data; never trust an offline search's scores."""
+
+from __future__ import annotations
+
+import hashlib
+import math
+from collections import Counter
+from pathlib import Path
+from typing import cast
+
+from scripts.historical_shard_snapshot import HISTORICAL_REVISION, HistoricalSnapshot
+from scripts.hosted_timing_calibration import _object, read_json
+
+FILENAME = "current-derived-assignment.json"
+SCHEMA = "reviewed-derived-current-shard-assignment-v1"
+ROLE = "Derived planning assignment only; no new hosted observations or timing qualification"
+
+
+def load_assignment(
+    directory: Path,
+    descriptor: dict[str, object],
+    history: HistoricalSnapshot,
+) -> tuple[tuple[tuple[str, ...], ...], dict[str, object]]:
+    from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
+
+    reference = _object(
+        descriptor["assignment"], {"file", "sha256"}, "derived assignment reference"
+    )
+    path = directory / FILENAME
+    if (
+        reference["file"] != FILENAME
+        or hashlib.sha256(path.read_bytes()).hexdigest() != reference["sha256"]
+    ):
+        raise SystemExit("Derived current assignment evidence changed.")
+    record = _object(
+        read_json(path),
+        {
+            "schema",
+            "role",
+            "historical_revision",
+            "current_runtime_fingerprint",
+            "baseline_sha256",
+            "shards",
+            "retained_selector_moves",
+            "new_selector_placement",
+        },
+        "derived current assignment",
+    )
+    if (
+        record["schema"] != SCHEMA
+        or record["role"] != ROLE
+        or record["historical_revision"] != HISTORICAL_REVISION
+        or record["current_runtime_fingerprint"] != descriptor["current_runtime_fingerprint"]
+        or record["baseline_sha256"] != cast(dict[str, object], descriptor["baseline"])["sha256"]
+    ):
+        raise SystemExit("Derived current assignment source binding differs.")
+    shards = _object(record["shards"], {str(index) for index in range(1, 13)}, "current shards")
+    for value in shards.values():
+        if (
+            not isinstance(value, list)
+            or not value
+            or any(not isinstance(node, str) for node in value)
+        ):
+            raise SystemExit("Current shards require nonempty string selector lists.")
+        if value != sorted(set(value)):
+            raise SystemExit("Current shard selectors must be sorted and unique.")
+    groups = tuple(tuple(cast(list[str], shards[str(index)])) for index in range(1, 13))
+    owner = next(iter(cast(dict[str, str], descriptor["new_test_sources"])))
+    expected = Counter(selector for group in history.groups for selector in group)
+    expected[owner] += 1
+    selected = Counter(selector for group in groups for selector in group)
+    if selected != expected or len(selected) != 505:
+        raise SystemExit("Derived current assignment selector inventory differs.")
+    extension = history.scope.extension
+    assert extension is not None
+    if (
+        extension.pinned_selector not in groups[3]
+        or groups[4] != (extension.fixed_selector,)
+        or SERIAL_BEHAVIORAL_CASE not in groups[1]
+        or SERIAL_BEHAVIORAL_CASE in groups[0]
+    ):
+        raise SystemExit("Derived assignment changed a pinned file or controller role.")
+    original = {
+        selector: index for index, group in enumerate(history.groups, 1) for selector in group
+    }
+    current = {selector: index for index, group in enumerate(groups, 1) for selector in group}
+    moves = [
+        {"selector": selector, "from": original[selector], "to": current[selector]}
+        for selector in sorted(original)
+        if original[selector] != current[selector]
+    ]
+    if record["retained_selector_moves"] != moves or record["new_selector_placement"] != {
+        owner: current[owner]
+    }:
+        raise SystemExit("Derived assignment relocation disclosure differs.")
+    return groups, record
+
+
+def require_planning_limits(values: tuple[float, ...]) -> None:
+    from scripts.extended_shard_allocation import HISTORICAL_CEILING, LATEST_CEILING, STRESS_CEILING
+
+    if (
+        len(values) != 10
+        or any(not math.isfinite(value) or value < 0 for value in values)
+        or max(values[:-2]) > HISTORICAL_CEILING
+        or values[-2] > STRESS_CEILING
+        or values[-1] > LATEST_CEILING
+    ):
+        raise SystemExit("Derived current assignment exceeds unchanged planning ceilings.")

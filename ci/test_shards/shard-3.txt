@@ -26,11 +26,11 @@ tests/rules/section05/test_retained_consumers.py
 tests/rules/section05/test_rule_effect_retention.py
 tests/rules/section06/test_coverage_map.py
 tests/rules/section06/test_isolation_and_guards.py
-tests/rules/section06/test_mortals.py
 tests/rules/section07/test_isolation.py
 tests/rules/section07/test_round_effect.py
 tests/rules/section08/test_isolation.py
 tests/rules/section08/test_rules_units.py
+tests/rules/section09/test_distances.py
 tests/rules/section10/test_boundaries.py
 tests/rules/section10/test_phase_flow.py
 tests/rules/section11/test_coverage_map.py
@@ -43,11 +43,11 @@ tests/rules/section18/test_formations.py
 tests/rules/section19/test_coverage.py
 tests/rules/section19/test_table.py
 tests/rules/section21/test_persistence.py
-tests/rules/section21/test_terrain_facade.py
 tests/rules/section21/test_witness_admission.py
 tests/rules/section22/test_damage.py
 tests/rules/section22/test_inventory.py
 tests/rules/section23/test_inventory.py
+tests/rules/section23/test_transit.py
 tests/rules/section24/test_hit_wound_consumers.py
 tests/rules/section25/test_detachments.py
 tests/unit/test_dice.py

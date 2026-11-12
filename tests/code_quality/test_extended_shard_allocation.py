@@ -8,12 +8,14 @@ import os
 import shutil
 import subprocess
 import sys
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
 from scripts import build_test_shards as sharding
 from scripts.extended_shard_allocation import allocate_extended, partial_projection
 from scripts.finite_case_partitions import FILENAME, OWNERS, partitions, validate_cases
+from scripts.historical_shard_snapshot import historical_snapshot
 from scripts.scoped_shard_evidence import ScopedEvidence, load_declared_scope, load_scope
 from scripts.scoped_shard_extension import (
     EXTENSION_FILE,
@@ -26,7 +28,20 @@ from scripts.scoped_shard_extension import (
 from scripts.shard_execution_model import Cohort, load_cohorts
 
 ROOT = Path(__file__).resolve().parents[2]
-DIRECTORY = ROOT / "ci/test_shards"
+historical_directory = ROOT / "ci/test_shards"
+historical_root = ROOT
+
+
+@pytest.fixture(scope="module", autouse=True)
+def authenticated_historical_inputs() -> Iterator[None]:
+    """These controls reproduce retained observations, not current qualification."""
+    global historical_directory, historical_root
+    with historical_snapshot(ROOT) as snapshot:
+        historical_directory, historical_root = snapshot.directory, snapshot.root
+        yield
+    historical_directory, historical_root = ROOT / "ci/test_shards", ROOT
+
+
 PRIOR = "b9b1c97a6a2da6fca624c7f30c471d6cfab56320"
 CALIBRATION_FETCH = "git fetch --no-tags --no-recurse-submodules origin " + PRIOR
 
@@ -143,9 +158,9 @@ def test_exact_fetch_restores_squashed_away_calibration_in_main_only_checkout(
 
 @pytest.fixture(scope="module")
 def inputs() -> tuple[dict[str, float], ScopedEvidence]:
-    summary = json.loads((DIRECTORY / "durations.json").read_bytes())
-    costs = sharding.dispatch_case_seconds(summary, DIRECTORY / "durations.json")
-    scope = load_declared_scope(DIRECTORY, root=ROOT, costs=costs)
+    summary = json.loads((historical_directory / "durations.json").read_bytes())
+    costs = sharding.dispatch_case_seconds(summary, historical_directory / "durations.json")
+    scope = load_declared_scope(historical_directory, root=historical_root, costs=costs)
     assert scope is not None
     assert scope.extension is not None
     return costs, scope
@@ -157,7 +172,7 @@ def test_complete_append_preserves_every_prior_observation_and_baseline() -> Non
             ["git", "show", PRIOR + ":ci/test_shards/hosted-calibration.json"], cwd=ROOT
         )
     )
-    current = json.loads((DIRECTORY / "hosted-calibration.json").read_bytes())
+    current = json.loads((historical_directory / "hosted-calibration.json").read_bytes())
     assert current["reports"][:843] == old["reports"]
     assert len(current["reports"]) == 892
     assert sum(map(len, current["observations"].values())) == 113105
@@ -166,7 +181,7 @@ def test_complete_append_preserves_every_prior_observation_and_baseline() -> Non
     before = json.loads(
         subprocess.check_output(["git", "show", PRIOR + ":ci/test_shards/durations.json"], cwd=ROOT)
     )
-    after = json.loads((DIRECTORY / "durations.json").read_bytes())
+    after = json.loads((historical_directory / "durations.json").read_bytes())
     assert before["profiles"] == after["profiles"]
     assert before["case_seconds"] == after["case_seconds"]
     for filename in (
@@ -175,7 +190,7 @@ def test_complete_append_preserves_every_prior_observation_and_baseline() -> Non
         "case-partitions.json",
         "preflight-case-partition.json",
     ):
-        assert (DIRECTORY / filename).read_bytes() == subprocess.check_output(
+        assert (historical_directory / filename).read_bytes() == subprocess.check_output(
             ["git", "show", PRIOR + ":ci/test_shards/" + filename], cwd=ROOT
         )
     for owner, ratios in partitions(ROOT, set(OWNERS)).items():
@@ -199,7 +214,7 @@ def test_extension_retains_unknown_and_failed_job_without_changing_original_scop
     assert extension.stress.cases[extension.unknown_node] == extension.reservation_seconds
     assert extension.reservation_seconds == 465.533262819
     assert all(extension.stress.cases[node] == value for node, value in extension.raw.cases.items())
-    raw = json.loads((DIRECTORY / EXTENSION_FILE).read_bytes())
+    raw = json.loads((historical_directory / EXTENSION_FILE).read_bytes())
     workers = {r["payload"]["worker"]: r["payload"] for r in raw["reports"]}
     assert set(workers) == {"gw0", "gw1", "gw3", "gw4"}
     assert len(workers["gw4"]["reports"]) == 61 * 3
@@ -215,7 +230,10 @@ def test_current_allocation_matches_reviewed_candidate_and_preserves_raw_null(
     costs, base = inputs
     extension = base.extension
     assert extension is not None
-    groups = [tuple((DIRECTORY / f"shard-{i}.txt").read_text().splitlines()) for i in range(1, 13)]
+    groups = [
+        tuple((historical_directory / f"shard-{i}.txt").read_text().splitlines())
+        for i in range(1, 13)
+    ]
     digest = hashlib.sha256((json.dumps(groups, separators=(",", ":")) + "\n").encode()).hexdigest()
     assert digest == "04070c21fbcb5a0f968e619bd6176de4761e27bc81def1b40ab3eda529978ea0"
     assert PINNED_OWNER in groups[3]
@@ -227,9 +245,9 @@ def test_current_allocation_matches_reviewed_candidate_and_preserves_raw_null(
     for i, group in enumerate(groups):
         row = partial_projection(group, costs, extension.raw)
         assert (row["full_raw_role_score"] is None) == (i == 3)
-    cohorts = load_cohorts(DIRECTORY, root=ROOT, nodes=set(costs))
+    cohorts = load_cohorts(historical_directory, root=historical_root, nodes=set(costs))
     assert len(cohorts) == 9
-    summary = json.loads((DIRECTORY / "durations.json").read_bytes())
+    summary = json.loads((historical_directory / "durations.json").read_bytes())
     rows = summary["scoped_allocation"]["shards"].values()
     assert max(max(row["historical"]) for row in rows) <= 1076
     assert max(row["derived_stress"] for row in rows) <= 1054
@@ -259,8 +277,10 @@ def test_extension_and_planning_reserve_fail_closed(
     change: str,
 ) -> None:
     costs, current = inputs
-    index = json.loads((DIRECTORY / "allocation-cohorts.json").read_bytes())
-    base = load_scope(DIRECTORY, root=ROOT, costs=costs, reference=index["scoped_evidence"])
+    index = json.loads((historical_directory / "allocation-cohorts.json").read_bytes())
+    base = load_scope(
+        historical_directory, root=historical_root, costs=costs, reference=index["scoped_evidence"]
+    )
     assert base.extension is None
     assert current.extension is not None
     for filename in (
@@ -269,9 +289,9 @@ def test_extension_and_planning_reserve_fail_closed(
         "hosted-calibration.json",
         "durations.json",
     ):
-        shutil.copyfile(DIRECTORY / filename, tmp_path / filename)
-    raw = json.loads((DIRECTORY / EXTENSION_FILE).read_bytes())
-    stress = json.loads((DIRECTORY / STRESS_FILE).read_bytes())
+        shutil.copyfile(historical_directory / filename, tmp_path / filename)
+    raw = json.loads((historical_directory / EXTENSION_FILE).read_bytes())
+    stress = json.loads((historical_directory / STRESS_FILE).read_bytes())
     payload = raw["reports"][0]["payload"]
     if change == "missing_phase":
         payload["reports"].pop()
@@ -310,7 +330,7 @@ def test_extension_and_planning_reserve_fail_closed(
     if change == "missing_file":
         raw_path.unlink()
     with pytest.raises(SystemExit):
-        load_extension(tmp_path, root=ROOT, costs=costs, base=base, reference=reference)
+        load_extension(tmp_path, root=historical_root, costs=costs, base=base, reference=reference)
 
 
 def test_step5g_partitions_match_real_collection_and_original_git_bytes(tmp_path: Path) -> None:
@@ -355,7 +375,7 @@ def test_step5g_partition_source_and_inventory_fail_closed(tmp_path: Path, chang
         target = tmp_path / owner
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes((ROOT / owner).read_bytes())
-    value = json.loads((DIRECTORY / FILENAME).read_bytes())
+    value = json.loads((historical_directory / FILENAME).read_bytes())
     owner = next(iter(OWNERS))
     row = value["partitions"][owner]
     if change == "source":

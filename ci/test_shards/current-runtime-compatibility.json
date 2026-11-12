@@ -1,0 +1,16 @@
+{
+  "assignment": {
+    "file": "current-derived-assignment.json",
+    "sha256": "46650eda267806f5d4f972b3d97ac95530683fece246794ec5e76027bab926f6"
+  },
+  "baseline": {
+    "file": "current-covered-baseline.json",
+    "sha256": "0f40018d85e4f9eb491463b01d71d08e75d39f58ffe32383ae7f11235bb15dd2"
+  },
+  "current_runtime_fingerprint": "53340ca35795a3eda1a6603cc383a61a394211f4e9a6b1fecff6eb5d2c70cffe",
+  "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
+  "new_test_sources": {
+    "tests/rules/section03/test_terrain_path_preparation.py": "80d1c500ec4c77de9d78725ab1f76e86ca44cf35961eaa1e0f082d8fd3e830f3"
+  },
+  "schema": "historical-snapshot-current-baseline-v1"
+}
