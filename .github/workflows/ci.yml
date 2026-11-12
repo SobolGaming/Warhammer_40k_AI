@@ -200,6 +200,9 @@ jobs:
       - name: Fetch original historical validation inputs
         run: git fetch --no-tags --no-recurse-submodules origin 4a8fb3c10cbf9c6ce1766f048508b8a16f8f24e8
 
+      - name: Fetch pre-squash calibration validation input
+        run: git fetch --no-tags --no-recurse-submodules origin b9b1c97a6a2da6fca624c7f30c471d6cfab56320
+
       - name: Set up uv
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
         with:
@@ -271,6 +274,9 @@ jobs:
 
       - name: Fetch original historical validation inputs
         run: git fetch --no-tags --no-recurse-submodules origin 4a8fb3c10cbf9c6ce1766f048508b8a16f8f24e8
+
+      - name: Fetch pre-squash calibration validation input
+        run: git fetch --no-tags --no-recurse-submodules origin b9b1c97a6a2da6fca624c7f30c471d6cfab56320
 
       - name: Set up uv
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
