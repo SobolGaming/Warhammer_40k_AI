@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:53340ca35795a3eda1a6603cc383a61a394211f4e9a6b1fecff6eb5d2c70cffe",
-  "fingerprint": "53340ca35795a3eda1a6603cc383a61a394211f4e9a6b1fecff6eb5d2c70cffe",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0b8e5714a12c2612efda8b92bcdb37be7c8045cb24d6b3c821527fecf21aee2f",
+  "fingerprint": "0b8e5714a12c2612efda8b92bcdb37be7c8045cb24d6b3c821527fecf21aee2f",
   "resource_count": 3248,
   "resources": [
     {
@@ -13870,9 +13870,9 @@
       "sha256": "1b80654b6a8271823c957b188ea64f4b89a75b6cfb6425397bc5af9b5369e68c"
     },
     {
-      "byte_length": 27130,
+      "byte_length": 27568,
       "path": "warhammer40k_core/geometry/shapely_backend.py",
-      "sha256": "a8da1d9403dd974c28657ff225c11d817c7089d526336a58b5c53ffe3a8c5c03"
+      "sha256": "1878aceeac9eb330bcbc2d5a0965e055321f54f7058f05160234db77084bf05d"
     },
     {
       "byte_length": 6972,
@@ -13890,9 +13890,9 @@
       "sha256": "217785ac4272adf40733ff1f6c7127c722a52c050aa09daa3f946d92645196f4"
     },
     {
-      "byte_length": 43854,
+      "byte_length": 44817,
       "path": "warhammer40k_core/geometry/terrain.py",
-      "sha256": "0c81c16e7b496028d87243d28684d8e53b1d8e7d832bcf520241e5346c0aa31a"
+      "sha256": "dc5c884c49a375d954f4c6d08cc99237bb74827db3e859b3084043aece149ba1"
     },
     {
       "byte_length": 14175,

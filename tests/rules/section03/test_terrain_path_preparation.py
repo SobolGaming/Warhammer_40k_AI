@@ -1,7 +1,10 @@
-"""Validation-local terrain footprints: differential legality and input isolation."""
+"""Terrain preparation: immutable reuse, differential legality and input isolation."""
+
+# pyright: reportPrivateUsage=false
 
 import math
 from dataclasses import replace
+from typing import cast
 
 import pytest
 
@@ -20,8 +23,9 @@ from warhammer40k_core.geometry.pathing import (
     PathWitness,
     TerrainPathLegalityContext,
 )
-from warhammer40k_core.geometry.pose import Point3, Pose
+from warhammer40k_core.geometry.pose import GeometryError, Point3, Pose
 from warhammer40k_core.geometry.terrain import (
+    ObstacleVolume,
     TerrainFeatureDefinition,
     TerrainFloorDefinition,
     TerrainVolume,
@@ -200,6 +204,21 @@ def test_terrain_preparation_preserves_complete_results_and_context_isolation(
         )
 
     monkeypatch.setattr(TerrainPathFootprints, "touching_poses", direct)
+    monkeypatch.setattr(
+        shapely_backend,
+        "_cached_terrain_footprint",
+        shapely_backend._cached_terrain_footprint.__wrapped__,
+    )
+    monkeypatch.setattr(
+        TerrainWallDefinition,
+        "_cached_terrain_volume",
+        TerrainWallDefinition._cached_terrain_volume.__wrapped__,
+    )
+    monkeypatch.setattr(
+        TerrainFloorDefinition,
+        "_cached_terrain_volume",
+        TerrainFloorDefinition._cached_terrain_volume.__wrapped__,
+    )
     expected = tuple(context.validate().to_payload() for context in contexts)
     assert actual == expected
     assert actual[0]["is_valid"]
@@ -207,3 +226,114 @@ def test_terrain_preparation_preserves_complete_results_and_context_isolation(
     assert not actual[3]["is_valid"]  # Endpoint inside terrain is never bypassed.
     assert not actual[4]["is_valid"]  # Unsupported elevated endpoint is still rejected.
     assert actual[0] == actual[-1]
+
+
+def test_terrain_footprint_cache_uses_exact_horizontal_geometry() -> None:
+    terrain = TerrainVolume("same-id", Point3(3, 4, 0), 2, 1, 3, 15)
+    footprint = shapely_backend.footprint_for_terrain(terrain)
+    # IDs, Z, height and sight policy have no part in a horizontal footprint.
+    equivalent = replace(
+        terrain,
+        terrain_id="other-id",
+        bottom_center=Point3(3, 4, 8),
+        height=9,
+        blocks_line_of_sight=True,
+    )
+    assert shapely_backend.footprint_for_terrain(equivalent) is footprint
+    for changed in (
+        replace(terrain, bottom_center=Point3(3.1, 4, 0)),
+        replace(terrain, bottom_center=Point3(3, 4.1, 0)),
+        replace(terrain, width=2.1),
+        replace(terrain, depth=1.1),
+        replace(terrain, rotation_degrees=15.1),
+        replace(terrain, rotation_degrees=math.nextafter(15, math.inf)),
+    ):
+        actual = shapely_backend.footprint_for_terrain(changed)
+        assert actual is not footprint
+        expected = shapely_backend._cached_terrain_footprint.__wrapped__(
+            (
+                changed.bottom_center.x,
+                changed.bottom_center.y,
+                changed.width,
+                changed.depth,
+                changed.rotation_degrees,
+            )
+        )
+        assert actual.bounds == expected.bounds
+        assert actual.symmetric_difference(expected).is_empty
+    # A warm cache must not bypass the public input boundary.
+    with pytest.raises(GeometryError, match="must be a TerrainVolume"):
+        shapely_backend.footprint_for_terrain(cast(TerrainVolume, []))
+
+
+@pytest.mark.parametrize("wall", [True, False])
+def test_terrain_volume_cache_preserves_definition_identity_and_validation(wall: bool) -> None:
+    part = (
+        TerrainWallDefinition("part", 3, 4, 0, 2, 1, 3, 15)
+        if wall
+        else TerrainFloorDefinition("part", 3, 4, 0, 2, 1, 3, 15)
+    )
+    volume = part.to_terrain_volume(feature_id="feature")
+    assert type(volume) is (ObstacleVolume if wall else TerrainVolume)
+    assert replace(part).to_terrain_volume(feature_id=" feature ") is volume
+    assert part.to_terrain_volume(feature_id="other").terrain_id == "other:part"
+    changed_parts = (
+        replace(part, center_x_inches=3.1),
+        replace(part, center_y_inches=4.1),
+        replace(part, bottom_z_inches=0.1),
+        replace(part, width_inches=2.1),
+        replace(part, depth_inches=1.1),
+        replace(part, rotation_degrees=15.1),
+    )
+    for changed in changed_parts:
+        actual = changed.to_terrain_volume(feature_id="feature")
+        assert actual != volume
+        assert (
+            actual.to_payload()
+            == changed._cached_terrain_volume.__wrapped__(changed, "feature").to_payload()
+        )
+    if isinstance(part, TerrainWallDefinition):
+        assert replace(part, wall_id="other").to_terrain_volume(feature_id="feature") != volume
+        assert replace(part, height_inches=4).to_terrain_volume(feature_id="feature") != volume
+    else:
+        assert replace(part, floor_id="other").to_terrain_volume(feature_id="feature") != volume
+        assert replace(part, thickness_inches=4).to_terrain_volume(feature_id="feature") != volume
+    invalid_ids: tuple[object, ...] = ("", "terrain:feature", [], True)
+    for invalid_id in invalid_ids:
+        with pytest.raises(GeometryError):
+            part.to_terrain_volume(feature_id=cast(str, invalid_id))
+
+
+def test_immutable_terrain_caches_are_bounded_and_eviction_preserves_values() -> None:
+    footprint_cache = shapely_backend._cached_terrain_footprint
+    wall_cache = TerrainWallDefinition._cached_terrain_volume
+    floor_cache = TerrainFloorDefinition._cached_terrain_volume
+    footprint_cache.cache_clear()
+    wall_cache.cache_clear()
+    floor_cache.cache_clear()
+    feature = _preparation_wall()
+    original = feature.terrain_volumes()
+    original_footprint = shapely_backend.footprint_for_terrain(original[0])
+    for index in range(4096):
+        feature_id = f"eviction-{index}"
+        feature.walls[0].to_terrain_volume(feature_id=feature_id)
+        volume = feature.floors[0].to_terrain_volume(feature_id=feature_id)
+        shapely_backend.footprint_for_terrain(
+            replace(volume, bottom_center=Point3(100 + index, 100, 0))
+        )
+    for cache in (footprint_cache, wall_cache, floor_cache):
+        assert cache.cache_info().maxsize == 4096
+        assert cache.cache_info().currsize == 4096
+    rebuilt = feature.terrain_volumes()
+    assert rebuilt == original
+    assert all(a is not b for a, b in zip(rebuilt, original, strict=True))
+    assert tuple(volume.terrain_id for volume in rebuilt) == (
+        "preparation-wall:floor",
+        "preparation-wall:wall",
+    )
+    rebuilt_footprint = shapely_backend.footprint_for_terrain(rebuilt[0])
+    assert rebuilt_footprint is not original_footprint
+    assert rebuilt_footprint.symmetric_difference(original_footprint).is_empty
+    footprint_cache.cache_clear()
+    wall_cache.cache_clear()
+    floor_cache.cache_clear()

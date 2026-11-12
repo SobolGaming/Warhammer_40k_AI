@@ -1,0 +1,176 @@
+{
+  "base": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "9ef21fbd939ccbf6b83113a126a2ddcc3d7d3ebe05e031df8f200ff256dbc9bf",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359363072,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:53340ca35795a3eda1a6603cc383a61a394211f4e9a6b1fecff6eb5d2c70cffe",
+    "samples": {
+      "associated-policy-only-woods": [
+        0.11051320699999678,
+        0.07004252599999461,
+        0.07030854399999953,
+        0.0695802059999977,
+        0.06970775100000992,
+        0.07123068000001354,
+        0.06960490699999866
+      ],
+      "attached-outside": [
+        0.18347354300000518,
+        0.13303962300000194,
+        0.13081738699999335,
+        0.1310553250000055,
+        0.1313493319999992,
+        0.1313799800000055,
+        0.132374384000002
+      ],
+      "dense-inside": [
+        0.13082942599999114,
+        0.0672273679999904,
+        0.0671215930000102,
+        0.06725659600000711,
+        0.06702026800000738,
+        0.06719618999999,
+        0.06781447000000185
+      ],
+      "dense-outside": [
+        0.106733724999998,
+        0.06822096199999805,
+        0.068256599999998,
+        0.06743174799998997,
+        0.06829463800001179,
+        0.06705414600000381,
+        0.06686399500000562
+      ],
+      "fully-visible": [
+        0.019919354999998973,
+        0.018038914000001682,
+        0.01795406799999455,
+        0.018574659999998744,
+        0.018768210000004615,
+        0.018389007000010338,
+        0.018513401999996404
+      ],
+      "light-outside": [
+        0.0505414099999939,
+        0.046167554999996696,
+        0.044794581000004996,
+        0.04474456200000532,
+        0.045815920999999094,
+        0.0452117899999962,
+        0.045029678999995326
+      ],
+      "not-hidden": [
+        0.0430234730000052,
+        0.04296876499999769,
+        0.042998803999992674,
+        0.0430640000000011,
+        0.04280106399998829,
+        0.042838350000010905,
+        0.042953327000006425
+      ]
+    },
+    "workload_sha256": "fdf2689406de0469904b7af9d24c8e15246e29eb31c37503b0e0fdd8b6b80f1d"
+  },
+  "base_revision": "9b4b84ba98ce2939fdbb9517bd9b2eff60bbfca2",
+  "budget_profile": "current-change-relative-v1",
+  "family": "visibility",
+  "head": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "9ef21fbd939ccbf6b83113a126a2ddcc3d7d3ebe05e031df8f200ff256dbc9bf",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359363072,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0b8e5714a12c2612efda8b92bcdb37be7c8045cb24d6b3c821527fecf21aee2f",
+    "samples": {
+      "associated-policy-only-woods": [
+        0.11024533500000189,
+        0.07125747500003854,
+        0.07065178400000605,
+        0.07133432199998424,
+        0.07222957999999835,
+        0.07048411200003102,
+        0.07050536000002694
+      ],
+      "attached-outside": [
+        0.185703143000012,
+        0.13166974000000664,
+        0.13187776000000895,
+        0.13201826299996355,
+        0.13193426800000907,
+        0.1318597000000068,
+        0.13505017199997837
+      ],
+      "dense-inside": [
+        0.11270029100001011,
+        0.0695969029999901,
+        0.06957868400002098,
+        0.06975625600000512,
+        0.0690167110000175,
+        0.06893525200001704,
+        0.06908444800001234
+      ],
+      "dense-outside": [
+        0.10586752000000388,
+        0.06749054200003002,
+        0.06777576899997939,
+        0.06738684700002295,
+        0.06840851900000189,
+        0.06765974399996821,
+        0.06730583099999876
+      ],
+      "fully-visible": [
+        0.019292242999995324,
+        0.01719838400003937,
+        0.017024820999949952,
+        0.017084239000041634,
+        0.016980421000027945,
+        0.017136495999977797,
+        0.01704476100002239
+      ],
+      "light-outside": [
+        0.052545393000002605,
+        0.04572412400000303,
+        0.045671607000031145,
+        0.04569822399997747,
+        0.04524459599997499,
+        0.04523169700001972,
+        0.0454198589999919
+      ],
+      "not-hidden": [
+        0.04344573099996296,
+        0.0430716569999845,
+        0.043162026000004516,
+        0.043322544999966794,
+        0.042611329999999725,
+        0.04251230500000247,
+        0.04377839500000391
+      ]
+    },
+    "workload_sha256": "fdf2689406de0469904b7af9d24c8e15246e29eb31c37503b0e0fdd8b6b80f1d"
+  },
+  "head_input_digest": "1242d95a85487abe79a383fe7f8a9fc758db7c841d5de5a629e4d0a7ff42cde3",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0b8e5714a12c2612efda8b92bcdb37be7c8045cb24d6b3c821527fecf21aee2f",
+  "historical_failures": [
+    "Original absolute-budget failures and retained unresolved/censored charge results remain unchanged. These fresh matched native component comparisons do not certify a legal charge or full-game throughput."
+  ],
+  "policy": "rules-engine-performance-v3",
+  "workload_id": "order78-gone-to-ground-v2"
+}

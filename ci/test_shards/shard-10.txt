@@ -9,7 +9,6 @@ tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_ph
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-priority-assets-vs-priority-assets-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-disruption-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-reconnaissance-layout-1]
-tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-priority-assets-layout-2]
 tests/infrastructure/source/unit/test_deadly_demise_descriptions.py
 tests/infrastructure/source_governance/unit/test_blocked_row_classification.py
 tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-one-player-b]
@@ -21,7 +20,6 @@ tests/rules/section04/test_allocation_and_effects.py
 tests/rules/section04/test_profiles_and_triggers.py
 tests/rules/section04/test_visibility.py
 tests/rules/section05/test_retention.py
-tests/rules/section06/test_mortals.py
 tests/rules/section07/test_trigger_effects.py
 tests/rules/section09/test_focused_checkpoint.py
 tests/rules/section12/test_ownership.py

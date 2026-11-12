@@ -1996,3 +1996,20 @@ cover this diagnostic; no runtime/schema/decision change is introduced. A legal
 Charge Move, tactical benefit, common horizon, Stage 2 and full-game throughput
 remain open, with `scoped_gap`, null target, learning exclusion and the inherited
 source/roster/provisional geometry/mission/points/public-seed limits intact.
+
+
+## Immutable terrain product reuse boundary
+
+The [matched geometry-reuse evaluation](AI_IMPLEMENTATION_PLAN.md#immutable-terrain-geometry-reuse)
+retains the identical saved query and full-resolution obligations. Three bounded
+immutable-product caches retain exact terrain footprints and wall/floor volumes;
+public validation and every mutable path/policy/endpoint context remain live.
+No legality, partial-prefix or actor/scorer result is cached. Geometry/owner
+changes select different value keys and each cache evicts beyond 4,096 entries.
+One fresh serial observation per arm reduces resolver time from 554.560 to
+331.298 seconds with exact seven-query outcomes/node counts/witness and complete
+resolution parity. Separate ordinary replay and full endpoint postflight pass.
+Six searches remain unresolved and no charge is established or submitted.
+Existing persistence/replay/resolver and adapter contracts cover the unchanged
+payload shapes; generated build identities are refreshed. Timing is operator-only,
+with no latency-distribution, tactical, Stage 2, learning or full-game claim.

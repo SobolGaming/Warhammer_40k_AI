@@ -29,6 +29,7 @@ _cached_geometry_module: _GeometryModule | None = None
 _cached_affinity_module: _AffinityModule | None = None
 
 type _BaseFootprintKey = tuple[str, float, float | None, float, float, float]
+type _TerrainFootprintKey = tuple[float, float, float, float, float]
 type _PolygonUnionFootprintKey = tuple[tuple[Point2D, ...], ...]
 
 
@@ -136,18 +137,34 @@ def footprint_for_base(base: BaseShape, pose: Pose) -> _Geometry:
 
 def footprint_for_terrain(terrain: TerrainVolume) -> _Geometry:
     valid_terrain = _validate_terrain("terrain", terrain)
-    half_width = valid_terrain.width / 2.0
-    half_depth = valid_terrain.depth / 2.0
+    return _cached_terrain_footprint(
+        (
+            valid_terrain.bottom_center.x,
+            valid_terrain.bottom_center.y,
+            valid_terrain.width,
+            valid_terrain.depth,
+            valid_terrain.rotation_degrees,
+        )
+    )
+
+
+@lru_cache(maxsize=_FOOTPRINT_CACHE_MAXSIZE)
+def _cached_terrain_footprint(key: _TerrainFootprintKey) -> _Geometry:
+    # Shapely geometries are immutable. Exact horizontal values, rather than
+    # terrain IDs or rounded coordinates, determine this reusable footprint.
+    x, y, width, depth, rotation_degrees = key
+    half_width = width / 2.0
+    half_depth = depth / 2.0
     rectangle = _box(
-        valid_terrain.bottom_center.x - half_width,
-        valid_terrain.bottom_center.y - half_depth,
-        valid_terrain.bottom_center.x + half_width,
-        valid_terrain.bottom_center.y + half_depth,
+        x - half_width,
+        y - half_depth,
+        x + half_width,
+        y + half_depth,
     )
     return _affinity_module().rotate(
         rectangle,
-        angle=valid_terrain.rotation_degrees,
-        origin=(valid_terrain.bottom_center.x, valid_terrain.bottom_center.y),
+        angle=rotation_degrees,
+        origin=(x, y),
     )
 
 

@@ -893,6 +893,56 @@ Legal charge, tactical benefit, common horizon, Stage 2 and full-game throughput
 remain unqualified. No geometry, seed, search budget, endpoint obligation, runtime
 or decision contract changes in this measurement slice.
 
+### Immutable terrain geometry reuse
+
+The shared geometry owners now retain only immutable leaf products in three
+bounded 4,096-entry LRU caches. Terrain footprints use exact, unrounded horizontal
+position, width, depth and rotation; IDs, elevation and height do not affect that
+horizontal product. Wall/floor volumes use the complete frozen part definition
+and validated feature owner ID, preserving volume type and physical ordering.
+Public validation still executes on hits. Changed geometry or owner identity
+selects a different key; changed models, paths, traversal permissions, support,
+coherency and endpoint obligations are evaluated normally on every call. No
+mutable context, legality answer or complete-prefix result is retained.
+
+One fresh matched complete evaluation per arm uses actual base
+`9b4b84ba98ce2939fdbb9517bd9b2eff60bbfca2`, the same saved checkpoint/corrected
+witness and locked CPython 3.14.5 on the provisional Threadripper/WSL2 host.
+The original driver is unchanged; the head launcher also clears the three new
+caches at its original evaluation boundary. No profiler, coverage or competing
+test workers run during timing. Resolver time is 554.560 seconds at base and
+331.298 seconds with reuse, a 40.3% reduction in this single paired
+observation. Restore, separate replay and returned-witness checks remain outside
+that boundary. No completed valid timing run is repeated to confirm a limit.
+
+| Saved query | Base seconds | Reuse seconds | Identical status / explored nodes |
+|---|---|---|---|
+| 001 preferred | 19.310 | 15.135 | unresolved; 20 |
+| 001 engagement | 39.877 | 23.689 | reachable; 25 |
+| 002 preferred | 73.177 | 43.845 | unresolved; 44 |
+| 002 engagement | 123.945 | 70.270 | unresolved; 48 |
+| 003 preferred | 85.737 | 51.795 | unresolved; 52 |
+| 003 engagement | 134.028 | 76.063 | unresolved; 57 |
+| 004 preferred | 78.030 | 50.028 | unresolved; 52 |
+
+All seven exact query hashes, complete outcomes and returned witness match both
+the fresh base and retained #671 results. The complete resolution, physical order,
+candidate path/terrain/coherency checks and all ten endpoint obligations also
+match. Ordinary replay reproduces 63 decisions/641 events, the live checkpoint
+is unchanged and the reachable alternative passes full path/terrain/endpoint
+postflight in its original context. Six searches remain unresolved; the resolver
+still returns `charge_reachability_unresolved`. No move is submitted and no legal
+charge, tactical benefit, Stage 2 completion or full-game throughput is qualified.
+This is one observation per arm, not a latency distribution. Existing source,
+geometry, mission, roster, points and public-seed limitations remain.
+
+Four additional controls cover exact key isolation and changed immutable inputs,
+validation on hits, bounded eviction and physical ordering; complete-result
+differentials also execute the uncached product implementations. The current
+behavioral inventory contains 6,300 cases, including eighteen preparation/cache
+controls. Fresh actual-base visibility, movement, setup and reconstruction
+comparisons retain every prescribed case/sample and historical outcomes.
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.

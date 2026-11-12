@@ -1,6 +1,6 @@
 {
-  "baseline_sha256": "0f40018d85e4f9eb491463b01d71d08e75d39f58ffe32383ae7f11235bb15dd2",
-  "current_runtime_fingerprint": "53340ca35795a3eda1a6603cc383a61a394211f4e9a6b1fecff6eb5d2c70cffe",
+  "baseline_sha256": "d90e031d9d59731de614890b2c3a7fcbce4cdeef9810677203768d4cd5ee7116",
+  "current_runtime_fingerprint": "0b8e5714a12c2612efda8b92bcdb37be7c8045cb24d6b3c821527fecf21aee2f",
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "new_selector_placement": {
     "tests/rules/section03/test_terrain_path_preparation.py": 8
@@ -58,13 +58,33 @@
     },
     {
       "from": 4,
+      "selector": "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_capability_rows_are_semantically_executable",
+      "to": 6
+    },
+    {
+      "from": 1,
+      "selector": "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-reconnaissance-layout-1]",
+      "to": 8
+    },
+    {
+      "from": 4,
       "selector": "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-take-and-hold-layout-1]",
       "to": 8
     },
     {
       "from": 4,
       "selector": "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-reconnaissance-layout-2]",
-      "to": 11
+      "to": 3
+    },
+    {
+      "from": 1,
+      "selector": "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-reconnaissance-layout-2]",
+      "to": 12
+    },
+    {
+      "from": 10,
+      "selector": "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-priority-assets-layout-2]",
+      "to": 1
     },
     {
       "from": 8,
@@ -82,6 +102,11 @@
       "to": 7
     },
     {
+      "from": 7,
+      "selector": "tests/infrastructure/runtime_content/unit/test_runtime_content.py",
+      "to": 6
+    },
+    {
       "from": 1,
       "selector": "tests/infrastructure/runtime_hooks/unit/test_runtime_hook_bindings.py",
       "to": 7
@@ -92,9 +117,24 @@
       "to": 1
     },
     {
+      "from": 7,
+      "selector": "tests/rules/rules24/unit/test_return_on_death.py",
+      "to": 8
+    },
+    {
       "from": 10,
       "selector": "tests/rules/section01/test_01_02_effects.py",
       "to": 2
+    },
+    {
+      "from": 6,
+      "selector": "tests/rules/section01/test_01_03_stratagem_ownership.py",
+      "to": 3
+    },
+    {
+      "from": 4,
+      "selector": "tests/rules/section02/test_02_02_02_ignore_modifiers.py",
+      "to": 9
     },
     {
       "from": 10,
@@ -107,6 +147,26 @@
       "to": 2
     },
     {
+      "from": 8,
+      "selector": "tests/rules/section02/test_02_03_01_nested.py",
+      "to": 12
+    },
+    {
+      "from": 7,
+      "selector": "tests/rules/section02/test_02_04_live_consumers.py",
+      "to": 4
+    },
+    {
+      "from": 11,
+      "selector": "tests/rules/section02/test_02_06_equipment.py",
+      "to": 8
+    },
+    {
+      "from": 3,
+      "selector": "tests/rules/section03/test_disembark_contracts.py",
+      "to": 7
+    },
+    {
       "from": 6,
       "selector": "tests/rules/section03/test_isolation.py",
       "to": 9
@@ -117,9 +177,19 @@
       "to": 1
     },
     {
+      "from": 11,
+      "selector": "tests/rules/section04/test_fight_facade.py",
+      "to": 3
+    },
+    {
       "from": 2,
       "selector": "tests/rules/section04/test_isolation.py",
       "to": 1
+    },
+    {
+      "from": 8,
+      "selector": "tests/rules/section04/test_selection_contracts.py",
+      "to": 7
     },
     {
       "from": 9,
@@ -134,12 +204,12 @@
     {
       "from": 6,
       "selector": "tests/rules/section05/test_saves.py",
-      "to": 2
+      "to": 12
     },
     {
       "from": 3,
       "selector": "tests/rules/section06/test_mortals.py",
-      "to": 10
+      "to": 9
     },
     {
       "from": 9,
@@ -207,9 +277,19 @@
       "to": 10
     },
     {
+      "from": 8,
+      "selector": "tests/rules/section15/test_snap_range.py",
+      "to": 3
+    },
+    {
       "from": 2,
       "selector": "tests/rules/section16/test_eligibility.py",
       "to": 4
+    },
+    {
+      "from": 9,
+      "selector": "tests/rules/section16/test_source_limits_review.py",
+      "to": 2
     },
     {
       "from": 11,
@@ -235,6 +315,11 @@
       "from": 8,
       "selector": "tests/rules/section21/test_flight.py",
       "to": 4
+    },
+    {
+      "from": 3,
+      "selector": "tests/rules/section21/test_persistence.py",
+      "to": 12
     },
     {
       "from": 3,
@@ -280,9 +365,8 @@
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-priority-assets-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-disruption-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-purge-the-foe-layout-1]",
-      "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-reconnaissance-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-disruption-layout-2]",
-      "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-reconnaissance-layout-2]",
+      "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-priority-assets-layout-2]",
       "tests/infrastructure/missions/unit/test_step6g_secondary_certification_a_grievous_through_beacon.py",
       "tests/performance/test_phase10u_movement_pathing_profile.py",
       "tests/rules/rules03/unit/test_setup.py",
@@ -315,7 +399,6 @@
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-priority-assets-vs-priority-assets-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-disruption-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-reconnaissance-layout-1]",
-      "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-priority-assets-layout-2]",
       "tests/infrastructure/source/unit/test_deadly_demise_descriptions.py",
       "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-one-player-b]",
@@ -327,7 +410,6 @@
       "tests/rules/section04/test_profiles_and_triggers.py",
       "tests/rules/section04/test_visibility.py",
       "tests/rules/section05/test_retention.py",
-      "tests/rules/section06/test_mortals.py",
       "tests/rules/section07/test_trigger_effects.py",
       "tests/rules/section09/test_focused_checkpoint.py",
       "tests/rules/section12/test_ownership.py",
@@ -350,7 +432,6 @@
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-priority-assets-vs-priority-assets-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-priority-assets-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-reconnaissance-layout-1]",
-      "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-reconnaissance-layout-2]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-priority-assets-layout-2]",
       "tests/infrastructure/missions/unit/test_step6g_secondary_certification_defend_through_forward.py",
       "tests/infrastructure/rule_execution/unit/test_rule_execution_part2.py",
@@ -360,12 +441,10 @@
       "tests/rules/rules24/unit/test_shadow_form_lookup.py",
       "tests/rules/section01/test_01_02_attached.py",
       "tests/rules/section01/test_01_03_ownership.py",
-      "tests/rules/section02/test_02_06_equipment.py",
       "tests/rules/section02/test_coverage_map.py",
       "tests/rules/section03/test_coherency.py",
       "tests/rules/section03/test_overhang.py",
       "tests/rules/section04/test_critical_faq.py",
-      "tests/rules/section04/test_fight_facade.py",
       "tests/rules/section06/test_visibility_ownership.py",
       "tests/rules/section07/test_progression.py",
       "tests/rules/section08/test_cp_resource.py",
@@ -411,6 +490,7 @@
       "tests/infrastructure/missions/unit/test_secondary_scoring_state_evidence_authority.py",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-purge-the-foe-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-priority-assets-layout-2]",
+      "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-reconnaissance-layout-2]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_c.py",
       "tests/infrastructure/missions/unit/test_step6g_secondary_certification_behind_through_cleanse.py",
       "tests/infrastructure/rule_execution/unit/test_generic_ir_support_validation.py",
@@ -427,6 +507,7 @@
       "tests/rules/section01/test_01_03_timing.py",
       "tests/rules/section01/test_01_05_choice.py",
       "tests/rules/section02/test_02_02_03_damage_timing.py",
+      "tests/rules/section02/test_02_03_01_nested.py",
       "tests/rules/section02/test_02_04_01_constructed_contract.py",
       "tests/rules/section03/test_distance_rotation.py",
       "tests/rules/section03/test_engagement.py",
@@ -436,6 +517,7 @@
       "tests/rules/section05/test_critical_consumers.py",
       "tests/rules/section05/test_post_roll.py",
       "tests/rules/section05/test_retained_stratagem.py",
+      "tests/rules/section05/test_saves.py",
       "tests/rules/section05/test_toughness.py",
       "tests/rules/section07/test_coverage_map.py",
       "tests/rules/section07/test_mission_boundary.py",
@@ -450,6 +532,7 @@
       "tests/rules/section18/test_facade.py",
       "tests/rules/section20/test_inventory.py",
       "tests/rules/section21/test_clarifications.py",
+      "tests/rules/section21/test_persistence.py",
       "tests/rules/section23/test_combat.py",
       "tests/rules/section23/test_movement.py",
       "tests/rules/section23/test_other_moves.py",
@@ -497,7 +580,6 @@
       "tests/rules/section03/test_coverage_map.py",
       "tests/rules/section03/test_setup.py",
       "tests/rules/section05/test_groups.py",
-      "tests/rules/section05/test_saves.py",
       "tests/rules/section06/test_hazard.py",
       "tests/rules/section07/test_mission_order.py",
       "tests/rules/section08/test_examples.py",
@@ -506,6 +588,7 @@
       "tests/rules/section11/test_reactive.py",
       "tests/rules/section15/test_bravery_faq50.py",
       "tests/rules/section15/test_smoke.py",
+      "tests/rules/section16/test_source_limits_review.py",
       "tests/rules/section18/test_emergency_status.py",
       "tests/rules/section19/test_abilities.py",
       "tests/rules/section19/test_retained_scope.py",
@@ -525,16 +608,18 @@
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-disruption-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-reconnaissance-vs-reconnaissance-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-priority-assets-layout-2]",
+      "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-reconnaissance-layout-2]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-priority-assets-layout-2]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-purge-the-foe-layout-2]",
       "tests/infrastructure/runtime_content/unit/test_ability_registry.py",
       "tests/infrastructure/setup/unit/test_setup_completion.py",
       "tests/rules/section01/test_01_02_tokens.py",
       "tests/rules/section01/test_01_03_batches.py",
+      "tests/rules/section01/test_01_03_stratagem_ownership.py",
       "tests/rules/section01/test_01_06_leadership.py",
-      "tests/rules/section03/test_disembark_contracts.py",
       "tests/rules/section03/test_terrain_and_budgets.py",
       "tests/rules/section04/test_coverage_map.py",
+      "tests/rules/section04/test_fight_facade.py",
       "tests/rules/section05/test_destroyed_measurement.py",
       "tests/rules/section05/test_retained_completion.py",
       "tests/rules/section05/test_retained_consumers.py",
@@ -552,12 +637,12 @@
       "tests/rules/section11/test_rolls.py",
       "tests/rules/section13/test_ownership.py",
       "tests/rules/section14/test_marker_axes.py",
+      "tests/rules/section15/test_snap_range.py",
       "tests/rules/section16/test_restrictions.py",
       "tests/rules/section17/test_coverage_map.py",
       "tests/rules/section18/test_formations.py",
       "tests/rules/section19/test_coverage.py",
       "tests/rules/section19/test_table.py",
-      "tests/rules/section21/test_persistence.py",
       "tests/rules/section21/test_witness_admission.py",
       "tests/rules/section22/test_damage.py",
       "tests/rules/section22/test_inventory.py",
@@ -572,7 +657,6 @@
       "tests/infrastructure/adapters/test_canonical_deployment_coverage.py",
       "tests/infrastructure/adapters/unit/test_session_commands.py",
       "tests/infrastructure/decisions/unit/test_physical_proposal_prevalidation.py",
-      "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_capability_rows_are_semantically_executable",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-purge-the-foe-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-take-and-hold-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-reconnaissance-layout-2]",
@@ -580,8 +664,8 @@
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-reconnaissance-layout-2]",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-characteristics-one-player-b]",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-zero-ap-save-roll-player-b]",
-      "tests/rules/section02/test_02_02_02_ignore_modifiers.py",
       "tests/rules/section02/test_02_02_03_random_characteristics.py",
+      "tests/rules/section02/test_02_04_live_consumers.py",
       "tests/rules/section05/test_coverage_map.py",
       "tests/rules/section05/test_damage_timing.py",
       "tests/rules/section05/test_reaction_boundaries.py",
@@ -603,6 +687,7 @@
       "tests/factions/world_eaters/unit/test_blessings_gameplay.py",
       "tests/factions/world_eaters/unit/test_icon_of_khorne.py",
       "tests/infrastructure/missions/unit/test_game_end_scoring.py",
+      "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_capability_rows_are_semantically_executable",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-priority-assets-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-reconnaissance-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-purge-the-foe-layout-1]",
@@ -612,12 +697,12 @@
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-disruption-layout-2]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-reconnaissance-layout-2]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-purge-the-foe-layout-2]",
+      "tests/infrastructure/runtime_content/unit/test_runtime_content.py",
       "tests/infrastructure/source/unit/test_source_overlays.py",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[duplicate-rapid-fire-player-b]",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-one-player-b]",
       "tests/rules/section01/test_01_02_attached_return.py",
       "tests/rules/section01/test_01_02_cargo_return.py",
-      "tests/rules/section01/test_01_03_stratagem_ownership.py",
       "tests/rules/section01/test_01_04_contact_movement.py",
       "tests/rules/section01/test_01_05_results.py",
       "tests/rules/section01/test_01_06_07_morale.py",
@@ -662,14 +747,12 @@
       "tests/infrastructure/rule_execution/unit/test_generic_rule_ability_registry.py",
       "tests/infrastructure/rule_execution/unit/test_generic_rule_effect_identity.py",
       "tests/infrastructure/rule_execution/unit/test_rule_execution.py",
-      "tests/infrastructure/runtime_content/unit/test_runtime_content.py",
       "tests/infrastructure/runtime_hooks/unit/test_runtime_hook_bindings.py",
       "tests/infrastructure/source/unit/test_starfang_deep_strike.py",
       "tests/rules/rules01/unit/test_unit_splitting.py",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-characteristics-player-a]",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-characteristics-player-b]",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-player-a]",
-      "tests/rules/rules24/unit/test_return_on_death.py",
       "tests/rules/rules24/unit/test_tracked_targets.py",
       "tests/rules/section01/test_01_02_presence.py",
       "tests/rules/section01/test_01_02_revival.py",
@@ -677,10 +760,11 @@
       "tests/rules/section01/test_01_05_dice.py",
       "tests/rules/section01/test_01_07_actions.py",
       "tests/rules/section02/test_02_02_03_attack_generation.py",
-      "tests/rules/section02/test_02_04_live_consumers.py",
+      "tests/rules/section03/test_disembark_contracts.py",
       "tests/rules/section03/test_large_reserve.py",
       "tests/rules/section03/test_redeploy.py",
       "tests/rules/section04/test_grouping.py",
+      "tests/rules/section04/test_selection_contracts.py",
       "tests/rules/section08/test_coverage_map.py",
       "tests/rules/section08/test_end_priority.py",
       "tests/rules/section09/test_selection.py",
@@ -714,6 +798,7 @@
       "tests/infrastructure/missions/unit/test_primary_scoring_boundary_lifecycle.py",
       "tests/infrastructure/missions/unit/test_step5b_marker_conditions.py",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-disruption-layout-1]",
+      "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-reconnaissance-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-priority-assets-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-take-and-hold-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-reconnaissance-layout-2]",
@@ -722,6 +807,7 @@
       "tests/rules/rules01/unit/test_table_quarters.py",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-characteristics-one-player-a]",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-save-with-inv-provider-player-a]",
+      "tests/rules/rules24/unit/test_return_on_death.py",
       "tests/rules/section01/test_01_02_split.py",
       "tests/rules/section01/test_01_02_unrestricted.py",
       "tests/rules/section01/test_01_04_contact_lifetime.py",
@@ -729,16 +815,15 @@
       "tests/rules/section02/test_02_01_identity.py",
       "tests/rules/section02/test_02_02_02_native_permission.py",
       "tests/rules/section02/test_02_02_04_healing.py",
-      "tests/rules/section02/test_02_03_01_nested.py",
       "tests/rules/section02/test_02_05_keyword_consumers.py",
       "tests/rules/section02/test_02_05_keywords.py",
+      "tests/rules/section02/test_02_06_equipment.py",
       "tests/rules/section03/test_cleanup_mission.py",
       "tests/rules/section03/test_facade.py",
       "tests/rules/section03/test_movement_paths.py",
       "tests/rules/section03/test_terrain_path_preparation.py",
       "tests/rules/section04/test_facade.py",
       "tests/rules/section04/test_melee.py",
-      "tests/rules/section04/test_selection_contracts.py",
       "tests/rules/section05/test_rolls.py",
       "tests/rules/section05/test_sequence.py",
       "tests/rules/section08/test_battle_shock.py",
@@ -748,7 +833,6 @@
       "tests/rules/section14/test_goals.py",
       "tests/rules/section15/test_costs_faqs.py",
       "tests/rules/section15/test_snap_faqs.py",
-      "tests/rules/section15/test_snap_range.py",
       "tests/rules/section16/test_turn_end_review.py",
       "tests/rules/section18/test_attached.py",
       "tests/rules/section18/test_isolation.py",
@@ -778,8 +862,10 @@
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-one-player-a]",
       "tests/rules/section01/test_01_04_measurement.py",
       "tests/rules/section01/test_coverage_map.py",
+      "tests/rules/section02/test_02_02_02_ignore_modifiers.py",
       "tests/rules/section03/test_isolation.py",
       "tests/rules/section05/test_isolation.py",
+      "tests/rules/section06/test_mortals.py",
       "tests/rules/section10/test_indirect.py",
       "tests/rules/section10/test_shooting_types.py",
       "tests/rules/section11/test_selection.py",
@@ -788,7 +874,6 @@
       "tests/rules/section15/test_retained_faq49.py",
       "tests/rules/section16/test_coverage_map.py",
       "tests/rules/section16/test_faqs.py",
-      "tests/rules/section16/test_source_limits_review.py",
       "tests/rules/section17/test_blocker_ownership.py",
       "tests/rules/section17/test_frame.py",
       "tests/rules/section17/test_isolation.py",

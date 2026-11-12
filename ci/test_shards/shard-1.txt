@@ -7,9 +7,8 @@ tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_ph
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-priority-assets-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-disruption-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-purge-the-foe-layout-1]
-tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-reconnaissance-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-disruption-layout-2]
-tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-reconnaissance-layout-2]
+tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-priority-assets-layout-2]
 tests/infrastructure/missions/unit/test_step6g_secondary_certification_a_grievous_through_beacon.py
 tests/performance/test_phase10u_movement_pathing_profile.py
 tests/rules/rules03/unit/test_setup.py

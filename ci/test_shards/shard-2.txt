@@ -36,7 +36,6 @@ tests/rules/section02/test_02_02_profiles.py
 tests/rules/section03/test_coverage_map.py
 tests/rules/section03/test_setup.py
 tests/rules/section05/test_groups.py
-tests/rules/section05/test_saves.py
 tests/rules/section06/test_hazard.py
 tests/rules/section07/test_mission_order.py
 tests/rules/section08/test_examples.py
@@ -45,6 +44,7 @@ tests/rules/section10/test_selection.py
 tests/rules/section11/test_reactive.py
 tests/rules/section15/test_bravery_faq50.py
 tests/rules/section15/test_smoke.py
+tests/rules/section16/test_source_limits_review.py
 tests/rules/section18/test_emergency_status.py
 tests/rules/section19/test_abilities.py
 tests/rules/section19/test_retained_scope.py

@@ -45,6 +45,7 @@ NEW_OWNER = "tests/rules/section03/test_terrain_path_preparation.py"
 NEW_NODES = frozenset(
     f"{NEW_OWNER}::{case}"
     for case in (
+        "test_immutable_terrain_caches_are_bounded_and_eviction_preserves_values",
         "test_prepared_terrain_builds_each_sample_once_and_keeps_boundary_contact",
         "test_prepared_terrain_samples_match_direct_intersections[0-base0]",
         "test_prepared_terrain_samples_match_direct_intersections[0-base1]",
@@ -59,6 +60,9 @@ NEW_NODES = frozenset(
         "test_prepared_terrain_samples_match_direct_intersections[90-base1]",
         "test_prepared_terrain_samples_match_direct_intersections[90-base2]",
         "test_terrain_preparation_preserves_complete_results_and_context_isolation",
+        "test_terrain_footprint_cache_uses_exact_horizontal_geometry",
+        "test_terrain_volume_cache_preserves_definition_identity_and_validation[False]",
+        "test_terrain_volume_cache_preserves_definition_identity_and_validation[True]",
     )
 )
 
@@ -146,11 +150,11 @@ def _baseline(
     if (
         cases.keys() != history.baseline.keys() | NEW_NODES
         or not history.baseline.keys() < cases.keys()
-        or len(cases) - len(history.baseline) != 14
+        or len(cases) - len(history.baseline) != 18
         or len(additions) != 1
         or set(additions) & {node.split("::", 1)[0] for node in history.baseline}
     ):
-        raise SystemExit("Compatibility requires exactly the reviewed fourteen added cases.")
+        raise SystemExit("Compatibility requires exactly the reviewed eighteen added cases.")
     owners = {node.split("::", 1)[0] for node in cases}
     sources = _object(data["test_sources"], owners, "current test source inventory")
     try:

@@ -2,7 +2,6 @@ tests/factions/aeldari/unit/test_unit_abilities.py
 tests/infrastructure/adapters/test_canonical_deployment_coverage.py
 tests/infrastructure/adapters/unit/test_session_commands.py
 tests/infrastructure/decisions/unit/test_physical_proposal_prevalidation.py
-tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_capability_rows_are_semantically_executable
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-purge-the-foe-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-take-and-hold-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-reconnaissance-layout-2]
@@ -10,8 +9,8 @@ tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-reconnaissance-layout-2]
 tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-characteristics-one-player-b]
 tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-zero-ap-save-roll-player-b]
-tests/rules/section02/test_02_02_02_ignore_modifiers.py
 tests/rules/section02/test_02_02_03_random_characteristics.py
+tests/rules/section02/test_02_04_live_consumers.py
 tests/rules/section05/test_coverage_map.py
 tests/rules/section05/test_damage_timing.py
 tests/rules/section05/test_reaction_boundaries.py
