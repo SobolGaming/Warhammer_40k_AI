@@ -8,7 +8,6 @@ tests/infrastructure/adapters/test_preserve_scenario.py
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-priority-assets-vs-priority-assets-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-priority-assets-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-reconnaissance-layout-1]
-tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-reconnaissance-layout-2]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-priority-assets-layout-2]
 tests/infrastructure/missions/unit/test_step6g_secondary_certification_defend_through_forward.py
 tests/infrastructure/rule_execution/unit/test_rule_execution_part2.py
@@ -18,12 +17,10 @@ tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_re
 tests/rules/rules24/unit/test_shadow_form_lookup.py
 tests/rules/section01/test_01_02_attached.py
 tests/rules/section01/test_01_03_ownership.py
-tests/rules/section02/test_02_06_equipment.py
 tests/rules/section02/test_coverage_map.py
 tests/rules/section03/test_coherency.py
 tests/rules/section03/test_overhang.py
 tests/rules/section04/test_critical_faq.py
-tests/rules/section04/test_fight_facade.py
 tests/rules/section06/test_visibility_ownership.py
 tests/rules/section07/test_progression.py
 tests/rules/section08/test_cp_resource.py

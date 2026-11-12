@@ -18,8 +18,10 @@ tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_re
 tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-one-player-a]
 tests/rules/section01/test_01_04_measurement.py
 tests/rules/section01/test_coverage_map.py
+tests/rules/section02/test_02_02_02_ignore_modifiers.py
 tests/rules/section03/test_isolation.py
 tests/rules/section05/test_isolation.py
+tests/rules/section06/test_mortals.py
 tests/rules/section10/test_indirect.py
 tests/rules/section10/test_shooting_types.py
 tests/rules/section11/test_selection.py
@@ -28,7 +30,6 @@ tests/rules/section14/test_control.py
 tests/rules/section15/test_retained_faq49.py
 tests/rules/section16/test_coverage_map.py
 tests/rules/section16/test_faqs.py
-tests/rules/section16/test_source_limits_review.py
 tests/rules/section17/test_blocker_ownership.py
 tests/rules/section17/test_frame.py
 tests/rules/section17/test_isolation.py
