@@ -1,95 +1,102 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "3c103311c23774b0c0ea7b84640eb3faae464651",
+  "base": "1fc48b879c2de921ee9c484052f7e802db157aa0",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:870d2370b0f71a646d7e20e9e998efa7c914fc187745f97830d81487d262115f",
   "operation_map_sha256": "41cbe072304e809b05fcc98cb0e78f8c854b8fd284dd611059dc8e4f5150e148",
   "changes": {
-    ".github/workflows/ci.yml": {
-      "before_sha256": "7e0b32def8b33a4d3476f71d01093d029be9f4c7cfc5b5fb4d240f136d91cb9e",
-      "after_sha256": "56642b30011a08da4ffc4419563f3612293bf149e5e8ff3fd89d2fef0045c32c",
+    "README.md": {
+      "before_sha256": "dbaf8f1f860335c00bb99bdc1600c66fe0ce947d14ca2ecd964162e689f9101f",
+      "after_sha256": "7edbfc0b436d8cfb45efe507934c083c05402a5816a79f6754a15012e02bb58b",
       "owners": {
         "@document": {
-          "before": "7e0b32def8b33a4d3476f71d01093d029be9f4c7cfc5b5fb4d240f136d91cb9e",
-          "after": "56642b30011a08da4ffc4419563f3612293bf149e5e8ff3fd89d2fef0045c32c"
+          "before": "dbaf8f1f860335c00bb99bdc1600c66fe0ce947d14ca2ecd964162e689f9101f",
+          "after": "7edbfc0b436d8cfb45efe507934c083c05402a5816a79f6754a15012e02bb58b"
         }
       }
     },
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "1590c9e5b7970f8455afdb1d415c3566a44068d1cb95c7e2cd604a6850f49624",
-      "after_sha256": "8f41163d4dc0d1016fea80c2f754dca806658a7a4ea52604bd045c04df2a33a1",
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "before_sha256": "8615d28892d8e1923a28b615ff28499a08c72e39edb5aeacbb0a949e63bd7616",
+      "after_sha256": "c4c64666e8dd2ba59531656b83dd8192f9b094410b8798cf359422f246c98e87",
       "owners": {
         "@document": {
-          "before": "1590c9e5b7970f8455afdb1d415c3566a44068d1cb95c7e2cd604a6850f49624",
-          "after": "8f41163d4dc0d1016fea80c2f754dca806658a7a4ea52604bd045c04df2a33a1"
+          "before": "8615d28892d8e1923a28b615ff28499a08c72e39edb5aeacbb0a949e63bd7616",
+          "after": "c4c64666e8dd2ba59531656b83dd8192f9b094410b8798cf359422f246c98e87"
         }
       }
     },
-    "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "7873e9341231fba9477eaa63e52e8e429bb2fab558ae65a34d43524872984ea8",
-      "after_sha256": "d19003159c624f903df9632243735bea7a2b8b1f6eb717652bbf1fff6996748e",
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "59987ef3fee1f7d99c2ce2768a945670b46c45c18aa0797673c11f70202e2aee",
+      "after_sha256": "56d179913280fb4efe9a1e44c9c5459182d5acdc3be1d96d3b7e3d4f6bf88fb5",
       "owners": {
         "@document": {
-          "before": "7873e9341231fba9477eaa63e52e8e429bb2fab558ae65a34d43524872984ea8",
-          "after": "d19003159c624f903df9632243735bea7a2b8b1f6eb717652bbf1fff6996748e"
+          "before": "59987ef3fee1f7d99c2ce2768a945670b46c45c18aa0797673c11f70202e2aee",
+          "after": "56d179913280fb4efe9a1e44c9c5459182d5acdc3be1d96d3b7e3d4f6bf88fb5"
         }
       }
     },
-    "tests/code_quality/test_extended_shard_allocation.py": {
-      "before_sha256": "7ddab24b43d6d278c9bdf494f403abaaa993e7bd87b125d762f8df464f85f4ae",
-      "after_sha256": "652311cae334579cf854698a1b9b12f4e0dc861d42db6043df2b1df5d372c0a1",
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "before_sha256": "b816d5c7a8af5cdbdee8ca3227ba595d20f2b60f8af671ed5e16f486c6e00f27",
+      "after_sha256": "31638ba5dca66bc146793489ac23ead8710470c160106f56bfd260b175b5705f",
       "owners": {
-        "@module": {
-          "before": "66987efe9bbad94bd6d14a8bad45d37a7926539c2995e8e67d9c01de599d5f05",
-          "after": "595feee8a530c61ecf7821de3914b38797505f756d942f1f285328f4e6a177ed"
-        },
-        "test_exact_fetch_restores_squashed_away_calibration_in_main_only_checkout": {
-          "before": null,
-          "after": "5523a58250b82236016722ee1e6774947e7bc80557b6f84038c6fe9e0d8cd337"
-        },
-        "test_quality_producers_fetch_exact_pre_squash_calibration_before_validation": {
-          "before": null,
-          "after": "271ae75b05c62499de3e8e2c73546e3806ba3fc95f25057b03d4c2b6c2f4768a"
+        "@document": {
+          "before": "b816d5c7a8af5cdbdee8ca3227ba595d20f2b60f8af671ed5e16f486c6e00f27",
+          "after": "31638ba5dca66bc146793489ac23ead8710470c160106f56bfd260b175b5705f"
+        }
+      }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "cb080468d1e501f666ba8121d2e753d75bcdda82b642315beb1cfd952ae31e12",
+      "after_sha256": "cf76eabd3dd0c954124ee5a10038f83ce57f310ff7a34ec086981805a09f2e24",
+      "owners": {
+        "@document": {
+          "before": "cb080468d1e501f666ba8121d2e753d75bcdda82b642315beb1cfd952ae31e12",
+          "after": "cf76eabd3dd0c954124ee5a10038f83ce57f310ff7a34ec086981805a09f2e24"
         }
       }
     }
   },
   "rows": {
-    ".github/workflows/ci.yml": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavioral-worker-progress",
-        "covered-shard-workload"
-      ],
-      "selected_families": [],
-      "rationale": "Provision the exact pre-squash calibration commit before both quality producers validate retained historical evidence. Add real-Git missing-history/fetch regression coverage and preserve the original assertions, data, old anchor, required gates and timing limits.",
-      "source_obligation": "A clean main-only checkout must obtain b9b1c97a6a2da6fca624c7f30c471d6cfab56320 before reading its six original calibration/baseline files; unavailable history remains a hard failure.",
-      "unchanged_work": "No engine, behavioral test, measured workload, algorithm, cache, serialization, runtime dependency, calibration measurement, shard allocation or coverage/timing budget changes. The serial current-runtime smoke and required exact-head gates remain mandatory."
-    },
-    "ci/quality_shards/all.txt": {
+    "README.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Provision the exact pre-squash calibration commit before both quality producers validate retained historical evidence. Add real-Git missing-history/fetch regression coverage and preserve the original assertions, data, old anchor, required gates and timing limits.",
-      "source_obligation": "A clean main-only checkout must obtain b9b1c97a6a2da6fca624c7f30c471d6cfab56320 before reading its six original calibration/baseline files; unavailable history remains a hard failure.",
-      "unchanged_work": "No engine, behavioral test, measured workload, algorithm, cache, serialization, runtime dependency, calibration measurement, shard allocation or coverage/timing budget changes. The serial current-runtime smoke and required exact-head gates remain mandatory."
+      "rationale": "Record a predeclared bounded ordinary E attack versus omission experiment at matched #662 endpoints, retaining operator-only evidence and remaining Stage 2 gaps.",
+      "source_obligation": "Keep the historical admissions, actual ordinary decisions and original fixed seed unchanged; report range/visibility, losses, failures and zero local outcome differences without a tactical-benefit or learning claim.",
+      "unchanged_work": "This documentation revision changes no runtime, test, workload, cache, dependency, serialization, schema, source corpus, shard calibration or timing/coverage limit. The existing serial smoke and all exact-head delivery gates remain required."
     },
-    "ci/quality_shards/shard-4.txt": {
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Provision the exact pre-squash calibration commit before both quality producers validate retained historical evidence. Add real-Git missing-history/fetch regression coverage and preserve the original assertions, data, old anchor, required gates and timing limits.",
-      "source_obligation": "A clean main-only checkout must obtain b9b1c97a6a2da6fca624c7f30c471d6cfab56320 before reading its six original calibration/baseline files; unavailable history remains a hard failure.",
-      "unchanged_work": "No engine, behavioral test, measured workload, algorithm, cache, serialization, runtime dependency, calibration measurement, shard allocation or coverage/timing budget changes. The serial current-runtime smoke and required exact-head gates remain mandatory."
+      "rationale": "Record a predeclared bounded ordinary E attack versus omission experiment at matched #662 endpoints, retaining operator-only evidence and remaining Stage 2 gaps.",
+      "source_obligation": "Keep the historical admissions, actual ordinary decisions and original fixed seed unchanged; report range/visibility, losses, failures and zero local outcome differences without a tactical-benefit or learning claim.",
+      "unchanged_work": "This documentation revision changes no runtime, test, workload, cache, dependency, serialization, schema, source corpus, shard calibration or timing/coverage limit. The existing serial smoke and all exact-head delivery gates remain required."
     },
-    "tests/code_quality/test_extended_shard_allocation.py": {
+    "docs/AI_POLICY_INTERFACE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record a predeclared bounded ordinary E attack versus omission experiment at matched #662 endpoints, retaining operator-only evidence and remaining Stage 2 gaps.",
+      "source_obligation": "Keep the historical admissions, actual ordinary decisions and original fixed seed unchanged; report range/visibility, losses, failures and zero local outcome differences without a tactical-benefit or learning claim.",
+      "unchanged_work": "This documentation revision changes no runtime, test, workload, cache, dependency, serialization, schema, source corpus, shard calibration or timing/coverage limit. The existing serial smoke and all exact-head delivery gates remain required."
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record a predeclared bounded ordinary E attack versus omission experiment at matched #662 endpoints, retaining operator-only evidence and remaining Stage 2 gaps.",
+      "source_obligation": "Keep the historical admissions, actual ordinary decisions and original fixed seed unchanged; report range/visibility, losses, failures and zero local outcome differences without a tactical-benefit or learning claim.",
+      "unchanged_work": "This documentation revision changes no runtime, test, workload, cache, dependency, serialization, schema, source corpus, shard calibration or timing/coverage limit. The existing serial smoke and all exact-head delivery gates remain required."
+    },
+    "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
       "operations": [
-        "scoped-shard-allocation"
+        "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Provision the exact pre-squash calibration commit before both quality producers validate retained historical evidence. Add real-Git missing-history/fetch regression coverage and preserve the original assertions, data, old anchor, required gates and timing limits.",
-      "source_obligation": "A clean main-only checkout must obtain b9b1c97a6a2da6fca624c7f30c471d6cfab56320 before reading its six original calibration/baseline files; unavailable history remains a hard failure.",
-      "unchanged_work": "No engine, behavioral test, measured workload, algorithm, cache, serialization, runtime dependency, calibration measurement, shard allocation or coverage/timing budget changes. The serial current-runtime smoke and required exact-head gates remain mandatory."
+      "rationale": "Refresh only the live README authentication digest after the maintained documentation update; retain source clauses, semantic assertions, historical evidence and selected tests byte-for-byte.",
+      "source_obligation": "The section-07 live authenticated_inputs README hash must describe the actual maintained contributor guidance. No historical hash, source block, semantic requirement or assertion is repinned.",
+      "unchanged_work": "Only one current documentation checksum changes. Engine, test functions, source corpus, replay, dependencies, workload selection, calibration, coverage and timing limits remain unchanged."
     }
   },
   "milestone": "ordinary",
