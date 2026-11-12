@@ -134,43 +134,43 @@
         }
       }
     },
-    "docs/performance/current/terrain-reuse-20261112-final-movement.json": {
+    "docs/performance/current/terrain-reuse-20261112-qualified-movement.json": {
       "before_sha256": null,
-      "after_sha256": "e60a35c4f57022e1d98a590eac28914797f854801741ba028fcfef9c92e002bc",
+      "after_sha256": "3921e94e72bb16699eb177ea5fa42430146d15ff77c08fe39ba48f3d57f66c23",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e60a35c4f57022e1d98a590eac28914797f854801741ba028fcfef9c92e002bc"
+          "after": "3921e94e72bb16699eb177ea5fa42430146d15ff77c08fe39ba48f3d57f66c23"
         }
       }
     },
-    "docs/performance/current/terrain-reuse-20261112-final-reconstruction.json": {
+    "docs/performance/current/terrain-reuse-20261112-qualified-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "83cfaa764c411fc924a17d8c477209e5093558399e08191bcd988fcbf0756c73",
+      "after_sha256": "acf62e77afd964248c18f7dea1aaf34fe9fb5a8adb6eca16de958634c8745844",
       "owners": {
         "@document": {
           "before": null,
-          "after": "83cfaa764c411fc924a17d8c477209e5093558399e08191bcd988fcbf0756c73"
+          "after": "acf62e77afd964248c18f7dea1aaf34fe9fb5a8adb6eca16de958634c8745844"
         }
       }
     },
-    "docs/performance/current/terrain-reuse-20261112-final-setup.json": {
+    "docs/performance/current/terrain-reuse-20261112-qualified-setup.json": {
       "before_sha256": null,
-      "after_sha256": "bc7351ae3d4b83c15ae61a7559c97a6e78b2f103afbabda8f8fdb709d38c93c2",
+      "after_sha256": "ad06eb86194576e3c7e2b6899c84df42cd7dceb0ecd276bd0d21e5c0a1ac5b83",
       "owners": {
         "@document": {
           "before": null,
-          "after": "bc7351ae3d4b83c15ae61a7559c97a6e78b2f103afbabda8f8fdb709d38c93c2"
+          "after": "ad06eb86194576e3c7e2b6899c84df42cd7dceb0ecd276bd0d21e5c0a1ac5b83"
         }
       }
     },
-    "docs/performance/current/terrain-reuse-20261112-final-visibility.json": {
+    "docs/performance/current/terrain-reuse-20261112-qualified-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "0e265fcf04b1638930db6bf15c55659aafb8f387f85a8a0c9e87c00daab65484",
+      "after_sha256": "ed58881503db96acf68c02d65566681925f68d80b401acae660c8e6b036a8939",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0e265fcf04b1638930db6bf15c55659aafb8f387f85a8a0c9e87c00daab65484"
+          "after": "ed58881503db96acf68c02d65566681925f68d80b401acae660c8e6b036a8939"
         }
       }
     },
@@ -279,6 +279,16 @@
         "test_terrain_volume_cache_preserves_definition_identity_and_validation": {
           "before": null,
           "after": "a0a36e3b771e5f8226268ecf20305402ac23dfcb339bee09a7240a5eb370c824"
+        }
+      }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "a92fe0173b319fe602f58fa38b9c6ddf2751604801c636583df1159a73c85177",
+      "after_sha256": "7fdb9c1fb8edbc9c5a120f77b5f4bca19b0a67dc6cc1746e1f88f69570fd4fc3",
+      "owners": {
+        "@document": {
+          "before": "a92fe0173b319fe602f58fa38b9c6ddf2751604801c636583df1159a73c85177",
+          "after": "7fdb9c1fb8edbc9c5a120f77b5f4bca19b0a67dc6cc1746e1f88f69570fd4fc3"
         }
       }
     }
@@ -406,7 +416,7 @@
       "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
       "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
     },
-    "docs/performance/current/terrain-reuse-20261112-final-movement.json": {
+    "docs/performance/current/terrain-reuse-20261112-qualified-movement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -414,7 +424,7 @@
       "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
       "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
     },
-    "docs/performance/current/terrain-reuse-20261112-final-reconstruction.json": {
+    "docs/performance/current/terrain-reuse-20261112-qualified-reconstruction.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -422,7 +432,7 @@
       "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
       "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
     },
-    "docs/performance/current/terrain-reuse-20261112-final-setup.json": {
+    "docs/performance/current/terrain-reuse-20261112-qualified-setup.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -430,7 +440,7 @@
       "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
       "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
     },
-    "docs/performance/current/terrain-reuse-20261112-final-visibility.json": {
+    "docs/performance/current/terrain-reuse-20261112-qualified-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -509,14 +519,24 @@
       "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
       "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
       "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the single current README authentication hash after the documented inventory changes from 6296/fourteen to 6300/eighteen; the existing unchanged control exposed the stale anchor.",
+      "source_obligation": "Preserve every historical authenticated input, retained literal rule/capture block, FAQ ownership and real semantic assertion. The current README anchor must authenticate the maintained contributor guidance.",
+      "unchanged_work": "Only authenticated_inputs.README.md changes. Production code, Python test bodies, rule evidence and obligations remain unchanged. The interrupted failing covered attempt is retained; final component records bind this exact metadata and a fresh complete covered gate is required."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "visibility": "docs/performance/current/terrain-reuse-20261112-final-visibility.json",
-    "movement": "docs/performance/current/terrain-reuse-20261112-final-movement.json",
-    "setup": "docs/performance/current/terrain-reuse-20261112-final-setup.json",
-    "reconstruction": "docs/performance/current/terrain-reuse-20261112-final-reconstruction.json"
+    "visibility": "docs/performance/current/terrain-reuse-20261112-qualified-visibility.json",
+    "movement": "docs/performance/current/terrain-reuse-20261112-qualified-movement.json",
+    "setup": "docs/performance/current/terrain-reuse-20261112-qualified-setup.json",
+    "reconstruction": "docs/performance/current/terrain-reuse-20261112-qualified-reconstruction.json"
   },
   "full_game": null
 }
