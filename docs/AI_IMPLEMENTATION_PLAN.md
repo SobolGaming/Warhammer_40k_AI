@@ -511,6 +511,78 @@ cooperation, useful candidate coverage, scenario costs, held-out outcomes,
 Stage 2 completion and learning remain unqualified. `scoped_gap`, a null reference
 target and learning exclusion remain mandatory.
 
+### Rule-grounded edge-column access contrast
+
+A separate operator experiment, `stage2-edge-column-access-v4`, keeps
+`canonical_deployment_config()` and its original seed unchanged. It changes only
+the ordinary deployment proposals for S and B: five-model columns at X=1 inch,
+with Y=45+1.8i for S and Y=3+1.8i for B, for i=0 through 4. E and the vehicle
+retain their canonical placements. The eleven setup choices and four
+redeploy/prebattle declines reach a common fifteen-record checkpoint. These
+placements do not change or extend any historical canonical admission.
+
+The screen arm moves S six inches in negative Y in each of A's first three
+Movement phases; preservation leaves S stationary. E and the vehicle remain
+stationary. B moves six inches in positive Y in rounds one and two. Both sides
+skip Shooting, complete offered Charge phases without charging and decline
+offered movement/Heroic Intervention reactions. All moves use full straight-line
+`PathWitness` paths from observed poses, front models first in the direction of
+travel, with unchanged height and facing. At round-three B Movement, independent
+forks attempt the same six-inch and two-inch positive-Y paths. The main arms
+instead attempt the same one-inch response and stop before A's subsequent
+Movement reaction choice.
+
+The final declaration's byte SHA-256 is
+`784db3767e55766ddb1c0c280f8cdf27d91f508711b4cba1ab116e069ab36aec`,
+pinned before the first access probe. Earlier attempts are retained: a rear-first
+B witness was rejected for friendly endpoint overlap; explicit Charge and Heroic
+Intervention requests stopped later harness assumptions before any access probe.
+The final recipe reuses the strictly restored ordinary prefix. Source review,
+before probing access, retained the originally intended two-inch response as a
+probe and declared a one-inch matched response because this fixture uses a
+two-inch Engagement Range. An operator assertion expecting a raw source ID in a
+viewer capability field also stopped before a decline; correcting it changed no
+geometry, seed, authoritative state or declared choice.
+
+The retained source obligations are sequential model movement (03.01),
+Engagement Range (03.04), and Normal Move start/end eligibility and distance
+(09.05), with the same maintained-mirror provenance limitations as their source
+ledgers. This is not a new official-source certification. The shared movement
+validator owns every acceptance or typed rejection; a transit diagnostic alone
+is not substituted for the retained Normal Move endpoint obligation.
+
+The same six-inch and two-inch B witnesses are accepted in preservation and
+rejected against the screen. The screen diagnostics are respectively
+`enemy_engagement_range_transit_forbidden` and
+`enemy_engagement_range_end_forbidden`. The six-inch endpoint would also
+overlap/engage S; the two-inch endpoint has a computed 1.540157-inch opposing
+base-edge gap, inside this fixture's two-inch Engagement Range. Thus the access
+finding does not depend solely on a transit restriction.
+
+Both one-inch main responses are accepted, reaching the declared round-three B
+Movement reaction boundary after 58 screen-arm records and 52 preservation-arm
+records. The same B witness ends at Y=16 through 23.2 inches in both arms; its
+nearest opposing base-edge gap in the screen arm is 2.540157 inches. All six
+complete histories pass ordinary-startup verification, strict persistence, exact
+replay and both-viewer persistence equality, including the rejected attempts and
+their fresh retry requests. Probes leave their original main checkpoints
+unchanged. S and B each retain five models/ten wounds, E three/six, and the
+vehicle one/twelve; neither arm loses material. Both VP ledgers remain zero.
+Natural RNG-state hashes differ between arms and are retained without replacement;
+no matched future-chance schedule or stochastic benefit is inferred. The final
+operator execution took 779.33 seconds including repeated startup, restoration
+and replay; this is not gameplay throughput or scenario-cost certification.
+
+This qualifies one specific path-access question, not exhaustive route denial,
+a useful sacrifice, E follow-through, tactical superiority or an outcome target.
+Charges, intervention, detours, alternative timings/opponents and held-out
+geometry remain unmeasured alternatives. Historical preservation, Normal Move,
+followthrough, opposing attack and bounded E-attack evidence retain their
+original meanings. The synthetic roster, provisional geometry, mixed mission/
+layout, partial points and public seed limitations remain. Operator diagnostics
+stay outside actor/scorer inputs, with `scoped_gap`, a null reference target and
+no learning eligibility. Stage 2 remains open.
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.
