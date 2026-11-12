@@ -52,6 +52,15 @@ The report records the shared timing, stationary choices and declined reactions;
 adversarial alternatives, tactical benefit, broader costs, Stage 2 completion and
 learning remain unqualified. Historical reports retain their narrower meanings.
 
+The [bounded E follow-through operator experiment](docs/AI_POLICY_INTERFACE.md#bounded-e-attack-operator-evidence)
+continues those matched endpoints with the same witnessed six-inch E approach,
+then compares E's carbine attack with omitting the attack. Both attacks complete
+and all four prefixes pass persistence/replay. B loses one wound in the stationary-S
+attack arm and zero in the other three arms; no models die and the VP difference
+is zero. The historical branches start with different RNG states, so that damage
+difference does not establish an S benefit. This retained operator evidence adds
+no runtime admission or learning eligibility; Stage 2 remains incomplete.
+
 ## 2. Non-negotiable invariants
 
 These rules are enforced from the first commit.

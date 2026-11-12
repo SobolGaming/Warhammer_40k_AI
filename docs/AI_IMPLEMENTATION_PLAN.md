@@ -462,6 +462,55 @@ implementations and tests retain their meanings. The inherited synthetic fixture
 exceptions, `scoped_gap`, null target, learning exclusion and incomplete Stage 2
 status remain. See the [comparison interface](AI_POLICY_INTERFACE.md#matched-opposing-attack-comparison).
 
+### Bounded E attack and no-follow-through control
+
+A bounded operator experiment starts at the unchanged matched comparison's exact
+65/66-record round-four player-A Movement endpoints. A stationary E attempt
+reaches no shooting declaration with its equipped 18-inch drop carbine. That
+negative opportunity is retained before the attack experiment; it is not an
+attack loss or evidence that E can never attack.
+
+The revised continuation is declared before resolving any E attack: all three E
+models make the same six-inch negative-Y Normal Move with full straight-line
+`PathWitness` paths and unchanged height/facing. S and the vehicle Remain
+Stationary, and B declines the movement reaction. The follow-through arm uses E
+model `:001`'s equipped drop carbine in round-four Normal shooting against B's
+unit; the control completes A's Shooting phase without an attack after the same
+movement. All Command Re-Rolls are declined; B allocates to the first living model
+offered by the engine. The stopping boundary is round-four player-B Movement's
+`select_movement_unit`, before B moves. Outcomes are E/B wounds, living models,
+positions, actual attack events and the victory-point ledgers at that horizon.
+The original public fixture seed is fixed, with no seed search or outcome filter.
+
+Both E attacks are legal and complete. All four final prefixes pass ordinary
+startup, strict persistence and exact replay at the declared horizon:
+
+| Historical S branch | E follow-through records | Omission records | B wounds lost, attack / omission |
+|---|---:|---:|---:|
+| Stationary | 85 | 74 | 1 / 0 |
+| Normal Move | 87 | 75 | 0 / 0 |
+
+E retains three living models and six wounds in every arm; B retains five models,
+with nine wounds in the stationary follow-through arm and ten in the other three.
+All E models finish six inches in negative Y, with matched poses across the arms;
+B's poses are unchanged. A remains at zero VP and B goes from three to seven VP
+in every arm, so the attack-versus-omission VP difference is zero. Each attack arm
+adds one completed attack sequence; omission adds none. Wound and living-model
+differences include the moved branch's zero result and the stationary branch's
+one B wound loss. The historical branches have different starting RNG states
+despite the common configured seed. Their damage difference cannot be attributed
+to S or described as screening benefit; each omission control starts from its
+own unchanged matched endpoint.
+
+This is an operator experiment outside the packaged runtime and admission APIs.
+Its retained harness and raw reports remain separate from the historical
+admissions. The [operator evidence contract](AI_POLICY_INTERFACE.md#bounded-e-attack-operator-evidence)
+keeps startup, persistence, replay and visibility checks, explicit incomplete
+results and the inherited fixture limits. Screening, adversarial timing and
+cooperation, useful candidate coverage, scenario costs, held-out outcomes,
+Stage 2 completion and learning remain unqualified. `scoped_gap`, a null reference
+target and learning exclusion remain mandatory.
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.

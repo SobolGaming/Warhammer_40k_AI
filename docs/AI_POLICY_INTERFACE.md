@@ -1679,3 +1679,54 @@ All choices use the existing adapter contract and shared engine movement,
 shooting, attack, persistence and replay owners. This adds no engine rule,
 player-facing route, proposal family, wire contract, policy or learner. Report
 metadata stays outside actor views and scorer inputs.
+
+## Bounded E attack operator evidence
+
+The bounded follow-through experiment starts from fresh ordinary reproduction of
+the matched comparison's exact 65/66-record endpoints. Supplied checkpoints are
+compared in full with that reproduction before four independent continuations:
+follow-through and omission for each historical S branch. Caller-owned endpoints
+remain unchanged. This is retained operator evidence; no packaged report factory,
+serialized-evidence admission, reference target or learning consumer is added.
+
+The continuation, local outcomes and round-four player-B Movement horizon are
+declared before the first E attack. Each arm uses the same witnessed six-inch
+negative-Y E movement, S/vehicle stationary choices and declined B reaction. Only
+the follow-through arm declares E model `:001`'s equipped drop carbine against B;
+the omission arm completes Shooting without attacking. Optional Command Re-Rolls
+are declined and damage allocation uses the first living engine-offered option.
+The legal candidate, in-range model IDs, visible model IDs and actual LOS witness
+are retained from A's viewer-scoped shooting proposal. Accepted requests/results,
+full movement paths, observations, events and checkpoint commitments remain in
+the report. Operator comparisons are excluded from player views and scorer inputs.
+
+Each complete prefix must start from the unchanged canonical configuration and
+pass strict persistence restoration and exact replay. Every final arm exports
+its source/build-bound origin and replay artifact/hash. A failed or unplanned
+continuation retains its attempted choice, actual accepted records/events,
+checkpoint and diagnostic as `scoped_gap`; it supplies no completed comparison.
+Successful comparisons retain wound losses and zero or negative differences.
+No seed search, favorable-result replacement or direct state alteration is used
+to construct the experiment. Manually drifted endpoint tests are separate
+trust-boundary controls and are never admitted as ordinary play.
+
+The reproduced follow-through prefixes contain 85 stationary-S and 87 moved-S
+records; their omission controls contain 74 and 75. Each follow-through adds one
+completed attack and each omission adds none. At the common horizon E has three
+models/six wounds in every arm. B has five models/nine wounds after stationary-S
+follow-through, and five models/ten wounds in the moved-S follow-through and both
+omission arms. A's VP remains zero and B's rises from three to seven in all four
+arms; the local VP difference is zero. E's three witnessed displacements are
+identical across the arms and B does not move. The initial RNG-state hashes differ
+between historical S branches. This single configured seed therefore does not
+establish a shared subsequent chance schedule or attribute one-versus-zero damage
+to S. These are retained local observations, with no screening-benefit claim.
+
+The earlier stationary-E probe is retained separately: selecting E and Normal
+shooting reaches no legal declaration and returns to A's Shooting unit selection.
+It does not resolve an attack or establish general unreachability. Historical
+admissions, runtime identity, exact test inventory and CI calibration retain their
+original meanings. The synthetic roster, provisional geometry, mixed mission/layout,
+partial points, public fixed seed and cooperative opponent remain limitations.
+Screening/exposure, adversarial alternatives, useful candidate coverage, scenario
+costs, held-out evidence, Stage 2 completion and learning remain open.
