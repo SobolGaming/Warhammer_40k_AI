@@ -298,7 +298,8 @@ def test_terrain_volume_cache_preserves_definition_identity_and_validation(wall:
     else:
         assert replace(part, floor_id="other").to_terrain_volume(feature_id="feature") != volume
         assert replace(part, thickness_inches=4).to_terrain_volume(feature_id="feature") != volume
-    for invalid_id in ("", "terrain:feature", [], True):
+    invalid_ids: tuple[object, ...] = ("", "terrain:feature", [], True)
+    for invalid_id in invalid_ids:
         with pytest.raises(GeometryError):
             part.to_terrain_volume(feature_id=cast(str, invalid_id))
 

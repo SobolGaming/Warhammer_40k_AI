@@ -96,11 +96,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "cf4786add34399b2ca9a6fa5d2e3a3ac64998d2148b85e869773d75e10ba7d4c",
-      "after_sha256": "ef7a7c9d693566492d7450da0567475ecc30e0c0d9da81e3da55595111beb399",
+      "after_sha256": "42ab61ce90aee34a91d77783add3a24d59f207250fc73873a03b4f132d30e902",
       "owners": {
         "@document": {
           "before": "cf4786add34399b2ca9a6fa5d2e3a3ac64998d2148b85e869773d75e10ba7d4c",
-          "after": "ef7a7c9d693566492d7450da0567475ecc30e0c0d9da81e3da55595111beb399"
+          "after": "42ab61ce90aee34a91d77783add3a24d59f207250fc73873a03b4f132d30e902"
         }
       }
     },
@@ -134,43 +134,43 @@
         }
       }
     },
-    "docs/performance/current/terrain-reuse-20261112-movement.json": {
+    "docs/performance/current/terrain-reuse-20261112-final-movement.json": {
       "before_sha256": null,
-      "after_sha256": "4c892a5f9bbce3e55f74f3a893b5f62b08ce05d631a993abd87e4efaa752d82f",
+      "after_sha256": "e60a35c4f57022e1d98a590eac28914797f854801741ba028fcfef9c92e002bc",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4c892a5f9bbce3e55f74f3a893b5f62b08ce05d631a993abd87e4efaa752d82f"
+          "after": "e60a35c4f57022e1d98a590eac28914797f854801741ba028fcfef9c92e002bc"
         }
       }
     },
-    "docs/performance/current/terrain-reuse-20261112-reconstruction.json": {
+    "docs/performance/current/terrain-reuse-20261112-final-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "966addaf2ba3c43bee402a993f0242c58d38247289b63d36df55f0dd7367155b",
+      "after_sha256": "83cfaa764c411fc924a17d8c477209e5093558399e08191bcd988fcbf0756c73",
       "owners": {
         "@document": {
           "before": null,
-          "after": "966addaf2ba3c43bee402a993f0242c58d38247289b63d36df55f0dd7367155b"
+          "after": "83cfaa764c411fc924a17d8c477209e5093558399e08191bcd988fcbf0756c73"
         }
       }
     },
-    "docs/performance/current/terrain-reuse-20261112-setup.json": {
+    "docs/performance/current/terrain-reuse-20261112-final-setup.json": {
       "before_sha256": null,
-      "after_sha256": "c609814b4bae40787d61b8fc8e86712c766df9b6a54b2f4b269e2db31c9fa08d",
+      "after_sha256": "bc7351ae3d4b83c15ae61a7559c97a6e78b2f103afbabda8f8fdb709d38c93c2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c609814b4bae40787d61b8fc8e86712c766df9b6a54b2f4b269e2db31c9fa08d"
+          "after": "bc7351ae3d4b83c15ae61a7559c97a6e78b2f103afbabda8f8fdb709d38c93c2"
         }
       }
     },
-    "docs/performance/current/terrain-reuse-20261112-visibility.json": {
+    "docs/performance/current/terrain-reuse-20261112-final-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "4194b3c0cc849e7ed2a6f6266135a5b7246a05395fab2287d2e396f802c2b9b1",
+      "after_sha256": "0e265fcf04b1638930db6bf15c55659aafb8f387f85a8a0c9e87c00daab65484",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4194b3c0cc849e7ed2a6f6266135a5b7246a05395fab2287d2e396f802c2b9b1"
+          "after": "0e265fcf04b1638930db6bf15c55659aafb8f387f85a8a0c9e87c00daab65484"
         }
       }
     },
@@ -258,7 +258,7 @@
     },
     "tests/rules/section03/test_terrain_path_preparation.py": {
       "before_sha256": "80d1c500ec4c77de9d78725ab1f76e86ca44cf35961eaa1e0f082d8fd3e830f3",
-      "after_sha256": "5167215d8f0bafca00e87ba202d5b5bf23d002fd451090be1fdf4168b5070b9b",
+      "after_sha256": "869ce37ba5d43d7a1c5558c94fceaf33eb81bfff62c2e5f13019551f2c071438",
       "owners": {
         "@module": {
           "before": "528fb90013b2044c4078c8491bc15f1acf9af01af8bdf8e096b621d6297a6946",
@@ -278,7 +278,7 @@
         },
         "test_terrain_volume_cache_preserves_definition_identity_and_validation": {
           "before": null,
-          "after": "d143e9a9fccc42b69001a51bd4c272f3a07e8c965bcb26054e66e29f8f1ca47e"
+          "after": "a0a36e3b771e5f8226268ecf20305402ac23dfcb339bee09a7240a5eb370c824"
         }
       }
     }
@@ -406,7 +406,7 @@
       "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
       "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
     },
-    "docs/performance/current/terrain-reuse-20261112-movement.json": {
+    "docs/performance/current/terrain-reuse-20261112-final-movement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -414,7 +414,7 @@
       "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
       "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
     },
-    "docs/performance/current/terrain-reuse-20261112-reconstruction.json": {
+    "docs/performance/current/terrain-reuse-20261112-final-reconstruction.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -422,7 +422,7 @@
       "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
       "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
     },
-    "docs/performance/current/terrain-reuse-20261112-setup.json": {
+    "docs/performance/current/terrain-reuse-20261112-final-setup.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -430,7 +430,7 @@
       "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
       "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
     },
-    "docs/performance/current/terrain-reuse-20261112-visibility.json": {
+    "docs/performance/current/terrain-reuse-20261112-final-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -513,10 +513,10 @@
   },
   "milestone": "ordinary",
   "comparisons": {
-    "visibility": "docs/performance/current/terrain-reuse-20261112-visibility.json",
-    "movement": "docs/performance/current/terrain-reuse-20261112-movement.json",
-    "setup": "docs/performance/current/terrain-reuse-20261112-setup.json",
-    "reconstruction": "docs/performance/current/terrain-reuse-20261112-reconstruction.json"
+    "visibility": "docs/performance/current/terrain-reuse-20261112-final-visibility.json",
+    "movement": "docs/performance/current/terrain-reuse-20261112-final-movement.json",
+    "setup": "docs/performance/current/terrain-reuse-20261112-final-setup.json",
+    "reconstruction": "docs/performance/current/terrain-reuse-20261112-final-reconstruction.json"
   },
   "full_game": null
 }
