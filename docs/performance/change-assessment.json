@@ -1,67 +1,522 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "7a52cc96b156a3a168625a6ad2d9da84af4e47aa",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:53340ca35795a3eda1a6603cc383a61a394211f4e9a6b1fecff6eb5d2c70cffe",
+  "base": "9b4b84ba98ce2939fdbb9517bd9b2eff60bbfca2",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0b8e5714a12c2612efda8b92bcdb37be7c8045cb24d6b3c821527fecf21aee2f",
   "operation_map_sha256": "8122ef8cf76b01a63fee89aed015224de90d35d77adf51b57f92eb6427ae760e",
   "changes": {
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "8c7f2962ebc6cdb49170141f1e71f9b17a0a5441159945fbf2384abcb43cbea3",
-      "after_sha256": "a9ed5bb7822da5f6625ef8de361ecb20d0f2dd8716149cd408d2090cced5807a",
+    "README.md": {
+      "before_sha256": "563977f594dd843039c04595c5c17829290134d1e84a139f132a7f2d30801413",
+      "after_sha256": "9338735a7078cd8ddb33bbae4094c3720672868302efb239be41c7e72d636b36",
       "owners": {
         "@document": {
-          "before": "8c7f2962ebc6cdb49170141f1e71f9b17a0a5441159945fbf2384abcb43cbea3",
-          "after": "a9ed5bb7822da5f6625ef8de361ecb20d0f2dd8716149cd408d2090cced5807a"
+          "before": "563977f594dd843039c04595c5c17829290134d1e84a139f132a7f2d30801413",
+          "after": "9338735a7078cd8ddb33bbae4094c3720672868302efb239be41c7e72d636b36"
+        }
+      }
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "9e8fb43c0f1d0ef907008efe19e136524da612ac38c471e1a84ac86df3519d33",
+      "after_sha256": "498a016b5f21801f41555243bf317cb39ce1ca3f0a491e853ef20c39167f0033",
+      "owners": {
+        "@document": {
+          "before": "9e8fb43c0f1d0ef907008efe19e136524da612ac38c471e1a84ac86df3519d33",
+          "after": "498a016b5f21801f41555243bf317cb39ce1ca3f0a491e853ef20c39167f0033"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "41ca2140d69c2b87ae5c1b8e427ed151f59612251b33dd03e64d3094aedd383b",
+      "after_sha256": "50bbc4801521a9238c0b1607f9b93b38231236ce57ef5795516d1da80f603c76",
+      "owners": {
+        "@document": {
+          "before": "41ca2140d69c2b87ae5c1b8e427ed151f59612251b33dd03e64d3094aedd383b",
+          "after": "50bbc4801521a9238c0b1607f9b93b38231236ce57ef5795516d1da80f603c76"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "57fee383a6660728e04a4a7a2d19cddcc67d05926ff8df082d19862c275755f0",
+      "after_sha256": "867b2942d8950108741d6d8a4af8caeeae66e67e276904ddb217791c46456706",
+      "owners": {
+        "@document": {
+          "before": "57fee383a6660728e04a4a7a2d19cddcc67d05926ff8df082d19862c275755f0",
+          "after": "867b2942d8950108741d6d8a4af8caeeae66e67e276904ddb217791c46456706"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "4102bcb49a235a26d28f7c475a5826d9638f7a7cd19531e98199c1552df434ea",
+      "after_sha256": "84a85c96321fac1b4e3bed836a102f893827f6f3f78e8289f5f6f0f93685dc4f",
+      "owners": {
+        "@document": {
+          "before": "4102bcb49a235a26d28f7c475a5826d9638f7a7cd19531e98199c1552df434ea",
+          "after": "84a85c96321fac1b4e3bed836a102f893827f6f3f78e8289f5f6f0f93685dc4f"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "dbe74f49ebe8f88d0908eacc6bc0c568dc1ffc5359ae78318e6762d84ad3c592",
+      "after_sha256": "c1c5a80983e015762d95444782991ac78f2107c1980419430cf29608449f8017",
+      "owners": {
+        "@document": {
+          "before": "dbe74f49ebe8f88d0908eacc6bc0c568dc1ffc5359ae78318e6762d84ad3c592",
+          "after": "c1c5a80983e015762d95444782991ac78f2107c1980419430cf29608449f8017"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "a43d917b93b49bb36592903ca5a2136d388d7812eceac4789249764c497c2dbf",
+      "after_sha256": "c6e6c9e3a7118b349f9580579eaae020e722afa1ecc63a743985d90553c73090",
+      "owners": {
+        "@document": {
+          "before": "a43d917b93b49bb36592903ca5a2136d388d7812eceac4789249764c497c2dbf",
+          "after": "c6e6c9e3a7118b349f9580579eaae020e722afa1ecc63a743985d90553c73090"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "a98a17a2490646f5835732907a678d0256a9f967cadbc6c563370cd3a16658f2",
+      "after_sha256": "c17761e912da9fc360b8c0919bb4c9a7a0129603a3ad5bd0df0139e74aff4601",
+      "owners": {
+        "@document": {
+          "before": "a98a17a2490646f5835732907a678d0256a9f967cadbc6c563370cd3a16658f2",
+          "after": "c17761e912da9fc360b8c0919bb4c9a7a0129603a3ad5bd0df0139e74aff4601"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "3111986d5b71339da086c7c821270a486fed4406a42db633a26c245b331afe27",
+      "after_sha256": "098323d55b3850b069666de5835bc2c39e9a736352c0d0549cff8044854b8ab8",
+      "owners": {
+        "@document": {
+          "before": "3111986d5b71339da086c7c821270a486fed4406a42db633a26c245b331afe27",
+          "after": "098323d55b3850b069666de5835bc2c39e9a736352c0d0549cff8044854b8ab8"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "before_sha256": "cf4786add34399b2ca9a6fa5d2e3a3ac64998d2148b85e869773d75e10ba7d4c",
+      "after_sha256": "ef7a7c9d693566492d7450da0567475ecc30e0c0d9da81e3da55595111beb399",
+      "owners": {
+        "@document": {
+          "before": "cf4786add34399b2ca9a6fa5d2e3a3ac64998d2148b85e869773d75e10ba7d4c",
+          "after": "ef7a7c9d693566492d7450da0567475ecc30e0c0d9da81e3da55595111beb399"
+        }
+      }
+    },
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "before_sha256": "a9ed5bb7822da5f6625ef8de361ecb20d0f2dd8716149cd408d2090cced5807a",
+      "after_sha256": "7c111ccc6afc10c26baa3d913736502ecf32f8e2a1d26eb2aff5fa1a6e4be872",
+      "owners": {
+        "@document": {
+          "before": "a9ed5bb7822da5f6625ef8de361ecb20d0f2dd8716149cd408d2090cced5807a",
+          "after": "7c111ccc6afc10c26baa3d913736502ecf32f8e2a1d26eb2aff5fa1a6e4be872"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "3bc1ff9f53993ab2c37e2e47e9a214b79baa8b27b8ffe79fff7e2cc2da3cb61f",
-      "after_sha256": "89289e2daa1cb0648c452d9fdbdae711e2b09d09185de6b6fa5af85017179b38",
+      "before_sha256": "89289e2daa1cb0648c452d9fdbdae711e2b09d09185de6b6fa5af85017179b38",
+      "after_sha256": "a4a8cf5e7106898f61279e720a45af25fa8bc218f04534f8b6b71153f0004ebb",
       "owners": {
         "@document": {
-          "before": "3bc1ff9f53993ab2c37e2e47e9a214b79baa8b27b8ffe79fff7e2cc2da3cb61f",
-          "after": "89289e2daa1cb0648c452d9fdbdae711e2b09d09185de6b6fa5af85017179b38"
+          "before": "89289e2daa1cb0648c452d9fdbdae711e2b09d09185de6b6fa5af85017179b38",
+          "after": "a4a8cf5e7106898f61279e720a45af25fa8bc218f04534f8b6b71153f0004ebb"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "bdb5bc6478e6fcc23fe69192652380353d99409971bcc48768e30d454c13a6ae",
-      "after_sha256": "aa55399a1246af7ccbf28396b89bfc466cd05f8dbef162f87ae68c965432cb40",
+      "before_sha256": "aa55399a1246af7ccbf28396b89bfc466cd05f8dbef162f87ae68c965432cb40",
+      "after_sha256": "5b4e3254f15d1dc32101e0d301ce586fae68d3cc2a9287c03fc66f518d4fcf42",
       "owners": {
         "@document": {
-          "before": "bdb5bc6478e6fcc23fe69192652380353d99409971bcc48768e30d454c13a6ae",
-          "after": "aa55399a1246af7ccbf28396b89bfc466cd05f8dbef162f87ae68c965432cb40"
+          "before": "aa55399a1246af7ccbf28396b89bfc466cd05f8dbef162f87ae68c965432cb40",
+          "after": "5b4e3254f15d1dc32101e0d301ce586fae68d3cc2a9287c03fc66f518d4fcf42"
+        }
+      }
+    },
+    "docs/performance/current/terrain-reuse-20261112-movement.json": {
+      "before_sha256": null,
+      "after_sha256": "4c892a5f9bbce3e55f74f3a893b5f62b08ce05d631a993abd87e4efaa752d82f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4c892a5f9bbce3e55f74f3a893b5f62b08ce05d631a993abd87e4efaa752d82f"
+        }
+      }
+    },
+    "docs/performance/current/terrain-reuse-20261112-reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "966addaf2ba3c43bee402a993f0242c58d38247289b63d36df55f0dd7367155b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "966addaf2ba3c43bee402a993f0242c58d38247289b63d36df55f0dd7367155b"
+        }
+      }
+    },
+    "docs/performance/current/terrain-reuse-20261112-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "c609814b4bae40787d61b8fc8e86712c766df9b6a54b2f4b269e2db31c9fa08d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c609814b4bae40787d61b8fc8e86712c766df9b6a54b2f4b269e2db31c9fa08d"
+        }
+      }
+    },
+    "docs/performance/current/terrain-reuse-20261112-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "4194b3c0cc849e7ed2a6f6266135a5b7246a05395fab2287d2e396f802c2b9b1",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4194b3c0cc849e7ed2a6f6266135a5b7246a05395fab2287d2e396f802c2b9b1"
+        }
+      }
+    },
+    "scripts/current_shard_compatibility.py": {
+      "before_sha256": "e0a01cd0dda3c0a1687db0f596ab5bad8a2eff7d00a64b73dcb149165b7f2945",
+      "after_sha256": "31a1d42022823ffcbfd946be96a766d2018e0ddc1c8964b5ecc75e0983e63345",
+      "owners": {
+        "@module": {
+          "before": "faab8e19f4b4d577e12b61fb7fe35beb3573d04f13b51e1df8672591e877e655",
+          "after": "c5383ba525657bd8e285d8e98140992500b49629323ffe039414f53664e4fbee"
+        },
+        "_baseline": {
+          "before": "411b325823bf0bdc55c2de25f7461057803a6e3d435986e746c86ec3a61a5da9",
+          "after": "440b62c9a3e519f9f1720861a5a7f58925dd686e43093f5f76c7e474308f8006"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "1e3e2edf2759b659894487fc53c2396da7eeaa1a2f5742e1c5bef04a97c1db15",
+      "after_sha256": "3214cb9140298af9964502ca607712e790c322f469e3c105f81c65e08849e2cd",
+      "owners": {
+        "@document": {
+          "before": "1e3e2edf2759b659894487fc53c2396da7eeaa1a2f5742e1c5bef04a97c1db15",
+          "after": "3214cb9140298af9964502ca607712e790c322f469e3c105f81c65e08849e2cd"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/shapely_backend.py": {
+      "before_sha256": "a8da1d9403dd974c28657ff225c11d817c7089d526336a58b5c53ffe3a8c5c03",
+      "after_sha256": "1878aceeac9eb330bcbc2d5a0965e055321f54f7058f05160234db77084bf05d",
+      "owners": {
+        "@module": {
+          "before": "9a39073d3787460f8eb27f429cda4d177fd51e58c2086033a5be50a5b23979e6",
+          "after": "450289d8f2dec3942d9e221d2cf8bc165fcd3e81c5a78e57cf468dcb60fbd604"
+        },
+        "_cached_terrain_footprint": {
+          "before": null,
+          "after": "a1c4b0c2347aff7c34686e08e49cd2ded21dbb8fcb676c8bb81a13b476d0fe2f"
+        },
+        "footprint_for_terrain": {
+          "before": "51644b80e6b8e093bd9738a73038805a8acbbccde414a26ca5fd67de875278f6",
+          "after": "8ab8e4a84142f55c8176309dfd159fa988f3be571bcd2ae536a8ce27ebbcaa8f"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/terrain.py": {
+      "before_sha256": "0c81c16e7b496028d87243d28684d8e53b1d8e7d832bcf520241e5346c0aa31a",
+      "after_sha256": "dc5c884c49a375d954f4c6d08cc99237bb74827db3e859b3084043aece149ba1",
+      "owners": {
+        "@module": {
+          "before": "05988a75b1bf335687f57278591d22b099d2955a5e8f5b5c87425130a694cbeb",
+          "after": "2147df1535a7e105a2333fefbb1a39f5443143b58573dc44f5a56bf685b0a4d1"
+        },
+        "TerrainFloorDefinition._cached_terrain_volume": {
+          "before": null,
+          "after": "250ff307d9c0effb0ce3dbabb508442903c3e82d6aa92012dcb9626fec07dd56"
+        },
+        "TerrainFloorDefinition.to_terrain_volume": {
+          "before": "f7c7f1d07852f93d153aaa4d2dc60543a42c5e3c5b6fabbe8377630d160d7748",
+          "after": "0a613fb852c6f168c3a76724ec30709e70778b534fa6a2290b79558f527fe808"
+        },
+        "TerrainWallDefinition._cached_terrain_volume": {
+          "before": null,
+          "after": "099cb329cbd3cd2d4bde259a761bf22e16c103527ede98cef655b68e58a040d0"
+        },
+        "TerrainWallDefinition.to_terrain_volume": {
+          "before": "6e53ce7f33cf021b3a37f367c0f004432590ef593e250d37577eb9cd43f05465",
+          "after": "eb054c5ac0723f95387b02225e2549c5c2ae5ac6b56636a4ab93c8f839700dfe"
+        }
+      }
+    },
+    "tests/code_quality/test_current_shard_compatibility.py": {
+      "before_sha256": "5109b7d501a392bf42cee00d2ae4d2c37ec386c81f560d539a5243ddf0ffa918",
+      "after_sha256": "2295c6ccd8daffe5ffb91aead69298ea465c151992ed1cd1afe9f1f3635ce9b6",
+      "owners": {
+        "test_compatibility_boundary_rejects_stale_or_forged_inputs": {
+          "before": "49b8a81252567a417a74b54a9ec331d2e26fb08864c1f2387bb3079860ac4579",
+          "after": "38af45be6d828fa3d62674a701e2b6930c8638ea11edec5ed759cb9cb0ec111b"
+        },
+        "test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves": {
+          "before": "289ab80c7dd6a5324b5dfd89511d355b944f3170ff59c2e612d2a2c03fdadf92",
+          "after": "9ce1b7711fe79237ec12627167808ef9ad5f9485842e564655b1dfa66880f9ef"
+        }
+      }
+    },
+    "tests/rules/section03/test_terrain_path_preparation.py": {
+      "before_sha256": "80d1c500ec4c77de9d78725ab1f76e86ca44cf35961eaa1e0f082d8fd3e830f3",
+      "after_sha256": "5167215d8f0bafca00e87ba202d5b5bf23d002fd451090be1fdf4168b5070b9b",
+      "owners": {
+        "@module": {
+          "before": "528fb90013b2044c4078c8491bc15f1acf9af01af8bdf8e096b621d6297a6946",
+          "after": "8e815b0f1e94cb2b31a147fce1df0c241ca5288329b9a4f5b341161cb2f00030"
+        },
+        "test_immutable_terrain_caches_are_bounded_and_eviction_preserves_values": {
+          "before": null,
+          "after": "84a5ebe894be471427c852644362e5dc96b5e160510ac7df7bcc97323143cc5d"
+        },
+        "test_terrain_footprint_cache_uses_exact_horizontal_geometry": {
+          "before": null,
+          "after": "b8e0e0b53f61e01cec624b1c4750936016c0c1aec1afa00e6b9b68d280755c91"
+        },
+        "test_terrain_preparation_preserves_complete_results_and_context_isolation": {
+          "before": "59f001f3b6a8823dcb0a6e2c6a735ae435c8338bc8d77ac5fb1884dcf979c724",
+          "after": "099342f43daa1e9fe66b98e0e5269ac08cd77db3eee5ddba80fba77de28b2ef2"
+        },
+        "test_terrain_volume_cache_preserves_definition_identity_and_validation": {
+          "before": null,
+          "after": "d143e9a9fccc42b69001a51bd4c272f3a07e8c965bcb26054e66e29f8f1ca47e"
         }
       }
     }
   },
   "rows": {
+    "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the complete corrected five-model operator evaluation and the remaining measured charge-search bottleneck.",
-      "source_obligation": "Preserve original checkpoint, corrected physical witness order, geometry, seeds, endpoint obligations, search limits, historical censored results and all delivery gates.",
-      "unchanged_work": "Documentation only. Engine, schemas, dependencies, fixtures, tests, search, caches, budgets, runtime identity and CI are unchanged; no full-game throughput or legal charge is certified."
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the complete corrected five-model operator evaluation and the remaining measured charge-search bottleneck.",
-      "source_obligation": "Preserve original checkpoint, corrected physical witness order, geometry, seeds, endpoint obligations, search limits, historical censored results and all delivery gates.",
-      "unchanged_work": "Documentation only. Engine, schemas, dependencies, fixtures, tests, search, caches, budgets, runtime identity and CI are unchanged; no full-game throughput or legal charge is certified."
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the complete corrected five-model operator evaluation and the remaining measured charge-search bottleneck.",
-      "source_obligation": "Preserve original checkpoint, corrected physical witness order, geometry, seeds, endpoint obligations, search limits, historical censored results and all delivery gates.",
-      "unchanged_work": "Documentation only. Engine, schemas, dependencies, fixtures, tests, search, caches, budgets, runtime identity and CI are unchanged; no full-game throughput or legal charge is certified."
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "docs/performance/current/terrain-reuse-20261112-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "docs/performance/current/terrain-reuse-20261112-reconstruction.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "docs/performance/current/terrain-reuse-20261112-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "docs/performance/current/terrain-reuse-20261112-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "scripts/current_shard_compatibility.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "src/warhammer40k_core/geometry/shapely_backend.py": {
+      "category": "cache_policy",
+      "operations": [
+        "geometry-search",
+        "cache-policy"
+      ],
+      "selected_families": [
+        "movement",
+        "reconstruction",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "src/warhammer40k_core/geometry/terrain.py": {
+      "category": "cache_policy",
+      "operations": [
+        "geometry-search",
+        "cache-policy"
+      ],
+      "selected_families": [
+        "movement",
+        "reconstruction",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "tests/code_quality/test_current_shard_compatibility.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
+    },
+    "tests/rules/section03/test_terrain_path_preparation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "terrain-preparation-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse exact immutable terrain products at their shared geometry owners; bind fresh same-host actual-base component evidence and preserve historical results.",
+      "source_obligation": "Preserve full-prefix and endpoint legality, exact physical execution order, geometry and seeds, search budgets, typed unresolved results and ordinary persistence/replay. Cache keys contain every value affecting the immutable product; public validation still runs on hits.",
+      "unchanged_work": "Mutable model/context/policy/path/support/coherency/endpoint results are never cached. All original legality and search work remains authoritative. Only four new active cases, derived runtime/contract identities and fresh complete local scheduling evidence change; historical phases remain unchanged and no full-game qualification is claimed."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "visibility": "docs/performance/current/terrain-reuse-20261112-visibility.json",
+    "movement": "docs/performance/current/terrain-reuse-20261112-movement.json",
+    "setup": "docs/performance/current/terrain-reuse-20261112-setup.json",
+    "reconstruction": "docs/performance/current/terrain-reuse-20261112-reconstruction.json"
+  },
   "full_game": null
 }

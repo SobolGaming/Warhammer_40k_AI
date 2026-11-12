@@ -2479,10 +2479,10 @@
       "bytes": 10424
     },
     "tests/rules/section03/test_terrain_path_preparation.py": {
-      "blob_sha1": "3bfde5443635c152d79c58c077cffacbba035e6e",
-      "bytes": 7692,
+      "blob_sha1": "e033090604eeaec56199fea9cdd6535449ae40dc",
+      "bytes": 13249,
       "mode": "100644",
-      "sha256": "80d1c500ec4c77de9d78725ab1f76e86ca44cf35961eaa1e0f082d8fd3e830f3"
+      "sha256": "5167215d8f0bafca00e87ba202d5b5bf23d002fd451090be1fdf4168b5070b9b"
     }
   },
   "active_roots": [

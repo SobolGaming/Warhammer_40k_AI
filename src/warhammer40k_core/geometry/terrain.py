@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -37,6 +38,8 @@ from warhammer40k_core.geometry.terrain_classification import (
 )
 from warhammer40k_core.geometry.terrain_solid import solid_opening_volumes
 from warhammer40k_core.geometry.volume import Model
+
+_TERRAIN_VOLUME_CACHE_MAXSIZE = 4096
 
 
 class TerrainVolumePayload(TypedDict):
@@ -351,17 +354,26 @@ class TerrainWallDefinition:
             feature_id,
             reserved_prefix="terrain:",
         )
+        return TerrainWallDefinition._cached_terrain_volume(self, terrain_feature_id)
+
+    @staticmethod
+    @lru_cache(maxsize=_TERRAIN_VOLUME_CACHE_MAXSIZE)
+    def _cached_terrain_volume(
+        definition: TerrainWallDefinition, terrain_feature_id: str
+    ) -> ObstacleVolume:
+        # Frozen definition values and the validated owner ID fully specify
+        # this immutable volume. No model, path or traversal result is retained.
         return ObstacleVolume(
-            terrain_id=f"{terrain_feature_id}:{self.wall_id}",
+            terrain_id=f"{terrain_feature_id}:{definition.wall_id}",
             bottom_center=Point3(
-                self.center_x_inches,
-                self.center_y_inches,
-                self.bottom_z_inches,
+                definition.center_x_inches,
+                definition.center_y_inches,
+                definition.bottom_z_inches,
             ),
-            width=self.width_inches,
-            depth=self.depth_inches,
-            height=self.height_inches,
-            rotation_degrees=self.rotation_degrees,
+            width=definition.width_inches,
+            depth=definition.depth_inches,
+            height=definition.height_inches,
+            rotation_degrees=definition.rotation_degrees,
         )
 
     def to_payload(self) -> TerrainWallDefinitionPayload:
@@ -500,17 +512,25 @@ class TerrainFloorDefinition:
             feature_id,
             reserved_prefix="terrain:",
         )
+        return TerrainFloorDefinition._cached_terrain_volume(self, terrain_feature_id)
+
+    @staticmethod
+    @lru_cache(maxsize=_TERRAIN_VOLUME_CACHE_MAXSIZE)
+    def _cached_terrain_volume(
+        definition: TerrainFloorDefinition, terrain_feature_id: str
+    ) -> TerrainVolume:
+        # Keep validation in the public method, including on cache hits.
         return TerrainVolume(
-            terrain_id=f"{terrain_feature_id}:{self.floor_id}",
+            terrain_id=f"{terrain_feature_id}:{definition.floor_id}",
             bottom_center=Point3(
-                self.center_x_inches,
-                self.center_y_inches,
-                self.bottom_z_inches,
+                definition.center_x_inches,
+                definition.center_y_inches,
+                definition.bottom_z_inches,
             ),
-            width=self.width_inches,
-            depth=self.depth_inches,
-            height=self.thickness_inches,
-            rotation_degrees=self.rotation_degrees,
+            width=definition.width_inches,
+            depth=definition.depth_inches,
+            height=definition.thickness_inches,
+            rotation_degrees=definition.rotation_degrees,
             blocks_line_of_sight=False,
         )
 
