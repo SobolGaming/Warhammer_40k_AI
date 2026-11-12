@@ -73,7 +73,8 @@ def test_exact_fetch_restores_squashed_away_calibration_in_main_only_checkout(
 
     origin = tmp_path / "origin"
     origin.mkdir()
-    git(origin, "init", "--initial-branch=main", "--quiet")
+    git(origin, "init", "--quiet")
+    git(origin, "symbolic-ref", "HEAD", "refs/heads/main")
     git(origin, "config", "core.autocrlf", "false")
     directory = origin / "ci/test_shards"
     directory.mkdir(parents=True)
