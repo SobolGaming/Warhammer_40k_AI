@@ -991,13 +991,6 @@ live conformance, base-ref compatibility, and installed-wheel smoke. Code-qualit
 workers share read-only source/AST data within each process; mutable test fixtures
 and generated temporary output remain independently validated.
 
-Both quality producers fetch the exact historical validation anchor and the
-pre-squash calibration commit `b9b1c97a6a2da6fca624c7f30c471d6cfab56320`
-before validation. Full main history alone does not contain every squashed topic
-commit. The latter supplies the six original calibration/baseline files checked
-by `test_complete_append_preserves_every_prior_observation_and_baseline`;
-missing history remains a failure, and its assertions and original data stay intact.
-
 Twelve standard runners increase behavioral parallel capacity without changing test
 selection or the combined branch-coverage measurement. Compare several successful CI
 runs before claiming a wall-time reduction: added capacity can increase total runner

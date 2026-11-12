@@ -14,16 +14,6 @@
         }
       }
     },
-    "README.md": {
-      "before_sha256": "dbaf8f1f860335c00bb99bdc1600c66fe0ce947d14ca2ecd964162e689f9101f",
-      "after_sha256": "360411d8256c073cf134e09f784b609959ecf4be8f2eea3237ff15964f5262e3",
-      "owners": {
-        "@document": {
-          "before": "dbaf8f1f860335c00bb99bdc1600c66fe0ce947d14ca2ecd964162e689f9101f",
-          "after": "360411d8256c073cf134e09f784b609959ecf4be8f2eea3237ff15964f5262e3"
-        }
-      }
-    },
     "ci/quality_shards/all.txt": {
       "before_sha256": "1590c9e5b7970f8455afdb1d415c3566a44068d1cb95c7e2cd604a6850f49624",
       "after_sha256": "8f41163d4dc0d1016fea80c2f754dca806658a7a4ea52604bd045c04df2a33a1",
@@ -70,14 +60,6 @@
         "behavioral-worker-progress",
         "covered-shard-workload"
       ],
-      "selected_families": [],
-      "rationale": "Provision the exact pre-squash calibration commit before both quality producers validate retained historical evidence. Add real-Git missing-history/fetch regression coverage and preserve the original assertions, data, old anchor, required gates and timing limits.",
-      "source_obligation": "A clean main-only checkout must obtain b9b1c97a6a2da6fca624c7f30c471d6cfab56320 before reading its six original calibration/baseline files; unavailable history remains a hard failure.",
-      "unchanged_work": "No engine, behavioral test, measured workload, algorithm, cache, serialization, runtime dependency, calibration measurement, shard allocation or coverage/timing budget changes. The serial current-runtime smoke and required exact-head gates remain mandatory."
-    },
-    "README.md": {
-      "category": "governance",
-      "operations": [],
       "selected_families": [],
       "rationale": "Provision the exact pre-squash calibration commit before both quality producers validate retained historical evidence. Add real-Git missing-history/fetch regression coverage and preserve the original assertions, data, old anchor, required gates and timing limits.",
       "source_obligation": "A clean main-only checkout must obtain b9b1c97a6a2da6fca624c7f30c471d6cfab56320 before reading its six original calibration/baseline files; unavailable history remains a hard failure.",
