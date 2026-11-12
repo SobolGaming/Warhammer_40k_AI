@@ -401,8 +401,10 @@ actual four-worker projections and preserve the historical/stress/latest plannin
 ceilings of 1,076/1,054/1,050 seconds. Original historical scores and partial unknowns
 remain separate; additions have no historical observations. No offline allocation
 search runs in CI, and planning estimates never qualify hosted timing. The complete
-current local covered run passed in 1,146.71 seconds with 67.47% coverage; fresh
-hosted CI and its unchanged approval limits remain required.
+PR671 local covered supervisor recorded 1,149.154 seconds with 67.47% coverage;
+the subsequent PR672 supervisor recorded 1,219.895 seconds with 67.48% coverage. These are
+historical observations, not qualification of a later head. Every new head still
+requires fresh local and hosted gates under the unchanged approval limits.
 
 Download the `behavior-report-*` artifacts from each chosen complete behavioral
 run into a separate directory outside the checkout, then regenerate (repeat both
