@@ -1865,3 +1865,67 @@ provisional geometry, mixed mission/layout, partial points and public-seed cavea
 These finite observations establish neither exhaustive denial nor a best response, useful
 sacrifice or tactical superiority. `useful_reference_status` remains `scoped_gap`,
 `reference_target` is null and `eligible_for_learning` is false; Stage 2 is open.
+
+## Natural charge and bounded witness operator evidence
+
+`stage2-bounded-screen-charge-v1` retains the canonical configuration/seed and
+the ordinary edge-column 1.4-inch approach. Its declaration-byte SHA-256 is
+`61bdb6e681cf0a94e248c3ffd78865a8205ebc10c18dadf5e9bccb7b5848a5dc`. Screen's 60-record Charge checkpoint is forked before choosing
+B versus declining. Preservation supplies only the actual no-charge eligibility
+control. Both forks share the screen checkpoint and its natural RNG authority;
+preservation's different history is not given an invented matching RNG state.
+
+The existing authority performs charging-unit selection, a physical 2D6 roll,
+the offered Command Re-roll decline, finite selection of S alone, then the
+parameterized Charge Move request. Natural values 6 and 3 produce a nine-inch
+maximum, with no reroll or modifier. S's observed base-edge gap is 2.140157
+inches. The 63-record selected-target checkpoint retains that realized roll and
+remains pending; target eligibility and a sufficient roll do not certify a path.
+
+The fixed initial witness moves all five B models 1.640157 inches positive Y
+with complete paths, unchanged height/facing and descending initial Y. The
+declared procedure allows at most six native pure evaluations, changing only
+the first physical-order model path for which native preferred-distance or
+engagement alternative evidence is available. Evaluation one is invalid with
+`charge_reachability_unresolved`; four model preferred-distance queries remain
+unresolved. This result never authorizes treating an unproved goal as impossible.
+
+Evaluation two is an operator ordering failure: composition used sorted
+`model_ids()` rather than the retained physical `model_paths` order. Its
+endpoint-overlap diagnostics and the subsequent optional no-move history are
+kept separately. They do not qualify the declared front-to-back procedure.
+The corrected fork reuses evaluation one, counts the faulty second call within
+the same six-call ceiling and resumes the same saved roll/target checkpoint.
+Evaluation three retains physical order but is interrupted at the original
+experiment allowance before returning. No corrected movement submission occurs.
+Available query/progress, the saved checkpoint and all earlier results remain
+diagnostics. The cross-process deadline uses a wall-time reconstruction after
+WSL's uptime reset, with explicit polling/timestamp uncertainty; it is not the
+exact monotonic covered-suite gate or a component/full-game speed measurement.
+
+The pending 63-record charge, 62-record direct decline and 54-record preservation
+control each retain ordinary-startup, strict JSON persistence, exact
+`ReplayRunner` reproduction and both players' projection/event-stream equality.
+Both viewer streams exclude the private seed. The controls end at round-four A
+Movement; the corrected charge remains pending in round-three B Charge. No
+comparison silently replaces that missing common horizon. Current engagement is
+empty, all original models/wounds remain and no Charge Move, displacement,
+Fights First or Fight is qualified. No geometry/seed search, authoritative state
+patch, future-chance overwrite or favorable-outcome replacement occurs.
+
+Prebattle option/reaction handling and a preservation-horizon overshoot also
+remain operator diagnostics. The retained overshoot is not the control: its
+54-record boundary is reconstructed through ordinary replay and independently
+verified. Existing finite, reaction, charge, movement, viewer and replay adapter
+contracts cover all actual submissions; this adds no runtime policy, decision
+family, admission factory, target calculator or learning consumer.
+
+The missing prerequisite is a complete legal witnessed Charge Move satisfying
+the retained per-model endpoint obligations. Neither the unresolved first query,
+the bad ordering nor the incomplete corrected query proves no such move exists.
+Retained 03.01/03.04/09.05/11.02/11.04 ledgers keep their provenance limits and no
+fresh official-App certification is asserted. The inherited roster, geometry,
+mission/layout, points and public-seed exceptions remain. Best response,
+successful engagement, sacrifice/E benefit, matched tactical outcome, throughput,
+Stage 2 completion and learning stay open; useful-reference status is
+`scoped_gap`, `reference_target` is null and `eligible_for_learning` is false.
