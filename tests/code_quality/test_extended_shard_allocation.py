@@ -76,6 +76,8 @@ def test_exact_fetch_restores_squashed_away_calibration_in_main_only_checkout(
     git(origin, "init", "--quiet")
     git(origin, "symbolic-ref", "HEAD", "refs/heads/main")
     git(origin, "config", "core.autocrlf", "false")
+    # Match the exact reachable-SHA fetch capability verified on the GitHub origin.
+    git(origin, "config", "uploadpack.allowReachableSHA1InWant", "true")
     directory = origin / "ci/test_shards"
     directory.mkdir(parents=True)
     files = (

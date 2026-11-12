@@ -46,7 +46,7 @@
     },
     "tests/code_quality/test_extended_shard_allocation.py": {
       "before_sha256": "7ddab24b43d6d278c9bdf494f403abaaa993e7bd87b125d762f8df464f85f4ae",
-      "after_sha256": "c130946b8091b25dd9ecba3137cd0dab36816a5d4c68c92c13b27cc5db52a00f",
+      "after_sha256": "652311cae334579cf854698a1b9b12f4e0dc861d42db6043df2b1df5d372c0a1",
       "owners": {
         "@module": {
           "before": "66987efe9bbad94bd6d14a8bad45d37a7926539c2995e8e67d9c01de599d5f05",
@@ -54,7 +54,7 @@
         },
         "test_exact_fetch_restores_squashed_away_calibration_in_main_only_checkout": {
           "before": null,
-          "after": "28b185d5c34cac38441960e87c646358051f8527c7fac67a343413849b56b8ce"
+          "after": "5523a58250b82236016722ee1e6774947e7bc80557b6f84038c6fe9e0d8cd337"
         },
         "test_quality_producers_fetch_exact_pre_squash_calibration_before_validation": {
           "before": null,
