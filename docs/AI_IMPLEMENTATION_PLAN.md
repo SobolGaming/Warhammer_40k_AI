@@ -644,6 +644,67 @@ response or tactical benefit. Historical admissions retain their meanings; usefu
 status remains `scoped_gap`, the reference target is null, learning is excluded and Stage 2 is
 open.
 
+### Bounded natural charge attempt against the edge-column screen
+
+`stage2-bounded-screen-charge-v1` reproduces the unchanged configuration/seed and
+ordinary 1.4-inch approach above. The screen arm reaches B's round-three
+`select_charging_unit` after 60 records, with S at a 2.140157-inch base-edge gap.
+The comparison forks this same checkpoint before choosing B versus completing
+Charge. Preservation is a separate no-charge-eligibility control; it does not
+invent a declaration when the engine offers none. Declaration-byte SHA-256 is
+`61bdb6e681cf0a94e248c3ffd78865a8205ebc10c18dadf5e9bccb7b5848a5dc`.
+
+The declaration fixes declines for optional reactions and rerolls. The ordinary
+sequence selects B, rolls physical 2D6, declines the offered Command Re-roll,
+selects S alone from the post-roll target request, then reaches the movement
+proposal. The natural dice are 6 and 3, giving nine inches without modifiers or
+rerolls. The saved 63-record checkpoint is an ordinary reachable post-roll,
+selected-target state; it is not a completed Charge Move.
+
+The bounded witness procedure starts with a full 1.640157-inch positive-Y path
+for every B model, front to back, leaving a half-inch nearest gap if accepted.
+It permits at most six pure native evaluations and replaces only the first
+execution-ordered model path with a native preferred-distance or engagement
+alternative when available. The first evaluation returns
+`charge_reachability_unresolved`: the front model satisfies both endpoint goals,
+but preferred-distance queries for the other four models remain unresolved.
+An unresolved mandatory query is not an impossibility proof or an exemption.
+
+The operator's second composition incorrectly used `PathWitness.model_ids()`,
+the sorted inventory, instead of `model_paths`, the physical execution order.
+Its `end_on_model_overlap` results and subsequent accepted optional no-move
+history at 65 records are retained as harness diagnostics, not the declared
+procedure's result. A corrected fork restores the same 63-record checkpoint,
+reuses the completed first evaluation and counts the faulty second call against
+the six-call ceiling. Its third evaluation preserves descending-Y order but
+does not finish within the original experiment allowance. The diagnostic watchdog stops the process
+at its reconstructed original deadline with checkpoint, query input and diagnostics retained.
+WSL reset its uptime between processes; the continuing deadline is reconstructed
+from the retained first exit receipt and wall time. This is diagnostic timing,
+with polling/timestamp uncertainty, not a certified monotonic performance gate.
+
+No corrected charge witness is submitted or accepted. The qualified endpoint
+remains the 63-record pending proposal, with no engagement, displacement, Fights
+First grant or Fight. The direct-decline branch and preservation control reach
+round-four A Movement after 62 and 54 records. The pending charge and both
+controls pass ordinary-startup verification, strict persistence, exact replay,
+and both-viewer projection/event equality; private RNG seed data is absent from
+those views and streams. No authoritative checkpoint or RNG state is patched.
+All retain S/B at five models and ten wounds, E at three/six and the vehicle at
+one/twelve. The unresolved charge and completed controls are different horizons,
+so they do not supply a common-horizon tactical outcome label.
+
+This qualifies roll/target ordering and a persistent pending-charge boundary,
+plus the specific witness prerequisites above. It does not establish that a
+legal charge is impossible, a best response, a useful screen, sacrifice value,
+E benefit, full-game performance or learning eligibility. The retained 03.01,
+03.04, 09.05, 11.02 and 11.04 source obligations keep their maintained-mirror
+provenance limits; successful 11.04 execution in this experiment remains open.
+The inherited synthetic roster, provisional geometry, mixed mission/layout,
+partial points and public seed limitations remain. Historical admissions retain
+their meanings; `scoped_gap`, null reference target, learning exclusion and open
+Stage 2 status are unchanged.
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.
