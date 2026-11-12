@@ -64,6 +64,9 @@ class _Geometry(Protocol):
     def union(self, other: _Geometry) -> _Geometry: ...
 
 
+type FootprintGeometry = _Geometry
+
+
 class _GeometryModule(Protocol):
     def Point(self, x: float, y: float) -> _Geometry: ...
 

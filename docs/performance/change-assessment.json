@@ -1,67 +1,477 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "0df5d9eec363ce8e46d6c59dceee188ab723f4bb",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:870d2370b0f71a646d7e20e9e998efa7c914fc187745f97830d81487d262115f",
-  "operation_map_sha256": "41cbe072304e809b05fcc98cb0e78f8c854b8fd284dd611059dc8e4f5150e148",
+  "base": "008be8a8cb0b50b232fe022452762b3906489b49",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:53340ca35795a3eda1a6603cc383a61a394211f4e9a6b1fecff6eb5d2c70cffe",
+  "operation_map_sha256": "77198879aeeee576de873de1aabfb0cf8557c8ea2f481777a5eba745c4f6062a",
   "changes": {
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "c9c91bb888c4998af52afb715c06f6f7ec9f3ed2b6f6ea49170f50f73eb0d869",
-      "after_sha256": "987abd50ad1f5fd2590c0db4f15774923b59e2e8884fce47ef8e5462a049af8d",
+    ".gitattributes": {
+      "before_sha256": "ab0ad576ebcc83998cfb6fdc19c567ce614bf653a63857587f510a4435a2b1ea",
+      "after_sha256": "22b9e999a2e6984b4d93fe9183713c658a151289e193a6860a5e5fb8553dc7d3",
       "owners": {
         "@document": {
-          "before": "c9c91bb888c4998af52afb715c06f6f7ec9f3ed2b6f6ea49170f50f73eb0d869",
-          "after": "987abd50ad1f5fd2590c0db4f15774923b59e2e8884fce47ef8e5462a049af8d"
+          "before": "ab0ad576ebcc83998cfb6fdc19c567ce614bf653a63857587f510a4435a2b1ea",
+          "after": "22b9e999a2e6984b4d93fe9183713c658a151289e193a6860a5e5fb8553dc7d3"
         }
       }
     },
-    "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "e48b3795448f071719d656f771a5fb6810b3b0753982565e87282f0961fa5adf",
-      "after_sha256": "3bc1ff9f53993ab2c37e2e47e9a214b79baa8b27b8ffe79fff7e2cc2da3cb61f",
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "245f6cafd6d9784e5d6a7a30d63f19376f5a818e355b44acc567e67609371aa6",
+      "after_sha256": "9e8fb43c0f1d0ef907008efe19e136524da612ac38c471e1a84ac86df3519d33",
       "owners": {
         "@document": {
-          "before": "e48b3795448f071719d656f771a5fb6810b3b0753982565e87282f0961fa5adf",
-          "after": "3bc1ff9f53993ab2c37e2e47e9a214b79baa8b27b8ffe79fff7e2cc2da3cb61f"
+          "before": "245f6cafd6d9784e5d6a7a30d63f19376f5a818e355b44acc567e67609371aa6",
+          "after": "9e8fb43c0f1d0ef907008efe19e136524da612ac38c471e1a84ac86df3519d33"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "93e8658ff60fe57ec673bdd2047c8faf3a8ff77551549445ef6def70a5b98741",
+      "after_sha256": "41ca2140d69c2b87ae5c1b8e427ed151f59612251b33dd03e64d3094aedd383b",
+      "owners": {
+        "@document": {
+          "before": "93e8658ff60fe57ec673bdd2047c8faf3a8ff77551549445ef6def70a5b98741",
+          "after": "41ca2140d69c2b87ae5c1b8e427ed151f59612251b33dd03e64d3094aedd383b"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "098b847fb3e38463e35623f0ea7f9afa35bd028756d787b8da280e7d7a6d28cd",
+      "after_sha256": "57fee383a6660728e04a4a7a2d19cddcc67d05926ff8df082d19862c275755f0",
+      "owners": {
+        "@document": {
+          "before": "098b847fb3e38463e35623f0ea7f9afa35bd028756d787b8da280e7d7a6d28cd",
+          "after": "57fee383a6660728e04a4a7a2d19cddcc67d05926ff8df082d19862c275755f0"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "fe447d1460a5f5dea216db6250d6243ef3eeaeaca70b0cfd60915ad3e7aeac42",
+      "after_sha256": "4102bcb49a235a26d28f7c475a5826d9638f7a7cd19531e98199c1552df434ea",
+      "owners": {
+        "@document": {
+          "before": "fe447d1460a5f5dea216db6250d6243ef3eeaeaca70b0cfd60915ad3e7aeac42",
+          "after": "4102bcb49a235a26d28f7c475a5826d9638f7a7cd19531e98199c1552df434ea"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "60dd12fe2b3ce8ee735ba48f556773227dc30dcc20ba3c695ce4a2cea8afe880",
+      "after_sha256": "dbe74f49ebe8f88d0908eacc6bc0c568dc1ffc5359ae78318e6762d84ad3c592",
+      "owners": {
+        "@document": {
+          "before": "60dd12fe2b3ce8ee735ba48f556773227dc30dcc20ba3c695ce4a2cea8afe880",
+          "after": "dbe74f49ebe8f88d0908eacc6bc0c568dc1ffc5359ae78318e6762d84ad3c592"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "840b501abb7f748a547a2ed3a849e55dd2d815b810ed6ff896d6ec60e2f3f7c8",
+      "after_sha256": "a43d917b93b49bb36592903ca5a2136d388d7812eceac4789249764c497c2dbf",
+      "owners": {
+        "@document": {
+          "before": "840b501abb7f748a547a2ed3a849e55dd2d815b810ed6ff896d6ec60e2f3f7c8",
+          "after": "a43d917b93b49bb36592903ca5a2136d388d7812eceac4789249764c497c2dbf"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "1a1802484febc6539240002e17853d50e777f1cfdb19a9bf409d7b98e5d3a71d",
+      "after_sha256": "a98a17a2490646f5835732907a678d0256a9f967cadbc6c563370cd3a16658f2",
+      "owners": {
+        "@document": {
+          "before": "1a1802484febc6539240002e17853d50e777f1cfdb19a9bf409d7b98e5d3a71d",
+          "after": "a98a17a2490646f5835732907a678d0256a9f967cadbc6c563370cd3a16658f2"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "c3ed8b3ee1b2ac5326d612e5854ee43e7e6cad689fac085d172921224707a305",
+      "after_sha256": "3111986d5b71339da086c7c821270a486fed4406a42db633a26c245b331afe27",
+      "owners": {
+        "@document": {
+          "before": "c3ed8b3ee1b2ac5326d612e5854ee43e7e6cad689fac085d172921224707a305",
+          "after": "3111986d5b71339da086c7c821270a486fed4406a42db633a26c245b331afe27"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "before_sha256": "51d584a3865e6f1b885b86a28dbfb0cded6b19d09fbe2e3fe57b7caef7685953",
+      "after_sha256": "cf4786add34399b2ca9a6fa5d2e3a3ac64998d2148b85e869773d75e10ba7d4c",
+      "owners": {
+        "@document": {
+          "before": "51d584a3865e6f1b885b86a28dbfb0cded6b19d09fbe2e3fe57b7caef7685953",
+          "after": "cf4786add34399b2ca9a6fa5d2e3a3ac64998d2148b85e869773d75e10ba7d4c"
+        }
+      }
+    },
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "before_sha256": "987abd50ad1f5fd2590c0db4f15774923b59e2e8884fce47ef8e5462a049af8d",
+      "after_sha256": "8c7f2962ebc6cdb49170141f1e71f9b17a0a5441159945fbf2384abcb43cbea3",
+      "owners": {
+        "@document": {
+          "before": "987abd50ad1f5fd2590c0db4f15774923b59e2e8884fce47ef8e5462a049af8d",
+          "after": "8c7f2962ebc6cdb49170141f1e71f9b17a0a5441159945fbf2384abcb43cbea3"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "224cef506d8dcbb4525bc4b6e5ab39a1891a4ea17fbf68c90f8ca58c7a7e8389",
-      "after_sha256": "cabe9a561aa7f22d1d1202ffa49f1835f369762665ad0435e6d2a43054aad1e0",
+      "before_sha256": "cabe9a561aa7f22d1d1202ffa49f1835f369762665ad0435e6d2a43054aad1e0",
+      "after_sha256": "bdb5bc6478e6fcc23fe69192652380353d99409971bcc48768e30d454c13a6ae",
       "owners": {
         "@document": {
-          "before": "224cef506d8dcbb4525bc4b6e5ab39a1891a4ea17fbf68c90f8ca58c7a7e8389",
-          "after": "cabe9a561aa7f22d1d1202ffa49f1835f369762665ad0435e6d2a43054aad1e0"
+          "before": "cabe9a561aa7f22d1d1202ffa49f1835f369762665ad0435e6d2a43054aad1e0",
+          "after": "bdb5bc6478e6fcc23fe69192652380353d99409971bcc48768e30d454c13a6ae"
+        }
+      }
+    },
+    "docs/performance/current/terrain-preparation-20261112-movement.json": {
+      "before_sha256": null,
+      "after_sha256": "b22c66a4cb76af2ebd60af205b82e9aaae2739980175c62149bc59ea54b0feac",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b22c66a4cb76af2ebd60af205b82e9aaae2739980175c62149bc59ea54b0feac"
+        }
+      }
+    },
+    "docs/performance/current/terrain-preparation-20261112-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "f00bedce40d4d3d89c209e0a995cb75b14d731e3fffaeeeffeac86519974da31",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f00bedce40d4d3d89c209e0a995cb75b14d731e3fffaeeeffeac86519974da31"
+        }
+      }
+    },
+    "docs/performance/current/terrain-preparation-20261112-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "f941b841ac701b550c1f56c4e5ca327cff7be4718564566d4f2f77fae18e09e5",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f941b841ac701b550c1f56c4e5ca327cff7be4718564566d4f2f77fae18e09e5"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "a81cdf31fa96780372450eb727c61d482f7ca3ac8fec5b8e1a2007c5a68d3074",
+      "after_sha256": "6891a99e41f064a52883e8672cf673059c6d937926a976fd09be7a788e6a0ef1",
+      "owners": {
+        "@document": {
+          "before": "a81cdf31fa96780372450eb727c61d482f7ca3ac8fec5b8e1a2007c5a68d3074",
+          "after": "6891a99e41f064a52883e8672cf673059c6d937926a976fd09be7a788e6a0ef1"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "2652e5149d2999a077ffa58effa00ff53b80e5d25517eb65ba6d0dcee6f536d9",
+      "after_sha256": "1e3e2edf2759b659894487fc53c2396da7eeaa1a2f5742e1c5bef04a97c1db15",
+      "owners": {
+        "@document": {
+          "before": "2652e5149d2999a077ffa58effa00ff53b80e5d25517eb65ba6d0dcee6f536d9",
+          "after": "1e3e2edf2759b659894487fc53c2396da7eeaa1a2f5742e1c5bef04a97c1db15"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "before_sha256": "a80eaeac284c8bcefe5054024262bd27c47f5554ef82a8b907ab848da1043bda",
+      "after_sha256": "a77585a1232c4756f67bd0793d6e66e9a15f450fd2aa8b069a084188779c80fc",
+      "owners": {
+        "@module": {
+          "before": "494052583923b454a26a999ef2d22d8690020d5c6ed5861b18e2f1fd0a486eda",
+          "after": "87747adbf4adaa0a6341751228d061215c49de740ef551d9b940fd2269f5e59c"
+        },
+        "TerrainPathLegalityContext._append_terrain_volume_segment": {
+          "before": "6cee92e57ecd42821e7eaf2a767fd2e5cff85402e0072ca6ae06c9033f400ce2",
+          "after": "93bbc95e7f53ca4dd163e9e0e5b06e4fe95e319321b602d02a6ad7943a853dfd"
+        },
+        "TerrainPathLegalityContext.validate": {
+          "before": "2a8aca9baf8cfe3f6c4b3db5aef5a7840e281fb499341e7695e15fcddfeca9b3",
+          "after": "8e0d782e853f453ca1117d421d1d295dc18c2e7a414133ee3d6fa11c8955cc28"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/shapely_backend.py": {
+      "before_sha256": "c8b58f9f1c98eb14f13ee6e074143e4c6a223251334cb10a121b797178d3f77e",
+      "after_sha256": "a8da1d9403dd974c28657ff225c11d817c7089d526336a58b5c53ffe3a8c5c03",
+      "owners": {
+        "@module": {
+          "before": "bede52609368e1cf2cf8178e4e34ca95309c7047cb68cddda0f1d6bdae292fa9",
+          "after": "9a39073d3787460f8eb27f429cda4d177fd51e58c2086033a5be50a5b23979e6"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/terrain_path_preparation.py": {
+      "before_sha256": null,
+      "after_sha256": "176bbca5e9006c5f38f2f6e686f64477f3fa1190d28e646f167ac31d0c67549c",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "55221234610a5b7f3ba3a3cc81a9b23773578d8a91cc27db59aa5068b3177cde"
+        },
+        "TerrainPathFootprints": {
+          "before": null,
+          "after": "6efb7964b96921f726e3cc3bd082e0fd886e3877020c681aa7add2d698753e91"
+        },
+        "TerrainPathFootprints.touching_poses": {
+          "before": null,
+          "after": "a2b1c730bae00d2970e9643709c7ad13438d3fc573de2269da700c2478026232"
+        }
+      }
+    },
+    "tests/rules/section03/test_terrain_path_preparation.py": {
+      "before_sha256": null,
+      "after_sha256": "80d1c500ec4c77de9d78725ab1f76e86ca44cf35961eaa1e0f082d8fd3e830f3",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "528fb90013b2044c4078c8491bc15f1acf9af01af8bdf8e096b621d6297a6946"
+        },
+        "_preparation_context": {
+          "before": null,
+          "after": "7e89e62df8f2b36299f00920ff5b7e050d07fd9c1282e1de865cb5cb72849fe0"
+        },
+        "_preparation_legality": {
+          "before": null,
+          "after": "11499059100ba15bddef41c565fc463535c02e555c87e0e2aaa216072a00606e"
+        },
+        "_preparation_wall": {
+          "before": null,
+          "after": "17d2f38ae38acf00980d47d0cd9d697a00f78c3a4a97aa4c6cd30dfe2e72ea34"
+        },
+        "test_prepared_terrain_builds_each_sample_once_and_keeps_boundary_contact": {
+          "before": null,
+          "after": "f12a3e784443230b6b326d432f32fafd79c20b6340a166eb76fec98fed678883"
+        },
+        "test_prepared_terrain_samples_match_direct_intersections": {
+          "before": null,
+          "after": "abb90e04f86f87783a13d8335451247d5a375c6a964d36a392f9b85c1c3cb797"
+        },
+        "test_terrain_preparation_preserves_complete_results_and_context_isolation": {
+          "before": null,
+          "after": "59f001f3b6a8823dcb0a6e2c6a735ae435c8338bc8d77ac5fb1884dcf979c724"
         }
       }
     }
   },
   "rows": {
+    ".gitattributes": {
+      "category": "rule_semantics",
+      "operations": [
+        "d09-authenticated-source-bytes"
+      ],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
+      ],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record exact saved-charge profiling boundaries and the measured shared geometry owner before tactical extension.",
-      "source_obligation": "Preserve exact geometry, seed, roll, selected target and physical witness order, historical completed/order-error/censored evidence, mandatory fail-closed legality and ordinary restore/replay. Distinguish operator cancellation from timeout, per-query results from full resolution and instrumented costs from game throughput.",
-      "unchanged_work": "Documentation only. The diagnostic remains a retained local operator artifact, not packaged runtime or a player policy. No source, tests, contracts, dependencies, inventories, coverage floor, timing limits or cache behavior change. Exact-base serial smoke and all required local/hosted gates remain mandatory."
-    },
-    "docs/AI_POLICY_INTERFACE.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record exact saved-charge profiling boundaries and the measured shared geometry owner before tactical extension.",
-      "source_obligation": "Preserve exact geometry, seed, roll, selected target and physical witness order, historical completed/order-error/censored evidence, mandatory fail-closed legality and ordinary restore/replay. Distinguish operator cancellation from timeout, per-query results from full resolution and instrumented costs from game throughput.",
-      "unchanged_work": "Documentation only. The diagnostic remains a retained local operator artifact, not packaged runtime or a player policy. No source, tests, contracts, dependencies, inventories, coverage floor, timing limits or cache behavior change. Exact-base serial smoke and all required local/hosted gates remain mandatory."
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record exact saved-charge profiling boundaries and the measured shared geometry owner before tactical extension.",
-      "source_obligation": "Preserve exact geometry, seed, roll, selected target and physical witness order, historical completed/order-error/censored evidence, mandatory fail-closed legality and ordinary restore/replay. Distinguish operator cancellation from timeout, per-query results from full resolution and instrumented costs from game throughput.",
-      "unchanged_work": "Documentation only. The diagnostic remains a retained local operator artifact, not packaged runtime or a player policy. No source, tests, contracts, dependencies, inventories, coverage floor, timing limits or cache behavior change. Exact-base serial smoke and all required local/hosted gates remain mandatory."
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "docs/performance/current/terrain-preparation-20261112-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "docs/performance/current/terrain-preparation-20261112-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "docs/performance/current/terrain-preparation-20261112-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "geometry-search"
+      ],
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "src/warhammer40k_core/geometry/shapely_backend.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "geometry-search"
+      ],
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "src/warhammer40k_core/geometry/terrain_path_preparation.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "geometry-search"
+      ],
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
+    },
+    "tests/rules/section03/test_terrain_path_preparation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "terrain-preparation-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Conservative validation-local terrain preparation from the exact saved-charge profile, with unchanged complete legality and exact-base matched component evidence.",
+      "source_obligation": "Preserve full growing paths, physical witness order, all dense-floor/body/climbing/support and mandatory endpoint predicates, fail-closed unresolved results, cache isolation and exact ordinary save/load/replay. Derived contract identities retain existing payload shapes; only new active regressions are registered.",
+      "unchanged_work": "Search enumeration, the 128-node limit, full-query cache keys and budgets, physical mutation/decision authority and all old test bytes remain unchanged. Historical timing observations and CI guards are not relabeled. The new test LF attribute preserves its raw-byte admission identity across checkouts. Remaining full-charge/full-game evidence is unqualified."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "visibility": "docs/performance/current/terrain-preparation-20261112-visibility.json",
+    "movement": "docs/performance/current/terrain-preparation-20261112-movement.json",
+    "setup": "docs/performance/current/terrain-preparation-20261112-setup.json"
+  },
   "full_game": null
 }

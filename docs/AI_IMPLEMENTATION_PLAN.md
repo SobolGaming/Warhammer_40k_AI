@@ -772,6 +772,38 @@ unresolved results; require matched base/head work counts, semantic equivalence,
 cache isolation and the existing delivery gates. No runtime fix is established
 by this profile, and no budget increase or smaller search replaces legality.
 
+The shared terrain owner now prepares feature volumes once per validation and
+extracts sampled model footprints into `geometry/terrain_path_preparation.py`.
+Footprints and their actual geometry bounds are prepared lazily once per sample;
+strictly separated bounds avoid an intersection call, while touching bounds still
+run the original predicate. The object lives only for that complete validation.
+Growing prefixes, physical execution order, dense-floor/body/climbing/support and
+mandatory endpoint checks, the 128-node search ceiling and full-query cache keys
+remain unchanged. New differential, boundary, work-count and context-isolation
+controls compare complete results with direct intersections.
+
+On the same provisional Threadripper host and locked CPython 3.14.5, the frozen
+first query pair from the unchanged checkpoint/corrected witness has three serial
+samples per arm, without coverage, profiling or competing test workers. Only the
+geometry/reachability caches named by the retained operator harness are cleared
+before each sample; imports, restore and replay are outside query timing.
+
+| Query | Base seconds | Prepared seconds | Base / prepared median | Base / prepared mean |
+|---|---|---|---|---|
+| 001 preferred | 40.911 / 19.203 / 19.230 | 32.730 / 11.877 / 11.862 | 19.230 / 11.877 | 26.448 / 18.823 |
+| 001 engagement | 76.650 / 67.122 / 67.109 | 45.339 / 36.104 / 35.836 | 67.122 / 36.104 | 70.294 / 39.093 |
+
+All preferred results remain unresolved at 20 explored nodes. All engagement
+results remain reachable at 25 nodes with the exact same complete witness, which
+is revalidated outside timing. Every sample, including the higher first samples,
+is retained. Exact saved-checkpoint restoration, ordinary replay of 63 decisions
+and 641 events, original physical witness order and post-query checkpoint equality
+also hold in both arms. No movement is submitted. These finite component results
+leave the remaining mandatory queries, a completed legal charge, tactical benefit,
+Stage 2 admission and complete-game throughput unqualified. The task-retained
+`measure_saved_queries.py` and `benchmark_pair.py` reproduce these distinct timing
+and restore/replay boundaries; the original instrumented profile remains history.
+
 These are one profiled local observation's costs, not uninstrumented latency,
 a speedup, a full-game throughput measurement or a tactical outcome. The legal
 Charge Move, common horizon and Stage 2 useful-reference qualification remain

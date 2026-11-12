@@ -84,6 +84,7 @@ from warhammer40k_core.geometry.terrain import (
     classified_feature_transit_permission,
     terrain_volume_from_payload,
 )
+from warhammer40k_core.geometry.terrain_path_preparation import TerrainPathFootprints
 from warhammer40k_core.geometry.terrain_solid import solid_endpoint_intersection
 from warhammer40k_core.geometry.terrain_transit import (
     forbidden_dense_floor_crossing,
@@ -1036,16 +1037,13 @@ class TerrainPathLegalityContext:
                 segments=(),
                 sampled_pose_count=len(sampled_path),
             )
+        feature_volumes = tuple(feature.terrain_volumes() for feature in self.terrain_features)
+        all_terrain = (
+            *self.terrain,
+            *(volume for volumes in feature_volumes for volume in volumes),
+        )
         body_collision = body_intersects_terrain_endpoint(
-            _model_at_pose(self.moving_model, path[-1]),
-            (
-                *self.terrain,
-                *(
-                    volume
-                    for feature in self.terrain_features
-                    for volume in feature.terrain_volumes()
-                ),
-            ),
+            _model_at_pose(self.moving_model, path[-1]), all_terrain
         )
         if body_collision is not None:
             return TerrainPathLegalityResult.invalid(
@@ -1058,13 +1056,14 @@ class TerrainPathLegalityContext:
                 sampled_pose_count=len(sampled_path),
             )
         segments: list[TerrainPathSegment] = []
+        footprints = TerrainPathFootprints(self.moving_model.base, sampled_path)
         for terrain in self.terrain:
             violation = self._append_terrain_volume_segment(
                 terrain=terrain,
                 feature=None,
                 feature_policy=None,
                 path=path,
-                sampled_path=sampled_path,
+                footprints=footprints,
                 segments=segments,
             )
             if violation is not None:
@@ -1074,17 +1073,17 @@ class TerrainPathLegalityContext:
                     sampled_pose_count=len(sampled_path),
                 )
 
-        for feature in self.terrain_features:
+        for feature, volumes in zip(self.terrain_features, feature_volumes, strict=True):
             feature_policy = self.terrain_movement_policy.policy_for_feature_kind(
                 feature.feature_kind
             )
-            for terrain in feature.terrain_volumes():
+            for terrain in volumes:
                 violation = self._append_terrain_volume_segment(
                     terrain=terrain,
                     feature=feature,
                     feature_policy=feature_policy,
                     path=path,
-                    sampled_path=sampled_path,
+                    footprints=footprints,
                     segments=segments,
                 )
                 if violation is not None:
@@ -1121,14 +1120,7 @@ class TerrainPathLegalityContext:
         if not self.has_fly and not path_retains_climbing_contact(
             self.moving_model,
             path,
-            (
-                *self.terrain,
-                *(
-                    volume
-                    for feature in self.terrain_features
-                    for volume in feature.terrain_volumes()
-                ),
-            ),
+            all_terrain,
         ):
             return TerrainPathLegalityResult.invalid(
                 TerrainTraversalViolation(
@@ -1150,7 +1142,7 @@ class TerrainPathLegalityContext:
         feature: TerrainFeatureDefinition | None,
         feature_policy: TerrainFeatureMovementPolicy | None,
         path: tuple[Pose, ...],
-        sampled_path: tuple[Pose, ...],
+        footprints: TerrainPathFootprints,
         segments: list[TerrainPathSegment],
     ) -> TerrainTraversalViolation | None:
         if all(
@@ -1160,14 +1152,7 @@ class TerrainPathLegalityContext:
             # A physically empty doorway beneath a lintel is not transit
             # through the lintel, even when Solid closes it for sight/endpoints.
             return None
-        terrain_footprint = shapely_backend.footprint_for_terrain(terrain)
-        touching_poses = tuple(
-            pose
-            for pose in sampled_path
-            if terrain_footprint.intersects(
-                shapely_backend.footprint_for_base(self.moving_model.base, pose)
-            )
-        )
+        touching_poses = footprints.touching_poses(terrain)
         if not touching_poses:
             return None
         traversal_mode = self._traversal_mode_for_terrain(
