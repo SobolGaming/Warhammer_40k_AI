@@ -43,6 +43,16 @@
           "after": "31638ba5dca66bc146793489ac23ead8710470c160106f56bfd260b175b5705f"
         }
       }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "cb080468d1e501f666ba8121d2e753d75bcdda82b642315beb1cfd952ae31e12",
+      "after_sha256": "cf76eabd3dd0c954124ee5a10038f83ce57f310ff7a34ec086981805a09f2e24",
+      "owners": {
+        "@document": {
+          "before": "cb080468d1e501f666ba8121d2e753d75bcdda82b642315beb1cfd952ae31e12",
+          "after": "cf76eabd3dd0c954124ee5a10038f83ce57f310ff7a34ec086981805a09f2e24"
+        }
+      }
     }
   },
   "rows": {
@@ -77,6 +87,16 @@
       "rationale": "Record a predeclared bounded ordinary E attack versus omission experiment at matched #662 endpoints, retaining operator-only evidence and remaining Stage 2 gaps.",
       "source_obligation": "Keep the historical admissions, actual ordinary decisions and original fixed seed unchanged; report range/visibility, losses, failures and zero local outcome differences without a tactical-benefit or learning claim.",
       "unchanged_work": "This documentation revision changes no runtime, test, workload, cache, dependency, serialization, schema, source corpus, shard calibration or timing/coverage limit. The existing serial smoke and all exact-head delivery gates remain required."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only the live README authentication digest after the maintained documentation update; retain source clauses, semantic assertions, historical evidence and selected tests byte-for-byte.",
+      "source_obligation": "The section-07 live authenticated_inputs README hash must describe the actual maintained contributor guidance. No historical hash, source block, semantic requirement or assertion is repinned.",
+      "unchanged_work": "Only one current documentation checksum changes. Engine, test functions, source corpus, replay, dependencies, workload selection, calibration, coverage and timing limits remain unchanged."
     }
   },
   "milestone": "ordinary",
