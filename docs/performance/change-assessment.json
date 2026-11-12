@@ -1,36 +1,36 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "5e43ab1c4feead8cb7719b1ff912d05dcbdadc78",
+  "base": "0df5d9eec363ce8e46d6c59dceee188ab723f4bb",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:870d2370b0f71a646d7e20e9e998efa7c914fc187745f97830d81487d262115f",
   "operation_map_sha256": "41cbe072304e809b05fcc98cb0e78f8c854b8fd284dd611059dc8e4f5150e148",
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "ca616093bb7e4a03fcbdeb9fc12ffb6c197848f4979e375de5f9fff2069a32a3",
-      "after_sha256": "c9c91bb888c4998af52afb715c06f6f7ec9f3ed2b6f6ea49170f50f73eb0d869",
+      "before_sha256": "c9c91bb888c4998af52afb715c06f6f7ec9f3ed2b6f6ea49170f50f73eb0d869",
+      "after_sha256": "987abd50ad1f5fd2590c0db4f15774923b59e2e8884fce47ef8e5462a049af8d",
       "owners": {
         "@document": {
-          "before": "ca616093bb7e4a03fcbdeb9fc12ffb6c197848f4979e375de5f9fff2069a32a3",
-          "after": "c9c91bb888c4998af52afb715c06f6f7ec9f3ed2b6f6ea49170f50f73eb0d869"
+          "before": "c9c91bb888c4998af52afb715c06f6f7ec9f3ed2b6f6ea49170f50f73eb0d869",
+          "after": "987abd50ad1f5fd2590c0db4f15774923b59e2e8884fce47ef8e5462a049af8d"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "21e135a0b72ebe18d7ea35c37f0ab339f77c2ce151e511bb9f33d0b170a182f5",
-      "after_sha256": "e48b3795448f071719d656f771a5fb6810b3b0753982565e87282f0961fa5adf",
+      "before_sha256": "e48b3795448f071719d656f771a5fb6810b3b0753982565e87282f0961fa5adf",
+      "after_sha256": "3bc1ff9f53993ab2c37e2e47e9a214b79baa8b27b8ffe79fff7e2cc2da3cb61f",
       "owners": {
         "@document": {
-          "before": "21e135a0b72ebe18d7ea35c37f0ab339f77c2ce151e511bb9f33d0b170a182f5",
-          "after": "e48b3795448f071719d656f771a5fb6810b3b0753982565e87282f0961fa5adf"
+          "before": "e48b3795448f071719d656f771a5fb6810b3b0753982565e87282f0961fa5adf",
+          "after": "3bc1ff9f53993ab2c37e2e47e9a214b79baa8b27b8ffe79fff7e2cc2da3cb61f"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "f24902d21702e463d47c1ade787385090f1dd7b3f4c1d5644d1393ecfeccbaaf",
-      "after_sha256": "224cef506d8dcbb4525bc4b6e5ab39a1891a4ea17fbf68c90f8ca58c7a7e8389",
+      "before_sha256": "224cef506d8dcbb4525bc4b6e5ab39a1891a4ea17fbf68c90f8ca58c7a7e8389",
+      "after_sha256": "cabe9a561aa7f22d1d1202ffa49f1835f369762665ad0435e6d2a43054aad1e0",
       "owners": {
         "@document": {
-          "before": "f24902d21702e463d47c1ade787385090f1dd7b3f4c1d5644d1393ecfeccbaaf",
-          "after": "224cef506d8dcbb4525bc4b6e5ab39a1891a4ea17fbf68c90f8ca58c7a7e8389"
+          "before": "224cef506d8dcbb4525bc4b6e5ab39a1891a4ea17fbf68c90f8ca58c7a7e8389",
+          "after": "cabe9a561aa7f22d1d1202ffa49f1835f369762665ad0435e6d2a43054aad1e0"
         }
       }
     }
@@ -40,25 +40,25 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record a natural ordinary charge roll/target checkpoint and its bounded witnessed-movement qualification gap with same-checkpoint decline and no-charge control.",
-      "source_obligation": "Preserve physical model execution order, real 2D6 and optional reroll/target/movement sequencing, mandatory endpoint fail-closed semantics, source provenance, ordinary startup/persistence/replay/viewer proofs, failed harness and incomplete query diagnostics. Do not claim charge impossibility, tactical benefit or learning.",
-      "unchanged_work": "Documentation only. Runtime, tests, source corpus, wire contract, dependencies, generated identities, selected inventory, coverage and timing limits remain unchanged. Existing qualified admissions keep their meanings; exact-base serial smoke and all required local/hosted gates remain mandatory."
+      "rationale": "Record exact saved-charge profiling boundaries and the measured shared geometry owner before tactical extension.",
+      "source_obligation": "Preserve exact geometry, seed, roll, selected target and physical witness order, historical completed/order-error/censored evidence, mandatory fail-closed legality and ordinary restore/replay. Distinguish operator cancellation from timeout, per-query results from full resolution and instrumented costs from game throughput.",
+      "unchanged_work": "Documentation only. The diagnostic remains a retained local operator artifact, not packaged runtime or a player policy. No source, tests, contracts, dependencies, inventories, coverage floor, timing limits or cache behavior change. Exact-base serial smoke and all required local/hosted gates remain mandatory."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record a natural ordinary charge roll/target checkpoint and its bounded witnessed-movement qualification gap with same-checkpoint decline and no-charge control.",
-      "source_obligation": "Preserve physical model execution order, real 2D6 and optional reroll/target/movement sequencing, mandatory endpoint fail-closed semantics, source provenance, ordinary startup/persistence/replay/viewer proofs, failed harness and incomplete query diagnostics. Do not claim charge impossibility, tactical benefit or learning.",
-      "unchanged_work": "Documentation only. Runtime, tests, source corpus, wire contract, dependencies, generated identities, selected inventory, coverage and timing limits remain unchanged. Existing qualified admissions keep their meanings; exact-base serial smoke and all required local/hosted gates remain mandatory."
+      "rationale": "Record exact saved-charge profiling boundaries and the measured shared geometry owner before tactical extension.",
+      "source_obligation": "Preserve exact geometry, seed, roll, selected target and physical witness order, historical completed/order-error/censored evidence, mandatory fail-closed legality and ordinary restore/replay. Distinguish operator cancellation from timeout, per-query results from full resolution and instrumented costs from game throughput.",
+      "unchanged_work": "Documentation only. The diagnostic remains a retained local operator artifact, not packaged runtime or a player policy. No source, tests, contracts, dependencies, inventories, coverage floor, timing limits or cache behavior change. Exact-base serial smoke and all required local/hosted gates remain mandatory."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record a natural ordinary charge roll/target checkpoint and its bounded witnessed-movement qualification gap with same-checkpoint decline and no-charge control.",
-      "source_obligation": "Preserve physical model execution order, real 2D6 and optional reroll/target/movement sequencing, mandatory endpoint fail-closed semantics, source provenance, ordinary startup/persistence/replay/viewer proofs, failed harness and incomplete query diagnostics. Do not claim charge impossibility, tactical benefit or learning.",
-      "unchanged_work": "Documentation only. Runtime, tests, source corpus, wire contract, dependencies, generated identities, selected inventory, coverage and timing limits remain unchanged. Existing qualified admissions keep their meanings; exact-base serial smoke and all required local/hosted gates remain mandatory."
+      "rationale": "Record exact saved-charge profiling boundaries and the measured shared geometry owner before tactical extension.",
+      "source_obligation": "Preserve exact geometry, seed, roll, selected target and physical witness order, historical completed/order-error/censored evidence, mandatory fail-closed legality and ordinary restore/replay. Distinguish operator cancellation from timeout, per-query results from full resolution and instrumented costs from game throughput.",
+      "unchanged_work": "Documentation only. The diagnostic remains a retained local operator artifact, not packaged runtime or a player policy. No source, tests, contracts, dependencies, inventories, coverage floor, timing limits or cache behavior change. Exact-base serial smoke and all required local/hosted gates remain mandatory."
     }
   },
   "milestone": "ordinary",

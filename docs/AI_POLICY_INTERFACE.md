@@ -1929,3 +1929,33 @@ mission/layout, points and public-seed exceptions remain. Best response,
 successful engagement, sacrifice/E benefit, matched tactical outcome, throughput,
 Stage 2 completion and learning stay open; useful-reference status is
 `scoped_gap`, `reference_target` is null and `eligible_for_learning` is false.
+
+## Charge reachability operator profiling boundary
+
+The [maintained charge diagnosis](AI_IMPLEMENTATION_PLAN.md#charge-reachability-diagnosis-and-next-optimization-boundary)
+separates checkpoint restore, ordinary replay, the corrected witness evaluation
+and each searched mandatory endpoint query. The retained local operator helper
+reconstructs #668's exact descending-Y witness from evaluation one's native
+alternative and compares it with the saved corrected progress before resolving.
+It does not generate another candidate, alter geometry/seed, submit a movement,
+change a gate or expose profiling data to an actor/scorer. Existing contracts
+cover restore/replay and the pure resolver; no decision family or wire change is
+introduced. Completed earlier candidates and original censored evidence persist.
+
+One in-process profile with a fresh 1,800-second monotonic supervisor is stopped
+by the operator at 544.147 seconds after identifying the hot owner. It is neither
+a timeout nor a completed witness. Model 001's preferred query returns unresolved
+in 54.454 seconds and its engagement query reachable in 153.476 seconds; model
+002's preferred query is censored after at least 260.511 observed seconds.
+Unobserved remaining obligations stay unqualified. The input checkpoint restores
+exactly and its ordinary replay reproduces 63 decisions/641 events. No final
+in-memory checkpoint equality is claimed after interruption.
+
+Increasing counters show combinatorial full-path validation, dominated by terrain
+legality and its terrain-volume/sample checks, with distinct complete-query keys
+and no observed full-query cache hits. The focused follow-up assesses immutable
+preparation/conservative reuse in the shared reachability/pathing owners with
+matched semantics and work evidence. This profile establishes no optimization,
+successful charge, impossibility, tactical label or game throughput. Timing stays
+operator-only; Stage 2 remains open, `useful_reference_status` is `scoped_gap`,
+`reference_target` is null and `eligible_for_learning` is false.
