@@ -1,36 +1,36 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "554fb8adb4ad47e5ef1075826f7f9953947a9f19",
+  "base": "66e44e44a86505fc4996de2a694cfe1bed7bfada",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:870d2370b0f71a646d7e20e9e998efa7c914fc187745f97830d81487d262115f",
   "operation_map_sha256": "41cbe072304e809b05fcc98cb0e78f8c854b8fd284dd611059dc8e4f5150e148",
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "c4c64666e8dd2ba59531656b83dd8192f9b094410b8798cf359422f246c98e87",
-      "after_sha256": "d0b10e1acb4391aa384afe254a926b3ea6da1346e5fd50dfb36f1369da76c3d6",
+      "before_sha256": "d0b10e1acb4391aa384afe254a926b3ea6da1346e5fd50dfb36f1369da76c3d6",
+      "after_sha256": "ca616093bb7e4a03fcbdeb9fc12ffb6c197848f4979e375de5f9fff2069a32a3",
       "owners": {
         "@document": {
-          "before": "c4c64666e8dd2ba59531656b83dd8192f9b094410b8798cf359422f246c98e87",
-          "after": "d0b10e1acb4391aa384afe254a926b3ea6da1346e5fd50dfb36f1369da76c3d6"
+          "before": "d0b10e1acb4391aa384afe254a926b3ea6da1346e5fd50dfb36f1369da76c3d6",
+          "after": "ca616093bb7e4a03fcbdeb9fc12ffb6c197848f4979e375de5f9fff2069a32a3"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "56d179913280fb4efe9a1e44c9c5459182d5acdc3be1d96d3b7e3d4f6bf88fb5",
-      "after_sha256": "1cb9f543099b227c405087937df874f1610b596e922dbe5a85fd631b2f6f6c26",
+      "before_sha256": "1cb9f543099b227c405087937df874f1610b596e922dbe5a85fd631b2f6f6c26",
+      "after_sha256": "21e135a0b72ebe18d7ea35c37f0ab339f77c2ce151e511bb9f33d0b170a182f5",
       "owners": {
         "@document": {
-          "before": "56d179913280fb4efe9a1e44c9c5459182d5acdc3be1d96d3b7e3d4f6bf88fb5",
-          "after": "1cb9f543099b227c405087937df874f1610b596e922dbe5a85fd631b2f6f6c26"
+          "before": "1cb9f543099b227c405087937df874f1610b596e922dbe5a85fd631b2f6f6c26",
+          "after": "21e135a0b72ebe18d7ea35c37f0ab339f77c2ce151e511bb9f33d0b170a182f5"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "31638ba5dca66bc146793489ac23ead8710470c160106f56bfd260b175b5705f",
-      "after_sha256": "a6f690bb7f5c9680122671363d44c8b05cc6616f8bf498483e15e4780633284e",
+      "before_sha256": "a6f690bb7f5c9680122671363d44c8b05cc6616f8bf498483e15e4780633284e",
+      "after_sha256": "f24902d21702e463d47c1ade787385090f1dd7b3f4c1d5644d1393ecfeccbaaf",
       "owners": {
         "@document": {
-          "before": "31638ba5dca66bc146793489ac23ead8710470c160106f56bfd260b175b5705f",
-          "after": "a6f690bb7f5c9680122671363d44c8b05cc6616f8bf498483e15e4780633284e"
+          "before": "a6f690bb7f5c9680122671363d44c8b05cc6616f8bf498483e15e4780633284e",
+          "after": "f24902d21702e463d47c1ade787385090f1dd7b3f4c1d5644d1393ecfeccbaaf"
         }
       }
     }
@@ -40,25 +40,25 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the predeclared ordinary-decision edge-column screen/preserve access contrast, independently retained rejected probes, matched reachable horizon and remaining Stage 2 gaps.",
-      "source_obligation": "Retain the source-qualified sequential movement, two-inch Engagement Range and Normal Move constraints, original fixed configuration and seed, failed prerequisites, exact startup/persistence/replay and both viewer projections. Do not infer tactical superiority, exhaustive path denial or learning admission.",
-      "unchanged_work": "Documentation only. No runtime, rule, test function, source corpus, wire contract, dependency, generated package, selected inventory, workload calibration, coverage floor or timing limit changes. Historical controls retain their exact meanings. Exact-head serial smoke and complete local/hosted gates remain required."
+      "rationale": "Record a predeclared bounded opposing-response set using ordinary witnessed moves, retained direct controls, actual charge eligibility and matched local observations.",
+      "source_obligation": "Retain sequential movement, Engagement Range, Normal Move and charge-declaration source obligations, original configuration and seed, failed operator prerequisites, exact startup/persistence/replay and both viewer/event consumers. Preserve finite and negative results without exhaustive denial, charge success, tactical benefit or learning claims.",
+      "unchanged_work": "Documentation only. No runtime, test, source corpus, wire contract, dependency, generated package, selected inventory, workload calibration, coverage floor or timing limit changes. Historical admissions retain their meanings. Exact-head serial smoke and complete local/hosted gates remain required."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the predeclared ordinary-decision edge-column screen/preserve access contrast, independently retained rejected probes, matched reachable horizon and remaining Stage 2 gaps.",
-      "source_obligation": "Retain the source-qualified sequential movement, two-inch Engagement Range and Normal Move constraints, original fixed configuration and seed, failed prerequisites, exact startup/persistence/replay and both viewer projections. Do not infer tactical superiority, exhaustive path denial or learning admission.",
-      "unchanged_work": "Documentation only. No runtime, rule, test function, source corpus, wire contract, dependency, generated package, selected inventory, workload calibration, coverage floor or timing limit changes. Historical controls retain their exact meanings. Exact-head serial smoke and complete local/hosted gates remain required."
+      "rationale": "Record a predeclared bounded opposing-response set using ordinary witnessed moves, retained direct controls, actual charge eligibility and matched local observations.",
+      "source_obligation": "Retain sequential movement, Engagement Range, Normal Move and charge-declaration source obligations, original configuration and seed, failed operator prerequisites, exact startup/persistence/replay and both viewer/event consumers. Preserve finite and negative results without exhaustive denial, charge success, tactical benefit or learning claims.",
+      "unchanged_work": "Documentation only. No runtime, test, source corpus, wire contract, dependency, generated package, selected inventory, workload calibration, coverage floor or timing limit changes. Historical admissions retain their meanings. Exact-head serial smoke and complete local/hosted gates remain required."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the predeclared ordinary-decision edge-column screen/preserve access contrast, independently retained rejected probes, matched reachable horizon and remaining Stage 2 gaps.",
-      "source_obligation": "Retain the source-qualified sequential movement, two-inch Engagement Range and Normal Move constraints, original fixed configuration and seed, failed prerequisites, exact startup/persistence/replay and both viewer projections. Do not infer tactical superiority, exhaustive path denial or learning admission.",
-      "unchanged_work": "Documentation only. No runtime, rule, test function, source corpus, wire contract, dependency, generated package, selected inventory, workload calibration, coverage floor or timing limit changes. Historical controls retain their exact meanings. Exact-head serial smoke and complete local/hosted gates remain required."
+      "rationale": "Record a predeclared bounded opposing-response set using ordinary witnessed moves, retained direct controls, actual charge eligibility and matched local observations.",
+      "source_obligation": "Retain sequential movement, Engagement Range, Normal Move and charge-declaration source obligations, original configuration and seed, failed operator prerequisites, exact startup/persistence/replay and both viewer/event consumers. Preserve finite and negative results without exhaustive denial, charge success, tactical benefit or learning claims.",
+      "unchanged_work": "Documentation only. No runtime, test, source corpus, wire contract, dependency, generated package, selected inventory, workload calibration, coverage floor or timing limit changes. Historical admissions retain their meanings. Exact-head serial smoke and complete local/hosted gates remain required."
     }
   },
   "milestone": "ordinary",

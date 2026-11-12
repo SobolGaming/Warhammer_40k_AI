@@ -575,13 +575,74 @@ and replay; this is not gameplay throughput or scenario-cost certification.
 
 This qualifies one specific path-access question, not exhaustive route denial,
 a useful sacrifice, E follow-through, tactical superiority or an outcome target.
-Charges, intervention, detours, alternative timings/opponents and held-out
-geometry remain unmeasured alternatives. Historical preservation, Normal Move,
+That experiment leaves charges, intervention, detours, alternative timings/opponents
+and held-out geometry unmeasured; the bounded response extension below adds one
+detour and declaration-eligibility observations. Historical preservation, Normal Move,
 followthrough, opposing attack and bounded E-attack evidence retain their
 original meanings. The synthetic roster, provisional geometry, mixed mission/
 layout, partial points and public seed limitations remain. Operator diagnostics
 stay outside actor/scorer inputs, with `scoped_gap`, a null reference target and
 no learning eligibility. Stage 2 remains open.
+
+### Bounded opposing responses to the edge-column screen
+
+`stage2-bounded-screen-responses-v1` preserves the edge-column setup, original canonical
+configuration/seed and ordinary round-three B Movement origins. Before probing, it declares the
+existing six-, two-and one-inch positive-Y controls, one rightward detour and one approach
+toward S. The detour moves every B model four inches in positive X, then two inches in positive
+Y; the approach moves every B model 1.4 inches in positive Y. All five models use complete
+interpolated `PathWitness` legs, descending initial Y, unchanged height/facing and no more than
+their native six-inch movement allowance. Each response uses an independent ordinary-session
+fork and leaves its origin unchanged. The declaration-byte SHA-256 is
+`6ed8aca07220e509948c5d0953d2d9cd06fa9689cbec2ece22ed5c3097ffb16c`.
+
+| Identical B witness in each position | Screen | Preservation |
+|---|---|---|
+| Six inches forward, retained control | Transit Engagement Range rejection | Accepted |
+| Two inches forward, retained control | Endpoint Engagement Range rejection | Accepted |
+| One inch forward, retained control | Accepted | Accepted |
+| Four inches right, then two forward | Accepted | Accepted |
+| 1.4 inches toward S | Accepted | Accepted |
+
+The detour reaches X=5, Y=17 through 24.2 inches; its nearest S base-edge gap is 3.622780 inches
+in the screen position. It gains the same Y depth as the rejected two-inch direct path but does
+not pass the entire S column. The straight approach reaches X=1, Y=16.4 through 23.6, leaving a
+2.140157-inch gap. Both remain outside the retained two-inch Engagement Range; neither is an
+engagement or charge move.
+
+The one-inch control, detour and approach continue by declining A's movement reaction, skipping
+B's Shooting and observing actual charge-declaration options. Charges and offered Heroic
+Intervention windows are then declined. All six continuations stop at round-four A Movement's
+`select_movement_unit`, after 62/54 records in screen/preservation. The shared charge owner
+reports S within twelve inches in each screen continuation and B is actually offered as a
+charging unit. E and the vehicle are out of declaration range. In preservation all three
+opposing units are out of range and B is not offered a charge. This qualifies declaration
+eligibility only: no Charge roll, target selection, charge-move witness, successful engagement
+or Fight is tested.
+
+The detour's turn-end objective observation is retained: B receives three VP after the detour in
+both positions for the same new-objective turn-end Primary rule; A remains at zero. The one-inch
+control and 1.4-inch approach leave both ledgers at zero in both positions. The paired screen-minus-preservation VP difference is zero for all three responses. These local observations do
+not attribute an advantage to S or qualify a useful sacrifice. No model or wound is lost: S/B
+retain five models/ten wounds each, E three/six and the vehicle one/twelve. B's response
+witnesses and resulting poses match between screen/preservation for every accepted paired
+response. Natural RNG hashes remain unmodified and differ between positions; no shared future-chance schedule or stochastic attribution is claimed.
+
+All ten complete response histories retain ordinary-startup verification, strict persistence,
+exact replay and both-viewer projection/event round trips, including the two rejected attempts
+and their retry requests. An initial operator harness stopped after an accepted one-inch move
+and reaction decline because it referenced a nonexistent lifecycle registry attribute. The
+correction reads the engine's loaded charge-restriction registry; its failed attempt is retained
+and the two already verified controls are reused. The declaration, engine, seed, geometry and
+authoritative checkpoints were not changed to obtain a result.
+
+Sequential movement (03.01), Engagement Range (03.04), Normal Move (09.05) and charge-declaration eligibility (11.02) use their retained maintained mirror source ledgers, with no new
+official-App certification. Charge-move obligations (11.04) remain unqualified here. The
+inherited synthetic roster, provisional geometry, mixed mission/layout, partial points and
+public seed limitations remain. This is a finite response set, not exhaustive denial, a best
+response or tactical benefit. Historical admissions retain their meanings; useful-reference
+status remains `scoped_gap`, the reference target is null, learning is excluded and Stage 2 is
+open.
 
 ## 6. First delayed-tradeoff experiment
 
