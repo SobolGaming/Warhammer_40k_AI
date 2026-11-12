@@ -705,6 +705,81 @@ partial points and public seed limitations remain. Historical admissions retain
 their meanings; `scoped_gap`, null reference target, learning exclusion and open
 Stage 2 status are unchanged.
 
+### Charge reachability diagnosis and next optimization boundary
+
+The retained #668 diagnostics reproduce the exact 63-record post-roll/selected-S
+checkpoint and corrected third witness. Only model 004 changes using evaluation
+one's native alternative; physical execution remains 005, 004, 003, 002, 001.
+The saved checkpoint's canonical digest remains
+`8b44eb8572d1d8cb433784a062fa22da95c36326b7a0f801cb422d83fbba9c7f`;
+the corrected witness digest is
+`1eae6ce43b769b61a2875092c0b3aea95fc9c0dedf867448301468af41ea42cc`.
+Original completed evaluation one, faulty ordering evaluation two and the
+original censored evaluation three retain their meanings and bytes. Their
+overall experiment allowance never measured a single query's duration.
+
+The operator-only `profile_charge.py` retained with the local diagnostics accepts
+`--inputs`, `--output` and optional `--profile`; run it from the unchanged
+repository with locked CPython 3.14.5 and `PYTHONPATH=src`. Inputs are the saved
+checkpoint, corrected progress, both earlier candidate records and the pending
+replay/result, copied from the retained archive. It reconstructs and compares the
+exact witness, restores without patching authority, replays ordinarily, then
+calls the native resolver once. A fresh supervisor monotonic clock covers the
+whole observation and terminates its owned process group only beyond 1,800
+seconds. Thirty-second progress/self-stack records and optional in-process
+`cProfile` stay outside engine records and player observations. No elevated
+inspection or failed #668 profiler retry occurs.
+
+This single instrumented observation uses the unchanged runtime build, geometry,
+seed, nine-inch budget and selected target. Imports take 5.306 seconds, strict
+restore 43.770 seconds and separate replay 24.940 seconds. Restore itself also
+verifies history; neither preparatory stage is witness-evaluation time. Replay
+reproduces 63 decisions and 641 events. The native evaluation starts at elapsed
+74.195 seconds. Its searched mandatory queries are individually delimited:
+
+| Model / goal | Instrumented query seconds | Native result |
+|---|---:|---|
+| 001 preferred distance | 54.454 | `unresolved`, 20 explored nodes |
+| 001 engagement | 153.476 | `reachable`, 25 explored nodes |
+| 002 preferred distance | at least 260.511 observed | operator-censored; no answer |
+
+After sufficient owner evidence, the operator stops the observation at 544.147
+supervisor seconds. Exit 143, no timeout and clean process-group cleanup are
+retained. This is an intentional early stop, not execution-limit exhaustion or a
+completed witness result. The evaluation has 469.073 observed seconds; remaining
+mandatory queries are unmeasured. Completed query answers cannot resolve the
+whole witness. No movement is submitted. Saved input bytes remain unchanged;
+post-interruption equality of the in-memory session was not measured.
+
+The profile attributes 459.077 inclusive seconds to 24,881 `_validated_witness`
+calls. `TerrainPathLegalityContext.validate` accounts for 345.274 inclusive
+seconds across 12,227 calls, including 244.579 seconds in 1,733,059 terrain-volume
+segment checks. Inclusive times overlap and must not be added. Navigation graph
+construction takes only 0.095 seconds for three graphs, with 1,850/1,850/2,230
+poses. Progress counters and CPU time continue increasing. Three distinct full
+query keys start; two complete and enter the bounded cache with zero hits. This
+is observed combinatorial edge/path validation and repeated terrain/sample work,
+not evidence of repeated identical full queries or a stalled solver. The graph
+owner revalidates complete growing prefixes for outgoing candidates; this code
+path identifies repeated work but does not measure an exact duplicate-path rate.
+
+The next focused optimization belongs to `geometry/movement_reachability.py`
+and `geometry/pathing.py`, especially terrain validation of search paths. Assess
+prepared immutable terrain/footprint data and conservative candidate pruning or
+prefix reuse against these same inputs. Preserve full path, physical order,
+body/terrain/support/coherency/endpoint obligations, bounded caches and typed
+unresolved results; require matched base/head work counts, semantic equivalence,
+cache isolation and the existing delivery gates. No runtime fix is established
+by this profile, and no budget increase or smaller search replaces legality.
+
+These are one profiled local observation's costs, not uninstrumented latency,
+a speedup, a full-game throughput measurement or a tactical outcome. The legal
+Charge Move, common horizon and Stage 2 useful-reference qualification remain
+open; `scoped_gap`, null target, learning exclusion and source/roster/provisional
+geometry/mission/points/public-seed limits persist. Preserve the original local
+archive without deleting or uploading it. Optimize this measured owner before
+extending the tactical scenario.
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.
