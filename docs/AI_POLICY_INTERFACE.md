@@ -1730,3 +1730,80 @@ original meanings. The synthetic roster, provisional geometry, mixed mission/lay
 partial points, public fixed seed and cooperative opponent remain limitations.
 Screening/exposure, adversarial alternatives, useful candidate coverage, scenario
 costs, held-out evidence, Stage 2 completion and learning remain open.
+
+## Edge-column path-access operator evidence
+
+`stage2-edge-column-access-v4` is separate operator evidence under the unchanged
+canonical configuration hash
+`adfdb1ee885d9de34ddbe6ef7fe1be64c728f86d3529dc2e82b7523132926409`.
+Its ordinary deployment proposals place B and S in five-model single columns at
+X=1, Y=3+1.8i and Y=45+1.8i inches respectively, i=0 through 4; E and the vehicle
+keep their canonical placements. Both arms share the resulting fifteen-record
+setup/prebattle prefix. No historical receipt is relabelled, imported as this
+geometry or extended by this experiment.
+
+Before any access measurement, the final declaration pins S's three six-inch
+negative-Y Normal Moves versus three Remain Stationary choices, the same two
+six-inch positive-Y B approaches, stationary E/vehicle, skipped Shooting and
+explicit Charge/reaction declines. It pins independent six-inch and two-inch
+positive-Y B probes and a one-inch matched main response. Its declaration-byte
+SHA-256 is `784db3767e55766ddb1c0c280f8cdf27d91f508711b4cba1ab116e069ab36aec`.
+Every movement uses observed model poses, unchanged Z/facing and a complete
+straight-line witness in front-to-back execution order. Probes fork before B's
+unit/action selection and leave each original main checkpoint unchanged. Their
+records, rejected attempts and retry requests remain in their own artifacts;
+main and probe traces are separate histories.
+
+Retained source ledgers `tests/rules/section03/coverage.json` and
+`tests/rules/section09/coverage.json` ground sequential movement (03.01), the
+two-inch horizontal/five-inch vertical Engagement Range (03.04), and Normal Move
+start/end eligibility and distance (09.05). Their maintained-mirror provenance
+and lack of fresh official-App certification remain explicit. The shared engine
+path validator owns legality. Its first transit diagnostic is reported as such;
+endpoint engagement/overlap is assessed separately against the retained source.
+
+The measured finite access contrast is:
+
+| B's identical submitted path | Screen arm | Preservation arm |
+|---|---|---|
+| Six inches in positive Y | Rejected: `enemy_engagement_range_transit_forbidden` | Accepted |
+| Two inches in positive Y | Rejected: `enemy_engagement_range_end_forbidden` | Accepted |
+| One-inch matched main response | Accepted, 58 records | Accepted, 52 records |
+
+S ends at Y=27 through 34.2 inches in the screen arm and remains at Y=45 through
+52.2 in preservation. B starts these probes at Y=15 through 22.2 in both arms.
+The six-inch endpoint overlaps/engages S; the two-inch endpoint's computed
+1.540157-inch base-edge gap is within the retained two-inch Engagement Range.
+The one-inch matched response leaves a 2.540157-inch gap and B at Y=16 through
+23.2 in both arms. These are fixed model-footprint observations, not exhaustive
+path searches.
+
+All six full histories retain ordinary-startup, strict JSON persistence, exact
+replay and both-viewer round-trip checks. Rejected histories retain the invalid
+record and fresh pending proposal; they are not accepted movement histories.
+The main horizons are the same round-three player-B end-of-Movement request for
+player A's reaction, before A chooses. B, E and vehicle poses match across the
+main arms. No model or wound is lost: S/B retain five models/ten wounds each,
+E three/six and the vehicle one/twelve. Both VP ledgers remain zero. Complete
+records, witnesses, diagnostics, checkpoints, replay artifacts and natural RNG
+hashes remain operator evidence. The RNG hashes differ across arms; no overwrite,
+matched future-chance schedule or stochastic-benefit attribution is claimed.
+
+The original rear-first B attempt remains an `end_on_model_overlap` rejection
+with a verified 27-record prefix. Later incomplete harness attempts retain newly
+reachable Charge and Heroic Intervention requests before the access probes.
+Source review revised the matched distance from two inches to one before those
+probes; both distances remain measured. The viewer-ID assertion correction also
+preceded probing and changed no declared action. No geometry/seed search,
+authoritative state patch or RNG replacement occurred. This diagnostic harness
+is outside packaged runtime/admission APIs and adds no decision family, wire
+payload, policy, target calculator or training consumer. Existing finite,
+movement, reaction, viewer and replay contracts already cover its submissions.
+
+The contrast does not certify a globally blocked path, best response, useful
+screen, sacrifice value, E benefit, full game, throughput or learning. Alternative
+charges/interventions, detours, timing, geometry and opponents remain open. The
+inherited synthetic roster, provisional geometry, mixed mission/layout, partial
+points and public fixed seed remain limitations. `useful_reference_status` stays
+`scoped_gap`, `reference_target` is null and `eligible_for_learning` is false.
+Historical controls retain their original meanings and Stage 2 remains incomplete.
