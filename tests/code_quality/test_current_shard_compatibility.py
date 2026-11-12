@@ -366,3 +366,104 @@ def test_each_original_planning_ceiling_remains_mandatory(index: int, seconds: f
     values[index] = seconds
     with pytest.raises(SystemExit, match="unchanged planning ceilings"):
         require_planning_limits(tuple(values))
+
+
+def test_source_bootstrap_preserves_history_for_shared_historical_clones(tmp_path: Path) -> None:
+    def git(directory: Path, *arguments: str) -> str:
+        return (
+            subprocess.check_output(
+                [
+                    "git",
+                    "-c",
+                    "user.name=history fixture",
+                    "-c",
+                    "user.email=fixture@example.invalid",
+                    *arguments,
+                ],
+                cwd=directory,
+                stderr=subprocess.PIPE,
+                timeout=30,
+            )
+            .decode()
+            .strip()
+        )
+
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    git(origin, "init", "--quiet")
+    git(origin, "symbolic-ref", "HEAD", "refs/heads/main")
+    (origin / "initial.txt").write_text("shared initial history")
+    git(origin, "add", ".")
+    git(origin, "commit", "--quiet", "-m", "initial")
+    initial = git(origin, "rev-parse", "HEAD")
+    git(origin, "checkout", "--quiet", "-b", "historical")
+    (origin / "anchor.txt").write_text("required immutable historical anchor")
+    git(origin, "add", ".")
+    git(origin, "commit", "--quiet", "-m", "anchor")
+    anchor = git(origin, "rev-parse", "HEAD")
+    (origin / "historical-tip.txt").write_text("historical source tip")
+    git(origin, "add", ".")
+    git(origin, "commit", "--quiet", "-m", "historical tip")
+    historical_tip = git(origin, "rev-parse", "HEAD")
+    git(origin, "checkout", "--quiet", "-b", "producer", initial)
+    (origin / "producer.txt").write_text("newly required producer")
+    git(origin, "add", ".")
+    git(origin, "commit", "--quiet", "-m", "producer")
+    producer = git(origin, "rev-parse", "HEAD")
+    git(origin, "checkout", "--quiet", "main")
+    (origin / "current.txt").write_text("current source")
+    git(origin, "add", ".")
+    git(origin, "commit", "--quiet", "-m", "main source")
+    current = git(origin, "rev-parse", "HEAD")
+
+    checkout = tmp_path / "checkout"
+    subprocess.run(
+        [
+            "git",
+            "clone",
+            "--quiet",
+            "--no-local",
+            "--single-branch",
+            "--branch",
+            "main",
+            str(origin),
+            str(checkout),
+        ],
+        check=True,
+        timeout=30,
+    )
+    git(checkout, "fetch", "--quiet", "origin", historical_tip)
+    assert git(checkout, "rev-parse", "--is-shallow-repository") == "false"
+    assert git(checkout, "cat-file", "-t", anchor) == "commit"
+    scripts = checkout / "scripts"
+    scripts.mkdir()
+    shutil.copyfile(
+        ROOT / "scripts/fetch_scheduling_sources.py", scripts / "fetch_scheduling_sources.py"
+    )
+    directory = checkout / "ci/test_shards"
+    directory.mkdir(parents=True)
+    source = {"pr_head": producer, "checkout": producer}
+    for name, record in {
+        "hosted-calibration.json": {"reports": [{"source": source}]},
+        "allocation-scope.json": {"source": source},
+        "current-runtime-compatibility.json": {"historical_revision": current},
+        "current-covered-baseline.json": {"source_head": current},
+    }.items():
+        (directory / name).write_text(json.dumps(record))
+    subprocess.run(
+        [sys.executable, "-B", str(scripts / "fetch_scheduling_sources.py")],
+        cwd=checkout,
+        check=True,
+        timeout=120,
+    )
+
+    borrowed = tmp_path / "borrowed"
+    subprocess.run(
+        ["git", "clone", "--shared", "--no-checkout", "--quiet", str(checkout), str(borrowed)],
+        check=True,
+        timeout=30,
+    )
+    git(borrowed, "update-ref", "--no-deref", "HEAD", anchor)
+    assert git(borrowed, "rev-parse", "HEAD") == anchor
+    assert git(checkout, "rev-parse", "--is-shallow-repository") == "false"
+    assert git(checkout, "cat-file", "-t", producer) == "commit"

@@ -47,7 +47,6 @@ def main() -> None:
             [
                 "git",
                 "fetch",
-                "--depth=1",
                 "--no-tags",
                 "--no-recurse-submodules",
                 "origin",
