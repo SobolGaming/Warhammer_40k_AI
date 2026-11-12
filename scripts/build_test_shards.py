@@ -83,6 +83,20 @@ def main() -> int:
     durations, profiles = _profile_medians(tuple(args.junit), tuple(args.profile_source))
     case_seconds = _case_profile_medians(tuple(args.junit))
     durations = _rounded_durations(_partitioned_durations(durations, case_seconds=case_seconds))
+    from scripts import current_shard_compatibility as compatibility
+
+    if compatibility.enabled(output_dir):
+        payload, result = compatibility.derive_summary(
+            REPOSITORY_ROOT, output_dir, durations, case_seconds, profiles, args.shard_count
+        )
+        groups = result.groups
+        for index, group in enumerate(groups, 1):
+            (output_dir / f"shard-{index}.txt").write_text("\n".join(group) + "\n")
+        (output_dir / "durations.json").write_text(
+            json.dumps(payload, indent=2, sort_keys=True) + "\n"
+        )
+        _check_manifests(output_dir=output_dir, shard_count=args.shard_count)
+        return 0
     planning, calibrated, _ = _planning_inputs(output_dir, durations, case_seconds)
     shards = _balanced_shards(
         durations=planning,
@@ -1116,6 +1130,25 @@ def _check_manifests(*, output_dir: Path, shard_count: int) -> None:
         if "case_seconds" in cast(dict[str, object], summary)
         else None
     )
+    from scripts import current_shard_compatibility as compatibility
+
+    if compatibility.enabled(output_dir, cast(dict[str, object], summary)):
+        if case_seconds is None:
+            raise SystemExit("Runtime compatibility requires complete current case evidence.")
+        expected_summary, result = compatibility.derive_summary(
+            REPOSITORY_ROOT,
+            output_dir,
+            durations,
+            case_seconds,
+            _summary_profiles(summary),
+            shard_count,
+        )
+        groups = result.groups
+        if summary != expected_summary or tuple(manifest_entries.values()) != groups:
+            raise SystemExit(
+                "Runtime compatibility manifests or summary differ from the reviewed derivation."
+            )
+        return
     planning, calibrated, calibration_sha256 = _planning_inputs(output_dir, durations, case_seconds)
     shards = _balanced_shards(
         durations=planning,
@@ -1374,6 +1407,10 @@ def dispatch_case_seconds(summary: object, profile: Path) -> dict[str, float]:
     validate_case_inventory(baseline)
     if any(node.split("::", 1)[0] == OWNER for node in baseline):
         validate_metadata(REPOSITORY_ROOT, fields.get("preflight_partition"))
+    from scripts import current_shard_compatibility as compatibility
+
+    if compatibility.enabled(profile.parent, fields):
+        return compatibility.dispatch(REPOSITORY_ROOT, profile.parent, fields)
     if "allocation_model" in fields:
         from scripts.shard_execution_model import MODEL, PROFILE_FILE
 

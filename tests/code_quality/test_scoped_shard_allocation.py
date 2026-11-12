@@ -7,11 +7,13 @@ import math
 import os
 import subprocess
 import sys
+from collections.abc import Iterator
 from pathlib import Path
 from typing import cast
 
 import pytest
 import scripts.build_test_shards as sharding
+from scripts.historical_shard_snapshot import historical_snapshot
 from scripts.preflight_case_partition import (
     FILENAME as PARTITION_FILE,
 )
@@ -27,15 +29,28 @@ from scripts.scoped_shard_evidence import (
 from scripts.shard_execution_model import Cohort, load_cohorts, worker_chunks
 
 ROOT = Path(__file__).resolve().parents[2]
-DIRECTORY = ROOT / "ci/test_shards"
+historical_directory = ROOT / "ci/test_shards"
+historical_root = ROOT
+
+
+@pytest.fixture(scope="module", autouse=True)
+def authenticated_historical_inputs() -> Iterator[None]:
+    """These controls reproduce retained observations, not current qualification."""
+    global historical_directory, historical_root
+    with historical_snapshot(ROOT) as snapshot:
+        historical_directory, historical_root = snapshot.directory, snapshot.root
+        yield
+    historical_directory, historical_root = ROOT / "ci/test_shards", ROOT
 
 
 @pytest.fixture(scope="module")
 def inputs() -> tuple[dict[str, float], dict[str, object], ScopedEvidence]:
-    summary = json.loads((DIRECTORY / "durations.json").read_bytes())
-    costs = sharding.dispatch_case_seconds(summary, DIRECTORY / "durations.json")
-    index = json.loads((DIRECTORY / "allocation-cohorts.json").read_bytes())
-    scope = load_scope(DIRECTORY, root=ROOT, costs=costs, reference=index["scoped_evidence"])
+    summary = json.loads((historical_directory / "durations.json").read_bytes())
+    costs = sharding.dispatch_case_seconds(summary, historical_directory / "durations.json")
+    index = json.loads((historical_directory / "allocation-cohorts.json").read_bytes())
+    scope = load_scope(
+        historical_directory, root=historical_root, costs=costs, reference=index["scoped_evidence"]
+    )
     return costs, summary, scope
 
 
@@ -43,7 +58,7 @@ def test_partial_scope_is_complete_only_within_its_declared_known_inventory(
     inputs: tuple[dict[str, float], dict[str, object], ScopedEvidence],
 ) -> None:
     costs, summary, scope = inputs
-    before = (DIRECTORY / "hosted-calibration.json").read_bytes()
+    before = (historical_directory / "hosted-calibration.json").read_bytes()
     ordinary = json.loads(before)
     assert len(ordinary["reports"]) == 892
     assert sum(len(rows) for rows in ordinary["observations"].values()) == 113105
@@ -58,26 +73,26 @@ def test_partial_scope_is_complete_only_within_its_declared_known_inventory(
     assert scope.cohort.cases.keys() == scope.known_nodes
     assert len(scope.frozen_selectors) == 28
     shards = tuple(
-        tuple((DIRECTORY / f"shard-{number}.txt").read_text().splitlines())
+        tuple((historical_directory / f"shard-{number}.txt").read_text().splitlines())
         for number in range(1, 13)
     )
-    historical = json.loads((DIRECTORY / FILENAME).read_bytes())
+    historical = json.loads((historical_directory / FILENAME).read_bytes())
     assert list(scope.frozen_selectors) == historical["frozen_selectors"]
     assert (
         hashlib.sha256(("\n".join(scope.frozen_selectors) + "\n").encode()).hexdigest()
         == (historical["frozen_manifest_sha256"])
     )
     assert sum(map(len, worker_chunks(scope.frozen_selectors, costs))) == 268
-    cohorts = load_cohorts(DIRECTORY, root=ROOT, nodes=set(costs))
+    cohorts = load_cohorts(historical_directory, root=historical_root, nodes=set(costs))
     assert len(cohorts) == 9
-    current = load_declared_scope(DIRECTORY, root=ROOT, costs=costs)
+    current = load_declared_scope(historical_directory, root=historical_root, costs=costs)
     assert current is not None
     assert current.extension is not None
     actual = scoped_metadata(shards, costs, cohorts, current)
     assert actual == summary["scoped_allocation"]
     row = cast(dict[str, dict[str, object]], actual["shards"])["4"]
     assert cast(dict[str, object], row["expanded_6281_partial_raw"])["full_raw_role_score"] is None
-    assert (DIRECTORY / "hosted-calibration.json").read_bytes() == before
+    assert (historical_directory / "hosted-calibration.json").read_bytes() == before
 
 
 @pytest.mark.parametrize(
@@ -102,8 +117,8 @@ def test_scoped_evidence_rejects_missing_invalid_or_misattributed_inputs(
     change: str,
 ) -> None:
     costs, _, _ = inputs
-    index = json.loads((DIRECTORY / FILENAME).read_bytes())
-    evidence = json.loads((DIRECTORY / EVIDENCE_FILE).read_bytes())
+    index = json.loads((historical_directory / FILENAME).read_bytes())
+    evidence = json.loads((historical_directory / EVIDENCE_FILE).read_bytes())
     node = next(iter(evidence["observations"]))
     if change == "missing_phase":
         evidence["observations"][node][0].pop()
@@ -140,7 +155,7 @@ def test_scoped_evidence_rejects_missing_invalid_or_misattributed_inputs(
     if change == "missing_data":
         data.unlink()
     with pytest.raises(SystemExit, match=r"[Ss]coped|[Cc]alibration|[Aa]llocation"):
-        load_scope(tmp_path, root=ROOT, costs=costs, reference=reference)
+        load_scope(tmp_path, root=historical_root, costs=costs, reference=reference)
 
 
 def test_preflight_partition_matches_real_collection_and_preserves_source(tmp_path: Path) -> None:
@@ -176,12 +191,12 @@ def test_preflight_inventory_and_partition_changes_fail_closed(tmp_path: Path) -
     source.write_bytes((ROOT / OWNER).read_bytes())
     data = tmp_path / "ci/test_shards" / PARTITION_FILE
     data.parent.mkdir(parents=True)
-    value = json.loads((DIRECTORY / PARTITION_FILE).read_bytes())
+    value = json.loads((historical_directory / PARTITION_FILE).read_bytes())
     value["nodes"].pop()
     data.write_text(json.dumps(value), encoding="utf-8")
     with pytest.raises(SystemExit, match="exact inventory"):
         partition(tmp_path, frozenset({OWNER}))
-    data.write_bytes((DIRECTORY / PARTITION_FILE).read_bytes())
+    data.write_bytes((historical_directory / PARTITION_FILE).read_bytes())
     source.write_bytes(source.read_bytes() + b"\n")
     with pytest.raises(SystemExit, match="source"):
         partition(tmp_path, frozenset({OWNER}))

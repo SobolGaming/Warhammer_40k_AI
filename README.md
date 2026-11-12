@@ -362,20 +362,47 @@ omissions or exclusions. This policy change does not claim either threshold has 
 all required tests and other gates must still succeed. See the
 [active review policy](docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md).
 
-The twelve behavioral manifests in `ci/test_shards/` use deterministic coherent
-cohort phase-and-role-residual scoring. The existing isolated mirror is seeded
-first, followed by largest selectors and improving whole-selector moves. The
+The twelve behavioral manifests in `ci/test_shards/` currently use an explicitly
+reviewed derived assignment, admitted by `current-runtime-compatibility.json`.
+The strict historical allocator remains available when that descriptor is absent:
+it seeds the isolated mirror, then uses largest selectors and improving moves.
+The
 source-bound S25 module retains its twenty exact cases; canonical coverage
 preflight retains its twelve-case partition. Two finite step5g modules add source-bound
 partitions of 32 and 30 exact cases. The bounded mirror setup case is a separate
 selector; its file selector denotes the remaining cases. CI always deselects that
 node from parallel work and runs it once on its owning shard. All other files remain
-intact. The resulting 504 selectors still select exactly 6,282 cases. The required guards verify the exact selected inventory and partition.
+intact. The resulting 505 selectors select exactly 6,296 cases, including the fourteen terrain-preparation regressions. The required guards verify the exact selected inventory and partition.
 Verify that every selected file or declared case appears exactly once:
 
 ```bash
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 ```
+
+The compatibility descriptor pins the original scheduling snapshot at
+`008be8a8cb0b50b232fe022452762b3906489b49`, a complete current covered local baseline,
+and `current-derived-assignment.json`. Current validators authenticate every
+dispatch-contributing producer and tested checkout against Git, then validate the
+original data, runtime, test bytes, cohorts and reserve in a temporary historical
+snapshot. Historical Python is never executed and historical receipts are unchanged.
+`scripts/fetch_scheduling_sources.py` supplies only the exact declared Git objects;
+missing objects remain errors, including after squash merges and branch deletion.
+
+The current baseline must bind unchanged historical gameplay test sources, exactly
+the fourteen reviewed additions, current runtime and profile/file/case costs,
+32 parallel workers plus the isolated one-worker mirror, 67% full-package branch
+coverage and an approved 1,620/1,800-second supervisor receipt. It is local evidence,
+not a hosted observation. Dispatch takes each retained case's maximum of its fresh
+baseline and historical passed triples; additions use only their fresh baseline.
+The assignment discloses every relocated selector. Generator, checker and live
+dispatch independently verify exact membership, finite partitions, fixed module
+alone on shard 5, pinned module on 4, mirror on 2 and cold role on 1. They recompute
+actual four-worker projections and preserve the historical/stress/latest planning
+ceilings of 1,076/1,054/1,050 seconds. Original historical scores and partial unknowns
+remain separate; additions have no historical observations. No offline allocation
+search runs in CI, and planning estimates never qualify hosted timing. The complete
+current local covered run passed in 1,146.71 seconds with 67.47% coverage; fresh
+hosted CI and its unchanged approval limits remain required.
 
 Download the `behavior-report-*` artifacts from each chosen complete behavioral
 run into a separate directory outside the checkout, then regenerate (repeat both
@@ -427,7 +454,7 @@ and index path. Failure, malformed completion and deadline expiry stop dispatch.
 Shard 1 deliberately bypasses source-index cache restore/save on PRs and main so
 every run verifies this cold path. Other shards retain exact-key reuse and the
 normal source/partition validation; a warm-cache retry is not cold qualification.
-After balancing, the generator swaps the eligible bucket with the lowest
+In the historical automatic allocation path, the generator swaps the eligible bucket with the lowest
 whole-second phase-plus-role planning score into shard 1, breaking ties by its
 original bucket number. The explicitly frozen shard is ineligible for this swap. This final
 permutation preserves every bucket's selectors and all measured case/selector
