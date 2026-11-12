@@ -804,13 +804,94 @@ Stage 2 admission and complete-game throughput unqualified. The task-retained
 `measure_saved_queries.py` and `benchmark_pair.py` reproduce these distinct timing
 and restore/replay boundaries; the original instrumented profile remains history.
 
-These are one profiled local observation's costs, not uninstrumented latency,
-a speedup, a full-game throughput measurement or a tactical outcome. The legal
-Charge Move, common horizon and Stage 2 useful-reference qualification remain
-open; `scoped_gap`, null target, learning exclusion and source/roster/provisional
-geometry/mission/points/public-seed limits persist. Preserve the original local
-archive without deleting or uploading it. Optimize this measured owner before
-extending the tactical scenario.
+The earlier one-process profile remains instrumented history; the separate
+three-sample comparison qualifies only its two measured component improvements.
+The legal Charge Move, common horizon and Stage 2 useful-reference qualification
+remain open; `scoped_gap`, null target, learning exclusion and
+source/roster/provisional geometry/mission/points/public-seed limits persist.
+Preserve the original local archives without deleting or uploading them.
+
+### Complete corrected charge-witness evaluation on optimized main
+
+One fresh serial evaluation at main `7a52cc96b156a3a168625a6ad2d9da84af4e47aa`
+uses the exact retained 63-record checkpoint and reconstructed descending-Y
+005→001 witness, changing only model 004's path to evaluation one's native
+alternative. Archive/member hashes authenticate the unchanged inputs. Strict
+restore takes 43.448 seconds; separate ordinary replay takes 24.923 seconds and
+reproduces all 63 decisions and 641 events. The host is the same provisional
+Threadripper 3970X with locked CPython 3.14.5 under WSL2.
+
+The complete resolver returns in 556.705 seconds. Its fresh monotonic supervisor
+observes 633.069 seconds for the primary worker, including imports, restore,
+replay, evaluation, its witness check and reporting, with exit zero, no timeout
+and no remaining child process. The original 1,800-second experiment ceiling is not a
+per-query allowance. No coverage, profiler or competing test workers run during
+the primary measurement. Named geometry/reachability caches are cleared once at
+the evaluation boundary and retain their ordinary behavior between queries.
+Endpoint evidence uses canonical model-ID order; the physical witness retains
+005→001 execution order throughout.
+
+| Model | Preferred-distance query | Engagement query |
+|---|---|---|
+| 001 | unresolved; 19.133 s; 20 nodes | reachable; 39.755 s; 25 nodes |
+| 002 | unresolved; 73.104 s; 44 nodes | unresolved; 124.709 s; 48 nodes |
+| 003 | unresolved; 86.408 s; 52 nodes | unresolved; 134.263 s; 57 nodes |
+| 004 | unresolved; 78.874 s; 52 nodes | satisfied; no search |
+| 005 | satisfied; no search | satisfied; no search |
+
+All ten per-model obligations have evidence: seven mandatory searches return and
+three endpoints already satisfy their obligations. Search time totals 556.246
+seconds; measured query bookkeeping adds 0.028 seconds inside the resolver wall
+time. Other resolver work and bookkeeping together account for 0.459 seconds.
+The seven full-query keys are distinct, with seven misses and zero hits; the
+128-node ceiling and all query/endpoint obligations are unchanged. This is one
+observation, with no latency distribution or matched speedup claim.
+
+Completion does **not** qualify a legal charge. The resolver returns
+`is_valid=false` and `charge_reachability_unresolved`; six searched obligations
+remain unresolved. Model 001's reachable alternative is evidence that its supplied
+endpoint has an unmet obligation, not a replacement whole-unit charge witness.
+Both full-path and terrain checks and coherency pass for the supplied candidate,
+but do not override mandatory endpoint checks. Exact live checkpoint equality
+holds afterward at 63 records, and no movement is submitted. The returned
+alternative's complete path and goal are revalidated outside primary timing;
+separate exact-context postflight also checks its full endpoint obligations.
+
+Model 003 engagement is the slowest individual query, followed by model 002
+engagement; together they consume 46.5% of resolver wall time. A separate cold-cache
+cProfile diagnostic of that exact model-003 query takes 307.836 seconds, preserving
+the unresolved result and 57 nodes. The 134.263-second primary observation and this
+profile have different cache/instrumentation boundaries: their difference is not
+an isolated estimate of profiler overhead, and their samples are not pooled.
+Restoration, revalidation and profiling all finish within the original experiment
+allowance, at a conservative 1,202.059 seconds from its parent process start.
+Two auxiliary postflight attempts fail before profiling: the first compares a
+sorted inventory with physical order, and the second compares native tuples with
+JSON arrays. Both failed receipts remain failed. The corrected postflight checks
+physical `model_paths`, matches all seven exact query hashes and the JSON-normalized
+complete resolution, revalidates the alternative's full path/terrain/endpoint
+context, and confirms checkpoint equality. It uses recorded search outcomes for
+context reconstruction, not another complete timing run.
+
+The profile attributes 301.789 inclusive seconds to 23,248 `_validated_witness`
+calls. Of those, 13,108 terrain validations consume 198.344 inclusive seconds;
+23,248 ordinary path validations consume 98.108. There are 1,729,628
+`footprint_for_terrain` calls (77.223 inclusive seconds) and 1,968,616
+`_append_terrain_volume_segment` calls (100.715 inclusive seconds). These inclusive
+times overlap and describe the profiled query only. They show substantial fixed
+terrain geometry work remaining inside repeated complete-prefix validation,
+after the earlier validation-local preparation improvement.
+
+The next bounded experiment should assess query-scoped preparation/reuse of
+immutable terrain feature/volume geometry across those validations in the shared
+geometry owner. Retain full growing prefixes, physical model order, all endpoint
+checks, exact context/cache identity and isolation, the unchanged hard query and
+search ceiling, and differential semantic/work evidence. This slice changes no
+runtime algorithm and makes no predicted speedup claim. The earlier censored
+evaluations and profile retain their original outcomes; they are not replaced by this completion.
+Legal charge, tactical benefit, common horizon, Stage 2 and full-game throughput
+remain unqualified. No geometry, seed, search budget, endpoint obligation, runtime
+or decision contract changes in this measurement slice.
 
 ## 6. First delayed-tradeoff experiment
 
